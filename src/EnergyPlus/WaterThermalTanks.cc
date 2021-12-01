@@ -2432,7 +2432,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         // Validate Heater Fuel Type
         Tank.FuelType = static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
         switch (Tank.FuelType) {
-        case Fuel::Unassigned: {
+        case Fuel::Invalid: {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                 ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(4));
@@ -2488,7 +2488,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OffCycParaFuelType =
             static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
         switch (Tank.OffCycParaFuelType) {
-        case Fuel::Unassigned:
+        case Fuel::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(6).empty()) { // If blank, default to Fuel Type for heater
                 Tank.OffCycParaFuelType = Tank.FuelType;
             } else { // could have been an unsupported value
@@ -2512,7 +2512,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OnCycParaFuelType =
             static_cast<Fuel>(getEnumerationValue(FuelTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
         switch (Tank.OnCycParaFuelType) {
-        case Fuel::Unassigned:
+        case Fuel::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(7).empty()) { // If blank, default to Fuel Type for heater
                 Tank.OnCycParaFuelType = Tank.FuelType;
             } else { // could have been an unsupported value
@@ -2744,7 +2744,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
             Tank.SourceSideControlMode = static_cast<SourceSideControl>(
                 getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(18))));
-            if (Tank.SourceSideControlMode == SourceSideControl::Unassigned) {
+            if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Control Mode entered=" + state.dataIPShortCut->cAlphaArgs(18));
@@ -2867,7 +2867,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         // Validate Heater Priority Control
         Tank.StratifiedControlMode = static_cast<PriorityControlMode>(
             getEnumerationValue(PriorityControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
-        if (Tank.StratifiedControlMode == PriorityControlMode::Unassigned) {
+        if (Tank.StratifiedControlMode == PriorityControlMode::Invalid) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                 ":  Invalid Heater Priority Control entered=" + state.dataIPShortCut->cAlphaArgs(4));
@@ -2959,7 +2959,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             getEnumerationValue(FuelTypeNamesUC,
                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                                     7)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
-        if (Tank.FuelType == Fuel::Unassigned) {
+        if (Tank.FuelType == Fuel::Invalid) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                 ":  Invalid Heater Fuel Type entered=" + state.dataIPShortCut->cAlphaArgs(7));
@@ -2984,7 +2984,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             getEnumerationValue(FuelTypeNamesUC,
                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                                     8)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
-        if (Tank.OffCycParaFuelType == Fuel::Unassigned) {
+        if (Tank.OffCycParaFuelType == Fuel::Invalid) {
             if (state.dataIPShortCut->cAlphaArgs(8).empty()) {
                 Tank.OffCycParaFuelType = Tank.FuelType;
             } else {
@@ -3007,7 +3007,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
             FuelTypeNamesUC,
             UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(
                 9)))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
-        if (Tank.OnCycParaFuelType == Fuel::Unassigned) {
+        if (Tank.OnCycParaFuelType == Fuel::Invalid) {
             if (state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 Tank.OnCycParaFuelType = Tank.FuelType;
             } else {
@@ -3333,7 +3333,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
             Tank.SourceSideControlMode = static_cast<SourceSideControl>(
                 getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(21))));
-            if (Tank.SourceSideControlMode == SourceSideControl::Unassigned) {
+            if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
                                     ":  Invalid Control Mode entered=" + state.dataIPShortCut->cAlphaArgs(21));
@@ -4648,7 +4648,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
                     switch (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode) {
 
-                    case SizingMode::Unassigned: {
+                    case SizingMode::Invalid: {
                         // do nothing, error thrown if design mode not found
                         break;
                     }
@@ -4797,21 +4797,21 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
             for (int WaterThermalTankNum = 1; WaterThermalTankNum <= state.dataWaterThermalTanks->numWaterThermalTank; ++WaterThermalTankNum) {
 
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
-                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Unassigned)) {
+                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Invalid)) {
                     ShowWarningError(state,
                                      "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
                                          "has tank volume set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
                     ErrorsFound = true;
                 }
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).MaxCapacityWasAutoSized) &&
-                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Unassigned)) {
+                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Invalid)) {
                     ShowWarningError(state,
                                      "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
                                          "has heater capacity set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
                     ErrorsFound = true;
                 }
                 if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).HeightWasAutoSized) &&
-                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Unassigned)) {
+                    (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == SizingMode::Invalid)) {
                     ShowWarningError(state,
                                      "Water heater named " + state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Name +
                                          "has tank height set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
@@ -10619,7 +10619,7 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
     //  2.  potentially making a flow request
     //  3.  throttling flow in response to Plant's restrictions (MassFlowRateMaxAvail)
     // init default mode changed to Unassigned
-    FlowMode CurrentMode = FlowMode::Unassigned; // default
+    FlowMode CurrentMode = FlowMode::Invalid; // default
 
     if (PlantLoopSide == DataPlant::DemandSupply_No) {
         CurrentMode = FlowMode::PassingFlowThru;
@@ -11031,7 +11031,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
 
     switch (this->Sizing.DesignMode) {
 
-    case SizingMode::Unassigned:
+    case SizingMode::Invalid:
     case SizingMode::PeakDraw: {
 
         break;

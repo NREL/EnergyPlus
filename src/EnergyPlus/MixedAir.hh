@@ -78,7 +78,7 @@ namespace MixedAir {
 
     enum class iLockoutType
     {
-        Unassigned = -1,
+        Invalid = -1,
         NoLockoutPossible,
         LockoutWithHeatingPossible,
         LockoutWithCompressorPossible,
@@ -87,7 +87,7 @@ namespace MixedAir {
 
     enum class iEconoOp
     {
-        Unassigned = -1,
+        Invalid = -1,
         NoEconomizer,
         FixedDryBulb,
         FixedEnthalpy,
@@ -117,7 +117,7 @@ namespace MixedAir {
     // Multiple Get Input routines in this module or these would be in individual routines.
     enum class CMO
     {
-        Unassigned = -1,
+        Invalid = -1,
         None,
         OASystem,
         AirLoopEqList,

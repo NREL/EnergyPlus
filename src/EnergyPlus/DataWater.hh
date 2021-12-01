@@ -62,7 +62,7 @@ namespace DataWater {
 
     enum class TankThermalMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         ScheduledTankTemp,      // tank water temperature is user input via schedule
         TankZoneThermalCoupled, // tank water temperature is modeled using simple UA
         Num
@@ -70,7 +70,7 @@ namespace DataWater {
 
     enum class RainfallMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         RainSchedDesign, // mode of Rainfall determination is Scheduled Design
         IrrSchedDesign,  // mode of Irrigation determination is Scheduled Design
         IrrSmartSched,   // mode of irrigation
@@ -79,7 +79,7 @@ namespace DataWater {
 
     enum class RainLossFactor
     {
-        Unassigned = -1,
+        Invalid = -1,
         Constant,
         Scheduled,
         Num
@@ -87,7 +87,7 @@ namespace DataWater {
 
     enum class AmbientTempType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Schedule, // ambient temperature around tank (or HPWH inlet air) is scheduled
         Zone,     // tank is located in a zone or HPWH inlet air is zone air only
         Exterior, // tank is located outdoors or HPWH inlet air is outdoor air only
@@ -96,7 +96,7 @@ namespace DataWater {
 
     enum class GroundWaterTable
     {
-        Unassigned = -1,
+        Invalid = -1,
         ConstantWaterTable,
         ScheduledWaterTable,
         Num
@@ -104,7 +104,7 @@ namespace DataWater {
 
     enum class ControlSupplyType
     {
-        Unassigned = -1,
+        Invalid = -1,
         NoControlLevel,
         MainsFloatValve,
         WellFloatValve,
@@ -116,7 +116,7 @@ namespace DataWater {
 
     enum class Overflow
     {
-        Unassigned = -1,
+        Invalid = -1,
         Discarded,
         ToTank,
         Num
@@ -188,10 +188,10 @@ namespace DataWater {
 
         // Default Constructor
         StorageTankDataStruct()
-            : MaxCapacity(0.0), OverflowMode(Overflow::Unassigned), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0),
-              ValveOffCapacity(0.0), LastTimeStepFilling(false), ControlSupply(ControlSupplyType::Unassigned), GroundWellID(0), SupplyTankID(0),
+            : MaxCapacity(0.0), OverflowMode(Overflow::Invalid), OverflowTankID(0), OverflowTankSupplyARRID(0), ValveOnCapacity(0.0),
+              ValveOffCapacity(0.0), LastTimeStepFilling(false), ControlSupply(ControlSupplyType::Invalid), GroundWellID(0), SupplyTankID(0),
               SupplyTankDemandARRID(0), BackupMainsCapacity(0.0), InitialVolume(0.0), MaxInFlowRate(0.0), MaxOutFlowRate(0.0),
-              ThermalMode(TankThermalMode::Unassigned), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(AmbientTempType::Unassigned),
+              ThermalMode(TankThermalMode::Invalid), InitialTankTemp(20.0), TempSchedID(0), AmbientTempIndicator(AmbientTempType::Invalid),
               AmbientTempSchedule(0), ZoneID(0), UValue(0.0), SurfArea(0.0), InternalMassID(0), ThisTimeStepVolume(0.0), LastTimeStepVolume(0.0),
               LastTimeStepTemp(0.0), NumWaterSupplies(0), NumWaterDemands(0), VdotFromTank(0.0), VdotToTank(0.0), VdotOverflow(0.0), VolOverflow(0.0),
               NetVdot(0.0), Twater(0.0), TouterSkin(0.0), TwaterOverflow(0.0), MainsDrawVdot(0.0), MainsDrawVol(0.0), SkinLossPower(0.0),
@@ -223,7 +223,7 @@ namespace DataWater {
 
         // Default Constructor
         RainfallCollectorDataStruct()
-            : StorageTankID(0), StorageTankSupplyARRID(0), LossFactorMode(RainLossFactor::Unassigned), LossFactor(0.0), LossFactorSchedID(0),
+            : StorageTankID(0), StorageTankSupplyARRID(0), LossFactorMode(RainLossFactor::Invalid), LossFactor(0.0), LossFactorSchedID(0),
               MaxCollectRate(0.0), NumCollectSurfs(0), HorizArea(0.0), VdotAvail(0.0), VolCollected(0.0), MeanHeight(0.0)
         {
         }
@@ -257,7 +257,7 @@ namespace DataWater {
         // Default Constructor
         GroundwaterWellDataStruct()
             : StorageTankID(0), StorageTankSupplyARRID(0), PumpDepth(0.0), PumpNomVolFlowRate(0.0), PumpNomHead(0.0), PumpNomPowerUse(0.0),
-              PumpEfficiency(0.0), WellRecoveryRate(0.0), NomWellStorageVol(0.0), GroundwaterTableMode(GroundWaterTable::Unassigned),
+              PumpEfficiency(0.0), WellRecoveryRate(0.0), NomWellStorageVol(0.0), GroundwaterTableMode(GroundWaterTable::Invalid),
               WaterTableDepth(0.0), WaterTableDepthSchedID(0), VdotRequest(0.0), VdotDelivered(0.0), VolDelivered(0.0), PumpPower(0.0),
               PumpEnergy(0.0)
         {
@@ -277,7 +277,7 @@ namespace DataWater {
 
         // Default Constructor
         SiteRainFallDataStruct()
-            : ModeID(RainfallMode::Unassigned), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
+            : ModeID(RainfallMode::Invalid), DesignAnnualRain(0.0), RainSchedID(0), NomAnnualRain(0.0), CurrentRate(0.0), CurrentAmount(0.0)
         {
         }
     };
@@ -292,7 +292,7 @@ namespace DataWater {
         Real64 IrrigationThreshold; // percent at which no irrigation happens (smart schedule)
 
         // Default Constructor
-        IrrigationDataStruct() : ModeID(RainfallMode::Unassigned), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
+        IrrigationDataStruct() : ModeID(RainfallMode::Invalid), IrrSchedID(0), ScheduledAmount(0.0), ActualAmount(0.0), IrrigationThreshold(0.4)
         {
         }
     };

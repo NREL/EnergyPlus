@@ -78,7 +78,7 @@ namespace DataZoneEquipment {
     // MODULE PARAMETER DEFINITIONS:
     enum class AirNodeType
     {
-        Unassigned = -1,
+        Invalid = -1,
         PathInlet,
         CompInlet,
         Intermediate,
@@ -88,7 +88,7 @@ namespace DataZoneEquipment {
 
     enum class AirLoopHVAC
     {
-        Unassigned = -1,
+        Invalid = -1,
         ZoneSplitter,
         ZoneSupplyPlenum,
         ZoneMixer,
@@ -103,7 +103,7 @@ namespace DataZoneEquipment {
     // list units that are valid for zone system availability managers first
     enum ZoneEquip
     {
-        Unassigned = -1,
+        Invalid = -1,
         FanCoil4Pipe = 1,
         PkgTermHPAirToAir,
         PkgTermACAirToAir,
@@ -144,7 +144,7 @@ namespace DataZoneEquipment {
     // Per Person Ventilation Rate Mode
     enum class PerPersonVentRateMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         DCVByCurrentLevel,
         ByDesignLevel,
         Num

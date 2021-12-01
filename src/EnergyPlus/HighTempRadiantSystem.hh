@@ -70,7 +70,7 @@ namespace HighTempRadiantSystem {
 
     enum class RadHeaterType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Gas,
         Electric,
         Num
@@ -78,7 +78,7 @@ namespace HighTempRadiantSystem {
 
     enum class RadControlType : int
     {
-        Unassigned = -1,
+        Invalid = -1,
         MATControl = 1001,
         MRTControl = 1002,
         OperativeControl = 1003,
@@ -137,8 +137,8 @@ namespace HighTempRadiantSystem {
 
         // Default Constructor
         HighTempRadiantSystemData()
-            : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Unassigned), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
-              FracLatent(0.0), FracLost(0.0), FracConvect(0.0), ControlType(RadControlType::Unassigned), ThrottlRange(0.0), SetptSchedPtr(0),
+            : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Invalid), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
+              FracLatent(0.0), FracLost(0.0), FracConvect(0.0), ControlType(RadControlType::Invalid), ThrottlRange(0.0), SetptSchedPtr(0),
               FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0),
               HeatEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {

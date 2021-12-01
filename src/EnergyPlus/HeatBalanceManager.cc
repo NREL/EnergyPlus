@@ -1219,7 +1219,7 @@ namespace HeatBalanceManager {
                                           BITF(AdjustmentType::AdjustMixingThenReturn) | BITF(AdjustmentType::AdjustReturnThenMixing))) {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                     }
-                    if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == AdjustmentType::Unassigned) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == AdjustmentType::Invalid) {
                         state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                         ShowWarningError(state,
@@ -1240,7 +1240,7 @@ namespace HeatBalanceManager {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
                             state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
-                    } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Unassigned) {
+                    } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Invalid) {
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
@@ -1262,7 +1262,7 @@ namespace HeatBalanceManager {
                         int FlowTypeNum = getEnumerationValue(InfiltrationZoneTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(3)));
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = static_cast<DataHeatBalance::InfiltrationZoneType>(FlowTypeNum);
                         AlphaName(3) = InfiltrationZoneTypeNamesCC[FlowTypeNum];
-                        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Unassigned) {
+                        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Invalid) {
                             state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                             ShowWarningError(state,
@@ -4395,7 +4395,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
 
         // Was it set?
-        if (state.dataMaterial->Material(MaterNum).Roughness == DataSurfaces::SurfaceRoughness::Unassigned) {
+        if (state.dataMaterial->Material(MaterNum).Roughness == DataSurfaces::SurfaceRoughness::Invalid) {
             ShowSevereError(state, "Material=" + state.dataMaterial->Material(MaterNum).Name + ",Illegal Roughness=" + Roughness);
             ErrorsFound = true;
         }
@@ -7180,8 +7180,8 @@ namespace HeatBalanceManager {
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataHeatBal->TotMaterials; ++loop) {
                 state.dataMaterial->Material(loop).Name = "";
-                state.dataMaterial->Material(loop).Group = DataHeatBalance::MaterialGroup::Unassigned;
-                state.dataMaterial->Material(loop).Roughness = DataSurfaces::SurfaceRoughness::Unassigned;
+                state.dataMaterial->Material(loop).Group = DataHeatBalance::MaterialGroup::Invalid;
+                state.dataMaterial->Material(loop).Roughness = DataSurfaces::SurfaceRoughness::Invalid;
                 state.dataMaterial->Material(loop).Conductivity = 0.0;
                 state.dataMaterial->Material(loop).Density = 0.0;
                 state.dataMaterial->Material(loop).IsoMoistCap = 0.0;

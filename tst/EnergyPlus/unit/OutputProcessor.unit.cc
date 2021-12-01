@@ -1309,7 +1309,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_determineMeterIPUnits)
     {
-        OutputProcessor::RT_IPUnits ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
+        OutputProcessor::RT_IPUnits ipUnits = OutputProcessor::RT_IPUnits::Invalid;
         bool errorFound = false;
 
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound);
@@ -1342,12 +1342,12 @@ namespace OutputProcessor {
 
         state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-        ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
+        ipUnits = OutputProcessor::RT_IPUnits::Invalid;
         DetermineMeterIPUnits(*state, ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound); // was "badunits"
         EXPECT_TRUE(compare_enums(RT_IPUnits::OtherJ, ipUnits));
         EXPECT_TRUE(errorFound);
 
-        ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
+        ipUnits = OutputProcessor::RT_IPUnits::Invalid;
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound); // was "kWh"
         EXPECT_TRUE(compare_enums(RT_IPUnits::Electricity, ipUnits));
         EXPECT_TRUE(errorFound);

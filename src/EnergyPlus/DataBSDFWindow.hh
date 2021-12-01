@@ -68,7 +68,7 @@ namespace DataBSDFWindow {
 
     enum class Basis
     {
-        Unassigned = -1,
+        Invalid = -1,
         WINDOW,
         Custom,
         Num
@@ -76,7 +76,7 @@ namespace DataBSDFWindow {
 
     enum class BasisSymmetry
     {
-        Unassigned = -1,
+        Invalid = -1,
         Axisymmetric,
         None,
         Num
@@ -88,7 +88,7 @@ namespace DataBSDFWindow {
     // winterCondition will override certain parameters so that produced results are matching standard winter WINDOW  = software results
     enum class Condition
     {
-        Unassigned = -1,
+        Invalid = -1,
         summerCondition,
         winterCondition,
         Num
@@ -162,7 +162,7 @@ namespace DataBSDFWindow {
         Array1D<BasisElemDescr> Grid;    // actual basis (to be constructed from matrix)
 
         // Default Constructor
-        BasisStruct() : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), BasisMatIndex(0), NBasis(0), NThetas(0)
+        BasisStruct() : BasisType(Basis::Invalid), BasisSymmetryType(BasisSymmetry::Invalid), BasisMatIndex(0), NBasis(0), NThetas(0)
         {
         }
     };
@@ -426,7 +426,7 @@ namespace DataBSDFWindow {
 
         // Default Constructor
         BSDFWindowInputStruct()
-            : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
+            : BasisType(Basis::Invalid), BasisSymmetryType(BasisSymmetry::Invalid), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
               BasisMatNcols(0), NBasis(0), SolFrtTransIndex(0), SolFrtTransNrows(0), SolFrtTransNcols(0), SolBkReflIndex(0), SolBkReflNrows(0),
               SolBkReflNcols(0), VisFrtTransIndex(0), VisFrtTransNrows(0), VisFrtTransNcols(0), VisBkReflIndex(0), VisBkReflNrows(0),
               VisBkReflNcols(0), NumLayers(0)

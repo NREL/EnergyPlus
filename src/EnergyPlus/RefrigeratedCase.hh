@@ -68,7 +68,7 @@ namespace RefrigeratedCase {
     // Compressor suction pressure control
     enum class iCompSuctionPressureCtrl
     {
-        Unassigned = -1,
+        Invalid = -1,
         FloatSuctionTemperature,
         ConstantSuctionTemperature,
         Num,
@@ -77,7 +77,7 @@ namespace RefrigeratedCase {
     // Subcooler type
     enum class iSubcoolerType
     {
-        Unassigned = -1,
+        Invalid = -1,
         LiquidSuction,
         Mechanical,
         Num,
@@ -86,7 +86,7 @@ namespace RefrigeratedCase {
     // Walk In Cooler Stock Door Protection types
     enum class WIStockDoor
     {
-        Unassigned = -1,
+        Invalid = -1,
         None,
         AirCurtain,
         StripCurtain,
@@ -96,7 +96,7 @@ namespace RefrigeratedCase {
     // Walk In Cooler Defrost Control type
     enum class iDefrostCtrlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Sched,
         TempTerm,
         Num
@@ -105,7 +105,7 @@ namespace RefrigeratedCase {
     // Walk In Cooler Defrost type
     enum class WalkinClrDefrostType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Fluid,
         Elec,
         None,
@@ -116,7 +116,7 @@ namespace RefrigeratedCase {
     // Secondary loop parameters
     enum class iSecFluidType
     {
-        Unassigned = -1,
+        Invalid = -1,
         AlwaysLiquid,
         PhaseChange,
         Num
@@ -124,7 +124,7 @@ namespace RefrigeratedCase {
 
     enum class iSecPumpCtrl
     {
-        Unassigned = -1,
+        Invalid = -1,
         Constant,
         Variable,
         Num
@@ -133,7 +133,7 @@ namespace RefrigeratedCase {
     // Refrigerated display case energy equation form
     enum class iEnergyEqnForm
     {
-        Unassigned = -1,
+        Invalid = -1,
         None,
         CaseTemperatureMethod,
         RHCubic,
@@ -144,7 +144,7 @@ namespace RefrigeratedCase {
     // Cascade condenser temperature control types
     enum class iCascadeCndsrTempCtrlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         TempSet,
         TempFloat,
         Num
@@ -153,7 +153,7 @@ namespace RefrigeratedCase {
     // Water-cooled condenser loop flow type
     enum class iCndsrFlowType : int
     {
-        Unassigned = -1,
+        Invalid = -1,
         VariableFlow,
         ConstantFlow,
         Num
@@ -162,7 +162,7 @@ namespace RefrigeratedCase {
     // Air- and evap-cooled condenser fan speed control types
     enum class iFanSpeedCtrlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         VariableSpeed,
         ConstantSpeedLinear,
         TwoSpeed,
@@ -173,7 +173,7 @@ namespace RefrigeratedCase {
     // Refrigerated display case rack heat rejection location
     enum class iLocation
     {
-        Unassigned = -1,
+        Invalid = -1,
         Outdoors,
         Zone,
         Num
@@ -182,7 +182,7 @@ namespace RefrigeratedCase {
     // Refrigerated display case defrost type
     enum class iRefCaseDefrostType
     {
-        Unassigned = -1,
+        Invalid = -1,
         None,
         OffCycle,
         HotFluid,
@@ -196,7 +196,7 @@ namespace RefrigeratedCase {
     // Anti-sweat heater control type
     enum class iASHtrCtrlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         None,
         Constant,
         Linear,
@@ -208,7 +208,7 @@ namespace RefrigeratedCase {
     // Compressor rating types
     enum class iCompRatingType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Superheat,
         ReturnGasTemperature,
         Subcooling,
@@ -227,7 +227,7 @@ namespace RefrigeratedCase {
 
     enum class iRatingType
     {
-        Unassigned = -1,
+        Invalid = -1,
         RatedCapacityTotal,
         EuropeanSC1Std,
         EuropeanSC1Nom,
@@ -245,7 +245,7 @@ namespace RefrigeratedCase {
 
     enum class iSHRCorrectionType
     {
-        Unassigned = -1,
+        Invalid = -1,
         SHR60,
         QuadraticSHR,
         European,
@@ -255,7 +255,7 @@ namespace RefrigeratedCase {
 
     enum class iVerticalLoc
     {
-        Unassigned = -1,
+        Invalid = -1,
         Ceiling,
         Middle,
         Floor,
@@ -264,7 +264,7 @@ namespace RefrigeratedCase {
 
     enum class iSourceType
     {
-        Unassigned = -1,
+        Invalid = -1,
         DetailedSystem,
         SecondarySystem,
         Num
@@ -273,7 +273,7 @@ namespace RefrigeratedCase {
     // Warehouse coil Defrost type
     enum class iDefrostType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Fluid,
         Elec,
         None,
@@ -390,9 +390,9 @@ namespace RefrigeratedCase {
         RefrigCaseData()
             : NumSysAttach(0), SchedPtr(0), ZoneNodeNum(0), ActualZoneNum(0), ZoneRANode(0), RatedAmbientTemp(0.0), RatedAmbientRH(0.0),
               RatedAmbientDewPoint(0.0), RateTotCapPerLength(0.0), RatedLHR(0.0), RatedRTF(0.0), LatCapCurvePtr(0), DefCapCurvePtr(0),
-              LatentEnergyCurveType(iEnergyEqnForm::Unassigned), DefrostEnergyCurveType(iEnergyEqnForm::Unassigned), STDFanPower(0.0),
+              LatentEnergyCurveType(iEnergyEqnForm::Invalid), DefrostEnergyCurveType(iEnergyEqnForm::Invalid), STDFanPower(0.0),
               OperatingFanPower(0.0), RatedLightingPower(0.0), LightingPower(0.0), LightingSchedPtr(0), AntiSweatPower(0.0), MinimumASPower(0.0),
-              AntiSweatControlType(iASHtrCtrlType::Unassigned), HumAtZeroAS(0.0), Height(0.0), DefrostType(iRefCaseDefrostType::Unassigned),
+              AntiSweatControlType(iASHtrCtrlType::Invalid), HumAtZeroAS(0.0), Height(0.0), DefrostType(iRefCaseDefrostType::Invalid),
               DefrostPower(0.0), DefrostSchedPtr(0), DefrostDripDownSchedPtr(0), Length(0.0), Temperature(0.0), RAFrac(0.0), StockingSchedPtr(0),
               LightingFractionToCase(0.0), ASHeaterFractionToCase(0.0), DesignSensCaseCredit(0.0), EvapTempDesign(0.0), RefrigInventory(0.0),
               DesignRefrigInventory(0.0), DesignRatedCap(0.0), DesignLatentCap(0.0), DesignDefrostCap(0.0), DesignLighting(0.0), DesignFanPower(0.0),
@@ -542,8 +542,8 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         RefrigRackData()
-            : MyIdx(0), CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(iLocation::Unassigned),
-              CondenserType(DataHeatBalance::RefrigCondenserType::Unassigned), LaggedUsedWaterHeater(0.0), LaggedUsedHVACCoil(0.0), EvapEffect(0.9),
+            : MyIdx(0), CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(iLocation::Invalid),
+              CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), LaggedUsedWaterHeater(0.0), LaggedUsedHVACCoil(0.0), EvapEffect(0.9),
               CondenserAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0),
               EvapWaterConsumption(0.0), EvapSchedPtr(0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0),
               BasinHeaterConsumption(0.0), RatedCOP(0.0), COPFTempPtr(0), NumCases(0), NumCoils(0), NumWalkIns(0),
@@ -1044,13 +1044,13 @@ namespace RefrigeratedCase {
         // Default Constructor
         RefrigCondenserData()
             : EndUseSubcategory("General"), CondenserRejectHeatToZone(false), CoilFlag(false), NumSysAttach(0),
-              CondenserType(DataHeatBalance::RefrigCondenserType::Unassigned), EvapFreezeWarnIndex(0), FlowType(iCndsrFlowType::VariableFlow),
+              CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), EvapFreezeWarnIndex(0), FlowType(iCndsrFlowType::VariableFlow),
               CondCreditWarnIndex1(0), CondCreditWarnIndex2(0), CondCreditWarnIndex3(0), CondCreditWarnIndex4(0), CondCreditWarnIndex5(0),
               CondCreditWarnIndex6(0), CondCreditWarnIndex7(0), NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0),
               HighInletWarnIndex(0), InletNode(0), EvapSchedPtr(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0),
               EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0),
-              OutletTempSchedPtr(0), InletAirNodeNum(0), InletAirZoneNum(0), FanSpeedControlType(iFanSpeedCtrlType::Unassigned), CapCurvePtr(0),
-              CascadeSysID(0), CascadeTempControl(iCascadeCndsrTempCtrlType::Unassigned), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0),
+              OutletTempSchedPtr(0), InletAirNodeNum(0), InletAirZoneNum(0), FanSpeedControlType(iFanSpeedCtrlType::Invalid), CapCurvePtr(0),
+              CascadeSysID(0), CascadeTempControl(iCascadeCndsrTempCtrlType::Invalid), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0),
               MinCondLoad(0.0), TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0),
               EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0),
               BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), FanMinAirFlowRatio(0.0), RatedFanPower(0.0),
@@ -1146,13 +1146,12 @@ namespace RefrigeratedCase {
         // Default Constructor
         RefrigGasCoolerData()
             : EndUseSubcategory("General"), GasCoolerRejectHeatToZone(false), TransOpFlag(false), CapCurvePtr(0),
-              FanSpeedControlType(iFanSpeedCtrlType::Unassigned), GasCoolerCreditWarnIndex(0), InletAirNodeNum(0), InletAirZoneNum(0),
-              NumSysAttach(0), ActualFanPower(0.0), CpGasCoolerOut(0.0), FanElecEnergy(0.0), FanMinAirFlowRatio(0.0), GasCoolerApproachT(3.0),
-              GasCoolerEnergy(0.0), GasCoolerLoad(0.0), HGasCoolerOut(0.0), InternalEnergyRecovered(0.0), InternalHeatRecoveredLoad(0.0),
-              MinCondLoad(0.0), MinCondTemp(1.0e1), PGasCoolerOut(0.0), RatedApproachT(3.0), RatedCapacity(0.0), RatedFanPower(0.0),
-              RatedOutletP(9.0e6), RatedOutletT(38.0), RefOpCharge(0.0), RefPipingInventory(0.0), RefReceiverInventory(0.0),
-              SubcriticalTempDiff(1.0e1), TempSlope(0.0), TGasCoolerOut(0.0), TotalHeatRecoveredEnergy(0.0), TotalHeatRecoveredLoad(0.0),
-              TransitionTemperature(0.0)
+              FanSpeedControlType(iFanSpeedCtrlType::Invalid), GasCoolerCreditWarnIndex(0), InletAirNodeNum(0), InletAirZoneNum(0), NumSysAttach(0),
+              ActualFanPower(0.0), CpGasCoolerOut(0.0), FanElecEnergy(0.0), FanMinAirFlowRatio(0.0), GasCoolerApproachT(3.0), GasCoolerEnergy(0.0),
+              GasCoolerLoad(0.0), HGasCoolerOut(0.0), InternalEnergyRecovered(0.0), InternalHeatRecoveredLoad(0.0), MinCondLoad(0.0),
+              MinCondTemp(1.0e1), PGasCoolerOut(0.0), RatedApproachT(3.0), RatedCapacity(0.0), RatedFanPower(0.0), RatedOutletP(9.0e6),
+              RatedOutletT(38.0), RefOpCharge(0.0), RefPipingInventory(0.0), RefReceiverInventory(0.0), SubcriticalTempDiff(1.0e1), TempSlope(0.0),
+              TGasCoolerOut(0.0), TotalHeatRecoveredEnergy(0.0), TotalHeatRecoveredLoad(0.0), TransitionTemperature(0.0)
         {
         }
 
@@ -1199,7 +1198,7 @@ namespace RefrigeratedCase {
         // Default Constructor
         RefrigCompressorData()
             : CoilFlag(false), CapacityCurvePtr(0), ElecPowerCurvePtr(0), MassFlowCurvePtr(0), TransElecPowerCurvePtr(0), TransCapacityCurvePtr(0),
-              NumSysAttach(0), SuperheatRatingType(iCompRatingType::Unassigned), SubcoolRatingType(iCompRatingType::Unassigned), Capacity(0.0),
+              NumSysAttach(0), SuperheatRatingType(iCompRatingType::Invalid), SubcoolRatingType(iCompRatingType::Invalid), Capacity(0.0),
               CoolingEnergy(0.0), Efficiency(0.0), ElecConsumption(0.0), LoadFactor(0.0), MassFlow(0.0), NomCap(0.0), Power(0.0), RatedSuperheat(0.0),
               RatedSubcool(0.0), EndUseSubcategory("General"), TransFlag(false)
         {
@@ -1243,7 +1242,7 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         SubcoolerData()
-            : CoilFlag(false), SubcoolerType(iSubcoolerType::Unassigned), MechSourceSysID(0), MechSCTransLoad(0.0), MechSCTransEnergy(0.0),
+            : CoilFlag(false), SubcoolerType(iSubcoolerType::Invalid), MechSourceSysID(0), MechSCTransLoad(0.0), MechSCTransEnergy(0.0),
               LiqSuctDesignDelT(0.0), LiqSuctDesignTliqIn(0.0), LiqSuctDesignTvapIn(0.0), MechControlTliqOut(0.0)
         {
         }
@@ -1323,9 +1322,9 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         SecondaryLoopData()
-            : CoilFlag(false), DistPipeZoneNum(0), DistPipeZoneNodeNum(0), DistPipeZoneHeatGain(0.0), FluidType(iSecFluidType::Unassigned),
-              FluidID(0), NumSysAttach(0), NumPumps(0), NumCases(0), NumCoils(0), NumWalkIns(0), PumpControlType(iSecPumpCtrl::Unassigned),
-              ReceiverZoneNum(0), ReceiverZoneNodeNum(0), ReceiverZoneHeatGain(0.0), VarSpeedCurvePtr(0), AvailLoadCoils(0.0), CpBrineRated(0.0),
+            : CoilFlag(false), DistPipeZoneNum(0), DistPipeZoneNodeNum(0), DistPipeZoneHeatGain(0.0), FluidType(iSecFluidType::Invalid), FluidID(0),
+              NumSysAttach(0), NumPumps(0), NumCases(0), NumCoils(0), NumWalkIns(0), PumpControlType(iSecPumpCtrl::Invalid), ReceiverZoneNum(0),
+              ReceiverZoneNodeNum(0), ReceiverZoneHeatGain(0.0), VarSpeedCurvePtr(0), AvailLoadCoils(0.0), CpBrineRated(0.0),
               ChillerRefInventory(0.0), CircRate(0.0), CoolingLoadRated(0.0), DensityBrineRated(0.0), DistPipeHeatGain(0.0),
               DistPipeHeatGainEnergy(0.0), FlowVolActual(0.0), HotDefrostCondCredit(0.0), HeatExchangeEta(0.0), MaxVolFlow(0.0), MaxLoad(0.0),
               PumpTotRatedPower(0.0), PumpPowerToHeat(0.0), PumpIncrementFlowVol(0.0), PumpIncrementPower(0.0), PumpPowerTotal(0.0),
@@ -1447,8 +1446,8 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         WalkInData()
-            : CircFanSchedPtr(0), DefrostDripDownSchedPtr(0), DefrostSchedPtr(0), DefrostControlType(iDefrostCtrlType::Unassigned),
-              DefrostType(WalkinClrDefrostType::Unassigned), HeaterSchedPtr(0), LightingSchedPtr(0), NumSysAttach(0), NumZones(0), SchedPtr(0),
+            : CircFanSchedPtr(0), DefrostDripDownSchedPtr(0), DefrostSchedPtr(0), DefrostControlType(iDefrostCtrlType::Invalid),
+              DefrostType(WalkinClrDefrostType::Invalid), HeaterSchedPtr(0), LightingSchedPtr(0), NumSysAttach(0), NumZones(0), SchedPtr(0),
               StockingSchedPtr(0), CircFanPower(0.0), CoilFanPower(0.0), IceTemp(0.0), IceTempSaved(0.0), DefrostCapacity(0.0),
               DeltaFreezeKgFrost(0.0), DefEnergyFraction(0.0), DesignFanPower(0.0), DesignLighting(0.0), DesignRatedCap(0.0),
               DesignRefrigInventory(0.0), FloorArea(0.0), FloorUValue(0.0), HeaterPower(0.0), HotDefrostCondCredit(0.0), KgFrost(0.0),
@@ -1611,10 +1610,10 @@ namespace RefrigeratedCase {
         // Default Constructor
         WarehouseCoilData()
             : SecStatusFirst(false), SecStatusLast(false), SysStatusFirst(false), SysStatusLast(false), CoilFanSchedPtr(0),
-              DefrostDripDownSchedPtr(0), DefrostSchedPtr(0), DefrostControlType(iDefrostCtrlType::Unassigned), DefrostType(iDefrostType::Unassigned),
-              FanType(iFanSpeedCtrlType::Unassigned), HeaterSchedPtr(0), NumSysAttach(0), RatingType(iRatingType::Unassigned), SchedPtr(0),
-              SCIndex(0), SecServeID(0), SHRCorrectionType(iSHRCorrectionType::Unassigned), SHRCorrectionCurvePtr(0), SysServeID(0),
-              VerticalLocation(iVerticalLoc::Unassigned), ZoneNodeNum(0), ZoneNum(0), CorrMaterial(0.0), CorrRefrigerant(0.0), DefrostCapacity(0.0),
+              DefrostDripDownSchedPtr(0), DefrostSchedPtr(0), DefrostControlType(iDefrostCtrlType::Invalid), DefrostType(iDefrostType::Invalid),
+              FanType(iFanSpeedCtrlType::Invalid), HeaterSchedPtr(0), NumSysAttach(0), RatingType(iRatingType::Invalid), SchedPtr(0), SCIndex(0),
+              SecServeID(0), SHRCorrectionType(iSHRCorrectionType::Invalid), SHRCorrectionCurvePtr(0), SysServeID(0),
+              VerticalLocation(iVerticalLoc::Invalid), ZoneNodeNum(0), ZoneNum(0), CorrMaterial(0.0), CorrRefrigerant(0.0), DefrostCapacity(0.0),
               DefrostPower(0.0), DeltaFreezeKgFrost(0.0), DefEnergyFraction(0.0), DesignRefrigInventory(0.0), FanMinAirFlowRatio(0.0),
               HeaterPower(0.0), HotDefrostCondCredit(0.0), IceTemp(0.0), IceTempSaved(0.0), KgFrost(0.0), KgFrostSaved(0.0), MaxTemperatureDif(0.0),
               RatedAirVolumeFlow(0.0), RatedCapTotal(0.0), RatedFanPower(0.0), RatedRH(0.0), RatedSensibleCap(0.0), RatedTemperatureDif(0.0),

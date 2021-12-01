@@ -70,7 +70,7 @@ namespace DataRoomAirModel {
     // Parameters to indicate room air model selected
     enum class RoomAirModel : int
     {
-        Unassigned = -1,
+        Invalid = -1,
         UserDefined,    // user defined patterns
         Mixing,         // mixing air model
         Mundt,          // Mundt nodal model
@@ -87,7 +87,7 @@ namespace DataRoomAirModel {
     // Parameters to indicate air temperature coupling scheme
     enum class CouplingScheme : int
     {
-        Unassigned = -1,
+        Invalid = -1,
         Direct,
         Indirect,
         Num
@@ -96,7 +96,7 @@ namespace DataRoomAirModel {
     // Parameters to indicate type of air node, which is dependent on air models
     enum class AirNodeType
     {
-        Unassigned = -1,
+        Invalid = -1,
         InletAirNode,              // air node at inlet (for Mundt and Rees&Haves Models)
         FloorAirNode,              // air node at floor (for Mundt and Rees&Haves Models)
         ControlAirNode,            // air node at control point (for Mundt Model)
@@ -112,7 +112,7 @@ namespace DataRoomAirModel {
     // user-defined pattern two gradient interpolation modes
     enum class UserDefinedPatternMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         OutdoorDryBulbMode,  // by outdoor air bulb.
         SensibleCoolingMode, // by sensible cooling load
         SensibleHeatingMode, // by sensible heating load
@@ -124,7 +124,7 @@ namespace DataRoomAirModel {
     // user defined temperature pattern types
     enum class UserDefinedPatternType
     {
-        Unassigned = -1,
+        Invalid = -1,
         ConstGradTempPattern,  // constant gradient in vertical direction
         TwoGradInterpPattern,  // two gradient interpolation
         NonDimenHeightPattern, // non-dimensionalized height
@@ -135,7 +135,7 @@ namespace DataRoomAirModel {
     // parameters to indicate diffuser type
     enum class Diffuser
     {
-        Unassigned = -1,
+        Invalid = -1,
         Swirl,
         VarArea,
         DisplVent,
@@ -186,7 +186,7 @@ namespace DataRoomAirModel {
         bool IsZone;               // TRUE if this node is zone node
 
         // Default Constructor
-        AirNodeData() : ZonePtr(0), ClassType(AirNodeType::Unassigned), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
+        AirNodeData() : ZonePtr(0), ClassType(AirNodeType::Invalid), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
         {
         }
     };
@@ -291,8 +291,8 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFIData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0),
-              CalcTransHeight(false), A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Invalid), TransHeight(0.0), CalcTransHeight(false),
+              A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
         {
         }
     };
@@ -328,8 +328,8 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFEData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0),
-              CalcTransHeight(false), A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Invalid), TransHeight(0.0), CalcTransHeight(false),
+              A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
         {
         }
     };
@@ -382,7 +382,7 @@ namespace DataRoomAirModel {
         // Default Constructor
         TwoVertGradInterpolPattern()
             : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0),
-              InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Unassigned), UpperBoundTempScale(0.0), LowerBoundTempScale(0.0),
+              InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Invalid), UpperBoundTempScale(0.0), LowerBoundTempScale(0.0),
               UpperBoundHeatRateScale(0.0), LowerBoundHeatRateScale(0.0)
         {
         }
@@ -415,8 +415,7 @@ namespace DataRoomAirModel {
         Real64 DeltaTexhaust;                    // (Texhaust - MAT) deg C
 
         // Default Constructor
-        TemperaturePatternStruct()
-            : PatrnID(0), PatternMode(UserDefinedPatternType::Unassigned), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
+        TemperaturePatternStruct() : PatrnID(0), PatternMode(UserDefinedPatternType::Invalid), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
         {
         }
     };
@@ -498,7 +497,7 @@ namespace DataRoomAirModel {
 
         // Default Constructor
         RoomAirflowNetworkNodeInternalGainsStruct()
-            : Type(DataHeatBalance::IntGainType::Unassigned), UseRoomAirModelTempForGains(false), FractionCheck(false)
+            : Type(DataHeatBalance::IntGainType::Invalid), UseRoomAirModelTempForGains(false), FractionCheck(false)
         {
         }
     };

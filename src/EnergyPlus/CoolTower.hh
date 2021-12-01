@@ -65,7 +65,7 @@ namespace CoolTower {
 
     enum class FlowCtrlEnum
     {
-        Unassigned = -1,
+        Invalid = -1,
         FlowSchedule,
         WindDriven,
         Num
@@ -128,7 +128,7 @@ namespace CoolTower {
 
         // Default Constructor
         CoolTowerParams()
-            : SchedPtr(0), ZonePtr(0), PumpSchedPtr(0), FlowCtrlType(FlowCtrlEnum::Unassigned), CoolTWaterSupplyMode(WaterSupplyMode::FromMains),
+            : SchedPtr(0), ZonePtr(0), PumpSchedPtr(0), FlowCtrlType(FlowCtrlEnum::Invalid), CoolTWaterSupplyMode(WaterSupplyMode::FromMains),
               CoolTWaterSupTankID(0), CoolTWaterTankDemandARRID(0), TowerHeight(0.0), OutletArea(0.0), OutletVelocity(0.0), MaxAirVolFlowRate(0.0),
               AirMassFlowRate(0.0), CoolTAirMass(0.0), MinZoneTemp(0.0), FracWaterLoss(0.0), FracFlowSched(0.0), MaxWaterFlowRate(0.0),
               ActualWaterFlowRate(0.0), RatedPumpPower(0.0), SenHeatLoss(0.0), SenHeatPower(0.0), LatHeatLoss(0.0), LatHeatPower(0.0),

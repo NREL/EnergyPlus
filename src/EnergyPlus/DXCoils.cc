@@ -2342,7 +2342,7 @@ void GetDXCoils(EnergyPlusData &state)
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
         if (UtilityRoutines::SameString(Alphas(11), "Resistive"))
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == StandardRatings::DefrostStrat::Unassigned) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, "...illegal " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
@@ -2354,7 +2354,7 @@ void GetDXCoils(EnergyPlusData &state)
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
         if (UtilityRoutines::SameString(Alphas(12), "OnDemand"))
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, "...illegal " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
@@ -4767,7 +4767,7 @@ void GetDXCoils(EnergyPlusData &state)
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
         if (UtilityRoutines::SameString(Alphas(6), "Resistive"))
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == StandardRatings::DefrostStrat::Unassigned) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, "...illegal " + cAlphaFields(6) + "=\"" + Alphas(6) + "\".");
@@ -4779,7 +4779,7 @@ void GetDXCoils(EnergyPlusData &state)
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
         if (UtilityRoutines::SameString(Alphas(7), "OnDemand"))
             state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
             ShowSevereError(state,
                             std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, "...illegal " + cAlphaFields(7) + "=\"" + Alphas(7) + "\".");

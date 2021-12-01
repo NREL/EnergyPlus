@@ -59,7 +59,7 @@ enum class LoopFlowStatus
     NeedyIfLoopOn, // component is a "winner" for loop flow requests but doesn't normally get the loop going to start with once loop is going, may
                    // increase needs, non-zero minimums
     TakesWhatGets, // component is a "loser" for loop flow requests, but if the loop is on it, it does make flow requests (for s/m resolution)
-    NUM
+    Num
 };
 
 // Parameters for scheme types
@@ -70,7 +70,7 @@ enum class LoopFlowStatus
 enum class OpScheme
 { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11
   // enum "class")
-    Unassigned = -1,
+    Invalid = -1,
     NoControl,            // Scheme Type placeholder for items such as pipes
     HeatingRB,            // Scheme Type for Heating Load Range Based Operation
     CoolingRB,            // Scheme Type for Cooling  Load Range Based Operation
@@ -206,12 +206,12 @@ enum class HowMet
     ByNominalCapHiOutLimit,               // MaxLoad, MinLoad, OptLoad but with high limit temp on outlet
     ByNominalCapFreeCoolCntrl,            // HowMet_ByNominalCap with free cool shutdown
     ByNominalCapLowOutLimitFreeCoolCntrl, // HowMet_ByNominalCapLowOutLimit with free cool shutdown
-    NUM
+    Num
 };
 
 enum class LoadingScheme
 {
-    Unassigned = -1,
+    Invalid = -1,
     Optimal,              // Optimal Load Distribution Scheme
     Sequential,           // Sequential Load Distribution Scheme
     Uniform,              // Uniform Load Distribution Scheme
@@ -222,7 +222,7 @@ enum class LoadingScheme
 
 enum class FlowMode
 {
-    Unassigned = -1,
+    Invalid = -1,
     Constant,
     NotModulated,
     LeavingSetpointModulated,
@@ -231,7 +231,7 @@ enum class FlowMode
 
 enum class CondenserType
 {
-    Unassigned = -1,
+    Invalid = -1,
     AirCooled,
     WaterCooled,
     EvapCooled,
@@ -244,7 +244,7 @@ static constexpr std::array<std::string_view, static_cast<int>(CondenserType::Nu
 // SimFlagCriteriaTypes for use in performing interconnect re-sim checks
 enum class CriteriaType
 {
-    Unassigned = -1,
+    Invalid = -1,
     MassFlowRate,
     Temperature,
     HeatTransferRate,
@@ -253,7 +253,7 @@ enum class CriteriaType
 
 enum class FreeCoolControlMode
 {
-    Unassigned = -1,
+    Invalid = -1,
     WetBulb, // HeatExchanger:Hydronic model control type mode, outdoor wetbulb sensor
     DryBulb, // HeatExchanger:Hydronic model control type mode, outdoor drybulb sensor
     Loop,    // HeatExchanger:Hydronic model control type mode, loop setpoint sensor
@@ -262,7 +262,7 @@ enum class FreeCoolControlMode
 
 enum class LoopDemandCalcScheme
 {
-    Unassigned = -1,
+    Invalid = -1,
     SingleSetPoint,       // Uses a single temp setpoint to calculate loop demand
     DualSetPointDeadBand, // Uses a dual temp setpoint with a deadband between the high
     Num
@@ -270,7 +270,7 @@ enum class LoopDemandCalcScheme
 
 enum class CommonPipeType
 {
-    Unassigned = -1,
+    Invalid = -1,
     No,
     Single,
     TwoWay,
@@ -279,7 +279,7 @@ enum class CommonPipeType
 
 enum class FlowLock
 {
-    Unassigned = -1,
+    Invalid = -1,
     PumpQuery, // Used to ask the pumps for their min/max avail based on no constraints
     Unlocked,  // components request flow
     Locked,    // components take their inlet flow
@@ -288,7 +288,7 @@ enum class FlowLock
 
 enum class PressureCall
 {
-    Unassigned = -1,
+    Invalid = -1,
     Init,
     Calc,
     Update,
@@ -297,7 +297,7 @@ enum class PressureCall
 
 enum class PressSimType
 {
-    Unassigned = -1,
+    Invalid = -1,
     NoPressure,          // Nothing for that particular loop
     PumpPowerCorrection, // Only updating the pump power
     FlowCorrection,      // Update pump flow rate based on pump curve
@@ -314,7 +314,7 @@ static constexpr std::array<std::string_view, static_cast<int>(PressSimType::Num
 
 enum class CtrlType
 {
-    Unassigned = -1,
+    Invalid = -1,
     HeatingOp, // Constant for Heating Operation
     CoolingOp, // Constant for Cooling Operation
     DualOp,    // Constant for Cooling or Heating Operation
@@ -324,7 +324,7 @@ enum class CtrlType
 // branch loop type for absorption chillerheater models
 enum class BrLoopType
 {
-    Unassigned = -1,
+    Invalid = -1,
     Chiller,
     Heater,
     Condenser,
@@ -332,7 +332,7 @@ enum class BrLoopType
     Num
 };
 
-static constexpr std::array<std::string_view, static_cast<int>(HowMet::NUM)> HowMetTypeNamesUC = {
+static constexpr std::array<std::string_view, static_cast<int>(HowMet::Num)> HowMetTypeNamesUC = {
     "DEMANDSLOAD",
     "MEETSLOADWITHPASSIVECAPACITY",
     "MEETSLOADWITHNOMINALCAPACITY",
@@ -341,7 +341,7 @@ static constexpr std::array<std::string_view, static_cast<int>(HowMet::NUM)> How
     "MEETSLOADWITHNOMINALCAPACITYFREECOOLCONTROL",
     "MEETSLOADWITHNOMINALCAPACITYLOWOUTLIMITFREECOOLCONTROL"};
 
-static constexpr std::array<std::string_view, static_cast<int>(LoopFlowStatus::NUM)> LoopFlowStatusTypeNamesUC = {
+static constexpr std::array<std::string_view, static_cast<int>(LoopFlowStatus::Num)> LoopFlowStatusTypeNamesUC = {
     "NEEDSFLOWANDTURNSLOOPON", "NEEDSFLOWIFLOOPON", "RECEIVESWHATEVERFLOWAVAILABLE"};
 
 } // namespace EnergyPlus::DataPlant

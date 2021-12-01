@@ -1359,13 +1359,13 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     Real64 PastNodeTempAbs(0.0); // Placeholder for absolute temperature (K) version of NodePast
     Real64 Ttemp(0.0);           // Placeholder for a current temperature node in convergence check
     Real64 SkyTempAbs(0.0);      // Placeholder for current sky temperature in Kelvin
-    DataSurfaces::SurfaceRoughness TopRoughness(DataSurfaces::SurfaceRoughness::Unassigned); // Placeholder for soil surface roughness
-    Real64 TopThermAbs(0.0);                                                                 // Placeholder for soil thermal radiation absorptivity
-    Real64 TopSolarAbs(0.0);                                                                 // Placeholder for soil solar radiation absorptivity
-    Real64 kSoil(0.0);                                                                       // Placeholder for soil conductivity
-    Real64 dS(0.0);                                                                          // Placeholder for soil grid spacing
-    Real64 rho(0.0);                                                                         // Placeholder for soil density
-    Real64 Cp(0.0);                                                                          // Placeholder for soil specific heat
+    DataSurfaces::SurfaceRoughness TopRoughness(DataSurfaces::SurfaceRoughness::Invalid); // Placeholder for soil surface roughness
+    Real64 TopThermAbs(0.0);                                                              // Placeholder for soil thermal radiation absorptivity
+    Real64 TopSolarAbs(0.0);                                                              // Placeholder for soil solar radiation absorptivity
+    Real64 kSoil(0.0);                                                                    // Placeholder for soil conductivity
+    Real64 dS(0.0);                                                                       // Placeholder for soil grid spacing
+    Real64 rho(0.0);                                                                      // Placeholder for soil density
+    Real64 Cp(0.0);                                                                       // Placeholder for soil specific heat
 
     // There are a number of coefficients which change through the simulation, and they are updated here
     this->FourierDS = this->SoilDiffusivity * state.dataPipeHT->nsvDeltaTime / pow_2(this->dSregular); // Eq. D4

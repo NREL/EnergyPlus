@@ -2179,7 +2179,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
     }
     auto &Pollution = state.dataPollutionModule->Pollution;
     auto &FuelType = state.dataPollutionModule->FuelType;
-    for (Loop = 1; Loop <= static_cast<int>(PollFactor::NUM); ++Loop) {
+    for (Loop = 1; Loop <= static_cast<int>(PollFactor::Num); ++Loop) {
 
         if (FuelType.FuelTypeNames(Loop).empty()) continue;
 

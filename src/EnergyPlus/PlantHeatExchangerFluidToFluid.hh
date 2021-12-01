@@ -67,7 +67,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
     enum class iFluidHXType
     {
-        Unassigned = -1,
+        Invalid = -1,
         CrossFlowBothUnMixed,
         CrossFlowBothMixed,
         CrossFlowSupplyLoopMixedDemandLoopUnMixed,
@@ -80,7 +80,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
     enum class iCtrlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         UncontrolledOn,
         OperationSchemeModulated,
         OperationSchemeOnOff,
@@ -98,7 +98,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
     enum class iCtrlTemp
     {
-        Unassigned = -1,
+        Invalid = -1,
         WetBulbTemperature,
         DryBulbTemperature,
         LoopTemperature,
@@ -186,12 +186,11 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Default Constructor
         HeatExchangerStruct()
-            : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Unassigned), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Unassigned),
-              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Unassigned), MinOperationTemp(-99999.0),
-              MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
-              HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
-              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
-              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+            : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Invalid), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Invalid),
+              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Invalid), MinOperationTemp(-99999.0), MaxOperationTemp(99999.0),
+              ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0),
+              Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0),
+              DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 

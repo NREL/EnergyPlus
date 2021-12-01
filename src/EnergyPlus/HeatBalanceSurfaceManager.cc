@@ -847,7 +847,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Real64 frameArea;
     Real64 dividerArea;
     // counts for object count report
-    int SurfaceClassCount = int(SurfaceClass::Count);
+    int SurfaceClassCount = int(SurfaceClass::Num);
     Array1D_int numSurfaces(SurfaceClassCount);
     Array1D_int numExtSurfaces(SurfaceClassCount);
     int frameDivNum;
@@ -1187,7 +1187,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             }
         }
         int currSurfaceClass = int(Surface(iSurf).Class);
-        assert(currSurfaceClass < int(SurfaceClass::Count));
+        assert(currSurfaceClass < int(SurfaceClass::Num));
         assert(currSurfaceClass > int(SurfaceClass::None));
         ++numSurfaces(currSurfaceClass);
         if (isExterior) {
@@ -1530,7 +1530,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     }
     state.dataHeatBalSurf->SurfAbsSolarExt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalExt.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, DataSurfaces::SurfaceRoughness::Unassigned);
+    state.dataHeatBalSurf->SurfRoughnessExt.dimension(state.dataSurface->TotSurfaces, DataSurfaces::SurfaceRoughness::Invalid);
     state.dataHeatBalSurf->SurfAbsSolarInt.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfAbsThermalInt.dimension(state.dataSurface->TotSurfaces, 0.0);
 

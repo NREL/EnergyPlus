@@ -77,7 +77,7 @@ namespace ScheduleManager {
 
     enum class SchedType : int
     {
-        Unassigned = -1,
+        Invalid = -1,
         ScheduleInput_year = 1,
         ScheduleInput_compact = 2,
         ScheduleInput_file = 3,
@@ -154,16 +154,16 @@ namespace ScheduleManager {
     struct ScheduleData
     {
         // Members
-        std::string Name;                          // Schedule Name
-        int ScheduleTypePtr;                       // Index of Schedule Type
-        Array1D_int WeekSchedulePointer;           // one created for each day of possible simulation
-        SchedType SchType = SchedType::Unassigned; // what kind of object has been input.
-        bool Used;                                 // Indicator for this schedule being "used".
-        bool MaxMinSet;                            // Max/min values have been stored for this schedule
-        Real64 MaxValue;                           // Maximum value for this schedule
-        Real64 MinValue;                           // Minimum value for this schedule
-        Real64 CurrentValue;                       // For Reporting
-        bool EMSActuatedOn;                        // indicates if EMS computed
+        std::string Name;                       // Schedule Name
+        int ScheduleTypePtr;                    // Index of Schedule Type
+        Array1D_int WeekSchedulePointer;        // one created for each day of possible simulation
+        SchedType SchType = SchedType::Invalid; // what kind of object has been input.
+        bool Used;                              // Indicator for this schedule being "used".
+        bool MaxMinSet;                         // Max/min values have been stored for this schedule
+        Real64 MaxValue;                        // Maximum value for this schedule
+        Real64 MinValue;                        // Minimum value for this schedule
+        Real64 CurrentValue;                    // For Reporting
+        bool EMSActuatedOn;                     // indicates if EMS computed
         Real64 EMSValue;
 
         // Default Constructor

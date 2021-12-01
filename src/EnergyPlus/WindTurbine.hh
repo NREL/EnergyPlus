@@ -66,7 +66,7 @@ namespace WindTurbine {
 
     enum class RotorType
     {
-        Unassigned = -1,
+        Invalid = -1,
         HAWT = 1, // 'HorizontalAxisWindTurbine'
         VAWT = 2, // 'VerticalAxisWindTurbine',
         Num
@@ -74,7 +74,7 @@ namespace WindTurbine {
 
     enum class ControlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         FSFP = 1, // 'FixedSpeedFixedPitch'
         FSVP = 2, // 'FixedSpeedVariablePitch'
         VSFP = 3, // 'VariableSpeedFixedPitch'
@@ -134,13 +134,13 @@ namespace WindTurbine {
 
         // Default Constructor
         WindTurbineParams()
-            : rotorType(RotorType::Unassigned), controlType(ControlType::Unassigned), SchedPtr(0), NumOfBlade(0), RatedRotorSpeed(0.0),
-              RotorDiameter(0.0), RotorHeight(0.0), RatedPower(0.0), RatedWindSpeed(0.0), CutInSpeed(0.0), CutOutSpeed(0.0), SysEfficiency(0.0),
-              MaxTipSpeedRatio(0.0), MaxPowerCoeff(0.0), LocalAnnualAvgWS(0.0), AnnualTMYWS(0.0), HeightForLocalWS(0.0), ChordArea(0.0),
-              DragCoeff(0.0), LiftCoeff(0.0), PowerCoeffC1(0.0), PowerCoeffC2(0.0), PowerCoeffC3(0.0), PowerCoeffC4(0.0), PowerCoeffC5(0.0),
-              PowerCoeffC6(0.0), TotPower(0.0), Power(0.0), TotEnergy(0.0), Energy(0.0), LocalWindSpeed(0.0), LocalAirDensity(0.0), PowerCoeff(0.0),
-              ChordalVel(0.0), NormalVel(0.0), RelFlowVel(0.0), TipSpeedRatio(0.0), WSFactor(0.0), AngOfAttack(0.0), IntRelFlowVel(0.0),
-              TanForce(0.0), NorForce(0.0), TotTorque(0.0), AzimuthAng(0.0)
+            : rotorType(RotorType::Invalid), controlType(ControlType::Invalid), SchedPtr(0), NumOfBlade(0), RatedRotorSpeed(0.0), RotorDiameter(0.0),
+              RotorHeight(0.0), RatedPower(0.0), RatedWindSpeed(0.0), CutInSpeed(0.0), CutOutSpeed(0.0), SysEfficiency(0.0), MaxTipSpeedRatio(0.0),
+              MaxPowerCoeff(0.0), LocalAnnualAvgWS(0.0), AnnualTMYWS(0.0), HeightForLocalWS(0.0), ChordArea(0.0), DragCoeff(0.0), LiftCoeff(0.0),
+              PowerCoeffC1(0.0), PowerCoeffC2(0.0), PowerCoeffC3(0.0), PowerCoeffC4(0.0), PowerCoeffC5(0.0), PowerCoeffC6(0.0), TotPower(0.0),
+              Power(0.0), TotEnergy(0.0), Energy(0.0), LocalWindSpeed(0.0), LocalAirDensity(0.0), PowerCoeff(0.0), ChordalVel(0.0), NormalVel(0.0),
+              RelFlowVel(0.0), TipSpeedRatio(0.0), WSFactor(0.0), AngOfAttack(0.0), IntRelFlowVel(0.0), TanForce(0.0), NorForce(0.0), TotTorque(0.0),
+              AzimuthAng(0.0)
         {
         }
     };

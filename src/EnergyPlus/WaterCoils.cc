@@ -1073,7 +1073,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
         bool WaterCoilOnAirLoop = true;
         for (tempCoilNum = 1; tempCoilNum <= state.dataWaterCoils->NumWaterCoils; ++tempCoilNum) {
             if (state.dataWaterCoils->WaterCoil(tempCoilNum).ControllerIndex > 0) {
-                SimAirServingZones::CompType CoilTypeNum(SimAirServingZones::CompType::Unassigned);
+                SimAirServingZones::CompType CoilTypeNum(SimAirServingZones::CompType::Invalid);
                 std::string CompType;
                 std::string CompName = state.dataWaterCoils->WaterCoil(tempCoilNum).Name;
                 if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {

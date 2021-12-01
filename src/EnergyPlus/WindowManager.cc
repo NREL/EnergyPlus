@@ -2327,7 +2327,7 @@ namespace WindowManager {
 
             // Simon: Complex fenestration state works only with tarcog
             CalcComplexWindowThermal(
-                state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Unassigned);
+                state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Invalid);
 
             TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             state.dataWindowManager->ngllayer =
@@ -2362,7 +2362,7 @@ namespace WindowManager {
         } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
 
             EQLWindowSurfaceHeatBalance(
-                state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Unassigned);
+                state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Invalid);
             state.dataWindowManager->hcout = HextConvCoeff;
             // Required for report variables calculations.
             if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)

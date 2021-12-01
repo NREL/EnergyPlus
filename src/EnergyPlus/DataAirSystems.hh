@@ -127,7 +127,7 @@ namespace DataAirSystems {
 
         // Default Constructor
         AirLoopCompData()
-            : CompType_Num(SimAirServingZones::CompType::Unassigned), CompIndex(0), FlowCtrl(0), ON(true), Parent(false), NodeNumIn(0), NodeNumOut(0),
+            : CompType_Num(SimAirServingZones::CompType::Invalid), CompIndex(0), FlowCtrl(0), ON(true), Parent(false), NodeNumIn(0), NodeNumOut(0),
               MeteredVarsFound(false), NumMeteredVars(0), NumSubComps(0), EnergyTransComp(0), Capacity(0.0), OpMode(0), TotPlantSupplyElec(0.0),
               PlantSupplyElecEff(0.0), PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0), PeakPlantSupplyGasEff(0.0),
               TotPlantSupplyPurch(0.0), PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0), PlantSupplyOtherEff(0.0),

@@ -1102,10 +1102,10 @@ void GetComponentData(EnergyPlusData &state,
 
     InletNodeNames = std::string();
     InletNodeNums = 0;
-    InletFluidStreams = NodeInputManager::compFluidStream::Unassigned;
+    InletFluidStreams = NodeInputManager::compFluidStream::Invalid;
     OutletNodeNames = std::string();
     OutletNodeNums = 0;
-    OutletFluidStreams = NodeInputManager::compFluidStream::Unassigned;
+    OutletFluidStreams = NodeInputManager::compFluidStream::Invalid;
     NumInlets = 0;
     NumOutlets = 0;
     ErrInObject = false;

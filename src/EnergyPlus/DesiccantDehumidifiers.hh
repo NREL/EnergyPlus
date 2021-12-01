@@ -66,7 +66,7 @@ namespace DesiccantDehumidifiers {
 
     enum class DesicDehumType // Desiccant dehumidifier type
     {
-        Unassigned = -1,
+        Invalid = -1,
         Solid,
         Generic,
         Num
@@ -74,7 +74,7 @@ namespace DesiccantDehumidifiers {
 
     enum class DesicDehumCtrlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         FixedHumratBypass, // FIXED LEAVING HUMRAT SETPOINT:BYPASS
         NodeHumratBypass,  // NODE LEAVING HUMRAT SETPOINT:BYPASS
         Num
@@ -82,7 +82,7 @@ namespace DesiccantDehumidifiers {
 
     enum class Selection
     {
-        Unassigned = -1,
+        Invalid = -1,
         No,  // Condenser waste heat NOT reclaimed for desiccant regeneration
         Yes, // Condenser waste heat reclaimed for desiccant regeneration
         Num
@@ -90,7 +90,7 @@ namespace DesiccantDehumidifiers {
 
     enum class PerformanceModel
     {
-        Unassigned = -1,
+        Invalid = -1,
         Default,
         UserCurves,
         Num
@@ -221,22 +221,22 @@ namespace DesiccantDehumidifiers {
 
         // Default Constructor
         DesiccantDehumidifierData()
-            : PerformanceModel_Num(PerformanceModel::Unassigned), ProcAirInNode(0), ProcAirOutNode(0), RegenAirInNode(0), RegenAirOutNode(0),
-              RegenFanInNode(0), ControlType(DesicDehumCtrlType::Unassigned), HumRatSet(0.0), NomProcAirVolFlow(0.0), NomProcAirVel(0.0),
+            : PerformanceModel_Num(PerformanceModel::Invalid), ProcAirInNode(0), ProcAirOutNode(0), RegenAirInNode(0), RegenAirOutNode(0),
+              RegenFanInNode(0), ControlType(DesicDehumCtrlType::Invalid), HumRatSet(0.0), NomProcAirVolFlow(0.0), NomProcAirVel(0.0),
               NomRotorPower(0.0), RegenCoilIndex(0), RegenFanIndex(0), regenFanType_Num(0), ProcDryBulbCurvefTW(0), ProcDryBulbCurvefV(0),
               ProcHumRatCurvefTW(0), ProcHumRatCurvefV(0), RegenEnergyCurvefTW(0), RegenEnergyCurvefV(0), RegenVelCurvefTW(0), RegenVelCurvefV(0),
               NomRegenTemp(121.0), MinProcAirInTemp(-73.3), MaxProcAirInTemp(65.6), MinProcAirInHumRat(0.0), MaxProcAirInHumRat(0.21273), SchedPtr(0),
               NomProcAirMassFlow(0.0), NomRegenAirMassFlow(0.0), ProcAirInTemp(0.0), ProcAirInHumRat(0.0), ProcAirInEnthalpy(0.0),
               ProcAirInMassFlowRate(0.0), ProcAirOutTemp(0.0), ProcAirOutHumRat(0.0), ProcAirOutEnthalpy(0.0), ProcAirOutMassFlowRate(0.0),
               RegenAirInTemp(0.0), RegenAirInHumRat(0.0), RegenAirInEnthalpy(0.0), RegenAirInMassFlowRate(0.0), RegenAirVel(0.0),
-              DehumTypeCode(DesicDehumType::Unassigned), WaterRemove(0.0), WaterRemoveRate(0.0), SpecRegenEnergy(0.0), QRegen(0.0), RegenEnergy(0.0),
+              DehumTypeCode(DesicDehumType::Invalid), WaterRemove(0.0), WaterRemoveRate(0.0), SpecRegenEnergy(0.0), QRegen(0.0), RegenEnergy(0.0),
               ElecUseEnergy(0.0), ElecUseRate(0.0), PartLoad(0.0), RegenCapErrorIndex1(0), RegenCapErrorIndex2(0), RegenCapErrorIndex3(0),
               RegenCapErrorIndex4(0), RegenFanErrorIndex1(0), RegenFanErrorIndex2(0), RegenFanErrorIndex3(0), RegenFanErrorIndex4(0), HXTypeNum(0),
-              coolingCoil_TypeNum(0), Preheat(Selection::Unassigned), RegenSetPointTemp(0.0), ExhaustFanMaxVolFlowRate(0.0),
+              coolingCoil_TypeNum(0), Preheat(Selection::Invalid), RegenSetPointTemp(0.0), ExhaustFanMaxVolFlowRate(0.0),
               ExhaustFanMaxMassFlowRate(0.0), ExhaustFanMaxPower(0.0), ExhaustFanPower(0.0), ExhaustFanElecConsumption(0.0),
               CompanionCoilCapacity(0.0), RegenFanPlacement(0), ControlNodeNum(0), ExhaustFanCurveIndex(0), CompIndex(0), CoolingCoilOutletNode(0),
               RegenFanOutNode(0), RegenCoilInletNode(0), RegenCoilOutletNode(0), HXProcInNode(0), HXProcOutNode(0), HXRegenInNode(0),
-              HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0), ErrIndex1(0), CoilUpstreamOfProcessSide(Selection::Unassigned),
+              HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0), ErrIndex1(0), CoilUpstreamOfProcessSide(Selection::Invalid),
               RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0), CoilControlNode(0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0),
               CompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxCoilFluidFlow(0.0), RegenCoilCapacity(0.0)
         {

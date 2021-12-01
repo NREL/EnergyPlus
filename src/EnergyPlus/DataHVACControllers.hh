@@ -88,7 +88,7 @@ namespace DataHVACControllers {
 
     enum class ControllerOperation // Controller operation used in module HVACControllers
     {
-        Unassigned = -1,
+        Invalid = -1,
         ColdStart,   // Reset for cold start
         WarmRestart, // Reset for warm restart with previous solution
         Iterate,     // Check convergence and estimate next guess if needed

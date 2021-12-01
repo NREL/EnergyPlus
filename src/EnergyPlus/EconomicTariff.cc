@@ -4096,8 +4096,8 @@ void LEEDtariffReporting(EnergyPlusData &state)
         distCoolUnits = iEconConv::USERDEF;
         distHeatUnits = iEconConv::USERDEF;
         othrUnits = iEconConv::USERDEF;
-        gasDemWindowUnits = iDemandWindow::Unassigned;
-        othrDemWindowUnits = iDemandWindow::Unassigned;
+        gasDemWindowUnits = iDemandWindow::Invalid;
+        othrDemWindowUnits = iDemandWindow::Invalid;
         elecTariffNames = "";
         gasTariffNames = "";
         distCoolTariffNames = "";

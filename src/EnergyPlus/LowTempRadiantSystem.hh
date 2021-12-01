@@ -71,7 +71,7 @@ namespace LowTempRadiantSystem {
 
     enum class SystemType
     {
-        Unassigned = -1,
+        Invalid = -1,
         HydronicSystem,     // Variable flow hydronic radiant system
         ConstantFlowSystem, // Constant flow, variable (controlled) temperature radiant system
         ElectricSystem,     // Electric resistance radiant heating system
@@ -128,7 +128,7 @@ namespace LowTempRadiantSystem {
     // Number of Circuits per Surface Calculation Method
     enum class CircuitCalc
     {
-        Unassigned = -1,
+        Invalid = -1,
         OneCircuit,          // there is 1 circuit per surface
         CalculateFromLength, // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
         Num
@@ -219,7 +219,7 @@ namespace LowTempRadiantSystem {
         Real64 CondCausedTimeOff = 0.0;  // Amount of time condensation did or could have turned system off
         bool CondCausedShutDown = false; // .TRUE. when condensation predicted at surface
         CircuitCalc NumCircCalcMethod =
-            CircuitCalc::Unassigned;          // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
+            CircuitCalc::Invalid;             // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength = 0.0;              // Circuit length {m}
         std::string schedNameChangeoverDelay; // changeover delay schedule
         int schedPtrChangeoverDelay = 0;      // Pointer to the schedule for the changeover delay in hours
@@ -482,9 +482,9 @@ namespace LowTempRadiantSystem {
     {
         // Members
         // This type used to track different components/types for efficiency
-        std::string Name;                                                                           // name of radiant system
-        LowTempRadiantSystem::SystemType SystemType = LowTempRadiantSystem::SystemType::Unassigned; // Type of System (see System Types in Parameters)
-        int CompIndex = 0;                                                                          // Index in specific system types
+        std::string Name;                                                                        // name of radiant system
+        LowTempRadiantSystem::SystemType SystemType = LowTempRadiantSystem::SystemType::Invalid; // Type of System (see System Types in Parameters)
+        int CompIndex = 0;                                                                       // Index in specific system types
 
         // Default Constructor
         RadSysTypeData() = default;

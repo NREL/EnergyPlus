@@ -72,7 +72,7 @@ namespace EconomicLifeCycleCost {
     // MODULE PARAMETER DEFINITIONS:
     enum class DiscConv
     {
-        Unassigned = -1,
+        Invalid = -1,
         BeginOfYear,
         MidYear,
         EndOfYear,
@@ -85,7 +85,7 @@ namespace EconomicLifeCycleCost {
 
     enum class InflAppr
     {
-        Unassigned = -1,
+        Invalid = -1,
         ConstantDollar,
         CurrentDollar,
         Num
@@ -97,7 +97,7 @@ namespace EconomicLifeCycleCost {
 
     enum class DeprMethod
     {
-        Unassigned = -1,
+        Invalid = -1,
         MACRS3,
         MACRS5,
         MACRS7,
@@ -169,7 +169,7 @@ namespace EconomicLifeCycleCost {
 
     enum CostCategory
     {
-        Unassigned = -1,
+        Invalid = -1,
         Maintenance,
         Repair,
         Operation,
@@ -269,7 +269,7 @@ namespace EconomicLifeCycleCost {
 
     enum class StartCosts
     {
-        Unassigned = -1,
+        Invalid = -1,
         ServicePeriod,
         BasePeriod,
         Num
@@ -279,7 +279,7 @@ namespace EconomicLifeCycleCost {
 
     enum class SourceKindType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Recurring,
         Nonrecurring,
         Resource,
@@ -291,7 +291,7 @@ namespace EconomicLifeCycleCost {
 
     enum class ResourceCostCategory
     {
-        Unassigned = -1,
+        Invalid = -1,
         Water,
         Energy,
         Num
@@ -300,7 +300,7 @@ namespace EconomicLifeCycleCost {
 
     enum class PrValKind
     {
-        Unassigned = -1,
+        Invalid = -1,
         Energy,
         NonEnergy,
         NotComputed,
@@ -400,8 +400,8 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         CashFlowType()
-            : SourceKind(SourceKindType::Unassigned), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Unassigned),
-              pvKind(PrValKind::Unassigned), presentValue(0.), orginalCost(0.)
+            : SourceKind(SourceKindType::Invalid), Resource(DataGlobalConstants::ResourceType::None), Category(CostCategory::Invalid),
+              pvKind(PrValKind::Invalid), presentValue(0.), orginalCost(0.)
         {
         }
     };

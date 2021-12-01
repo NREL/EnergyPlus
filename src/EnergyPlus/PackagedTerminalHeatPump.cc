@@ -7661,7 +7661,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
     } else if (state.dataPTHP->CoolingLoad) {
         state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
     } else {
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Unassigned;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Invalid;
     }
 
     // set the on/off flags
@@ -9165,7 +9165,7 @@ void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
     } else if (state.dataPTHP->HeatingLoad) {
         state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
     } else {
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Unassigned;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Invalid;
     }
 
     // Set the inlet node mass flow rate
@@ -9212,7 +9212,7 @@ void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
             state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
             PartLoadRatio = 0.0;
         } else {
-            if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode != iCompMode::Unassigned) {
+            if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode != iCompMode::Invalid) {
                 PartLoadRatio = 1.0;
             } else {
                 PartLoadRatio = 0.0;

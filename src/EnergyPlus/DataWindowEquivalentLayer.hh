@@ -76,7 +76,7 @@ namespace DataWindowEquivalentLayer {
     // CFSLAYER: layer types
     enum class LayerType
     {
-        Unassigned = -1,
+        Invalid = -1,
         NONE,   // unused / empty layer
         GLAZE,  // glazing layer i.e, purely specular
         DRAPE,  // pleated drapes/curtains
@@ -92,7 +92,7 @@ namespace DataWindowEquivalentLayer {
     // index for solar arrays
     enum class SolarArrays
     {
-        Unassigned = -1,
+        Invalid = -1,
         DIFF,
         BEAM,
         Num
@@ -102,7 +102,7 @@ namespace DataWindowEquivalentLayer {
     // derived type (see below):
     enum class Orientation
     {
-        Unassigned = -1,
+        Invalid = -1,
         Horizontal,
         Vertical,
         Num
@@ -110,7 +110,7 @@ namespace DataWindowEquivalentLayer {
 
     enum class AngleType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Fixed,
         Variable,
         Num
@@ -206,7 +206,7 @@ namespace DataWindowEquivalentLayer {
         //                   PHI_DEG = 20 if diffuse only
 
         // Default Constructor
-        CFSLAYER() : LTYPE(LayerType::Unassigned), iGZS(0), S(0.0), W(0.0), C(0.0), PHI_DEG(0.0), CNTRL(0)
+        CFSLAYER() : LTYPE(LayerType::Invalid), iGZS(0), S(0.0), W(0.0), C(0.0), PHI_DEG(0.0), CNTRL(0)
         {
         }
     };

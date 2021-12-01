@@ -67,7 +67,7 @@ namespace CoolingPanelSimple {
     // Control types:
     enum class Control
     {
-        Unassigned = -1,
+        Invalid = -1,
         MAT,                // Controls system using mean air temperature
         MRT,                // Controls system using mean radiant temperature
         Operative,          // Controls system using operative temperature
@@ -149,7 +149,7 @@ namespace CoolingPanelSimple {
         // Default Constructor
         CoolingPanelParams()
             : EquipType(DataPlant::PlantEquipmentType::Invalid), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0), TotSurfToDistrib(0),
-              ControlCompTypeNum(0), CompErrIndex(0), ControlType(Control::Unassigned), ColdSetptSchedPtr(0), CondCtrlType(CondCtrl::NONE),
+              ControlCompTypeNum(0), CompErrIndex(0), ControlType(Control::Invalid), ColdSetptSchedPtr(0), CondCtrlType(CondCtrl::NONE),
               CondDewPtDeltaT(0.0), CondErrIndex(0), ColdThrottlRange(0.0), RatedWaterTemp(0.0), CoolingCapMethod(0), ScaledCoolingCapacity(0.0),
               UA(0.0), Offset(0.0), WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), RatedWaterFlowRate(0.0), WaterVolFlowRateMax(0.0),
               WaterInletTempStd(0.0), WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0),

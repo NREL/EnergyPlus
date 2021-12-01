@@ -2697,7 +2697,7 @@ namespace WindowComplexManager {
         CalcDeflection = TARCOGParams::DeflectionCalculation::NONE;
         CalcSHGC = 0;
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -2727,7 +2727,7 @@ namespace WindowComplexManager {
         isky = 3; // IR radiation is provided from external source
         iwd = 0;  // assume windward for now.  TODO compare surface normal with wind direction
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
             Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
             tind = RefAirTemp + DataGlobalConstants::KelvinConv; // Inside air temperature
@@ -2943,7 +2943,7 @@ namespace WindowComplexManager {
 
         } // End of loop over glass, gap and blind/shade layers in a window construction
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             // now calculate correct areas for multipliers
             for (Lay = 1; Lay <= nlayer; ++Lay) {
                 if (LayerType(Lay) != TARCOGParams::TARCOGLayerType::SPECULAR) { // Layer is shading
@@ -2972,7 +2972,7 @@ namespace WindowComplexManager {
         // vector of absorbed solar energy fractions for each layer.
         asol = 0.0;
         // direct solar radiation
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
                   state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
@@ -3017,7 +3017,7 @@ namespace WindowComplexManager {
         }
 
         // Common condition data
-        if (CalcCondition != DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition != DataBSDFWindow::Condition::Invalid) {
             trmin = tind;
             outir = 0.0;
             tsky = tout;
@@ -3163,7 +3163,7 @@ namespace WindowComplexManager {
             ShowSevereError(state, "Window tarcog returned an error");
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
             ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
-            if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+            if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
                 ShowContinueError(state, "surface name = " + state.dataSurface->Surface(SurfNum).Name);
             }
             ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
@@ -3193,7 +3193,7 @@ namespace WindowComplexManager {
             state.dataConstruction->Construct(ConstrNum).SummerSHGC = shgc;
 
             // Construct(SurfNum)%VisTransNorm = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffVisTrans
-        } else if (CalcCondition == DataBSDFWindow::Condition::Unassigned) { // expect converged results...
+        } else if (CalcCondition == DataBSDFWindow::Condition::Invalid) { // expect converged results...
             // Window heat balance solution has converged.
 
             state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;

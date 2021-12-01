@@ -103,7 +103,7 @@ namespace AirflowNetwork {
     // MODULE PARAMETER DEFINITIONS:
     enum class iComponentTypeNum : int
     {
-        Unassigned = 0,
+        Invalid = 0,
         DOP = 1,  // Detailed large opening component
         SOP = 2,  // Simple opening component
         SCR = 3,  // Surface crack component
@@ -161,7 +161,7 @@ namespace AirflowNetwork {
     // EPlus component Type
     enum class iEPlusComponentType : int
     {
-        Unassigned = 0,
+        Invalid = 0,
         SCN = 1, // Supply connection
         RCN = 2, // Return connection
         RHT = 3, // Reheat terminal
@@ -175,7 +175,7 @@ namespace AirflowNetwork {
     // EPlus node type
     enum class iEPlusNodeType : int
     {
-        Unassigned = 0,
+        Invalid = 0,
         ZIN = 1,  // Zone inlet node
         ZOU = 2,  // Zone outlet node
         SPL = 3,  // Splitter node
@@ -195,7 +195,7 @@ namespace AirflowNetwork {
 
     enum class iWPCCntr : int
     {
-        Unassigned = 0,
+        Invalid = 0,
         Input = 1,
         SurfAvg = 2,
         Num
@@ -244,12 +244,12 @@ namespace AirflowNetwork {
         // MULTIZONE WITHOUT DISTRIBUTION
         // MULTIZONE WITH DISTRIBUTION ONLY DURING FAN OPERATION,
         // and NO MULTIZONE OR DISTRIBUTION
-        std::string WPCCntr;                     // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        iWPCCntr iWPCCnt = iWPCCntr::Unassigned; // Integer equivalent for WPCCntr field
-        std::string BldgType;                    // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
-        std::string HeightOption;                // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-        int MaxIteration;                        // Maximum number of iteration, default 500
-        int InitFlag;                            // Initialization flag
+        std::string WPCCntr;                  // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
+        iWPCCntr iWPCCnt = iWPCCntr::Invalid; // Integer equivalent for WPCCntr field
+        std::string BldgType;                 // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
+        std::string HeightOption;             // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
+        int MaxIteration;                     // Maximum number of iteration, default 500
+        int InitFlag;                         // Initialization flag
         Solver solver;
         Real64 RelTol;               // Relative airflow convergence
         Real64 AbsTol;               // Absolute airflow convergence
@@ -1343,7 +1343,7 @@ namespace AirflowNetwork {
         // Default Constructor
         AirflowNetworkNodeProp()
             : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0),
-              EPlusTypeNum(iEPlusNodeType::Unassigned), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
+              EPlusTypeNum(iEPlusNodeType::Invalid), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }
     };
@@ -1361,7 +1361,7 @@ namespace AirflowNetwork {
         iEPlusComponentType EPlusTypeNum; // Provide EPlus component type
 
         // Default Constructor
-        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Unassigned)
+        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Invalid), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Invalid)
         {
         }
     };
@@ -1379,7 +1379,7 @@ namespace AirflowNetwork {
 
         // Default Constructor
         AirflowNetworkLinkageProp()
-            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Unassigned), VAVTermDamper(false),
+            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Invalid), VAVTermDamper(false),
               LinkageViewFactorObjectNum(0), AirLoopNum(0)
         {
         }

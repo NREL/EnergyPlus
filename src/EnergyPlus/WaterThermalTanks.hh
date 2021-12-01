@@ -71,7 +71,7 @@ namespace WaterThermalTanks {
 
     enum class WTTAmbientTemp
     {
-        Unassigned = -1,
+        Invalid = -1,
         Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
         TempZone,   // tank is located in a zone or HPWH inlet air is zone air only
         OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
@@ -91,7 +91,7 @@ namespace WaterThermalTanks {
 
     enum class CrankcaseHeaterControlTemp
     {
-        Unassigned = -1,
+        Invalid = -1,
         Schedule, // temperature controlling compressor crankcase heater is scheduled
         Zone,     // temperature controlling compressor crankcase heater is zone air
         Outdoors, // temperature controlling compressor crankcase heater is outdoor air
@@ -106,7 +106,7 @@ namespace WaterThermalTanks {
 
     enum class TankShape
     {
-        Unassigned = -1,
+        Invalid = -1,
         VertCylinder,  // tank shape is a vertical cylinder
         HorizCylinder, // tank shape is a horizontal cylinder
         Other,         // tank shape has an arbitrary perimeter shape
@@ -121,7 +121,7 @@ namespace WaterThermalTanks {
 
     enum class HeaterControlMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         Cycle,
         Modulate,
         Num
@@ -131,7 +131,7 @@ namespace WaterThermalTanks {
 
     enum class PriorityControlMode // For Stratified Water Heaters, this controls how the two heating elements work together
     {
-        Unassigned = -1,
+        Invalid = -1,
         MasterSlave,  // water heater only, master-slave priority control of heater elements
         Simultaneous, // water heater only, simultaneous control of heater elements
         Num
@@ -141,7 +141,7 @@ namespace WaterThermalTanks {
 
     enum class InletPositionMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         Fixed,   // water heater only, inlet water always enters at the user-specified height
         Seeking, // water heater only, inlet water seeks out the node with the closest temperature
         Num
@@ -152,7 +152,7 @@ namespace WaterThermalTanks {
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
     enum class ReclaimHeatObjectType
     {
-        Unassigned = -1,
+        Invalid = -1,
         CompressorRackRefrigeratedCase, // reclaim heating source is refrigerated case compressor rack
         DXCooling,                      // reclaim heating source is DX cooling coil
         DXMultiSpeed,                   // reclaim heating source is DX multispeed coil
@@ -165,7 +165,7 @@ namespace WaterThermalTanks {
 
     enum class WaterHeaterSide
     {
-        Unassigned = -1,
+        Invalid = -1,
         Use,    // Indicates Use side of water heater
         Source, // Indicates Source side of water heater
         Num
@@ -173,7 +173,7 @@ namespace WaterThermalTanks {
 
     enum class SizingMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         PeakDraw,
         ResidentialMin,
         PerPerson,
@@ -185,7 +185,7 @@ namespace WaterThermalTanks {
 
     enum class SourceSideControl
     {
-        Unassigned = -1,
+        Invalid = -1,
         StorageTank,
         IndirectHeatPrimarySetpoint,
         IndirectHeatAltSetpoint,
@@ -197,7 +197,7 @@ namespace WaterThermalTanks {
 
     enum class FlowMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         PassingFlowThru,
         MaybeRequestingFlow,
         ThrottlingFlow,
@@ -206,7 +206,7 @@ namespace WaterThermalTanks {
 
     enum class Fuel
     {
-        Unassigned = -1,
+        Invalid = -1,
         Electricity,
         NaturalGas,
         Diesel,
@@ -314,7 +314,7 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         WaterHeaterSizingData()
-            : DesignMode(SizingMode::Unassigned), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
+            : DesignMode(SizingMode::Invalid), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
               NumberOfBathrooms(0.0), TankCapacityPerPerson(0.0), RecoveryCapacityPerPerson(0.0), TankCapacityPerArea(0.0),
               RecoveryCapacityPerArea(0.0), NumberOfUnits(0.0), TankCapacityPerUnit(0.0), RecoveryCapacityPerUnit(0.0),
               TankCapacityPerCollectorArea(0.0), HeightAspectRatio(0.0), PeakDemand(0.0), PeakNumberOfPeople(0.0), TotalFloorArea(0.0),
@@ -713,7 +713,7 @@ namespace WaterThermalTanks {
               VolumeWasAutoSized(false), Mass(0.0), TimeElapsed(0.0), AmbientTempIndicator(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0),
               AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0),
               OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(HeaterControlMode::Cycle),
-              StratifiedControlMode(PriorityControlMode::Unassigned), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0),
+              StratifiedControlMode(PriorityControlMode::Invalid), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0),
               Efficiency(0.0), PLFCurve(0), SetPointTempSchedule(0), SetPointTemp(0.0), DeadBandDeltaTemp(0.0), TankTempLimit(0.0),
               IgnitionDelay(0.0), OffCycParaLoad(0.0), OffCycParaFracToTank(0.0), OnCycParaLoad(0.0), OnCycParaFracToTank(0.0),
               UseCurrentFlowLock(DataPlant::FlowLock::Unlocked), UseInletNode(0), UseInletTemp(0.0), UseOutletNode(0), UseOutletTemp(0.0),

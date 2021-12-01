@@ -91,7 +91,7 @@ namespace DataBranchNodeConnections {
         bool ObjectIsParent;                           // Indicator whether the object is a parent or not
 
         // Default Constructor
-        NodeConnectionDef() : NodeNumber(0), FluidStream(NodeInputManager::compFluidStream::Unassigned), ObjectIsParent(false)
+        NodeConnectionDef() : NodeNumber(0), FluidStream(NodeInputManager::compFluidStream::Invalid), ObjectIsParent(false)
         {
         }
     };

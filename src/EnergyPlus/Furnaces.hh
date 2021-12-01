@@ -68,7 +68,7 @@ namespace Furnaces {
 
     enum class ModeOfOperation
     {
-        Unassigned = -1,
+        Invalid = -1,
         CoolingMode, // last compressor operating mode was in cooling
         HeatingMode, // last compressor operating mode was in heating
         NoCoolHeat,  // last operating mode was coil off
@@ -78,7 +78,7 @@ namespace Furnaces {
     // Airflow control for contant fan mode
     enum class AirFlowControlConstFan
     {
-        Unassigned = -1,      // default
+        Invalid = -1,         // default
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value,
         Num
@@ -262,10 +262,10 @@ namespace Furnaces {
               HeatingCoilType_Num(0), HeatingCoilIndex(0), ReheatingCoilType_Num(0), ReheatingCoilIndex(0), CoilControlNode(0), HWCoilAirInletNode(0),
               HWCoilAirOutletNode(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
               SuppCoilControlNode(0), FanType_Num(0), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0), OpMode(0),
-              LastMode(Furnaces::ModeOfOperation::Unassigned), AirFlowControl(AirFlowControlConstFan::Unassigned), FanPlace(0),
-              NodeNumOfControlledZone(0), WatertoAirHPType(0), CoolingConvergenceTolerance(0.0), HeatingConvergenceTolerance(0.0),
-              DesignHeatingCapacity(0.0), DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0), HeatingCoilSensDemand(0.0),
-              CoolingCoilLatentDemand(0.0), DesignSuppHeatingCapacity(0.0), DesignFanVolFlowRate(0.0), DesignFanVolFlowRateEMSOverrideOn(false),
+              LastMode(Furnaces::ModeOfOperation::Invalid), AirFlowControl(AirFlowControlConstFan::Invalid), FanPlace(0), NodeNumOfControlledZone(0),
+              WatertoAirHPType(0), CoolingConvergenceTolerance(0.0), HeatingConvergenceTolerance(0.0), DesignHeatingCapacity(0.0),
+              DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0), HeatingCoilSensDemand(0.0), CoolingCoilLatentDemand(0.0),
+              DesignSuppHeatingCapacity(0.0), DesignFanVolFlowRate(0.0), DesignFanVolFlowRateEMSOverrideOn(false),
               DesignFanVolFlowRateEMSOverrideValue(0.0), DesignMassFlowRate(0.0), MaxCoolAirVolFlow(0.0), MaxCoolAirVolFlowEMSOverrideOn(false),
               MaxCoolAirVolFlowEMSOverrideValue(0.0), MaxHeatAirVolFlow(0.0), MaxHeatAirVolFlowEMSOverrideOn(false),
               MaxHeatAirVolFlowEMSOverrideValue(0.0), MaxNoCoolHeatAirVolFlow(0.0), MaxNoCoolHeatAirVolFlowEMSOverrideOn(false),
@@ -282,7 +282,7 @@ namespace Furnaces {
               DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), SuppCoilOutletNode(0),
               LoopNumSupp(0), LoopSideSupp(0), BranchNumSupp(0), CompNumSupp(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
               EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0), EMSOverrideMoistZoneLoadRequest(false),
-              EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Unassigned), NumOfSpeedCooling(0), NumOfSpeedHeating(0),
+              EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Invalid), NumOfSpeedCooling(0), NumOfSpeedHeating(0),
               IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
               HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
               CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),

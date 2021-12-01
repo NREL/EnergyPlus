@@ -255,7 +255,7 @@ namespace DataPlant {
                     // For now this is just a placeholder, because these components shouldn't cause a problem anywhere...
                     break;
                 }
-                case DataPlant::OpScheme::Unassigned: { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
+                case DataPlant::OpScheme::Invalid: { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
                     // throw fatal
                     ShowSevereError(state,
                                     "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
@@ -323,8 +323,8 @@ namespace DataPlant {
                             //  and they won't affect the load distribution
                             break;
                         }
-                        case DataPlant::OpScheme::Unassigned: { //~ Uninitialized, this should be sufficient place to
-                                                                // catch for this on other branches
+                        case DataPlant::OpScheme::Invalid: { //~ Uninitialized, this should be sufficient place to
+                                                             // catch for this on other branches
                             // throw fatal error
                             ShowSevereError(
                                 state, "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);

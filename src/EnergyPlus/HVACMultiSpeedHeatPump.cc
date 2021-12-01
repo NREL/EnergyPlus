@@ -2533,7 +2533,7 @@ namespace HVACMultiSpeedHeatPump {
         } else if (QZnReq < (-1.0 * SmallLoad)) {
             MSHeatPump(MSHeatPumpNum).HeatCoolMode = ModeOfOperation::CoolingMode;
         } else {
-            MSHeatPump(MSHeatPumpNum).HeatCoolMode = ModeOfOperation::Unassigned;
+            MSHeatPump(MSHeatPumpNum).HeatCoolMode = ModeOfOperation::Invalid;
         }
 
         // Determine the staged status
@@ -2591,7 +2591,7 @@ namespace HVACMultiSpeedHeatPump {
                 state.dataLoopNodes->Node(MSHeatPump(MSHeatPumpNum).AirInletNodeNum).MassFlowRate = state.dataHVACMultiSpdHP->CompOnMassFlow;
                 PartLoadFrac = 0.0;
             } else {
-                if (MSHeatPump(MSHeatPumpNum).HeatCoolMode != ModeOfOperation::Unassigned) {
+                if (MSHeatPump(MSHeatPumpNum).HeatCoolMode != ModeOfOperation::Invalid) {
                     PartLoadFrac = 1.0;
                 } else {
                     PartLoadFrac = 0.0;
@@ -2699,7 +2699,7 @@ namespace HVACMultiSpeedHeatPump {
             return;
         }
 
-        if ((MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::Unassigned && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil) ||
+        if ((MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::Invalid && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil) ||
             state.dataHVACMultiSpdHP->CompOnMassFlow == 0.0) {
             QZnReq = 0.0;
             PartLoadFrac = 0.0;

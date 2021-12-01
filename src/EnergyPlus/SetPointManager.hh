@@ -1000,7 +1000,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineScheduledTESSetPointManager()
-            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::CtrlType::Unassigned),
+            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::CtrlType::Invalid),
               SetPt(0.0)
         {
         }

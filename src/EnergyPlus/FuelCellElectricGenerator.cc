@@ -253,7 +253,7 @@ namespace FuelCellElectricGenerator {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode = DataGenerators::CurveMode::Direct;
                 if (UtilityRoutines::SameString(AlphArray(2), "NORMALIZED"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode = DataGenerators::CurveMode::Normalized;
-                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode == DataGenerators::CurveMode::Unassigned) {
+                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode == DataGenerators::CurveMode::Invalid) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
@@ -293,7 +293,7 @@ namespace FuelCellElectricGenerator {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode = DataGenerators::SkinLoss::UADT;
                 if (UtilityRoutines::SameString(AlphArray(4), "QUADRATIC FUNCTION OF FUEL RATE"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode = DataGenerators::SkinLoss::QuadraticFuelNdot;
-                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode == DataGenerators::SkinLoss::Unassigned) {
+                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode == DataGenerators::SkinLoss::Invalid) {
                     // throw error
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
@@ -985,7 +985,7 @@ namespace FuelCellElectricGenerator {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEfficiencyMode::Quadratic;
                 if (UtilityRoutines::SameString(AlphArray(2), "Constant"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEfficiencyMode::Constant;
-                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode == DataGenerators::InverterEfficiencyMode::Unassigned) {
+                if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode == DataGenerators::InverterEfficiencyMode::Invalid) {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;

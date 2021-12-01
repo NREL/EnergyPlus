@@ -441,7 +441,7 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).ControlType = DesicDehumCtrlType::FixedHumratBypass;
             if (UtilityRoutines::SameString(Alphas(7), "SystemNodeMaximumHumidityRatioSetpoint"))
                 DesicDehum(DesicDehumNum).ControlType = DesicDehumCtrlType::NodeHumratBypass;
-            if (DesicDehum(DesicDehumNum).ControlType == DesicDehumCtrlType::Unassigned) {
+            if (DesicDehum(DesicDehumNum).ControlType == DesicDehumCtrlType::Invalid) {
                 ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                 ShowContinueError(state, "Invalid " + cAlphaFields(7) + " = " + Alphas(7));
                 ShowContinueError(state, "setting to LeavingMaximumHumidityRatioSetpoint");

@@ -143,7 +143,7 @@ namespace Boilers {
         BoilerSpecs()
             : FuelType(DataGlobalConstants::ResourceType::None), Type(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0),
               BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), VolFlowRate(0.0),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), VolFlowRate(0.0),
               VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0),
               MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0), CurveTempMode(TempMode::NOTSET),
               EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0),

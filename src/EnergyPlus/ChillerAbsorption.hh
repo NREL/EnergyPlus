@@ -179,7 +179,7 @@ namespace ChillerAbsorption {
         // Default Constructor
         BLASTAbsorberSpecs()
             : Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomPumpPower(0.0), NomPumpPowerWasAutoSized(false),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0),
               CondMassFlowRateMax(0.0), GenMassFlowRateMax(0.0), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),

@@ -112,7 +112,7 @@ namespace OutputProcessor {
 
     enum class VariableType
     {
-        Unassigned = -1,
+        Invalid = -1,
         NotFound, // ref: GetVariableKeyCountandType, 0 = not found
         Integer,  // ref: GetVariableKeyCountandType, 1 = integer
         Real,     // ref: GetVariableKeyCountandType, 2 = real
@@ -123,7 +123,7 @@ namespace OutputProcessor {
 
     enum class MtrType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Normal,     // Type value for normal meters
         Custom,     // Type value for custom meters
         CustomDec,  // Type value for custom meters that decrement another meter
@@ -188,7 +188,7 @@ namespace OutputProcessor {
     //  For IP Units (tabular reports) certain resources will be put in sub-tables
     enum class RT_IPUnits
     {
-        Unassigned = -1,
+        Invalid = -1,
         OtherJ,
         Electricity,
         Gas,
@@ -551,17 +551,17 @@ namespace OutputProcessor {
 
         // Default Constructor
         MeterType()
-            : Units(OutputProcessor::Unit::None), RT_forIPUnits(OutputProcessor::RT_IPUnits::Unassigned), TypeOfMeter(MtrType::Normal),
-              SourceMeter(0), TSValue(0.0), CurTSValue(0.0), RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false),
-              HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0),
-              DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0),
-              MNRptNum(0), YRValue(0.0), RptYR(false), RptYRFO(false), YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0),
-              YRRptNum(0), SMValue(0.0), RptSM(false), RptSMFO(false), SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0),
-              SMRptNum(0), LastSMValue(0.0), LastSMMaxVal(-99999.0), LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0),
-              FinYrSMValue(0.0), FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0), FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false),
-              RptAccTSFO(false), RptAccHR(false), RptAccHRFO(false), RptAccDY(false), RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false),
-              RptAccYR(false), RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false), TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0),
-              YRAccRptNum(0), SMAccRptNum(0), InstMeterCacheStart(0), InstMeterCacheEnd(0)
+            : Units(OutputProcessor::Unit::None), RT_forIPUnits(OutputProcessor::RT_IPUnits::Invalid), TypeOfMeter(MtrType::Normal), SourceMeter(0),
+              TSValue(0.0), CurTSValue(0.0), RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false), HRRptNum(0),
+              DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0), DYRptNum(0),
+              MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0), MNRptNum(0),
+              YRValue(0.0), RptYR(false), RptYRFO(false), YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0), YRRptNum(0),
+              SMValue(0.0), RptSM(false), RptSMFO(false), SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0), SMRptNum(0),
+              LastSMValue(0.0), LastSMMaxVal(-99999.0), LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0), FinYrSMValue(0.0),
+              FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0), FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false), RptAccTSFO(false),
+              RptAccHR(false), RptAccHRFO(false), RptAccDY(false), RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false), RptAccYR(false),
+              RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false), TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0), YRAccRptNum(0),
+              SMAccRptNum(0), InstMeterCacheStart(0), InstMeterCacheEnd(0)
         {
         }
     };

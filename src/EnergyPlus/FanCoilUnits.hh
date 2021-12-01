@@ -81,7 +81,7 @@ namespace FanCoilUnits {
 
     enum class CCoil
     {
-        Unassigned = -1,
+        Invalid = -1,
         Water,
         Detailed,
         HXAssist,
@@ -90,7 +90,7 @@ namespace FanCoilUnits {
 
     enum class HCoil
     {
-        Unassigned = -1,
+        Invalid = -1,
         Water,
         Electric,
         Num
@@ -98,7 +98,7 @@ namespace FanCoilUnits {
 
     enum class CCM // capacity control method supported in this module
     {
-        Unassigned = -1,
+        Invalid = -1,
         ConsFanVarFlow,
         CycFan,
         VarFanVarFlow,
@@ -250,13 +250,13 @@ namespace FanCoilUnits {
         int RegulaFalsiFailedIndex;      // iteration loop warning
 
         FanCoilData() // Default Constructor
-            : UnitType_Num(0), SchedPtr(0), SchedOutAirPtr(0), FanType_Num(0), SpeedFanSel(0), CapCtrlMeth_Num(CCM::Unassigned), PLR(0.0),
+            : UnitType_Num(0), SchedPtr(0), SchedOutAirPtr(0), FanType_Num(0), SpeedFanSel(0), CapCtrlMeth_Num(CCM::Invalid), PLR(0.0),
               MaxIterIndexH(0), BadMassFlowLimIndexH(0), MaxIterIndexC(0), BadMassFlowLimIndexC(0), FanAirVolFlow(0.0), MaxAirVolFlow(0.0),
               MaxAirMassFlow(0.0), LowSpeedRatio(0.0), MedSpeedRatio(0.0), SpeedFanRatSel(0.0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), AirInNode(0),
               AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanIndex(0), CCoilName_Index(0),
-              CCoilType_Num(CCoil::Unassigned), CCoilPlantType(DataPlant::PlantEquipmentType::Invalid), ControlCompTypeNum(0), CompErrIndex(0),
+              CCoilType_Num(CCoil::Invalid), CCoilPlantType(DataPlant::PlantEquipmentType::Invalid), ControlCompTypeNum(0), CompErrIndex(0),
               MaxColdWaterVolFlow(0.0), MinColdWaterVolFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), HCoilName_Index(0),
-              HCoilType_Num(HCoil::Unassigned), MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0), MinHotWaterFlow(0.0), HotControlOffset(0.0),
+              HCoilType_Num(HCoil::Invalid), MaxHotWaterVolFlow(0.0), MinHotWaterVolFlow(0.0), MinHotWaterFlow(0.0), HotControlOffset(0.0),
               DesignHeatingCapacity(0.0), AvailStatus(0), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), HVACSizingIndex(0),
               SpeedRatio(0.0), FanOpModeSchedPtr(0), FanOpMode(1), ASHRAETempControl(false), QUnitOutNoHC(0.0), QUnitOutMaxH(0.0), QUnitOutMaxC(0.0),
               LimitErrCountH(0), LimitErrCountC(0), ConvgErrCountH(0), ConvgErrCountC(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),

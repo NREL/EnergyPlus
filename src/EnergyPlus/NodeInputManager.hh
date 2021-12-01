@@ -72,7 +72,7 @@ namespace NodeInputManager {
     // For GetOnlySingleNode(), GetNodeNums(), etc
     enum class compFluidStream
     {
-        Unassigned = -1,
+        Invalid = -1,
         Primary = 1,
         Secondary = 2,
         Tertiary = 3,

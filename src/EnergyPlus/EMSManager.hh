@@ -84,7 +84,7 @@ namespace EMSManager {
     // Parameters for EMS Calling Points
     enum class EMSCallFrom
     {
-        Unassigned = -1,
+        Invalid = -1,
         ZoneSizing,
         SystemSizing,
         BeginNewEnvironment,

@@ -692,7 +692,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         e.avgSum = OutputProcessor::StoreType::Averaged;
         e.stepType = OutputProcessor::TimeStepType::TimeStepZone;
         e.units = OutputProcessor::Unit::None;
-        e.aggType = iAggType::Unassigned;
+        e.aggType = iAggType::Invalid;
     }
     for (colNum = 1; colNum <= ort->MonthlyColumnsCount; ++colNum) {
         ort->MonthlyColumns(colNum).reslt = 0.0;

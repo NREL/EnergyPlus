@@ -1592,7 +1592,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         ++SupAirPathNodeNum;
                         state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
                             state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Unassigned;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 } else if (PlenumNum > 0) {
                     ++SupAirPathNodeNum;
@@ -1606,14 +1606,14 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         ++SupAirPathNodeNum;
                         state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
                             state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Unassigned;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 }
             }
 
             // find the nodes that connect a splitter and a plenum
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Unassigned) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
                     for (SupNodeIndex2 = SupNodeIndex + 1; SupNodeIndex2 <= NumAllSupAirPathNodes; ++SupNodeIndex2) {
                         if ((state.dataSimAirServingZones->SupNode(SupNodeIndex) == state.dataSimAirServingZones->SupNode(SupNodeIndex2)) &&
                             (state.dataSimAirServingZones->SupNodeType(SupNodeIndex2) == DataZoneEquipment::AirNodeType::CompInlet)) {
@@ -1626,7 +1626,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
             //  the rest of the nodes are outlet nodes and count the duplicated intermediate nodes
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Unassigned) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
                     ++NumSupAirPathOutNodes;
                     state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Outlet;
                 } else if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate) {

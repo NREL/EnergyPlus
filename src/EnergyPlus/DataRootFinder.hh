@@ -58,9 +58,9 @@ namespace EnergyPlus::DataRootFinder {
 
 enum class Slope
 {
-    Unassigned = -1, // Undefined slope specification
-    Increasing,      // For overall increasing function F(X) between min and max points
-    Decreasing,      // For overall decreasing function F(X) between min and max points
+    Invalid = -1, // Undefined slope specification
+    Increasing,   // For overall increasing function F(X) between min and max points
+    Decreasing,   // For overall decreasing function F(X) between min and max points
     Num
 };
 
@@ -115,7 +115,7 @@ struct ControlsType
     Real64 ATolY; // Absolute tolerance for variable Y
 
     // Default Constructor
-    ControlsType() : SlopeType(DataRootFinder::Slope::Unassigned), MethodType(iMethod::None), TolX(1.0e-3), ATolX(1.0e-3), ATolY(1.0e-3)
+    ControlsType() : SlopeType(DataRootFinder::Slope::Invalid), MethodType(iMethod::None), TolX(1.0e-3), ATolX(1.0e-3), ATolY(1.0e-3)
     {
     }
 };

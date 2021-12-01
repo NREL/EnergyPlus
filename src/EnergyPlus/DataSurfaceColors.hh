@@ -67,7 +67,7 @@ namespace DataSurfaceColors {
 
     enum class ColorNo
     {
-        Unassigned = -1,
+        Invalid = -1,
         Text,
         Wall,
         Window,
@@ -83,7 +83,7 @@ namespace DataSurfaceColors {
         TDDDiffuser,
         DaylSensor1,
         DaylSensor2,
-        NUM,
+        Num,
     };
 
     bool MatchAndSetColorTextString(EnergyPlusData &state,

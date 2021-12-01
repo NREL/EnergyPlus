@@ -74,7 +74,6 @@ namespace RuntimeLanguageProcessor {
     enum class Token
     {
         Invalid = -1,
-        Unassigned = 0,
         Number = 1,            // matches the ValueNumber
         Variable = 4,          // matches the ValueVariable
         Expression = 5,        // matches the ValueExpression
@@ -99,7 +98,7 @@ namespace RuntimeLanguageProcessor {
         std::string Error;  // holds token processing error message content
 
         // Default Constructor
-        TokenType() : Type(Token::Unassigned), Number(0.0), Operator(ErlFunc::Unassigned), Variable(0), Parenthesis(Token::Unassigned), Expression(0)
+        TokenType() : Type(Token::Invalid), Number(0.0), Operator(ErlFunc::Invalid), Variable(0), Parenthesis(Token::Invalid), Expression(0)
         {
         }
     };

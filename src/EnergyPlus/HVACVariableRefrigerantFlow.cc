@@ -2203,7 +2203,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
             if (UtilityRoutines::SameString(cAlphaArgs(31), "Resistive"))
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Unassigned) {
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(31) +
                                     " not found: " + cAlphaArgs(31));
@@ -2218,7 +2218,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
             if (UtilityRoutines::SameString(cAlphaArgs(32), "OnDemand"))
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(32) +
                                     " not found: " + cAlphaArgs(32));
@@ -2283,7 +2283,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ShowContinueError(state, "... " + cAlphaFieldNames(19) + " will be reset to DRYBULBTEMPERATURE and simulation continues.");
                 }
             }
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType == DataHeatBalance::RefrigCondenserType::Unassigned) {
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType == DataHeatBalance::RefrigCondenserType::Invalid) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + state.dataHVACVarRefFlow->VRF(VRFNum).Name);
                 ShowContinueError(state, "Illegal " + cAlphaFieldNames(34) + " = " + cAlphaArgs(34));
                 ErrorsFound = true;
@@ -2802,7 +2802,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
             if (UtilityRoutines::SameString(cAlphaArgs(8), "Resistive"))
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Unassigned) {
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(8) +
                                     " not found: " + cAlphaArgs(8));
@@ -2817,7 +2817,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
             if (UtilityRoutines::SameString(cAlphaArgs(9), "OnDemand"))
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(9) +
                                     " not found: " + cAlphaArgs(9));
@@ -3286,7 +3286,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
             if (UtilityRoutines::SameString(cAlphaArgs(8), "Resistive"))
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Unassigned) {
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(8) +
                                     " not found: " + cAlphaArgs(8));
@@ -3301,7 +3301,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
             if (UtilityRoutines::SameString(cAlphaArgs(9), "OnDemand"))
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(9) +
                                     " not found: " + cAlphaArgs(9));
@@ -6265,7 +6265,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             EquipList_exit:;
                 if (ctrlZoneNum > 0) {
                     int inletNodeADUNum = 0;
-                    DataZoneEquipment::ZoneEquip sysType_Num = DataZoneEquipment::ZoneEquip::Unassigned;
+                    DataZoneEquipment::ZoneEquip sysType_Num = DataZoneEquipment::ZoneEquip::Invalid;
                     std::string sysName = "";
                     for (int inletNode = 1; inletNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; inletNode++) {
                         if (state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(inletNode) !=

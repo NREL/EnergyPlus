@@ -71,7 +71,7 @@ namespace CondenserLoopTowers {
     enum class ModelType
     {
         // Empirical Model Type
-        Unassigned = -1,
+        Invalid = -1,
         CoolToolsXFModel,
         CoolToolsUserDefined,
         YorkCalcModel,
@@ -97,7 +97,7 @@ namespace CondenserLoopTowers {
 
     enum class PIM
     {
-        Unassigned = -1,
+        Invalid = -1,
         NominalCapacity,
         UFactor,
         Num
@@ -105,7 +105,7 @@ namespace CondenserLoopTowers {
 
     enum class CapacityCtrlEnum
     {
-        Unassigned = -1,
+        Invalid = -1,
         FanCycling,
         FluidBypass,
         Num
@@ -113,7 +113,7 @@ namespace CondenserLoopTowers {
 
     enum class CellCtrl
     {
-        Unassigned = -1,
+        Invalid = -1,
         MinCell,
         MaxCell,
         Num
@@ -360,7 +360,7 @@ namespace CondenserLoopTowers {
 
         // Default Constructor
         CoolingTower()
-            : TowerType(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::Unassigned), Available(true), ON(true),
+            : TowerType(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PIM::Invalid), Available(true), ON(true),
               DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0),
               DesWaterMassFlowRatePerCell(0.0), HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
               DefaultedDesignAirFlowScalingFactor(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
@@ -375,11 +375,11 @@ namespace CondenserLoopTowers {
               TowerNominalCapacityWasAutoSized(false), TowerLowSpeedNomCap(0.0), TowerLowSpeedNomCapWasAutoSized(false),
               TowerLowSpeedNomCapSizingFactor(0.0), TowerFreeConvNomCap(0.0), TowerFreeConvNomCapWasAutoSized(false),
               TowerFreeConvNomCapSizingFactor(0.0), SizFac(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
-              TowerModelType(ModelType::Unassigned), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0),
+              TowerModelType(ModelType::Invalid), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0),
               HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0),
               SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0),
               WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), CoolingTowerAFRRFailedCount(0), CoolingTowerAFRRFailedIndex(0),
-              SpeedSelected(0), CapacityControl(CapacityCtrlEnum::Unassigned), BypassFraction(0.0), NumCell(0), CellCtrl_Num(CellCtrl::Unassigned),
+              SpeedSelected(0), CapacityControl(CapacityCtrlEnum::Invalid), BypassFraction(0.0), NumCell(0), CellCtrl_Num(CellCtrl::Invalid),
               NumCellOn(0), MinFracFlowRate(0.0), MaxFracFlowRate(0.0), EvapLossMode(EvapLoss::MoistTheory), UserEvapLossFactor(0.0),
               DriftLossFraction(0.0), BlowdownMode(Blowdown::Concentration), ConcentrationRatio(0.0), SchedIDBlowdown(0),
               SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),

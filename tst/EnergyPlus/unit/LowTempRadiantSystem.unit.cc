@@ -239,7 +239,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     ExpectedResult2 = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
     ExpectedResult2 = ExpectedResult2 / (state->dataSize->PlantSizData(2).DeltaT * RhoWater * CpWater);
 
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).NumCircCalcMethod = CircuitCalc::Unassigned;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).NumCircCalcMethod = CircuitCalc::Invalid;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).NumOfSurfaces = 1;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).TubeLength = AutoSize;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).TotalSurfaceArea = 1500.0;
@@ -429,7 +429,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode = 4;
 
     // Hydronic - embeded tube length autosize
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).NumCircCalcMethod = CircuitCalc::Unassigned;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).NumCircCalcMethod = CircuitCalc::Invalid;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NumOfSurfaces = 1;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).TubeLength = AutoSize;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).TotalSurfaceArea = 150.0;

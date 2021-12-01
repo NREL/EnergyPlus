@@ -218,7 +218,7 @@ namespace UnitarySystems {
         // Parent models simulated using UnitarySystem source code
         enum class SysType : int
         {
-            Unassigned = -1,
+            Invalid = -1,
             Unitary,          // AirloopHVAC:UnitarySystem
             CoilCoolingDX,    // CoilSystem:Cooling:DX
             CoilCoolingWater, // CoilSystem:Cooling:Water

@@ -660,7 +660,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
-    int numGainTypes = static_cast<int>(DataHeatBalance::IntGainType::NUM);
+    int numGainTypes = static_cast<int>(DataHeatBalance::IntGainType::Num);
     Array1D<Real64> convGains({0, numGainTypes - 1});
     convGains = 0.0;
     Real64 totConvGains = 0.0;

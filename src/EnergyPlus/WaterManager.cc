@@ -540,7 +540,7 @@ namespace WaterManager {
                     } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Scheduled")) {
                         state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::ScheduledWaterTable;
                     } else if (lAlphaFieldBlanks(3)) {
-                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::Unassigned;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::Invalid;
                     } else {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));

@@ -75,7 +75,7 @@ namespace DataRuntimeLanguage {
 
     enum class ErlKeywordParam // keyword parameters for types of Erl statements
     {
-        Unassigned = -1,
+        Invalid = -1,
         None,     // statement type not set
         Return,   // Return statement, as in leave program
         Goto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
@@ -92,7 +92,7 @@ namespace DataRuntimeLanguage {
 
     enum class Value
     {
-        Unassigned = -1,
+        Invalid = -1,
         Null,       // Erl entity type, "Null" value
         Number,     // Erl entity type,  hard numeric value
         String,     // Erl entity type,  character data
@@ -106,7 +106,7 @@ namespace DataRuntimeLanguage {
 
     enum class PtrDataType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Real,    // data type for overloaded pointer management, double real
         Integer, // data type for overloaded pointer management, integer
         Logical, // data type for overloaded pointer management, logical
@@ -117,7 +117,7 @@ namespace DataRuntimeLanguage {
     // The number of these parameters indicates the order of precedence
     enum class ErlFunc
     {
-        Unassigned = -1,
+        Invalid = -1,
         Null,
         Literal,        // Just stores a literal value
         Negative,       // -  (unary) No LHS?
@@ -271,7 +271,7 @@ namespace DataRuntimeLanguage {
         int *IntValue;               // POINTER to the Integer value that is being accessed
 
         // Default Constructor
-        InternalVarsAvailableType() : PntrVarTypeUsed(PtrDataType::Unassigned), RealValue(nullptr), IntValue(nullptr)
+        InternalVarsAvailableType() : PntrVarTypeUsed(PtrDataType::Invalid), RealValue(nullptr), IntValue(nullptr)
         {
         }
     };
@@ -311,7 +311,7 @@ namespace DataRuntimeLanguage {
 
         // Default Constructor
         EMSActuatorAvailableType()
-            : handleCount(0), PntrVarTypeUsed(PtrDataType::Unassigned), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
+            : handleCount(0), PntrVarTypeUsed(PtrDataType::Invalid), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
         {
         }
     };
@@ -344,7 +344,7 @@ namespace DataRuntimeLanguage {
         Array1D_int ErlProgramARR;            // list of integer pointers to Erl programs used by this manager
 
         // Default Constructor
-        EMSProgramCallManagementType() : CallingPoint(EMSManager::EMSCallFrom::Unassigned), NumErlPrograms(0)
+        EMSProgramCallManagementType() : CallingPoint(EMSManager::EMSCallFrom::Invalid), NumErlPrograms(0)
         {
         }
     };
@@ -441,7 +441,7 @@ namespace DataRuntimeLanguage {
         Array1D<ErlValueType> Operand; // holds Erl values for operands in expression
 
         // Default Constructor
-        ErlExpressionType() : Operator(ErlFunc::Unassigned), NumOperands(0)
+        ErlExpressionType() : Operator(ErlFunc::Invalid), NumOperands(0)
         {
         }
     };
@@ -455,7 +455,7 @@ namespace DataRuntimeLanguage {
         int NumOperands;    // count of operands or function arguments.
 
         // Default Constructor
-        OperatorType() : Code(ErlFunc::Unassigned), NumOperands(0)
+        OperatorType() : Code(ErlFunc::Invalid), NumOperands(0)
         {
         }
     };

@@ -151,7 +151,7 @@ namespace PlantChillers {
         BaseChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
               CondenserType(DataPlant::CondenserType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
               EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),
               CondMassFlowRateMax(0.0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0),

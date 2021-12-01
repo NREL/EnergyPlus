@@ -135,7 +135,7 @@ namespace UnitarySystems {
     }
 
     UnitarySys::UnitarySys() // constructor
-        : m_UnitarySysNum(-1), m_sysType(SysType::Unassigned), m_ThisSysInputShouldBeGotten(true), m_SysAvailSchedPtr(0),
+        : m_UnitarySysNum(-1), m_sysType(SysType::Invalid), m_ThisSysInputShouldBeGotten(true), m_SysAvailSchedPtr(0),
           m_ControlType(ControlType::None), m_DehumidControlType_Num(DehumCtrlType::None), m_Humidistat(false), m_ValidASHRAECoolCoil(false),
           m_ValidASHRAEHeatCoil(false), m_SimASHRAEModel(false), m_setFaultModelInput(true), m_FanIndex(0), m_FanPlace(FanPlace::NotYetSet),
           m_FanOpModeSchedPtr(0), m_FanExists(false), m_FanType_Num(0), m_RequestAutoSize(false), m_ActualFanVolFlowRate(0.0),
@@ -146,7 +146,7 @@ namespace UnitarySystems {
 
           m_VarSpeedHeatingCoil(false), m_SystemHeatControlNodeNum(0), m_CoolCoilExists(false), m_CoolingCoilType_Num(0), m_NumOfSpeedCooling(0),
           m_CoolingCoilAvailSchPtr(0), m_DesignCoolingCapacity(0.0), m_MaxCoolAirVolFlow(0.0), m_CondenserNodeNum(0),
-          m_CondenserType(DataHeatBalance::RefrigCondenserType::Unassigned), m_CoolingCoilIndex(0), m_HeatPump(false),
+          m_CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), m_CoolingCoilIndex(0), m_HeatPump(false),
           m_ActualDXCoilIndexForHXAssisted(0), m_DiscreteSpeedCoolingCoil(false), m_ContSpeedCoolingCoil(false), m_SystemCoolControlNodeNum(0),
           m_WaterCyclingMode(0), m_ISHundredPercentDOASDXCoil(false), m_RunOnSensibleLoad(false), m_RunOnLatentLoad(false),
           m_RunOnLatentOnlyWithSensible(false), m_DehumidificationMode(0), m_SuppHeatCoilType_Num(0), m_SuppCoilExists(false),

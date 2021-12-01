@@ -72,7 +72,7 @@ namespace PoweredInductionUnits {
     // coil types in this module
     enum class iHCoilType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Gas,
         Electric,
         SimpleHeating,
@@ -152,11 +152,11 @@ namespace PoweredInductionUnits {
 
         // Default Constructor
         PowIndUnitData()
-            : UnitType_Num(DataDefineEquip::iZnAirLoopEquipType::Unassigned), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0),
+            : UnitType_Num(DataDefineEquip::iZnAirLoopEquipType::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0),
               MaxPriAirVolFlow(0.0), MaxPriAirMassFlow(0.0), MinPriAirFlowFrac(0.0), MinPriAirMassFlow(0.0), PriDamperPosition(0.0),
               MaxSecAirVolFlow(0.0), MaxSecAirMassFlow(0.0), FanOnFlowFrac(0.0), FanOnAirMassFlow(0.0), PriAirInNode(0), SecAirInNode(0),
               OutAirNode(0), HCoilInAirNode(0), ControlCompTypeNum(0), CompErrIndex(0), Mixer_Num(0), Fan_Num(0), Fan_Index(0), FanAvailSchedPtr(0),
-              HCoilType(iHCoilType::Unassigned), HCoil_PlantType(DataPlant::PlantEquipmentType::Invalid), HCoil_Index(0), HCoil_FluidIndex(0),
+              HCoilType(iHCoilType::Invalid), HCoil_PlantType(DataPlant::PlantEquipmentType::Invalid), HCoil_Index(0), HCoil_FluidIndex(0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0),
               MinHotSteamFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
               HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), ADUNum(0), InducesPlenumAir(false), HeatingRate(0.0), HeatingEnergy(0.0),

@@ -954,7 +954,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
 
     //  Do all detached shading surfaces first
     int surfcount = 0;
-    ColorNo colorindex = ColorNo::Unassigned;
+    ColorNo colorindex = ColorNo::Invalid;
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
         if (state.dataSurface->Surface(surf).HeatTransSurf) continue;
@@ -1151,7 +1151,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 
     //  Do all detached shading surfaces first
     int surfcount = 0;
-    ColorNo colorindex = ColorNo::Unassigned;
+    ColorNo colorindex = ColorNo::Invalid;
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
 

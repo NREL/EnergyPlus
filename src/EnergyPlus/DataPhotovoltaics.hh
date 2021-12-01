@@ -64,7 +64,7 @@ namespace DataPhotovoltaics {
 
     enum class PVModel
     {
-        Unassigned = -1,
+        Invalid = -1,
         Simple,
         TRNSYS,
         Sandia,
@@ -73,7 +73,7 @@ namespace DataPhotovoltaics {
 
     enum class CellIntegration
     {
-        Unassigned = -1,          // cell temp method not set
+        Invalid = -1,             // cell temp method not set
         Decoupled,                // cell temp method based on energy balance
         DecoupledUllebergDynamic, // cell temp method based on energy bal with capacity
         SurfaceOutsideFace,       // cell temp method based on coupling to E+'s heat balance
@@ -85,7 +85,7 @@ namespace DataPhotovoltaics {
 
     enum class Efficiency
     {
-        Unassigned = -1,
+        Invalid = -1,
         Fixed,     // simple PV, constant efficiency
         Scheduled, // simple PV, scheduled efficiency
         Num
@@ -93,7 +93,7 @@ namespace DataPhotovoltaics {
 
     enum class SiPVCells
     {
-        Unassigned = -1,
+        Invalid = -1,
         Crystalline,
         Amorphous,
         Num
@@ -110,7 +110,7 @@ namespace DataPhotovoltaics {
         Real64 PVEfficiency;           // fixed or current PV efficiency
 
         // Default Constructor
-        SimplePVParamsStruct() : AreaCol(0.0), ActiveFraction(0.0), EfficencyInputMode(Efficiency::Unassigned), EffSchedPtr(0), PVEfficiency(0.0)
+        SimplePVParamsStruct() : AreaCol(0.0), ActiveFraction(0.0), EfficencyInputMode(Efficiency::Invalid), EffSchedPtr(0), PVEfficiency(0.0)
         {
         }
     };
@@ -141,9 +141,9 @@ namespace DataPhotovoltaics {
 
         // Default Constructor
         TRNSYSPVModuleParamsStruct()
-            : CellsInSeries(0), CellType(SiPVCells::Unassigned), Area(0.0), TauAlpha(0.0), SemiConductorBandgap(0.0), ShuntResistance(0.0),
-              RefIsc(0.0), RefVoc(0.0), RefTemperature(0.0), RefInsolation(0.0), Imp(0.0), Vmp(0.0), TempCoefIsc(0.0), TempCoefVoc(0.0),
-              NOCTAmbTemp(0.0), NOCTCellTemp(0.0), NOCTInsolation(0.0), HeatLossCoef(0.0), HeatCapacity(0.0)
+            : CellsInSeries(0), CellType(SiPVCells::Invalid), Area(0.0), TauAlpha(0.0), SemiConductorBandgap(0.0), ShuntResistance(0.0), RefIsc(0.0),
+              RefVoc(0.0), RefTemperature(0.0), RefInsolation(0.0), Imp(0.0), Vmp(0.0), TempCoefIsc(0.0), TempCoefVoc(0.0), NOCTAmbTemp(0.0),
+              NOCTCellTemp(0.0), NOCTInsolation(0.0), HeatLossCoef(0.0), HeatCapacity(0.0)
         {
         }
     };
@@ -328,7 +328,7 @@ namespace DataPhotovoltaics {
 
         // Default Constructor
         PVArrayStruct()
-            : SurfacePtr(0), Zone(0), PVModelType(PVModel::Unassigned), CellIntegrationMode(CellIntegration::Unassigned), NumModNSeries(1.0),
+            : SurfacePtr(0), Zone(0), PVModelType(PVModel::Invalid), CellIntegrationMode(CellIntegration::Invalid), NumModNSeries(1.0),
               NumSeriesNParall(1.0), UTSCPtr(0), ExtVentCavPtr(0), PVTPtr(0), SurfaceSink(0.0)
         {
         }

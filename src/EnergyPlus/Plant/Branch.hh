@@ -87,7 +87,7 @@ namespace DataPlant {
             : ControlType(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false),
               ConstantSpeedBranchMassFlow(0.0), BranchLevel(0), FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0),
               IsBypass(false), PumpIndex(0), PumpSizFac(1.0), EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false),
-              PressureDrop(0.0), PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Unassigned), PressureCurveIndex(0),
+              PressureDrop(0.0), PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Invalid), PressureCurveIndex(0),
               PressureEffectiveK(0.0), disableOverrideForCSBranchPumping(false), lastComponentSimulated(0)
         {
         }

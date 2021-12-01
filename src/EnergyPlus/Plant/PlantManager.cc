@@ -870,7 +870,7 @@ void GetPlantInput(EnergyPlusData &state)
                     auto &this_comp_type(CompTypes(CompNum));
                     auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
-                    this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                    this_comp.CurOpSchemeType = OpScheme::Invalid;
                     this_comp.TypeOf = this_comp_type;
                     this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
 
@@ -936,7 +936,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(state, CompNames(CompNum));
                         break;
@@ -954,7 +954,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(state, CompNames(CompNum));
                         break;
@@ -1004,7 +1004,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = ChillerElectricEIR::ElectricEIRChillerSpecs::factory(state, CompNames(CompNum));
                         break;
@@ -1013,7 +1013,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(state, CompNames(CompNum));
                         break;
@@ -1022,7 +1022,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(state, CompNames(CompNum));
                         break;
@@ -1031,7 +1031,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = PlantChillers::EngineDrivenChillerSpecs::factory(state, CompNames(CompNum));
                         break;
@@ -1040,7 +1040,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(state, CompNames(CompNum));
                         break;
@@ -1049,18 +1049,18 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
                     case PlantEquipmentType::Boiler_Simple: {
-                        this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
                         this_comp.compPtr = Boilers::BoilerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
                     case PlantEquipmentType::Boiler_Steam: {
-                        this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
                         this_comp.compPtr = BoilerSteam::BoilerSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
@@ -1068,7 +1068,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = ChillerIndirectAbsorption::IndirectAbsorberSpecs::factory(state, CompNames(CompNum));
                         break;
@@ -1077,14 +1077,14 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(state, CompNames(CompNum));
                         break;
                     }
                     case PlantEquipmentType::CoolingTower_SingleSpd:
                     case PlantEquipmentType::CoolingTower_TwoSpd: {
-                        this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
                         this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state, CompNames(CompNum));
                         break;
                     }
@@ -1098,7 +1098,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         break;
                     }
@@ -1114,7 +1114,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         break;
                     }
@@ -1124,7 +1124,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         break;
                     }
@@ -1133,7 +1133,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         break;
                     }
@@ -1142,7 +1142,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         break;
                     }
@@ -1152,7 +1152,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         break;
                     }
@@ -1162,7 +1162,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         break;
                     }
@@ -1170,7 +1170,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(state, CompNames(CompNum));
                         break;
@@ -1210,7 +1210,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(state, CompNames(CompNum));
                         break;
@@ -1219,7 +1219,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(state, CompNames(CompNum));
 
@@ -1229,7 +1229,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(state, CompNames(CompNum));
                         break;
@@ -1238,7 +1238,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state, CompNames(CompNum));
                         break;
@@ -1248,7 +1248,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         break;
                     }
@@ -1276,7 +1276,7 @@ void GetPlantInput(EnergyPlusData &state)
                         if (LoopSideNum == DemandSide) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
                         } else if (LoopSideNum == SupplySide) {
-                            this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                            this_comp.CurOpSchemeType = OpScheme::Invalid;
                         }
                         this_comp.compPtr = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(state, CompNames(CompNum));
                         break;
@@ -1323,14 +1323,14 @@ void GetPlantInput(EnergyPlusData &state)
                         break;
                     }
                     case PlantEquipmentType::PlantComponentUserDefined: {
-                        this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
                         this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(state, CompNames(CompNum));
                         break;
                     }
                     case PlantEquipmentType::CoilUserDefined:
                     case PlantEquipmentType::ZoneHVACAirUserDefined:
                     case PlantEquipmentType::AirTerminalUserDefined: {
-                        this_comp.CurOpSchemeType = OpScheme::Unassigned;
+                        this_comp.CurOpSchemeType = OpScheme::Invalid;
                         this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         break;
                     }

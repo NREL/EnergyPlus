@@ -66,7 +66,7 @@ namespace PlantCentralGSHP {
 
     enum class iCondType
     {
-        Unassigned = -1,
+        Invalid = -1,
         WaterCooled,
         SmartMixing,
         Num
@@ -254,7 +254,7 @@ namespace PlantCentralGSHP {
 
         ChillerHeaterSpecs()
             : ConstantFlow(false), VariableFlow(false), CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), CoolSetPointErrDone(false),
-              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(iCondType::Unassigned),
+              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(iCondType::Invalid),
               ChillerCapFTCoolingIDX(0), ChillerEIRFTCoolingIDX(0), ChillerEIRFPLRCoolingIDX(0), ChillerCapFTHeatingIDX(0), ChillerEIRFTHeatingIDX(0),
               ChillerEIRFPLRHeatingIDX(0), ChillerCapFTIDX(0), ChillerEIRFTIDX(0), ChillerEIRFPLRIDX(0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
               CondInletNodeNum(0), CondOutletNodeNum(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0),
@@ -377,7 +377,7 @@ namespace PlantCentralGSHP {
         bool mySizesReported;
 
         WrapperSpecs()
-            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(iCondType::Unassigned), CHWInletNodeNum(0), CHWOutletNodeNum(0),
+            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(iCondType::Invalid), CHWInletNodeNum(0), CHWOutletNodeNum(0),
               HWInletNodeNum(0), HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0),
               HWMassFlowRate(0.0), GLHEMassFlowRate(0.0), CHWMassFlowRateMax(0.0), HWMassFlowRateMax(0.0), GLHEMassFlowRateMax(0.0),
               WrapperCoolingLoad(0.0), WrapperHeatingLoad(0.0), AncillaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false),

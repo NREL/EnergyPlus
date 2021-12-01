@@ -164,7 +164,7 @@ namespace EconomicTariff {
 
     enum class iDemandWindow
     {
-        Unassigned = -1,
+        Invalid = -1,
         Quarter,
         Half,
         Hour,
@@ -176,7 +176,7 @@ namespace EconomicTariff {
     constexpr std::string_view demWindowStrings(iDemandWindow &e)
     {
         switch (e) {
-        case iDemandWindow::Unassigned:
+        case iDemandWindow::Invalid:
             return "";
         case iDemandWindow::Quarter:
         case iDemandWindow::Half:
@@ -476,7 +476,7 @@ namespace EconomicTariff {
         TariffType()
             : reportMeterIndx(0), kindElectricMtr(0), kindWaterMtr(0), kindGasMtr(0), resourceNum(DataGlobalConstants::ResourceType::None),
               convChoice(iEconConv::USERDEF), energyConv(0.0), demandConv(0.0), periodSchIndex(0), seasonSchIndex(0), monthSchIndex(0),
-              demandWindow(iDemandWindow::Unassigned), demWinTime(0.0), monthChgVal(0.0), monthChgPt(0), minMonthChgVal(0.0), minMonthChgPt(0),
+              demandWindow(iDemandWindow::Invalid), demWinTime(0.0), monthChgVal(0.0), monthChgPt(0), minMonthChgVal(0.0), minMonthChgPt(0),
               chargeSchIndex(0), baseUseSchIndex(0), buyOrSell(0), firstCategory(0), lastCategory(0), ptEnergyCharges(0), ptDemandCharges(0),
               ptServiceCharges(0), ptBasis(0), ptAdjustment(0), ptSurcharge(0), ptSubtotal(0), ptTaxes(0), ptTotal(0), ptNotIncluded(0),
               firstNative(0), lastNative(0), nativeTotalEnergy(0), nativeTotalDemand(0), nativePeakEnergy(0), nativePeakDemand(0),

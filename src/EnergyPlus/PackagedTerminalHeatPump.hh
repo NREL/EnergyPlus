@@ -76,7 +76,7 @@ namespace PackagedTerminalHeatPump {
     // Last mode of operation
     enum class iCompMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         CoolingMode, // last compressor operating mode was in cooling
         HeatingMode, // last compressor operating mode was in heating
         Num
@@ -85,7 +85,7 @@ namespace PackagedTerminalHeatPump {
     // Airflow control for constant fan mode
     enum class iAirflowCtrlMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
         Num
@@ -94,7 +94,7 @@ namespace PackagedTerminalHeatPump {
     // Unit type
     enum class iPTHPType
     {
-        Unassigned = -1,
+        Invalid = -1,
         PTHPUnit,   // equivalent to PackagedTerminal:HeatPump:AirToAir
         PTACUnit,   // equivalent to PackagedTerminal:AirConditioner
         PTWSHPUnit, // equivalent to WaterToAirHeatPump
@@ -104,7 +104,7 @@ namespace PackagedTerminalHeatPump {
     // control type
     enum class iCtrlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         None,       // no special capacity control
         CCM_ASHRAE, // capacity control based on ASHRAE Standard 90.1
         Num
@@ -296,7 +296,7 @@ namespace PackagedTerminalHeatPump {
 
         // Default Constructor
         PTUnitData()
-            : UnitType_Num(iPTHPType::Unassigned), ZoneEquipType(DataZoneEquipment::ZoneEquip::Unassigned), useVSCoilModel(false), SchedPtr(0),
+            : UnitType_Num(iPTHPType::Invalid), ZoneEquipType(DataZoneEquipment::ZoneEquip::Invalid), useVSCoilModel(false), SchedPtr(0),
               MaxCoolAirVolFlow(0.0), MaxHeatAirVolFlow(0.0), MaxNoCoolHeatAirVolFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0),
               NoCoolHeatOutAirVolFlow(0.0), CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutsideAirNode(0),
               AirReliefNode(0), OAMixIndex(0), FanType_Num(0), FanIndex(0), FanSchedPtr(0), FanAvailSchedPtr(0), DXCoolCoilType_Num(0),
@@ -309,12 +309,12 @@ namespace PackagedTerminalHeatPump {
               ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), TotHeatEnergyRate(0.0), TotHeatEnergy(0.0),
               TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0),
               LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0),
-              CompPartLoadRatio(0.0), LastMode(iCompMode::Unassigned), AirFlowControl(iAirflowCtrlMode::Unassigned),
-              ControlType(iCtrlType::Unassigned), validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false),
-              CompPartLoadFrac(0.0), PlantCoilOutletNode(0), SuppCoilLoopNum(0), SuppCoilLoopSide(0), SuppCoilBranchNum(0), SuppCoilCompNum(0),
-              MaxSuppCoilFluidFlow(0.0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0),
-              CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(iCompMode::Unassigned), NumOfSpeedCooling(0),
-              NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
+              CompPartLoadRatio(0.0), LastMode(iCompMode::Invalid), AirFlowControl(iAirflowCtrlMode::Invalid), ControlType(iCtrlType::Invalid),
+              validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false), CompPartLoadFrac(0.0), PlantCoilOutletNode(0),
+              SuppCoilLoopNum(0), SuppCoilLoopSide(0), SuppCoilBranchNum(0), SuppCoilCompNum(0), MaxSuppCoilFluidFlow(0.0),
+              HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
+              NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(iCompMode::Invalid), NumOfSpeedCooling(0), NumOfSpeedHeating(0),
+              IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
               HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
               CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
               MSHeatingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), MSCoolingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),

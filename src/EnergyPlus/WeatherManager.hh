@@ -201,7 +201,7 @@ namespace WeatherManager {
 
         // Default Constructor
         EnvironmentData()
-            : KindOfEnvrn(DataGlobalConstants::KindOfSim::Unassigned), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
+            : KindOfEnvrn(DataGlobalConstants::KindOfSim::Invalid), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
               HVACSizingIterationNum(0), TotalDays(0), StartJDay(0), StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0),
               EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0), UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true),
               UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0),

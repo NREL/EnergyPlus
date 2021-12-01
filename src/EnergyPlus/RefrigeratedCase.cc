@@ -1567,7 +1567,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (!allocated(WalkIn(WalkInID).HeightGlassDr)) WalkIn(WalkInID).HeightGlassDr.allocate(NumZones) = 0.0;
             if (!allocated(WalkIn(WalkInID).UValueStockDr)) WalkIn(WalkInID).UValueStockDr.allocate(NumZones) = 0.0;
             if (!allocated(WalkIn(WalkInID).StockDoorOpenSchedPtr)) WalkIn(WalkInID).StockDoorOpenSchedPtr.allocate(NumZones) = 0;
-            if (!allocated(WalkIn(WalkInID).StockDoorProtectType)) WalkIn(WalkInID).StockDoorProtectType.allocate(NumZones) = WIStockDoor::Unassigned;
+            if (!allocated(WalkIn(WalkInID).StockDoorProtectType)) WalkIn(WalkInID).StockDoorProtectType.allocate(NumZones) = WIStockDoor::Invalid;
             if (!allocated(WalkIn(WalkInID).AreaStockDr)) WalkIn(WalkInID).AreaStockDr.allocate(NumZones) = 0.0;
             if (!allocated(WalkIn(WalkInID).HeightStockDr)) WalkIn(WalkInID).HeightStockDr.allocate(NumZones) = 0.0;
             if (!allocated(WalkIn(WalkInID).SensZoneCreditRate)) WalkIn(WalkInID).SensZoneCreditRate.allocate(NumZones) = 0.0;

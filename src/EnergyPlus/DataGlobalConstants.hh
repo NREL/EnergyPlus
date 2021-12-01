@@ -148,7 +148,6 @@ namespace DataGlobalConstants {
     {
         // TODO: enum check
         Invalid = -1,
-        Unassigned = 0,
         DesignDay = 1,
         RunPeriodDesign = 2,
         RunPeriodWeather = 3,

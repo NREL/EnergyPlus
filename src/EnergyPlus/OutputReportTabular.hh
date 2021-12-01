@@ -82,7 +82,7 @@ namespace OutputReportTabular {
 
     enum class iAggType
     {
-        Unassigned = -1,
+        Invalid = -1,
         SumOrAvg,
         Maximum,
         Minimum,
@@ -101,7 +101,7 @@ namespace OutputReportTabular {
 
     enum class iTableStyle
     {
-        Unassigned = -1,
+        Invalid = -1,
         Comma,
         Tab,
         Fixed,
@@ -346,7 +346,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyFieldSetInputType()
-            : aggregate(iAggType::Unassigned), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
+            : aggregate(iAggType::Invalid), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
               varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::TimeStepZone)
         {
         }
@@ -385,8 +385,8 @@ namespace OutputReportTabular {
         // Default Constructor
         MonthlyColumnsType()
             : varNum(0), typeOfVar(OutputProcessor::VariableType::NotFound), avgSum(OutputProcessor::StoreType::Averaged),
-              stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(iAggType::Unassigned),
-              reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
+              stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(iAggType::Invalid), reslt(12, 0.0),
+              duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
     };
@@ -911,7 +911,7 @@ struct OutputReportTabularData : BaseGlobalStruct
         OutputReportTabular::maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
     Array1D_string del = Array1D_string(OutputReportTabular::maxNumStyles);                                    // the delimiter to use
     Array1D<OutputReportTabular::iTableStyle> TableStyle = Array1D<OutputReportTabular::iTableStyle>(
-        OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned); // see list of parameters
+        OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Invalid); // see list of parameters
 
     Real64 timeInYear = 0.0;
 
@@ -1259,7 +1259,7 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->TabularOutputFile = Array1D<std::ofstream *>(
             OutputReportTabular::maxNumStyles, {&this->csv_stream, &this->tab_stream, &this->fix_stream, &this->htm_stream, &this->xml_stream});
         this->del = Array1D_string(OutputReportTabular::maxNumStyles);
-        this->TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned);
+        this->TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Invalid);
         this->timeInYear = 0.0;
         this->displayTabularBEPS = false;
         this->displayLEEDSummary = false;

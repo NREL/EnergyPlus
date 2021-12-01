@@ -530,7 +530,7 @@ namespace TranspiredCollector {
                 state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
 
             // Was it set?
-            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == DataSurfaces::SurfaceRoughness::Unassigned) {
+            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == DataSurfaces::SurfaceRoughness::Invalid) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cAlphaFieldNames(11) + " has incorrect entry of " + Alphas(11) + " in " + CurrentModuleObject +
                                     " =" + state.dataTranspiredCollector->UTSC(Item).Name);

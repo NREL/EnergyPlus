@@ -59,7 +59,7 @@ int constexpr maxgas = 10;
 // Standards:
 enum class Stdrd
 {
-    Unassigned = -1,
+    Invalid = -1,
     ISO15099,    // standard = ISO15099
     EN673,       // standard = EN 673 / ISO 10292 Declared
     EN673Design, // standard = EN 673 / ISO 10292 Design

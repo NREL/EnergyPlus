@@ -82,7 +82,7 @@ namespace CurveManager {
 
     enum class CurveTypeEnum
     {
-        Unassigned = -1,
+        Invalid = -1,
         Linear,
         BiLinear,
         Quadratic,
@@ -109,7 +109,7 @@ namespace CurveManager {
 
     enum class InterpTypeEnum
     {
-        Unassigned = -1,
+        Invalid = -1,
         EvaluateCurveToLimits,
         BtwxtMethod,
         Num
@@ -225,7 +225,7 @@ namespace CurveManager {
 
         // Default Constructor
         PerformanceCurveData()
-            : CurveType(CurveTypeEnum::Unassigned), InterpolationType(InterpTypeEnum::Unassigned), DataFormat(0), TableIndex(0), NumDims(0),
+            : CurveType(CurveTypeEnum::Invalid), InterpolationType(InterpTypeEnum::Invalid), DataFormat(0), TableIndex(0), NumDims(0),
               NumIVLowErrorIndex(0), NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), GridValueIndex(0), NormalizationValue(1.0), Coeff1(0.0),
               Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0), Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0), Coeff11(0.0),
               Coeff12(0.0), Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0), Var3Max(0.0), Var3Min(0.0), Var4Max(0.0), Var4Min(0.0),

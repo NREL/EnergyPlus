@@ -67,7 +67,7 @@ namespace DataBranchAirLoopPlant {
     enum class PressureCurveType
     {
         // TODO: enum check
-        Unassigned = -2,
+        Invalid = -2,
         Error = -1,
         None = 0,
         Pressure = 1,

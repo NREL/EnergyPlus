@@ -67,7 +67,7 @@ namespace ChillerReformulatedEIR {
 
     enum class PLR
     {
-        Unassigned = -1,
+        Invalid = -1,
         LeavingCondenserWaterTemperature, // Type 1_LeavingCondenserWaterTemperature
         Lift,                             // Type 2_Lift
         Num
@@ -223,12 +223,12 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0),
-              RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
-              ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
-              CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
-              CondInletNodeNum(0), CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0),
-              TempRefCondIn(0.0), TempRefCondOut(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Invalid), PartLoadCurveType(PLR::Invalid), RefCap(0.0), RefCapWasAutoSized(false),
+              RefCOP(0.0), FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),
+              CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
+              CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0), TempRefCondIn(0.0),
+              TempRefCondOut(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), SizFac(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
               HeatRecInletLimitSchedNum(0), ChillerCapFTIndex(0), ChillerEIRFTIndex(0), ChillerEIRFPLRIndex(0), ChillerCapFTError(0),

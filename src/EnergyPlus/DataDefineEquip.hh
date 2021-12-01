@@ -68,7 +68,7 @@ namespace DataDefineEquip {
     // Equipment Types covered by ZoneAirLoopEquipment:
     enum class iZnAirLoopEquipType
     {
-        Unassigned = -1,
+        Invalid = -1,
         DualDuctConstVolume,
         DualDuctVAV,
         SingleDuctVAVReheat,
@@ -132,7 +132,7 @@ namespace DataDefineEquip {
         // Default Constructor
         ZoneAirEquip()
             : OutletNodeNum(0), NumComponents(0), NumControls(0), EquipType(MaxZoneAirComponents),
-              EquipTypeEnum(MaxZoneAirComponents, DataDefineEquip::iZnAirLoopEquipType::Unassigned), airTerminalPtr(nullptr),
+              EquipTypeEnum(MaxZoneAirComponents, DataDefineEquip::iZnAirLoopEquipType::Invalid), airTerminalPtr(nullptr),
               EquipName(MaxZoneAirComponents), EquipIndex(MaxZoneAirComponents, 0), AirTerminalSizingSpecIndex(0), TermUnitSizingNum(0),
               UpStreamLeakFrac(0.0), DownStreamLeakFrac(0.0), MassFlowRateUpStrLk(0.0), MassFlowRateDnStrLk(0.0), MassFlowRateTU(0.0),
               MassFlowRateZSup(0.0), MassFlowRateSup(0.0), MassFlowRatePlenInd(0.0), MaxAvailDelta(0.0), MinAvailDelta(0.0), InletNodeNum(0),

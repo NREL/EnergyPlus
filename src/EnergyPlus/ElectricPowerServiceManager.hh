@@ -71,7 +71,7 @@ namespace EnergyPlus {
 
 enum class GeneratorType
 {
-    Unassigned = -1,
+    Invalid = -1,
     ICEngine,
     CombTurbine,
     PV,

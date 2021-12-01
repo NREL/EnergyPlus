@@ -63,7 +63,7 @@ namespace DataGenerators {
     // MODULE PARAMETER DEFINITIONS:
     enum class CurveMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         Normalized, // mode where efficiency curves are modifier curves
         Direct,     // mode where efficiency curves are direct
         Num
@@ -71,7 +71,7 @@ namespace DataGenerators {
 
     enum class SkinLoss
     {
-        Unassigned = -1,
+        Invalid = -1,
         ConstantRate,
         UADT,              // UAdelta T mode for skin losses
         QuadraticFuelNdot, // Quadratic function of fuel flow for skin losses
@@ -80,7 +80,7 @@ namespace DataGenerators {
 
     enum class AirSupRateMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         QuadraticFuncofNdot,  // function of fuel rate mode for air flow
         ConstantStoicsAirRat, // Constant air ratio in stoics with fuel constituents
         QuadraticFuncofPel,   // function of electric power mode
@@ -89,7 +89,7 @@ namespace DataGenerators {
 
     enum class RecoverMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         NoRecoveryOnAirIntake,  // mode for controlling intake air heat recovery
         RecoverBurnInvertBatt,  // mode for controlling intake air heat recovery
         RecoverAuxiliaryBurner, // mode for controlling intake air heat recovery
@@ -101,7 +101,7 @@ namespace DataGenerators {
 
     enum class ConstituentMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         RegularAir,
         UserDefinedConstituents,
         Num
@@ -109,7 +109,7 @@ namespace DataGenerators {
 
     enum class FuelTemperatureMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         FuelInTempFromNode,
         FuelInTempSchedule,
         Num
@@ -117,7 +117,7 @@ namespace DataGenerators {
 
     enum class WaterTemperatureMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         WaterInReformMains,
         WaterInReformAirNode,
         WaterInReformWaterNode,
@@ -127,7 +127,7 @@ namespace DataGenerators {
 
     enum class InverterEfficiencyMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         Constant,
         Quadratic,
         Num
@@ -135,7 +135,7 @@ namespace DataGenerators {
 
     enum class ExhaustGasHX
     {
-        Unassigned = -1,
+        Invalid = -1,
         FixedEffectiveness,   // exhaust gas HX modeling mode
         LMTDempiricalUAeff,   // exhaust gas HX modeling mode
         LMTDfundementalUAeff, // exhaust gas HX modeling mode
@@ -145,7 +145,7 @@ namespace DataGenerators {
 
     enum class ElectricalStorage
     {
-        Unassigned = -1,
+        Invalid = -1,
         SimpleEffConstraints,         // electrical storage modeling mode
         LeadAcidBatterySaupe,         // electrical storage modeling mode
         LeadAcidBatterManwellMcGowan, // electrical storage modeling mode
@@ -154,7 +154,7 @@ namespace DataGenerators {
 
     enum class LossDestination
     {
-        Unassigned = -1,
+        Invalid = -1,
         SurroundingZone,
         AirInletForFC,
         Num
@@ -162,7 +162,7 @@ namespace DataGenerators {
 
     enum class OperatingMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         OpModeOff,      // CHP operating mode OFF
         OpModeStandby,  // CHP operating mode Stand By
         OpModeWarmUp,   // CHP operating mode Warm Up or start up
@@ -173,7 +173,7 @@ namespace DataGenerators {
 
     enum class FuelMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         fuelModeGaseousConstituents,
         fuelModeGenericLiquid,
         Num
@@ -184,7 +184,7 @@ namespace DataGenerators {
 
     enum class ThermodynamicMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         NISTShomate,
         NASAPolynomial,
         Num
@@ -228,9 +228,9 @@ namespace DataGenerators {
 
         // Default Constructor
         GeneratorFuelSupplyDataStruct()
-            : FuelTempMode(DataGenerators::FuelTemperatureMode::Unassigned), FuelTypeMode(DataGenerators::FuelMode::Unassigned), NodeNum(0),
-              SchedNum(0), CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0),
-              LHVJperkg(0.0), LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0), KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0),
+            : FuelTempMode(DataGenerators::FuelTemperatureMode::Invalid), FuelTypeMode(DataGenerators::FuelMode::Invalid), NodeNum(0), SchedNum(0),
+              CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0), LHVJperkg(0.0),
+              LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0), KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0),
               TfuelIntoFCPM(0.0), PfuelCompEl(0.0), QskinLoss(0.0), CO2ProductGasCoef(0.0), H2OProductGasCoef(0.0)
         {
         }
@@ -265,7 +265,7 @@ namespace DataGenerators {
 
         // Default Constructor
         GasPropertyDataStruct()
-            : StdRefMolarEnthOfForm(0.0), ThermoMode(DataGenerators::ThermodynamicMode::Unassigned), ShomateA(0.0), ShomateB(0.0), ShomateC(0.0),
+            : StdRefMolarEnthOfForm(0.0), ThermoMode(DataGenerators::ThermodynamicMode::Invalid), ShomateA(0.0), ShomateB(0.0), ShomateC(0.0),
               ShomateD(0.0), ShomateE(0.0), ShomateF(0.0), ShomateG(0.0), ShomateH(0.0), NumCarbons(0.0), NumHydrogens(0.0), NumOxygens(0.0),
               MolecularWeight(0.0), NASA_A1(0.0), NASA_A2(0.0), NASA_A3(0.0), NASA_A4(0.0), NASA_A5(0.0), NASA_A6(0.0), NASA_A7(0.0)
         {

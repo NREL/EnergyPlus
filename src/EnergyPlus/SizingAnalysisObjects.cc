@@ -66,7 +66,7 @@ namespace EnergyPlus {
 
 ZoneTimestepObject::ZoneTimestepObject()
 {
-    kindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+    kindOfSim = DataGlobalConstants::KindOfSim::Invalid;
     envrnNum = 0;
     dayOfSim = 0;
     hourOfDay = 0;
@@ -263,10 +263,10 @@ ZoneTimestepObject SizingLog::GetLogVariableDataMax(EnergyPlusData &state)
     }
 
     for (auto &zt : ztStepObj) {
-        if (zt.envrnNum > 0 && zt.kindOfSim != DataGlobalConstants::KindOfSim::Unassigned && zt.runningAvgDataValue > MaxVal) {
+        if (zt.envrnNum > 0 && zt.kindOfSim != DataGlobalConstants::KindOfSim::Invalid && zt.runningAvgDataValue > MaxVal) {
             MaxVal = zt.runningAvgDataValue;
             tmpztStepStamp = zt;
-        } else if (zt.envrnNum == 0 && zt.kindOfSim == DataGlobalConstants::KindOfSim::Unassigned) { // null timestamp, problem to fix
+        } else if (zt.envrnNum == 0 && zt.kindOfSim == DataGlobalConstants::KindOfSim::Invalid) { // null timestamp, problem to fix
             ShowWarningMessage(state, "GetLogVariableDataMax: null timestamp in log");
         }
     }
@@ -661,7 +661,7 @@ bool PlantCoinicidentAnalysis::CheckTimeStampForNull(ZoneTimestepObject testStam
     if (testStamp.envrnNum != 0) {
         isNull = false;
     }
-    if (testStamp.kindOfSim != DataGlobalConstants::KindOfSim::Unassigned) {
+    if (testStamp.kindOfSim != DataGlobalConstants::KindOfSim::Invalid) {
         isNull = false;
     }
 

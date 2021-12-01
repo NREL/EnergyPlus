@@ -200,8 +200,8 @@ namespace ChillerElectricEIR {
 
         // Default Constructor
         ElectricEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Invalid), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
               EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRate(0.0), CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), EvapOutletTemp(0.0), CondInletNodeNum(0),

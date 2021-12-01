@@ -79,7 +79,7 @@ namespace FaultsManager {
     // Input methods for fouling coils
     enum class FouledCoil
     {
-        Unassigned = -1,
+        Invalid = -1,
         UARated,
         FoulingFactor,
         Num
@@ -88,7 +88,7 @@ namespace FaultsManager {
     // FaultTypeEnum
     enum class Fault
     {
-        Unassigned = -1,
+        Invalid = -1,
         TemperatureSensorOffset_OutdoorAir,
         HumiditySensorOffset_OutdoorAir,
         EnthalpySensorOffset_OutdoorAir,
@@ -159,7 +159,7 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultProperties()
-            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(Fault::Unassigned), AvaiSchedPtr(0), SeveritySchedPtr(0),
+            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(Fault::Invalid), AvaiSchedPtr(0), SeveritySchedPtr(0),
               Offset(0.0), Status(false)
         {
         }
@@ -233,8 +233,8 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultPropertiesFoulingCoil()
-            : FouledCoilName(""), FouledCoilType(DataPlant::PlantEquipmentType::Invalid), FouledCoilNum(0),
-              FoulingInputMethod(FouledCoil::Unassigned), UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
+            : FouledCoilName(""), FouledCoilType(DataPlant::PlantEquipmentType::Invalid), FouledCoilNum(0), FoulingInputMethod(FouledCoil::Invalid),
+              UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
         {
         }
 
@@ -242,7 +242,7 @@ namespace FaultsManager {
         virtual ~FaultPropertiesFoulingCoil() = default;
 
     public:
-        // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
+        // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfer coefficient) due to fouling in a coil
         // Real64 CalFaultyCoilFoulingFactor();
 
         // Calculate the Fault Fraction based on Availability and Severity Schedules

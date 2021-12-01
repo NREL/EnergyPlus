@@ -608,7 +608,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
     EXPECT_FALSE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing));
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::No));
-    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::Unassigned));
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::Invalid));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVariableTest)

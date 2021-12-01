@@ -63,7 +63,7 @@ namespace DataComplexFenestration {
     // Parameters for gas definitions
     enum class GasCoeffs
     {
-        Unassigned = -1,
+        Invalid = -1,
         Custom,
         Air,
         Argon,
@@ -75,7 +75,7 @@ namespace DataComplexFenestration {
     // Parameters for thermal model
     enum class ThermalModel
     {
-        Unassigned = -1,
+        Invalid = -1,
         ISO15099,
         ScaledCavityWidth,
         ConvectiveScalarModel_NoSDThickness,
@@ -153,7 +153,7 @@ namespace DataComplexFenestration {
 
         // Default Constructor
         WindowThermalModelParams()
-            : CalculationStandard(TARCOGGassesParams::Stdrd::Unassigned), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0),
+            : CalculationStandard(TARCOGGassesParams::Stdrd::Invalid), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0),
               DeflectionModel(TARCOGParams::DeflectionCalculation::UNASSIGNED), VacuumPressureLimit(0.0), InitialTemperature(0.0),
               InitialPressure(0.0)
         {

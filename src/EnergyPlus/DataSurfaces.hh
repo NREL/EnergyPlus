@@ -108,7 +108,7 @@ namespace DataSurfaces {
 
     enum class SurfaceClass : int
     {
-        INVALID = -1,
+        Invalid = -1,
         None,
         Wall,
         Floor,
@@ -124,7 +124,7 @@ namespace DataSurfaces {
         Fin,
         TDD_Dome,
         TDD_Diffuser,
-        Count // The counter representing the total number of surface class, always stays at the bottom
+        Num // The counter representing the total number of surface class, always stays at the bottom
     };
 
     enum class WinShadingType : int
@@ -247,7 +247,7 @@ namespace DataSurfaces {
     // derived type:
     enum class SurfaceRoughness
     {
-        Unassigned = -1,
+        Invalid = -1,
         VeryRough,
         Rough,
         MediumRough,
@@ -868,8 +868,8 @@ namespace DataSurfaces {
               FrEdgeToCenterGlCondRatio(1.0), FrameSolAbsorp(0.0), FrameVisAbsorp(0.0), FrameEmis(0.9), DividerType(0), DividerWidth(0.0),
               HorDividers(0), VertDividers(0), DividerProjectionOut(0.0), DividerProjectionIn(0.0), DividerEdgeWidth(0.06355),
               DividerConductance(0.0), DivEdgeToCenterGlCondRatio(1.0), DividerSolAbsorp(0.0), DividerVisAbsorp(0.0), DividerEmis(0.9),
-              MullionOrientation(DataWindowEquivalentLayer::Orientation::Unassigned), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0),
-              InsideReveal(0.0), InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
+              MullionOrientation(DataWindowEquivalentLayer::Orientation::Invalid), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0), InsideReveal(0.0),
+              InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
         {
         }
     };
