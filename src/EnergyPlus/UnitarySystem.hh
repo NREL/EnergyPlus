@@ -708,23 +708,23 @@ namespace UnitarySystems {
         void unitarySystemHeatRecovery(EnergyPlusData &state);
 
         void controlUnitarySystemtoSP(EnergyPlusData &state,
-                                      int const AirLoopNum,                         // Primary air loop number
-                                      bool const FirstHVACIteration,                // True when first HVAC iteration
+                                      int const AirLoopNum,                               // Primary air loop number
+                                      bool const FirstHVACIteration,                      // True when first HVAC iteration
                                       DataHVACGlobals::CompressorOperation &CompressorOn, // compressor on/off control
-                                      Real64 const OAUCoilOutTemp,                  // the coil inlet temperature of OutdoorAirUnit
-                                      bool HXUnitOn,                                // Flag to control HX for HXAssisted Cooling Coil
-                                      Real64 &sysOutputProvided,                    // sensible output at supply air node
-                                      Real64 &latOutputProvided                     // latent output at supply air node
+                                      Real64 const OAUCoilOutTemp,                        // the coil inlet temperature of OutdoorAirUnit
+                                      bool HXUnitOn,                                      // Flag to control HX for HXAssisted Cooling Coil
+                                      Real64 &sysOutputProvided,                          // sensible output at supply air node
+                                      Real64 &latOutputProvided                           // latent output at supply air node
         );
 
         void controlUnitarySystemtoLoad(EnergyPlusData &state,
-                                        int const AirLoopNum,                         // Primary air loop number
-                                        bool const FirstHVACIteration,                // True when first HVAC iteration
+                                        int const AirLoopNum,                               // Primary air loop number
+                                        bool const FirstHVACIteration,                      // True when first HVAC iteration
                                         DataHVACGlobals::CompressorOperation &CompressorOn, // Determines if compressor is on or off
-                                        Real64 const OAUCoilOutTemp,                  // the coil inlet temperature of OutdoorAirUnit
-                                        bool HXUnitOn,                                // Flag to control HX for HXAssisted Cooling Coil
-                                        Real64 &sysOutputProvied,                     // system sensible output at supply air node
-                                        Real64 &latOutputProvided                     // system latent output at supply air node
+                                        Real64 const OAUCoilOutTemp,                        // the coil inlet temperature of OutdoorAirUnit
+                                        bool HXUnitOn,                                      // Flag to control HX for HXAssisted Cooling Coil
+                                        Real64 &sysOutputProvied,                           // system sensible output at supply air node
+                                        Real64 &latOutputProvided                           // system latent output at supply air node
         );
 
         void updateUnitarySystemControl(EnergyPlusData &state,
@@ -777,9 +777,9 @@ namespace UnitarySystems {
         );
 
         void calcUnitaryCoolingSystem(EnergyPlusData &state,
-                                      int const AirLoopNum,                        // index to air loop
-                                      bool const FirstHVACIteration,               // True when first HVAC iteration
-                                      Real64 const PartLoadRatio,                  // coil operating part-load ratio
+                                      int const AirLoopNum,                              // index to air loop
+                                      bool const FirstHVACIteration,                     // True when first HVAC iteration
+                                      Real64 const PartLoadRatio,                        // coil operating part-load ratio
                                       DataHVACGlobals::CompressorOperation CompressorOn, // compressor control (0=off, 1=on)
                                       Real64 const OnOffAirFlowRatio,
                                       Real64 const CoilCoolHeatRat, // ratio of cooling to heating PLR for cycling fan RH control
@@ -787,12 +787,12 @@ namespace UnitarySystems {
         );
 
         void calcUnitaryHeatingSystem(EnergyPlusData &state,
-                                      int const AirLoopNum,                        // index to air loop
-                                      bool const FirstHVACIteration,               // True when first HVAC iteration
-                                      Real64 const PartLoadRatio,                  // coil operating part-load ratio
+                                      int const AirLoopNum,                              // index to air loop
+                                      bool const FirstHVACIteration,                     // True when first HVAC iteration
+                                      Real64 const PartLoadRatio,                        // coil operating part-load ratio
                                       DataHVACGlobals::CompressorOperation CompressorOn, // comrpressor control (0=off, 1=on)
-                                      Real64 const OnOffAirFlowRatio,              // ratio of on to off flow rate
-                                      Real64 HeatCoilLoad                          // adjusted heating coil load if outlet temp exceeds max (W)
+                                      Real64 const OnOffAirFlowRatio,                    // ratio of on to off flow rate
+                                      Real64 HeatCoilLoad                                // adjusted heating coil load if outlet temp exceeds max (W)
         );
 
         void calcUnitarySuppHeatingSystem(EnergyPlusData &state,
@@ -824,8 +824,8 @@ namespace UnitarySystems {
         );
 
         void simMultiSpeedCoils(EnergyPlusData &state,
-                                int const AirLoopNum,                         // Index to air loop
-                                bool const FirstHVACIteration,                // True when first HVAC iteration
+                                int const AirLoopNum,                               // Index to air loop
+                                bool const FirstHVACIteration,                      // True when first HVAC iteration
                                 DataHVACGlobals::CompressorOperation &CompressorOn, // compressor on/off control
                                 bool const SensibleLoad,
                                 bool const LatentLoad,
