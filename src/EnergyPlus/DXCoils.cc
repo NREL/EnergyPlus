@@ -1315,9 +1315,9 @@ void GetDXCoils(EnergyPlusData &state)
         // A13; \field Name of Water Storage Tank for Condensate Collection
         state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectName = Alphas(13);
         if (lAlphaBlanks(13)) {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::Discarded;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::Discard;
         } else {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::ToTank;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::ToTank;
             SetupTankSupplyComponent(state,
                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                      CurrentModuleObject,
@@ -1961,9 +1961,9 @@ void GetDXCoils(EnergyPlusData &state)
         // A14; \field Name of Water Storage Tank for Condensate Collection
         state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectName = Alphas(14);
         if (lAlphaBlanks(14)) {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::Discarded;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::Discard;
         } else {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::ToTank;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::ToTank;
             SetupTankSupplyComponent(state,
                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                      CurrentModuleObject,
@@ -2976,9 +2976,9 @@ void GetDXCoils(EnergyPlusData &state)
         // A15; \field Name of Water Storage Tank for Condensate Collection
         state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectName = Alphas(15);
         if (lAlphaBlanks(15)) {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::Discarded;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::Discard;
         } else {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::ToTank;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::ToTank;
             SetupTankSupplyComponent(state,
                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                      CurrentModuleObject,
@@ -4174,9 +4174,9 @@ void GetDXCoils(EnergyPlusData &state)
         // A9; \field Name of Water Storage Tank for Condensate Collection
         state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectName = Alphas(8);
         if (lAlphaBlanks(8)) {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::Discarded;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::Discard;
         } else {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::ToTank;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::ToTank;
             SetupTankSupplyComponent(state,
                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                      CurrentModuleObject,
@@ -5298,9 +5298,9 @@ void GetDXCoils(EnergyPlusData &state)
 
         state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectName = Alphas(7);
         if (lAlphaBlanks(7)) {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::Discarded;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::Discard;
         } else {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::ToTank;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::ToTank;
             SetupTankSupplyComponent(state,
                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                      CurrentModuleObject,
@@ -5564,9 +5564,9 @@ void GetDXCoils(EnergyPlusData &state)
 
         state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectName = Alphas(6);
         if (lAlphaBlanks(6)) {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::Discarded;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::Discard;
         } else {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectMode::ToTank;
+            state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode = CondensateCollectAction::ToTank;
             SetupTankSupplyComponent(state,
                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                      CurrentModuleObject,
@@ -5780,7 +5780,7 @@ void GetDXCoils(EnergyPlusData &state)
             }
 
             // do we report these even if no storage tank?
-            if (Coil.CondensateCollectMode == CondensateCollectMode::ToTank) {
+            if (Coil.CondensateCollectMode == CondensateCollectAction::ToTank) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
@@ -6732,7 +6732,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Coil.Name);
-            if (Coil.CondensateCollectMode == CondensateCollectMode::ToTank) {
+            if (Coil.CondensateCollectMode == CondensateCollectAction::ToTank) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
@@ -6861,7 +6861,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Average,
                                 Coil.Name);
 
-            if (Coil.CondensateCollectMode == CondensateCollectMode::ToTank) {
+            if (Coil.CondensateCollectMode == CondensateCollectAction::ToTank) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
@@ -14886,7 +14886,7 @@ void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
         }
     }
 
-    if (state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode == CondensateCollectMode::ToTank) {
+    if (state.dataDXCoils->DXCoil(DXCoilNum).CondensateCollectMode == CondensateCollectAction::ToTank) {
         // calculate and report condensation rates  (how much water extracted from the air stream)
         // water flow of water in m3/s for water system interactions
         //  put here to catch all types of DX coils
