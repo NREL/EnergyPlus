@@ -99,10 +99,9 @@ The newly ZoneHVAC:ExhaustSystem is considered to be an zone equipment, and can 
 
 It is also possible to included multipel ZoneHVAC:ExhaustSystem for a single zone, correponding to the design that multiple exhausts could goes together into a central exhaust system, such as mutiple exhaust hoods in a laboratry [4, 5]. 
 
-### Other considerations ###
+### Reporting ###
 
-#### Report considerations ####
-One issue for using the methods above is which Air loop should the exhaust system belongs when it spans across more than one air loops. One general rule would should be tied to an airloop that it connects to; but there should also be a check to let one airloop to have at most one exhaust system. 
+One issue for using the methods above is which Air loop should the exhaust system belongs when it spans across more than one air loops. For reporting, a new section of the tabular report will be added to list the operations of the exhaust systems. For each exhaust system, the (design, max, and min) central exhaust flow, temperature and humidity conditions will be added to a tabular Table named "General Exhaust Systems". For each exhaust system reported, the flow conditions at each indivual exhaust will also be reported.  
 
 ### IDD changes ###
 
@@ -364,9 +363,12 @@ Central Exhaust Fan Runtime Fraction [];
 Central Exhaust Fan Volumetric Flow Rate [m3/s];
 Central Exhaust Fan Mass Flow Rate [kg/s];
 Central Exhaust Fan pressure drop [Pa];
+Individual Exhaust Volumetric Flow Rate [m3/s]; 
+Individual Exhaust Mass Flow Rate Rate [kg/s];
 ```
 
 In addition, the tabular report will now also add the central exhaust fans' flow rates and energy usages to each of the connected HVAC and airloops that the exhaust system is connected.
+
 
 ## Engineering Reference ##
 
