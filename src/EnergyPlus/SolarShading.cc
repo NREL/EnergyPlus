@@ -6974,7 +6974,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     // Construct( Surface( SurfNum ).Construction ).TransDiff = NomDiffTrans;
                 }
             } else if (state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                DiffTrans = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarAniso);
+                DiffTrans = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso);
             } else {
                 DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
             }
@@ -7059,7 +7059,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             // Beam-beam transmittance for bare exterior window
             if (SunLitFract > 0.0) {
                 if (state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                    TBmDif = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarBeam);
+                    TBmDif = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarBeam);
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam = TBmDif;                  // Report variable
                 } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {       // Regular window
                     if (!state.dataSurface->SurfWinSolarDiffusing(SurfNum)) {                                  // Clear glazing
@@ -7091,7 +7091,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             }
             // Diffuse-diffuse transmittance for bare exterior window
             if (state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                TDifBare = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarAniso);
+                TDifBare = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso);
             } else {
                 if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                     // Complex Fenestration: use hemispherical ave of directional-hemispherical transmittance
@@ -8410,7 +8410,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                              state.dataEnvrn->GndSolarRad * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
                         // Exterior diffuse sky solar transmitted by TDD (W/m2)
                         Real64 SkySolarTrans = state.dataEnvrn->DifSolarRad *
-                                               TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::iRadType::SolarAniso) *
+                                               TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso) *
                                                state.dataSolarShading->SurfAnisoSkyMult(SurfNum2);
                         // Exterior diffuse ground solar transmitted by TDD (W/m2)
                         Real64 GndSolarTrans = state.dataEnvrn->GndSolarRad * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *

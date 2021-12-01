@@ -78,7 +78,7 @@ namespace DataDaylighting {
         Num
     };
 
-    enum class iExtWinType
+    enum class ExtWinType
     {
         Invalid = -1,
         NotInOrAdjZoneExtWin, // Exterior window is not in a Daylighting:Detailed zone or in an adjacent zone with a shared interior window
@@ -87,7 +87,7 @@ namespace DataDaylighting {
         Num
     };
 
-    enum class iCalledFor
+    enum class CalledFor
     {
         Invalid = -1,
         RefPoint,
@@ -95,7 +95,7 @@ namespace DataDaylighting {
         Num
     };
 
-    enum class iDaylightingMethod
+    enum class DaylightingMethod
     {
         Invalid = -1,
         NoDaylighting,
@@ -107,7 +107,6 @@ namespace DataDaylighting {
     // Parameters for "Lighting Control Type" - these are the values expected by DElight
     enum class LtgCtrlType
     {
-        // TODO: enum check
         Invalid = -1,
         Continuous = 1,
         Stepped = 2,
@@ -156,8 +155,8 @@ namespace DataDaylighting {
         int zoneIndex = 0;    // Index to zone where the daylighting:controls object is located
         int spaceIndex = 0;   // Index to space where the daylighting:controls object is located (0 if specified for a zone)
         int enclIndex = 0;    // Index to enclosure where the daylighting:controls object is located
-        DataDaylighting::iDaylightingMethod DaylightMethod = iDaylightingMethod::NoDaylighting; // Type of Daylighting (1=SplitFlux, 2=DElight)
-        int AvailSchedNum = 0;                                                                  // pointer to availability schedule if present
+        DataDaylighting::DaylightingMethod DaylightMethod = DaylightingMethod::NoDaylighting; // Type of Daylighting (1=SplitFlux, 2=DElight)
+        int AvailSchedNum = 0;                                                                // pointer to availability schedule if present
         int TotalDaylRefPoints = 0;        // Number of daylighting reference points for this control
         Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
         Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points

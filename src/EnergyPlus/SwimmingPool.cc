@@ -422,7 +422,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                           "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
         ErrorsFound = true;
         // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-    } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) {
+    } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) {
         ShowSevereError(state,
                         state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "

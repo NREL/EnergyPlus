@@ -63,7 +63,7 @@ namespace DataDaylightingDevices {
     constexpr int MaxTZones(10);   // Maximum number of transition zones
     constexpr int NumOfAngles(19); // Number of data points on transmittance vs. angle curve
 
-    enum class iRadType
+    enum class RadType
     {
         Invalid = -1,
         VisibleBeam,

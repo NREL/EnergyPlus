@@ -215,7 +215,7 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential
 
-    enum class iHeatTransferModel : int
+    enum class HeatTransferModel : int
     {
         NotSet = -1,
         None, // shading surfaces
@@ -231,7 +231,7 @@ namespace DataSurfaces {
         Num                  // count, always the final element
     };
 
-    static constexpr std::array<std::string_view, (int)DataSurfaces::iHeatTransferModel::Num> HeatTransAlgoStrs = {
+    static constexpr std::array<std::string_view, (int)DataSurfaces::HeatTransferModel::Num> HeatTransAlgoStrs = {
         "None",
         "CTF - ConductionTransferFunction",
         "EMPD - MoisturePenetrationDepthConductionTransferFunction",
@@ -504,11 +504,11 @@ namespace DataSurfaces {
         Real64 ViewFactorSky;    // View factor to the sky from the exterior of the surface for diffuse solar radiation
 
         // Special Properties
-        iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        int IntConvCoeff;                         // Interior Convection Coefficient Algorithm pointer (different data structure)
-        int ExtConvCoeff;                         // Exterior Convection Coefficient Algorithm pointer (different data structure)
-        int OSCPtr;                               // Pointer to OSC data structure
-        int OSCMPtr;                              // "Pointer" to OSCM data structure (other side conditions from a model)
+        HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+        int IntConvCoeff;                        // Interior Convection Coefficient Algorithm pointer (different data structure)
+        int ExtConvCoeff;                        // Exterior Convection Coefficient Algorithm pointer (different data structure)
+        int OSCPtr;                              // Pointer to OSC data structure
+        int OSCMPtr;                             // "Pointer" to OSCM data structure (other side conditions from a model)
 
         // Windows
         int FrameDivider;          // Pointer to frame and divider information (windows only)
@@ -554,7 +554,7 @@ namespace DataSurfaces {
                     hash<Real64>()(ViewFactorGround),
                     hash<Real64>()(ViewFactorSky),
 
-                    hash<iHeatTransferModel>()(HeatTransferAlgorithm),
+                    hash<HeatTransferModel>()(HeatTransferAlgorithm),
                     hash<int>()(IntConvCoeff),
                     hash<int>()(ExtConvCoeff),
                     hash<int>()(OSCPtr),
@@ -675,12 +675,12 @@ namespace DataSurfaces {
         Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
 
         // Boundary conditions and interconnections
-        bool HeatTransSurf;                       // True if surface is a heat transfer surface,
-        int OutsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
-        int InsideHeatSourceTermSchedule;         // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
-                                                  // False if a (detached) shadowing (sub)surface
-        iHeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        std::string BaseSurfName;                 // Name of BaseSurf
+        bool HeatTransSurf;                      // True if surface is a heat transfer surface,
+        int OutsideHeatSourceTermSchedule;       // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+        int InsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
+                                                 // False if a (detached) shadowing (sub)surface
+        HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+        std::string BaseSurfName;                // Name of BaseSurf
         int BaseSurf;       // "Base surface" for this surface. Applies mainly to subsurfaces in which case it points back to the base surface number.
                             // Equals 0 for detached shading. BaseSurf equals surface number for all other surfaces.
         int NumSubSurfaces; // Number of subsurfaces this surface has (doors/windows)
@@ -746,7 +746,7 @@ namespace DataSurfaces {
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
-              HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
+              HeatTransferAlgorithm(HeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
               ExtSolar(false), ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0),
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),

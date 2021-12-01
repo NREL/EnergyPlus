@@ -1915,7 +1915,7 @@ namespace UnitVentilator {
         }
         state.dataSize->DataFanIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index;
         // unit ventilator is always blow thru
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == BothOption) {
             state.dataSize->ZoneCoolingOnlyFan = true;

@@ -4728,10 +4728,10 @@ namespace VariableSpeedCoils {
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = PsyCpAirFnW(MixHumRat);
                     if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                        DataAirSystems::fanPlacement::BlowThru) {
+                        DataAirSystems::FanPlacement::BlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                               DataAirSystems::fanPlacement::DrawThru) {
+                               DataAirSystems::FanPlacement::DrawThru) {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
@@ -4812,7 +4812,7 @@ namespace VariableSpeedCoils {
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = PsyCpAirFnW(MixHumRat);
 
-                    if (state.dataSize->DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                    if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     } else {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);

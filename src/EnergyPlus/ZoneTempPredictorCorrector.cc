@@ -4898,7 +4898,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         bool no_ht_EMPD_or_HAMT(true);
         for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
             auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-            if ((htAlgo == DataSurfaces::iHeatTransferModel::EMPD) || (htAlgo == DataSurfaces::iHeatTransferModel::HAMT)) {
+            if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
                 no_ht_EMPD_or_HAMT = false;
                 break;
             }
@@ -5904,7 +5904,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     bool no_ht_EMPD_or_HAMT(true);
     for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
         auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-        if ((htAlgo == DataSurfaces::iHeatTransferModel::EMPD) || (htAlgo == DataSurfaces::iHeatTransferModel::HAMT)) {
+        if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
             no_ht_EMPD_or_HAMT = false;
             break;
         }
@@ -7080,7 +7080,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - RefAirTemp);
 
         // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
-        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyM;
             state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyF;
         }

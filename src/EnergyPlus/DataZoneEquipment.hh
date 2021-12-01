@@ -160,7 +160,7 @@ namespace DataZoneEquipment {
         Num
     };
 
-    enum class iLightReturnExhaustConfig : int
+    enum class LightReturnExhaustConfig : int
     {
         Invalid = -1,
         NoExhast = 0, // No exhaust node
@@ -304,7 +304,7 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeExhaustNodeNum; // Exhaust node number flow to a corrsponding return node due to light heat gain
         // Array1D_int SharedExhaustNode;        // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the
         // exhaust node value
-        Array1D<iLightReturnExhaustConfig>
+        Array1D<LightReturnExhaustConfig>
             SharedExhaustNode; // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)

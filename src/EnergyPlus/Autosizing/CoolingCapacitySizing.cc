@@ -183,9 +183,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(CoilInHumRat);
                             // adjust coil inlet/outlet temp with fan temperature rise
                             if (this->dataDesAccountForFanHeat) {
-                                if (state.dataSize->DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                                if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
                                     CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
-                                } else if (state.dataSize->DataFanPlacement == DataSizing::zoneFanPlacement::zoneDrawThru) {
+                                } else if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::DrawThru) {
                                     CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 }
                             }
@@ -409,12 +409,12 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         // adjust coil inlet/outlet temp with fan temperature rise
                         if (this->dataDesAccountForFanHeat) {
                             PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
-                            if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                            if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::BlowThru) {
                                 CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 // include change in inlet condition in TotCapTempModFac
                                 CoilInWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                                     state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
-                            } else if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                            } else if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::DrawThru) {
                                 CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                             }
                         }

@@ -67,7 +67,7 @@ int constexpr maxlay3(maxlay2 + 1); // maximum number of ? (maxlay2+1)
 //  Layer types:
 enum class TARCOGLayerType : int
 {
-    UNASSIGNED = -1,
+    Invalid = -1,
     SPECULAR = 0,
     VENETBLIND_HORIZ = 1,
     WOVSHADE = 2,
@@ -81,7 +81,7 @@ enum class TARCOGLayerType : int
 //  Thermal models:
 enum class TARCOGThermalModel : int
 {
-    UNASSIGNED = -1,
+    Invalid = -1,
     ISO15099 = 0,
     SCW = 1,
     CSM = 2,
@@ -94,7 +94,7 @@ int constexpr YES_SupportPillar = 1;
 // Deflection parameters
 enum class DeflectionCalculation : int
 {
-    UNASSIGNED = -1,
+    Invalid = -1,
     NONE = 0,
     TEMPERATURE = 1,
     GAP_WIDTHS = 2,

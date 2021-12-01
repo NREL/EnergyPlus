@@ -927,15 +927,15 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(AlphaName(1));
                 // The default is CTF
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
 
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::EMPD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::EMPD;
                     state.dataHeatBal->AnyEMPD = true;
                     state.dataHeatBal->AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CondFD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CondFD;
                     state.dataHeatBal->AnyCondFD = true;
                     state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -951,7 +951,7 @@ namespace HeatBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::HAMT;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::HAMT;
                     state.dataHeatBal->AnyHAMT = true;
                     state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -970,7 +970,7 @@ namespace HeatBalanceManager {
                     }
 
                 } else {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
                 }
             }
@@ -993,7 +993,7 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
+            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
             state.dataHeatBal->AnyCTF = true;
             state.dataHeatBalSurf->MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
             state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;

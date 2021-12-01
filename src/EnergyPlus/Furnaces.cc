@@ -6611,9 +6611,9 @@ namespace Furnaces {
             state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
         }
         if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == BlowThru) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
         } else if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DrawThru) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
         }
 
         if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {

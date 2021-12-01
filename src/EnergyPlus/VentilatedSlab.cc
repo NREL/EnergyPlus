@@ -1970,7 +1970,7 @@ namespace VentilatedSlab {
         }
         state.dataSize->DataFanIndex = state.dataVentilatedSlab->VentSlab(Item).Fan_Index;
         // ventilated slab unit is always blow thru
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
         if (state.dataVentilatedSlab->VentSlab(Item).HVACSizingIndex > 0) {
             zoneHVACIndex = state.dataVentilatedSlab->VentSlab(Item).HVACSizingIndex;

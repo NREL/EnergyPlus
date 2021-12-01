@@ -85,7 +85,7 @@ namespace HVACVariableRefrigerantFlow {
         Num
     };
 
-    enum class iWaterSupply
+    enum class EvapWaterSupply
     {
         Invalid = -1,
         FromMains, // mains water line used as water source
@@ -283,8 +283,8 @@ namespace HVACVariableRefrigerantFlow {
         int DefrostHeatErrorIndex;   // warning message index for recurring warnings
         // end variables used for heat recovery mode
         // begin variables for Water System interactions
-        iWaterSupply EvapWaterSupplyMode; // where does water come from
-        std::string EvapWaterSupplyName;  // name of water source e.g. water storage tank
+        EvapWaterSupply EvapWaterSupplyMode; // where does water come from
+        std::string EvapWaterSupplyName;     // name of water source e.g. water storage tank
         int EvapWaterSupTankID;
         int EvapWaterTankDemandARRID;
         std::string CondensateCollectName; // name of water source e.g. water storage tank
@@ -402,7 +402,7 @@ namespace HVACVariableRefrigerantFlow {
               HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0), HRHeatCapTC(0.0),
               HREIRFTHeat(0), HREIRFTHeatConst(1.1), HRInitialHeatEIRFrac(1.0), HRHeatEIRTC(0.0), HRCoolingActive(false), HRHeatingActive(false),
               ModeChange(false), HRModeChange(false), HRTimer(0.0), HRTime(0.0), EIRFTempCoolErrorIndex(0), EIRFTempHeatErrorIndex(0),
-              DefrostHeatErrorIndex(0), EvapWaterSupplyMode(iWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              DefrostHeatErrorIndex(0), EvapWaterSupplyMode(EvapWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
               CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), BasinHeaterPowerFTempDiff(0.0),
               BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), BasinHeaterSchedulePtr(0),
               EMSOverrideHPOperatingMode(false), EMSValueForHPOperatingMode(0.0), HPOperatingModeErrorIndex(0), VRFHeatRec(0.0),

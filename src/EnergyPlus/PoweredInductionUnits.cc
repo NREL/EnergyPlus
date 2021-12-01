@@ -190,12 +190,12 @@ void SimPIU(EnergyPlusData &state,
     // Select the correct unit type
     switch (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num) {
 
-    case DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat: { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
+    case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat: { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
 
         CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
         break;
     }
-    case DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat: { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
+    case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat: { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
 
         CalcParallelPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
         break;
@@ -296,7 +296,7 @@ void GetPIUs(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPowerInductionUnits->PIU(PIUNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPowerInductionUnits->PIU(PIUNum).UnitType = cCurrentModuleObject;
-        state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
+        state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
         state.dataPowerInductionUnits->PIU(PIUNum).Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -540,7 +540,7 @@ void GetPIUs(EnergyPlusData &state)
                                                  ErrorsFound);
         state.dataPowerInductionUnits->PIU(PIUNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         state.dataPowerInductionUnits->PIU(PIUNum).UnitType = cCurrentModuleObject;
-        state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
+        state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat;
         state.dataPowerInductionUnits->PIU(PIUNum).Sched = state.dataIPShortCut->cAlphaArgs(2);
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -1436,9 +1436,9 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 
     if (CurTermUnitSizingNum > 0) {
 
-        if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
+        if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
             TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow;
-        } else if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
+        } else if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
             TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow +
                 state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;

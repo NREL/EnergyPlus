@@ -117,7 +117,7 @@ namespace HVACInterfaceManager {
 
     void UpdateHVACInterface(EnergyPlusData &state,
                              int AirLoopNum, // airloop number for which air loop this is
-                             DataConvergParams::iCalledFrom CalledFrom,
+                             DataConvergParams::CalledFrom CalledFrom,
                              int OutletNode,          // Node number for the outlet of the side of the loop just simulated
                              int InletNode,           // Node number for the inlet of the side that needs the outlet node data
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated

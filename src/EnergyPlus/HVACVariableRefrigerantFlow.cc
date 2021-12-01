@@ -2369,9 +2369,9 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         // A37, \field Supply Water Storage Tank Name
         state.dataHVACVarRefFlow->VRF(VRFNum).EvapWaterSupplyName = cAlphaArgs(37);
         if (lAlphaFieldBlanks(37)) {
-            state.dataHVACVarRefFlow->VRF(VRFNum).EvapWaterSupplyMode = iWaterSupply::FromMains;
+            state.dataHVACVarRefFlow->VRF(VRFNum).EvapWaterSupplyMode = EvapWaterSupply::FromMains;
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFNum).EvapWaterSupplyMode = iWaterSupply::FromTank;
+            state.dataHVACVarRefFlow->VRF(VRFNum).EvapWaterSupplyMode = EvapWaterSupply::FromTank;
             SetupTankDemandComponent(state,
                                      state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                      cCurrentModuleObject,
@@ -8064,9 +8064,9 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
             state.dataSize->DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
-                state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+                state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
             } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
-                state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+                state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
             }
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum =
@@ -8075,10 +8075,10 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanLocation =
-                    DataAirSystems::fanPlacement::BlowThru;
+                    DataAirSystems::FanPlacement::BlowThru;
             } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanLocation =
-                    DataAirSystems::fanPlacement::DrawThru;
+                    DataAirSystems::FanPlacement::DrawThru;
             }
         }
     } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
@@ -8086,9 +8086,9 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
             state.dataSize->DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
-                state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+                state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
             } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
-                state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+                state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
             }
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum =
@@ -8097,10 +8097,10 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanLocation =
-                    DataAirSystems::fanPlacement::BlowThru;
+                    DataAirSystems::FanPlacement::BlowThru;
             } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanLocation =
-                    DataAirSystems::fanPlacement::DrawThru;
+                    DataAirSystems::FanPlacement::DrawThru;
             }
         }
     }

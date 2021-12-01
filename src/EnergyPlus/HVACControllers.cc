@@ -345,7 +345,7 @@ void ManageControllers(EnergyPlusData &state,
                 RootFinder::SetupRootFinder(state,
                                             RootFinders(ControlNum),
                                             DataRootFinder::Slope::Decreasing,
-                                            DataRootFinder::iMethod::Brent,
+                                            DataRootFinder::RootFinderMethod::Brent,
                                             DataPrecisionGlobals::constant_zero,
                                             1.0e-6,
                                             ControllerProps(ControlNum).Offset);
@@ -843,8 +843,8 @@ void ResetController(EnergyPlusData &state, int const ControlNum, bool const DoW
 
     // Reset root finder
     // This is independent of the processing in InitializeRootFinder() performed in Calc() routine.
-    RootFinders(ControlNum).StatusFlag = iStatus::None;
-    RootFinders(ControlNum).CurrentMethodType = DataRootFinder::iMethod::None;
+    RootFinders(ControlNum).StatusFlag = RootFinderStatus::None;
+    RootFinders(ControlNum).CurrentMethodType = DataRootFinder::RootFinderMethod::None;
 
     RootFinders(ControlNum).CurrentPoint.DefinedFlag = false;
     RootFinders(ControlNum).CurrentPoint.X = 0.0;
@@ -1125,7 +1125,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                 SetupRootFinder(state,
                                 RootFinders(ControlNum),
                                 DataRootFinder::Slope::Increasing,
-                                DataRootFinder::iMethod::Brent,
+                                DataRootFinder::RootFinderMethod::Brent,
                                 DataPrecisionGlobals::constant_zero,
                                 1.0e-6,
                                 ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
@@ -1136,7 +1136,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                 SetupRootFinder(state,
                                 RootFinders(ControlNum),
                                 DataRootFinder::Slope::Decreasing,
-                                DataRootFinder::iMethod::Brent,
+                                DataRootFinder::RootFinderMethod::Brent,
                                 DataPrecisionGlobals::constant_zero,
                                 1.0e-6,
                                 ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
@@ -1554,8 +1554,8 @@ void FindRootSimpleController(EnergyPlusData &state,
     // Map root finder status onto controller mode
     {
         auto const SELECT_CASE_var(RootFinders(ControlNum).StatusFlag);
-        if ((SELECT_CASE_var == iStatus::None) || (SELECT_CASE_var == iStatus::WarningNonMonotonic) ||
-            (SELECT_CASE_var == iStatus::WarningSingular)) {
+        if ((SELECT_CASE_var == RootFinderStatus::None) || (SELECT_CASE_var == RootFinderStatus::WarningNonMonotonic) ||
+            (SELECT_CASE_var == RootFinderStatus::WarningSingular)) {
             // We need to keep iterating...
             IsConvergedFlag = false;
 
@@ -1577,7 +1577,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             // Make sure that mode of previous solution was active
             // Make sure that proposed candidate does not conflict with current min/max range and lower/upper brackets
             ReusePreviousSolutionFlag = ControllerProps(ControlNum).ReusePreviousSolutionFlag &&
-                                        (RootFinders(ControlNum).CurrentMethodType == DataRootFinder::iMethod::Bracket) &&
+                                        (RootFinders(ControlNum).CurrentMethodType == DataRootFinder::RootFinderMethod::Bracket) &&
                                         PreviousSolutionDefinedFlag && (PreviousSolutionMode == ControllerMode::Active) &&
                                         CheckRootFinderCandidate(RootFinders(ControlNum), PreviousSolutionValue);
 
@@ -1593,21 +1593,21 @@ void FindRootSimpleController(EnergyPlusData &state,
                 ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).XCandidate;
             }
 
-        } else if ((SELECT_CASE_var == iStatus::OK) || (SELECT_CASE_var == iStatus::OKRoundOff)) {
+        } else if ((SELECT_CASE_var == RootFinderStatus::OK) || (SELECT_CASE_var == RootFinderStatus::OKRoundOff)) {
             // Indicate convergence with base value (used to obtain DeltaSensed!)
             ExitCalcController(state, ControlNum, RootFinders(ControlNum).XCandidate, ControllerMode::Active, IsConvergedFlag, IsUpToDateFlag);
 
-        } else if (SELECT_CASE_var == iStatus::OKMin) {
+        } else if (SELECT_CASE_var == RootFinderStatus::OKMin) {
             // Indicate convergence with min value
             // Should be the same as ControllerProps(ControlNum)%MinAvailActuated
             ExitCalcController(state, ControlNum, RootFinders(ControlNum).MinPoint.X, ControllerMode::MinActive, IsConvergedFlag, IsUpToDateFlag);
 
-        } else if (SELECT_CASE_var == iStatus::OKMax) {
+        } else if (SELECT_CASE_var == RootFinderStatus::OKMax) {
             // Indicate convergence with max value
             // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
             ExitCalcController(state, ControlNum, RootFinders(ControlNum).MaxPoint.X, ControllerMode::MaxActive, IsConvergedFlag, IsUpToDateFlag);
 
-        } else if (SELECT_CASE_var == iStatus::ErrorSingular) {
+        } else if (SELECT_CASE_var == RootFinderStatus::ErrorSingular) {
             // Indicate inactive mode with min actuated value
             // NOTE: Original code returned Node(ActuatedNode)%MassFlowRateMinAvail
             //       This was not portable in case the actuated variable was NOT a mass flow rate!
@@ -1618,7 +1618,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             ExitCalcController(state, ControlNum, RootFinders(ControlNum).MinPoint.X, ControllerMode::Inactive, IsConvergedFlag, IsUpToDateFlag);
 
             // Abnormal case: should never happen
-        } else if (SELECT_CASE_var == iStatus::ErrorRange) {
+        } else if (SELECT_CASE_var == RootFinderStatus::ErrorRange) {
             ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
             ShowContinueError(state, " Controller name=\"" + ControllerName + "\"");
             ShowContinueError(
@@ -1629,7 +1629,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             ShowFatalError(state, "Preceding error causes program termination.");
 
             // Abnormal case: should never happen
-        } else if (SELECT_CASE_var == iStatus::ErrorBracket) {
+        } else if (SELECT_CASE_var == RootFinderStatus::ErrorBracket) {
             ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
             ShowContinueError(state, " Controller name=" + ControllerProps(ControlNum).ControllerName);
             ShowContinueError(
@@ -1657,7 +1657,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             //       - REVERSE ACTION:
             //         - If y(xMin) < ySetPoint && y(xMax) > y(xMin), then  x = xMin
             //         - If y(xMin) > ySetPoint && y(xMax) > y(xMin), then  x = xMax
-        } else if (SELECT_CASE_var == iStatus::ErrorSlope) {
+        } else if (SELECT_CASE_var == RootFinderStatus::ErrorSlope) {
             if (!state.dataGlobal->WarmupFlag && ControllerProps(ControlNum).BadActionErrCount == 0) {
                 ++ControllerProps(ControlNum).BadActionErrCount;
                 ShowSevereError(state, "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"");
@@ -2063,7 +2063,7 @@ void CheckTempAndHumRatCtrl(EnergyPlusData &state, int const ControlNum, bool &I
                             RootFinder::SetupRootFinder(state,
                                                         state.dataHVACControllers->RootFinders(ControlNum),
                                                         DataRootFinder::Slope::Decreasing,
-                                                        DataRootFinder::iMethod::FalsePosition,
+                                                        DataRootFinder::RootFinderMethod::FalsePosition,
                                                         DataPrecisionGlobals::constant_zero,
                                                         1.0e-6,
                                                         1.0e-5);

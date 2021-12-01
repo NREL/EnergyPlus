@@ -177,12 +177,12 @@ namespace DataSizing {
     constexpr int GlobalCoolingSizingFactorMode(103);
     constexpr int LoopComponentSizingFactorMode(104);
 
-    enum class zoneFanPlacement
+    enum class ZoneFanPlacement
     {
         Invalid = -1,
-        zoneFanPlaceNotSet,
-        zoneBlowThru,
-        zoneDrawThru,
+        NotSet,
+        BlowThru,
+        DrawThru,
         Num
     };
 
@@ -1151,7 +1151,7 @@ struct SizingData : BaseGlobalStruct
     bool DataNomCapInpMeth = false;                  // True if heating coil is sized by CoilPerfInpMeth == NomCa
     int DataFanEnumType = -1;                        // Fan type used during sizing
     int DataFanIndex = -1;                           // Fan index used during sizing
-    DataSizing::zoneFanPlacement DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet; // identifies location of fan wrt coil
+    DataSizing::ZoneFanPlacement DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
     EPVector<DataSizing::OARequirementsData> OARequirements;
     EPVector<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
@@ -1329,7 +1329,7 @@ struct SizingData : BaseGlobalStruct
         this->DataNomCapInpMeth = false;
         this->DataFanEnumType = -1;
         this->DataFanIndex = -1;
-        this->DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+        this->DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
         this->DataDXSpeedNum = 0;
         this->OARequirements.deallocate();
         this->ZoneAirDistribution.deallocate();

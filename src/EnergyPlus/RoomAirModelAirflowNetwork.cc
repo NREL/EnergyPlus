@@ -1183,7 +1183,7 @@ namespace RoomAirModelAirflowNetwork {
             auto &HMassConvInFD = state.dataMstBal->HMassConvInFD;
             auto &RhoVaporSurfIn = state.dataMstBal->RhoVaporSurfIn;
             auto &RhoVaporAirIn = state.dataMstBal->RhoVaporAirIn;
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::HAMT) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
                 UpdateHeatBalHAMT(state, SurfNum);
 
                 SumHmAW += HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
@@ -1205,7 +1205,7 @@ namespace RoomAirModelAirflowNetwork {
                 SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone * Wsurf;
             }
 
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::EMPD) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::EMPD) {
 
                 UpdateMoistureBalanceEMPD(state, SurfNum);
                 RhoVaporSurfIn(SurfNum) = state.dataMstBalEMPD->RVSurface(SurfNum);

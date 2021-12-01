@@ -1692,9 +1692,9 @@ namespace UnitarySystems {
                 state.dataSize->DataFanIndex = this->m_FanIndex;
             }
             if (this->m_FanPlace == FanPlace::BlowThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
             } else if (this->m_FanPlace == FanPlace::DrawThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
             }
         } else if (state.dataSize->CurZoneEqNum > 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -1704,9 +1704,9 @@ namespace UnitarySystems {
             }
             state.dataSize->DataFanIndex = this->m_FanIndex;
             if (this->m_FanPlace == FanPlace::BlowThru) {
-                state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+                state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
             } else if (this->m_FanPlace == FanPlace::DrawThru) {
-                state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+                state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
             }
         }
 

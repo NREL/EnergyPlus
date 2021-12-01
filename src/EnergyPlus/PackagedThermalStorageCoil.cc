@@ -1773,10 +1773,10 @@ void GetTESCoilInput(EnergyPlusData &state)
         }
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(60)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode = iWaterSupply::WaterSupplyFromMains;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode = EvapWaterSupply::WaterSupplyFromMains;
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyName = state.dataIPShortCut->cAlphaArgs(60);
-            state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode = iWaterSupply::WaterSupplyFromTank;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode = EvapWaterSupply::WaterSupplyFromTank;
             SetupTankDemandComponent(state,
                                      state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                      cCurrentModuleObject,
@@ -2038,7 +2038,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
-            if (state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromMains) {
+            if (state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode == EvapWaterSupply::WaterSupplyFromMains) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Water Volume",
                                     OutputProcessor::Unit::m3,
@@ -2063,7 +2063,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                     "Cooling",
                                     _,
                                     "System");
-            } else if (state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromTank) {
+            } else if (state.dataPackagedThermalStorageCoil->TESCoil(item).EvapWaterSupplyMode == EvapWaterSupply::WaterSupplyFromTank) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Storage Tank Water Volume",
                                     OutputProcessor::Unit::m3,
@@ -5378,14 +5378,14 @@ void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoil
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserRuntimeFraction;
 
     // Set the demand request for supply water from water storage tank (if needed)
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromTank) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupplyMode == EvapWaterSupply::WaterSupplyFromTank) {
         state.dataWaterData->WaterStorage(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupTankID)
             .VdotRequestDemand(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterTankDemandARRID) =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate;
     }
 
     // check if should be starved by restricted flow from tank
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupplyMode == iWaterSupply::WaterSupplyFromTank) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupplyMode == EvapWaterSupply::WaterSupplyFromTank) {
         AvailWaterRate = state.dataWaterData->WaterStorage(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupTankID)
                              .VdotAvailDemand(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterTankDemandARRID);
         if (AvailWaterRate < state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate) {

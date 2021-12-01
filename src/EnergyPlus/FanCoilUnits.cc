@@ -1488,7 +1488,7 @@ namespace FanCoilUnits {
         }
         state.dataSize->DataFanIndex = FanCoil(FanCoilNum).FanIndex;
         // fan coil unit is always blow thru
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 

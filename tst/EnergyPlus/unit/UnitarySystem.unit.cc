@@ -452,7 +452,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanVecIndex = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
     Real64 FanCoolLoad = Fans::FanDesHeatGain(*state, state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum, coil1CoolingAirFlowRate);
     WaterCoils::SizeWaterCoil(*state, CoilNum);
 
@@ -470,7 +470,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
     // reset primary air system fan type and location as if is doesn't exist
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::fanPlaceNotSet;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::fanPlaceNotSet;
 
     // size same coils in UnitarySystem
     int AirLoopNum(1);

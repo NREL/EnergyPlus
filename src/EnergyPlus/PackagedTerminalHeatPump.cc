@@ -5214,9 +5214,9 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
     }
     state.dataSize->DataFanIndex = state.dataPTHP->PTUnit(PTUnitNum).FanIndex;
     if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
     } else if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
     }
 
     if (state.dataSize->CurZoneEqNum > 0) {

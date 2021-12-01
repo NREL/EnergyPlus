@@ -151,7 +151,7 @@ namespace RefrigeratedCase {
     };
 
     // Water-cooled condenser loop flow type
-    enum class iCndsrFlowType : int
+    enum class CndsrFlowType : int
     {
         Invalid = -1,
         VariableFlow,
@@ -532,7 +532,7 @@ namespace RefrigeratedCase {
         Real64 MassFlowRate;            // Water-cooled condenser mass flow rate (kg/s)
         Real64 CondLoad;                // Total condenser load (W)
         Real64 CondEnergy;              // Condenser energy (J)
-        iCndsrFlowType FlowType;        // Water-cooled condenser loop flow type
+        CndsrFlowType FlowType;         // Water-cooled condenser loop flow type
         Real64 VolFlowRateMax;          // Maximum condenser volumetric flow rate (m3/s)
         Real64 MassFlowRateMax;         // Maximum condenser mass flow rate (kg/s)
         Real64 InletTempMin;            // Minimum condenser water inlet temperature (C)
@@ -554,7 +554,7 @@ namespace RefrigeratedCase {
               SensHVACCreditHeatRate(0.0), SensHVACCreditHeat(0.0), EvapFreezeWarnIndex(0), NoFlowWarnIndex(0), HighTempWarnIndex(0),
               LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), InletTemp(0.0), OutletNode(0), PlantTypeOfNum(0),
               PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0), OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0),
-              DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0), FlowType(iCndsrFlowType::VariableFlow), VolFlowRateMax(0.0),
+              DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0), FlowType(CndsrFlowType::VariableFlow), VolFlowRateMax(0.0),
               MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
         {
         }
@@ -951,7 +951,7 @@ namespace RefrigeratedCase {
         int NumSysAttach;                                   // Number of systems attached to condenser, error if /=1
         DataHeatBalance::RefrigCondenserType CondenserType; // Specifies cooling mode for condenser
         int EvapFreezeWarnIndex;                            // Recurring freeze warning index
-        iCndsrFlowType FlowType;                            // Water-cooled condenser loop flow type
+        CndsrFlowType FlowType;                             // Water-cooled condenser loop flow type
         int CondCreditWarnIndex1;                           // Used to count warnings
         int CondCreditWarnIndex2;                           // Used to count warnings
         int CondCreditWarnIndex3;                           // Used to count warnings
@@ -1044,7 +1044,7 @@ namespace RefrigeratedCase {
         // Default Constructor
         RefrigCondenserData()
             : EndUseSubcategory("General"), CondenserRejectHeatToZone(false), CoilFlag(false), NumSysAttach(0),
-              CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), EvapFreezeWarnIndex(0), FlowType(iCndsrFlowType::VariableFlow),
+              CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), EvapFreezeWarnIndex(0), FlowType(CndsrFlowType::VariableFlow),
               CondCreditWarnIndex1(0), CondCreditWarnIndex2(0), CondCreditWarnIndex3(0), CondCreditWarnIndex4(0), CondCreditWarnIndex5(0),
               CondCreditWarnIndex6(0), CondCreditWarnIndex7(0), NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0),
               HighInletWarnIndex(0), InletNode(0), EvapSchedPtr(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0),

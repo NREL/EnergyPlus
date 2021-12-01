@@ -104,7 +104,7 @@ namespace PackagedThermalStorageCoil {
         Num
     };
 
-    enum class iWaterSupply
+    enum class EvapWaterSupply
     {
         Invalid = -1,
         WaterSupplyFromMains,
@@ -300,7 +300,7 @@ namespace PackagedThermalStorageCoil {
         Real64 BasinHeaterPowerFTempDiff;                   // Basin heater power for evaporatively cooled condensers [W/K]
         int BasinHeaterAvailSchedNum;                       // basin heater availability schedule pointer num
         Real64 BasinHeaterSetpointTemp;                     // evap water basin temperature setpoint [C]
-        iWaterSupply EvapWaterSupplyMode;                   // where does evap water come from
+        EvapWaterSupply EvapWaterSupplyMode;                // where does evap water come from
         std::string EvapWaterSupplyName;                    // name of water source e.g. water storage tank
         int EvapWaterSupTankID;                             // supply tank index, if any
         int EvapWaterTankDemandARRID;                       // evap water demand array index
@@ -408,7 +408,7 @@ namespace PackagedThermalStorageCoil {
               CondAirOutletNodeNum(0), CondenserType(DataHeatBalance::RefrigCondenserType::Air), CondenserAirVolumeFlow(0.0),
               CondenserAirFlowSizingFactor(0.0), CondenserAirMassFlow(0.0), EvapCondEffect(0.0), CondInletTemp(0.0), EvapCondPumpElecNomPower(0.0),
               EvapCondPumpElecEnergy(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterAvailSchedNum(0), BasinHeaterSetpointTemp(0.0),
-              EvapWaterSupplyMode(iWaterSupply::WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              EvapWaterSupplyMode(EvapWaterSupply::WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
               CondensateCollectMode(iWaterSys::CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0), StorageMedia(iMedia::Invalid),
               StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0), StorageCapacitySizingFactor(0.0),
               MinimumFluidTankTempLimit(0.0), MaximumFluidTankTempLimit(100.0), RatedFluidTankTemp(0.0), StorageAmbientNodeNum(0), StorageUA(0.0),

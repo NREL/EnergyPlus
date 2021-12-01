@@ -2057,9 +2057,9 @@ namespace HVACUnitaryBypassVAV {
                 state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             }
             if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
             } else if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
             }
         }
 

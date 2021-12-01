@@ -4516,8 +4516,8 @@ TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 6;
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(1) = 6;
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeExhaustNodeNum(2) = 6;
-    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(1) = iLightReturnExhaustConfig::Multi;
-    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(2) = iLightReturnExhaustConfig::Shared;
+    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(1) = LightReturnExhaustConfig::Multi;
+    state->dataZoneEquip->ZoneEquipConfig(1).SharedExhaustNode(2) = LightReturnExhaustConfig::Shared;
 
     state->dataHeatBal->spaceIntGainDevices.allocate(1);
     state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices = 2;

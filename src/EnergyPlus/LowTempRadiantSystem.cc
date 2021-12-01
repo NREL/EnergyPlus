@@ -3942,7 +3942,7 @@ namespace LowTempRadiantSystem {
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
                 ConstrNum = Surface(SurfNum).Construction;
 
-                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF) {
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
 
                     Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                     Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -3963,7 +3963,7 @@ namespace LowTempRadiantSystem {
                     state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                         EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
 
-                } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+                } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
 
                     state.dataHeatBalFanSys->QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
                 }
@@ -4178,7 +4178,7 @@ namespace LowTempRadiantSystem {
                                                                      this->DesignObjectPtr,
                                                                      typeOfRadiantSystem);
 
-                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF) {
+                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
                                 Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                                 Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -4194,7 +4194,7 @@ namespace LowTempRadiantSystem {
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                                     EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
-                            } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+                            } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                                     EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
                             }
@@ -5042,11 +5042,11 @@ namespace LowTempRadiantSystem {
 
                 if (!Iteration) {
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF)
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF)
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                             EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD)
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD)
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                             EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
 

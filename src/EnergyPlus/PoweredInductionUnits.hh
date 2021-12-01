@@ -90,26 +90,26 @@ namespace PoweredInductionUnits {
     {
         // Members
         // input data
-        std::string Name;                                  // name of unit
-        std::string UnitType;                              // type of unit
-        DataDefineEquip::iZnAirLoopEquipType UnitType_Num; // index for type of unit
-        std::string Sched;                                 // availability schedule
-        int SchedPtr;                                      // index to schedule
-        Real64 MaxTotAirVolFlow;                           // m3/s  (series)
-        Real64 MaxTotAirMassFlow;                          // kg/s  (series)
-        Real64 MaxPriAirVolFlow;                           // m3/s
-        Real64 MaxPriAirMassFlow;                          // kg/s
-        Real64 MinPriAirFlowFrac;                          // minimum primary air flow fraction
-        Real64 MinPriAirMassFlow;                          // kg/s
-        Real64 PriDamperPosition;                          // primary air damper position
-        Real64 MaxSecAirVolFlow;                           // m3/s (parallel)
-        Real64 MaxSecAirMassFlow;                          // kg/s (parallel)
-        Real64 FanOnFlowFrac;                              // frac of primary air flow at which fan turns on (parallel)
-        Real64 FanOnAirMassFlow;                           // primary air mass flow rate at which fan turns on (parallel)
-        int PriAirInNode;                                  // unit primary air inlet node number
-        int SecAirInNode;                                  // unit secondary air inlet node number
-        int OutAirNode;                                    // unit air outlet node number
-        int HCoilInAirNode;                                // unit mixed air node number
+        std::string Name;                                 // name of unit
+        std::string UnitType;                             // type of unit
+        DataDefineEquip::ZnAirLoopEquipType UnitType_Num; // index for type of unit
+        std::string Sched;                                // availability schedule
+        int SchedPtr;                                     // index to schedule
+        Real64 MaxTotAirVolFlow;                          // m3/s  (series)
+        Real64 MaxTotAirMassFlow;                         // kg/s  (series)
+        Real64 MaxPriAirVolFlow;                          // m3/s
+        Real64 MaxPriAirMassFlow;                         // kg/s
+        Real64 MinPriAirFlowFrac;                         // minimum primary air flow fraction
+        Real64 MinPriAirMassFlow;                         // kg/s
+        Real64 PriDamperPosition;                         // primary air damper position
+        Real64 MaxSecAirVolFlow;                          // m3/s (parallel)
+        Real64 MaxSecAirMassFlow;                         // kg/s (parallel)
+        Real64 FanOnFlowFrac;                             // frac of primary air flow at which fan turns on (parallel)
+        Real64 FanOnAirMassFlow;                          // primary air mass flow rate at which fan turns on (parallel)
+        int PriAirInNode;                                 // unit primary air inlet node number
+        int SecAirInNode;                                 // unit secondary air inlet node number
+        int OutAirNode;                                   // unit air outlet node number
+        int HCoilInAirNode;                               // unit mixed air node number
         int ControlCompTypeNum;
         int CompErrIndex;
         std::string MixerName; // name of air mixer component
@@ -152,7 +152,7 @@ namespace PoweredInductionUnits {
 
         // Default Constructor
         PowIndUnitData()
-            : UnitType_Num(DataDefineEquip::iZnAirLoopEquipType::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0),
+            : UnitType_Num(DataDefineEquip::ZnAirLoopEquipType::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0),
               MaxPriAirVolFlow(0.0), MaxPriAirMassFlow(0.0), MinPriAirFlowFrac(0.0), MinPriAirMassFlow(0.0), PriDamperPosition(0.0),
               MaxSecAirVolFlow(0.0), MaxSecAirMassFlow(0.0), FanOnFlowFrac(0.0), FanOnAirMassFlow(0.0), PriAirInNode(0), SecAirInNode(0),
               OutAirNode(0), HCoilInAirNode(0), ControlCompTypeNum(0), CompErrIndex(0), Mixer_Num(0), Fan_Num(0), Fan_Index(0), FanAvailSchedPtr(0),

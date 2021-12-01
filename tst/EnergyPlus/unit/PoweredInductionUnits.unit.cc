@@ -553,7 +553,7 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds)
     state->dataPowerInductionUnits->PIU.allocate(1);
     int PIUNum = 1;
     state->dataPowerInductionUnits->PIU(PIUNum).Name = "Series PIU";
-    state->dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
+    state->dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
     state->dataPowerInductionUnits->PIU(PIUNum).HCoilType = PoweredInductionUnits::iHCoilType::Electric;
 
     // Go into all of the autosize blocks (aside from Heating/Steam coils)

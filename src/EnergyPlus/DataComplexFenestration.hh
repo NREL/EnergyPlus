@@ -116,7 +116,7 @@ namespace DataComplexFenestration {
         Real64 Thickness;                        // Layer thickness (m)
         Real64 Conductivity;                     // Layer conductivity (W/m2K)
         Real64 IRTransmittance;                  // IR Transmittance
-        Real64 FrontEmissivity;                  // Emissivity of front suraface
+        Real64 FrontEmissivity;                  // Emissivity of front surface
         Real64 BackEmissivity;                   // Emissivity of back surface
         Real64 TopOpeningMultiplier;             // Coverage percent for top opening (%)
         Real64 BottomOpeningMultiplier;          // Coverage percent for bottom opening (%)
@@ -132,7 +132,7 @@ namespace DataComplexFenestration {
 
         // Default Constructor
         WindowComplexShade()
-            : LayerType(TARCOGParams::TARCOGLayerType::UNASSIGNED), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0),
+            : LayerType(TARCOGParams::TARCOGLayerType::Invalid), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0),
               BackEmissivity(0.0), TopOpeningMultiplier(0.0), BottomOpeningMultiplier(0.0), LeftOpeningMultiplier(0.0), RightOpeningMultiplier(0.0),
               FrontOpeningMultiplier(0.0), SlatWidth(0.0), SlatSpacing(0.0), SlatThickness(0.0), SlatAngle(0.0), SlatConductivity(0.0), SlatCurve(0.0)
         {
@@ -153,9 +153,8 @@ namespace DataComplexFenestration {
 
         // Default Constructor
         WindowThermalModelParams()
-            : CalculationStandard(TARCOGGassesParams::Stdrd::Invalid), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0),
-              DeflectionModel(TARCOGParams::DeflectionCalculation::UNASSIGNED), VacuumPressureLimit(0.0), InitialTemperature(0.0),
-              InitialPressure(0.0)
+            : CalculationStandard(TARCOGGassesParams::Stdrd::Invalid), ThermalModel(TARCOGParams::TARCOGThermalModel::Invalid), SDScalar(0.0),
+              DeflectionModel(TARCOGParams::DeflectionCalculation::Invalid), VacuumPressureLimit(0.0), InitialTemperature(0.0), InitialPressure(0.0)
         {
         }
     };

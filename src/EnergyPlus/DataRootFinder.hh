@@ -64,7 +64,7 @@ enum class Slope
     Num
 };
 
-enum class iStatus
+enum class RootFinderStatus
 {
     Invalid = -1,
     ErrorSingular, // Error because the overall slope appears to be flat between the min and max points, implying that the
@@ -92,7 +92,7 @@ enum class iStatus
     Num
 };
 
-enum class iMethod
+enum class RootFinderMethod
 {
     Invalid = -1,
     None,          // No solution method (used internally only when root finder is reset)
@@ -108,14 +108,14 @@ struct ControlsType
 {
     // Members
     DataRootFinder::Slope SlopeType; // Set to any of the iSlope<...> codes
-    iMethod MethodType;              // Desired solution method.
+    RootFinderMethod MethodType;     // Desired solution method.
     // Set to any of the iMethod<...> codes except for iMethodNone and iMethodBracket
     Real64 TolX;  // Relative tolerance for variable X
     Real64 ATolX; // Absolute tolerance for variable X
     Real64 ATolY; // Absolute tolerance for variable Y
 
     // Default Constructor
-    ControlsType() : SlopeType(DataRootFinder::Slope::Invalid), MethodType(iMethod::None), TolX(1.0e-3), ATolX(1.0e-3), ATolY(1.0e-3)
+    ControlsType() : SlopeType(DataRootFinder::Slope::Invalid), MethodType(RootFinderMethod::None), TolX(1.0e-3), ATolX(1.0e-3), ATolY(1.0e-3)
     {
     }
 };
@@ -137,23 +137,24 @@ struct RootFinderDataType
 {
     // Members
     ControlsType Controls;
-    iStatus StatusFlag; // Current status of root finder
+    RootFinderStatus StatusFlag; // Current status of root finder
     // Valid values are any of the STATUS_<code> constants
-    iMethod CurrentMethodType;  // Solution method used to perform current step
-    Real64 XCandidate;          // Candidate X value to use next when evaluating F(X)
-    Real64 ConvergenceRate;     // Convergence rate achieved over the last 2 successive iterations
-    PointType Increment;        // Increment between last 2 iterations
-    PointType MinPoint;         // Point { XMin, F(XMin) }
-    PointType MaxPoint;         // Point { XMax, F(XMax) }
-    PointType LowerPoint;       // Point { XLower, F(XLower) } so that XLower <= XRoot
-    PointType UpperPoint;       // Point { XUpper, F(XUpper) } so that XRoot <= YUpper
-    PointType CurrentPoint;     // Last evaluated point { X, F(X) }
-    int NumHistory;             // Number of points stored in History
-    Array1D<PointType> History; // Vector containing last 3 best iterates
+    RootFinderMethod CurrentMethodType; // Solution method used to perform current step
+    Real64 XCandidate;                  // Candidate X value to use next when evaluating F(X)
+    Real64 ConvergenceRate;             // Convergence rate achieved over the last 2 successive iterations
+    PointType Increment;                // Increment between last 2 iterations
+    PointType MinPoint;                 // Point { XMin, F(XMin) }
+    PointType MaxPoint;                 // Point { XMax, F(XMax) }
+    PointType LowerPoint;               // Point { XLower, F(XLower) } so that XLower <= XRoot
+    PointType UpperPoint;               // Point { XUpper, F(XUpper) } so that XRoot <= YUpper
+    PointType CurrentPoint;             // Last evaluated point { X, F(X) }
+    int NumHistory;                     // Number of points stored in History
+    Array1D<PointType> History;         // Vector containing last 3 best iterates
 
     // Default Constructor
     RootFinderDataType()
-        : StatusFlag(iStatus::None), CurrentMethodType(iMethod::None), XCandidate(0.0), ConvergenceRate(0.0), NumHistory(0), History(3)
+        : StatusFlag(RootFinderStatus::None), CurrentMethodType(RootFinderMethod::None), XCandidate(0.0), ConvergenceRate(0.0), NumHistory(0),
+          History(3)
     {
     }
 };

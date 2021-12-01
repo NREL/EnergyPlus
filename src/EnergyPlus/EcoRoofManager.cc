@@ -248,7 +248,7 @@ namespace EcoRoofManager {
 
         if (state.dataEcoRoofMgr->EcoRoofbeginFlag) {
             state.dataEcoRoofMgr->EcoRoofbeginFlag = false;
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF)
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF)
                 ShowSevereError(state,
                                 "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
                                 "currently works only with CTF heat balance solution algorithm.");

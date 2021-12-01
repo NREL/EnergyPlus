@@ -102,7 +102,7 @@ namespace DataConvergParams {
 
     constexpr int ConvergLogStackDepth(10);
 
-    enum class iCalledFrom
+    enum class CalledFrom
     {
         Invalid = -1,
         AirSystemDemandSide,

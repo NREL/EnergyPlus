@@ -2230,9 +2230,9 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
     int DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
     int DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
-    DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                  // Solar Distribution Algorithm
-    int InsideSurfIterations = 0;                                                                             // Counts inside surface iterations
-    DataSurfaces::iHeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
+    DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                // Solar Distribution Algorithm
+    int InsideSurfIterations = 0;                                                                           // Counts inside surface iterations
+    DataSurfaces::HeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
     // Flags for HeatTransfer Algorithms Used
     bool AllCTF = true;                  // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
     bool AnyCTF = false;                 // CTF used
@@ -2542,7 +2542,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
         this->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
         this->InsideSurfIterations = 0;
-        this->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
+        this->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
         this->AllCTF = true;
         this->AnyCTF = false;
         this->AnyEMPD = false;

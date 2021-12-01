@@ -200,7 +200,7 @@ struct BaseSizer
     Real64 dataAirFlowUsedForSizing = 0.0;
     Real64 dataDesInletAirTemp = 0.0;
     bool dataDesAccountForFanHeat = false;
-    DataSizing::zoneFanPlacement dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+    DataSizing::ZoneFanPlacement dataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
 
     // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
     // HeatingWaterDesAirInletTempSizer

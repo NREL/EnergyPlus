@@ -2683,9 +2683,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "RefrigRack Nodes");
                 // Get loop flow type
                 if (UtilityRoutines::SameString(Alphas(8), "VariableFlow")) {
-                    RefrigRack(RackNum).FlowType = iCndsrFlowType::VariableFlow;
+                    RefrigRack(RackNum).FlowType = CndsrFlowType::VariableFlow;
                 } else if (UtilityRoutines::SameString(Alphas(8), "ConstantFlow")) {
-                    RefrigRack(RackNum).FlowType = iCndsrFlowType::ConstantFlow;
+                    RefrigRack(RackNum).FlowType = CndsrFlowType::ConstantFlow;
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
@@ -2694,7 +2694,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
                 // Get outlet temperature schedule for variable flow case
-                if (RefrigRack(RackNum).FlowType == iCndsrFlowType::VariableFlow) {
+                if (RefrigRack(RackNum).FlowType == CndsrFlowType::VariableFlow) {
                     if (lAlphaBlanks(9)) {
                         RefrigRack(RackNum).OutletTempSchedPtr = 0;
                     } else {
@@ -2710,7 +2710,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     }
                 }
                 // Get volumetric flow rate if applicable
-                if (RefrigRack(RackNum).FlowType == iCndsrFlowType::ConstantFlow) {
+                if (RefrigRack(RackNum).FlowType == CndsrFlowType::ConstantFlow) {
                     RefrigRack(RackNum).DesVolFlowRate = Numbers(3);
                     RefrigRack(RackNum).VolFlowRate = Numbers(3);
                 }
@@ -2718,7 +2718,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigRack(RackNum).VolFlowRateMax = Numbers(4);
 
                 // Check constant flow for max violation, if applicable
-                if (RefrigRack(RackNum).FlowType == iCndsrFlowType::ConstantFlow && RefrigRack(RackNum).VolFlowRate > Numbers(4)) {
+                if (RefrigRack(RackNum).FlowType == CndsrFlowType::ConstantFlow && RefrigRack(RackNum).VolFlowRate > Numbers(4)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\" " +
                                         cNumericFieldNames(3) + " > " + cNumericFieldNames(4) + '.');
@@ -3490,9 +3490,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(2), Alphas(3), "Water Cooled Condenser Nodes");
                 // Get loop flow type
                 if (UtilityRoutines::SameString(Alphas(4), "VariableFlow")) { // set FlowType
-                    Condenser(CondNum).FlowType = iCndsrFlowType::VariableFlow;
+                    Condenser(CondNum).FlowType = CndsrFlowType::VariableFlow;
                 } else if (UtilityRoutines::SameString(Alphas(4), "ConstantFlow")) {
-                    Condenser(CondNum).FlowType = iCndsrFlowType::ConstantFlow;
+                    Condenser(CondNum).FlowType = CndsrFlowType::ConstantFlow;
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " +
@@ -3502,7 +3502,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 } // Set FlowType
 
                 // Get outlet temperature schedule for variable flow case
-                if (Condenser(CondNum).FlowType == iCndsrFlowType::VariableFlow) {
+                if (Condenser(CondNum).FlowType == CndsrFlowType::VariableFlow) {
                     if (lAlphaBlanks(5)) {
                         Condenser(CondNum).OutletTempSchedPtr = 0;
                     } else {
@@ -3519,7 +3519,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 } // Outlet temperature schedule
 
                 // Get volumetric flow rate if applicable
-                if (Condenser(CondNum).FlowType == iCndsrFlowType::ConstantFlow) {
+                if (Condenser(CondNum).FlowType == CndsrFlowType::ConstantFlow) {
                     if ((!lNumericBlanks(5)) && (Numbers(5) > 0.0)) {
                         Condenser(CondNum).DesVolFlowRate = Numbers(5);
                         Condenser(CondNum).VolFlowRate = Numbers(5);
@@ -3537,7 +3537,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (Numbers(6) > 0.0) {
                     Condenser(CondNum).VolFlowRateMax = Numbers(6);
                     // Check constant flow for max violation, if applicable
-                    if (Condenser(CondNum).FlowType == iCndsrFlowType::ConstantFlow && Condenser(CondNum).VolFlowRate > Numbers(6)) {
+                    if (Condenser(CondNum).FlowType == CndsrFlowType::ConstantFlow && Condenser(CondNum).VolFlowRate > Numbers(6)) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " +
                                             cNumericFieldNames(5) + " > " + cNumericFieldNames(6) + " .");
@@ -9828,9 +9828,9 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                            state.dataPlnt->PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidIndex,
                                                            RoutineName);
 
-            if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::ConstantFlow) {
+            if (Condenser(RefCondLoop).FlowType == CndsrFlowType::ConstantFlow) {
                 Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).DesVolFlowRate * rho;
-            } else if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::VariableFlow) {
+            } else if (Condenser(RefCondLoop).FlowType == CndsrFlowType::VariableFlow) {
                 Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).VolFlowRateMax * rho;
             }
         }
@@ -9862,9 +9862,9 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                            state.dataPlnt->PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidIndex,
                                                            RoutineName);
 
-            if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::ConstantFlow) {
+            if (RefrigRack(RefCompRackLoop).FlowType == CndsrFlowType::ConstantFlow) {
                 RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).DesVolFlowRate * rho;
-            } else if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::VariableFlow) {
+            } else if (RefrigRack(RefCompRackLoop).FlowType == CndsrFlowType::VariableFlow) {
                 RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).VolFlowRateMax * rho;
             }
         }
@@ -9887,9 +9887,9 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                                state.dataPlnt->PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidIndex,
                                                                RoutineName);
 
-                if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::ConstantFlow) {
+                if (Condenser(RefCondLoop).FlowType == CndsrFlowType::ConstantFlow) {
                     Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).DesVolFlowRate * rho;
-                } else if (Condenser(RefCondLoop).FlowType == iCndsrFlowType::VariableFlow) {
+                } else if (Condenser(RefCondLoop).FlowType == CndsrFlowType::VariableFlow) {
                     Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).VolFlowRateMax * rho;
                 }
 
@@ -9912,9 +9912,9 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                                state.dataPlnt->PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidIndex,
                                                                RoutineName);
 
-                if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::ConstantFlow) {
+                if (RefrigRack(RefCompRackLoop).FlowType == CndsrFlowType::ConstantFlow) {
                     RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).DesVolFlowRate * rho;
-                } else if (RefrigRack(RefCompRackLoop).FlowType == iCndsrFlowType::VariableFlow) {
+                } else if (RefrigRack(RefCompRackLoop).FlowType == CndsrFlowType::VariableFlow) {
                     RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).VolFlowRateMax * rho;
                 }
 
@@ -10803,7 +10803,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
                                                        state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex,
                                                        RoutineName);
 
-    if (this->FlowType == iCndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+    if (this->FlowType == CndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
 
         this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
 
@@ -10836,7 +10836,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
             }
         } // compare outlet T to inlet T
 
-    } else if (this->FlowType == iCndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+    } else if (this->FlowType == CndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
         // this part for constant flow condition
         this->VolFlowRate = this->DesVolFlowRate;
         this->MassFlowRate = this->VolFlowRate * rho;
@@ -10969,7 +10969,7 @@ void RefrigRackData::simulate(EnergyPlusData &state,
                                                        state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex,
                                                        RoutineName);
 
-    if (this->FlowType == iCndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+    if (this->FlowType == CndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
         this->OutletTemp = ScheduleManager::GetCurrentScheduleValue(state, this->OutletTempSchedPtr);
 
         if (this->OutletTemp == this->InletTemp) {
@@ -11001,7 +11001,7 @@ void RefrigRackData::simulate(EnergyPlusData &state,
             }
         } // compare outlet T to inlet T
 
-    } else if (this->FlowType == iCndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
+    } else if (this->FlowType == CndsrFlowType::ConstantFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
         // this part for constant flow condition
         this->VolFlowRate = this->DesVolFlowRate;
         this->MassFlowRate = this->VolFlowRate * rho;

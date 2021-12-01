@@ -2095,9 +2095,9 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum = objectVectorOOFanSystemModel;
             }
             if (FoundCentralCoolCoil) { // parent systems with fan will need to set the fan placement
-                PrimaryAirSystems(AirLoopNum).supFanLocation = fanPlacement::DrawThru;
+                PrimaryAirSystems(AirLoopNum).supFanLocation = FanPlacement::DrawThru;
             } else {
-                PrimaryAirSystems(AirLoopNum).supFanLocation = fanPlacement::BlowThru;
+                PrimaryAirSystems(AirLoopNum).supFanLocation = FanPlacement::BlowThru;
             }
 
             if (retFanModelType == structArrayLegacyFanModels) {
@@ -2525,7 +2525,7 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
     int AirLoopPass;
     // Flag set by ResolveSysFlow; if TRUE, mass balance failed and there must be a second pass
     bool SysReSim;
-    DataConvergParams::iCalledFrom CalledFrom;
+    DataConvergParams::CalledFrom CalledFrom;
 
     auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -2626,8 +2626,8 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
         // the zone equipment side, looping through all supply air paths for this
         // air loop.
         for (AirSysOutNum = 1; AirSysOutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
-            if (AirSysOutNum == 1) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1;
-            if (AirSysOutNum == 2) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2;
+            if (AirSysOutNum == 1) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck1;
+            if (AirSysOutNum == 2) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck2;
             UpdateHVACInterface(state,
                                 AirLoopNum,
                                 CalledFrom,
@@ -2701,8 +2701,8 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                 // the zone equipment side, looping through all supply air paths for this
                 // air loop.
                 for (AirSysOutNum = 1; AirSysOutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
-                    if (AirSysOutNum == 1) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1;
-                    if (AirSysOutNum == 2) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2;
+                    if (AirSysOutNum == 1) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck1;
+                    if (AirSysOutNum == 2) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck2;
                     UpdateHVACInterface(state,
                                         AirLoopNum,
                                         CalledFrom,

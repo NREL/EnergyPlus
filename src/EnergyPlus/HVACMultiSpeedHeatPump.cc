@@ -2859,9 +2859,9 @@ namespace HVACMultiSpeedHeatPump {
                     DataAirSystems::structArrayLegacyFanModels;
             }
             if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
             } else if (MSHeatPump(MSHeatPumpNum).FanPlaceType == DrawThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
             }
         }
 
