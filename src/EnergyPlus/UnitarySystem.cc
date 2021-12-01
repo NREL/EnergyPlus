@@ -231,7 +231,7 @@ namespace UnitarySystems {
                                  Real64 &sysOutputProvided,
                                  Real64 &latOutputProvided)
     {
-        DataHVACGlobals::CompressorOperation CompOn = DataHVACGlobals::CompressorOperation::Off;
+        DataHVACGlobals::CompressorOperation CompressorOn = DataHVACGlobals::CompressorOperation::Off;
 
         // Obtains and Allocates unitary system related parameters from input file
         if (this->m_ThisSysInputShouldBeGotten) {
@@ -262,18 +262,18 @@ namespace UnitarySystems {
                 if (SELECT_CASE_var == ControlType::Setpoint) {
                     if (ZoneEquipment) {
                         this->controlUnitarySystemtoSP(
-                            state, 0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
+                            state, 0, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     } else {
                         this->controlUnitarySystemtoSP(
-                            state, AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
+                            state, AirLoopNum, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     }
                 } else if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
                     if (ZoneEquipment) {
                         this->controlUnitarySystemtoLoad(
-                            state, 0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
+                            state, 0, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     } else {
                         this->controlUnitarySystemtoLoad(
-                            state, AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
+                            state, AirLoopNum, FirstHVACIteration, CompressorOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     }
                 }
             }
@@ -287,9 +287,9 @@ namespace UnitarySystems {
         }
 
         // CoolActive = false; // set in call from ZoneEquipmentManager
-        if (this->m_CoolingPartLoadFrac * double(CompOn) > 0.0) CoolActive = true;
+        if (this->m_CoolingPartLoadFrac * double(CompressorOn) > 0.0) CoolActive = true;
         // HeatActive = false; // set in call from ZoneEquipmentManager
-        if (this->m_HeatingPartLoadFrac * double(CompOn) > 0.0 || this->m_SuppHeatPartLoadFrac * double(CompOn) > 0.0) HeatActive = true;
+        if (this->m_HeatingPartLoadFrac * double(CompressorOn) > 0.0 || this->m_SuppHeatPartLoadFrac * double(CompressorOn) > 0.0) HeatActive = true;
 
         // set econo lockout flag
         // If the sysem is not an equipment of Outdoor air unit
@@ -2382,7 +2382,7 @@ namespace UnitarySystems {
             // system ran prior to this one)
             state.dataHVACGlobal->MSHPMassFlowRateHigh =
                 EqSizing.CoolingAirVolFlow *
-                state.dataEnvrn->StdRhoAir; // doesn't matter what this value is since only coil size is needed and CompOn = 0 here
+                state.dataEnvrn->StdRhoAir; // doesn't matter what this value is since only coil size is needed and CompressorOn = 0 here
             DXCoils::SimDXCoilMultiSpeed(state, blankString, 1.0, 1.0, this->m_CoolingCoilIndex, 0, 0, DataHVACGlobals::CompressorOperation::Off);
             if (!HardSizeNoDesRun && EqSizing.Capacity) {
                 // do nothing, the vars EqSizing.DesCoolingLoad and DataSizing::DXCoolCap are already set earlier and the values could be max of the
@@ -7597,7 +7597,7 @@ namespace UnitarySystems {
     void UnitarySys::controlUnitarySystemtoLoad(EnergyPlusData &state,
                                                 int const AirLoopNum,                         // Primary air loop number
                                                 bool const FirstHVACIteration,                // True when first HVAC iteration
-                                                DataHVACGlobals::CompressorOperation &CompOn, // Determines if compressor is on or off
+                                                DataHVACGlobals::CompressorOperation &CompressorOn, // Determines if compressor is on or off
                                                 Real64 const OAUCoilOutTemp,                  // the coil inlet temperature of OutdoorAirUnit
                                                 bool HXUnitOn,                                // Flag to control HX for HXAssisted Cooling Coil
                                                 Real64 &sysOutputProvided,                    // system sensible output at supply air node
@@ -7633,24 +7633,24 @@ namespace UnitarySystems {
                 this->m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed && !FirstHVACIteration &&
                 this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil && state.dataUnitarySystems->CoolingLoad &&
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
+                CompressorOn = DataHVACGlobals::CompressorOperation::Off;
                 this->controlUnitarySystemOutput(
-                    state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompOn);
+                    state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompressorOn);
                 if (this->m_CoolingPartLoadFrac >= 1.0 || this->m_HeatingPartLoadFrac >= 1.0 ||
                     (this->m_CoolingPartLoadFrac <= 0.0 && this->m_HeatingPartLoadFrac <= 0.0)) {
-                    CompOn = DataHVACGlobals::CompressorOperation::On;
+                    CompressorOn = DataHVACGlobals::CompressorOperation::On;
                     this->controlUnitarySystemOutput(
-                        state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompOn);
+                        state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompressorOn);
                 }
             } else {
-                CompOn = DataHVACGlobals::CompressorOperation::On;
+                CompressorOn = DataHVACGlobals::CompressorOperation::On;
                 this->controlUnitarySystemOutput(
-                    state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompOn);
+                    state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompressorOn);
             }
         } else {
-            CompOn = DataHVACGlobals::CompressorOperation::On;
+            CompressorOn = DataHVACGlobals::CompressorOperation::On;
             this->controlUnitarySystemOutput(
-                state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompOn);
+                state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompressorOn);
         }
         if (state.dataLoopNodes->Node(this->AirOutNode).MassFlowRate < DataHVACGlobals::SmallMassFlow) {
             state.dataUnitarySystems->CoolingLoad = false;
@@ -7721,7 +7721,7 @@ namespace UnitarySystems {
                                       HXUnitOn,
                                       HeatCoilLoad,
                                       SupHeaterLoad,
-                                      CompOn);
+                                      CompressorOn);
 
         // check supplemental heating coil outlet temp based on maximum allowed
         if (this->m_SuppCoilExists) {
@@ -7739,7 +7739,7 @@ namespace UnitarySystems {
                                               HXUnitOn,
                                               HeatCoilLoad,
                                               SupHeaterLoad,
-                                              CompOn);
+                                              CompressorOn);
                 if (this->m_DesignSuppHeatingCapacity > 0.0) {
                     this->m_SuppHeatPartLoadFrac = SupHeaterLoad / this->m_DesignSuppHeatingCapacity;
                 } else {
@@ -7774,7 +7774,7 @@ namespace UnitarySystems {
     void UnitarySys::controlUnitarySystemtoSP(EnergyPlusData &state,
                                               int const AirLoopNum,                         // Primary air loop number
                                               bool const FirstHVACIteration,                // True when first HVAC iteration
-                                              DataHVACGlobals::CompressorOperation &CompOn, // compressor on/off control
+                                              DataHVACGlobals::CompressorOperation &CompressorOn, // compressor on/off control
                                               Real64 const OAUCoilOutTemp,                  // the coil inlet temperature of OutdoorAirUnit
                                               bool HXUnitOn,                                // Flag to control HX for HXAssisted Cooling Coil
                                               Real64 &sysOutputProvided,                    // sensible output at supply air node
@@ -7829,15 +7829,15 @@ namespace UnitarySystems {
                                                  OAUCoilOutTemp,
                                                  ZoneLoad,
                                                  this->DesignMaxOutletTemp);
-                this->controlCoolingSystemToSP(state, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+                this->controlCoolingSystemToSP(state, AirLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
                 PartLoadRatio = this->m_CoolingPartLoadFrac;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
+                CompressorOn = DataHVACGlobals::CompressorOperation::Off;
                 if (PartLoadRatio > 0.0) {
-                    CompOn = DataHVACGlobals::CompressorOperation::On;
+                    CompressorOn = DataHVACGlobals::CompressorOperation::On;
                     this->m_LastMode = CoolingMode;
                 }
                 this->calcUnitaryCoolingSystem(
-                    state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
+                    state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
             }
             if (this->m_HeatCoilExists) {
                 this->updateUnitarySystemControl(state,
@@ -7849,14 +7849,14 @@ namespace UnitarySystems {
                                                  OAUCoilOutTemp,
                                                  ZoneLoad,
                                                  this->DesignMaxOutletTemp);
-                this->controlHeatingSystemToSP(state, AirLoopNum, FirstHVACIteration, CompOn, HeatCoilLoad);
+                this->controlHeatingSystemToSP(state, AirLoopNum, FirstHVACIteration, CompressorOn, HeatCoilLoad);
                 PartLoadRatio = this->m_HeatingPartLoadFrac;
-                DataHVACGlobals::CompressorOperation CompOn = DataHVACGlobals::CompressorOperation::Off;
+                DataHVACGlobals::CompressorOperation CompressOn = DataHVACGlobals::CompressorOperation::Off;
                 if (PartLoadRatio > 0.0) {
-                    CompOn = DataHVACGlobals::CompressorOperation::On;
+                    CompressOn = DataHVACGlobals::CompressorOperation::On;
                     this->m_LastMode = HeatingMode;
                 }
-                this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, HeatCoilLoad);
+                this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompressOn, OnOffAirFlowRatio, HeatCoilLoad);
             }
 
         } else {
@@ -7871,14 +7871,14 @@ namespace UnitarySystems {
                                                  OAUCoilOutTemp,
                                                  ZoneLoad,
                                                  this->DesignMaxOutletTemp);
-                this->controlHeatingSystemToSP(state, AirLoopNum, FirstHVACIteration, CompOn, HeatCoilLoad);
+                this->controlHeatingSystemToSP(state, AirLoopNum, FirstHVACIteration, CompressorOn, HeatCoilLoad);
                 PartLoadRatio = this->m_HeatingPartLoadFrac;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
+                CompressorOn = DataHVACGlobals::CompressorOperation::Off;
                 if (PartLoadRatio > 0.0) {
-                    CompOn = DataHVACGlobals::CompressorOperation::On;
+                    CompressorOn = DataHVACGlobals::CompressorOperation::On;
                     this->m_LastMode = HeatingMode;
                 }
-                this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, HeatCoilLoad);
+                this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompressorOn, OnOffAirFlowRatio, HeatCoilLoad);
             }
             if (this->m_CoolCoilExists) {
                 this->updateUnitarySystemControl(state,
@@ -7890,15 +7890,15 @@ namespace UnitarySystems {
                                                  OAUCoilOutTemp,
                                                  ZoneLoad,
                                                  this->DesignMaxOutletTemp);
-                this->controlCoolingSystemToSP(state, AirLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+                this->controlCoolingSystemToSP(state, AirLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
                 PartLoadRatio = this->m_CoolingPartLoadFrac;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
+                CompressorOn = DataHVACGlobals::CompressorOperation::Off;
                 if (PartLoadRatio > 0.0) {
-                    CompOn = DataHVACGlobals::CompressorOperation::On;
+                    CompressorOn = DataHVACGlobals::CompressorOperation::On;
                     this->m_LastMode = CoolingMode;
                 }
                 this->calcUnitaryCoolingSystem(
-                    state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
+                    state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
             }
         }
 
@@ -8147,12 +8147,12 @@ namespace UnitarySystems {
                                                    Real64 const ZoneLoad,
                                                    Real64 &FullSensibleOutput,
                                                    bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
-                                                   DataHVACGlobals::CompressorOperation CompOn)
+                                                   DataHVACGlobals::CompressorOperation CompressorOn)
     {
         Real64 PartLoadRatio = 1.0;
         Real64 CoolPLR = 0.0;
         Real64 HeatPLR = 0.0;
-        DataHVACGlobals::CompressorOperation CompressorONFlag = CompOn;
+        DataHVACGlobals::CompressorOperation CompressorONFlag = CompressorOn;
         Real64 HeatCoilLoad = 0.0;
         Real64 SupHeaterLoad = 0.0;
         Real64 SensOutput; // sensible output
@@ -8294,7 +8294,7 @@ namespace UnitarySystems {
                                                 Real64 const ZoneLoad,
                                                 Real64 &FullSensibleOutput,
                                                 bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
-                                                DataHVACGlobals::CompressorOperation CompOn)
+                                                DataHVACGlobals::CompressorOperation CompressorOn)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8335,7 +8335,7 @@ namespace UnitarySystems {
         }
         if (this->m_EMSOverrideCoilSpeedNumOn) {
             this->controlUnitarySystemOutputEMS(
-                state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompOn);
+                state, AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompressorOn);
             return;
         }
 
@@ -8487,7 +8487,7 @@ namespace UnitarySystems {
 
         PartLoadRatio = 1.0; // Get full load result
         this->FanPartLoadRatio = 1.0;
-        CompressorONFlag = CompOn;
+        CompressorONFlag = CompressorOn;
 
         if (state.dataUnitarySystems->HeatingLoad) {
             CoolPLR = 0.0;
@@ -9860,7 +9860,7 @@ namespace UnitarySystems {
         Real64 LatOutputOff = 0.0;
         Real64 HeatCoilLoad = 0.0;
         Real64 SupHeaterLoad = 0.0;
-        DataHVACGlobals::CompressorOperation CompOn = DataHVACGlobals::CompressorOperation::Off;
+        DataHVACGlobals::CompressorOperation CompressorOn = DataHVACGlobals::CompressorOperation::Off;
 
         // if (initLoadBasedControlOneTimeFlag) {
 
@@ -10138,7 +10138,7 @@ namespace UnitarySystems {
                                           HXUnitOn,
                                           HeatCoilLoad,
                                           SupHeaterLoad,
-                                          CompOn);
+                                          CompressorOn);
             {
                 auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(this->ControlZoneNum));
                 if (SELECT_CASE_var == DataHVACGlobals::SingleHeatingSetPoint) {
@@ -10841,7 +10841,7 @@ namespace UnitarySystems {
                                              bool HXUnitOn,                 // Flag to control HX for HXAssisted Cooling Coil
                                              Real64 HeatCoilLoad,           // Adjusted load to heating coil when SAT exceeds max limit (W)
                                              Real64 SuppCoilLoad,           // Adjusted load to supp heating coil when SAT exceeds max limit (W)
-                                             DataHVACGlobals::CompressorOperation const CompOn // Determines if compressor is on or off
+                                             DataHVACGlobals::CompressorOperation const CompressorOn // Determines if compressor is on or off
     )
     {
 
@@ -10859,7 +10859,7 @@ namespace UnitarySystems {
 
         DataHVACGlobals::CompressorOperation CoolingCompOn = DataHVACGlobals::CompressorOperation::Off;
         if (CoolPLR > 0) {
-            CoolingCompOn = CompOn;
+            CoolingCompOn = CompressorOn;
             // for multispeed coils, comp is on IF speed > 1
         } else if (this->m_CoolingSpeedNum > 1) {
             CoolingCompOn = DataHVACGlobals::CompressorOperation::On;
@@ -10867,7 +10867,7 @@ namespace UnitarySystems {
 
         DataHVACGlobals::CompressorOperation HeatingCompOn = DataHVACGlobals::CompressorOperation::Off;
         if (HeatPLR > 0) {
-            HeatingCompOn = CompOn;
+            HeatingCompOn = CompressorOn;
             CoilCoolHeatRat = min(1.0, CoolPLR / HeatPLR);
         } else {
             CoilCoolHeatRat = 1.0;
@@ -11141,7 +11141,7 @@ namespace UnitarySystems {
                                               int const AirLoopNum,                              // index to air loop
                                               bool const FirstHVACIteration,                     // True when first HVAC iteration
                                               Real64 const PartLoadRatio,                        // coil operating part-load ratio
-                                              DataHVACGlobals::CompressorOperation const CompOn, // compressor control (0=off, 1=on)
+                                              DataHVACGlobals::CompressorOperation const CompressorOn, // compressor control (0=off, 1=on)
                                               Real64 const OnOffAirFlowRatio,
                                               Real64 const CoilCoolHeatRat, // ratio of cooling to heating PLR for cycling fan RH control
                                               bool const HXUnitOn           // Flag to control HX for HXAssisted Cooling Coil
@@ -11197,14 +11197,15 @@ namespace UnitarySystems {
             if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingSingleSpeed) { // Coil:Cooling:DX:SingleSpeed
 
                 DXCoils::SimDXCoil(
-                    state, blankString, CompOn, FirstHVACIteration, CompIndex, this->m_FanOpMode, PartLoadRatio, OnOffAirFlowRatio, CoilCoolHeatRat);
-                this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                    state, blankString,
+                                   CompressorOn, FirstHVACIteration, CompIndex, this->m_FanOpMode, PartLoadRatio, OnOffAirFlowRatio, CoilCoolHeatRat);
+                this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
 
                 bool const singleMode = (this->m_SingleMode == 1);
                 if (this->m_ControlType == ControlType::Setpoint) {
-                    if (CompOn == DataHVACGlobals::CompressorOperation::On) {
+                    if (CompressorOn == DataHVACGlobals::CompressorOperation::On) {
                         if (this->m_CoolingSpeedNum > 1) {
                             CoilPLR = 1.0;
                         } else {
@@ -11217,13 +11218,13 @@ namespace UnitarySystems {
                     if (state.dataUnitarySystems->CoolingLoad) {
                         if (this->m_CoolingSpeedNum > 1) {
                             if (!singleMode) {
-                                CoilPLR = (CompOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
-                                this->m_CoolingSpeedRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                                CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
+                                this->m_CoolingSpeedRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
                             } else {
-                                CoilPLR = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                                CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
                             }
                         } else {
-                            CoilPLR = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                            CoilPLR = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
                         }
                     } else {
                         CoilPLR = 0.0;
@@ -11241,14 +11242,14 @@ namespace UnitarySystems {
 
                 if (this->m_CoolingSpeedNum > 1) {
                     if (this->m_SingleMode == 0) {
-                        this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
+                        this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
                     } else {
-                        this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                        this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
                         // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
                         this->m_CoolingSpeedRatio = 1.0;
                     }
                 } else {
-                    this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingCycRatio : 0.0;
+                    this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingCycRatio : 0.0;
                     // this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
                     this->m_CoolingSpeedRatio = 0.0;
                 }
@@ -11264,7 +11265,7 @@ namespace UnitarySystems {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                     blankString,
                                                                     FirstHVACIteration,
-                                                                    CompOn,
+                                                                    CompressorOn,
                                                                     PartLoadRatio,
                                                                     CompIndex,
                                                                     this->m_FanOpMode,
@@ -11272,7 +11273,7 @@ namespace UnitarySystems {
                                                                     OnOffAirFlowRatio,
                                                                     state.dataUnitarySystems->economizerFlag);
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
-                    this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                    this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
                 }
 
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoSpeed) { // Coil:Cooling:DX:TwoSpeed
@@ -11280,9 +11281,9 @@ namespace UnitarySystems {
 
                 DXCoils::SimDXCoilMultiSpeed(state, blankString, this->m_CoolingSpeedRatio, this->m_CoolingCycRatio, CompIndex);
                 if (this->m_CoolingSpeedRatio > 0.0) {
-                    this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingSpeedRatio : 0.0;
+                    this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingSpeedRatio : 0.0;
                 } else {
-                    this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingCycRatio : 0.0;
+                    this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingCycRatio : 0.0;
                 }
 
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling) { // Coil:Cooling:DX:Multispeed
@@ -11295,19 +11296,19 @@ namespace UnitarySystems {
                                                  CompIndex,
                                                  this->m_CoolingSpeedNum,
                                                  this->m_FanOpMode,
-                                                 CompOn,
+                                                 CompressorOn,
                                                  this->m_SingleMode);
                     if (this->m_CoolingSpeedNum > 1) {
                         if (this->m_SingleMode == 0) {
-                            this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
+                            this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
                         } else {
-                            this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingCycRatio : 0.0;
+                            this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingCycRatio : 0.0;
                         }
                     } else {
-                        this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingCycRatio : 0.0;
+                        this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? this->m_CoolingCycRatio : 0.0;
                     }
                 } else {
-                    DXCoils::SimDXCoilMultiSpeed(state, CompName, 0.0, 0.0, CompIndex, this->m_CoolingSpeedNum, this->m_FanOpMode, CompOn);
+                    DXCoils::SimDXCoilMultiSpeed(state, CompName, 0.0, 0.0, CompIndex, this->m_CoolingSpeedNum, this->m_FanOpMode, CompressorOn);
                     this->m_CoolCompPartLoadRatio = 0.0;
                 }
 
@@ -11315,8 +11316,8 @@ namespace UnitarySystems {
                 // formerly (v3 and beyond) COIL:DX:MULTIMODE:COOLINGEMPIRICAL
 
                 DXCoils::SimDXCoilMultiMode(
-                    state, CompName, CompOn, FirstHVACIteration, PartLoadRatio, this->m_DehumidificationMode, CompIndex, this->m_FanOpMode);
-                this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                    state, CompName, CompressorOn, FirstHVACIteration, PartLoadRatio, this->m_DehumidificationMode, CompIndex, this->m_FanOpMode);
+                this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined) {
 
@@ -11350,7 +11351,7 @@ namespace UnitarySystems {
                                                           this->m_MaxONOFFCyclesperHour,
                                                           this->m_HPTimeConstant,
                                                           this->m_FanDelayTime,
-                                                          CompOn,
+                                                          CompressorOn,
                                                           CoilPLR,
                                                           this->m_CoolingSpeedNum,
                                                           this->m_CoolingSpeedRatio,
@@ -11360,7 +11361,7 @@ namespace UnitarySystems {
                 if (this->m_CoolingSpeedNum > 1) {
                     this->m_CoolCompPartLoadRatio = 1.0;
                 } else {
-                    this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                    this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
                 }
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
@@ -11379,11 +11380,11 @@ namespace UnitarySystems {
                                                                 this->m_MaxONOFFCyclesperHour,
                                                                 this->m_HPTimeConstant,
                                                                 this->m_FanDelayTime,
-                                                                CompOn,
+                                                                CompressorOn,
                                                                 PartLoadRatio,
                                                                 FirstHVACIteration);
 
-                this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterToAirHP) {
 
@@ -11406,10 +11407,10 @@ namespace UnitarySystems {
                                                     this->m_InitHeatPump,
                                                     this->m_CoolingCoilSensDemand,
                                                     this->m_CoolingCoilLatentDemand,
-                                                    CompOn,
+                                                    CompressorOn,
                                                     PartLoadRatio);
 
-                this->m_CoolCompPartLoadRatio = (CompOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
+                this->m_CoolCompPartLoadRatio = (CompressorOn == DataHVACGlobals::CompressorOperation::On) ? PartLoadRatio : 0.0;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
 
@@ -11425,7 +11426,7 @@ namespace UnitarySystems {
                                               int const AirLoopNum,                              // index to air loop
                                               bool const FirstHVACIteration,                     // True when first HVAC iteration
                                               Real64 const PartLoadRatio,                        // coil operating part-load ratio
-                                              DataHVACGlobals::CompressorOperation const CompOn, // compressor control (0=off, 1=on)
+                                              DataHVACGlobals::CompressorOperation const CompressorOn, // compressor control (0=off, 1=on)
                                               Real64 const OnOffAirFlowRatio,                    // ratio of on to off flow rate
                                               Real64 HeatCoilLoad // adjusted heating coil load if outlet temp exceeds max (W)
     )
@@ -11479,8 +11480,8 @@ namespace UnitarySystems {
             if (SELECT_CASE_var == DataHVACGlobals::CoilDX_HeatingEmpirical) { // COIL:HEATING:DX:SINGLESPEED
 
                 DXCoils::SimDXCoil(
-                    state, CompName, CompOn, FirstHVACIteration, this->m_HeatingCoilIndex, this->m_FanOpMode, PartLoadRatio, OnOffAirFlowRatio);
-                this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompOn);
+                    state, CompName, CompressorOn, FirstHVACIteration, this->m_HeatingCoilIndex, this->m_FanOpMode, PartLoadRatio, OnOffAirFlowRatio);
+                this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompressorOn);
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined) {
 
@@ -11508,12 +11509,12 @@ namespace UnitarySystems {
                                                  this->m_HeatingCoilIndex,
                                                  this->m_HeatingSpeedNum,
                                                  this->m_FanOpMode,
-                                                 CompOn,
+                                                 CompressorOn,
                                                  this->m_SingleMode);
-                    this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompOn);
+                    this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompressorOn);
                 } else {
                     DXCoils::SimDXCoilMultiSpeed(
-                        state, CompName, 0.0, 0.0, this->m_HeatingCoilIndex, this->m_HeatingSpeedNum, this->m_FanOpMode, CompOn);
+                        state, CompName, 0.0, 0.0, this->m_HeatingCoilIndex, this->m_HeatingSpeedNum, this->m_FanOpMode, CompressorOn);
                     this->m_HeatCompPartLoadRatio = 0.0;
                 }
 
@@ -11569,7 +11570,7 @@ namespace UnitarySystems {
                                                           this->m_MaxONOFFCyclesperHour,
                                                           this->m_HPTimeConstant,
                                                           this->m_FanDelayTime,
-                                                          CompOn,
+                                                          CompressorOn,
                                                           HeatPLR,
                                                           this->m_HeatingSpeedNum,
                                                           this->m_HeatingSpeedRatio,
@@ -11579,7 +11580,7 @@ namespace UnitarySystems {
                 if (this->m_HeatingSpeedNum > 1) {
                     this->m_HeatCompPartLoadRatio = 1.0;
                 } else {
-                    this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompOn);
+                    this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompressorOn);
                 }
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) {
 
@@ -11597,10 +11598,10 @@ namespace UnitarySystems {
                                                                 this->m_MaxONOFFCyclesperHour,
                                                                 this->m_HPTimeConstant,
                                                                 this->m_FanDelayTime,
-                                                                CompOn,
+                                                                CompressorOn,
                                                                 PartLoadRatio,
                                                                 FirstHVACIteration);
-                this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompOn);
+                this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompressorOn);
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP) {
 
@@ -11623,9 +11624,9 @@ namespace UnitarySystems {
                                                     this->m_InitHeatPump,
                                                     this->m_HeatingCoilSensDemand,
                                                     dummy,
-                                                    CompOn,
+                                                    CompressorOn,
                                                     PartLoadRatio);
-                this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompOn);
+                this->m_HeatCompPartLoadRatio = PartLoadRatio * double(CompressorOn);
 
             } else {
                 ShowFatalError(state,
@@ -14595,7 +14596,7 @@ namespace UnitarySystems {
     void UnitarySys::simMultiSpeedCoils(EnergyPlusData &state,
                                         int const AirLoopNum,                         // Index to air loop
                                         bool const FirstHVACIteration,                // True when first HVAC iteration
-                                        DataHVACGlobals::CompressorOperation &CompOn, // compresor on/off control
+                                        DataHVACGlobals::CompressorOperation &CompressorOn, // compresor on/off control
                                         bool const SensibleLoad,
                                         bool const LatentLoad,
                                         Real64 const PartLoadFrac,
@@ -14743,7 +14744,7 @@ namespace UnitarySystems {
                                                       this->m_MaxONOFFCyclesperHour,
                                                       this->m_HPTimeConstant,
                                                       this->m_FanDelayTime,
-                                                      CompOn,
+                                                      CompressorOn,
                                                       PartLoadFrac,
                                                       SpeedNum,
                                                       this->m_CoolingSpeedRatio,
@@ -14760,7 +14761,7 @@ namespace UnitarySystems {
                                                       this->m_MaxONOFFCyclesperHour,
                                                       this->m_HPTimeConstant,
                                                       this->m_FanDelayTime,
-                                                      CompOn,
+                                                      CompressorOn,
                                                       PartLoadFrac,
                                                       SpeedNum,
                                                       this->m_HeatingSpeedRatio,
@@ -14777,7 +14778,7 @@ namespace UnitarySystems {
                                                       this->m_MaxONOFFCyclesperHour,
                                                       this->m_HPTimeConstant,
                                                       this->m_FanDelayTime,
-                                                      CompOn,
+                                                      CompressorOn,
                                                       PartLoadFrac,
                                                       SpeedNum,
                                                       this->m_CoolingSpeedRatio,
@@ -14794,7 +14795,7 @@ namespace UnitarySystems {
                                                       this->m_MaxONOFFCyclesperHour,
                                                       this->m_HPTimeConstant,
                                                       this->m_FanDelayTime,
-                                                      CompOn,
+                                                      CompressorOn,
                                                       PartLoadFrac,
                                                       SpeedNum,
                                                       this->m_HeatingSpeedRatio,
@@ -14826,7 +14827,7 @@ namespace UnitarySystems {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PartLoadRatio = 0.0;                                                              // coil operating part-load ratio
-        DataHVACGlobals::CompressorOperation CompOn = DataHVACGlobals::CompressorOperation::Off; // compressor control (0=off, 1=on)
+        DataHVACGlobals::CompressorOperation CompressorOn = DataHVACGlobals::CompressorOperation::Off; // compressor control (0=off, 1=on)
         bool HXUnitOn = false;
 
         Real64 OnOffAirFlowRatio = 1.0;
@@ -14854,34 +14855,34 @@ namespace UnitarySystems {
 
             if (this->m_CoolCoilExists) {
                 PartLoadRatio = this->m_CoolingPartLoadFrac;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
-                if (PartLoadRatio > 0.0) CompOn = DataHVACGlobals::CompressorOperation::On;
+                CompressorOn = DataHVACGlobals::CompressorOperation::Off;
+                if (PartLoadRatio > 0.0) CompressorOn = DataHVACGlobals::CompressorOperation::On;
                 HXUnitOn = false;
                 this->calcUnitaryCoolingSystem(
-                    state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
+                    state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
             }
             if (this->m_HeatCoilExists) {
                 PartLoadRatio = this->m_HeatingPartLoadFrac;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
-                if (PartLoadRatio > 0.0) CompOn = DataHVACGlobals::CompressorOperation::On;
-                this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, HeatCoilLoad);
+                CompressorOn = DataHVACGlobals::CompressorOperation::Off;
+                if (PartLoadRatio > 0.0) CompressorOn = DataHVACGlobals::CompressorOperation::On;
+                this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompressorOn, OnOffAirFlowRatio, HeatCoilLoad);
             }
 
         } else {
 
             if (this->m_HeatCoilExists) {
                 PartLoadRatio = this->m_HeatingPartLoadFrac;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
-                if (PartLoadRatio > 0.0) CompOn = DataHVACGlobals::CompressorOperation::On;
-                this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, HeatCoilLoad);
+                CompressorOn = DataHVACGlobals::CompressorOperation::Off;
+                if (PartLoadRatio > 0.0) CompressorOn = DataHVACGlobals::CompressorOperation::On;
+                this->calcUnitaryHeatingSystem(state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompressorOn, OnOffAirFlowRatio, HeatCoilLoad);
             }
             if (this->m_CoolCoilExists) {
                 PartLoadRatio = this->m_CoolingPartLoadFrac;
-                CompOn = DataHVACGlobals::CompressorOperation::Off;
-                if (PartLoadRatio > 0.0) CompOn = DataHVACGlobals::CompressorOperation::On;
+                CompressorOn = DataHVACGlobals::CompressorOperation::Off;
+                if (PartLoadRatio > 0.0) CompressorOn = DataHVACGlobals::CompressorOperation::On;
                 HXUnitOn = false;
                 this->calcUnitaryCoolingSystem(
-                    state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
+                    state, AirLoopNum, FirstHVACIteration, PartLoadRatio, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, HXUnitOn);
             }
         }
 
