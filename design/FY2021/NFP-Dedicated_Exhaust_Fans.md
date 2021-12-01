@@ -5,7 +5,7 @@ Dedicated Exhaust System for Flexible Exhausts Configurations
 
  - Original Date: July 30, 2021
  - Revised: August 2, 2021, revise and start design
- - Revised: Nov 20, 2021, 
+ - Revised: Dec 3, 2021, 
 
 ## Justification for New Feature ##
 
@@ -381,7 +381,33 @@ NA
 
 ## Designs ##
 
-### SimExhaustAirSystem() ###
+### Air Loop Calling Tree ###
+
+#### getExhaustSystemInput() ####
+
+A function to process the input fields for the AirLoopHVAC:ExhaustSystem object. It will read input information in the exhaust system set and update internal data for the components (such as the central exhaust fan, zone exhaust fans, and exhaust mixers) being read in.
+
+#### SizeExhaustSystemFans() ####
+
+This function will be added to size the central exhaust system fans. 
+
+#### SimAirLoopExhaustSystems() ####
+
+This function will be added to simulate the central exhaust system in the airloop. Here, since we choose not to tie a central exhaust system to a particular airloop, in this function it could loop through all the central exhaust systems to do the simulation. 
+
+One piece of information that needed exchange from the Zone Equipment calling tree is about the flow conditions from the incoming inlet of the AirLoopHVAC:ExhaustSystem objects. It seems that the 
+
+#### AirLoopHVAC:ExhaustSystem data struct ####
+
+This struct definition and declaration will create a new data struct for the AirLoopHVAC:ExhaustSystem object.
+
+When the AirlooopHVAC:ExhaustSystem is on, the central exhaust fan needs to know all of the incoming flows set by the ZoneHVAC:ExhaustSystem objects so that the total flow rate can be set. Therefore the AirloopHVAC:ExhuastSystem objects need to be called before zone equipment to set the AirLoop exhaust system's status for the Zone Equipment exhaust system simulation, which seems to be a natural order of calling. 
+
+However, when modeling the central exhasut fans in the airloop, the zone equipment airflow status needs to be feed back to the Air Loop, in order to simulate the exhaust fan flows. This is not a natural order of calling. One additional airloop level exhasut system call need to be added after the zone equipment exhaust module calling.  
+
+### Zone Equipment Calling Tree ###
+
+#### SimZoneHVACExhaustAirSystem() ####
 
 A proper simulation entry point for the exhaust system simulation would be after the 
 ```
@@ -393,23 +419,18 @@ and before the function
 ```
 near the end of the `SimZoneEquipment()` function in ZoneEquipmentManager.cc.
  
-The new `SimExhaustAirSystem()` should be added here to conduct the AirLoopHVAC:ExhaustSystem simulation. 
+The new `SimZoneExhaustAirSystem()` should be added here to conduct the AirLoopHVAC:ExhaustSystem simulation. 
 
-There should also be some airloop level calls (or a new function if needed) about the exhasut air system.
+However, the situation could be complicated by the general exhaust system's operation. Here based on If the AirloopHVAC:ExhaustSystem's condition, (e.g. "is on" or "is off"), the zone air balance will be treated differently. For example, when the AirLoopHVAC:ExhaustSystem is off, all inlet flows for the connected zone exhausts should be set to zero. This needs to be known at the time of the zone air mass balance. A zone mass balance, in this case, the call to the newly adde SimZoneExhaustAirSystem() should be called before the zone mass balance calculation: 
+```
+    CalcZoneMassBalance(state, FirstHVACIteration);
+```
 
-### SizeExhaustSystemFan() ###
+#### Modleing AirloopHVAC central exhaust airflow ####
 
-This function will be added to size the central exhaust system fans. 
+After the zone equipment exhaust systems' airflows are modeled, here the airloop's central airlfow should be modeled (again). This time, the central exhaust fan airflow should be udpated based on the zone exhaust airflows of the connected zone exhaust. 
 
-### getExhaustSystemInput() ###
-
-A function to process the input fields for the AirLoopHVAC:ExhaustSystem object. It will read input information in the exhaust system set and update internal data for the components (such as the central exhaust fan, zone exhaust fans, and exhaust mixers) being read in.
-
-### AirLoopHVAC:ExhaustSystem data struct ###
-
-This struct definition and declaration will create a new data struct for the AirLoopHVAC:ExhaustSystem object.
-
-### ZoneHVAC:ExhaustSystem data struct ###
+#### ZoneHVAC:ExhaustSystem data struct #### 
 
 This struct definition and declaration will create a new data struct for the ZoneHVAC:ExhaustSystem object.
 
