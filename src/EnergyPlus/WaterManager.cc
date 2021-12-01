@@ -942,6 +942,7 @@ namespace WaterManager {
         Real64 schedRate;
         Real64 ScaleFactor;
 
+        // when the site:precipitation exists, use the precipitation schedule
         if (state.dataWaterData->RainFall.ModeID == DataWater::RainfallMode::RainSchedDesign) {
             schedRate = GetCurrentScheduleValue(state, state.dataWaterData->RainFall.RainSchedID); // m/hr
             if (state.dataWaterData->RainFall.NomAnnualRain > 0.0) {
@@ -951,6 +952,12 @@ namespace WaterManager {
             }
             state.dataWaterData->RainFall.CurrentRate = schedRate * ScaleFactor / DataGlobalConstants::SecInHour; // convert to m/s
             state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
+        // when there's no site:precipitation but non-zero epw precipitation, uset the epw precipitation as the CurrentRate
+        } else {
+            if (state.dataEnvrn->LiquidPrecipitation > 0) {
+                state.dataWaterData->RainFall.CurrentRate = state.dataEnvrn->LiquidPrecipitation / DataGlobalConstants::SecInHour;
+                state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
+            }
         }
     }
 
