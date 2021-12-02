@@ -70,6 +70,8 @@ namespace HeatBalFiniteDiffManager {
     Real64 constexpr RhovInitValue(0.0115); // Initialization value for Rhov
     Real64 constexpr EnthInitValue(100.0);  // Initialization value for Enthalpy
     constexpr Real64 smalldiff(1.e-8);      // Used in places where "equality" tests should not be used.
+    constexpr Real64 MinTempLimit = -100.0;           // lower limit check, degree C
+    constexpr Real64 MaxTempLimit = 100.0;            // upper limit check, degree C
 
     enum class CondFDScheme
     {
@@ -314,8 +316,6 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct
     HeatBalFiniteDiffManager::CondFDScheme CondFDSchemeType =
         HeatBalFiniteDiffManager::CondFDScheme::FullyImplicitFirstOrder; // solution scheme for CondFD - default
     Real64 SpaceDescritConstant = 3.0;                                   // spatial descritization constant,
-    Real64 MinTempLimit = -100.0;                                        // lower limit check, degree C
-    Real64 MaxTempLimit = 100.0;                                         // upper limit check, degree C
     int MaxGSiter = 30;                                                  // maximum number of Gauss Seidel iterations
     Real64 fracTimeStepZone_Hour = 0.0;
     bool GetHBFiniteDiffInputFlag = true;
@@ -335,8 +335,6 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct
         this->QHeatOutFlux.deallocate();
         this->CondFDSchemeType = HeatBalFiniteDiffManager::CondFDScheme::FullyImplicitFirstOrder;
         this->SpaceDescritConstant = 3.0;
-        this->MinTempLimit = -100.0;
-        this->MaxTempLimit = 100.0;
         this->MaxGSiter = 30;
         this->fracTimeStepZone_Hour = 0.0;
         this->GetHBFiniteDiffInputFlag = true;
