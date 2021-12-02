@@ -58,7 +58,7 @@ namespace DataPlant {
     {
         // Members
         std::string Name; // Name of the branch
-        DataBranchAirLoopPlant::ControlTypeEnum ControlType;
+        DataBranchAirLoopPlant::ControlType controlType;
         Real64 RequestedMassFlow;
         bool HasConstantSpeedBranchPump;    // true if branch has a constant speed branch pump
         Real64 ConstantSpeedBranchMassFlow; // nominal flow rate if constant speed branch pump on
@@ -84,7 +84,7 @@ namespace DataPlant {
 
         // Default Constructor
         BranchData()
-            : ControlType(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false),
+            : controlType(DataBranchAirLoopPlant::ControlType::Unknown), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false),
               ConstantSpeedBranchMassFlow(0.0), BranchLevel(0), FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0),
               IsBypass(false), PumpIndex(0), PumpSizFac(1.0), EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false),
               PressureDrop(0.0), PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Invalid), PressureCurveIndex(0),

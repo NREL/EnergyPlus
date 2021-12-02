@@ -148,7 +148,7 @@ namespace LowTempRadiantSystem {
         Array1D_string SurfaceName;    // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFrac;   // Fraction of flow/pipe length or electric power for a particular surface
         Real64 TotalSurfaceArea = 0.0; // Total surface area for all surfaces that are part of this radiant system
-        LowTempRadiantControlTypes ControlType = LowTempRadiantControlTypes::MATControl; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
+        LowTempRadiantControlTypes controlType = LowTempRadiantControlTypes::MATControl; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
                                                                                          // Surface Face Temp, Surface Interior Temp, Running Mean
                                                                                          // Temp for Constant Flow systems only)
         LowTempRadiantSetpointTypes SetpointType =

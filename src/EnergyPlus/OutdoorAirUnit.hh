@@ -121,7 +121,7 @@ namespace OutdoorAirUnit {
         "AIRLOOPHVAC:UNITARYSYSTEM",
     };
 
-    enum class Control
+    enum class OAUnitCtrlType
     {
         Invalid = -1,
         Neutral,
@@ -205,7 +205,7 @@ namespace OutdoorAirUnit {
         int ZoneNodeNum;             // index of zone air node in node structure
         std::string UnitControlType; // Control type for the system
         // (Neutral and setpoint temperatrue)
-        Control ControlType;         // Unit Control type indicator
+        OAUnitCtrlType controlType;  // Unit Control type indicator
         int AirInletNode;            // inlet air node number
         int AirOutletNode;           // outlet air node number
         std::string SFanName;        // name of supply fan
@@ -268,8 +268,8 @@ namespace OutdoorAirUnit {
 
         // Default Constructor
         OAUnitData()
-            : SchedPtr(0), ZonePtr(0), ZoneNodeNum(0), ControlType(Control::Invalid), AirInletNode(0), AirOutletNode(0), SFan_Index(0), SFanType(0),
-              SFanAvailSchedPtr(0), FanPlace(0), FanCorTemp(0.0), FanEffect(false), SFanOutletNode(0), ExtFan_Index(0), ExtFanType(0),
+            : SchedPtr(0), ZonePtr(0), ZoneNodeNum(0), controlType(OAUnitCtrlType::Invalid), AirInletNode(0), AirOutletNode(0), SFan_Index(0),
+              SFanType(0), SFanAvailSchedPtr(0), FanPlace(0), FanCorTemp(0.0), FanEffect(false), SFanOutletNode(0), ExtFan_Index(0), ExtFanType(0),
               ExtFanAvailSchedPtr(0), ExtFan(false), OutAirSchedPtr(0), OutsideAirNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0),
               ExtAirVolFlow(0.0), ExtAirMassFlow(0.0), ExtOutAirSchedPtr(0), SMaxAirMassFlow(0.0), EMaxAirMassFlow(0.0), SFanMaxAirVolFlow(0.0),
               EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0), LoCtrlTempSchedPtr(0), OperatingMode(Operation::Invalid), ControlCompTypeNum(0),

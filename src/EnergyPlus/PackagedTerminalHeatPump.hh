@@ -102,7 +102,7 @@ namespace PackagedTerminalHeatPump {
     };
 
     // control type
-    enum class iCtrlType
+    enum class PTHPCtrlType
     {
         Invalid = -1,
         None,       // no special capacity control
@@ -211,7 +211,7 @@ namespace PackagedTerminalHeatPump {
         Real64 CompPartLoadRatio;        // compressor part-load ratio for time step
         iCompMode LastMode;              // last mode of operation, coolingmode or heatingmode
         iAirflowCtrlMode AirFlowControl; // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
-        iCtrlType ControlType;           // Setpoint, Load based or ASHRAE (SZVAV) control
+        PTHPCtrlType controlType;        // Setpoint, Load based or ASHRAE (SZVAV) control
         bool validASHRAECoolCoil;        // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
         bool validASHRAEHeatCoil;        // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
         bool simASHRAEModel;             // flag denoting that ASHRAE model (SZVAV) should be used
@@ -309,7 +309,7 @@ namespace PackagedTerminalHeatPump {
               ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), TotHeatEnergyRate(0.0), TotHeatEnergy(0.0),
               TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0),
               LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0),
-              CompPartLoadRatio(0.0), LastMode(iCompMode::Invalid), AirFlowControl(iAirflowCtrlMode::Invalid), ControlType(iCtrlType::Invalid),
+              CompPartLoadRatio(0.0), LastMode(iCompMode::Invalid), AirFlowControl(iAirflowCtrlMode::Invalid), controlType(PTHPCtrlType::Invalid),
               validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false), CompPartLoadFrac(0.0), PlantCoilOutletNode(0),
               SuppCoilLoopNum(0), SuppCoilLoopSide(0), SuppCoilBranchNum(0), SuppCoilCompNum(0), MaxSuppCoilFluidFlow(0.0),
               HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),

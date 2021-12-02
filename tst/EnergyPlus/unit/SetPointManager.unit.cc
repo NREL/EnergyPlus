@@ -1282,7 +1282,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
     EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "MAXIMUMTEMPERATURE");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MaxTemp));
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::MaxTemp));
     EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir));
     EXPECT_EQ(80.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
     EXPECT_EQ(-17.778, state->dataSetPointManager->OutAirSetPtMgr(1).OutLow1);
@@ -1338,7 +1338,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
     EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "MINIMUMTEMPERATURE");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MinTemp));
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::MinTemp));
     EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir));
     EXPECT_EQ(80.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
     EXPECT_EQ(-17.778, state->dataSetPointManager->OutAirSetPtMgr(1).OutLow1);

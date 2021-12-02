@@ -116,7 +116,7 @@ namespace DesiccantDehumidifiers {
         // (initially set to conditions entering regen heating coil)
         int RegenAirOutNode;            // regen air outlet node of dehumidifier
         int RegenFanInNode;             // regen fan inlet node
-        DesicDehumCtrlType ControlType; // type of controls
+        DesicDehumCtrlType controlType; // type of controls
         Real64 HumRatSet;               // humidity ratio setpoint [kg water / kg air]
         Real64 NomProcAirVolFlow;       // nominal process air flow rate [m3/s]
         Real64 NomProcAirVel;           // nominal process air velocity [m/s]
@@ -222,7 +222,7 @@ namespace DesiccantDehumidifiers {
         // Default Constructor
         DesiccantDehumidifierData()
             : PerformanceModel_Num(PerformanceModel::Invalid), ProcAirInNode(0), ProcAirOutNode(0), RegenAirInNode(0), RegenAirOutNode(0),
-              RegenFanInNode(0), ControlType(DesicDehumCtrlType::Invalid), HumRatSet(0.0), NomProcAirVolFlow(0.0), NomProcAirVel(0.0),
+              RegenFanInNode(0), controlType(DesicDehumCtrlType::Invalid), HumRatSet(0.0), NomProcAirVolFlow(0.0), NomProcAirVel(0.0),
               NomRotorPower(0.0), RegenCoilIndex(0), RegenFanIndex(0), regenFanType_Num(0), ProcDryBulbCurvefTW(0), ProcDryBulbCurvefV(0),
               ProcHumRatCurvefTW(0), ProcHumRatCurvefV(0), RegenEnergyCurvefTW(0), RegenEnergyCurvefV(0), RegenVelCurvefTW(0), RegenVelCurvefV(0),
               NomRegenTemp(121.0), MinProcAirInTemp(-73.3), MaxProcAirInTemp(65.6), MinProcAirInHumRat(0.0), MaxProcAirInHumRat(0.21273), SchedPtr(0),

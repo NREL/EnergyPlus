@@ -136,7 +136,7 @@ namespace UnitarySystems {
 
     UnitarySys::UnitarySys() // constructor
         : m_UnitarySysNum(-1), m_sysType(SysType::Invalid), m_ThisSysInputShouldBeGotten(true), m_SysAvailSchedPtr(0),
-          m_ControlType(ControlType::None), m_DehumidControlType_Num(DehumCtrlType::None), m_Humidistat(false), m_ValidASHRAECoolCoil(false),
+          m_ControlType(UnitarySysCtrlType::None), m_DehumidControlType_Num(DehumCtrlType::None), m_Humidistat(false), m_ValidASHRAECoolCoil(false),
           m_ValidASHRAEHeatCoil(false), m_SimASHRAEModel(false), m_setFaultModelInput(true), m_FanIndex(0), m_FanPlace(FanPlace::NotYetSet),
           m_FanOpModeSchedPtr(0), m_FanExists(false), m_FanType_Num(0), m_RequestAutoSize(false), m_ActualFanVolFlowRate(0.0),
           m_DesignFanVolFlowRate(0.0), m_DesignMassFlowRate(0.0), m_FanAvailSchedPtr(0), m_FanOpMode(0), m_ATMixerIndex(0), m_ATMixerPriNode(0),
@@ -253,7 +253,7 @@ namespace UnitarySystems {
         // temporarily open up flow limits while simulating, and then set this same value at the INLET after this parent has simulated
         Real64 tempMassFlowRateMaxAvail = state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail;
         // this is not working for CoilSystem simulated with UnitarySystem. Try to protect when this happens.
-        if (AirLoopNum > 0 && this->m_ControlType != ControlType::Setpoint) {
+        if (AirLoopNum > 0 && this->m_ControlType != UnitarySysCtrlType::Setpoint) {
             state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail = this->m_DesignMassFlowRate;
         }
 
@@ -261,7 +261,7 @@ namespace UnitarySystems {
             bool HXUnitOn = false;
             {
                 auto const SELECT_CASE_var(this->m_ControlType);
-                if (SELECT_CASE_var == ControlType::Setpoint) {
+                if (SELECT_CASE_var == UnitarySysCtrlType::Setpoint) {
                     if (ZoneEquipment) {
                         this->controlUnitarySystemtoSP(
                             state, 0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
@@ -269,7 +269,7 @@ namespace UnitarySystems {
                         this->controlUnitarySystemtoSP(
                             state, AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     }
-                } else if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
+                } else if (SELECT_CASE_var == UnitarySysCtrlType::Load || SELECT_CASE_var == UnitarySysCtrlType::CCMASHRAE) {
                     if (ZoneEquipment) {
                         this->controlUnitarySystemtoLoad(
                             state, 0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
@@ -322,7 +322,7 @@ namespace UnitarySystems {
         // No, can't do this since there are other checks that need this flag (e.g., HVACManager, SetHeatToReturnAirFlag())
         //  AirLoopControlInfo(AirLoopNum)%UnitarySys = .FALSE.
 
-        if (AirLoopNum > 0 && this->m_ControlType != ControlType::Setpoint) {
+        if (AirLoopNum > 0 && this->m_ControlType != UnitarySysCtrlType::Setpoint) {
             state.dataLoopNodes->Node(this->AirInNode).MassFlowRateMaxAvail = tempMassFlowRateMaxAvail;
         }
     }
@@ -590,7 +590,7 @@ namespace UnitarySystems {
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = this->m_FanOpMode;
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = this->m_FanOpModeSchedPtr;
             } else if (AirLoopNum < 0) {
-                if (this->m_ControlType == ControlType::CCMASHRAE) {
+                if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
                     ShowSevereError(state, this->UnitType + ": " + this->Name);
                     ShowContinueError(state, "  Invalid application of Control Type = SingleZoneVAV in outdoor air system.");
                     ShowFatalError(state, "InitUnitarySystems: Program terminated for previous conditions.");
@@ -1120,7 +1120,7 @@ namespace UnitarySystems {
                 }
 
                 // for DX systems, just read the inlet node flow rate and let air loop decide flow
-                if (this->m_ControlType == ControlType::Setpoint && this->m_sysType == SysType::Unitary) {
+                if (this->m_ControlType == UnitarySysCtrlType::Setpoint && this->m_sysType == SysType::Unitary) {
                     if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0) {
                         if (this->m_LastMode == CoolingMode) {
                             if (this->m_MultiOrVarSpeedCoolCoil) {
@@ -1318,7 +1318,7 @@ namespace UnitarySystems {
                 // check FaultsManager if connection exists
                 FaultsManager::SetFaultyCoilSATSensor(state, this->UnitType, this->Name, this->m_FaultyCoilSATFlag, this->m_FaultyCoilSATIndex);
                 if (this->m_FaultyCoilSATFlag) {
-                    if (this->m_ControlType != ControlType::Setpoint) {
+                    if (this->m_ControlType != UnitarySysCtrlType::Setpoint) {
                         ShowWarningError(state,
                                          state.dataFaultsMgr->FaultsCoilSATSensor(this->m_FaultyCoilSATIndex).FaultType + ": " +
                                              state.dataFaultsMgr->FaultsCoilSATSensor(this->m_FaultyCoilSATIndex).Name);
@@ -1450,7 +1450,7 @@ namespace UnitarySystems {
 
             bool SetPointErrorFlag = false;
             if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue &&
-                this->m_ControlType == ControlType::Setpoint) {
+                this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name);
                     ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
@@ -1467,7 +1467,7 @@ namespace UnitarySystems {
             }
             if ((this->m_DehumidControlType_Num != DehumCtrlType::None) &&
                 (state.dataLoopNodes->Node(ControlNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) &&
-                this->m_ControlType == ControlType::Setpoint && CoilType == CoolingCoil) {
+                this->m_ControlType == UnitarySysCtrlType::Setpoint && CoilType == CoolingCoil) {
                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel &&
                     state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                     ShowSevereError(state, this->UnitType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
@@ -2131,7 +2131,7 @@ namespace UnitarySystems {
                     this->m_NoLoadAirFlowRateRatio = min(NoLoadCoolingAirFlowRateRatio, NoLoadHeatingAirFlowRateRatio);
                 }
             }
-            if (this->m_NoCoolHeatSAFMethod <= SupplyAirFlowRate && this->m_ControlType == ControlType::CCMASHRAE) {
+            if (this->m_NoCoolHeatSAFMethod <= SupplyAirFlowRate && this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
                 if (this->m_MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
                     state.dataSize->DataConstantUsedForSizing = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
@@ -2467,7 +2467,7 @@ namespace UnitarySystems {
                 // use reverse order since we divide by HeatVolumeFlowRate(max)
                 for (Iter = state.dataUnitarySystems->designSpecMSHP[MSHPIndex].numOfSpeedHeating; Iter > 0; --Iter) {
                     if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] == DataSizing::AutoSize) {
-                        if (this->m_ControlType == ControlType::Setpoint &&
+                        if (this->m_ControlType == UnitarySysCtrlType::Setpoint &&
                             (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                              this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage)) {
                             state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] = 1.0;
@@ -2479,7 +2479,7 @@ namespace UnitarySystems {
                         if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                             if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] < 1.0 &&
-                                this->m_ControlType == ControlType::Setpoint) {
+                                this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                                 ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                                 ShowContinueError(state, "Design specification object = " + state.dataUnitarySystems->designSpecMSHP[MSHPIndex].name);
                                 ShowContinueError(state,
@@ -2837,7 +2837,7 @@ namespace UnitarySystems {
             state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
         }
 
-        if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != ControlType::CCMASHRAE) {
+        if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != UnitarySysCtrlType::CCMASHRAE) {
 
             TempSize = this->DesignMaxOutletTemp;
             MaxHeaterOutletTempSizer sizerMaxHeaterOutTemp;
@@ -2902,7 +2902,7 @@ namespace UnitarySystems {
 
         // Moved from InitLoadBasedControl
         // Find the number of zones (zone Inlet Nodes) attached to an air loop from the air loop number
-        if (this->m_AirLoopEquipment && this->m_ControlType != ControlType::Setpoint) {
+        if (this->m_AirLoopEquipment && this->m_ControlType != UnitarySysCtrlType::Setpoint) {
             if (allocated(state.dataAirLoop->AirToZoneNodeInfo))
                 NumAirLoopZones =
                     state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
@@ -2956,7 +2956,7 @@ namespace UnitarySystems {
             this->ControlZoneMassFlowFrac = 1.0;
         }
 
-        if (this->m_ControlType == ControlType::CCMASHRAE) {
+        if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
 
             SizingDesRunThisSys = false;
             state.dataSize->DataZoneUsedForSizing = this->ControlZoneNum;
@@ -3230,11 +3230,11 @@ namespace UnitarySystems {
         std::string loc_m_ControlType = input_data.control_type;
 
         if (UtilityRoutines::SameString(loc_m_ControlType, "Load")) {
-            this->m_ControlType = ControlType::Load;
+            this->m_ControlType = UnitarySysCtrlType::Load;
         } else if (UtilityRoutines::SameString(loc_m_ControlType, "SetPoint")) {
-            this->m_ControlType = ControlType::Setpoint;
+            this->m_ControlType = UnitarySysCtrlType::Setpoint;
         } else if (UtilityRoutines::SameString(loc_m_ControlType, "SingleZoneVAV")) {
-            this->m_ControlType = ControlType::CCMASHRAE;
+            this->m_ControlType = UnitarySysCtrlType::CCMASHRAE;
             this->m_ValidASHRAECoolCoil = true;
             this->m_ValidASHRAEHeatCoil = true;
         } else {
@@ -3331,14 +3331,14 @@ namespace UnitarySystems {
         std::string loc_controlZoneName = input_data.controlling_zone_or_thermostat_location;
         if (loc_controlZoneName.size() > 0) { // not required field
             this->ControlZoneNum = UtilityRoutines::FindItemInList(loc_controlZoneName, state.dataHeatBal->Zone);
-        } else if (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE) {
+        } else if (this->m_ControlType == UnitarySysCtrlType::Load || this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
             ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
             ShowContinueError(state, "Controlling Zone or Thermostat Location cannot be blank when Control Type = Load or SingleZoneVAV");
             errorsFound = true;
         }
 
         // check that control zone name is valid for load based control
-        if (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE) {
+        if (this->m_ControlType == UnitarySysCtrlType::Load || this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
             if (this->ControlZoneNum == 0) {
                 ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                 ShowContinueError(state, "When Control Type = Load or SingleZoneVAV");
@@ -3363,7 +3363,7 @@ namespace UnitarySystems {
             this->m_Humidistat = false;
             errorsFound = true;
         }
-        if (this->m_Humidistat && this->m_ControlType == ControlType::Load) {
+        if (this->m_Humidistat && this->m_ControlType == UnitarySysCtrlType::Load) {
             bool AirNodeFound = false;
             for (int HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                 if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != this->ControlZoneNum) continue;
@@ -3616,7 +3616,7 @@ namespace UnitarySystems {
             // Unsucessful attempt to get all input data.
             return;
         } else {
-            if (AirLoopFound && (this->m_ZoneInletNode > 0 || this->m_ControlType == ControlType::Setpoint)) {
+            if (AirLoopFound && (this->m_ZoneInletNode > 0 || this->m_ControlType == UnitarySysCtrlType::Setpoint)) {
                 this->m_OKToPrintSizing = true;
                 this->m_ThisSysInputShouldBeGotten = false;
             } else if (ZoneEquipmentFound) {
@@ -3629,7 +3629,7 @@ namespace UnitarySystems {
         }
 
         if (AirLoopNumber == 0 && !ZoneEquipmentFound &&
-            (this->m_ControlType == ControlType::Load || this->m_ControlType == ControlType::CCMASHRAE)) {
+            (this->m_ControlType == UnitarySysCtrlType::Load || this->m_ControlType == UnitarySysCtrlType::CCMASHRAE)) {
             ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
             ShowContinueError(state, "Did not find proper connection for AirLoopHVAC or ZoneHVAC system.");
             ShowContinueError(state, "specified Controlling Zone or Thermostat Location name = " + loc_controlZoneName);
@@ -3780,7 +3780,7 @@ namespace UnitarySystems {
             // ShowContinueError(state, "Illegal " + cAlphaFields(iFanSchedAlphaNum) + " = " + Alphas(iFanSchedAlphaNum));
             errorsFound = true;
         } else if (this->m_FanOpModeSchedPtr == 0) {
-            if (this->m_ControlType == ControlType::Setpoint) {
+            if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                 // Fan operating mode must be constant fan so that the coil outlet temp is proportional to PLR
                 // Cycling fan always outputs the full load outlet air temp so should not be used with set point based control
                 this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
@@ -3797,7 +3797,7 @@ namespace UnitarySystems {
                     errorsFound = true;
                 }
             }
-        } else if (this->m_FanOpModeSchedPtr > 0 && this->m_ControlType == ControlType::Setpoint) {
+        } else if (this->m_FanOpModeSchedPtr > 0 && this->m_ControlType == UnitarySysCtrlType::Setpoint) {
             if (!ScheduleManager::CheckScheduleValueMinMax(state, this->m_FanOpModeSchedPtr, ">", 0.0, "<=", 1.0)) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                 ShowContinueError(state, "For " + loc_fanType + " = " + loc_m_FanName);
@@ -4395,9 +4395,9 @@ namespace UnitarySystems {
         } // IF (this->m_HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
         // coil outlet node set point has priority, IF not exist, then use system outlet node
-        if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::iCtrlVarType::Temp))
+        if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
             this->m_SystemHeatControlNodeNum = this->AirOutNode;
-        if (SetPointManager::NodeHasSPMCtrlVarType(state, HeatingCoilOutletNode, SetPointManager::iCtrlVarType::Temp))
+        if (SetPointManager::NodeHasSPMCtrlVarType(state, HeatingCoilOutletNode, SetPointManager::CtrlVarType::Temp))
             this->m_SystemHeatControlNodeNum = HeatingCoilOutletNode;
 
         this->HeatCoilInletNodeNum = HeatingCoilInletNode;
@@ -4603,12 +4603,12 @@ namespace UnitarySystems {
                                 this->FullLatOutput.resize(this->m_NumOfSpeedCooling + 1);
                                 this->SpeedSHR.resize(this->m_NumOfSpeedCooling + 1);
                             }
-                            if (this->m_ControlType == ControlType::Setpoint) {
+                            if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                                 ShowContinueError(state,
                                                   "Setpoint control is not available for SubcoolReheat cooling coil. Load control is forced. "
                                                   "Simulation continues.");
-                                this->m_ControlType = ControlType::Load;
+                                this->m_ControlType = UnitarySysCtrlType::Load;
                             }
                         }
                         newCoil.setData(this->m_FanIndex, this->m_FanType_Num, this->m_FanName, this->m_SuppCoilLoopNum);
@@ -5414,9 +5414,9 @@ namespace UnitarySystems {
                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                        DataLoopNode::ObjectIsParent);
             } else {
-                if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::iCtrlVarType::Temp))
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
                     this->m_SystemCoolControlNodeNum = this->AirOutNode;
-                if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, SetPointManager::iCtrlVarType::Temp))
+                if (SetPointManager::NodeHasSPMCtrlVarType(state, CoolingCoilOutletNode, SetPointManager::CtrlVarType::Temp))
                     this->m_SystemCoolControlNodeNum = CoolingCoilOutletNode;
             }
 
@@ -5496,13 +5496,13 @@ namespace UnitarySystems {
         // if (NumNumbers > 0) {
         // if (!lNumericBlanks(iDOASDXMinTempNumericNum)) {
         this->DesignMinOutletTemp = loc_DesignMinOutletTemp;
-        if (this->m_ControlType != ControlType::CCMASHRAE && this->DesignMinOutletTemp == DataSizing::AutoSize) {
+        if (this->m_ControlType != UnitarySysCtrlType::CCMASHRAE && this->DesignMinOutletTemp == DataSizing::AutoSize) {
             ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
             ShowContinueError(state, "Invalid entry for Minimum Supply Air Temperature = AutoSize.");
             ShowContinueError(state, "AutoSizing not allowed when Control Type = Load or Setpoint");
             errorsFound = true;
         }
-        if (this->m_ControlType != ControlType::CCMASHRAE && this->DesignMinOutletTemp > 7.5) {
+        if (this->m_ControlType != UnitarySysCtrlType::CCMASHRAE && this->DesignMinOutletTemp > 7.5) {
             ShowWarningError(state, cCurrentModuleObject + " = " + thisObjectName);
             ShowContinueError(state, format("Invalid entry for Minimum Supply Air Temperature = {:.4R}", this->DesignMinOutletTemp));
             ShowContinueError(state, "The minimum supply air temperature will be limited to 7.5C and the simulation continues.");
@@ -5535,7 +5535,7 @@ namespace UnitarySystems {
             }
         }
         if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat || this->m_DehumidControlType_Num == DehumCtrlType::Multimode) {
-            if (!this->m_RunOnLatentLoad && !this->m_RunOnLatentOnlyWithSensible && this->m_ControlType == ControlType::Load) {
+            if (!this->m_RunOnLatentLoad && !this->m_RunOnLatentOnlyWithSensible && this->m_ControlType == UnitarySysCtrlType::Load) {
                 ShowWarningError(state, cCurrentModuleObject + " = " + thisObjectName);
                 ShowContinueError(state, "Inconsistent moisture control inputs.");
                 ShowContinueError(state, "Dehumidification Control Type = " + loc_dehumm_ControlType);
@@ -5543,7 +5543,7 @@ namespace UnitarySystems {
                 ShowContinueError(state, "Humidity/Moisture may not be controlled with these settings.");
             }
         } else {
-            if ((this->m_RunOnLatentLoad || this->m_RunOnLatentOnlyWithSensible) && this->m_ControlType == ControlType::Load) {
+            if ((this->m_RunOnLatentLoad || this->m_RunOnLatentOnlyWithSensible) && this->m_ControlType == UnitarySysCtrlType::Load) {
                 ShowWarningError(state, cCurrentModuleObject + " = " + thisObjectName);
                 ShowContinueError(state, "Inconsistent moisture control inputs.");
                 ShowContinueError(state, "Dehumidification Control Type = " + loc_dehumm_ControlType);
@@ -5780,9 +5780,9 @@ namespace UnitarySystems {
 
         } // IF(.NOT. lAlphaBlanks(iSuppHeatCoilTypeAlphaNum))THEN
 
-        if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::iCtrlVarType::Temp))
+        if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
             this->m_SuppHeatControlNodeNum = this->AirOutNode;
-        if (SetPointManager::NodeHasSPMCtrlVarType(state, SupHeatCoilOutletNode, SetPointManager::iCtrlVarType::Temp))
+        if (SetPointManager::NodeHasSPMCtrlVarType(state, SupHeatCoilOutletNode, SetPointManager::CtrlVarType::Temp))
             this->m_SuppHeatControlNodeNum = SupHeatCoilOutletNode;
 
         // Add supplemental heating coil to component sets array
@@ -6260,7 +6260,7 @@ namespace UnitarySystems {
             }
         } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "None") || loc_m_NoCoolHeatSAFMethod == "") {
             this->m_NoCoolHeatSAFMethod = None;
-            if (this->m_ControlType == ControlType::CCMASHRAE) {
+            if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
                 if (loc_m_NoCoolHeatSAFMethod_SAFlow == -99999.0) { // no load air flow is autosized
                     this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
                     this->m_RequestAutoSize = true;
@@ -6974,7 +6974,7 @@ namespace UnitarySystems {
         }
 
         // check for specific input requirements for ASHRAE90.1 model
-        if (this->m_ControlType == ControlType::CCMASHRAE) {
+        if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
 
             // only allowed for water and DX cooling coils at this time
             if (this->m_CoolCoilExists && this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWater &&
@@ -7971,7 +7971,7 @@ namespace UnitarySystems {
             this->LoadSHR = 0.0;
             this->CoilSHR = 0.0;
             auto const SELECT_CASE_var(this->m_ControlType);
-            if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
+            if (SELECT_CASE_var == UnitarySysCtrlType::Load || SELECT_CASE_var == UnitarySysCtrlType::CCMASHRAE) {
                 if (AirLoopNum == -1) { // This IF-THEN routine is just for ZoneHVAC:OutdoorAirUnit
                     ShowWarningError(state, this->UnitType + " \"" + this->Name + "\"");
                     ShowFatalError(state, "...Load based control is not allowed when used with ZoneHVAC:OutdoorAirUnit");
@@ -8057,7 +8057,7 @@ namespace UnitarySystems {
                     }
                 }
 
-            } else if (SELECT_CASE_var == ControlType::Setpoint) {
+            } else if (SELECT_CASE_var == UnitarySysCtrlType::Setpoint) {
                 if (AirLoopNum == -1) { // This IF-THEN routine is just for ZoneHVAC:OutdoorAIRUNIT
 
                     if (ControlNode == 0) {
@@ -10797,7 +10797,7 @@ namespace UnitarySystems {
         }
         if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0 &&
             ((FanOn || state.dataHVACGlobal->TurnFansOn) && !state.dataHVACGlobal->TurnFansOff)) {
-            if (this->m_ControlType == ControlType::Setpoint) {
+            if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                 // set point based equipment should use VAV terminal units to set the flow.
                 // zone equipment needs to set flow since no other device regulates flow (ZoneHVAC /= AirLoopEquipment)
                 if (!this->m_AirLoopEquipment) {
@@ -11072,7 +11072,7 @@ namespace UnitarySystems {
         Real64 AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
         Real64 RefTemp = 0.0;
         Real64 RefHumRat = 0.0;
-        if (this->m_ControlType == ControlType::Setpoint) {
+        if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
             RefTemp = state.dataLoopNodes->Node(this->AirInNode).Temp;
             RefHumRat = state.dataLoopNodes->Node(this->AirInNode).HumRat;
         } else {
@@ -11205,7 +11205,7 @@ namespace UnitarySystems {
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
 
                 bool const singleMode = (this->m_SingleMode == 1);
-                if (this->m_ControlType == ControlType::Setpoint) {
+                if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                     if (this->m_CoolingSpeedNum > 1) {
                         CoilPLR = 1.0 * double(CompOn);
                     } else {
@@ -11682,7 +11682,7 @@ namespace UnitarySystems {
             if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric)) {
                 {
                     auto const SELECT_CASE_var1(this->m_ControlType);
-                    if (SELECT_CASE_var1 == ControlType::Setpoint) {
+                    if (SELECT_CASE_var1 == UnitarySysCtrlType::Setpoint) {
                         HeatingCoils::SimulateHeatingCoilComponents(
                             state, CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, true, this->m_FanOpMode, PartLoadRatio);
                     } else {
@@ -14864,7 +14864,7 @@ namespace UnitarySystems {
         auto const SELECT_CASE_var(this->m_ControlType);
         // Noticed that these are calculated differently.
         // That doesn't make sense except that NodeNumOfControlledZone = 0 for set point control because the control zone name is not required.
-        if (SELECT_CASE_var == ControlType::Setpoint) {
+        if (SELECT_CASE_var == UnitarySysCtrlType::Setpoint) {
             if (OutletNode > 0) {
                 int InletNode = this->AirInNode;
                 CalcComponentSensibleLatentOutput(AirMassFlow,
@@ -17488,7 +17488,7 @@ namespace UnitarySystems {
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
 
                     // report predicted load as determined by Unitary System for load control only
-                    if (state.dataUnitarySystems->unitarySys[sysNum].m_ControlType != UnitarySys::ControlType::Setpoint) {
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_ControlType != UnitarySys::UnitarySysCtrlType::Setpoint) {
                         SetupOutputVariable(state,
                                             "Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                             OutputProcessor::Unit::W,

@@ -196,7 +196,7 @@ namespace ChillerElectricEIR {
         Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
         Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
         bool IPLVFlag;
-        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlType EquipFlowCtrl;
 
         // Default Constructor
         ElectricEIRChillerSpecs()
@@ -222,7 +222,7 @@ namespace ChillerElectricEIR {
               ChillerCyclingRatio(0.0), BasinHeaterPower(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0),
               CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0), IPLVFlag(true),
-              EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              EquipFlowCtrl(DataBranchAirLoopPlant::ControlType::Unknown)
         {
         }
 

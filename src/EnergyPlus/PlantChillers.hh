@@ -251,9 +251,9 @@ namespace PlantChillers {
         void size(EnergyPlusData &state) override;
 
         void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad,                                       // operating load
-                       bool RunFlag,                                         // TRUE when chiller operating
-                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                       Real64 &MyLoad,                                   // operating load
+                       bool RunFlag,                                     // TRUE when chiller operating
+                       DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(EnergyPlusData &state,
@@ -357,9 +357,9 @@ namespace PlantChillers {
         void size(EnergyPlusData &state) override;
 
         void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad,                                       // operating load
-                       bool RunFlag,                                         // TRUE when chiller operating
-                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                       Real64 &MyLoad,                                   // operating load
+                       bool RunFlag,                                     // TRUE when chiller operating
+                       DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void calcHeatRecovery(EnergyPlusData &state,
@@ -458,9 +458,9 @@ namespace PlantChillers {
         void size(EnergyPlusData &state) override;
 
         void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad,                                       // operating load
-                       bool RunFlag,                                         // TRUE when chiller operating
-                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                       Real64 &MyLoad,                                   // operating load
+                       bool RunFlag,                                     // TRUE when chiller operating
+                       DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(EnergyPlusData &state,
@@ -497,7 +497,7 @@ namespace PlantChillers {
 
         void size(EnergyPlusData &state) override;
 
-        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, DataBranchAirLoopPlant::ControlType EquipFlowCtrl);
 
         void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 

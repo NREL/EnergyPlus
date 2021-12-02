@@ -132,9 +132,9 @@ namespace BoilerSteam {
         void autosize(EnergyPlusData &state);
 
         void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad,                                       // W - hot water demand to be met by boiler
-                       bool RunFlag,                                         // TRUE if boiler operating
-                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                       Real64 &MyLoad,                                   // W - hot water demand to be met by boiler
+                       bool RunFlag,                                     // TRUE if boiler operating
+                       DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(EnergyPlusData &state,

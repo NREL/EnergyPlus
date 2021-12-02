@@ -78,7 +78,7 @@ namespace PlantHeatExchangerFluidToFluid {
         Num
     };
 
-    enum class iCtrlType
+    enum class ControlType
     {
         Invalid = -1,
         UncontrolledOn,
@@ -96,7 +96,7 @@ namespace PlantHeatExchangerFluidToFluid {
         Num
     };
 
-    enum class iCtrlTemp
+    enum class CtrlTempType
     {
         Invalid = -1,
         WetBulbTemperature,
@@ -158,10 +158,10 @@ namespace PlantHeatExchangerFluidToFluid {
         iFluidHXType HeatExchangeModelType;
         Real64 UA;
         bool UAWasAutoSized; // true is UA was autosized on input
-        iCtrlType ControlMode;
+        ControlType controlMode;
         int SetPointNodeNum;
         Real64 TempControlTol;
-        iCtrlTemp ControlSignalTemp;
+        CtrlTempType ControlSignalTemp;
         Real64 MinOperationTemp;
         Real64 MaxOperationTemp;
         PlantConnectionStruct DemandSideLoop; // plant connections and data for the side of HX connected to demand side
@@ -186,11 +186,12 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Default Constructor
         HeatExchangerStruct()
-            : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Invalid), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Invalid),
-              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Invalid), MinOperationTemp(-99999.0), MaxOperationTemp(99999.0),
-              ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0),
-              Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0),
-              DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+            : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Invalid), UA(0.0), UAWasAutoSized(false), controlMode(ControlType::Invalid),
+              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(CtrlTempType::Invalid), MinOperationTemp(-99999.0),
+              MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
+              HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
+              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
+              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 

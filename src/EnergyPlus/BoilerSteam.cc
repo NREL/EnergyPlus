@@ -611,9 +611,9 @@ namespace BoilerSteam {
     }
 
     void BoilerSpecs::calculate(EnergyPlusData &state,
-                                Real64 &MyLoad,                                             // W - hot water demand to be met by boiler
-                                bool const RunFlag,                                         // TRUE if boiler operating
-                                DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
+                                Real64 &MyLoad,                                         // W - hot water demand to be met by boiler
+                                bool const RunFlag,                                     // TRUE if boiler operating
+                                DataBranchAirLoopPlant::ControlType const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
         // SUBROUTINE INFORMATION:
@@ -654,7 +654,7 @@ namespace BoilerSteam {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive)
                 this->BoilerMassFlowRate = state.dataLoopNodes->Node(this->BoilerInletNodeNum).MassFlowRate;
             return;
         }

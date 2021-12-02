@@ -1309,7 +1309,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Process the temperature control type
-            thisElecSys.ControlType =
+            thisElecSys.controlType =
                 thisElecSys.processRadiantSystemControlInput(state, Alphas(6), cAlphaFields(6), LowTempRadiantSystem::SystemType::ElectricSystem);
 
             // Process the setpoint type
@@ -5455,7 +5455,7 @@ namespace LowTempRadiantSystem {
 
             // Determine the control temperature--what the setpoint/offtemp is being compared to for unit operation
 
-            ControlTemp = this->setRadiantSystemControlTemperature(state, ControlType);
+            ControlTemp = this->setRadiantSystemControlTemperature(state, controlType);
 
             if (ControlTemp < OffTemp) { // HEATING MODE
 

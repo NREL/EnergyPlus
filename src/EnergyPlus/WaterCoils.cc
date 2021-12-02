@@ -6399,9 +6399,9 @@ void CheckActuatorNode(EnergyPlusData &state,
 }
 
 void CheckForSensorAndSetPointNode(EnergyPlusData &state,
-                                   int const SensorNodeNum,                     // controller sensor node number
-                                   HVACControllers::iCtrl const &ControlledVar, // controlled variable type
-                                   bool &NodeNotFound                           // true if matching air outlet node not found
+                                   int const SensorNodeNum,                           // controller sensor node number
+                                   HVACControllers::CtrlVarType const &ControlledVar, // controlled variable type
+                                   bool &NodeNotFound                                 // true if matching air outlet node not found
 )
 {
 
@@ -6417,7 +6417,7 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
 
     // Using/Aliasing
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
-    using SetPointManager::iCtrlVarType;
+    using SetPointManager::CtrlVarType;
     using SetPointManager::NodeHasSPMCtrlVarType;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -6457,11 +6457,11 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
             }
             EMSSetPointErrorFlag = false;
             switch (ControlledVar) {
-            case HVACControllers::iCtrl::Temperature: {
+            case HVACControllers::CtrlVarType::Temperature: {
                 CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
+                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::Temp)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                         ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
@@ -6472,11 +6472,11 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 }
                 break;
             }
-            case HVACControllers::iCtrl::HumidityRatio: {
+            case HVACControllers::CtrlVarType::HumidityRatio: {
                 CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
+                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::MaxHumRat)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                         ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
@@ -6487,11 +6487,11 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 }
                 break;
             }
-            case HVACControllers::iCtrl::TemperatureAndHumidityRatio: {
+            case HVACControllers::CtrlVarType::TemperatureAndHumidityRatio: {
                 CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
+                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::Temp)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                         ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
@@ -6504,7 +6504,7 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
+                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::MaxHumRat)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                         ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");

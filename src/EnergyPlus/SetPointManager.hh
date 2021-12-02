@@ -106,7 +106,7 @@ namespace SetPointManager {
         Num
     };
 
-    enum class iCtrlVarType
+    enum class CtrlVarType
     {
         Unknown = -1,
         Temp,
@@ -123,28 +123,28 @@ namespace SetPointManager {
 
     int constexpr NumValidCtrlTypes = 9;
 
-    inline const char *controlTypeName(iCtrlVarType cvt)
+    inline const char *controlTypeName(CtrlVarType cvt)
     {
         switch (cvt) {
-        case iCtrlVarType::Temp:
+        case CtrlVarType::Temp:
             return "Temperature";
-        case iCtrlVarType::MaxTemp:
+        case CtrlVarType::MaxTemp:
             return "MaximumTemperature";
-        case iCtrlVarType::MinTemp:
+        case CtrlVarType::MinTemp:
             return "MinimumTemperature";
-        case iCtrlVarType::HumRat:
+        case CtrlVarType::HumRat:
             return "HumidityRatio";
-        case iCtrlVarType::MaxHumRat:
+        case CtrlVarType::MaxHumRat:
             return "MaximumHumidityRatio";
-        case iCtrlVarType::MinHumRat:
+        case CtrlVarType::MinHumRat:
             return "MinimumHumidityRatio";
-        case iCtrlVarType::MassFlow:
+        case CtrlVarType::MassFlow:
             return "MassFlowRate";
-        case iCtrlVarType::MaxMassFlow:
+        case CtrlVarType::MaxMassFlow:
             return "MaximumMassFlowRate";
-        case iCtrlVarType::MinMassFlow:
+        case CtrlVarType::MinMassFlow:
             return "MinimumMassFlowRate";
-        case iCtrlVarType::Unknown:
+        case CtrlVarType::Unknown:
             return "*UNKNOWN*";
         default:
             assert(false);
@@ -264,9 +264,9 @@ namespace SetPointManager {
     struct SPBase
     {
         std::string Name;
-        iCtrlVarType CtrlTypeMode; // set to iCtrlVarType::*
+        CtrlVarType CtrlTypeMode; // set to CtrlVarType::*
         std::string CtrlVarType;
-        SPBase() : CtrlTypeMode(iCtrlVarType::Unknown)
+        SPBase() : CtrlTypeMode(CtrlVarType::Unknown)
         {
         }
     };
@@ -1027,17 +1027,17 @@ namespace SetPointManager {
 
     void UpdateOAPretreatSetPoints(EnergyPlusData &state);
 
-    int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
+    int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, CtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
 
-    bool IsNodeOnSetPtManager(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType);
+    bool IsNodeOnSetPtManager(EnergyPlusData &state, int NodeNum, CtrlVarType SetPtType);
 
-    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int NodeNum, iCtrlVarType iCtrlVarType);
+    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int NodeNum, CtrlVarType CtrlVarType);
 
     void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int NodeNum);
 
     void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state);
 
-    iCtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int CntrlNodeNum);
+    CtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int CntrlNodeNum);
 
     void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
                                       int SchedPtr,

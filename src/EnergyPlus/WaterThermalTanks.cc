@@ -10598,7 +10598,7 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
                                                     WaterHeaterSide const WaterThermalTankSide,
                                                     int const PlantLoopSide,
                                                     [[maybe_unused]] bool const PlumbedInSeries,
-                                                    DataBranchAirLoopPlant::ControlTypeEnum const BranchControlType,
+                                                    DataBranchAirLoopPlant::ControlType const BranchControlType,
                                                     Real64 const OutletTemp,
                                                     Real64 const DeadBandTemp,
                                                     Real64 const SetPointTemp_loc)
@@ -10641,13 +10641,13 @@ Real64 WaterThermalTankData::PlantMassFlowRatesFunc(EnergyPlusData &state,
 
         //  2.  Might be Requesting Flow.
         if (FirstHVACIteration) {
-            if (BranchControlType == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
+            if (BranchControlType == DataBranchAirLoopPlant::ControlType::Bypass) {
                 CurrentMode = FlowMode::PassingFlowThru;
             } else {
                 CurrentMode = FlowMode::MaybeRequestingFlow;
             }
         } else {
-            if (BranchControlType == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
+            if (BranchControlType == DataBranchAirLoopPlant::ControlType::Bypass) {
                 CurrentMode = FlowMode::PassingFlowThru;
             } else {
                 CurrentMode = FlowMode::ThrottlingFlow;

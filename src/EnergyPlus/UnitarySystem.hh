@@ -177,7 +177,7 @@ namespace UnitarySystems {
     struct UnitarySys : HVACSystemData
     {
 
-        enum class ControlType : int
+        enum class UnitarySysCtrlType : int
         {
             Invalid = -1,
             None,
@@ -230,7 +230,7 @@ namespace UnitarySystems {
         SysType m_sysType;
         bool m_ThisSysInputShouldBeGotten;
         int m_SysAvailSchedPtr; // Pointer to the availability schedule
-        ControlType m_ControlType;
+        UnitarySysCtrlType m_ControlType;
         DehumCtrlType m_DehumidControlType_Num;
         bool m_Humidistat;
         bool m_ValidASHRAECoolCoil;

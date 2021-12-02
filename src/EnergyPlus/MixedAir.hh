@@ -76,7 +76,7 @@ namespace MixedAir {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    enum class iLockoutType
+    enum class LockoutType
     {
         Invalid = -1,
         NoLockoutPossible,
@@ -85,7 +85,7 @@ namespace MixedAir {
         Num
     };
 
-    enum class iEconoOp
+    enum class EconoOp
     {
         Invalid = -1,
         NoEconomizer,
@@ -103,7 +103,7 @@ namespace MixedAir {
     constexpr int On(1);  // normal coil operation
     constexpr int Off(0); // signal coil shouldn't run
 
-    enum class iControllerType
+    enum class MixedAirControllerType
     {
         Invalid = -1,
         None,
@@ -164,9 +164,9 @@ namespace MixedAir {
         // Members
         std::string Name;
         std::string ControllerType;
-        iControllerType ControllerType_Num; // Parameter equivalent of controller type
+        MixedAirControllerType ControllerType_Num; // Parameter equivalent of controller type
         int OACtrlIndex;
-        iLockoutType Lockout; // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
+        LockoutType Lockout; // 0=NoLockoutPossible; 1=LockoutWithHeatingPossible;
         // 2=LockoutWithCompressorPossible;
         bool FixedMin;        // Fixed Minimum or Proportional Minimum
         Real64 TempLim;       // Temperature Limit
@@ -176,7 +176,7 @@ namespace MixedAir {
         int EnthalpyCurvePtr; // Electronic Enthalpy Curve Index (max HumRat = f[OAT])
         Real64 MinOA;         // Minimum outside air flow (m3/sec)
         Real64 MaxOA;         // Maximum outside air flow (m3/sec)
-        iEconoOp Econo;       // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
+        EconoOp Econo;        // 0 = NoEconomizer, 1 = FixedDryBulb, 2 = FixedEnthalpy, 3=DifferentialDryBulb,
         // 4=DifferentialEnthalpy, 5=FixedDewPointAndDryBulb, 6 = ElectronicEnthalpy,
         // 7 =DifferentialDryBulbAndEnthalpy
         bool EconBypass;      // ModulateFlow =FALSE , MinimumFlowWithBypass =TRUE
@@ -227,7 +227,7 @@ namespace MixedAir {
         //   indicates when the conditions are favorable for the economizer to operate (i.e., none of the control limits have been exceeded).
         //   While this status signal indicates favorable conditions for economizer operation, it does not guarantee that the air-side
         //   economizer has increased outdoor air flow above the minimum level since the actual outdoor air flow rate is also governed
-        //   by other controls (e.g., mixed air setpoint tempeature, time of day economizer control, etc.).
+        //   by other controls (e.g., mixed air setpoint temperature, time of day economizer control, etc.).
         int EconomizerStatus;           // Air Economizer status (1 = on, 0 = off or economizer not exists)
         int HeatRecoveryBypassStatus;   // OA Sys Heat Recovery Bypass status (1 = on, 0 = off or economizer not exists)
         int HRHeatingCoilActive;        // OA Sys Heat Recovery Heating Coil Was Active status (1 = on, 0 = off)
@@ -256,8 +256,8 @@ namespace MixedAir {
 
         // Default Constructor
         OAControllerProps()
-            : ControllerType_Num(iControllerType::None), OACtrlIndex(0), Lockout(iLockoutType::NoLockoutPossible), FixedMin(true), TempLim(0.0),
-              TempLowLim(0.0), EnthLim(0.0), DPTempLim(0.0), EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(iEconoOp::NoEconomizer),
+            : ControllerType_Num(MixedAirControllerType::None), OACtrlIndex(0), Lockout(LockoutType::NoLockoutPossible), FixedMin(true), TempLim(0.0),
+              TempLowLim(0.0), EnthLim(0.0), DPTempLim(0.0), EnthalpyCurvePtr(0), MinOA(0.0), MaxOA(0.0), Econo(EconoOp::NoEconomizer),
               EconBypass(false), MixNode(0), OANode(0), InletNode(0), RelNode(0), RetNode(0), MinOASchPtr(0), RelMassFlow(0.0), OAMassFlow(0.0),
               ExhMassFlow(0.0), MixMassFlow(0.0), InletTemp(0.0), InletEnth(0.0), InletPress(0.0), InletHumRat(0.0), OATemp(0.0), OAEnth(0.0),
               OAPress(0.0), OAHumRat(0.0), RetTemp(0.0), RetEnth(0.0), MixSetTemp(0.0), MinOAMassFlowRate(0.0), MaxOAMassFlowRate(0.0), RelTemp(0.0),

@@ -1571,7 +1571,7 @@ namespace HVACUnitaryBypassVAV {
             // check for set point manager on outlet node of CBVAV
             CBVAV(CBVAVNum).OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(state,
                                                                                  OutNode,
-                                                                                 SetPointManager::iCtrlVarType::Temp,
+                                                                                 SetPointManager::CtrlVarType::Temp,
                                                                                  SetPointManager::SetPointManagerType::MixedAir,
                                                                                  SetPointManager::CtrlNodeType::reference);
             state.dataHVACUnitaryBypassVAV->MySizeFlag(CBVAVNum) = false;

@@ -1348,25 +1348,25 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         if (NumAlphas < 19) {
-            state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+            state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
         } else if (!lAlphaBlanks(19)) {
             if (UtilityRoutines::SameString(Alphas(19), "SingleZoneVAV")) {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::CCM_ASHRAE;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::CCM_ASHRAE;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = true;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = true;
             } else if (UtilityRoutines::SameString(Alphas(19), "None")) {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             } else {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             }
         } else {
-            state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+            state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
         }
@@ -1481,7 +1481,7 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         // check for specific input requirements for SZVAV model
-        if (state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).controlType == PTHPCtrlType::CCM_ASHRAE) {
 
             // MaxNoCoolHeatAirVolFlow should be greater than 0
             if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0) {
@@ -2287,25 +2287,25 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         if (NumAlphas < 17) {
-            state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+            state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
         } else if (!lAlphaBlanks(17)) {
             if (UtilityRoutines::SameString(Alphas(17), "SingleZoneVAV")) {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::CCM_ASHRAE;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::CCM_ASHRAE;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = true;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = true;
             } else if (UtilityRoutines::SameString(Alphas(17), "None")) {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             } else {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             }
         } else {
-            state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+            state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
         }
@@ -2402,7 +2402,7 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         // check for specific input requirements for ASHRAE90.1 model
-        if (state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).controlType == PTHPCtrlType::CCM_ASHRAE) {
 
             // MaxNoCoolHeatAirVolFlow should be greater than 0
             if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0) {
@@ -3541,7 +3541,7 @@ void GetPTUnit(EnergyPlusData &state)
         state.dataPTHP->PTUnit(PTUnitNum).MaxOATSupHeat = Numbers(12);
 
         // WSHP not yet included in ASHRAE90.1 model
-        state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+        state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
         state.dataPTHP->PTUnit(PTUnitNum).simASHRAEModel = false;
         state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
         state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
@@ -5533,7 +5533,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
             if (state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir ||
                 state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == AutoSize &&
-                    state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
+                    state.dataPTHP->PTUnit(PTUnitNum).controlType == PTHPCtrlType::CCM_ASHRAE) {
                     SizingMethod = AutoCalculateSizing;
                     state.dataSize->DataConstantUsedForSizing =
                         max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
@@ -5832,7 +5832,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
         }
     }
 
-    if (state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
+    if (state.dataPTHP->PTUnit(PTUnitNum).controlType == PTHPCtrlType::CCM_ASHRAE) {
 
         SizingDesRunThisZone = false;
         state.dataSize->DataZoneUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum;

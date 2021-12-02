@@ -435,17 +435,17 @@ namespace DesiccantDehumidifiers {
                 ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                 ShowContinueError(state, "Obsolete " + cAlphaFields(7) + " = " + Alphas(7));
                 ShowContinueError(state, "setting to LeavingMaximumHumidityRatioSetpoint");
-                DesicDehum(DesicDehumNum).ControlType = DesicDehumCtrlType::FixedHumratBypass;
+                DesicDehum(DesicDehumNum).controlType = DesicDehumCtrlType::FixedHumratBypass;
             }
             if (UtilityRoutines::SameString(Alphas(7), "LeavingMaximumHumidityRatioSetpoint"))
-                DesicDehum(DesicDehumNum).ControlType = DesicDehumCtrlType::FixedHumratBypass;
+                DesicDehum(DesicDehumNum).controlType = DesicDehumCtrlType::FixedHumratBypass;
             if (UtilityRoutines::SameString(Alphas(7), "SystemNodeMaximumHumidityRatioSetpoint"))
-                DesicDehum(DesicDehumNum).ControlType = DesicDehumCtrlType::NodeHumratBypass;
-            if (DesicDehum(DesicDehumNum).ControlType == DesicDehumCtrlType::Invalid) {
+                DesicDehum(DesicDehumNum).controlType = DesicDehumCtrlType::NodeHumratBypass;
+            if (DesicDehum(DesicDehumNum).controlType == DesicDehumCtrlType::Invalid) {
                 ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                 ShowContinueError(state, "Invalid " + cAlphaFields(7) + " = " + Alphas(7));
                 ShowContinueError(state, "setting to LeavingMaximumHumidityRatioSetpoint");
-                DesicDehum(DesicDehumNum).ControlType = DesicDehumCtrlType::FixedHumratBypass;
+                DesicDehum(DesicDehumNum).controlType = DesicDehumCtrlType::FixedHumratBypass;
             }
             DesicDehum(DesicDehumNum).HumRatSet = Numbers(1);
             DesicDehum(DesicDehumNum).NomProcAirVolFlow = Numbers(2);
@@ -1917,7 +1917,7 @@ namespace DesiccantDehumidifiers {
             if (SELECT_CASE_var == DesicDehumType::Solid) {
 
                 if (!state.dataGlobal->SysSizingCalc && state.dataDesiccantDehumidifiers->MySetPointCheckFlag && DoSetPointTest) {
-                    if (DesicDehum(DesicDehumNum).ControlType == DesicDehumCtrlType::NodeHumratBypass) {
+                    if (DesicDehum(DesicDehumNum).controlType == DesicDehumCtrlType::NodeHumratBypass) {
                         ControlNode = DesicDehum(DesicDehumNum).ProcAirOutNode;
                         if (ControlNode > 0) {
                             if (state.dataLoopNodes->Node(ControlNode).HumRatMax == SensedNodeFlagValue) {
@@ -2149,7 +2149,7 @@ namespace DesiccantDehumidifiers {
 
                     // perform the correct dehumidifier control strategy
                     {
-                        auto const SELECT_CASE_var1(DesicDehum(DesicDehumNum).ControlType);
+                        auto const SELECT_CASE_var1(DesicDehum(DesicDehumNum).controlType);
 
                         if (SELECT_CASE_var1 == DesicDehumCtrlType::FixedHumratBypass) {
 

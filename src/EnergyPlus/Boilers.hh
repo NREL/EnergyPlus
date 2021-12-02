@@ -181,9 +181,9 @@ namespace Boilers {
         void SizeBoiler(EnergyPlusData &state);
 
         void CalcBoilerModel(EnergyPlusData &state,
-                             Real64 MyLoad,                                        // W - hot water demand to be met by boiler
-                             bool RunFlag,                                         // TRUE if boiler operating
-                             DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                             Real64 MyLoad,                                    // W - hot water demand to be met by boiler
+                             bool RunFlag,                                     // TRUE if boiler operating
+                             DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void UpdateBoilerRecords(EnergyPlusData &state,
