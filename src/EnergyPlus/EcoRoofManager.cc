@@ -56,6 +56,7 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -822,6 +823,8 @@ namespace EcoRoofManager {
         Real64 AvgMoisture; // Average soil moisture over depth of ecoroof media
         int index1;
 
+        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+
         // NOTE:  As Energyplus calls the energy balance manager (and hence CalcEcoroof)
         // once for each surface within each zone that has an ecoroof
         // --- the CALCECOROOF routine is called multiple times within each time step
@@ -916,6 +919,14 @@ namespace EcoRoofManager {
             Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth;  // x (m) evenly put into top layer
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
+            }
+        } else {
+            if (state.dataEnvrn->LiquidPrecipitation > 0) {
+                state.dataEcoRoofMgr->CurrentPrecipitation = state.dataEnvrn->LiquidPrecipitation * TimeStepSys; //  units of m
+                Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth;  // x (m) evenly put into top layer
+                if (!state.dataGlobal->WarmupFlag) {
+                    state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
+                }
             }
         }
 
