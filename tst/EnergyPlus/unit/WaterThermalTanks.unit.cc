@@ -796,9 +796,9 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     // ValidateFuelType tests for WaterHeater:Stratified
     WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
-    EXPECT_EQ(Tank.FuelType, "Electricity");
-    EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
-    EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
+    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -1522,9 +1522,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     // ValidateFuelType tests for WaterHeater:Mixed
     WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-    EXPECT_EQ(Tank.FuelType, "Electricity");
-    EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
-    EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
+    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
@@ -4217,9 +4217,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_EQ(HPWHTank.FuelType, "Steam");
-        EXPECT_EQ(HPWHTank.OffCycParaFuelType, "Steam");
-        EXPECT_EQ(HPWHTank.OnCycParaFuelType, "Steam");
+        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, WaterThermalTanks::Fuel::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, WaterThermalTanks::Fuel::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, WaterThermalTanks::Fuel::Steam));
     }
 
     ++HPWaterHeaterNum;
@@ -5327,7 +5327,7 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
     result = Tank.PlantMassFlowRatesFunc(*state,
                                          inNodeNum,
                                          false,
-                                         EnergyPlus::WaterThermalTanks::SideEnum::Use,
+                                         EnergyPlus::WaterThermalTanks::WaterHeaterSide::Use,
                                          plantLoopSide,
                                          false,
                                          DataBranchAirLoopPlant::ControlTypeEnum::Bypass,
