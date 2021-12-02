@@ -1153,6 +1153,9 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                 } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
                     surfName = Surface(iSurf).Name;
                     curCons = Surface(iSurf).Construction;
+                    Real64 nomCond = 0.;
+                    int errFlag = 0;
+                    Real64 TransSolNorm = 0.;
                     CreateWindowReportSection(state,
                                               surfName,
                                               curCons,
