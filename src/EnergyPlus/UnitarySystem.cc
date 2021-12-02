@@ -11944,8 +11944,12 @@ namespace UnitarySystems {
                         this->m_SpeedNum = this->m_NumOfSpeedCooling;
                         CycRatio = this->m_CoolingCycRatio = 1.0;
                         PartLoadFrac = SpeedRatio = this->m_CoolingSpeedRatio = 1.0;
-                        this->m_CoilSpeedErrIdx++;
                         useMaxedSpeed = true;
+                        if (this->m_CoilSpeedErrIdx == 0) {
+                            ShowWarningMessage(state, "Wrong coil speed EMS override value, for unit=\"" + this->m_CoolingCoilName);
+                            ShowContinueError(state,
+                                              "  Exceeding maximum coil speed level. Speed level is set to the maximum coil speed level allowed.");
+                        }
                         ShowRecurringWarningErrorAtEnd(
                             state,
                             "Wrong coil speed EMS override value, for unit=\"" + this->m_CoolingCoilName +
@@ -11956,7 +11960,29 @@ namespace UnitarySystems {
                             _,
                             "",
                             "");
-                    } else if (this->m_CoolingSpeedNum == 1) {
+                    }
+
+                    if (this->m_SpeedNum < 0) {
+                        this->m_CoolingSpeedNum = 0;
+                        this->m_SpeedNum = 0;
+                        CycRatio = this->m_CoolingCycRatio = 0.0;
+                        PartLoadFrac = SpeedRatio = this->m_CoolingSpeedRatio = 0.0;
+                        if (this->m_CoilSpeedErrIdx == 0) {
+                            ShowWarningMessage(state, "Wrong coil speed EMS override value, for unit=\"" + this->m_CoolingCoilName);
+                            ShowContinueError(state, "  Input speed value is below zero. Speed level is set to zero.");
+                        }
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "Wrong coil speed EMS override value, for unit=\"" + this->m_CoolingCoilName +
+                                                           "\". Input speed value is below zero. Speed level is set to zero.",
+                                                       this->m_CoilSpeedErrIdx,
+                                                       this->m_EMSOverrideCoilSpeedNumValue,
+                                                       this->m_EMSOverrideCoilSpeedNumValue,
+                                                       _,
+                                                       "",
+                                                       "");
+                    }
+
+                    if (this->m_CoolingSpeedNum == 1) {
                         SpeedRatio = this->m_CoolingSpeedRatio = 0.0;
                         CycRatio = this->m_CoolingCycRatio = this->m_EMSOverrideCoilSpeedNumValue - floor(this->m_EMSOverrideCoilSpeedNumValue);
                         if (useMaxedSpeed || this->m_CoolingCycRatio == 0) {
