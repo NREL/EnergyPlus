@@ -3378,8 +3378,6 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Detailed;
 
-  Output:Variable,SPACE1-1,Site Outdoor Air Drybulb Temperature,Detailed;
-
   Output:Variable,SPACE1-1,Zone Thermostat Cooling Setpoint Temperature,Detailed;
 
   Output:Variable,SPACE1-1,Zone Air Temperature,Detailed;
