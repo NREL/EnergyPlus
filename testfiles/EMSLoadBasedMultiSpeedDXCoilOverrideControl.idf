@@ -1793,7 +1793,7 @@
     No,
     No;
 
-  Output:Variable,SPACE1-1,Site Outdoor Air Drybulb Temperature,Detailed;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,Detailed;
 
   Output:Variable,SPACE1-1,Zone Thermostat Cooling Setpoint Temperature,Detailed;
 
@@ -5052,10 +5052,10 @@
 
   EnergyManagementSystem:Program,
     CoilSpeedControl,                                                                            !- Name
-    IF (ZoneAirTemperature > CoolingSetpoint + 0.3),                                             !- Program Line 7
+    IF (ZoneAirTemperature > CoolingSetpoint + 0.5),                                             !- Program Line 7
     SET CoilSpeedOverride = 1.5,                                                                 !- Program Line 8
     SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 9
-    ELSEIF (ZoneAirTemperature > CoolingSetpoint - 0.5),                                        !- Program Line 10
+    ELSEIF (ZoneAirTemperature > CoolingSetpoint - 0.5),                                         !- Program Line 10
     SET CoilSpeedOverride = 1,                                                                   !- Program Line 11
     SET CoilSpeedLevelOverrideReport = 1,                                                        !- Program Line 12
     ELSE,                                                                                        !- Program Line 13
