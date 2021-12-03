@@ -162,6 +162,15 @@ namespace OutputReportPredefined {
         s->pdchFenTilt = newPreDefColumn(state, s->pdstFen, "Tilt [deg]");
         s->pdchFenDir = newPreDefColumn(state, s->pdstFen, "Cardinal Direction");
 
+        s->pdstFenShd = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Fenestration Shaded State");
+
+        s->pdchFenShdUfact = newPreDefColumn(state, s->pdstFenShd, "Glass U-Factor [W/m2-K]");
+        s->pdchFenShdSHGC = newPreDefColumn(state, s->pdstFenShd, "Glass SHGC");
+        s->pdchFenShdVisTr = newPreDefColumn(state, s->pdstFenShd, "Glass Visible Transmittance");
+        s->pdchFenShdAssemUfact = newPreDefColumn(state, s->pdstFenShd, "Assembly U-Factor [W/m2-K]");
+        s->pdchFenShdAssemSHGC = newPreDefColumn(state, s->pdstFenShd, "Assembly SHGC");
+        s->pdchFenShdAssemVisTr = newPreDefColumn(state, s->pdstFenShd, "Assembly Visible Transmittance");
+
         s->pdstIntFen = newPreDefSubTable(state, s->pdrEnvelope, "Interior Fenestration");
 
         s->pdchIntFenCons = newPreDefColumn(state, s->pdstIntFen, "Construction");

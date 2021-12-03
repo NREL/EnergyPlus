@@ -365,6 +365,15 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFenAzimuth = 0;
     int pdchFenTilt = 0;
     int pdchFenDir = 0;
+
+    int pdstFenShd = 0;
+    int pdchFenShdUfact = 0;
+    int pdchFenShdSHGC = 0;
+    int pdchFenShdVisTr = 0;
+    int pdchFenShdAssemUfact = 0;
+    int pdchFenShdAssemSHGC = 0;
+    int pdchFenShdAssemVisTr = 0;
+
     int pdstDoor = 0;
     int pdchDrCons = 0;
     int pdchDrUfactFilm = 0;
