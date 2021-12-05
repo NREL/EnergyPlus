@@ -128,8 +128,8 @@ void WrapperSpecs::getDesignCapacities(
     MinLoad = 0.0;
     MaxLoad = 0.0;
     OptLoad = 0.0;
-    if (calledFromLocation.loopNum == this->CWLoopNum) {   // Chilled water loop
-        if (this->ControlMode == iCondType::SmartMixing) { // control mode is SmartMixing
+    if (calledFromLocation.loopNum == this->CWLoopNum) {       // Chilled water loop
+        if (this->ControlMode == CondenserType::SmartMixing) { // control mode is SmartMixing
             for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
                 MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).MaxPartLoadRatCooling;
                 OptLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).OptPartLoadRatCooling;
@@ -137,7 +137,7 @@ void WrapperSpecs::getDesignCapacities(
             }
         }
     } else if (calledFromLocation.loopNum == this->HWLoopNum) { // Hot water loop
-        if (this->ControlMode == iCondType::SmartMixing) {      // control mode is SmartMixing
+        if (this->ControlMode == CondenserType::SmartMixing) {  // control mode is SmartMixing
             for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
                 MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg * this->ChillerHeater(NumChillerHeater).MaxPartLoadRatClgHtg;
                 OptLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg * this->ChillerHeater(NumChillerHeater).OptPartLoadRatClgHtg;
@@ -212,7 +212,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
     bool ErrorsFound; // If errors detected in input
 
     // auto-size the chiller heater components
-    if (this->ControlMode == iCondType::SmartMixing) {
+    if (this->ControlMode == CondenserType::SmartMixing) {
 
         for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
             ErrorsFound = false;
@@ -593,7 +593,7 @@ void GetWrapperInput(EnergyPlusData &state)
         }
 
         if (state.dataIPShortCut->cAlphaArgs(2) == "SMARTMIXING") {
-            state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode = iCondType::SmartMixing;
+            state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode = CondenserType::SmartMixing;
         }
 
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWInletNodeNum =
@@ -734,7 +734,7 @@ void GetWrapperInput(EnergyPlusData &state)
 
         // ALLOCATE ARRAYS
         if ((state.dataPlantCentralGSHP->numChillerHeaters == 0) &&
-            (state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode == iCondType::SmartMixing)) {
+            (state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode == CondenserType::SmartMixing)) {
             ShowFatalError(state,
                            "SmartMixing Control Mode in object " + state.dataIPShortCut->cCurrentModuleObject + " : " +
                                state.dataPlantCentralGSHP->Wrapper(WrapperNum).Name +
@@ -1284,7 +1284,7 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         }
 
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "WaterCooled")) {
-            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).CondenserType = iCondType::WaterCooled;
+            state.dataPlantCentralGSHP->ChillerHeater(ChillerHeaterNum).condenserType = CondenserType::WaterCooled;
         } else {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
@@ -1694,7 +1694,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
 
     if (this->MyWrapperEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
-        if (this->ControlMode == iCondType::SmartMixing) {
+        if (this->ControlMode == CondenserType::SmartMixing) {
 
             this->CHWVolFlowRate = 0.0;
             this->HWVolFlowRate = 0.0;
@@ -2886,7 +2886,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
     }
 
     if (LoopNum == this->CWLoopNum) {
-        if (this->ControlMode == iCondType::SmartMixing) {
+        if (this->ControlMode == CondenserType::SmartMixing) {
             if (CurCoolingLoad > 0.0 && CHWInletMassFlowRate > 0.0 && GLHEInletMassFlowRate > 0) {
 
                 this->CalcChillerModel(state);
@@ -3060,8 +3060,8 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
         } // End of cooling
 
-    } else if (LoopNum == this->HWLoopNum) {               // Hot water loop
-        if (this->ControlMode == iCondType::SmartMixing) { // Chiller heater component
+    } else if (LoopNum == this->HWLoopNum) {                   // Hot water loop
+        if (this->ControlMode == CondenserType::SmartMixing) { // Chiller heater component
             if (CurHeatingLoad > 0.0 && HWInletMassFlowRate > 0.0) {
 
                 this->CalcChillerHeaterModel(state);

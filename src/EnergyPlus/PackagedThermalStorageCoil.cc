@@ -253,9 +253,9 @@ void GetTESCoilInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
             if (SELECT_CASE_var == "SCHEDULEDMODES") {
-                state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType = iModeCtrlType::ScheduledOpModes;
+                state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType = PTSCCtrlType::ScheduledOpModes;
             } else if (SELECT_CASE_var == "EMSCONTROLLED") {
-                state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType = iModeCtrlType::EMSActuatedOpModes;
+                state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType = PTSCCtrlType::EMSActuatedOpModes;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
@@ -266,7 +266,7 @@ void GetTESCoilInput(EnergyPlusData &state)
             }
         }
         if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-            if (state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType == iModeCtrlType::ScheduledOpModes) {
+            if (state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType == PTSCCtrlType::ScheduledOpModes) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
                                     "\", invalid");
@@ -276,7 +276,7 @@ void GetTESCoilInput(EnergyPlusData &state)
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(item).ControlModeSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).ControlModeSchedNum == 0 &&
-                state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType == iModeCtrlType::ScheduledOpModes) {
+                state.dataPackagedThermalStorageCoil->TESCoil(item).ModeControlType == PTSCCtrlType::ScheduledOpModes) {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
                                     "\", invalid");
@@ -2332,7 +2332,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
 
     // determine control mode
     if (GetCurrentScheduleValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).AvailSchedNum) != 0.0) {
-        if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ModeControlType == iModeCtrlType::ScheduledOpModes) {
+        if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ModeControlType == PTSCCtrlType::ScheduledOpModes) {
             tmpSchedValue = GetCurrentScheduleValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ControlModeSchedNum);
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode = tmpSchedValue;
             // check if value is valid
@@ -2359,7 +2359,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                 }
             }
 
-        } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ModeControlType == iModeCtrlType::EMSActuatedOpModes) {
+        } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ModeControlType == PTSCCtrlType::EMSActuatedOpModes) {
             if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeOn) {
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CurControlMode =
                     std::floor(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EMSControlModeValue);

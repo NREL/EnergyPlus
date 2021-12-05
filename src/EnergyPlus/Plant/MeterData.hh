@@ -61,7 +61,7 @@ namespace DataPlant {
         OutputProcessor::Unit ReportVarUnits;
         DataGlobalConstants::ResourceType ResourceType;
         std::string EndUse;
-        SystemReports::iEndUseType EndUse_CompMode;
+        SystemReports::EndUseType EndUse_CompMode;
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
@@ -71,7 +71,7 @@ namespace DataPlant {
         // Default Constructor
         MeterData()
             : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
-              EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
+              EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0),
               ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(OutputProcessor::VariableType::NotFound),
               CurMeterReading(0.0)
         {

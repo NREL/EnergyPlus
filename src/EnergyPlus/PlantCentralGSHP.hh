@@ -64,7 +64,7 @@ struct EnergyPlusData;
 
 namespace PlantCentralGSHP {
 
-    enum class iCondType
+    enum class CondenserType
     {
         Invalid = -1,
         WaterCooled,
@@ -180,7 +180,7 @@ namespace PlantCentralGSHP {
         bool HeatSetPointErrDone;         // true if setpoint warning issued
         bool PossibleSubcooling;          // flag to indicate chiller is doing less cooling that requested
         int ChillerHeaterNum;             // Chiller heater number
-        iCondType CondenserType;          // Type of Condenser - only water cooled is allowed
+        CondenserType condenserType;      // Type of Condenser - only water cooled is allowed
         int ChillerCapFTCoolingIDX;       // Cooling capacity function of temperature curve index
         int ChillerEIRFTCoolingIDX;       // Elec Input to Cooling Output ratio function of temperature curve index
         int ChillerEIRFPLRCoolingIDX;     // Elec Input to cooling output ratio function of PLR curve index
@@ -254,7 +254,7 @@ namespace PlantCentralGSHP {
 
         ChillerHeaterSpecs()
             : ConstantFlow(false), VariableFlow(false), CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), CoolSetPointErrDone(false),
-              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(iCondType::Invalid),
+              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), condenserType(CondenserType::Invalid),
               ChillerCapFTCoolingIDX(0), ChillerEIRFTCoolingIDX(0), ChillerEIRFPLRCoolingIDX(0), ChillerCapFTHeatingIDX(0), ChillerEIRFTHeatingIDX(0),
               ChillerEIRFPLRHeatingIDX(0), ChillerCapFTIDX(0), ChillerEIRFTIDX(0), ChillerEIRFPLRIDX(0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
               CondInletNodeNum(0), CondOutletNodeNum(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0),
@@ -325,7 +325,7 @@ namespace PlantCentralGSHP {
         bool VariableFlowCH;        // True if all chiller heaters are variable flow control
         int SchedPtr;               // Schedule value for ancillary power control
         int CHSchedPtr;             // Schedule value for individual chiller heater control
-        iCondType ControlMode;      // SmartMixing or FullyMixing
+        CondenserType ControlMode;  // SmartMixing or FullyMixing
         int CHWInletNodeNum;        // Node number on the inlet side of the plant (Chilled Water side)
         int CHWOutletNodeNum;       // Node number on the outlet side of the plant (Chilled Water side)
         int HWInletNodeNum;         // Node number on the inlet side of the plant (Hot Water side)
@@ -377,7 +377,7 @@ namespace PlantCentralGSHP {
         bool mySizesReported;
 
         WrapperSpecs()
-            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(iCondType::Invalid), CHWInletNodeNum(0), CHWOutletNodeNum(0),
+            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(CondenserType::Invalid), CHWInletNodeNum(0), CHWOutletNodeNum(0),
               HWInletNodeNum(0), HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0),
               HWMassFlowRate(0.0), GLHEMassFlowRate(0.0), CHWMassFlowRateMax(0.0), HWMassFlowRateMax(0.0), GLHEMassFlowRateMax(0.0),
               WrapperCoolingLoad(0.0), WrapperHeatingLoad(0.0), AncillaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false),

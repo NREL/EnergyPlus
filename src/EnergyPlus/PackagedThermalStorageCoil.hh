@@ -69,7 +69,7 @@ namespace PackagedThermalStorageCoil {
     using namespace DataHVACGlobals;
 
     // control types
-    enum class iModeCtrlType
+    enum class PTSCCtrlType
     {
         Invalid = -1,
         ScheduledOpModes,   // control over TES modes is via local schedule
@@ -118,12 +118,12 @@ namespace PackagedThermalStorageCoil {
     struct PackagedTESCoolingCoilStruct
     {
         // Members
-        std::string Name;              // Name of TES cooling package
-        int AvailSchedNum;             // pointer to availability schedule
-        iModeCtrlType ModeControlType; // how are operation modes controlled
-        int ControlModeSchedNum;       // pointer to control schedule if used
-        bool EMSControlModeOn;         // if true, then EMS actuator has been used
-        Real64 EMSControlModeValue;    // value to use from EMS actuator for control mode
+        std::string Name;             // Name of TES cooling package
+        int AvailSchedNum;            // pointer to availability schedule
+        PTSCCtrlType ModeControlType; // how are operation modes controlled
+        int ControlModeSchedNum;      // pointer to control schedule if used
+        bool EMSControlModeOn;        // if true, then EMS actuator has been used
+        Real64 EMSControlModeValue;   // value to use from EMS actuator for control mode
         int CurControlMode;
         int ControlModeErrorIndex;
         Real64 RatedEvapAirVolFlowRate;  // [m3/s]
@@ -365,7 +365,7 @@ namespace PackagedThermalStorageCoil {
 
         // Default Constructor
         PackagedTESCoolingCoilStruct()
-            : AvailSchedNum(0), ModeControlType(iModeCtrlType::Invalid), ControlModeSchedNum(0), EMSControlModeOn(false), EMSControlModeValue(0.0),
+            : AvailSchedNum(0), ModeControlType(PTSCCtrlType::Invalid), ControlModeSchedNum(0), EMSControlModeOn(false), EMSControlModeValue(0.0),
               CurControlMode(OffMode), ControlModeErrorIndex(0), RatedEvapAirVolFlowRate(0.0), RatedEvapAirMassFlowRate(0.0), EvapAirInletNodeNum(0),
               EvapAirOutletNodeNum(0), CoolingOnlyModeIsAvailable(false), CoolingOnlyRatedTotCap(0.0), CoolingOnlyRatedSHR(0.0),
               CoolingOnlyRatedCOP(0.0), CoolingOnlyCapFTempCurve(0), CoolingOnlyCapFTempObjectNum(0), CoolingOnlyCapFFlowCurve(0),
