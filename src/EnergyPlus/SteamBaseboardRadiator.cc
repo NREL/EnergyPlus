@@ -555,7 +555,7 @@ namespace SteamBaseboardRadiator {
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
 
             // Get outlet node number
@@ -567,7 +567,7 @@ namespace SteamBaseboardRadiator {
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state,
                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,

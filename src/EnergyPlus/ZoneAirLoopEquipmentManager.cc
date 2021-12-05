@@ -228,7 +228,7 @@ namespace ZoneAirLoopEquipmentManager {
                                                                                                          AlphArray(1),
                                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                                          ObjectIsParent);
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).InletNodeNum = 0;
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).NumComponents = 1;

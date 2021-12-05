@@ -221,7 +221,7 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
                                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             DataLoopNode::ObjectIsNotParent);
         if (state.dataPondGHE->PondGHE(Item).InletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
@@ -238,7 +238,7 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
                                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              DataLoopNode::ObjectIsNotParent);
         if (state.dataPondGHE->PondGHE(Item).OutletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));

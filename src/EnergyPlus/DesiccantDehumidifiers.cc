@@ -398,7 +398,7 @@ namespace DesiccantDehumidifiers {
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsNotParent);
 
             DesicDehum(DesicDehumNum).ProcAirOutNode = GetOnlySingleNode(state,
@@ -408,7 +408,7 @@ namespace DesiccantDehumidifiers {
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
             DesicDehum(DesicDehumNum).RegenAirInNode = GetOnlySingleNode(state,
@@ -418,7 +418,7 @@ namespace DesiccantDehumidifiers {
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                         NodeInputManager::compFluidStream::Secondary,
+                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                          ObjectIsNotParent);
 
             DesicDehum(DesicDehumNum).RegenFanInNode = GetOnlySingleNode(state,
@@ -428,7 +428,7 @@ namespace DesiccantDehumidifiers {
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Internal,
-                                                                         NodeInputManager::compFluidStream::Secondary,
+                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                          ObjectIsParent);
 
             if (UtilityRoutines::SameString(Alphas(7), "LEAVING HUMRAT:BYPASS")) {
@@ -824,7 +824,7 @@ namespace DesiccantDehumidifiers {
                                                                         DesicDehum(DesicDehumNum).Name,
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsParent);
 
             ErrorsFound2 = false;
@@ -843,7 +843,7 @@ namespace DesiccantDehumidifiers {
                                                                          DesicDehum(DesicDehumNum).Name,
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsParent);
 
             TestCompSet(state, DesicDehum(DesicDehumNum).DehumType, DesicDehum(DesicDehumNum).Name, ProcAirInlet, ProcAirOutlet, "Process Air Nodes");
@@ -869,7 +869,7 @@ namespace DesiccantDehumidifiers {
                                                                          DesicDehum(DesicDehumNum).Name,
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
             if (DesicDehum(DesicDehumNum).ControlNodeNum == 0) {
@@ -1231,7 +1231,7 @@ namespace DesiccantDehumidifiers {
                                                                              DesicDehum(DesicDehumNum).Name,
                                                                              DataLoopNode::NodeFluidType::Air,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsParent);
                 DesicDehum(DesicDehumNum).RegenAirOutNode = GetOnlySingleNode(state,
                                                                               RegenAirOutlet,
@@ -1240,7 +1240,7 @@ namespace DesiccantDehumidifiers {
                                                                               DesicDehum(DesicDehumNum).Name,
                                                                               DataLoopNode::NodeFluidType::Air,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsParent);
                 if (!lAlphaBlanks(10)) {
                     if (DesicDehum(DesicDehumNum).RegenFanOutNode != DesicDehum(DesicDehumNum).RegenCoilInletNode) {
@@ -1285,7 +1285,7 @@ namespace DesiccantDehumidifiers {
                                                                               DesicDehum(DesicDehumNum).Name,
                                                                               DataLoopNode::NodeFluidType::Air,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsParent);
                 if (!lAlphaBlanks(10)) {
                     DesicDehum(DesicDehumNum).RegenAirInNode = GetOnlySingleNode(state,
@@ -1295,7 +1295,7 @@ namespace DesiccantDehumidifiers {
                                                                                  DesicDehum(DesicDehumNum).Name,
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
                     if (DesicDehum(DesicDehumNum).RegenCoilOutletNode != DesicDehum(DesicDehumNum).HXRegenInNode) {
                         ShowSevereError(state, DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name + "\"");
@@ -1316,7 +1316,7 @@ namespace DesiccantDehumidifiers {
                                                                                  DesicDehum(DesicDehumNum).Name,
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
                 }
                 if (DesicDehum(DesicDehumNum).RegenFanInNode != DesicDehum(DesicDehumNum).HXRegenOutNode) {
@@ -1470,7 +1470,7 @@ namespace DesiccantDehumidifiers {
                                           DesicDehum(DesicDehumNum).Name,
                                           DataLoopNode::NodeFluidType::Air,
                                           DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                          NodeInputManager::compFluidStream::Secondary,
+                                          NodeInputManager::CompFluidStream::Secondary,
                                           ObjectIsNotParent);
                     CheckAndAddAirNodeNumber(state, DesicDehum(DesicDehumNum).CondenserInletNode, OANodeError);
                     if (!OANodeError) {

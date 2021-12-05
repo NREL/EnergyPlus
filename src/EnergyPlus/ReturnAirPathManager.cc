@@ -158,7 +158,7 @@ namespace ReturnAirPathManager {
                                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                               ObjectIsParent);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);

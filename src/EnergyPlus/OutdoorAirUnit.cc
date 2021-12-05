@@ -565,7 +565,7 @@ namespace OutdoorAirUnit {
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                     ObjectIsParent);
             if (!lAlphaBlanks(14)) {
                 OutAirUnit(OAUnitNum).AirInletNode = GetOnlySingleNode(state,
@@ -575,7 +575,7 @@ namespace OutdoorAirUnit {
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Air,
                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                        ObjectIsParent);
             } else {
                 if (OutAirUnit(OAUnitNum).ExtFan) {
@@ -593,7 +593,7 @@ namespace OutdoorAirUnit {
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Internal,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
 
             //  Set connection type to 'OutdoorAir', because this is hardwired to OA conditions
@@ -604,7 +604,7 @@ namespace OutdoorAirUnit {
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
 
             if (!lAlphaBlanks(12)) {

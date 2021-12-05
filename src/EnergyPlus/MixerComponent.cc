@@ -222,7 +222,7 @@ void GetMixerInput(EnergyPlusData &state)
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes = NumAlphas - 2;
 
@@ -263,7 +263,7 @@ void GetMixerInput(EnergyPlusData &state)
                                                                                                  AlphArray(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  ObjectIsNotParent);
             if (lAlphaBlanks(2 + NodeNum)) {
                 ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));

@@ -347,7 +347,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).PlantOutletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -357,7 +357,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,
@@ -379,7 +379,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).HVACOutletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -389,7 +389,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,

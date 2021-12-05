@@ -651,7 +651,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                     ObjectIsParent);
 
             MSHeatPump(MSHPNum).AirOutletNodeNum = GetOnlySingleNode(state,
@@ -661,7 +661,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsParent);
 
             TestCompSet(state, state.dataHVACMultiSpdHP->CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -1390,7 +1390,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                            NodeInputManager::compFluidStream::Tertiary,
+                                                                            NodeInputManager::CompFluidStream::Tertiary,
                                                                             ObjectIsNotParent);
                 if (MSHeatPump(MSHPNum).HeatRecInletNodeNum == 0) {
                     ShowSevereError(state,
@@ -1405,7 +1405,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                              Alphas(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                             NodeInputManager::compFluidStream::Tertiary,
+                                                                             NodeInputManager::CompFluidStream::Tertiary,
                                                                              ObjectIsNotParent);
                 if (MSHeatPump(MSHPNum).HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state,

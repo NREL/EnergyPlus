@@ -314,7 +314,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -324,7 +324,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -565,7 +565,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -575,7 +575,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -738,7 +738,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Steam,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -748,7 +748,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Steam,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -879,7 +879,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -889,7 +889,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -1039,7 +1039,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -1049,7 +1049,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,

@@ -443,7 +443,7 @@ namespace HVACFan {
                                                            alphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           NodeInputManager::compFluidStream::Primary,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                             alphaArgs(4),
@@ -452,7 +452,7 @@ namespace HVACFan {
                                                             alphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
         BranchNodeConnections::TestCompSet(state, locCurrentModuleObject, alphaArgs(1), alphaArgs(3), alphaArgs(4), "Air Nodes");

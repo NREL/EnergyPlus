@@ -179,7 +179,7 @@ namespace PlantValves {
                                                                                          Alphas(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
                                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                          ObjectIsNotParent);
             // Get Plant Outlet Node
             state.dataPlantValves->TemperValve(Item).PltOutletNodeNum = GetOnlySingleNode(state,
@@ -189,7 +189,7 @@ namespace PlantValves {
                                                                                           Alphas(1),
                                                                                           DataLoopNode::NodeFluidType::Water,
                                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
             // Get Stream 2 Source Node
@@ -200,7 +200,7 @@ namespace PlantValves {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Water,
                                                                                            DataLoopNode::NodeConnectionType::Sensor,
-                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsNotParent);
             // Get Mixed water Setpoint
             state.dataPlantValves->TemperValve(Item).PltSetPointNodeNum = GetOnlySingleNode(state,
@@ -210,7 +210,7 @@ namespace PlantValves {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType::SetPoint,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsNotParent);
 
             // Get Pump outlet
@@ -221,7 +221,7 @@ namespace PlantValves {
                                                                                               Alphas(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Sensor,
-                                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                               ObjectIsNotParent);
 
             // Note most checks on user input are made in second pass thru init routine

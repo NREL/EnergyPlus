@@ -283,7 +283,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Air,
                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            ObjectIsNotParent);
             UniqueNodeError = false;
             CheckUniqueNodes(state,
@@ -304,7 +304,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsNotParent);
                 } else {
                     PurchAir(PurchAirNum).ZoneExhaustAirNodeNum = GetOnlySingleNode(state,
@@ -314,7 +314,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsNotParent);
                 }
                 UniqueNodeError = false;
@@ -335,7 +335,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsNotParent);
             }
             PurchAir(PurchAirNum).MaxHeatSuppAirTemp = state.dataIPShortCut->rNumericArgs(1);
@@ -520,7 +520,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
                 // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
                 CheckAndAddAirNodeNumber(state, PurchAir(PurchAirNum).OutdoorAirNodeNum, IsOANodeListed);

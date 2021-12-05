@@ -267,7 +267,7 @@ namespace BoilerSteam {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Steam,
                                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                                NodeInputManager::compFluidStream::Primary,
+                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                  state.dataIPShortCut->cAlphaArgs(4),
@@ -276,7 +276,7 @@ namespace BoilerSteam {
                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                  DataLoopNode::NodeFluidType::Steam,
                                                                                  DataLoopNode::NodeConnectionType::Outlet,
-                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,

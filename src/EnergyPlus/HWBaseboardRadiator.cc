@@ -523,7 +523,7 @@ namespace HWBaseboardRadiator {
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
             // Get outlet node number
@@ -534,7 +534,7 @@ namespace HWBaseboardRadiator {
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Water,
                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                           ObjectIsNotParent);
             TestCompSet(state,
                         cCMO_BBRadiator_Water,

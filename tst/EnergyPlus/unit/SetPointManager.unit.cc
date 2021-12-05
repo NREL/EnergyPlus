@@ -612,7 +612,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Internal,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).OASysInletNodeNum =
@@ -623,7 +623,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Inlet,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).OAMixOAInNodeNum = NodeInputManager::GetOnlySingleNode(*state,
@@ -633,7 +633,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                            "SZRHtest",
                                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                                            DataLoopNode::NodeConnectionType::Internal,
-                                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                                            DataLoopNode::ObjectIsNotParent,
                                                                                                            "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -650,7 +650,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Inlet,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
@@ -665,7 +665,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Internal,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
 
@@ -677,7 +677,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Internal,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
 
@@ -695,7 +695,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                           "SZRHspmTest",
                                                           DataLoopNode::NodeFluidType::Air,
                                                           DataLoopNode::NodeConnectionType::ZoneNode,
-                                                          NodeInputManager::compFluidStream::Primary,
+                                                          NodeInputManager::CompFluidStream::Primary,
                                                           DataLoopNode::ObjectIsNotParent,
                                                           "Test zone node");
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneAirNode;
@@ -706,7 +706,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                             "SZRHspmTest",
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::NodeConnectionType::ZoneInlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent,
                                                             "Test zone inlet node");
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = zoneInletNode;

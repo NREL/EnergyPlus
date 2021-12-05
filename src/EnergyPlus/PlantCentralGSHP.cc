@@ -604,7 +604,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -614,7 +614,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -631,7 +631,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Secondary,
+                                                NodeInputManager::CompFluidStream::Secondary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -641,7 +641,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Secondary,
+                                                NodeInputManager::CompFluidStream::Secondary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -658,7 +658,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Tertiary,
+                                                NodeInputManager::CompFluidStream::Tertiary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -668,7 +668,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Tertiary,
+                                                NodeInputManager::CompFluidStream::Tertiary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,

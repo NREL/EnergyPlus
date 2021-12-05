@@ -1037,7 +1037,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
                                       AlphArray(1),
                                       DataLoopNode::NodeFluidType::Water,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      NodeInputManager::compFluidStream::Primary,
+                                      NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 // For DO Loop below -- Check for lower limit > upper limit.(invalid)
                 for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
@@ -1412,7 +1412,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
                                           DataLoopNode::NodeConnectionType::Sensor,
-                                          NodeInputManager::compFluidStream::Primary,
+                                          NodeInputManager::CompFluidStream::Primary,
                                           ObjectIsNotParent);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName =
                         state.dataIPShortCut->cAlphaArgs(CompNumA);
@@ -1424,7 +1424,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
                                           DataLoopNode::NodeConnectionType::Sensor,
-                                          NodeInputManager::compFluidStream::Primary,
+                                          NodeInputManager::CompFluidStream::Primary,
                                           ObjectIsNotParent);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate =
                         state.dataIPShortCut->rNumericArgs(CompNumN);

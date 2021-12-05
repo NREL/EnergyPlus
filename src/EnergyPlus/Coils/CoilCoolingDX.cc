@@ -148,7 +148,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    input_data.name,
                                                                    DataLoopNode::NodeFluidType::Air,
                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsNotParent);
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
                                                                     input_data.evaporator_outlet_node_name,
@@ -157,7 +157,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                     input_data.name,
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
 
     this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
@@ -167,7 +167,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    input_data.name,
                                                                    DataLoopNode::NodeFluidType::Air,
                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                    DataLoopNode::ObjectIsNotParent);
 
     // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
@@ -187,7 +187,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                     input_data.name,
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                     DataLoopNode::ObjectIsNotParent);
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {

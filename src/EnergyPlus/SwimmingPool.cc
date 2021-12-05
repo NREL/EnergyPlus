@@ -330,7 +330,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                  Alphas(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
         state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                                   Alphas(7),
@@ -339,7 +339,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                   Alphas(1),
                                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                   DataLoopNode::ObjectIsNotParent);
         if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");

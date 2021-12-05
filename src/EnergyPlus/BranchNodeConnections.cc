@@ -81,7 +81,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
                             std::string_view const ObjectType,                   // Type of object this Node is connected to (e.g. Chiller:Electric)
                             std::string_view const ObjectName,                   // Name of object this Node is connected to (e.g. MyChiller)
                             std::string_view const ConnectionType,               // Connection Type for this Node (must be valid)
-                            NodeInputManager::compFluidStream const FluidStream, // Count on Fluid Streams
+                            NodeInputManager::CompFluidStream const FluidStream, // Count on Fluid Streams
                             bool const IsParent,                                 // True when node is a parent node
                             bool &errFlag,                                       // Will be True if errors already detected or if errors found here
                             Optional_string_const InputFieldName                 // Input Field Name
@@ -209,7 +209,7 @@ void OverrideNodeConnectionType(EnergyPlusData &state,
                                 std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
                                 std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
                                 std::string const &ConnectionType, // Connection Type for this Node (must be valid)
-                                NodeInputManager::compFluidStream const FluidStream, // Count on Fluid Streams
+                                NodeInputManager::CompFluidStream const FluidStream, // Count on Fluid Streams
                                 bool const IsParent,                                 // True when node is a parent node
                                 bool &errFlag // Will be True if errors already detected or if errors found here
 )
@@ -1046,11 +1046,11 @@ void GetComponentData(EnergyPlusData &state,
                       int &NumInlets,
                       Array1D_string &InletNodeNames,
                       Array1D_int &InletNodeNums,
-                      Array1D<NodeInputManager::compFluidStream> &InletFluidStreams,
+                      Array1D<NodeInputManager::CompFluidStream> &InletFluidStreams,
                       int &NumOutlets,
                       Array1D_string &OutletNodeNames,
                       Array1D_int &OutletNodeNums,
-                      Array1D<NodeInputManager::compFluidStream> &OutletFluidStreams,
+                      Array1D<NodeInputManager::CompFluidStream> &OutletFluidStreams,
                       bool &ErrorsFound // set to true if errors found, unchanged otherwise
 )
 {
@@ -1102,10 +1102,10 @@ void GetComponentData(EnergyPlusData &state,
 
     InletNodeNames = std::string();
     InletNodeNums = 0;
-    InletFluidStreams = NodeInputManager::compFluidStream::Invalid;
+    InletFluidStreams = NodeInputManager::CompFluidStream::Invalid;
     OutletNodeNames = std::string();
     OutletNodeNums = 0;
-    OutletFluidStreams = NodeInputManager::compFluidStream::Invalid;
+    OutletFluidStreams = NodeInputManager::CompFluidStream::Invalid;
     NumInlets = 0;
     NumOutlets = 0;
     ErrInObject = false;

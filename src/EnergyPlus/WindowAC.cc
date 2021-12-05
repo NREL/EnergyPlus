@@ -333,7 +333,7 @@ namespace WindowAC {
                                                                                 Alphas(1),
                                                                                 DataLoopNode::NodeFluidType::Air,
                                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                                NodeInputManager::compFluidStream::Primary,
+                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                 ObjectIsParent);
 
             state.dataWindowAC->WindAC(WindACNum).AirOutNode = GetOnlySingleNode(state,
@@ -343,7 +343,7 @@ namespace WindowAC {
                                                                                  Alphas(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::NodeConnectionType::Outlet,
-                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
 
             state.dataWindowAC->WindAC(WindACNum).OAMixType = Alphas(5);

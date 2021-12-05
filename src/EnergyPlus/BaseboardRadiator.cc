@@ -343,7 +343,7 @@ namespace BaseboardRadiator {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsNotParent);
                 // get outlet node number
                 baseboard->Baseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
@@ -353,7 +353,7 @@ namespace BaseboardRadiator {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsNotParent);
 
                 TestCompSet(state,

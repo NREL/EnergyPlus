@@ -455,7 +455,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                        Alpha(1),
                                                        this_loop.FluidType,
                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                       NodeInputManager::compFluidStream::Primary,
+                                                       NodeInputManager::CompFluidStream::Primary,
                                                        ObjectIsParent);
         this_supply_side.NodeNumOut = GetOnlySingleNode(state,
                                                         Alpha(7),
@@ -464,7 +464,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                         Alpha(1),
                                                         this_loop.FluidType,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         ObjectIsParent);
         this_demand_side.NodeNumIn = GetOnlySingleNode(state,
                                                        Alpha(10),
@@ -473,7 +473,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                        Alpha(1),
                                                        this_loop.FluidType,
                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                       NodeInputManager::compFluidStream::Primary,
+                                                       NodeInputManager::CompFluidStream::Primary,
                                                        ObjectIsParent);
         this_demand_side.NodeNumOut = GetOnlySingleNode(state,
                                                         Alpha(11),
@@ -482,7 +482,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                         Alpha(1),
                                                         this_loop.FluidType,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         ObjectIsParent);
 
         this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumIn, localTempSetPt);
@@ -496,7 +496,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                           Alpha(1),
                                                           this_loop.FluidType,
                                                           DataLoopNode::NodeConnectionType::Sensor,
-                                                          NodeInputManager::compFluidStream::Primary,
+                                                          NodeInputManager::CompFluidStream::Primary,
                                                           ObjectIsParent);
 
         // Load the load distribution scheme.

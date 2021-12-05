@@ -301,7 +301,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(6),
@@ -310,7 +310,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -361,7 +361,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                               NodeInputManager::compFluidStream::Secondary,
+                                                                               NodeInputManager::CompFluidStream::Secondary,
                                                                                DataLoopNode::ObjectIsNotParent);
             bool Okay = true;
             OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -379,7 +379,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Air,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                NodeInputManager::compFluidStream::Secondary,
+                                                                                NodeInputManager::CompFluidStream::Secondary,
                                                                                 DataLoopNode::ObjectIsNotParent);
 
         } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -399,7 +399,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               NodeInputManager::compFluidStream::Secondary,
+                                                                               NodeInputManager::CompFluidStream::Secondary,
                                                                                DataLoopNode::ObjectIsNotParent);
 
             thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -409,7 +409,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                NodeInputManager::compFluidStream::Secondary,
+                                                                                NodeInputManager::CompFluidStream::Secondary,
                                                                                 DataLoopNode::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state,
@@ -435,7 +435,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::blank,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               NodeInputManager::compFluidStream::Secondary,
+                                                                               NodeInputManager::CompFluidStream::Secondary,
                                                                                DataLoopNode::ObjectIsNotParent);
 
             thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -445,7 +445,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::blank,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                NodeInputManager::compFluidStream::Secondary,
+                                                                                NodeInputManager::CompFluidStream::Secondary,
                                                                                 DataLoopNode::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state,
@@ -578,7 +578,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                                  NodeInputManager::compFluidStream::Tertiary,
+                                                                                  NodeInputManager::CompFluidStream::Tertiary,
                                                                                   DataLoopNode::ObjectIsNotParent);
             if (thisChiller.HeatRecInletNodeNum == 0) {
                 ShowSevereError(state,
@@ -594,7 +594,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                                                   NodeInputManager::compFluidStream::Tertiary,
+                                                                                   NodeInputManager::CompFluidStream::Tertiary,
                                                                                    DataLoopNode::ObjectIsNotParent);
             if (thisChiller.HeatRecOutletNodeNum == 0) {
                 ShowSevereError(state,
@@ -659,7 +659,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Sensor,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              DataLoopNode::ObjectIsNotParent);
                 } else {
                     thisChiller.HeatRecSetPointNodeNum = 0;

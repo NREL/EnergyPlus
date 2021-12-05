@@ -485,7 +485,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::Inlet,
-                              NodeInputManager::compFluidStream::Primary,
+                              NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode =
             GetOnlySingleNode(state,
@@ -495,7 +495,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::Outlet,
-                              NodeInputManager::compFluidStream::Primary,
+                              NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode =
             GetOnlySingleNode(state,
@@ -505,7 +505,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::Inlet,
-                              NodeInputManager::compFluidStream::Secondary,
+                              NodeInputManager::CompFluidStream::Secondary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode =
             GetOnlySingleNode(state,
@@ -515,7 +515,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::ReliefAir,
-                              NodeInputManager::compFluidStream::Secondary,
+                              NodeInputManager::CompFluidStream::Secondary,
                               ObjectIsParent);
 
         //   Check that supply air inlet node is an OA node

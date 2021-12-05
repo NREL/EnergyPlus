@@ -93,7 +93,7 @@ void GetNodeNums(EnergyPlusData &state,
                  std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
                  std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                  DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-                 compFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
+                 CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                  bool const ObjectIsParent,                                 // True/False
                  Optional_bool_const IncrementFluidStream,                  // True/False
                  Optional_string_const InputFieldName                       // Input Field Name
@@ -120,7 +120,7 @@ void GetNodeNums(EnergyPlusData &state,
     int ThisOne; // Indicator for this Name
     std::string ConnectionType;
     int Loop;
-    NodeInputManager::compFluidStream FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
+    NodeInputManager::CompFluidStream FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
 
     if (state.dataNodeInputMgr->GetNodeInputFlag) {
         GetNodeListsInput(state, ErrorsFound);
@@ -183,7 +183,7 @@ void GetNodeNums(EnergyPlusData &state,
         // If requested, assign NodeFluidStream to the first node and increment the fluid stream number
         // for each remaining node in the list
         if (present(IncrementFluidStream)) {
-            if (IncrementFluidStream) FluidStreamNum = static_cast<NodeInputManager::compFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
+            if (IncrementFluidStream) FluidStreamNum = static_cast<NodeInputManager::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
         }
         RegisterNodeConnection(state,
                                NodeNumbers(Loop),
@@ -748,7 +748,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
                       std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                       DataLoopNode::NodeFluidType const NodeFluidType,           // Fluidtype for checking/setting node FluidType
                       DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-                      compFluidStream const NodeFluidStream,                     // Which Fluid Stream
+                      CompFluidStream const NodeFluidStream,                     // Which Fluid Stream
                       bool const ObjectIsParent,                                 // True/False
                       Optional_string_const InputFieldName                       // Input Field Name
 )

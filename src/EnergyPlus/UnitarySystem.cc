@@ -3039,7 +3039,7 @@ namespace UnitarySystems {
                                                                   thisObjectName,
                                                                   DataLoopNode::NodeFluidType::Air,
                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                   DataLoopNode::ObjectIsParent);
         } else {
             this->AirInNode = UtilityRoutines::FindItemInList(loc_AirInNodeName, state.dataLoopNodes->NodeID);
@@ -3054,7 +3054,7 @@ namespace UnitarySystems {
                                                                    thisObjectName,
                                                                    DataLoopNode::NodeFluidType::Air,
                                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsParent);
         } else {
             this->AirOutNode = UtilityRoutines::FindItemInList(loc_AirOutNodeName, state.dataLoopNodes->NodeID);
@@ -5411,7 +5411,7 @@ namespace UnitarySystems {
                                                                                        thisObjectName,
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Sensor,
-                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                        DataLoopNode::ObjectIsParent);
             } else {
                 if (SetPointManager::NodeHasSPMCtrlVarType(state, this->AirOutNode, SetPointManager::CtrlVarType::Temp))
@@ -6732,7 +6732,7 @@ namespace UnitarySystems {
                                                                                thisObjectName,
                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsParent);
             } else {
                 // do nothing?
@@ -6771,7 +6771,7 @@ namespace UnitarySystems {
                                                                                        thisObjectName,
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::compFluidStream::Tertiary,
+                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 this->m_HeatRecoveryOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                         loc_heatRecoveryOutletNodeName,
@@ -6780,7 +6780,7 @@ namespace UnitarySystems {
                                                                                         thisObjectName,
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::compFluidStream::Tertiary,
+                                                                                        NodeInputManager::CompFluidStream::Tertiary,
                                                                                         DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,

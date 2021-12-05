@@ -352,7 +352,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(3));
 
@@ -363,7 +363,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(4));
 
@@ -374,7 +374,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsParent,
                                                                                   state.dataIPShortCut->cAlphaFieldNames(5));
 
@@ -385,7 +385,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Internal,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent,
                                                                                       state.dataIPShortCut->cAlphaFieldNames(6));
         // The reheat coil control node is necessary for hot water reheat, but not necessary for
@@ -589,7 +589,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(3));
 
@@ -600,7 +600,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(4));
 
@@ -611,7 +611,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsParent,
                                                                                   state.dataIPShortCut->cAlphaFieldNames(5));
 
@@ -622,7 +622,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Internal,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent,
                                                                                       state.dataIPShortCut->cAlphaFieldNames(6));
         // The reheat coil control node is necessary for hot water reheat, but not necessary for

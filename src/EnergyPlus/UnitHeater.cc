@@ -322,7 +322,7 @@ namespace UnitHeater {
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsParent);
 
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode = GetOnlySingleNode(state,
@@ -332,7 +332,7 @@ namespace UnitHeater {
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                         ObjectIsParent);
 
             // Fan information:

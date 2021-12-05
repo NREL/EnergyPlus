@@ -1518,7 +1518,7 @@ namespace PlantPipingSystemsManager {
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
@@ -1539,7 +1539,7 @@ namespace PlantPipingSystemsManager {
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
@@ -1656,7 +1656,7 @@ namespace PlantPipingSystemsManager {
                                                                            thisTrenchName,
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
@@ -1669,7 +1669,7 @@ namespace PlantPipingSystemsManager {
                                                                             thisTrenchName,
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
