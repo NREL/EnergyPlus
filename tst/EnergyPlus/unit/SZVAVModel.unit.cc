@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataPTHP->PTUnit(1) = thisUnit;
     state->dataPTHP->PTUnit(1).simASHRAEModel = true;
     state->dataPTHP->PTUnit(1).MinOATCompressorCooling = -10.0;
-    state->dataPTHP->PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::iPTHPType::PTHPUnit;
+    state->dataPTHP->PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::PTHPType::PTHPUnit;
     state->dataPTHP->PTUnit(1).FanName = "TEST FAN";
     state->dataPTHP->PTUnit(1).FanType = "Fan:OnOff";
     state->dataPTHP->PTUnit(1).DXCoolCoilName = "COOLINGCOIL";

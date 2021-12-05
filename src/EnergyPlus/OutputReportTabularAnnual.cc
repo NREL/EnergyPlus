@@ -630,7 +630,7 @@ void WriteAnnualTables(EnergyPlusData &state)
 {
     auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-        OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
+        OutputReportTabular::UnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
         if (produceDualUnitsFlags(
@@ -647,7 +647,7 @@ void WriteAnnualTables(EnergyPlusData &state)
     }
 }
 
-void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para)
+void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para)
 {
     Array1D_string columnHead;
     Array1D_int columnWidth;
@@ -714,7 +714,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsS
             curAggString = " {" + trim(curAggString) + '}';
         }
         // do the unit conversions
-        if (unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
+        if (unitsStyle == OutputReportTabular::UnitsStyle::InchPound) {
             varNameWithUnits = fldStIt->m_variMeter + unitEnumToStringBrackets(fldStIt->m_varUnits);
             OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
             OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
@@ -1030,20 +1030,20 @@ std::vector<std::string> AnnualTable::setupAggString()
     return retStringVec;
 }
 
-Real64 AnnualTable::setEnergyUnitStringAndFactor(OutputReportTabular::iUnitsStyle const unitsStyle, std::string &unitString)
+Real64 AnnualTable::setEnergyUnitStringAndFactor(OutputReportTabular::UnitsStyle const unitsStyle, std::string &unitString)
 {
     Real64 convFactor;
     // set the unit conversion
-    if (unitsStyle == OutputReportTabular::iUnitsStyle::None) {
+    if (unitsStyle == OutputReportTabular::UnitsStyle::None) {
         unitString = "J";
         convFactor = 1.0;
-    } else if (unitsStyle == OutputReportTabular::iUnitsStyle::JtoKWH) {
+    } else if (unitsStyle == OutputReportTabular::UnitsStyle::JtoKWH) {
         unitString = "kWh";
         convFactor = 1.0 / 3600000.0;
-    } else if (unitsStyle == OutputReportTabular::iUnitsStyle::JtoMJ) {
+    } else if (unitsStyle == OutputReportTabular::UnitsStyle::JtoMJ) {
         unitString = "MJ";
         convFactor = 1.0 / 1000000.0;
-    } else if (unitsStyle == OutputReportTabular::iUnitsStyle::JtoGJ) {
+    } else if (unitsStyle == OutputReportTabular::UnitsStyle::JtoGJ) {
         unitString = "GJ";
         convFactor = 1.0 / 1000000000.0;
     } else { // Should never happen but assures compilers of initialization
@@ -1190,7 +1190,7 @@ void AnnualTable::addTableOfContents(std::ostream &nameOfStream)
                  << "</a>    |   \n";
 }
 
-void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const &unitsStyle_para)
+void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::UnitsStyle const &unitsStyle_para)
 {
     std::vector<AnnualFieldSet>::iterator fldStIt;
     Real64 constexpr veryLarge = 1.0E280;
@@ -1281,7 +1281,7 @@ bool AnnualTable::allRowsSameSizeDefferedVectors(std::vector<AnnualFieldSet>::it
 
 void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
                                                 std::vector<AnnualFieldSet>::iterator fldStIt,
-                                                OutputReportTabular::iUnitsStyle const unitsStyle)
+                                                OutputReportTabular::UnitsStyle const unitsStyle)
 {
     Real64 curConversionFactor;
     Real64 curConversionOffset;
@@ -1293,7 +1293,7 @@ void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
     Real64 curIP;
     Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
     // do the unit conversions
-    if (unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
+    if (unitsStyle == OutputReportTabular::UnitsStyle::InchPound) {
         varNameWithUnits = fldStIt->m_variMeter + " [" + unitEnumToString(fldStIt->m_varUnits) + ']';
         OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
         OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);

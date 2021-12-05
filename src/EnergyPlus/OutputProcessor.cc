@@ -8345,9 +8345,9 @@ void ProduceRDDMDD(EnergyPlusData &state)
     //  IF (.not. DoReport) RETURN
 
     if (DoReport) {
-        op->ProduceReportVDD = iReportVDD::Yes;
+        op->ProduceReportVDD = ReportVDD::Yes;
         if (VarOption1 == std::string("IDF")) {
-            op->ProduceReportVDD = iReportVDD::IDF;
+            op->ProduceReportVDD = ReportVDD::IDF;
         }
         if (!VarOption2.empty()) {
             if (UtilityRoutines::SameString(VarOption2, "Name") || UtilityRoutines::SameString(VarOption2, "AscendingName")) {
@@ -8358,13 +8358,13 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
     state.files.rdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.rdd);
     state.files.mdd.ensure_open(state, "ProduceRDDMDD", state.files.outputControl.mdd);
-    if (op->ProduceReportVDD == iReportVDD::Yes) {
+    if (op->ProduceReportVDD == ReportVDD::Yes) {
         print(state.files.rdd, "Program Version,{},{}{}", state.dataStrGlobals->VerStringVar, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
 
         print(state.files.mdd, "Program Version,{},{}{}", state.dataStrGlobals->VerStringVar, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", '\n');
-    } else if (op->ProduceReportVDD == iReportVDD::IDF) {
+    } else if (op->ProduceReportVDD == ReportVDD::IDF) {
         print(state.files.rdd, "! Program Version,{},{}{}", state.dataStrGlobals->VerStringVar, state.dataStrGlobals->IDDVerString, '\n');
         print(state.files.rdd, "! Output:Variable Objects (applicable to this run){}", '\n');
 
@@ -8386,7 +8386,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
     }
 
     for (Item = 1; Item <= op->NumVariablesForOutput; ++Item) {
-        if (op->ProduceReportVDD == iReportVDD::Yes) {
+        if (op->ProduceReportVDD == ReportVDD::Yes) {
             ItemPtr = iVariableNames(Item);
             if (!op->DDVariableTypes(ItemPtr).ReportedOnDDFile) {
                 print(state.files.rdd,
@@ -8420,7 +8420,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                     op->DDVariableTypes(ItemPtr).ReportedOnDDFile = true;
                 }
             }
-        } else if (op->ProduceReportVDD == iReportVDD::IDF) {
+        } else if (op->ProduceReportVDD == ReportVDD::IDF) {
             ItemPtr = iVariableNames(Item);
             if (!op->DDVariableTypes(ItemPtr).ReportedOnDDFile) {
                 print(state.files.rdd,
@@ -8475,7 +8475,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
 
     for (Item = 1; Item <= op->NumEnergyMeters; ++Item) {
         ItemPtr = iVariableNames(Item);
-        if (op->ProduceReportVDD == iReportVDD::Yes) {
+        if (op->ProduceReportVDD == ReportVDD::Yes) {
             print(state.files.mdd,
                   "Zone,Meter,{}{}{}",
                   op->EnergyMeters(ItemPtr).Name,
@@ -8483,7 +8483,7 @@ void ProduceRDDMDD(EnergyPlusData &state)
                   '\n');
             state.dataResultsFramework->resultsFramework->MDD.push_back("Zone,Meter," + op->EnergyMeters(ItemPtr).Name +
                                                                         unitEnumToStringBrackets(op->EnergyMeters(ItemPtr).Units));
-        } else if (op->ProduceReportVDD == iReportVDD::IDF) {
+        } else if (op->ProduceReportVDD == ReportVDD::IDF) {
             print(state.files.mdd,
                   "Output:Meter,{},hourly; !-{}{}",
                   op->EnergyMeters(ItemPtr).Name,

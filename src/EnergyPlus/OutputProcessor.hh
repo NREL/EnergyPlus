@@ -96,7 +96,7 @@ namespace OutputProcessor {
     };
     static constexpr std::array<std::string_view, (int)SOVStoreType::Num> sovStoreTypeStrings = {"State", "NonState", "Summed", "Average"};
 
-    enum class iReportVDD
+    enum class ReportVDD
     {
         Invalid = -1,
         No,  // Don't report the variable dictionaries in any form
@@ -1042,7 +1042,7 @@ struct OutputProcessorData : BaseGlobalStruct
     int NumOfIVariable = 0;
     int MaxIVariable = 0;
     bool OutputInitialized = false;
-    OutputProcessor::iReportVDD ProduceReportVDD = OutputProcessor::iReportVDD::No;
+    OutputProcessor::ReportVDD ProduceReportVDD = OutputProcessor::ReportVDD::No;
     int NumHoursInMonth = 0;
     int NumHoursInSim = 0;
     Array1D_int ReportList;
@@ -1139,7 +1139,7 @@ struct OutputProcessorData : BaseGlobalStruct
         this->NumOfIVariable = 0;
         this->MaxIVariable = 0;
         this->OutputInitialized = false;
-        this->ProduceReportVDD = OutputProcessor::iReportVDD::No;
+        this->ProduceReportVDD = OutputProcessor::ReportVDD::No;
         this->NumHoursInMonth = 0;
         this->NumHoursInSim = 0;
         this->ReportList.deallocate();

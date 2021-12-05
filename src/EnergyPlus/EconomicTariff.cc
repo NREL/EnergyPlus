@@ -4193,7 +4193,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
     // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
     // when ort->unitsStyle inputs should have been concretely processed and assigned.
     // Included this here to make sure the units specifications are correctly updated.
-    if (state.dataOutRptTab->unitsStyle_SQLite == OutputReportTabular::iUnitsStyle::NotFound) {
+    if (state.dataOutRptTab->unitsStyle_SQLite == OutputReportTabular::UnitsStyle::NotFound) {
         state.dataOutRptTab->unitsStyle_SQLite = state.dataOutRptTab->unitsStyle; // This is the default UseOutputControlTableStyles
     }
 
@@ -4214,7 +4214,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             WriteReportHeaders(state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-                OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
+                OutputReportTabular::UnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
                 bool produceTabular = true;
                 bool produceSQLite = false;
                 if (produceDualUnitsFlags(iUnitSystem,
@@ -4226,7 +4226,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                     break;
 
                 // do unit conversions if necessary
-                if (unitsStyle_cur == OutputReportTabular::iUnitsStyle::InchPound) {
+                if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound) {
                     SIunit = "[~~$~~/m2]";
                     LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
                     perAreaUnitConv = ConvertIP(state, unitConvIndex, 1.0);

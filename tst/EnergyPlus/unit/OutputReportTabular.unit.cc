@@ -107,12 +107,12 @@ using namespace SimulationManager;
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmSetUnitsStyleFromString)
 {
 
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::None, SetUnitsStyleFromString("None")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND")));
-    EXPECT_TRUE(compare_enums(OutputReportTabular::iUnitsStyle::NotFound, SetUnitsStyleFromString("qqq")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::None, SetUnitsStyleFromString("None")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoKWH, SetUnitsStyleFromString("JTOKWH")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoMJ, SetUnitsStyleFromString("JTOMJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::JtoGJ, SetUnitsStyleFromString("JTOGJ")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::InchPound, SetUnitsStyleFromString("INCHPOUND")));
+    EXPECT_TRUE(compare_enums(OutputReportTabular::UnitsStyle::NotFound, SetUnitsStyleFromString("qqq")));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_Basic)
@@ -206,7 +206,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_unitsFromHeading)
     Real64 curConversionOffset;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
 
     unitString = "";
     EXPECT_EQ(97, unitsFromHeading(*state, unitString));
@@ -6809,7 +6809,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test
     compLoad.airflowPerTotCap = 0.2;
     compLoad.totCapPerArea = 0.15;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
     Real64 powerConversion = getSpecificUnitMultiplier(*state, "W", "Btu/h");
     Real64 areaConversion = getSpecificUnitMultiplier(*state, "m2", "ft2");
     Real64 airFlowConversion = getSpecificUnitMultiplier(*state, "m3/s", "ft3/min");
@@ -7025,8 +7025,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     OutputReportTabular::SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     // We ask for the air loop component load summary since that's the one we test
     // We also ask for the zone component load summary because that's necessary to "copy" the load and trigger a potential double conversion
@@ -7375,8 +7375,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil with 10000W cooling";
@@ -7434,8 +7434,8 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::InchPound;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil";
@@ -7872,8 +7872,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
     state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
 
     // Now we're ready to call the actual function of interest
     OutputReportTabular::WriteSourceEnergyEndUseSummary(*state);
@@ -7936,8 +7936,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
 
     // Needed to avoid crash (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject(*state);
@@ -8607,7 +8607,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8629,7 +8629,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout2.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::InchPound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8651,7 +8651,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
     state->dataStrGlobals->outputSqliteErrFilePath = "eplusout3.sql";
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::None));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8674,7 +8674,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8698,7 +8698,7 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound));
+    EXPECT_TRUE(compare_enums(state->dataOutRptTab->unitsStyle_SQLite, UnitsStyle::NotFound));
     ASSERT_NE(state->dataSQLiteProcedures->sqlite.get(), nullptr);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite(), true);
@@ -8723,8 +8723,8 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     state->dataHeatBal->BuildingPreDefRep.emiTotHeat = 4000.00;        // * energyconversion, 2);
 
     // Test Combination 0: GJ
-    state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoGJ;
-    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::JtoGJ;
+    state->dataOutRptTab->unitsStyle = UnitsStyle::JtoGJ;
+    state->dataOutRptTab->unitsStyle_SQLite = UnitsStyle::JtoGJ;
     Real64 energyconversion = 1.0;
 
     WriteHeatEmissionTable(*state);
@@ -8778,8 +8778,8 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     }
 
     // Test Combination 1: None
-    state->dataOutRptTab->unitsStyle = iUnitsStyle::None;
-    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::None;
+    state->dataOutRptTab->unitsStyle = UnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = UnitsStyle::None;
     energyconversion = 1.0;
 
     WriteHeatEmissionTable(*state);
@@ -8833,8 +8833,8 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
     }
 
     // Test Combination 2:
-    state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = UnitsStyle::InchPound;
 
     // Test 2.5:
     // Actually here is an additonal test unit for the getSpecificUnitDivider:
@@ -9026,8 +9026,8 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;
     Real64 eleckWh = 1e4;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetupUnitConversions(*state);
     Real64 largeConv = getSpecificUnitDivider(*state, "J", "kBtu");
@@ -9106,7 +9106,7 @@ TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
     compLoad.airflowPerTotCap = 0.2;
     compLoad.totCapPerArea = 0.15;
 
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
     Real64 powerConversion = getSpecificUnitMultiplier(*state, "W", "Btu/h");
     Real64 areaConversion = getSpecificUnitMultiplier(*state, "m2", "ft2");
     Real64 airFlowConversion = getSpecificUnitMultiplier(*state, "m3/s", "ft3/min");
@@ -9200,8 +9200,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
     state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::None;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetupUnitConversions(*state);
     Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
@@ -9396,8 +9396,8 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(3).ExteriorTotalGroundSurfArea = 0;
     state->dataHeatBal->Zone(3).ExtWindowArea = 0.0;
 
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::None;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::None;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
 
     SetupUnitConversions(*state);
     Real64 areaConv = getSpecificUnitDivider(*state, "m2", "ft2");
@@ -9554,8 +9554,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     state->dataOutRptTab->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
-    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
     Real64 enerConv = getSpecificUnitDivider(*state, "GJ", "kBtu"); // 948.45
     EXPECT_NEAR(1.0 / enerConv, 948.0, 0.5);
 
@@ -9862,13 +9862,13 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 
     auto &ort(state->dataOutRptTab);
     ort->numStyles = 1;
-    ort->TableStyle(1) = OutputReportTabular::iTableStyle::HTML;
+    ort->TableStyle(1) = OutputReportTabular::TableStyle::HTML;
     ort->del(1) = DataStringGlobals::CharSpace; // space - this is not used much for HTML output
 
     ort->WriteTabularFiles = true;
 
     SetupUnitConversions(*state);
-    ort->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
+    ort->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
 
     SetPredefinedTables(*state);
     std::string CompName = "My Coil <coil is DX>";
