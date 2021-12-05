@@ -265,7 +265,7 @@ namespace SetPointManager {
     {
         std::string Name;
         CtrlVarType CtrlTypeMode; // set to CtrlVarType::*
-        std::string CtrlVarType;
+        std::string ctrlVarType;
         SPBase() : CtrlTypeMode(CtrlVarType::Unknown)
         {
         }
