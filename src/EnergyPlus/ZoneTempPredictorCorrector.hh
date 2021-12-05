@@ -70,9 +70,9 @@ struct EnergyPlusData;
 
 namespace ZoneTempPredictorCorrector {
 
-    // iZControlTypes
+    // ZoneControlTypes
 
-    enum class ZControlTypes
+    enum class ZoneControlTypes
     {
         Invalid = -1,
         TStat = 1,

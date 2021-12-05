@@ -4613,12 +4613,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 Subcooler(SubcoolerNum).Name = Alphas(1);
 
                 // Get subcooler type
-                Subcooler(SubcoolerNum).SubcoolerType = iSubcoolerType::LiquidSuction; // default subcooler type
-                if (UtilityRoutines::SameString(Alphas(2), "Mechanical")) {            // set subcooler type
-                    Subcooler(SubcoolerNum).SubcoolerType = iSubcoolerType::Mechanical;
+                Subcooler(SubcoolerNum).subcoolerType = SubcoolerType::LiquidSuction; // default subcooler type
+                if (UtilityRoutines::SameString(Alphas(2), "Mechanical")) {           // set subcooler type
+                    Subcooler(SubcoolerNum).subcoolerType = SubcoolerType::Mechanical;
                     ++state.dataRefrigCase->NumSimulationMechSubcoolers;
                 } else if (UtilityRoutines::SameString(Alphas(2), "LiquidSuction")) {
-                    Subcooler(SubcoolerNum).SubcoolerType = iSubcoolerType::LiquidSuction;
+                    Subcooler(SubcoolerNum).subcoolerType = SubcoolerType::LiquidSuction;
                 } else {
                     ShowSevereError(state,
                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\", " +
@@ -4628,9 +4628,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 } // Set Subcooler Type
 
                 {
-                    auto const SELECT_CASE_var(Subcooler(SubcoolerNum).SubcoolerType);
+                    auto const SELECT_CASE_var(Subcooler(SubcoolerNum).subcoolerType);
 
-                    if (SELECT_CASE_var == iSubcoolerType::LiquidSuction) {
+                    if (SELECT_CASE_var == SubcoolerType::LiquidSuction) {
                         Subcooler(SubcoolerNum).LiqSuctDesignDelT = 10.0; // default value
                         if (!lNumericBlanks(1)) Subcooler(SubcoolerNum).LiqSuctDesignDelT = Numbers(1);
                         if (Subcooler(SubcoolerNum).LiqSuctDesignDelT < 0.0) {
@@ -4664,7 +4664,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                             ErrorsFound = true;
                         } // error check
 
-                    } else if (SELECT_CASE_var == iSubcoolerType::Mechanical) {
+                    } else if (SELECT_CASE_var == SubcoolerType::Mechanical) {
                         Subcooler(SubcoolerNum).MechSourceSys = Alphas(3);
                         // Error check on system name comes later after systems have been read
 
@@ -5243,9 +5243,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
             AlphaNum = 7;
             if (!lAlphaBlanks(AlphaNum)) {
                 if (UtilityRoutines::SameString(Alphas(AlphaNum), "ConstantSuctionTemperature")) {
-                    System(RefrigSysNum).CompSuctControl = iCompSuctionPressureCtrl::ConstantSuctionTemperature;
+                    System(RefrigSysNum).CompSuctControl = CompressorSuctionPressureCtrl::ConstantSuctionTemperature;
                 } else if (UtilityRoutines::SameString(Alphas(AlphaNum), "FloatSuctionTemperature")) {
-                    System(RefrigSysNum).CompSuctControl = iCompSuctionPressureCtrl::FloatSuctionTemperature;
+                    System(RefrigSysNum).CompSuctControl = CompressorSuctionPressureCtrl::FloatSuctionTemperature;
                     if (System(RefrigSysNum).CoilFlag) {
                         ShowWarningError(state,
                                          CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
@@ -5259,7 +5259,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else {
-                System(RefrigSysNum).CompSuctControl = iCompSuctionPressureCtrl::ConstantSuctionTemperature; // Default for blank
+                System(RefrigSysNum).CompSuctControl = CompressorSuctionPressureCtrl::ConstantSuctionTemperature; // Default for blank
             }
 
             // Count subcoolers on system and allocate
@@ -5620,7 +5620,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
     // System%NumMechSCServed=0
     if (state.dataRefrigCase->NumSimulationSubcoolers > 0) {
         for (int SubcoolerNum = 1; SubcoolerNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolerNum) {
-            if (Subcooler(SubcoolerNum).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
+            if (Subcooler(SubcoolerNum).subcoolerType == SubcoolerType::LiquidSuction) continue;
             Subcooler(SubcoolerNum).MechSourceSysID =
                 state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Refrigeration:System", Subcooler(SubcoolerNum).MechSourceSys);
             if (Subcooler(SubcoolerNum).MechSourceSysID == 0) {
@@ -5643,7 +5643,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
         for (RefrigSysNum = 1; RefrigSysNum <= state.dataRefrigCase->NumRefrigSystems; ++RefrigSysNum) {
             for (int SubcoolerNum = 1; SubcoolerNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolerNum) {
-                if (Subcooler(SubcoolerNum).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
+                if (Subcooler(SubcoolerNum).subcoolerType == SubcoolerType::LiquidSuction) continue;
                 if (Subcooler(SubcoolerNum).MechSourceSysID == RefrigSysNum) {
                     ++System(RefrigSysNum).NumMechSCServed;
                 }
@@ -8971,7 +8971,7 @@ void SetupReportInput(EnergyPlusData &state)
             for (int subcoolNum = 1; subcoolNum <= state.dataRefrigCase->NumSimulationSubcoolers; ++subcoolNum) {
                 // CurrentModuleObject='Refrigeration:Subcooler'
                 if (Subcooler(subcoolNum).CoilFlag) { // Subcooler serving system with chillers on HVAC time step
-                    if (Subcooler(subcoolNum).SubcoolerType == iSubcoolerType::Mechanical) {
+                    if (Subcooler(subcoolNum).subcoolerType == SubcoolerType::Mechanical) {
                         SetupOutputVariable(state,
                                             "Refrigeration Air Chiller System Mechanical Subcooler Heat Transfer Rate",
                                             OutputProcessor::Unit::W,
@@ -8988,7 +8988,7 @@ void SetupReportInput(EnergyPlusData &state)
                                             Subcooler(subcoolNum).Name);
                     }
                 } else { // Subcooler on system serving cases and/or walkins
-                    if (Subcooler(subcoolNum).SubcoolerType == iSubcoolerType::Mechanical) {
+                    if (Subcooler(subcoolNum).subcoolerType == SubcoolerType::Mechanical) {
                         SetupOutputVariable(state,
                                             "Refrigeration System Mechanical Subcooler Heat Transfer Rate",
                                             OutputProcessor::Unit::W,
@@ -11164,7 +11164,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                     //  Tevap needed is either fixed at this design value,
                     //  or allowed to float to meet lowest T needed among all loads served by the system
                     //  (Floating Tevap = Design Tevap unless load <= Design cap)
-                    if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
+                    if (System(SysNum).CompSuctControl == CompressorSuctionPressureCtrl::ConstantSuctionTemperature) {
                         System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                     } else { // calculate floating T evap
                         Real64 LoadFrac = min(1.0, (RefrigCase(CaseID).TotalCoolingLoad / RefrigCase(CaseID).DesignRatedCap));
@@ -11188,7 +11188,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                 for (int WalkInIndex = 1; WalkInIndex <= System(SysNum).NumWalkIns; ++WalkInIndex) {
                     int WalkInID = System(SysNum).WalkInNum(WalkInIndex);
                     WalkIn(WalkInID).CalculateWalkIn(state);
-                    if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
+                    if (System(SysNum).CompSuctControl == CompressorSuctionPressureCtrl::ConstantSuctionTemperature) {
                         System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                     } else { // calculate floating T evap
                         Real64 LoadFrac = min(1.0, (WalkIn(WalkInID).TotalCoolingLoad / WalkIn(WalkInID).DesignRatedCap));
@@ -11212,7 +11212,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                 for (int CoilIndex = 1; CoilIndex <= System(SysNum).NumCoils; ++CoilIndex) {
                     int CoilID = System(SysNum).CoilNum(CoilIndex);
                     // already CALLed CalculateCoil(CoilID) in CoilSet specified order
-                    if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
+                    if (System(SysNum).CompSuctControl == CompressorSuctionPressureCtrl::ConstantSuctionTemperature) {
                         System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                     } else { // calculate floating T evap
                         // for now, override floating Tevap if coils on system, warning was printed in input to let user know
@@ -11228,7 +11228,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                 for (int SecondIndex = 1; SecondIndex <= System(SysNum).NumSecondarys; ++SecondIndex) {
                     int SecondID = System(SysNum).SecondaryNum(SecondIndex);
                     Secondary(SecondID).CalculateSecondary(state, SecondID);
-                    if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
+                    if (System(SysNum).CompSuctControl == CompressorSuctionPressureCtrl::ConstantSuctionTemperature) {
                         System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                     } else { // check for lowest T evap design among the secondary systems and
                         //  Compare Tevap for this second to max allowed for cases, walk ins, and
@@ -11298,7 +11298,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                 if ((state.dataRefrigCase->NumSimulationMechSubcoolers > 0) && (!FirstSCLoop)) {
                     // This loop places load on system providing mechanical subcooling
                     for (int SubcoolID = 1; SubcoolID <= state.dataRefrigCase->NumSimulationSubcoolers; ++SubcoolID) {
-                        if (Subcooler(SubcoolID).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
+                        if (Subcooler(SubcoolID).subcoolerType == SubcoolerType::LiquidSuction) continue;
                         if (Subcooler(SubcoolID).MechSourceSysID != SysNum) continue;
                         // don't have summechscload until second subcooler pass, set to zero on first pass
                         System(SysNum).SumMechSCLoad += System(SysNum).MechSCLoad(SubcoolID);
@@ -11314,7 +11314,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                     if (System(SysNum).NumSubcoolers > 0) {
                         for (int SubcoolerIndex = 1; SubcoolerIndex <= System(SysNum).NumSubcoolers; ++SubcoolerIndex) {
                             int SubcoolID = System(SysNum).SubcoolerNum(SubcoolerIndex);
-                            if (Subcooler(SubcoolID).SubcoolerType == iSubcoolerType::LiquidSuction) continue;
+                            if (Subcooler(SubcoolID).subcoolerType == SubcoolerType::LiquidSuction) continue;
                             System(SysNum).SumMechSCBenefit = Subcooler(SubcoolID).MechSCTransLoad;
                         } // subcoolerindex
                     }     // System(sysid)%numsubcoolers > 0
@@ -11325,7 +11325,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                 if ((System(SysNum).NumCascadeLoads > 0) && (!FirstSCLoop)) {
                     for (int CascadeLoadIndex = 1; CascadeLoadIndex <= System(SysNum).NumCascadeLoads; ++CascadeLoadIndex) {
                         int CascadeLoadID = System(SysNum).CascadeLoadNum(CascadeLoadIndex);
-                        if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
+                        if (System(SysNum).CompSuctControl == CompressorSuctionPressureCtrl::ConstantSuctionTemperature) {
                             System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                         } else { // check for lowest T evap design among the CascadeLoad systems and
                             //  Compare Tevap for this Cascade to max allowed for cases, walk ins, and
@@ -11407,7 +11407,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                         for (int CoilIndex = 1; CoilIndex <= System(SysNum).NumCoils; ++CoilIndex) {
                             int CoilID = System(SysNum).CoilNum(CoilIndex);
                             // already CALLed CalculateCoil(CoilID) in CoilSet specified order
-                            if (System(SysNum).CompSuctControl == iCompSuctionPressureCtrl::ConstantSuctionTemperature) {
+                            if (System(SysNum).CompSuctControl == CompressorSuctionPressureCtrl::ConstantSuctionTemperature) {
                                 System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
                             } else { // calculate floating T evap
                                 System(SysNum).TEvapNeeded = System(SysNum).TEvapDesign;
@@ -13323,11 +13323,11 @@ void RefrigSystemData::CalculateSubcoolers(EnergyPlusData &state)
         } // NumStages and IntercoolerType
 
         {
-            auto const SELECT_CASE_var(Subcooler(SubcoolerID).SubcoolerType);
+            auto const SELECT_CASE_var(Subcooler(SubcoolerID).subcoolerType);
             // Mechanical subcoolers required to come first in order to take advantage of delT
             //  from lshx. taken care of because subcooler ID assigned in that order in input.
 
-            if (SELECT_CASE_var == iSubcoolerType::Mechanical) {
+            if (SELECT_CASE_var == SubcoolerType::Mechanical) {
                 Real64 mechSCLoad = this->RefMassFlowtoLoads * CpLiquid * (TLiqInActualLocal - ControlTLiqOut);
                 this->HCaseIn -= CpLiquid * (TLiqInActualLocal - ControlTLiqOut);
                 // refrigeration benefit to System(sysnum)
@@ -13340,7 +13340,7 @@ void RefrigSystemData::CalculateSubcoolers(EnergyPlusData &state)
                 TLiqInActualLocal = ControlTLiqOut;
                 this->TCompIn = this->TEvapNeeded + CaseSuperheat;
 
-            } else if (SELECT_CASE_var == iSubcoolerType::LiquidSuction) {
+            } else if (SELECT_CASE_var == SubcoolerType::LiquidSuction) {
                 Real64 LSHXeffectiveness = DelTLiqDes / (TLiqInDes - TVapInDes);
                 Real64 TVapInActual = this->TEvapNeeded + CaseSuperheat;
                 Real64 DelTempActual = LSHXeffectiveness * (TLiqInActualLocal - TVapInActual);
@@ -13844,8 +13844,8 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
             for (int SubcoolerNum = 1; SubcoolerNum <= System(SystemNum).NumSubcoolers; ++SubcoolerNum) {
                 int SubcoolerID = System(SystemNum).SubcoolerNum(SubcoolerNum);
                 {
-                    auto const SELECT_CASE_var(Subcooler(SubcoolerID).SubcoolerType);
-                    if (SELECT_CASE_var == iSubcoolerType::LiquidSuction) {
+                    auto const SELECT_CASE_var(Subcooler(SubcoolerID).subcoolerType);
+                    if (SELECT_CASE_var == SubcoolerType::LiquidSuction) {
                         print(state.files.eio,
                               "   Refrigeration Liquid Suction Subcooler,{},{},{:.1R},{:.1R},{:.1R}\n",
                               SubcoolerID,
@@ -13853,7 +13853,7 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
                               Subcooler(SubcoolerID).LiqSuctDesignDelT,
                               Subcooler(SubcoolerID).LiqSuctDesignTliqIn,
                               Subcooler(SubcoolerID).LiqSuctDesignTvapIn);
-                    } else if (SELECT_CASE_var == iSubcoolerType::Mechanical) {
+                    } else if (SELECT_CASE_var == SubcoolerType::Mechanical) {
                         print(state.files.eio,
                               "   Refrigeration Mechanical Subcooler,{},{},{},{:.1R}\n",
                               SubcoolerID,

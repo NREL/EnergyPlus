@@ -77,7 +77,7 @@ namespace PipeHeatTransfer {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    enum class iEnvrnPtr
+    enum class EnvrnPtr
     {
         Invalid = -1,
         None,
@@ -116,7 +116,7 @@ namespace PipeHeatTransfer {
         DataPlant::PlantEquipmentType Type; // Type of pipe
         // derived data
         int ConstructionNum; // construction ref number
-        iEnvrnPtr EnvironmentPtr;
+        EnvrnPtr EnvironmentPtr;
         int EnvrSchedPtr;              // pointer to schedule used to set environmental temp
         int EnvrVelSchedPtr;           // pointer to schedule used to set environmental temp
         int EnvrZonePtr;               // pointer to zone number used to set environmental temp
@@ -200,7 +200,7 @@ namespace PipeHeatTransfer {
         // Default Constructor
         PipeHTData()
             : Length(0.0), PipeID(0.0), InletNodeNum(0), OutletNodeNum(0), Type(DataPlant::PlantEquipmentType::Invalid), ConstructionNum(0),
-              EnvironmentPtr(iEnvrnPtr::None), EnvrSchedPtr(0), EnvrVelSchedPtr(0), EnvrZonePtr(0), EnvrAirNodeNum(0), NumSections(0),
+              EnvironmentPtr(EnvrnPtr::None), EnvrSchedPtr(0), EnvrVelSchedPtr(0), EnvrZonePtr(0), EnvrAirNodeNum(0), NumSections(0),
               FluidSpecHeat(0.0), FluidDensity(0.0), MaxFlowRate(0.0), InsideArea(0.0), OutsideArea(0.0), SectionArea(0.0), PipeHeatCapacity(0.0),
               PipeOD(0.0), PipeCp(0.0), PipeDensity(0.0), PipeConductivity(0.0), InsulationOD(0.0), InsulationCp(0.0), InsulationDensity(0.0),
               InsulationConductivity(0.0), InsulationThickness(0.0), InsulationResistance(0.0), CurrentSimTime(0.0), PreviousSimTime(0.0),

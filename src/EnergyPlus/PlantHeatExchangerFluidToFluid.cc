@@ -293,19 +293,19 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             }
 
             if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowBothUnMixed")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowBothUnMixed;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CrossFlowBothUnMixed;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowBothMixed")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowBothMixed;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CrossFlowBothMixed;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowSupplyMixedDemandUnMixed")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CrossFlowSupplyUnMixedDemandMixed")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "CounterFlow")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::CounterFlow;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::CounterFlow;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "ParallelFlow")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::ParallelFlow;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::ParallelFlow;
             } else if (UtilityRoutines::SameString(cAlphaArgs(7), "Ideal")) {
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = iFluidHXType::Ideal;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType = FluidHXType::Ideal;
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
@@ -318,7 +318,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                     state.dataPlantHXFluidToFluid->FluidHX(CompLoop).UAWasAutoSized = true;
                 }
             } else {
-                if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType != iFluidHXType::Ideal) {
+                if (state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatExchangeModelType != FluidHXType::Ideal) {
                     ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid entry.");
                     ShowContinueError(state, "Missing entry for " + cNumericFieldNames(3));
                     ErrorsFound = true;
@@ -1016,7 +1016,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                                                RoutineName);
                             Real64 TargetLeavingTemp = this->SupplySideLoop.InletTemp - std::abs(MyLoad) / (cp * mdotSupSide);
 
-                            this->findDemandSideLoopFlow(state, TargetLeavingTemp, iHXAction::CoolingSupplySideLoop);
+                            this->findDemandSideLoopFlow(state, TargetLeavingTemp, HXAction::CoolingSupplySideLoop);
                         } else { // no flow on supply side so do not request flow on demand side
                             mdotDmdSide = 0.0;
                             PlantUtilities::SetComponentFlowRate(state,
@@ -1075,7 +1075,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                                                RoutineName);
                             Real64 TargetLeavingTemp = this->SupplySideLoop.InletTemp + std::abs(MyLoad) / (cp * mdotSupSide);
 
-                            this->findDemandSideLoopFlow(state, TargetLeavingTemp, iHXAction::HeatingSupplySideLoop);
+                            this->findDemandSideLoopFlow(state, TargetLeavingTemp, HXAction::HeatingSupplySideLoop);
                         } else { // no flow on supply side so do not request flow on demand side
                             mdotDmdSide = 0.0;
                             PlantUtilities::SetComponentFlowRate(state,
@@ -1287,7 +1287,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
 
                     Real64 TargetLeavingTemp = SetPointTemp;
-                    this->findDemandSideLoopFlow(state, TargetLeavingTemp, iHXAction::HeatingSupplySideLoop);
+                    this->findDemandSideLoopFlow(state, TargetLeavingTemp, HXAction::HeatingSupplySideLoop);
                 } else {
                     mdotDmdSide = 0.0;
                     PlantUtilities::SetComponentFlowRate(state,
@@ -1402,7 +1402,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
                     Real64 TargetLeavingTemp = SetPointTemp;
-                    this->findDemandSideLoopFlow(state, TargetLeavingTemp, iHXAction::CoolingSupplySideLoop);
+                    this->findDemandSideLoopFlow(state, TargetLeavingTemp, HXAction::CoolingSupplySideLoop);
                 } else {
                     mdotDmdSide = 0.0;
                     PlantUtilities::SetComponentFlowRate(state,
@@ -1520,7 +1520,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
                     Real64 TargetLeavingTemp = SetPointTempHi;
-                    this->findDemandSideLoopFlow(state, TargetLeavingTemp, iHXAction::CoolingSupplySideLoop);
+                    this->findDemandSideLoopFlow(state, TargetLeavingTemp, HXAction::CoolingSupplySideLoop);
                 } else {
                     mdotDmdSide = 0.0;
                     PlantUtilities::SetComponentFlowRate(state,
@@ -1545,7 +1545,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
                     Real64 TargetLeavingTemp = SetPointTempLo;
-                    this->findDemandSideLoopFlow(state, TargetLeavingTemp, iHXAction::HeatingSupplySideLoop);
+                    this->findDemandSideLoopFlow(state, TargetLeavingTemp, HXAction::HeatingSupplySideLoop);
                 } else {
                     mdotDmdSide = 0.0;
                     PlantUtilities::SetComponentFlowRate(state,
@@ -1880,7 +1880,7 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
         switch (this->HeatExchangeModelType) {
 
-        case iFluidHXType::CrossFlowBothUnMixed: {
+        case FluidHXType::CrossFlowBothUnMixed: {
             Real64 NTU = this->UA / MinCapRate;
             Real64 CapRatio = MinCapRate / MaxCapRate;
             Real64 ExpCheckValue1 = std::pow(NTU, 0.22) / CapRatio;
@@ -1899,7 +1899,7 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
             break;
         }
-        case iFluidHXType::CrossFlowBothMixed: {
+        case FluidHXType::CrossFlowBothMixed: {
             Real64 NTU = this->UA / MinCapRate;
             Real64 CapRatio = MinCapRate / MaxCapRate;
             Real64 ExpCheckValue1 = -CapRatio * NTU;
@@ -1923,17 +1923,17 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
             break;
         }
-        case iFluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed:
-        case iFluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed: {
+        case FluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed:
+        case FluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed: {
 
             int CrossFlowEquation;
-            if (SupSideCapRate == MaxCapRate && this->HeatExchangeModelType == iFluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed) {
+            if (SupSideCapRate == MaxCapRate && this->HeatExchangeModelType == FluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed) {
                 CrossFlowEquation = CmaxMixedCminUnmixed;
-            } else if (SupSideCapRate == MinCapRate && this->HeatExchangeModelType == iFluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed) {
+            } else if (SupSideCapRate == MinCapRate && this->HeatExchangeModelType == FluidHXType::CrossFlowSupplyLoopMixedDemandLoopUnMixed) {
                 CrossFlowEquation = CmaxUnMixedCminMixed;
-            } else if (DmdSideCapRate == MaxCapRate && this->HeatExchangeModelType == iFluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed) {
+            } else if (DmdSideCapRate == MaxCapRate && this->HeatExchangeModelType == FluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed) {
                 CrossFlowEquation = CmaxMixedCminUnmixed;
-            } else if (DmdSideCapRate == MinCapRate && this->HeatExchangeModelType == iFluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed) {
+            } else if (DmdSideCapRate == MinCapRate && this->HeatExchangeModelType == FluidHXType::CrossFlowSupplyLoopUnMixedDemandLoopMixed) {
                 CrossFlowEquation = CmaxUnMixedCminMixed;
             } else {
                 CrossFlowEquation = CmaxMixedCminUnmixed;
@@ -1985,7 +1985,7 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
             break;
         }
-        case iFluidHXType::CounterFlow: {
+        case FluidHXType::CounterFlow: {
             Real64 NTU = this->UA / MinCapRate;
             Real64 CapRatio = MinCapRate / MaxCapRate;
             Real64 ExpCheckValue1 = -NTU * (1.0 - CapRatio);
@@ -2010,7 +2010,7 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
             break;
         }
-        case iFluidHXType::ParallelFlow: {
+        case FluidHXType::ParallelFlow: {
             Real64 NTU = this->UA / MinCapRate;
             Real64 CapRatio = MinCapRate / MaxCapRate;
             Real64 ExpCheckValue1 = -NTU * (1.0 + CapRatio);
@@ -2028,7 +2028,7 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
             break;
         }
-        case iFluidHXType::Ideal: {
+        case FluidHXType::Ideal: {
             this->Effectiveness = 1.0;
             break;
         }
@@ -2073,7 +2073,7 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
     }
 }
 
-void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 const TargetSupplySideLoopLeavingTemp, iHXAction const HXActionMode)
+void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 const TargetSupplySideLoopLeavingTemp, HXAction const HXActionMode)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2111,7 +2111,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
 
     switch (HXActionMode) {
 
-    case iHXAction::HeatingSupplySideLoop: {
+    case HXAction::HeatingSupplySideLoop: {
         if ((LeavingTempFullFlow > TargetSupplySideLoopLeavingTemp) && (TargetSupplySideLoopLeavingTemp > LeavingTempMinFlow)) {
             // need to solve
             Par(2) = TargetSupplySideLoopLeavingTemp;
@@ -2191,7 +2191,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
         }
         break;
     }
-    case iHXAction::CoolingSupplySideLoop: {
+    case HXAction::CoolingSupplySideLoop: {
         if ((LeavingTempFullFlow < TargetSupplySideLoopLeavingTemp) && (TargetSupplySideLoopLeavingTemp < LeavingTempMinFlow)) {
             // need to solve
             Par(2) = TargetSupplySideLoopLeavingTemp;

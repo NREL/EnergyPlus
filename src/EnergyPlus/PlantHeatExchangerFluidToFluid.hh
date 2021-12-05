@@ -65,7 +65,7 @@ struct EnergyPlusData;
 
 namespace PlantHeatExchangerFluidToFluid {
 
-    enum class iFluidHXType
+    enum class FluidHXType
     {
         Invalid = -1,
         CrossFlowBothUnMixed,
@@ -105,7 +105,7 @@ namespace PlantHeatExchangerFluidToFluid {
         Num
     };
 
-    enum class iHXAction
+    enum class HXAction
     {
         Invalid = -1,
         HeatingSupplySideLoop,
@@ -155,7 +155,7 @@ namespace PlantHeatExchangerFluidToFluid {
         // Members
         std::string Name;
         int AvailSchedNum;
-        iFluidHXType HeatExchangeModelType;
+        FluidHXType HeatExchangeModelType;
         Real64 UA;
         bool UAWasAutoSized; // true is UA was autosized on input
         ControlType controlMode;
@@ -186,7 +186,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Default Constructor
         HeatExchangerStruct()
-            : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Invalid), UA(0.0), UAWasAutoSized(false), controlMode(ControlType::Invalid),
+            : AvailSchedNum(0), HeatExchangeModelType(FluidHXType::Invalid), UA(0.0), UAWasAutoSized(false), controlMode(ControlType::Invalid),
               SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(CtrlTempType::Invalid), MinOperationTemp(-99999.0),
               MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
               HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
@@ -218,7 +218,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void control(EnergyPlusData &state, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
 
-        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, iHXAction HXActionMode);
+        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, HXAction HXActionMode);
 
         Real64 demandSideFlowResidual(EnergyPlusData &state,
                                       Real64 DmdSideMassFlowRate,

@@ -66,7 +66,7 @@ struct EneryPlusData;
 namespace RefrigeratedCase {
 
     // Compressor suction pressure control
-    enum class iCompSuctionPressureCtrl
+    enum class CompressorSuctionPressureCtrl
     {
         Invalid = -1,
         FloatSuctionTemperature,
@@ -75,7 +75,7 @@ namespace RefrigeratedCase {
     };
 
     // Subcooler type
-    enum class iSubcoolerType
+    enum class SubcoolerType
     {
         Invalid = -1,
         LiquidSuction,
@@ -601,29 +601,29 @@ namespace RefrigeratedCase {
     struct RefrigSystemData
     {
         // Members
-        std::string Name;                         // Name of refrigeration system
-        std::string RefrigerantName;              // Name of refrigerant, must match name in FluidName
-        std::string EndUseSubcategory;            // Used for reporting purposes
-        bool SystemRejectHeatToZone;              // Flag to show air-cooled condenser located inside zone
-        bool CoilFlag;                            // Flag to show if coil type load on system (even if below in a secondary)
-        Array1D_int CascadeLoadNum;               // absolute index  of condensers placing load (allocated NumCondensers)
-        Array1D_int CaseNum;                      // absolute Index of cases (allocated NumCases)
-        Array1D_int CoilNum;                      // absolute Index of coils (allocated NumCoils)
-        Array1D_int CompressorNum;                // absolute Index of compressors (allocated NumCompressors)
-        Array1D_int CondenserNum;                 // absolute Index of condensers removing load (allocated NumCondensers)
-        Array1D_int GasCoolerNum;                 // absolute Index of gas cooler
-        Array1D_int HiStageCompressorNum;         // absolute Index of high-stage compressors (allocated NumHiStageCompressors)
-        Array1D_int SecondaryNum;                 // absolute Index of seocndary loops (allocated NumSecondarys)
-        Array1D_int SubcoolerNum;                 // Absolute Index of subcoolers (allocated NumSubcoolers)
-        Array1D_int WalkInNum;                    // absolute Index of walk ins (allocated NumWalkIns)
-        iCompSuctionPressureCtrl CompSuctControl; // Index to suction control
-        int HiStageWarnIndex1;                    // Recurring warning index when hi stage compressors unable to meet coil loads
-        int HiStageWarnIndex2;                    // Recurring warning index when hi stage compressors unable to meet coil loads
-        int InsuffCapWarn;                        // Recurring warning index when refrigeration system unable to meet coil loads
-        int IntercoolerType;                      // Intercooler type (0=none, 1=flash intercooler, 2=shell-and-coil intercooler)
-        int NumCases;                             // Number of cases on this system
-        int NumCoils;                             // Number of cases on this system
-        int NumCompressors;                       // Number of compressors on this system for single-stage systems
+        std::string Name;                              // Name of refrigeration system
+        std::string RefrigerantName;                   // Name of refrigerant, must match name in FluidName
+        std::string EndUseSubcategory;                 // Used for reporting purposes
+        bool SystemRejectHeatToZone;                   // Flag to show air-cooled condenser located inside zone
+        bool CoilFlag;                                 // Flag to show if coil type load on system (even if below in a secondary)
+        Array1D_int CascadeLoadNum;                    // absolute index  of condensers placing load (allocated NumCondensers)
+        Array1D_int CaseNum;                           // absolute Index of cases (allocated NumCases)
+        Array1D_int CoilNum;                           // absolute Index of coils (allocated NumCoils)
+        Array1D_int CompressorNum;                     // absolute Index of compressors (allocated NumCompressors)
+        Array1D_int CondenserNum;                      // absolute Index of condensers removing load (allocated NumCondensers)
+        Array1D_int GasCoolerNum;                      // absolute Index of gas cooler
+        Array1D_int HiStageCompressorNum;              // absolute Index of high-stage compressors (allocated NumHiStageCompressors)
+        Array1D_int SecondaryNum;                      // absolute Index of seocndary loops (allocated NumSecondarys)
+        Array1D_int SubcoolerNum;                      // Absolute Index of subcoolers (allocated NumSubcoolers)
+        Array1D_int WalkInNum;                         // absolute Index of walk ins (allocated NumWalkIns)
+        CompressorSuctionPressureCtrl CompSuctControl; // Index to suction control
+        int HiStageWarnIndex1;                         // Recurring warning index when hi stage compressors unable to meet coil loads
+        int HiStageWarnIndex2;                         // Recurring warning index when hi stage compressors unable to meet coil loads
+        int InsuffCapWarn;                             // Recurring warning index when refrigeration system unable to meet coil loads
+        int IntercoolerType;                           // Intercooler type (0=none, 1=flash intercooler, 2=shell-and-coil intercooler)
+        int NumCases;                                  // Number of cases on this system
+        int NumCoils;                                  // Number of cases on this system
+        int NumCompressors;                            // Number of compressors on this system for single-stage systems
         // or number of low-stage compressors on this system for two-stage systems
         int NumCondensers;         // Number of condensers on this system
         int NumGasCoolers;         // Number of gas coolers on this system
@@ -712,7 +712,7 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         RefrigSystemData()
-            : SystemRejectHeatToZone(false), CoilFlag(false), CompSuctControl(iCompSuctionPressureCtrl::ConstantSuctionTemperature),
+            : SystemRejectHeatToZone(false), CoilFlag(false), CompSuctControl(CompressorSuctionPressureCtrl::ConstantSuctionTemperature),
               HiStageWarnIndex1(0), HiStageWarnIndex2(0), InsuffCapWarn(0), IntercoolerType(0), NumCases(0), NumCoils(0), NumCompressors(0),
               NumCondensers(1), NumGasCoolers(0), NumHiStageCompressors(0), NumSecondarys(0), NumStages(1), NumSubcoolers(0), NumWalkIns(0),
               NumMechSCServed(0), NumNonCascadeLoads(0), NumCascadeLoads(0), NumTransferLoads(0), RefIndex(0), SuctionPipeActualZoneNum(0),
@@ -1231,18 +1231,18 @@ namespace RefrigeratedCase {
         std::string Name;          // Name of Subcooler
         std::string MechSourceSys; // Name of refrigeration system providing
         // cool liquid to mechanical, needed for character comparison after systems read
-        iSubcoolerType SubcoolerType; // Specifies subcooler type(0=liquid suction heat exchanger,1=mechanical)
-        int MechSourceSysID;          // ID number of refrigeration system providing cool liquid to mechanical
-        Real64 MechSCTransLoad;       // Mechanical subcooler load transferred between suction groups, W
-        Real64 MechSCTransEnergy;     // Mechanical subcooler energy transferred between suction groups, W
-        Real64 LiqSuctDesignDelT;     // Liquid suction subcooler design subcooling, C
-        Real64 LiqSuctDesignTliqIn;   // Liquid suction subcooler design inlet temperature liquid, C
-        Real64 LiqSuctDesignTvapIn;   // Liquid suction subcooler design inlet temperature vapor, C
-        Real64 MechControlTliqOut;    // Mechanical subcooler design outlet temperature subcooled liquid, C
+        SubcoolerType subcoolerType; // Specifies subcooler type(0=liquid suction heat exchanger,1=mechanical)
+        int MechSourceSysID;         // ID number of refrigeration system providing cool liquid to mechanical
+        Real64 MechSCTransLoad;      // Mechanical subcooler load transferred between suction groups, W
+        Real64 MechSCTransEnergy;    // Mechanical subcooler energy transferred between suction groups, W
+        Real64 LiqSuctDesignDelT;    // Liquid suction subcooler design subcooling, C
+        Real64 LiqSuctDesignTliqIn;  // Liquid suction subcooler design inlet temperature liquid, C
+        Real64 LiqSuctDesignTvapIn;  // Liquid suction subcooler design inlet temperature vapor, C
+        Real64 MechControlTliqOut;   // Mechanical subcooler design outlet temperature subcooled liquid, C
 
         // Default Constructor
         SubcoolerData()
-            : CoilFlag(false), SubcoolerType(iSubcoolerType::Invalid), MechSourceSysID(0), MechSCTransLoad(0.0), MechSCTransEnergy(0.0),
+            : CoilFlag(false), subcoolerType(SubcoolerType::Invalid), MechSourceSysID(0), MechSCTransLoad(0.0), MechSCTransEnergy(0.0),
               LiqSuctDesignDelT(0.0), LiqSuctDesignTliqIn(0.0), LiqSuctDesignTvapIn(0.0), MechControlTliqOut(0.0)
         {
         }

@@ -70,7 +70,7 @@ namespace PoweredInductionUnits {
     // Data
     // MODULE PARAMETER DEFINITIONS
     // coil types in this module
-    enum class iHCoilType
+    enum class HtgCoilType
     {
         Invalid = -1,
         Gas,
@@ -80,10 +80,10 @@ namespace PoweredInductionUnits {
         Num
     };
 
-    static constexpr std::array<std::string_view, static_cast<int>(iHCoilType::Num)> HCoilNamesUC{
+    static constexpr std::array<std::string_view, static_cast<int>(HtgCoilType::Num)> HCoilNamesUC{
         "COIL:HEATING:FUEL", "COIL:HEATING:ELECTRIC", "COIL:HEATING:WATER", "COIL:HEATING:STEAM"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(iHCoilType::Num)> HCoilNames{
+    static constexpr std::array<std::string_view, static_cast<int>(HtgCoilType::Num)> HCoilNames{
         "Coil:Heating:Fuel", "Coil:Heating:Electric", "Coil:Heating:Water", "Coil:Heating:Steam"};
 
     struct PowIndUnitData
@@ -118,7 +118,7 @@ namespace PoweredInductionUnits {
         int Fan_Num;           // index for fan type
         int Fan_Index;         // store index for this fan
         int FanAvailSchedPtr;  // index to fan availability schedule
-        iHCoilType HCoilType;  // index for heating coil type
+        HtgCoilType HCoilType; // index for heating coil type
         DataPlant::PlantEquipmentType HCoil_PlantType;
         std::string HCoil; // name of heating coil component
         int HCoil_Index;   // index to this heating coil
@@ -156,7 +156,7 @@ namespace PoweredInductionUnits {
               MaxPriAirVolFlow(0.0), MaxPriAirMassFlow(0.0), MinPriAirFlowFrac(0.0), MinPriAirMassFlow(0.0), PriDamperPosition(0.0),
               MaxSecAirVolFlow(0.0), MaxSecAirMassFlow(0.0), FanOnFlowFrac(0.0), FanOnAirMassFlow(0.0), PriAirInNode(0), SecAirInNode(0),
               OutAirNode(0), HCoilInAirNode(0), ControlCompTypeNum(0), CompErrIndex(0), Mixer_Num(0), Fan_Num(0), Fan_Index(0), FanAvailSchedPtr(0),
-              HCoilType(iHCoilType::Invalid), HCoil_PlantType(DataPlant::PlantEquipmentType::Invalid), HCoil_Index(0), HCoil_FluidIndex(0),
+              HCoilType(HtgCoilType::Invalid), HCoil_PlantType(DataPlant::PlantEquipmentType::Invalid), HCoil_Index(0), HCoil_FluidIndex(0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0),
               MinHotSteamFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
               HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), ADUNum(0), InducesPlenumAir(false), HeatingRate(0.0), HeatingEnergy(0.0),

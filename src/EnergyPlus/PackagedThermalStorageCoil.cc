@@ -287,13 +287,13 @@ void GetTESCoilInput(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(5));
             if (SELECT_CASE_var == "ICE") {
-                state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia = iMedia::IceBased;
+                state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia = MediaType::IceBased;
             } else if (SELECT_CASE_var == "WATER") {
-                state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia = iMedia::FluidBased;
+                state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia = MediaType::FluidBased;
                 state.dataPackagedThermalStorageCoil->TESCoil(item).StorageFluidName = "WATER";
                 state.dataPackagedThermalStorageCoil->TESCoil(item).StorageFluidIndex = FindGlycol(state, "WATER");
             } else if (SELECT_CASE_var == "USERDEFINEDFLUIDTYPE") {
-                state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia = iMedia::FluidBased;
+                state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia = MediaType::FluidBased;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
@@ -335,10 +335,10 @@ void GetTESCoilInput(EnergyPlusData &state)
             }
         }
 
-        if ((state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == iMedia::FluidBased) &&
+        if ((state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == MediaType::FluidBased) &&
             (!state.dataIPShortCut->lNumericFieldBlanks(1))) {
             state.dataPackagedThermalStorageCoil->TESCoil(item).FluidStorageVolume = state.dataIPShortCut->rNumericArgs(1);
-        } else if ((state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == iMedia::FluidBased) &&
+        } else if ((state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == MediaType::FluidBased) &&
                    (state.dataIPShortCut->lNumericFieldBlanks(1))) {
             ShowSevereError(state,
                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
@@ -348,7 +348,7 @@ void GetTESCoilInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if ((state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == iMedia::IceBased) &&
+        if ((state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == MediaType::IceBased) &&
             (!state.dataIPShortCut->lNumericFieldBlanks(2))) {
             if (state.dataIPShortCut->rNumericArgs(2) == DataGlobalConstants::AutoCalculate) {
                 state.dataPackagedThermalStorageCoil->TESCoil(item).IceStorageCapacity = state.dataIPShortCut->rNumericArgs(2);
@@ -356,7 +356,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                 state.dataPackagedThermalStorageCoil->TESCoil(item).IceStorageCapacity =
                     state.dataIPShortCut->rNumericArgs(2) * 1.e+09; // input in giga joules, used as joules internally
             }
-        } else if ((state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == iMedia::IceBased) &&
+        } else if ((state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == MediaType::IceBased) &&
                    (state.dataIPShortCut->lNumericFieldBlanks(2))) {
             ShowSevereError(state,
                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name +
@@ -1787,10 +1787,10 @@ void GetTESCoilInput(EnergyPlusData &state)
         }
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(61)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectMode = iWaterSys::CondensateDiscarded;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectMode = CondensateAction::CondensateDiscarded;
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectName = state.dataIPShortCut->cAlphaArgs(61);
-            state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectMode = iWaterSys::CondensateToTank;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectMode = CondensateAction::CondensateToTank;
             SetupTankSupplyComponent(state,
                                      state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                      cCurrentModuleObject,
@@ -1850,7 +1850,7 @@ void GetTESCoilInput(EnergyPlusData &state)
         if (!state.dataIPShortCut->lNumericFieldBlanks(41)) {
             state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantEffectiveness = state.dataIPShortCut->rNumericArgs(41);
         }
-        if (state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == iMedia::FluidBased) {
+        if (state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == MediaType::FluidBased) {
             if (!state.dataIPShortCut->lNumericFieldBlanks(42)) {
                 state.dataPackagedThermalStorageCoil->TESCoil(item).MinimumFluidTankTempLimit = state.dataIPShortCut->rNumericArgs(42);
             } else {
@@ -2143,7 +2143,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 "System");
         }
 
-        if (state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == iMedia::FluidBased) {
+        if (state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == MediaType::FluidBased) {
             SetupOutputVariable(state,
                                 "Cooling Coil Fluid Thermal Storage End Temperature",
                                 OutputProcessor::Unit::C,
@@ -2152,7 +2152,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
 
-        } else if (state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == iMedia::IceBased) {
+        } else if (state.dataPackagedThermalStorageCoil->TESCoil(item).StorageMedia == MediaType::IceBased) {
             SetupOutputVariable(state,
                                 "Cooling Coil Ice Thermal Storage End Fraction",
                                 OutputProcessor::Unit::None,
@@ -2733,7 +2733,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                      state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap);
     }
 
-    if ((state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) &&
+    if ((state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::FluidBased) &&
         (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidStorageVolume == DataGlobalConstants::AutoCalculate)) {
         // for fluid tanks, assume a 10C deltaT or diff between max and min, whichever is smaller
         deltaT = min(FluidTankSizingDeltaT,
@@ -2768,7 +2768,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                      "Fluid Storage Volume [m3]",
                                      state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidStorageVolume);
     }
-    if ((state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) &&
+    if ((state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::IceBased) &&
         (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity == DataGlobalConstants::AutoCalculate)) {
 
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).DischargeOnlyRatedDischargeCap > 0.0 &&
@@ -3353,7 +3353,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     EvapInletEnthalpy = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
     CoilMightBeDry = false;
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::FluidBased) {
         sTES = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
         if ((sTES > state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MinimumFluidTankTempLimit) &&
             (sTES < state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
@@ -3376,7 +3376,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
         } else {
             TESCanBeCharged = false;
         }
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::IceBased) {
         sTES = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemainLastTimestep;
         if (sTES < 1.0) {
             TESCanBeCharged = true;
@@ -3860,7 +3860,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
     EvapInletEnthalpy = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
     CoilMightBeDry = false;
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::FluidBased) {
         sTES = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
         if ((sTES >= state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MinimumFluidTankTempLimit) &&
             (sTES < state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
@@ -3882,7 +3882,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
         } else {
             TESHasSomeCharge = false;
         }
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::IceBased) {
         sTES = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemainLastTimestep;
         if (sTES > 0.0) {
             TESHasSomeCharge = true;
@@ -4269,7 +4269,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
         CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
     }
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::FluidBased) {
         sTES = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
         if ((sTES > state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MinimumFluidTankTempLimit) &&
             (sTES < state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
@@ -4292,7 +4292,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
         } else {
             TESCanBeCharged = false;
         }
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::IceBased) {
         sTES = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemainLastTimestep;
         if (sTES < 1.0) {
             TESCanBeCharged = true;
@@ -4459,7 +4459,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
     EvapInletEnthalpy = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirInletNodeNum).Enthalpy;
     CoilMightBeDry = false;
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::FluidBased) {
         sTES = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).FluidTankTempFinalLastTimestep;
         if ((sTES >= state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MinimumFluidTankTempLimit) &&
             (sTES < state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).MaximumFluidTankTempLimit)) {
@@ -4481,7 +4481,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
         } else {
             TESHasSomeCharge = false;
         }
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::IceBased) {
         sTES = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceFracRemainLastTimestep;
         if (sTES > 0.0) {
             TESHasSomeCharge = true;
@@ -5074,9 +5074,9 @@ void UpdateTEStorage(EnergyPlusData &state, int const TESCoilNum)
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::FluidBased) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::FluidBased) {
         CalcTESWaterStorageTank(state, TESCoilNum);
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == iMedia::IceBased) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageMedia == MediaType::IceBased) {
         CalcTESIceStorageTank(state, TESCoilNum);
     }
 }

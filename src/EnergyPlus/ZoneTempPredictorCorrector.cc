@@ -351,7 +351,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &inputProcessor = state.dataInputProcessing->inputProcessor;
     auto &SetPointDualHeatCool = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool;
 
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TStat));
     NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     TStatObjects.allocate(NumTStatStatements);
 
@@ -777,7 +777,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                               "..specifies control type 1 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                                   TempControlledZone(TempControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -804,7 +804,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                               "..specifies control type 2 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglCoolSetPoint)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                                   TempControlledZone(TempControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -831,7 +831,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                               "..specifies control type 3 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHCSetPoint)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                                   TempControlledZone(TempControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -858,7 +858,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                               "..specifies control type 4 (" + ValidControlTypes(static_cast<int>(ComfortControl::DualSetPoint)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                                   TempControlledZone(TempControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -898,7 +898,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 1 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint)) +
                                           ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                           TempControlledZone(TempControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
 
@@ -909,7 +909,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 2 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglCoolSetPoint)) +
                                           ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                           TempControlledZone(TempControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
 
@@ -920,7 +920,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 3 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHCSetPoint)) +
                                           ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                           TempControlledZone(TempControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
 
@@ -931,7 +931,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 4 (" + ValidControlTypes(static_cast<int>(ComfortControl::DualSetPoint)) +
                                           ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                           TempControlledZone(TempControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
 
@@ -943,7 +943,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     if (allocated(TStatControlTypes)) TStatControlTypes.deallocate();
     // This starts the Humidity Control Get Input section
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::HStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::HStat));
     state.dataZoneCtrls->NumHumidityControlZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneCtrls->NumHumidityControlZones > 0) {
@@ -1006,7 +1006,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     } // HumidControlledZoneNum
 
     // Start to read Thermal comfort control objects
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TCTStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat));
     state.dataZoneCtrls->NumComfortTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     ComfortTStatObjects.allocate(state.dataZoneCtrls->NumComfortTStatStatements);
 
@@ -1633,7 +1633,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                   ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                                   ComfortControlledZone(ComfortControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -1661,7 +1661,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                   ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                                   ComfortControlledZone(ComfortControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -1689,7 +1689,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                   ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                                   ComfortControlledZone(ComfortControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -1717,7 +1717,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                   ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                                   ComfortControlledZone(ComfortControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -1760,7 +1760,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 1 (" +
                                           ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) + ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                           ComfortControlledZone(ComfortControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
 
@@ -1771,7 +1771,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 2 (" +
                                           ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) + ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                           ComfortControlledZone(ComfortControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
 
@@ -1782,7 +1782,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 3 (" +
                                           ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) + ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                           ComfortControlledZone(ComfortControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
 
@@ -1793,7 +1793,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 4 (" +
                                           ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) + ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                           ComfortControlledZone(ComfortControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
 
@@ -1922,7 +1922,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     print(state.files.eio, Header);
     print(state.files.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::OTTStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::OTTStat));
     state.dataZoneCtrls->NumOpTempControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneCtrls->NumOpTempControlledZones > 0) {
@@ -1949,7 +1949,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (found == 0) { // throw error
                     ShowSevereError(state,
                                     cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " +
-                                        cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + " reference not found.");
+                                        cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + " reference not found.");
                     ErrorsFound = true;
                 } else {
                     TempControlledZoneNum = found;
@@ -2152,7 +2152,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     }             // NumOpTempControlledZones > 0
 
     // Overcool dehumidificaton GetInput starts here
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TandHStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TandHStat));
     state.dataZoneCtrls->NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneCtrls->NumTempAndHumidityControlledZones > 0) {
@@ -2179,7 +2179,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (found == 0) { // throw error
                     ShowSevereError(state,
                                     cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " +
-                                        cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + " reference not found.");
+                                        cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + " reference not found.");
                     ErrorsFound = true;
                 } else {
                     TempControlledZoneNum = found;
@@ -2357,7 +2357,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     }             // NumTempAndHumidityControlledZones > 0
 
     // Staged thermostat control inputs start
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::StagedDual));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::StagedDual));
     NumStageControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (NumStageControlledZones > 0) state.dataZoneCtrls->StagedTStatObjects.allocate(NumStageControlledZones);
 
