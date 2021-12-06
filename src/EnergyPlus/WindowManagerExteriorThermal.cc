@@ -101,7 +101,8 @@ namespace WindowManager {
         auto const solutionTolerance = 0.02;
 
         // Tarcog thermal system for solving heat transfer through the window
-        auto aFactory = CWCEHeatTransferFactory(state, surface, SurfNum);
+        const auto activeConstrNum{CWCEHeatTransferFactory::getActiveConstructionNumber(state, surface, SurfNum)};
+        auto aFactory = CWCEHeatTransferFactory(state, surface, SurfNum, activeConstrNum);
         auto aSystem = aFactory.getTarcogSystem(state, SurfNum, HextConvCoeff);
         aSystem->setTolerance(solutionTolerance);
 
@@ -257,24 +258,24 @@ namespace WindowManager {
         }
     }
 
-    double GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const double windowWidth, const double windowHeight)
+    double GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const double windowWidth, const double windowHeight)
     {
         const auto tilt{90.0};
 
         auto &surface(state.dataSurface->Surface(surfNum));
-        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
+        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum, constrNum);
 
         const auto winterGlassUnit = aFactory.getTarcogSystemForReporting(state, false, windowWidth, windowHeight, tilt);
 
         return winterGlassUnit->getUValue();
     }
 
-    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, double windowWidth, double windowHeight)
+    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight)
     {
         const auto tilt{90.0};
 
         auto &surface(state.dataSurface->Surface(surfNum));
-        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
+        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum, constrNum);
 
         const auto summerGlassUnit = aFactory.getTarcogSystemForReporting(state, true, windowWidth, windowHeight, tilt);
         return summerGlassUnit->getSHGC(state.dataConstruction->Construct(surface.Construction).SolTransNorm);
@@ -282,21 +283,21 @@ namespace WindowManager {
 
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
+                                        int constrNum,
                                         double windowWidth,
                                         double windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
                                         double &uvalue,
-                                        double &shgc,
-                                        double &vt)
+                                        double &shgc, double &vt)
     {
         auto &surface(state.dataSurface->Surface(surfNum));
         auto frameDivider(state.dataSurface->FrameDivider(state.dataSurface->Surface(surfNum).FrameDivider));
 
-        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum);
+        auto aFactory = CWCEHeatTransferFactory(state, surface, surfNum, constrNum);
 
         for (bool isSummer : {false, true}) {
-            const auto framehExtConvCoeff{30.0};
-            const auto framehIntConvCoeff{8.0};
+            constexpr auto framehExtConvCoeff{30.0};
+            constexpr auto framehIntConvCoeff{8.0};
             const auto tilt{90.0};
 
             auto insulGlassUnit = aFactory.getTarcogSystemForReporting(state, isSummer, windowWidth, windowHeight, tilt);
@@ -325,8 +326,8 @@ namespace WindowManager {
             Tarcog::ISO15099::FrameData dividerData{
                 dividerUvalue, dividerEdgeUValue, dividerProjectedDimension, dividerWettedLength, dividerAbsorptance};
 
-            const auto tVis{state.dataConstruction->Construct(surface.Construction).VisTransNorm};
-            const auto tSol{state.dataConstruction->Construct(surface.Construction).SolTransNorm};
+            const auto tVis{state.dataConstruction->Construct(constrNum).VisTransNorm};
+            const auto tSol{state.dataConstruction->Construct(constrNum).SolTransNorm};
 
             if (vision == EnergyPlus::DataSurfaces::NfrcVisionType::Single) {
                 auto window = Tarcog::ISO15099::WindowSingleVision(windowWidth, windowHeight, tVis, tSol, insulGlassUnit);
@@ -399,20 +400,18 @@ namespace WindowManager {
     //  CWCEHeatTransferFactory
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    CWCEHeatTransferFactory::CWCEHeatTransferFactory(EnergyPlusData &state, SurfaceData const &surface, int const t_SurfNum)
-        : m_Surface(surface), m_SurfNum(t_SurfNum), m_SolidLayerIndex(0), m_InteriorBSDFShade(false), m_ExteriorShade(false)
+    CWCEHeatTransferFactory::CWCEHeatTransferFactory(
+        EnergyPlusData &state, SurfaceData const &surface, int const t_SurfNum, int const t_ConstrNum)
+        : m_Surface(surface), m_SurfNum(t_SurfNum), m_SolidLayerIndex(0), m_ConstructionNumber(t_ConstrNum), m_InteriorBSDFShade(false),
+          m_ExteriorShade(false)
     {
         m_Window = state.dataSurface->SurfaceWindow(t_SurfNum);
-        auto ShadeFlag = state.dataSurface->SurfWinShadingFlag(t_SurfNum);
 
-        m_ConstructionNumber = m_Surface.Construction;
         m_ShadePosition = ShadePosition::NoShade;
 
-        if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
-            m_ConstructionNumber = state.dataSurface->SurfWinActiveShadedConstruction(t_SurfNum);
-        }
-
         m_TotLay = getNumOfLayers(state);
+
+        const auto ShadeFlag{getShadeType(state, t_ConstrNum)};
 
         if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
             m_ShadePosition = ShadePosition::Interior;
@@ -867,6 +866,20 @@ namespace WindowManager {
         return {width, height, tilt};
     }
 
+    int CWCEHeatTransferFactory::getActiveConstructionNumber(EnergyPlusData &state,
+                                                             EnergyPlus::DataSurfaces::SurfaceData const &surface,
+                                                             int t_SurfNum)
+    {
+        auto result{surface.Construction};
+        const auto ShadeFlag = state.dataSurface->SurfWinShadingFlag(t_SurfNum);
+
+        if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
+            result = state.dataSurface->SurfWinActiveShadedConstruction(t_SurfNum);
+        }
+
+        return result;
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////
     bool CWCEHeatTransferFactory::isInteriorShade() const
     {
@@ -903,6 +916,50 @@ namespace WindowManager {
         }
         auto Indoor = Tarcog::ISO15099::Environments::indoor(roomTemperature);
         return Indoor;
+    }
+
+    WinShadingType CWCEHeatTransferFactory::getShadeType(EnergyPlusData &state, int ConstrNum)
+    {
+        WinShadingType ShadeFlag{WinShadingType::NoShade};
+
+        const auto TotLay = state.dataConstruction->Construct(ConstrNum).TotLayers;
+        const auto TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
+        const auto MatOutside = state.dataConstruction->Construct(ConstrNum).LayerPoint(1);
+        const auto MatInside = state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay);
+
+        if (state.dataMaterial->Material(MatOutside).Group == DataHeatBalance::MaterialGroup::Shade) { // Exterior shade present
+            ShadeFlag = WinShadingType::ExtShade;
+        } else if (state.dataMaterial->Material(MatOutside).Group == DataHeatBalance::MaterialGroup::Screen) { // Exterior screen present
+            const auto MatShade = MatOutside;
+            const auto ScNum = state.dataMaterial->Material(MatShade).ScreenDataPtr;
+            // Orphaned constructs with exterior screen are ignored
+            if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
+        } else if (state.dataMaterial->Material(MatOutside).Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Exterior blind present
+            const auto MatShade = MatOutside;
+            ShadeFlag = WinShadingType::ExtBlind;
+        } else if (state.dataMaterial->Material(MatInside).Group == DataHeatBalance::MaterialGroup::Shade) { // Interior shade present
+            const auto MatShade = MatInside;
+            ShadeFlag = WinShadingType::IntShade;
+        } else if (state.dataMaterial->Material(MatInside).Group == DataHeatBalance::MaterialGroup::WindowBlind) { // Interior blind present
+            const auto MatShade = MatInside;
+            ShadeFlag = WinShadingType::IntBlind;
+        } else if (TotGlassLay == 2) {
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group ==
+                DataHeatBalance::MaterialGroup::Shade)
+                ShadeFlag = WinShadingType::BGShade;
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group ==
+                DataHeatBalance::MaterialGroup::WindowBlind)
+                ShadeFlag = WinShadingType::BGBlind;
+        } else if (TotGlassLay == 3) {
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group ==
+                DataHeatBalance::MaterialGroup::Shade)
+                ShadeFlag = WinShadingType::BGShade;
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group ==
+                DataHeatBalance::MaterialGroup::WindowBlind)
+                ShadeFlag = WinShadingType::BGBlind;
+        }
+
+        return ShadeFlag;
     }
 
     double CWCEHeatTransferFactory::overallUfactorFromFilmsAndCond(double conductance, double insideFilm, double outsideFilm)

@@ -99,23 +99,26 @@ namespace WindowManager {
                                                Real64 &SurfOutsideTemp     // Outside surface temperature (C)
     );
 
-    double GetIGUUValueForNFRCReport(EnergyPlusData &state, int surfNum, double windowWidth, double windowHeight);
-    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, double windowWidth, double windowHeight);
+    double GetIGUUValueForNFRCReport(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight);
+    double GetSHGCValueForNFRCReporting(EnergyPlusData &state, int surfNum, int constrNum, double windowWidth, double windowHeight);
 
     void GetWindowAssemblyNfrcForReport(EnergyPlusData &state,
                                         int const surfNum,
+                                        int constrNum,
                                         double windowWidth,
                                         double windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
                                         double &uvalue,
-                                        double &shgc,
-                                        double &vt);
+                                        double &shgc, double &vt);
 
     // Class that is used to create layers for Windows-CalcEngine
     class CWCEHeatTransferFactory
     {
     public:
-        CWCEHeatTransferFactory(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int const t_SurfNum);
+        CWCEHeatTransferFactory(EnergyPlusData &state,
+                                EnergyPlus::DataSurfaces::SurfaceData const &surface,
+                                int t_SurfNum,
+                                int t_ConstrNum);
 
         std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getTarcogSystem(EnergyPlusData &state, int const SurfNum, Real64 const t_HextConvCoeff);
 
@@ -124,6 +127,8 @@ namespace WindowManager {
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoor(EnergyPlusData &state, Real64 const t_Hext) const;
         Tarcog::ISO15099::CIGU getIGU() const;
         Tarcog::ISO15099::CIGU getIGU(double width, double height, double tilt);
+
+        static int getActiveConstructionNumber(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int t_SurfNum);
 
         // for assembly windoww reporting
         std::shared_ptr<Tarcog::ISO15099::IIGUSystem> getTarcogSystemForReporting(
@@ -171,6 +176,10 @@ namespace WindowManager {
         // methods specifically for helping in NFRC assembly calculations
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getOutdoorNfrc(bool const useSummerConditions);
         std::shared_ptr<Tarcog::ISO15099::CEnvironment> getIndoorNfrc(bool const useSummerConditions);
+
+        // Method to determine current construction shade type
+        static EnergyPlus::DataSurfaces::WinShadingType getShadeType(EnergyPlusData &state, int ConstrNum);
+
     };
 } // namespace WindowManager
 
