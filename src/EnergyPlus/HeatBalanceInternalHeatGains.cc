@@ -58,7 +58,6 @@ namespace EnergyPlus {
 
 void SetupZoneInternalGain(EnergyPlusData &state,
                            int const ZoneNum,
-                           std::string_view const &cComponentObject, // object class name for device contributing internal gain
                            std::string_view const &cComponentName,   // user unique name for device
                            DataHeatBalance::IntGainType const IntGainCompType,
                            Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
@@ -80,7 +79,6 @@ void SetupZoneInternalGain(EnergyPlusData &state,
         SetupSpaceInternalGain(state,
                                spaceNum,
                                gainFrac,
-                               cComponentObject,
                                cComponentName,
                                IntGainCompType,
                                ConvectionGainRate,
@@ -96,7 +94,6 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 void SetupSpaceInternalGain(EnergyPlusData &state,
                             int const spaceNum,
                             Real64 spaceGainFraction,                 // Fraction of gain value assigned to this space
-                            std::string_view const &cComponentObject, // object class name for device contributing internal gain
                             std::string_view const &cComponentName,   // user unique name for device
                             DataHeatBalance::IntGainType const IntGainCompType,
                             Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
@@ -129,28 +126,17 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     int IntGainsNum;
     bool FoundIntGainsType;
     bool FoundDuplicate;
-    std::string UpperCaseObjectType;
     std::string UpperCaseObjectName;
 
     // Object Data
 
     FoundIntGainsType = false;
     FoundDuplicate = false;
-    UpperCaseObjectType = UtilityRoutines::MakeUPPERCase(cComponentObject);
     UpperCaseObjectName = UtilityRoutines::MakeUPPERCase(cComponentName);
-
-    // Check if IntGainCompType and cComponentObject are consistent
-    if (!UtilityRoutines::SameString(UpperCaseObjectType, IntGainTypeNamesUC[static_cast<int>(IntGainCompType)])) {
-        ShowSevereError(state,
-                        "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain");
-        ShowContinueError(state, "Object type character = " + format(cComponentObject));
-        ShowContinueError(state, "Type of Num object name = " + format(IntGainTypeNamesUC[static_cast<int>(IntGainCompType)]));
-        return;
-    }
 
     auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
     for (IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
-        if ((thisIntGain.device(IntGainsNum).CompObjectType == UpperCaseObjectType) &&
+        if ((thisIntGain.device(IntGainsNum).CompObjectType == DataHeatBalance::IntGainTypeNamesUC[static_cast<int>(IntGainCompType)]) &&
             (thisIntGain.device(IntGainsNum).CompType == IntGainCompType)) {
             FoundIntGainsType = true;
             if (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
@@ -163,7 +149,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     if (FoundDuplicate) {
         ShowSevereError(state, "SetupZoneInternalGain: developer error, trapped duplicate internal gains sent to SetupZoneInternalGain");
         ShowContinueError(state, "The duplicate object user name =" + format(cComponentName));
-        ShowContinueError(state, "The duplicate object type = " + format(cComponentObject));
+        ShowContinueError(state, "The duplicate object type = " + format(DataHeatBalance::IntGainTypeNamesCC[static_cast<int>(IntGainCompType)]));
         ShowContinueError(state, "This internal gain will not be modeled, and the simulation continues");
         return;
     }
@@ -178,7 +164,7 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     }
     ++thisIntGain.numberOfDevices;
 
-    thisIntGain.device(thisIntGain.numberOfDevices).CompObjectType = UpperCaseObjectType;
+    thisIntGain.device(thisIntGain.numberOfDevices).CompObjectType = DataHeatBalance::IntGainTypeNamesUC[static_cast<int>(IntGainCompType)];
     thisIntGain.device(thisIntGain.numberOfDevices).CompObjectName = UpperCaseObjectName;
     thisIntGain.device(thisIntGain.numberOfDevices).CompType = IntGainCompType;
     thisIntGain.device(thisIntGain.numberOfDevices).spaceGainFrac = spaceGainFraction;
