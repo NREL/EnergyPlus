@@ -3313,7 +3313,7 @@ namespace SurfaceGeometry {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
-            ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = Minimal");
+            ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
 
         if ((TotDetachedFixed + TotDetachedBldg) == 0) return;
@@ -3490,7 +3490,7 @@ namespace SurfaceGeometry {
         SurfaceClass ClassItem;
 
         if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
-            ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = Minimal");
+            ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
 
         if (TotRectDetachedFixed + TotRectDetachedBldg == 0) return;
@@ -6337,7 +6337,7 @@ namespace SurfaceGeometry {
         Real64 SchedMaxValue;
 
         if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
-            ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = Minimal");
+            ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Shading:Zone:Detailed";
@@ -6551,7 +6551,7 @@ namespace SurfaceGeometry {
 
         if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 &&
             state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
-            ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = Minimal");
+            ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         for (Item = 1; Item <= 4; ++Item) {

@@ -200,11 +200,11 @@ namespace CurveManager {
         }
 
         switch (state.dataCurveManager->PerfCurve(CurveIndex).InterpolationType) {
-        case InterpTypeEnum::EvaluateCurveToLimits: {
+        case InterpType::EvaluateCurveToLimits: {
             CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3, Var4, Var5);
             break;
         }
-        case InterpTypeEnum::BtwxtMethod: {
+        case InterpType::BtwxtMethod: {
             CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
             break;
         }
@@ -360,10 +360,10 @@ namespace CurveManager {
 
             // could add checks for blank numeric fields, and use field names for errors.
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -444,10 +444,10 @@ namespace CurveManager {
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
 
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ChillerPartLoadWithLift;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::ChillerPartLoadWithLift;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 3;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
 
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
@@ -523,10 +523,10 @@ namespace CurveManager {
                                                      state.dataIPShortCut->cAlphaFieldNames(1),
                                                      ErrorsFound);
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -587,10 +587,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quartic;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quartic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -652,10 +652,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -715,10 +715,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadraticLinear;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadraticLinear;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -798,10 +798,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::CubicLinear;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::CubicLinear;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -881,10 +881,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Linear;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Linear;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Var1Min = Numbers(3);
@@ -943,10 +943,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiCubic;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiCubic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1030,10 +1030,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::TriQuadratic;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::TriQuadratic;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 3;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Tri2ndOrder.allocate(1);
             for (auto &e : state.dataCurveManager->PerfCurve(CurveNum).Tri2ndOrder) {
                 e.CoeffA0 = Numbers(1);
@@ -1154,10 +1154,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuadLinear;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuadLinear;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 4;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1234,10 +1234,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::QuintLinear;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::QuintLinear;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 5;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1316,10 +1316,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Exponent;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Exponent;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1368,10 +1368,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::FanPressureRise;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::FanPressureRise;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 2;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1436,10 +1436,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialSkewNormal;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::ExponentialSkewNormal;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1502,10 +1502,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Sigmoid;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Sigmoid;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1569,10 +1569,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola1;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::RectangularHyperbola1;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1634,10 +1634,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::RectangularHyperbola2;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::RectangularHyperbola2;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1699,10 +1699,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::ExponentialDecay;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::ExponentialDecay;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1764,10 +1764,10 @@ namespace CurveManager {
                                                      ErrorsFound);
             ++CurveNum;
             state.dataCurveManager->PerfCurve(CurveNum).Name = Alphas(1);
-            state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::DoubleExponentialDecay;
+            state.dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::DoubleExponentialDecay;
             state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
             state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
-            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+            state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
             state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = Numbers(1);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = Numbers(2);
             state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = Numbers(3);
@@ -1893,7 +1893,7 @@ namespace CurveManager {
                     state.dataCurveManager->PerfCurve(CurveNum).ObjectType = CurrentModuleObject;
                     state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
 
-                    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
+                    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::BtwxtMethod;
 
                     std::string contextString = CurrentModuleObject + " \"" + Alphas(1) + "\"";
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2110,7 +2110,7 @@ namespace CurveManager {
                 ++CurveNum;
                 state.dataCurveManager->PerfCurve(CurveNum).Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
-                state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
+                state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::BtwxtMethod;
 
                 std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
 
@@ -2595,35 +2595,35 @@ namespace CurveManager {
         Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
 
         {
-            auto const SELECT_CASE_var(Curve.CurveType);
-            if (SELECT_CASE_var == CurveTypeEnum::Linear) {
+            auto const SELECT_CASE_var(Curve.curveType);
+            if (SELECT_CASE_var == CurveType::Linear) {
                 CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::Quadratic) {
+            } else if (SELECT_CASE_var == CurveType::Quadratic) {
                 CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3);
-            } else if (SELECT_CASE_var == CurveTypeEnum::QuadLinear) {
+            } else if (SELECT_CASE_var == CurveType::QuadLinear) {
                 CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5;
-            } else if (SELECT_CASE_var == CurveTypeEnum::QuintLinear) {
+            } else if (SELECT_CASE_var == CurveType::QuintLinear) {
                 CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5 + V5 * Curve.Coeff6;
-            } else if (SELECT_CASE_var == CurveTypeEnum::Cubic) {
+            } else if (SELECT_CASE_var == CurveType::Cubic) {
                 CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4));
-            } else if (SELECT_CASE_var == CurveTypeEnum::Quartic) {
+            } else if (SELECT_CASE_var == CurveType::Quartic) {
                 CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * (Curve.Coeff4 + V1 * Curve.Coeff5)));
-            } else if (SELECT_CASE_var == CurveTypeEnum::BiQuadratic) {
+            } else if (SELECT_CASE_var == CurveType::BiQuadratic) {
                 CurveValue =
                     Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3) + V2 * (Curve.Coeff4 + V2 * Curve.Coeff5) + V1 * V2 * Curve.Coeff6;
-            } else if (SELECT_CASE_var == CurveTypeEnum::QuadraticLinear) {
+            } else if (SELECT_CASE_var == CurveType::QuadraticLinear) {
                 CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3)) + (Curve.Coeff4 + V1 * (Curve.Coeff5 + V1 * Curve.Coeff6)) * V2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::CubicLinear) {
+            } else if (SELECT_CASE_var == CurveType::CubicLinear) {
                 CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4))) + (Curve.Coeff5 + V1 * Curve.Coeff6) * V2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::BiCubic) {
+            } else if (SELECT_CASE_var == CurveType::BiCubic) {
                 CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 +
                              V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 +
                              V1 * V2 * V2 * Curve.Coeff10;
-            } else if (SELECT_CASE_var == CurveTypeEnum::ChillerPartLoadWithLift) {
+            } else if (SELECT_CASE_var == CurveType::ChillerPartLoadWithLift) {
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 * V1 + Curve.Coeff3 * V1 * V1 + Curve.Coeff4 * V2 + Curve.Coeff5 * V2 * V2 +
                              Curve.Coeff6 * V1 * V2 + Curve.Coeff7 * V1 * V1 * V1 + Curve.Coeff8 * V2 * V2 * V2 + Curve.Coeff9 * V1 * V1 * V2 +
                              Curve.Coeff10 * V1 * V2 * V2 + Curve.Coeff11 * V1 * V1 * V2 * V2 + Curve.Coeff12 * V3 * V2 * V2 * V2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::TriQuadratic) {
+            } else if (SELECT_CASE_var == CurveType::TriQuadratic) {
                 auto const &Tri2ndOrder(Curve.Tri2ndOrder(1));
                 auto const V1s(V1 * V1);
                 auto const V2s(V2 * V2);
@@ -2637,31 +2637,31 @@ namespace CurveManager {
                              Tri2ndOrder.CoeffA20 * V1s * V2s * V3 + Tri2ndOrder.CoeffA21 * V1s * V2 * V3s + Tri2ndOrder.CoeffA22 * V1 * V2s * V3s +
                              Tri2ndOrder.CoeffA23 * V1s * V2 * V3 + Tri2ndOrder.CoeffA24 * V1 * V2s * V3 + Tri2ndOrder.CoeffA25 * V1 * V2 * V3s +
                              Tri2ndOrder.CoeffA26 * V1 * V2 * V3;
-            } else if (SELECT_CASE_var == CurveTypeEnum::Exponent) {
+            } else if (SELECT_CASE_var == CurveType::Exponent) {
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow(V1, Curve.Coeff3);
-            } else if (SELECT_CASE_var == CurveTypeEnum::FanPressureRise) {
+            } else if (SELECT_CASE_var == CurveType::FanPressureRise) {
                 CurveValue = V1 * (Curve.Coeff1 * V1 + Curve.Coeff2 + Curve.Coeff3 * std::sqrt(V2)) + Curve.Coeff4 * V2;
-            } else if (SELECT_CASE_var == CurveTypeEnum::ExponentialSkewNormal) {
+            } else if (SELECT_CASE_var == CurveType::ExponentialSkewNormal) {
                 CoeffZ1 = (V1 - Curve.Coeff1) / Curve.Coeff2;
                 CoeffZ2 = (Curve.Coeff4 * V1 * std::exp(Curve.Coeff3 * V1) - Curve.Coeff1) / Curve.Coeff2;
                 CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
                 CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
                 CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
                 CurveValue = CurveValueNumer / CurveValueDenom;
-            } else if (SELECT_CASE_var == CurveTypeEnum::Sigmoid) {
+            } else if (SELECT_CASE_var == CurveType::Sigmoid) {
                 CurveValueExp = std::exp((Curve.Coeff3 - V1) / Curve.Coeff4);
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow(1.0 + CurveValueExp, Curve.Coeff5);
-            } else if (SELECT_CASE_var == CurveTypeEnum::RectangularHyperbola1) {
+            } else if (SELECT_CASE_var == CurveType::RectangularHyperbola1) {
                 CurveValueNumer = Curve.Coeff1 * V1;
                 CurveValueDenom = Curve.Coeff2 + V1;
                 CurveValue = (CurveValueNumer / CurveValueDenom) + Curve.Coeff3;
-            } else if (SELECT_CASE_var == CurveTypeEnum::RectangularHyperbola2) {
+            } else if (SELECT_CASE_var == CurveType::RectangularHyperbola2) {
                 CurveValueNumer = Curve.Coeff1 * V1;
                 CurveValueDenom = Curve.Coeff2 + V1;
                 CurveValue = (CurveValueNumer / CurveValueDenom) + (Curve.Coeff3 * V1);
-            } else if (SELECT_CASE_var == CurveTypeEnum::ExponentialDecay) {
+            } else if (SELECT_CASE_var == CurveType::ExponentialDecay) {
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1);
-            } else if (SELECT_CASE_var == CurveTypeEnum::DoubleExponentialDecay) {
+            } else if (SELECT_CASE_var == CurveType::DoubleExponentialDecay) {
                 CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1) + Curve.Coeff4 * std::exp(Curve.Coeff5 * V1);
             } else {
                 CurveValue = 0.0;

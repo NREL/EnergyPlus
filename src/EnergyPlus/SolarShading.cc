@@ -717,7 +717,7 @@ void GetShadowingInput(EnergyPlusData &state)
             ShowWarningError(state,
                              "GetShadowingInput: DetailedSkyDiffuseModeling is chosen but not needed as either the shading transmittance for "
                              "shading devices does not change throughout the year");
-            ShowContinueError(state, " or Minimal has been chosen.");
+            ShowContinueError(state, " or MinimalShadowing has been chosen.");
             ShowContinueError(state, "Simulation should be set to use SimpleSkyDiffuseModeling, but is left at Detailed for simulation.");
             ShowContinueError(state, "Choose SimpleSkyDiffuseModeling in the " + cCurrentModuleObject + " object to reduce computation time.");
         }

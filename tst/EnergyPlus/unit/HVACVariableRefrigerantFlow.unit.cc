@@ -193,12 +193,12 @@ protected:
         state->dataSize->SysSizInput(1).AirLoopNum = 1;
         state->dataCurveManager->NumCurves = 10;
         state->dataCurveManager->PerfCurve.allocate(10);
-        state->dataCurveManager->PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(1).CurveType = CurveTypeEnum::Linear;
+        state->dataCurveManager->PerfCurve(1).InterpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(1).curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
         state->dataCurveManager->PerfCurve(1).CurveMax = 1.0;
-        state->dataCurveManager->PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(2).CurveType = CurveTypeEnum::Linear;
+        state->dataCurveManager->PerfCurve(2).InterpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(2).curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
         state->dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
@@ -2863,9 +2863,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Par(3) = CurveNum;
 
     // Inputs: parameters
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2

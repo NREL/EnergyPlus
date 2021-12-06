@@ -690,7 +690,7 @@ namespace HeatBalanceManager {
             // Solar Distribution
             if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || state.dataSysVars->lMinimalShadowing) {
                 state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::Minimal;
-                AlphaName(3) = "Minimal";
+                AlphaName(3) = "MinimalShadowing";
                 state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIOR" || AlphaName(3) == "0") {
                 state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;

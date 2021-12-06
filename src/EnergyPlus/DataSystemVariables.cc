@@ -99,7 +99,7 @@ namespace DataSystemVariables {
     constexpr const char *cSutherlandHodgman("SutherlandHodgman");
     constexpr const char *cSlaterBarsky("SlaterBarsky");
     constexpr const char *cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
-    constexpr const char *cMinimalShadowing("Minimal");
+    constexpr const char *cMinimalShadowing("MinimalShadowing");
     constexpr const char *cInputPath1("epin");       // EP-Launch setting.  Full path + project name
     constexpr const char *cInputPath2("input_path"); // RunEplus.bat setting.  Full path
     constexpr const char *cProgramPath("program_path");

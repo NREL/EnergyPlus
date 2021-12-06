@@ -80,7 +80,7 @@ namespace CurveManager {
 
     // Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
 
-    enum class CurveTypeEnum
+    enum class CurveType
     {
         Invalid = -1,
         Linear,
@@ -107,7 +107,7 @@ namespace CurveManager {
         Num
     };
 
-    enum class InterpTypeEnum
+    enum class InterpType
     {
         Invalid = -1,
         EvaluateCurveToLimits,
@@ -159,59 +159,59 @@ namespace CurveManager {
     struct PerformanceCurveData
     {
         // Members
-        std::string Name;                 // Curve Name
-        std::string ObjectType;           // Curve object type
-        CurveTypeEnum CurveType;          // Curve type (see parameter definitions above)
-        InterpTypeEnum InterpolationType; // Table interpolation method
-        int DataFormat;                   // format of tabular data
-        int TableIndex;                   // Index to tablular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
-        int NumDims;                      // Number of dimensions (AKA, independent variables)
-        int NumIVLowErrorIndex;           // Index to table object error message for too few IV's
-        int NumIVHighErrorIndex;          // Index to table object error message for too many IV's
-        int X1SortOrder;                  // sort order for table data for X1
-        int X2SortOrder;                  // sort order for table data for X2
-        int GridValueIndex;               // Index of output within RGI for new Table:Lookup
-        Real64 NormalizationValue;        // normalization value (TODO: Move from Table object)
-        Real64 Coeff1;                    // constant coefficient
-        Real64 Coeff2;                    // linear coeff (1st independent variable)
-        Real64 Coeff3;                    // quadratic coeff (1st independent variable)
-        Real64 Coeff4;                    // linear coeff (2nd ind var) or cubic coeff
-        Real64 Coeff5;                    // quadratic coeff (2nd independent variable)
-        Real64 Coeff6;                    // cross coeff (1st & 2nd ind var)
-        Real64 Coeff7;                    // cubic coeff for bicubic (1st ind var)
-        Real64 Coeff8;                    // cubic coeff for bicubic (2nd ind var)
-        Real64 Coeff9;                    // cross coeff for bicubic (1st quadratic & 2nd linear)
-        Real64 Coeff10;                   // cross coeff for bicubic (1st linear & 2nd quadratic)
-        Real64 Coeff11;                   // cross coeff
-        Real64 Coeff12;                   // cross coeff
-        Real64 Var1Max;                   // maximum of 1st independent variable
-        Real64 Var1Min;                   // minimum of 1st independent variable
-        Real64 Var2Max;                   // maximum of 2nd independent variable
-        Real64 Var2Min;                   // minimum of 2nd independent variable
-        Real64 Var3Max;                   // maximum of 3rd independent variable
-        Real64 Var3Min;                   // minimum of 3rd independent variable
-        Real64 Var4Max;                   // maximum of 4th independent variable
-        Real64 Var4Min;                   // minimum of 4th independent variable
-        Real64 Var5Max;                   // maximum of 5th independent variable
-        Real64 Var5Min;                   // minimum of 5th independent variable
-        Real64 Var6Max;                   // maximum of 6th independent variable
-        Real64 Var6Min;                   // minimum of 6th independent variable
-        Real64 CurveMin;                  // minimum value of curve output
-        Real64 CurveMax;                  // maximum value of curve output
-        bool CurveMinPresent;             // If TRUE, then cap minimum curve output
-        bool CurveMaxPresent;             // if TRUE, then cap maximum curve output
-        bool Var1MinPresent;              // uses data set limit to set Var1Min if false
-        bool Var1MaxPresent;              // uses data set limit to set Var1Max if false
-        bool Var2MinPresent;              // uses data set limit to set Var2Min if false
-        bool Var2MaxPresent;              // uses data set limit to set Var2Max if false
-        bool Var3MinPresent;              // uses data set limit to set Var3Min if false
-        bool Var3MaxPresent;              // uses data set limit to set Var3Max if false
-        bool Var4MinPresent;              // uses data set limit to set Var4Min if false
-        bool Var4MaxPresent;              // uses data set limit to set Var4Max if false
-        bool Var5MinPresent;              // uses data set limit to set Var5Min if false
-        bool Var5MaxPresent;              // uses data set limit to set Var5Max if false
-        bool Var6MinPresent;              // uses data set limit to set Var6Min if false
-        bool Var6MaxPresent;              // uses data set limit to set Var6Max if false
+        std::string Name;                                 // Curve Name
+        std::string ObjectType;                           // Curve object type
+        CurveType curveType;                              // Curve type (see parameter definitions above)
+        InterpType InterpolationType;                     // Table interpolation method
+        int DataFormat;                                   // format of tabular data
+        int TableIndex;                                   // Index to tabular data (0 if a standard curve object) OR Index of RGI for new Table:Lookup
+        int NumDims;                                      // Number of dimensions (AKA, independent variables)
+        int NumIVLowErrorIndex;                           // Index to table object error message for too few IV's
+        int NumIVHighErrorIndex;                          // Index to table object error message for too many IV's
+        int X1SortOrder;                                  // sort order for table data for X1
+        int X2SortOrder;                                  // sort order for table data for X2
+        int GridValueIndex;                               // Index of output within RGI for new Table:Lookup
+        Real64 NormalizationValue;                        // normalization value (TODO: Move from Table object)
+        Real64 Coeff1;                                    // constant coefficient
+        Real64 Coeff2;                                    // linear coeff (1st independent variable)
+        Real64 Coeff3;                                    // quadratic coeff (1st independent variable)
+        Real64 Coeff4;                                    // linear coeff (2nd ind var) or cubic coeff
+        Real64 Coeff5;                                    // quadratic coeff (2nd independent variable)
+        Real64 Coeff6;                                    // cross coeff (1st & 2nd ind var)
+        Real64 Coeff7;                                    // cubic coeff for bicubic (1st ind var)
+        Real64 Coeff8;                                    // cubic coeff for bicubic (2nd ind var)
+        Real64 Coeff9;                                    // cross coeff for bicubic (1st quadratic & 2nd linear)
+        Real64 Coeff10;                                   // cross coeff for bicubic (1st linear & 2nd quadratic)
+        Real64 Coeff11;                                   // cross coeff
+        Real64 Coeff12;                                   // cross coeff
+        Real64 Var1Max;                                   // maximum of 1st independent variable
+        Real64 Var1Min;                                   // minimum of 1st independent variable
+        Real64 Var2Max;                                   // maximum of 2nd independent variable
+        Real64 Var2Min;                                   // minimum of 2nd independent variable
+        Real64 Var3Max;                                   // maximum of 3rd independent variable
+        Real64 Var3Min;                                   // minimum of 3rd independent variable
+        Real64 Var4Max;                                   // maximum of 4th independent variable
+        Real64 Var4Min;                                   // minimum of 4th independent variable
+        Real64 Var5Max;                                   // maximum of 5th independent variable
+        Real64 Var5Min;                                   // minimum of 5th independent variable
+        Real64 Var6Max;                                   // maximum of 6th independent variable
+        Real64 Var6Min;                                   // minimum of 6th independent variable
+        Real64 CurveMin;                                  // minimum value of curve output
+        Real64 CurveMax;                                  // maximum value of curve output
+        bool CurveMinPresent;                             // If TRUE, then cap minimum curve output
+        bool CurveMaxPresent;                             // if TRUE, then cap maximum curve output
+        bool Var1MinPresent;                              // uses data set limit to set Var1Min if false
+        bool Var1MaxPresent;                              // uses data set limit to set Var1Max if false
+        bool Var2MinPresent;                              // uses data set limit to set Var2Min if false
+        bool Var2MaxPresent;                              // uses data set limit to set Var2Max if false
+        bool Var3MinPresent;                              // uses data set limit to set Var3Min if false
+        bool Var3MaxPresent;                              // uses data set limit to set Var3Max if false
+        bool Var4MinPresent;                              // uses data set limit to set Var4Min if false
+        bool Var4MaxPresent;                              // uses data set limit to set Var4Max if false
+        bool Var5MinPresent;                              // uses data set limit to set Var5Min if false
+        bool Var5MaxPresent;                              // uses data set limit to set Var5Max if false
+        bool Var6MinPresent;                              // uses data set limit to set Var6Min if false
+        bool Var6MaxPresent;                              // uses data set limit to set Var6Max if false
         Array1D<TriQuadraticCurveDataStruct> Tri2ndOrder; // structure for triquadratic curve data
         bool EMSOverrideOn;                               // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue;                     // Value of curve result EMS is directing to use
@@ -225,11 +225,11 @@ namespace CurveManager {
 
         // Default Constructor
         PerformanceCurveData()
-            : CurveType(CurveTypeEnum::Invalid), InterpolationType(InterpTypeEnum::Invalid), DataFormat(0), TableIndex(0), NumDims(0),
-              NumIVLowErrorIndex(0), NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), GridValueIndex(0), NormalizationValue(1.0), Coeff1(0.0),
-              Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0), Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0), Coeff11(0.0),
-              Coeff12(0.0), Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0), Var3Max(0.0), Var3Min(0.0), Var4Max(0.0), Var4Min(0.0),
-              Var5Max(0.0), Var5Min(0.0), Var6Max(0.0), Var6Min(0.0), CurveMin(0.0), CurveMax(0.0), CurveMinPresent(false), CurveMaxPresent(false),
+            : curveType(CurveType::Invalid), InterpolationType(InterpType::Invalid), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
+              NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), GridValueIndex(0), NormalizationValue(1.0), Coeff1(0.0), Coeff2(0.0),
+              Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0), Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0), Coeff11(0.0), Coeff12(0.0),
+              Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0), Var3Max(0.0), Var3Min(0.0), Var4Max(0.0), Var4Min(0.0), Var5Max(0.0),
+              Var5Min(0.0), Var6Max(0.0), Var6Min(0.0), CurveMin(0.0), CurveMax(0.0), CurveMinPresent(false), CurveMaxPresent(false),
               Var1MinPresent(false), Var1MaxPresent(false), Var2MinPresent(false), Var2MaxPresent(false), Var3MinPresent(false),
               Var3MaxPresent(false), Var4MinPresent(false), Var4MaxPresent(false), Var5MinPresent(false), Var5MaxPresent(false),
               Var6MinPresent(false), Var6MaxPresent(false), EMSOverrideOn(false), EMSOverrideCurveValue(0.0), CurveOutput(0.0), CurveInput1(0.0),

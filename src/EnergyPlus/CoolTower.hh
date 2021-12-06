@@ -63,7 +63,7 @@ struct EnergyPlusData;
 
 namespace CoolTower {
 
-    enum class FlowCtrlEnum
+    enum class FlowCtrl
     {
         Invalid = -1,
         FlowSchedule,
@@ -89,7 +89,7 @@ namespace CoolTower {
         int SchedPtr;                         // Index to schedule
         int ZonePtr;                          // Point to this zone
         int PumpSchedPtr;                     // Index to schedule for water pump
-        FlowCtrlEnum FlowCtrlType;            // Type of cooltower operation
+        FlowCtrl FlowCtrlType;                // Type of cooltower operation
         WaterSupplyMode CoolTWaterSupplyMode; // Type of water source
         std::string CoolTWaterSupplyName;     // Name of water source
         int CoolTWaterSupTankID;              // Index to water storage tank
@@ -128,7 +128,7 @@ namespace CoolTower {
 
         // Default Constructor
         CoolTowerParams()
-            : SchedPtr(0), ZonePtr(0), PumpSchedPtr(0), FlowCtrlType(FlowCtrlEnum::Invalid), CoolTWaterSupplyMode(WaterSupplyMode::FromMains),
+            : SchedPtr(0), ZonePtr(0), PumpSchedPtr(0), FlowCtrlType(FlowCtrl::Invalid), CoolTWaterSupplyMode(WaterSupplyMode::FromMains),
               CoolTWaterSupTankID(0), CoolTWaterTankDemandARRID(0), TowerHeight(0.0), OutletArea(0.0), OutletVelocity(0.0), MaxAirVolFlowRate(0.0),
               AirMassFlowRate(0.0), CoolTAirMass(0.0), MinZoneTemp(0.0), FracWaterLoss(0.0), FracFlowSched(0.0), MaxWaterFlowRate(0.0),
               ActualWaterFlowRate(0.0), RatedPumpPower(0.0), SenHeatLoss(0.0), SenHeatPower(0.0), LatHeatLoss(0.0), LatHeatPower(0.0),
