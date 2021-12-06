@@ -67,11 +67,11 @@ struct EnergyPlusData;
 
 namespace SetPointManager {
 
-    enum class CtrlNodeType : int
+    enum class CtrlNodeType
     {
         Invalid = -1,
-        control,
-        reference,
+        Control,
+        Reference,
         Num
     };
 

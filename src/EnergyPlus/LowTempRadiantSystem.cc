@@ -1845,14 +1845,14 @@ namespace LowTempRadiantSystem {
                                                                                          std::string const &controlInputField)
     {
         if (UtilityRoutines::SameString(controlInput, "HalfFlowPower")) {
-            return LowTempRadiantSetpointTypes::halfFlowPower;
+            return LowTempRadiantSetpointTypes::HalfFlowPower;
         } else if (UtilityRoutines::SameString(controlInput, "ZeroFlowPower")) {
-            return LowTempRadiantSetpointTypes::zeroFlowPower;
+            return LowTempRadiantSetpointTypes::ZeroFlowPower;
         } else {
             ShowWarningError(state, "Invalid " + controlInputField + " = " + controlInput);
             ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
             ShowContinueError(state, "Setpoint type reset to HalfFlowPower for this Low Temperature Radiant System.");
-            return LowTempRadiantSetpointTypes::halfFlowPower;
+            return LowTempRadiantSetpointTypes::HalfFlowPower;
         }
     }
 
@@ -5798,9 +5798,9 @@ namespace LowTempRadiantSystem {
     {
         Real64 scheduleValue = ScheduleManager::GetCurrentScheduleValue(state, scheduleIndex);
         switch (SetpointControlType) {
-        case LowTempRadiantSetpointTypes::halfFlowPower:
+        case LowTempRadiantSetpointTypes::HalfFlowPower:
             return scheduleValue + 0.5 * throttlingRange;
-        case LowTempRadiantSetpointTypes::zeroFlowPower:
+        case LowTempRadiantSetpointTypes::ZeroFlowPower:
             return scheduleValue;
         default:
             ShowSevereError(state, "Illegal setpoint type in low temperature radiant system: " + this->Name);

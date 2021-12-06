@@ -590,7 +590,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -694,7 +694,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -818,7 +818,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -927,7 +927,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -1047,7 +1047,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -1166,7 +1166,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -2793,7 +2793,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -2883,7 +2883,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                          ErrorsFound,
                                                                                                          cCurrentModuleObject,
                                                                                                          cAlphaArgs(1),
-                                                                                                         DataLoopNode::NodeFluidType::blank,
+                                                                                                         DataLoopNode::NodeFluidType::Blank,
                                                                                                          DataLoopNode::NodeConnectionType::Sensor,
                                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                                          ObjectIsNotParent);
@@ -2919,7 +2919,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -3086,7 +3086,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -3209,7 +3209,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -3298,7 +3298,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -3410,7 +3410,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -3521,7 +3521,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     NumNodes,
                     NodeNums,
                     NodeListError,
-                    DataLoopNode::NodeFluidType::blank,
+                    DataLoopNode::NodeFluidType::Blank,
                     cCurrentModuleObject,
                     cAlphaArgs(1),
                     DataLoopNode::NodeConnectionType::SetPoint,
@@ -3600,7 +3600,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               errFlag,
                               cCurrentModuleObject,
                               cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::blank,
+                              DataLoopNode::NodeFluidType::Blank,
                               DataLoopNode::NodeConnectionType::SetPoint,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
@@ -3611,7 +3611,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               errFlag,
                               cCurrentModuleObject,
                               cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::blank,
+                              DataLoopNode::NodeFluidType::Blank,
                               DataLoopNode::NodeConnectionType::Sensor,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
@@ -3697,7 +3697,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               errFlag,
                               cCurrentModuleObject,
                               cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::blank,
+                              DataLoopNode::NodeFluidType::Blank,
                               DataLoopNode::NodeConnectionType::SetPoint,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
@@ -3708,7 +3708,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               errFlag,
                               cCurrentModuleObject,
                               cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::blank,
+                              DataLoopNode::NodeFluidType::Blank,
                               DataLoopNode::NodeConnectionType::Sensor,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
@@ -6249,7 +6249,7 @@ void DefineMixedAirSetPointManager::calculate(EnergyPlusData &state)
             } else {
                 // need call to check if this is the target of an EnergyManagementSystem:Actuator object
                 CheckIfNodeSetPointManagedByEMS(
-                    state, RefNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                    state, RefNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                     ShowSevereError(state,
                                     "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + this->Name);
@@ -6379,15 +6379,15 @@ void DefineOAPretreatSetPointManager::calculate(EnergyPlusData &state)
                 {
                     auto const SELECT_CASE_var(this->CtrlTypeMode);
                     if (SELECT_CASE_var == CtrlVarType::Temp) { // 'Temperature'
-                        CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iTemperatureSetPoint, LocalSetPointCheckFailed);
+                        CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::TemperatureSetPoint, LocalSetPointCheckFailed);
                     } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) { // 'HUMRATMAX'
                         CheckIfNodeSetPointManagedByEMS(
-                            state, RefNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
+                            state, RefNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
                     } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) { // 'HUMRATMIN'
                         CheckIfNodeSetPointManagedByEMS(
-                            state, RefNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, LocalSetPointCheckFailed);
+                            state, RefNode, EMSManager::SPControlType::HumidityRatioMinSetPoint, LocalSetPointCheckFailed);
                     } else if (SELECT_CASE_var == CtrlVarType::HumRat) { // 'HumidityRatio'
-                        CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iHumidityRatioSetPoint, LocalSetPointCheckFailed);
+                        CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioSetPoint, LocalSetPointCheckFailed);
                     }
                 }
                 if (LocalSetPointCheckFailed) {
@@ -8737,7 +8737,7 @@ int getSPMBasedOnNode(
         if (SetPtType ==
             state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlTypeMode) { // SetPtType is e.g., CtrlVarType::Temp, CtrlVarType::HumRat, etc.
             switch (ctrlOrRefNode) { // ctrlOrRefNode is enum type of node to look for, either control node or reference node
-            case CtrlNodeType::control: {
+            case CtrlNodeType::Control: {
                 for (int NumNode = 1; NumNode <= state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++NumNode) {
                     // SPMType is type of set point manager, e.g., SetPointManagerType::Scheduled, SetPointManagerType::MixedAir, etc.
                     if (NodeNum == state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).CtrlNodes(NumNode) &&
@@ -8748,7 +8748,7 @@ int getSPMBasedOnNode(
                 }
                 break;
             }
-            case CtrlNodeType::reference: {
+            case CtrlNodeType::Reference: {
                 // SPMType is type of set point manager, e.g., SetPointManagerType::Scheduled, SetPointManagerType::MixedAir, etc.
                 if (NodeNum == state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).RefNode &&
                     SPMType == state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType) {

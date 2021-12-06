@@ -1180,7 +1180,7 @@ namespace BranchInputManager {
                             NumNodes,
                             NodeNums,
                             ErrFound,
-                            DataLoopNode::NodeFluidType::blank,
+                            DataLoopNode::NodeFluidType::Blank,
                             CurrentModuleObject,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
@@ -1222,7 +1222,7 @@ namespace BranchInputManager {
                             NumNodes,
                             NodeNums,
                             ErrFound,
-                            DataLoopNode::NodeFluidType::blank,
+                            DataLoopNode::NodeFluidType::Blank,
                             CurrentModuleObject,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
@@ -2588,7 +2588,7 @@ namespace BranchInputManager {
                   state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
 
             IsAirBranch = false;
-            BranchFluidType = NodeFluidType::blank;
+            BranchFluidType = NodeFluidType::Blank;
             MixedFluidTypesOnBranchList = false;
             NumNodesOnBranchList = 0;
             FoundBranches.allocate(state.dataBranchInputManager->BranchList(BCount).NumOfBranchNames);
@@ -2638,16 +2638,16 @@ namespace BranchInputManager {
                     if (state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType ==
                         DataLoopNode::NodeFluidType::Air)
                         IsAirBranch = true;
-                    if (BranchFluidType == DataLoopNode::NodeFluidType::blank) {
+                    if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                         BranchFluidType = state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType;
                         InitialBranchFluidNode = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
-                        OriginalBranchFluidType = DataLoopNode::ValidNodeFluidTypes(DataLoopNode::NodeFluidType::blank);
+                        OriginalBranchFluidType = DataLoopNode::ValidNodeFluidTypes(DataLoopNode::NodeFluidType::Blank);
                     } else if (BranchFluidType !=
                                    state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType &&
                                state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType !=
-                                   DataLoopNode::NodeFluidType::blank) {
+                                   DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                         MixedFluidTypesOnBranchList = true;
@@ -2658,7 +2658,7 @@ namespace BranchInputManager {
                     if (state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType ==
                         DataLoopNode::NodeFluidType::Air)
                         IsAirBranch = true;
-                    if (BranchFluidType == DataLoopNode::NodeFluidType::blank) {
+                    if (BranchFluidType == DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                         BranchFluidType = state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType;
@@ -2667,7 +2667,7 @@ namespace BranchInputManager {
                     } else if (BranchFluidType !=
                                    state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType &&
                                state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType !=
-                                   DataLoopNode::NodeFluidType::blank) {
+                                   DataLoopNode::NodeFluidType::Blank) {
                         ++NumFluidNodes;
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode;
                         MixedFluidTypesOnBranchList = true;

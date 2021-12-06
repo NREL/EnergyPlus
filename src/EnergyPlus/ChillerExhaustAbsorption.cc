@@ -916,7 +916,7 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         } else {
             // need call to EMS to check node
             errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::TemperatureSetPoint, errFlag);
             state.dataLoopNodes->NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
             if (errFlag) {
                 if (!this->ChillSetPointErrDone) {
@@ -948,7 +948,7 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         } else {
             // need call to EMS to check node
             errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::TemperatureSetPoint, errFlag);
             state.dataLoopNodes->NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
             if (errFlag) {
                 if (!this->HeatSetPointErrDone) {

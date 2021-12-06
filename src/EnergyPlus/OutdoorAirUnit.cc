@@ -1534,9 +1534,9 @@ namespace OutdoorAirUnit {
         auto &DataFanEnumType(state.dataSize->DataFanEnumType);
 
         if (OutAirUnit(OAUnitNum).SFanType == DataHVACGlobals::FanType_SystemModelObject) {
-            DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = OutAirUnit(OAUnitNum).SFan_Index;
         if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {

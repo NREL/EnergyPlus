@@ -1648,7 +1648,7 @@ namespace HeatRecovery {
                                 // need call to EMS to check node
                                 CheckIfNodeSetPointManagedByEMS(state,
                                                                 state.dataHeatRecovery->ExchCond(ExIndex).SupOutletNode,
-                                                                EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                EMSManager::SPControlType::TemperatureSetPoint,
                                                                 FatalError);
                                 if (FatalError) {
                                     ShowSevereError(state,
@@ -1746,7 +1746,7 @@ namespace HeatRecovery {
                                     // need call to EMS to check node
                                     CheckIfNodeSetPointManagedByEMS(state,
                                                                     state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode,
-                                                                    EMSManager::SPControlType::iHumidityRatioMaxSetPoint,
+                                                                    EMSManager::SPControlType::HumidityRatioMaxSetPoint,
                                                                     LocalWarningError);
                                     state.dataLoopNodes->NodeSetpointCheck(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode)
                                         .needsSetpointChecking = false;

@@ -99,15 +99,15 @@ namespace DataAirSystems {
         if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) return fanDesHeatLoad;
 
         switch (dataFanEnumType) {
-        case DataAirSystems::structArrayLegacyFanModels: {
+        case DataAirSystems::StructArrayLegacyFanModels: {
             fanDesHeatLoad = Fans::FanDesHeatGain(state, dataFanIndex, desVolFlow);
             break;
         }
-        case DataAirSystems::objectVectorOOFanSystemModel: {
+        case DataAirSystems::ObjectVectorOOFanSystemModel: {
             fanDesHeatLoad = state.dataHVACFan->fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
             break;
         }
-        case DataAirSystems::fanModelTypeNotYetSet: {
+        case DataAirSystems::Invalid: {
             // do nothing
             break;
         }

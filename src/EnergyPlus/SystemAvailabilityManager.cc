@@ -980,7 +980,7 @@ namespace SystemAvailabilityManager {
                                       ErrorsFound,
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
-                                      DataLoopNode::NodeFluidType::blank,
+                                      DataLoopNode::NodeFluidType::Blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
@@ -995,7 +995,7 @@ namespace SystemAvailabilityManager {
                                       ErrorsFound,
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
-                                      DataLoopNode::NodeFluidType::blank,
+                                      DataLoopNode::NodeFluidType::Blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
@@ -1063,7 +1063,7 @@ namespace SystemAvailabilityManager {
                                       ErrorsFound,
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
-                                      DataLoopNode::NodeFluidType::blank,
+                                      DataLoopNode::NodeFluidType::Blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
@@ -1118,7 +1118,7 @@ namespace SystemAvailabilityManager {
                                       ErrorsFound,
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
-                                      DataLoopNode::NodeFluidType::blank,
+                                      DataLoopNode::NodeFluidType::Blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
@@ -1173,7 +1173,7 @@ namespace SystemAvailabilityManager {
                                       ErrorsFound,
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
-                                      DataLoopNode::NodeFluidType::blank,
+                                      DataLoopNode::NodeFluidType::Blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
@@ -1239,7 +1239,7 @@ namespace SystemAvailabilityManager {
                                       ErrorsFound,
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
-                                      DataLoopNode::NodeFluidType::blank,
+                                      DataLoopNode::NodeFluidType::Blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);

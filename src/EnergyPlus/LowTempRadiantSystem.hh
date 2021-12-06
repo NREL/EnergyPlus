@@ -103,8 +103,8 @@ namespace LowTempRadiantSystem {
     enum class LowTempRadiantSetpointTypes
     {
         Invalid = -1,
-        halfFlowPower, // Controls system where the setpoint is at the 50% flow/power point
-        zeroFlowPower, // Controls system where the setpoint is at the 0% flow/power point
+        HalfFlowPower, // Controls system where the setpoint is at the 50% flow/power point
+        ZeroFlowPower, // Controls system where the setpoint is at the 0% flow/power point
         Num
     };
     // Fluid to Slab Heat Transfer Types:
@@ -152,7 +152,7 @@ namespace LowTempRadiantSystem {
                                                                                          // Surface Face Temp, Surface Interior Temp, Running Mean
                                                                                          // Temp for Constant Flow systems only)
         LowTempRadiantSetpointTypes SetpointType =
-            LowTempRadiantSetpointTypes::halfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
+            LowTempRadiantSetpointTypes::HalfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
         int OperatingMode = NotOperating;               // Operating mode currently being used (NotOperating, Heating, Cooling)
         Real64 HeatPower;                               // heating sent to panel in Watts
         Real64 HeatEnergy;                              // heating sent to panel in Joules
@@ -321,7 +321,7 @@ namespace LowTempRadiantSystem {
         // Surface Face Temp, Surface Interior Temp, Running Mean Temp
         // for Constant Flow systems only)
         LowTempRadiantSetpointTypes VarFlowSetpointType =
-            LowTempRadiantSetpointTypes::halfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
+            LowTempRadiantSetpointTypes::HalfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
         std::string DesignHeatingCapMethodInput;
         int DesignHeatingCapMethod = 0; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity,
         // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)

@@ -897,7 +897,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
                 EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                    state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->ModulatedFlowErrDone) {

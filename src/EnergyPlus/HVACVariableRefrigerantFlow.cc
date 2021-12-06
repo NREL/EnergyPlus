@@ -6469,17 +6469,17 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             bool SPNotFound = false;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum,
-                                                                        EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                        EMSManager::SPControlType::TemperatureSetPoint,
                                                                         SetPointErrorFlag);
                             SPNotFound = SPNotFound || SetPointErrorFlag;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode,
-                                                                        EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                        EMSManager::SPControlType::TemperatureSetPoint,
                                                                         SetPointErrorFlag);
                             SPNotFound = SPNotFound || SetPointErrorFlag;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode,
-                                                                        EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                        EMSManager::SPControlType::TemperatureSetPoint,
                                                                         SetPointErrorFlag);
                             SPNotFound = SPNotFound || SetPointErrorFlag;
 
@@ -8060,7 +8060,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
             state.dataSize->DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
                 state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
@@ -8068,8 +8068,8 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
             }
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum =
-                DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelType =
+                DataAirSystems::ObjectVectorOOFanSystemModel;
             state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanVecIndex =
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
@@ -8082,7 +8082,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         }
     } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
             state.dataSize->DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
                 state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
@@ -8090,8 +8090,8 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
             }
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum =
-                DataAirSystems::structArrayLegacyFanModels;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelType =
+                DataAirSystems::StructArrayLegacyFanModels;
             state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanVecIndex =
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {

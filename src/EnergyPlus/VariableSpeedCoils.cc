@@ -4157,7 +4157,7 @@ namespace VariableSpeedCoils {
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex);
                 }
 
@@ -4168,7 +4168,7 @@ namespace VariableSpeedCoils {
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex);
                 }
             }

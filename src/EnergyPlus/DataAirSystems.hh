@@ -148,8 +148,6 @@ namespace DataAirSystems {
         int NodeNumOut;                // Branch outlet node number
         int DuctType;                  // 1=main, 2=cooling, 3=heating, 4=other
         Array1D<AirLoopCompData> Comp; // Component list--high level components
-        //  TYPE(ExpandedCompData), &
-        //           ALLOCATABLE, DIMENSION(:) :: MegaComp              ! Component list
         //  This list would include children, grandchildren, etc.
         int TotalNodes;      // total number of nodes on branch
         Array1D_int NodeNum; // node list (numbers)
@@ -198,17 +196,16 @@ namespace DataAirSystems {
         }
     };
 
-    enum fanModelTypeEnum
+    enum FanModelType
     {
-        fanModelTypeNotYetSet,
-        structArrayLegacyFanModels,
-        objectVectorOOFanSystemModel
+        Invalid = -1,
+        StructArrayLegacyFanModels,
+        ObjectVectorOOFanSystemModel
     };
 
     enum class FanPlacement
     {
         Invalid = -1,
-        fanPlaceNotSet,
         BlowThru,
         DrawThru,
         Num
@@ -243,24 +240,24 @@ namespace DataAirSystems {
         int OASysOutletNodeNum;     // node number of mixed air outlet of OA sys
         int OAMixOAInNodeNum;       // node number of the OA stream inlet to the
         // OA mixer component.
-        bool RABExists;                       // true if there is a RAB
-        int RABMixInNode;                     // node num of RAB mixer inlet
-        int SupMixInNode;                     // node num of supply air inlet to mixer
-        int MixOutNode;                       // outlet node of mixer
-        int RABSplitOutNode;                  // node num of RAB splitter outlet
-        int OtherSplitOutNode;                // node num of nonRAB splitter outlet
-        int NumOACoolCoils;                   // number of cooling coils in the outside air system
-        int NumOAHeatCoils;                   // number of heating coils in the outside air system
-        int NumOAHXs;                         // number of heat exchangers in the outside air system
-        bool SizeAirloopCoil;                 // simulates air loop coils before calling controllers
-        fanModelTypeEnum supFanModelTypeEnum; // indicates which type of fan model to call for supply fan, legacy or new OO
-        int SupFanNum;                        // index of the supply fan in the Fan data structure when model type is structArrayLegacyFanModels
-        int supFanVecIndex;          // index in fan object vector for supply fan when model type is objectVectorOOFanSystemModel, zero-based index
-        FanPlacement supFanLocation; // location of fan relative to coil
-        fanModelTypeEnum retFanModelTypeEnum; // indicates which type of fan model to call for return fan, legacy or new OO
-        int RetFanNum;                        // index of the return fan in the Fan data structure when model type is structArrayLegacyFanModels
-        int retFanVecIndex;    // index in fan object vector for return fan when model type is objectVectorOOFanSystemModel, zero-based index
-        Real64 FanDesCoolLoad; // design fan heat gain for the air loop [W]
+        bool RABExists;               // true if there is a RAB
+        int RABMixInNode;             // node num of RAB mixer inlet
+        int SupMixInNode;             // node num of supply air inlet to mixer
+        int MixOutNode;               // outlet node of mixer
+        int RABSplitOutNode;          // node num of RAB splitter outlet
+        int OtherSplitOutNode;        // node num of nonRAB splitter outlet
+        int NumOACoolCoils;           // number of cooling coils in the outside air system
+        int NumOAHeatCoils;           // number of heating coils in the outside air system
+        int NumOAHXs;                 // number of heat exchangers in the outside air system
+        bool SizeAirloopCoil;         // simulates air loop coils before calling controllers
+        FanModelType supFanModelType; // indicates which type of fan model to call for supply fan, legacy or new OO
+        int SupFanNum;                // index of the supply fan in the Fan data structure when model type is StructArrayLegacyFanModels
+        int supFanVecIndex;           // index in fan object vector for supply fan when model type is ObjectVectorOOFanSystemModel, zero-based index
+        FanPlacement supFanLocation;  // location of fan relative to coil
+        FanModelType retFanModelType; // indicates which type of fan model to call for return fan, legacy or new OO
+        int RetFanNum;                // index of the return fan in the Fan data structure when model type is StructArrayLegacyFanModels
+        int retFanVecIndex;           // index in fan object vector for return fan when model type is ObjectVectorOOFanSystemModel, zero-based index
+        Real64 FanDesCoolLoad;        // design fan heat gain for the air loop [W]
 
         // Default Constructor
         DefinePrimaryAirSystem()
@@ -268,8 +265,8 @@ namespace DataAirSystems {
               NumInletBranches(0), InletBranchNum(3, 0), CentralHeatCoilExists(true), CentralCoolCoilExists(true), OASysExists(false), isAllOA(false),
               OASysInletNodeNum(0), OASysOutletNodeNum(0), OAMixOAInNodeNum(0), RABExists(false), RABMixInNode(0), SupMixInNode(0), MixOutNode(0),
               RABSplitOutNode(0), OtherSplitOutNode(0), NumOACoolCoils(0), NumOAHeatCoils(0), NumOAHXs(0), SizeAirloopCoil(true),
-              supFanModelTypeEnum(fanModelTypeNotYetSet), SupFanNum(0), supFanVecIndex(-1), supFanLocation(FanPlacement::fanPlaceNotSet),
-              retFanModelTypeEnum(fanModelTypeNotYetSet), RetFanNum(0), retFanVecIndex(-1), FanDesCoolLoad(0.0)
+              supFanModelType(Invalid), SupFanNum(0), supFanVecIndex(-1), supFanLocation(FanPlacement::Invalid), retFanModelType(Invalid),
+              RetFanNum(0), retFanVecIndex(-1), FanDesCoolLoad(0.0)
         {
         }
     };

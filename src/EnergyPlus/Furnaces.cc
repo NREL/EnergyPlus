@@ -6601,13 +6601,13 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
             state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
         } else {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
             state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
         }
         if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == BlowThru) {

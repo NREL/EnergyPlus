@@ -3001,13 +3001,13 @@ namespace WindowComplexManager {
         }
 
         // Standard conditions run (winter and summer)
-        if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::Winter) {
             tind = 294.15;
             tout = 255.15;
             hcout = 26.0;
             wso = 5.5;
             dir = 0.0;
-        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Summer) {
             tind = 297.15;
             tout = 305.15;
             hcout = 15.0;
@@ -3168,9 +3168,9 @@ namespace WindowComplexManager {
             }
             ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
             ShowFatalError(state, "halting because of error in tarcog");
-        } else if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Winter) {
             state.dataHeatBal->NominalU(ConstrNum) = ufactor;
-        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Summer) {
             // tempInt = SurfaceWindow(SurfNum)%ComplexFen%CurrentState
             // tempReal = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffTrans
 

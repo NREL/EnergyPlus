@@ -197,21 +197,21 @@ public:                                  // data
     Real64 ratedCoilOadbRef;   // rated DX coil outside air dry bulb reference [C]
     Real64 ratedCoilOawbRef;   // rated DX coil outside air wet bulb reference [C]
 
-    std::string fanAssociatedWithCoilName;                // name of fan found to be associated with this coil
-    std::string fanTypeName;                              // type of fan found to be associated with this coil
-    DataAirSystems::fanModelTypeEnum supFanModelTypeEnum; // indicates which type of fan model for supply fan, legacy or new OO
-    int supFanNum;                                        // index pointing to this fan in legacy fan data structure, 1-based struct array
-    int supFanVecIndex;                                   // index pointing to this fan in new OO fan object array, 0-based
-    Real64 fanSizeMaxAirVolumeFlow;                       // the size of the fan in terms of volume flow rate [m3/s]
-    Real64 fanSizeMaxAirMassFlow;                         // the size of the fan in terms of mass flow rate [kg/s]
-    Real64 fanHeatGainIdealPeak;                          // Fan heat gain to air during Ideal loads peak sizing [W]
-    Real64 coilAndFanNetTotalCapacityIdealPeak;           // coil net total capacity including fan heat gain for ideal loads peak sizing [W]
+    std::string fanAssociatedWithCoilName;        // name of fan found to be associated with this coil
+    std::string fanTypeName;                      // type of fan found to be associated with this coil
+    DataAirSystems::FanModelType supFanModelType; // indicates which type of fan model for supply fan, legacy or new OO
+    int supFanNum;                                // index pointing to this fan in legacy fan data structure, 1-based struct array
+    int supFanVecIndex;                           // index pointing to this fan in new OO fan object array, 0-based
+    Real64 fanSizeMaxAirVolumeFlow;               // the size of the fan in terms of volume flow rate [m3/s]
+    Real64 fanSizeMaxAirMassFlow;                 // the size of the fan in terms of mass flow rate [kg/s]
+    Real64 fanHeatGainIdealPeak;                  // Fan heat gain to air during Ideal loads peak sizing [W]
+    Real64 coilAndFanNetTotalCapacityIdealPeak;   // coil net total capacity including fan heat gain for ideal loads peak sizing [W]
 
     // static plant info
     Real64 plantDesMaxMassFlowRate; // this coil's plant loop overall design flow rate [kg/s]
     Real64 plantDesRetTemp;         // this coil's plant loop design return temperature
     Real64 plantDesSupTemp;         // this coil's plant loop design supply temperature
-    Real64 plantDesDeltaTemp;       // this coil's plant loop design temperature differene (delta C)
+    Real64 plantDesDeltaTemp;       // this coil's plant loop design temperature diference (delta C)
     Real64 plantDesCapacity;        // this coil's plant loop capacity [W]
     Real64 coilCapPrcntPlantCap;    // this coil's capacity as a percentage of the overall loop's capacity
     Real64 coilFlowPrcntPlantFlow;  // this coil's design flow rate as a percentage the overall loop's design flow rate
@@ -404,7 +404,7 @@ public: // methods
                               std::string const &coilName, // user-defined name of the coil
                               std::string const &coilType, // idf input object class name of coil
                               std::string const &fanName,
-                              DataAirSystems::fanModelTypeEnum const &fanEnumType,
+                              DataAirSystems::FanModelType const &fanEnumType,
                               int const &fanIndex);
 
     static std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);

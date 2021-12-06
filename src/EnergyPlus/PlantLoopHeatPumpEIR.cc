@@ -992,9 +992,9 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsNotParent);
-                DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::blank;
-                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::blank;
-                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::blank;
+                DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
+                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::Blank;
+                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::Blank;
                 if (condenserType == "WATERSOURCE") {
                     thisPLHP.waterSource = true;
                     condenserNodeType = DataLoopNode::NodeFluidType::Water;

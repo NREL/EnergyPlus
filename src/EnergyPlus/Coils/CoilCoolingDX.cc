@@ -848,7 +848,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
                                                                                              this->name,
                                                                                              state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                                              state.dataHVACFan->fanObjs[this->supplyFanIndex]->name,
-                                                                                             DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                             DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                              this->supplyFanIndex);
                 }
             } else {
@@ -857,7 +857,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
                                                                                              this->name,
                                                                                              state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                                              state.dataFans->Fan(this->supplyFanIndex).FanName,
-                                                                                             DataAirSystems::structArrayLegacyFanModels,
+                                                                                             DataAirSystems::StructArrayLegacyFanModels,
                                                                                              this->supplyFanIndex);
                 }
             }

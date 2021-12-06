@@ -891,7 +891,7 @@ namespace TranspiredCollector {
                             } else {
                                 // need call to EMS to check node
                                 CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
+                                    state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state,
                                                     "Missing temperature setpoint for UTSC " + state.dataTranspiredCollector->UTSC(UTSCUnitNum).Name);

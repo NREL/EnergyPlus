@@ -7459,8 +7459,8 @@ namespace WindowManager {
                 if (state.dataConstruction->Construct(ThisNum).WindowTypeBSDF) {
 
                     i = ThisNum;
-                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::winterCondition);
-                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::summerCondition);
+                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::Winter);
+                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::Summer);
 
                     static constexpr std::string_view Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
                     print(state.files.eio,

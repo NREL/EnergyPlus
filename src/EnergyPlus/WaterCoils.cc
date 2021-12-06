@@ -6458,7 +6458,7 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
             EMSSetPointErrorFlag = false;
             switch (ControlledVar) {
             case HVACControllers::CtrlVarType::Temperature: {
-                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
+                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::TemperatureSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
                     if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::Temp)) {
@@ -6473,7 +6473,7 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 break;
             }
             case HVACControllers::CtrlVarType::HumidityRatio: {
-                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
                     if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::MaxHumRat)) {
@@ -6488,7 +6488,7 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 break;
             }
             case HVACControllers::CtrlVarType::TemperatureAndHumidityRatio: {
-                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
+                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::TemperatureSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
                     if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::Temp)) {
@@ -6501,7 +6501,7 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     }
                 }
                 EMSSetPointErrorFlag = false;
-                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
                     if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::MaxHumRat)) {

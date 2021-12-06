@@ -125,8 +125,8 @@ namespace OutputReportTabular {
     enum class EndUseSubTableType
     {
         Invalid = -1,
-        bySubCategory,
-        bySpaceType,
+        BySubCategory,
+        BySpaceType,
         Num
     };
 
@@ -182,9 +182,9 @@ namespace OutputReportTabular {
     enum class OutputType
     {
         Invalid = -1,
-        zoneOutput,
-        airLoopOutput,
-        facilityOutput,
+        Zone,
+        AirLoop,
+        Facility,
         Num
     };
 
@@ -212,16 +212,16 @@ namespace OutputReportTabular {
         DataSourceLine,
         WMOStationLine,
         DesignConditionsLine,
-        heatingConditionsLine,
-        coolingConditionsLine,
-        stdHDDLine,
-        stdCDDLine,
-        maxDryBulbLine,
-        minDryBulbLine,
-        maxDewPointLine,
-        minDewPointLine,
-        wthHDDLine,
-        wthCDDLine,
+        HeatingConditionsLine,
+        CoolingConditionsLine,
+        StdHDDLine,
+        StdCDDLine,
+        MaxDryBulbLine,
+        MinDryBulbLine,
+        MaxDewPointLine,
+        MinDewPointLine,
+        WithHDDLine,
+        WithCDDLine,
         KoppenLine,
         KoppenDes1Line,
         KoppenDes2Line,

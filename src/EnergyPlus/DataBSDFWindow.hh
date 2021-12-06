@@ -84,13 +84,13 @@ namespace DataBSDFWindow {
 
     // Thermal calculations for complex fenestration can be used to generate reports for standard cases
     // noCondition is used when performing timestep calculations
-    // summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW  = software results
-    // winterCondition will override certain parameters so that produced results are matching standard winter WINDOW  = software results
+    // 'Summer' will override certain parameters so that produced results are matching standard summer WINDOW  = software results
+    // 'Winter' will override certain parameters so that produced results are matching standard winter WINDOW  = software results
     enum class Condition
     {
         Invalid = -1,
-        summerCondition,
-        winterCondition,
+        Summer,
+        Winter,
         Num
     };
 

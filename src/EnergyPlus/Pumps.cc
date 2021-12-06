@@ -497,9 +497,9 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
             if (state.dataIPShortCut->cAlphaArgs(14) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(14) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -678,9 +678,9 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
             if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -819,9 +819,9 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
             if (state.dataIPShortCut->cAlphaArgs(6) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(6) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -977,9 +977,9 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
             if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -1130,9 +1130,9 @@ void GetPumpInput(EnergyPlusData &state)
         }
         if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
             if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -2322,12 +2322,12 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
         if (state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate >= SmallWaterVolFlow) {
             switch (state.dataPumps->PumpEquip(PumpNum).powerSizingMethod) {
 
-            case PowerSizingMethod::sizePowerPerFlow: {
+            case PowerSizingMethod::SizePowerPerFlow: {
                 TotalEffic = state.dataPumps->PumpEquip(PumpNum).NomPumpHead / state.dataPumps->PumpEquip(PumpNum).powerPerFlowScalingFactor;
                 break;
             }
 
-            case PowerSizingMethod::sizePowerPerFlowPerPressure: {
+            case PowerSizingMethod::SizePowerPerFlowPerPressure: {
                 TotalEffic =
                     (1 / state.dataPumps->PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor) * state.dataPumps->PumpEquip(PumpNum).MotorEffic;
                 break;

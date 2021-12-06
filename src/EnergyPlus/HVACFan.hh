@@ -172,21 +172,19 @@ namespace HVACFan {
 
         // data
 
-        enum class PowerSizingMethod : int
+        enum class PowerSizingMethod
         {
             Invalid = -1,
-            powerSizingMethodNotSet = 0,
-            powerPerFlow,
-            powerPerFlowPerPressure,
-            totalEfficiencyAndPressure,
+            PowerPerFlow,
+            PowerPerFlowPerPressure,
+            TotalEfficiencyAndPressure,
             Num
         };
-        enum class ThermalLossDestination : int
+        enum class ThermalLossDestination
         {
             Invalid = -1,
-            heatLossNotDetermined = 0,
-            zoneGains,
-            lostToOutside,
+            ZoneGains,
+            LostToOutside,
             Num
         };
 
@@ -198,8 +196,8 @@ namespace HVACFan {
         Real64 m_motorInAirFrac;                 // Fraction of motor heat entering air stream
         bool m_designElecPowerWasAutosized;
         PowerSizingMethod m_powerSizingMethod;          // sizing method for design electric power, three options
-        Real64 m_elecPowerPerFlowRate;                  // scaling factor for powerPerFlow method
-        Real64 m_elecPowerPerFlowRatePerPressure;       // scaling factor for powerPerFlowPerPressure
+        Real64 m_elecPowerPerFlowRate;                  // scaling factor for PowerPerFlow method
+        Real64 m_elecPowerPerFlowRatePerPressure;       // scaling factor for PowerPerFlowPerPressure
         Real64 m_fanTotalEff;                           // Fan total system efficiency (fan*belt*motor*VFD)
         Real64 m_nightVentPressureDelta;                // fan pressure rise during night ventilation mode
         Real64 m_nightVentFlowFraction;                 // fan's flow fraction during night ventilation mode, not used

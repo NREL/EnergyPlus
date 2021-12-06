@@ -1087,7 +1087,7 @@ void InitEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                         ShowContinueError(state, " use a Setpoint Manager to establish a setpoint at the unit control node.");
                     } else {
                         localSetPointCheck = false;
-                        CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, localSetPointCheck);
+                        CheckIfNodeSetPointManagedByEMS(state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, localSetPointCheck);
                         state.dataLoopNodes->NodeSetpointCheck(ControlNode).needsSetpointChecking = false;
                         // Let it slide apparently
                         if (localSetPointCheck) {

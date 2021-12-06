@@ -113,8 +113,8 @@ namespace Pumps {
     enum class PowerSizingMethod
     {
         Invalid = -1,
-        sizePowerPerFlow,
-        sizePowerPerFlowPerPressure,
+        SizePowerPerFlow,
+        SizePowerPerFlowPerPressure,
         Num
     };
 
@@ -220,7 +220,7 @@ namespace Pumps {
               MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false),
               EMSMassFlowValue(0.0), NomSteamVolFlowRate(0.0), NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0),
               minVolFlowRateWasAutosized(false), MassFlowRateMin(0.0), NomPumpHead(0.0), EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0),
-              NomPowerUse(0.0), NomPowerUseWasAutoSized(false), powerSizingMethod(PowerSizingMethod::sizePowerPerFlowPerPressure),
+              NomPowerUse(0.0), NomPowerUseWasAutoSized(false), powerSizingMethod(PowerSizingMethod::SizePowerPerFlowPerPressure),
               powerPerFlowScalingFactor(348701.1),            // 22 W/gpm
               powerPerFlowPerPressureScalingFactor(1 / 0.78), // legacy impeller efficiency
               MotorEffic(0.0), PumpEffic(0.0), FracMotorLossToFluid(0.0), Energy(0.0), Power(0.0), PartLoadCoef(4, 0.0), PressureCurve_Index(0),

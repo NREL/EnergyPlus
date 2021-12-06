@@ -189,7 +189,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     state->dataFans->Fan(1).MotInAirFrac = 0.1;
     state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     state->dataSize->DataFanIndex = 1;
-    state->dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+    state->dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
     state->dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
     state->dataSize->DataDesInletAirHumRat = 0.008;
     state->dataSize->DataAirFlowUsedForSizing = 0.24;

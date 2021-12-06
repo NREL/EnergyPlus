@@ -548,8 +548,8 @@ namespace UnitarySystems {
                             // need to check for all other coil types
                         }
                         if (coilDataSet) {
-                            switch (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            switch (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanModelType) {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 int SupFanNum = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum;
                                 if (SupFanNum > 0) {
                                     state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
@@ -557,25 +557,25 @@ namespace UnitarySystems {
                                         coilName,
                                         coilType,
                                         state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum).FanName,
-                                        DataAirSystems::structArrayLegacyFanModels,
+                                        DataAirSystems::StructArrayLegacyFanModels,
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).SupFanNum);
                                 }
 
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex >= 0) {
                                     state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                                         state,
                                         coilName,
                                         coilType,
                                         state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex]->name,
-                                        DataAirSystems::objectVectorOOFanSystemModel,
+                                        DataAirSystems::ObjectVectorOOFanSystemModel,
                                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanVecIndex);
                                 }
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
@@ -1457,7 +1457,7 @@ namespace UnitarySystems {
                     SetPointErrorFlag = true;
                 } else {
                     EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
+                        state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, this->UnitType + ": Missing temperature setpoint for unitary system = " + this->Name);
                         ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the coil control node.");
@@ -1475,7 +1475,7 @@ namespace UnitarySystems {
                     SetPointErrorFlag = true;
                 } else if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                        state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state,
                                         this->UnitType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
@@ -1680,15 +1680,13 @@ namespace UnitarySystems {
         if (state.dataSize->CurSysNum > 0 && state.dataSize->CurOASysNum == 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = this->m_FanIndex;
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum =
-                    DataAirSystems::objectVectorOOFanSystemModel;
-                state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
+                state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
                 state.dataSize->DataFanIndex = this->m_FanIndex;
             } else {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = this->m_FanIndex;
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum =
-                    DataAirSystems::structArrayLegacyFanModels;
-                state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
+                state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
                 state.dataSize->DataFanIndex = this->m_FanIndex;
             }
             if (this->m_FanPlace == FanPlace::BlowThru) {
@@ -1698,9 +1696,9 @@ namespace UnitarySystems {
             }
         } else if (state.dataSize->CurZoneEqNum > 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
             } else {
-                state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
             }
             state.dataSize->DataFanIndex = this->m_FanIndex;
             if (this->m_FanPlace == FanPlace::BlowThru) {
@@ -4546,14 +4544,14 @@ namespace UnitarySystems {
                                                                                                          this->m_HeatingCoilName,
                                                                                                          this->m_HeatingCoilTypeName,
                                                                                                          this->m_FanName,
-                                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                                          this->m_FanIndex);
                             } else {
                                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                                          this->m_HeatingCoilName,
                                                                                                          this->m_HeatingCoilTypeName,
                                                                                                          this->m_FanName,
-                                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                                          this->m_FanIndex);
                             }
                         }
@@ -4641,7 +4639,7 @@ namespace UnitarySystems {
                                                                                                          this->m_HeatingCoilName,
                                                                                                          this->m_HeatingCoilTypeName,
                                                                                                          this->m_FanName,
-                                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                                          this->m_FanIndex);
 
                             } else {
@@ -4649,7 +4647,7 @@ namespace UnitarySystems {
                                                                                                          this->m_HeatingCoilName,
                                                                                                          this->m_HeatingCoilTypeName,
                                                                                                          this->m_FanName,
-                                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                                          this->m_FanIndex);
                             }
                         }
@@ -5804,14 +5802,14 @@ namespace UnitarySystems {
                                                                                          this->m_SuppHeatCoilName,
                                                                                          this->m_SuppHeatCoilTypeName,
                                                                                          this->m_FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          this->m_FanIndex);
             } else {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          this->m_SuppHeatCoilName,
                                                                                          this->m_SuppHeatCoilTypeName,
                                                                                          this->m_FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          this->m_FanIndex);
             }
         }

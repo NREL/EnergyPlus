@@ -174,8 +174,8 @@ namespace DataGenerators {
     enum class FuelMode
     {
         Invalid = -1,
-        fuelModeGaseousConstituents,
-        fuelModeGenericLiquid,
+        GaseousConstituents,
+        GenericLiquid,
         Num
     };
 

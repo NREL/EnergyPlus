@@ -1546,7 +1546,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                 CheckIfNodeSetPointManagedByEMS(
                                     state,
                                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                    EMSManager::SPControlType::iTemperatureSetPoint,
+                                    EMSManager::SPControlType::TemperatureSetPoint,
                                     NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
                                     ShowSevereError(state,
@@ -1599,7 +1599,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
+                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,
@@ -1650,12 +1650,12 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                        EMSManager::SPControlType::TemperatureMinSetPoint,
                                         NodeEMSSetPointMissing);
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
+                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,
@@ -1708,7 +1708,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                        EMSManager::SPControlType::TemperatureMinSetPoint,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,

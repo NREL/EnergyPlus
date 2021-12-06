@@ -2852,7 +2852,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                     } else {
                         // add call to check node in EMS
                         CheckIfNodeSetPointManagedByEMS(
-                            state, MixedAirNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                            state, MixedAirNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "MixedAir: Missing temperature setpoint for economizer controller " + thisOAController.Name);
                             ShowSevereError(state, "Node Referenced (by Controller)=" + state.dataLoopNodes->NodeID(MixedAirNode));

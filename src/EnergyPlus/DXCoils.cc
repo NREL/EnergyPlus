@@ -7591,7 +7591,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                                                                                          state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                                          state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                                          state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
             }
 
@@ -7601,7 +7601,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                                                                                          state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                                                                          state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                                                          state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
             }
         }
@@ -16687,7 +16687,7 @@ void SetDXCoolingCoilData(EnergyPlusData &state,
                     state.dataDXCoils->DXCoil(DXCoilNum).Name,
                     state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                     state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->name,
-                    DataAirSystems::objectVectorOOFanSystemModel,
+                    DataAirSystems::ObjectVectorOOFanSystemModel,
                     state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
             } else {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
@@ -16695,7 +16695,7 @@ void SetDXCoolingCoilData(EnergyPlusData &state,
                     state.dataDXCoils->DXCoil(DXCoilNum).Name,
                     state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                     state.dataFans->Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,
-                    DataAirSystems::structArrayLegacyFanModels,
+                    DataAirSystems::StructArrayLegacyFanModels,
                     state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
             }
         }

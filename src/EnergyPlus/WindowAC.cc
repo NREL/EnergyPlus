@@ -765,14 +765,14 @@ namespace WindowAC {
                                                                                          state.dataWindowAC->WindAC(WindACNum).DXCoilName,
                                                                                          state.dataWindowAC->WindAC(WindACNum).DXCoilType,
                                                                                          state.dataWindowAC->WindAC(WindACNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataWindowAC->WindAC(WindACNum).FanIndex);
             } else {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          state.dataWindowAC->WindAC(WindACNum).DXCoilName,
                                                                                          state.dataWindowAC->WindAC(WindACNum).DXCoilType,
                                                                                          state.dataWindowAC->WindAC(WindACNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataWindowAC->WindAC(WindACNum).FanIndex);
             }
         }
@@ -1011,9 +1011,9 @@ namespace WindowAC {
         CompName = state.dataWindowAC->WindAC(WindACNum).Name;
         state.dataSize->DataZoneNumber = state.dataWindowAC->WindAC(WindACNum).ZonePtr;
         if (state.dataWindowAC->WindAC(WindACNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = state.dataWindowAC->WindAC(WindACNum).FanIndex;
         if (state.dataWindowAC->WindAC(WindACNum).FanPlace == BlowThru) {

@@ -11884,13 +11884,12 @@ namespace SurfaceGeometry {
         enum class ZoneVolumeCalcMethod
         {
             Invalid = -1,
-            enclosed,
-            floorAreaTimesHeight1,
-            floorAreaTimesHeight2,
-            ceilingAreaTimesHeight,
-            opWallAreaTimesDistance,
-            userProvided,
-            error,
+            Enclosed,
+            FloorAreaTimesHeight1,
+            FloorAreaTimesHeight2,
+            CeilingAreaTimesHeight,
+            OpWallAreaTimesDistance,
+            UserProvided,
             Num
         };
 
@@ -11954,32 +11953,32 @@ namespace SurfaceGeometry {
 
             if (isZoneEnclosed) {
                 CalcVolume = CalcPolyhedronVolume(state, ZoneStruct);
-                volCalcMethod = ZoneVolumeCalcMethod::enclosed;
+                volCalcMethod = ZoneVolumeCalcMethod::Enclosed;
             } else if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0 && state.dataHeatBal->Zone(ZoneNum).CeilingHeight > 0.0 &&
                        areFloorAndCeilingSame(state, ZoneStruct)) {
                 CalcVolume = state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
-                volCalcMethod = ZoneVolumeCalcMethod::floorAreaTimesHeight1;
+                volCalcMethod = ZoneVolumeCalcMethod::FloorAreaTimesHeight1;
             } else if (isFloorHorizontal && areWallsVertical && areWallsSameHeight && state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0 &&
                        state.dataHeatBal->Zone(ZoneNum).CeilingHeight > 0.0) {
                 CalcVolume = state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
-                volCalcMethod = ZoneVolumeCalcMethod::floorAreaTimesHeight2;
+                volCalcMethod = ZoneVolumeCalcMethod::FloorAreaTimesHeight2;
             } else if (isCeilingHorizontal && areWallsVertical && areWallsSameHeight && state.dataHeatBal->Zone(ZoneNum).CeilingArea > 0.0 &&
                        state.dataHeatBal->Zone(ZoneNum).CeilingHeight > 0.0) {
                 CalcVolume = state.dataHeatBal->Zone(ZoneNum).CeilingArea * state.dataHeatBal->Zone(ZoneNum).CeilingHeight;
-                volCalcMethod = ZoneVolumeCalcMethod::ceilingAreaTimesHeight;
+                volCalcMethod = ZoneVolumeCalcMethod::CeilingAreaTimesHeight;
             } else if (areOppositeWallsSame(state, ZoneStruct, oppositeWallArea, distanceBetweenOppositeWalls)) {
                 CalcVolume = oppositeWallArea * distanceBetweenOppositeWalls;
-                volCalcMethod = ZoneVolumeCalcMethod::opWallAreaTimesDistance;
+                volCalcMethod = ZoneVolumeCalcMethod::OpWallAreaTimesDistance;
             } else if (state.dataHeatBal->Zone(ZoneNum).Volume == DataGlobalConstants::AutoCalculate) { // no user entered zone volume
                 ShowSevereError(state,
                                 "For zone: " + state.dataHeatBal->Zone(ZoneNum).Name +
                                     " it is not possible to calculate the volume from the surrounding surfaces so either provide the volume value or "
                                     "define all the surfaces to fully enclose the zone.");
                 CalcVolume = 0.;
-                volCalcMethod = ZoneVolumeCalcMethod::error;
+                volCalcMethod = ZoneVolumeCalcMethod::Invalid;
             } else {
                 CalcVolume = 0.;
-                volCalcMethod = ZoneVolumeCalcMethod::userProvided;
+                volCalcMethod = ZoneVolumeCalcMethod::UserProvided;
             }
             if (!isZoneEnclosed) {
                 ++countNotFullyEnclosedZones;
@@ -11989,32 +11988,32 @@ namespace SurfaceGeometry {
                         "CalculateZoneVolume: The Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
                             "\" is not fully enclosed. To be fully enclosed, each edge of a surface must also be an edge on one other surface.");
                     switch (volCalcMethod) {
-                    case ZoneVolumeCalcMethod::floorAreaTimesHeight1:
+                    case ZoneVolumeCalcMethod::FloorAreaTimesHeight1:
                         ShowContinueError(state,
                                           "  The zone volume was calculated using the floor area times ceiling height method where the floor and "
                                           "ceiling are the same except for the z-coordinates.");
                         break;
-                    case ZoneVolumeCalcMethod::floorAreaTimesHeight2:
+                    case ZoneVolumeCalcMethod::FloorAreaTimesHeight2:
                         ShowContinueError(state,
                                           "  The zone volume was calculated using the floor area times ceiling height method where the floor is "
                                           "horizontal, the walls are vertical, and the wall heights are all the same.");
                         break;
-                    case ZoneVolumeCalcMethod::ceilingAreaTimesHeight:
+                    case ZoneVolumeCalcMethod::CeilingAreaTimesHeight:
                         ShowContinueError(state,
                                           "  The zone volume was calculated using the ceiling area times ceiling height method where the ceiling is "
                                           "horizontal, the walls are vertical, and the wall heights are all the same.");
                         break;
-                    case ZoneVolumeCalcMethod::opWallAreaTimesDistance:
+                    case ZoneVolumeCalcMethod::OpWallAreaTimesDistance:
                         ShowContinueError(state,
                                           "  The zone volume was calculated using the opposite wall area times the distance between them method ");
                         break;
-                    case ZoneVolumeCalcMethod::userProvided:
+                    case ZoneVolumeCalcMethod::UserProvided:
                         ShowContinueError(state, "  The zone volume was provided as an input to the ZONE object ");
                         break;
-                    case ZoneVolumeCalcMethod::error:
+                    case ZoneVolumeCalcMethod::Invalid:
                         ShowContinueError(state, "  The zone volume was not calculated and an error exists. ");
                         break;
-                    case ZoneVolumeCalcMethod::enclosed: // should not be called but completes enumeration
+                    case ZoneVolumeCalcMethod::Enclosed: // should not be called but completes enumeration
                         ShowContinueError(state, "  The zone volume was calculated using multiple pyramids and was fully enclosed. ");
                         break;
                     default:

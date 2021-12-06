@@ -69,15 +69,15 @@ namespace EMSManager {
     enum class SPControlType
     {
         Invalid = -1,
-        iTemperatureSetPoint,      // integer for node setpoint control type
-        iTemperatureMinSetPoint,   // integer for node setpoint control type
-        iTemperatureMaxSetPoint,   // integer for node setpoint control type
-        iHumidityRatioSetPoint,    // integer for node setpoint control type
-        iHumidityRatioMinSetPoint, // integer for node setpoint control type
-        iHumidityRatioMaxSetPoint, // integer for node setpoint control type
-        iMassFlowRateSetPoint,     // integer for node setpoint control type
-        iMassFlowRateMinSetPoint,  // integer for node setpoint control type
-        iMassFlowRateMaxSetPoint,  // integer for node setpoint control type
+        TemperatureSetPoint,      // integer for node setpoint control type
+        TemperatureMinSetPoint,   // integer for node setpoint control type
+        TemperatureMaxSetPoint,   // integer for node setpoint control type
+        HumidityRatioSetPoint,    // integer for node setpoint control type
+        HumidityRatioMinSetPoint, // integer for node setpoint control type
+        HumidityRatioMaxSetPoint, // integer for node setpoint control type
+        MassFlowRateSetPoint,     // integer for node setpoint control type
+        MassFlowRateMinSetPoint,  // integer for node setpoint control type
+        MassFlowRateMaxSetPoint,  // integer for node setpoint control type
         Num
     };
 
@@ -136,7 +136,7 @@ namespace EMSManager {
     void UpdateEMSTrendVariables(EnergyPlusData &state);
 
     std::string controlTypeName(SPControlType SetPointType); // Maps int to the std::string equivalent
-                                                             // (eg iTemperatureSetPoint => "Temperature Setpoint")
+                                                             // (eg TemperatureSetPoint => "Temperature Setpoint")
 
     bool CheckIfNodeSetPointManaged(EnergyPlusData &state,
                                     int NodeNum, // index of node being checked.

@@ -1417,15 +1417,15 @@ namespace WaterToAirHeatPumpSimple {
                         Real64 FanCoolLoad = 0.0;
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
@@ -1505,15 +1505,15 @@ namespace WaterToAirHeatPumpSimple {
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
@@ -1604,15 +1604,15 @@ namespace WaterToAirHeatPumpSimple {
                         Real64 FanCoolLoad = 0.0;
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
@@ -1689,15 +1689,15 @@ namespace WaterToAirHeatPumpSimple {
                         Real64 FanCoolLoad = 0.0;
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }

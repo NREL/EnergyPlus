@@ -372,31 +372,31 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         if (this->curOASysNum > 0) { // coil is in the OA stream
                             // need to find fan type in OA system
                         } else {
-                            switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            switch (this->primaryAirSystem(this->curSysNum).supFanModelType) {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
                             } // end switch
 
-                            switch (this->primaryAirSystem(this->curSysNum).retFanModelTypeEnum) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            switch (this->primaryAirSystem(this->curSysNum).retFanModelType) {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad += (1.0 - OutAirFrac) * this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad += (1.0 - OutAirFrac) * this->calcFanDesHeatGain(DesVolFlow);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }

@@ -3217,7 +3217,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     // Test 1: zeroFlow and no throttling range
     scheduleIndex = -1; // this assigns a value of 1.0
     throttlingRange = 0.0;
-    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
+    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::ZeroFlowPower;
     expectedResult = 1.0;
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(
         *state, scheduleIndex, throttlingRange, state->dataLowTempRadSys->HydrRadSys(1).SetpointType);
@@ -3226,7 +3226,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     // Test 2: zeroFlow and positive throttling range
     scheduleIndex = -1; // this assigns a value of 1.0
     throttlingRange = 0.5;
-    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
+    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::ZeroFlowPower;
     expectedResult = 1.0;
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(
         *state, scheduleIndex, throttlingRange, state->dataLowTempRadSys->HydrRadSys(1).SetpointType);
@@ -3235,7 +3235,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     // Test 3: zeroFlow and negative throttling range (cooling situation)
     scheduleIndex = -1; // this assigns a value of 1.0
     throttlingRange = -0.5;
-    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::zeroFlowPower;
+    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::ZeroFlowPower;
     expectedResult = 1.0;
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(
         *state, scheduleIndex, throttlingRange, state->dataLowTempRadSys->HydrRadSys(1).SetpointType);
@@ -3244,7 +3244,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     // Test 4: halfFlow and no throttling range
     scheduleIndex = -1; // this assigns a value of 1.0
     throttlingRange = 0.0;
-    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
+    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::HalfFlowPower;
     expectedResult = 1.0;
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(
         *state, scheduleIndex, throttlingRange, state->dataLowTempRadSys->HydrRadSys(1).SetpointType);
@@ -3253,7 +3253,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     // Test 5: halfFlow and positive throttling range
     scheduleIndex = -1; // this assigns a value of 1.0
     throttlingRange = 0.5;
-    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
+    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::HalfFlowPower;
     expectedResult = 1.25;
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(
         *state, scheduleIndex, throttlingRange, state->dataLowTempRadSys->HydrRadSys(1).SetpointType);
@@ -3262,7 +3262,7 @@ TEST_F(LowTempRadiantSystemTest, setOffTemperatureLowTemperatureRadiantSystemTes
     // Test 5: halfFlow and negative throttling range (cooling situation)
     scheduleIndex = -1; // this assigns a value of 1.0
     throttlingRange = -0.5;
-    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;
+    state->dataLowTempRadSys->HydrRadSys(1).SetpointType = LowTempRadiantSetpointTypes::HalfFlowPower;
     expectedResult = 0.75;
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setOffTemperatureLowTemperatureRadiantSystem(
         *state, scheduleIndex, throttlingRange, state->dataLowTempRadSys->HydrRadSys(1).SetpointType);

@@ -385,7 +385,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                             bool NodeEMSSetPointMissing = false;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                        EMSManager::SPControlType::TemperatureSetPoint,
                                                                         NodeEMSSetPointMissing);
                             if (NodeEMSSetPointMissing) {
                                 ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9));
@@ -411,11 +411,11 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                             bool NodeEMSSetPointMissing = false;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                                                        EMSManager::SPControlType::TemperatureMinSetPoint,
                                                                         NodeEMSSetPointMissing);
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
+                                                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
                                                                         NodeEMSSetPointMissing);
                             if (NodeEMSSetPointMissing) {
                                 ShowSevereError(state, std::string{RoutineName} + " Missing temperature setpoint for node = " + cAlphaArgs(9));

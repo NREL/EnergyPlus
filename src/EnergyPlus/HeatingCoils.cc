@@ -1477,7 +1477,7 @@ namespace HeatingCoils {
                             state.dataHeatingCoils->HeatingCoilFatalError = true;
                         } else {
                             CheckIfNodeSetPointManagedByEMS(
-                                state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHeatingCoils->HeatingCoilFatalError);
+                                state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHeatingCoils->HeatingCoilFatalError);
                             if (state.dataHeatingCoils->HeatingCoilFatalError) {
                                 ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                                 ShowContinueError(state, "... Missing temperature setpoint for heating coil.");

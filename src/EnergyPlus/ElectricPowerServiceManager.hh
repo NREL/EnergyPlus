@@ -101,12 +101,11 @@ static constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Nu
                                                                                                          "GENERATOR:WINDTURBINE",
                                                                                                          "GENERATOR:PVWATTS"};
 
-enum class ThermalLossDestination : int
+enum class ThermalLossDestination
 {
     Invalid = -1,
-    heatLossNotDetermined = 0,
-    zoneGains,     // device thermal losses are added to a zone as internal gains
-    lostToOutside, // device thermal losses have no destination
+    ZoneGains,     // device thermal losses are added to a zone as internal gains
+    LostToOutside, // device thermal losses have no destination
     Num
 };
 
@@ -118,15 +117,13 @@ class DCtoACInverter
 {
 
 public: // Methods
-    enum class InverterModelType : int
+    enum class InverterModelType
     {
-        // TODO: enum check
         Invalid = -1,
-        notYetSet,
-        cECLookUpTableModel,
-        curveFuncOfPower,
-        simpleConstantEff,
-        pvWatts,
+        CECLookUpTableModel,
+        CurveFuncOfPower,
+        SimpleConstantEff,
+        PVWatts,
         Num
     };
 
@@ -228,12 +225,11 @@ private: // methods
     void calcEfficiency(EnergyPlusData &state);
 
 private: // data
-    enum class ConverterModelType : int
+    enum class ConverterModelType
     {
         Invalid = -1,
-        notYetSet,
-        curveFuncOfPower,
-        simpleConstantEff,
+        CurveFuncOfPower,
+        SimpleConstantEff,
         Num
     };
 
@@ -359,22 +355,20 @@ private:                            // methods
     );
 
 private: // data
-    enum class StorageModelType : int
+    enum class StorageModelType
     {
         Invalid = -1,
-        storageTypeNotSet = 0,
-        simpleBucketStorage,
-        kiBaMBattery,
-        liIonNmcBattery,
+        SimpleBucketStorage,
+        KIBaMBattery,
+        LiIonNmcBattery,
         Num
     };
 
-    enum class BatteryDegradationModelType : int
+    enum class BatteryDegradationModelType
     {
         Invalid = -1,
-        degredationNotSet = 0,
-        lifeCalculationYes,
-        lifeCalculationNo,
+        LifeCalculationYes,
+        LifeCalculationNo,
         Num
     };
 
@@ -490,24 +484,20 @@ public: // methods
     std::string const &name() const;
 
 private: // data
-    enum class TransformerUse : int
+    enum class TransformerUse
     {
-        // TODO: enum check
         Invalid = -1,
-        usenotYetSet = 0,
-        powerInFromGrid,               // condition power from grid going into building buss
-        powerOutFromBldgToGrid,        // condition power from building buss going out to grid
-        powerBetweenLoadCenterAndBldg, // condition power from a load center going into building buss, or from building buss into load center for
+        PowerInFromGrid,               // condition power from grid going into building buss
+        PowerOutFromBldgToGrid,        // condition power from building buss going out to grid
+        PowerBetweenLoadCenterAndBldg, // condition power from a load center going into building buss, or from building buss into load center for
                                        // draws
         Num
     };
-    enum class TransformerPerformanceInput : int
+    enum class TransformerPerformanceInput
     {
-        // TODO: enum check
         Invalid = -1,
-        perfInputMethodNotSet = 0,
-        lossesMethod,
-        efficiencyMethod,
+        LossesMethod,
+        EfficiencyMethod,
         Num
     };
 
@@ -646,16 +636,14 @@ private: // Methods
     Real64 calcLoadCenterThermalLoad(EnergyPlusData &state); // returns heat rate called for from cogenerator(watts)
 
 public: // data public for unit test
-    enum class ElectricBussType : int
+    enum class ElectricBussType
     {
-        // TODO: enum check
         Invalid = -1,
-        notYetSet = 0,
-        aCBuss,
-        dCBussInverter,
-        aCBussStorage,
-        dCBussInverterDCStorage,
-        dCBussInverterACStorage,
+        ACBuss,
+        DCBussInverter,
+        ACBussStorage,
+        DCBussInverterDCStorage,
+        DCBussInverterACStorage,
         Num
     };
 
@@ -688,28 +676,24 @@ public: // data public for unit test
 private: // data
     enum class GeneratorOpScheme : int
     {
-        // TODO: enum check
         Invalid = -1,
-        notYetSet = 0,
-        baseLoad,
-        demandLimit,
-        trackElectrical,
-        trackSchedule,
-        trackMeter,
-        thermalFollow,
-        thermalFollowLimitElectrical,
+        BaseLoad,
+        DemandLimit,
+        TrackElectrical,
+        TrackSchedule,
+        TrackMeter,
+        ThermalFollow,
+        ThermalFollowLimitElectrical,
         Num
     };
 
     enum class StorageOpScheme : int
     {
-        // TODO: enum check
         Invalid = -1,
-        notYetSet = 0,
-        facilityDemandStoreExcessOnSite, // legacy control behavior
-        meterDemandStoreExcessOnSite,
-        chargeDischargeSchedules,
-        facilityDemandLeveling,
+        FacilityDemandStoreExcessOnSite, // legacy control behavior
+        MeterDemandStoreExcessOnSite,
+        ChargeDischargeSchedules,
+        FacilityDemandLeveling,
         Num
     };
 

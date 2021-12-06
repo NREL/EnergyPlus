@@ -1964,9 +1964,9 @@ namespace VentilatedSlab {
         CompName = state.dataVentilatedSlab->VentSlab(Item).Name;
         state.dataSize->DataZoneNumber = state.dataVentilatedSlab->VentSlab(Item).ZonePtr;
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = state.dataVentilatedSlab->VentSlab(Item).Fan_Index;
         // ventilated slab unit is always blow thru

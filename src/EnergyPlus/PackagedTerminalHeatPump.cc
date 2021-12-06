@@ -3938,7 +3938,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
@@ -3946,7 +3946,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
@@ -3954,7 +3954,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
@@ -3962,7 +3962,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
         } else {
@@ -3971,7 +3971,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
@@ -3979,7 +3979,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
@@ -3987,7 +3987,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
@@ -3995,7 +3995,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
         }
@@ -5208,9 +5208,9 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
     CompName = state.dataPTHP->PTUnit(PTUnitNum).Name;
     state.dataSize->DataZoneNumber = state.dataPTHP->PTUnit(PTUnitNum).ZonePtr;
     if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
     } else {
-        state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
     }
     state.dataSize->DataFanIndex = state.dataPTHP->PTUnit(PTUnitNum).FanIndex;
     if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {

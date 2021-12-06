@@ -5361,30 +5361,30 @@ void parseStatLine(const std::string &lineIn,
     } else if (has_prefix(lineIn, "\tHeating")) {
         if (!heatingDesignlinepassed) {
             heatingDesignlinepassed = true;
-            lineType = StatLineType::heatingConditionsLine;
+            lineType = StatLineType::HeatingConditionsLine;
         }
     } else if (has_prefix(lineIn, "\tCooling")) {
         if (!coolingDesignlinepassed) {
             coolingDesignlinepassed = true;
-            lineType = StatLineType::coolingConditionsLine;
+            lineType = StatLineType::CoolingConditionsLine;
         }
     } else if (has(lineIn, "(standard) heating degree-days (18.3")) {
-        lineType = StatLineType::stdHDDLine;
+        lineType = StatLineType::StdHDDLine;
     } else if (has(lineIn, "(standard) cooling degree-days (10")) {
-        lineType = StatLineType::stdCDDLine;
+        lineType = StatLineType::StdCDDLine;
 
     } else if (has(lineIn, "Maximum Dry Bulb")) {
-        lineType = StatLineType::maxDryBulbLine;
+        lineType = StatLineType::MaxDryBulbLine;
     } else if (has(lineIn, "Minimum Dry Bulb")) {
-        lineType = StatLineType::minDryBulbLine;
+        lineType = StatLineType::MinDryBulbLine;
     } else if (has(lineIn, "Maximum Dew Point")) {
-        lineType = StatLineType::maxDewPointLine;
+        lineType = StatLineType::MaxDewPointLine;
     } else if (has(lineIn, "Minimum Dew Point")) {
-        lineType = StatLineType::minDewPointLine;
+        lineType = StatLineType::MinDewPointLine;
     } else if (has(lineIn, "(wthr file) heating degree-days (18") || has(lineIn, "heating degree-days (18")) {
-        lineType = StatLineType::wthHDDLine;
+        lineType = StatLineType::WithHDDLine;
     } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
-        lineType = StatLineType::wthCDDLine;
+        lineType = StatLineType::WithCDDLine;
     }
     // these not part of big if/else because sequential
     if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
@@ -5552,7 +5552,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         PreDefTableEntry(
                             state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "Calculated from the weather file");
                     }
-                } else if (SELECT_CASE_var == StatLineType::heatingConditionsLine) { //  winter/heating design conditions
+                } else if (SELECT_CASE_var == StatLineType::HeatingConditionsLine) { //  winter/heating design conditions
                     if (iscalc) {
                         if (isASHRAE) {
                             if (ashDesYear == "2001") {
@@ -5637,7 +5637,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                             }
                         }
                     }
-                } else if (SELECT_CASE_var == StatLineType::coolingConditionsLine) { //  summer/cooling design conditions
+                } else if (SELECT_CASE_var == StatLineType::CoolingConditionsLine) { //  summer/cooling design conditions
                     if (iscalc) {
                         if (isASHRAE) {
                             if (ashDesYear == "2001") {
@@ -5751,11 +5751,11 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                             }
                         }
                     }
-                } else if (SELECT_CASE_var == StatLineType::stdHDDLine) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
+                } else if (SELECT_CASE_var == StatLineType::StdHDDLine) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
                     storeASHRAEHDD = lineIn.substr(2, 4);
-                } else if (SELECT_CASE_var == StatLineType::stdCDDLine) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
+                } else if (SELECT_CASE_var == StatLineType::StdCDDLine) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
                     storeASHRAECDD = lineIn.substr(2, 4);
-                } else if (SELECT_CASE_var == StatLineType::maxDryBulbLine) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
+                } else if (SELECT_CASE_var == StatLineType::MaxDryBulbLine) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
                     sposlt = index(lineIn, "of");
                     eposlt = index(lineIn, 'C');
                     sposlt += 2;
@@ -5790,7 +5790,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                     } else {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found");
                     }
-                } else if (SELECT_CASE_var == StatLineType::minDryBulbLine) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
+                } else if (SELECT_CASE_var == StatLineType::MinDryBulbLine) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
                     sposlt = index(lineIn, "of");
                     eposlt = index(lineIn, 'C');
                     sposlt += 2;
@@ -5825,7 +5825,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                     } else {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found");
                     }
-                } else if (SELECT_CASE_var == StatLineType::maxDewPointLine) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
+                } else if (SELECT_CASE_var == StatLineType::MaxDewPointLine) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
                     sposlt = index(lineIn, "of");
                     eposlt = index(lineIn, 'C');
                     sposlt += 2;
@@ -5860,7 +5860,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                     } else {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", "not found");
                     }
-                } else if (SELECT_CASE_var == StatLineType::minDewPointLine) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
+                } else if (SELECT_CASE_var == StatLineType::MinDewPointLine) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
                     sposlt = index(lineIn, "of");
                     eposlt = index(lineIn, 'C');
                     sposlt += 2;
@@ -5895,7 +5895,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                     } else {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
                     }
-                } else if (SELECT_CASE_var == StatLineType::wthHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
+                } else if (SELECT_CASE_var == StatLineType::WithHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
                     if (storeASHRAEHDD != "") {
                         if (ort->unitsStyle == UnitsStyle::InchPound) {
                             curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
@@ -5938,7 +5938,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Heating Degree Days", lineIn.substr(2, 4));
                     }
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "HDD and CDD data source", "Weather File Stat");
-                } else if (SELECT_CASE_var == StatLineType::wthCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
+                } else if (SELECT_CASE_var == StatLineType::WithCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
                     if (storeASHRAECDD != "") {
                         if (ort->unitsStyle == UnitsStyle::InchPound) {
                             curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
@@ -8903,7 +8903,7 @@ void WriteBEPSTable(EnergyPlusData &state)
 
             //---- End Uses By Subcategory Sub-Table
             writeBEPSEndUseBySubCatOrSpaceType(state,
-                                               EndUseSubTableType::bySubCategory,
+                                               EndUseSubTableType::BySubCategory,
                                                endUseSubOther,
                                                collapsedEndUse,
                                                collapsedEndUseSub,
@@ -8913,7 +8913,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                                                produceSQLite);
 
             writeBEPSEndUseBySubCatOrSpaceType(state,
-                                               EndUseSubTableType::bySpaceType,
+                                               EndUseSubTableType::BySpaceType,
                                                endUseSubOther,
                                                collapsedEndUse,
                                                collapsedEndUseSpType,
@@ -9664,9 +9664,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
 
     int numSubCatOrTypes = 0;
     int numRows = 0;
-    if (tableType == EndUseSubTableType::bySubCategory) {
+    if (tableType == EndUseSubTableType::BySubCategory) {
         columnHead(1) = "Subcategory";
-    } else if (tableType == EndUseSubTableType::bySpaceType) {
+    } else if (tableType == EndUseSubTableType::BySpaceType) {
         columnHead(1) = "Space Type";
     }
 
@@ -9677,9 +9677,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     }
     for (int iResource = 1; iResource <= 13; ++iResource) {
         for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
-            if (tableType == EndUseSubTableType::bySubCategory) {
+            if (tableType == EndUseSubTableType::BySubCategory) {
                 numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
-            } else if (tableType == EndUseSubTableType::bySpaceType) {
+            } else if (tableType == EndUseSubTableType::BySpaceType) {
                 numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
             }
             if (numSubCatOrTypes > 0) {
@@ -9702,9 +9702,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     }
 
     for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
-        if (tableType == EndUseSubTableType::bySubCategory) {
+        if (tableType == EndUseSubTableType::BySubCategory) {
             numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
-        } else if (tableType == EndUseSubTableType::bySpaceType) {
+        } else if (tableType == EndUseSubTableType::BySpaceType) {
             numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
         }
         if (numSubCatOrTypes > 0) {
@@ -9733,17 +9733,17 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     // Build row head and subcategories columns
     int i = 1;
     for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
-        if (tableType == EndUseSubTableType::bySubCategory) {
+        if (tableType == EndUseSubTableType::BySubCategory) {
             numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
-        } else if (tableType == EndUseSubTableType::bySpaceType) {
+        } else if (tableType == EndUseSubTableType::BySpaceType) {
             numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
         }
         rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
         if (numSubCatOrTypes > 0) {
             for (int kEndUseSub = 1; kEndUseSub <= numSubCatOrTypes; ++kEndUseSub) {
-                if (tableType == EndUseSubTableType::bySubCategory) {
+                if (tableType == EndUseSubTableType::BySubCategory) {
                     tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
-                } else if (tableType == EndUseSubTableType::bySpaceType) {
+                } else if (tableType == EndUseSubTableType::BySpaceType) {
                     tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).spaceTypeName(kEndUseSub);
                 }
                 ++i;
@@ -9754,9 +9754,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
                 ++i;
             }
         } else {
-            if (tableType == EndUseSubTableType::bySubCategory) {
+            if (tableType == EndUseSubTableType::BySubCategory) {
                 tableBody(1, i) = "General";
-            } else if (tableType == EndUseSubTableType::bySpaceType) {
+            } else if (tableType == EndUseSubTableType::BySpaceType) {
                 tableBody(1, i) = "Unassigned";
             }
             ++i;
@@ -9766,9 +9766,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     for (int iResource = 1; iResource <= 13; ++iResource) {
         i = 1;
         for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
-            if (tableType == EndUseSubTableType::bySubCategory) {
+            if (tableType == EndUseSubTableType::BySubCategory) {
                 numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories;
-            } else if (tableType == EndUseSubTableType::bySpaceType) {
+            } else if (tableType == EndUseSubTableType::BySpaceType) {
                 numSubCatOrTypes = state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes;
             }
             if (numSubCatOrTypes > 0) {
@@ -9791,9 +9791,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     // heading for the entire sub-table
     std::string subTableTitle;
     if (ort->displayTabularBEPS) {
-        if (tableType == EndUseSubTableType::bySubCategory) {
+        if (tableType == EndUseSubTableType::BySubCategory) {
             subTableTitle = "End Uses By Subcategory";
-        } else if (tableType == EndUseSubTableType::bySpaceType) {
+        } else if (tableType == EndUseSubTableType::BySpaceType) {
             subTableTitle = "End Uses By Space Type";
         }
         if (produceTabular) {
@@ -14424,7 +14424,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_cur);
 
                 OutputCompLoadSummary(state,
-                                      OutputType::airLoopOutput,
+                                      OutputType::AirLoop,
                                       AirLoopCoolCompLoadTables(iAirLoop),
                                       AirLoopHeatCompLoadTables(iAirLoop),
                                       iAirLoop,
@@ -14536,7 +14536,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
             LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables, unitsStyle_cur);
 
             OutputCompLoadSummary(state,
-                                  OutputType::facilityOutput,
+                                  OutputType::Facility,
                                   FacilityCoolCompLoadTables,
                                   FacilityHeatCompLoadTables,
                                   0,
@@ -14554,7 +14554,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                     LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone), unitsStyle_cur);
 
                     OutputCompLoadSummary(state,
-                                          OutputType::zoneOutput,
+                                          OutputType::Zone,
                                           ZoneCoolCompLoadTables(iZone),
                                           ZoneHeatCompLoadTables(iZone),
                                           iZone,
@@ -15481,15 +15481,15 @@ void OutputCompLoadSummary(EnergyPlusData &state,
 
     auto &ort(state.dataOutRptTab);
 
-    if (kind == OutputType::zoneOutput && ort->displayZoneComponentLoadSummary) {
+    if (kind == OutputType::Zone && ort->displayZoneComponentLoadSummary) {
         reportName = "Zone Component Load Summary";
         zoneAirLoopFacilityName = state.dataHeatBal->Zone(zoneOrAirLoopIndex).Name;
         writeOutput = true;
-    } else if (kind == OutputType::airLoopOutput && ort->displayAirLoopComponentLoadSummary) {
+    } else if (kind == OutputType::AirLoop && ort->displayAirLoopComponentLoadSummary) {
         reportName = "AirLoop Component Load Summary";
         zoneAirLoopFacilityName = state.dataSize->FinalSysSizing(zoneOrAirLoopIndex).AirPriLoopName;
         writeOutput = true;
-    } else if (kind == OutputType::facilityOutput && ort->displayFacilityComponentLoadSummary) {
+    } else if (kind == OutputType::Facility && ort->displayFacilityComponentLoadSummary) {
         reportName = "Facility Component Load Summary";
         zoneAirLoopFacilityName = "Facility";
         writeOutput = true;
@@ -15661,7 +15661,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
                 tableBody(1, 7) = RealToStr(curCompLoad.zoneHumRatio, 5);     // Zone Humidity Ratio at Peak
             }
             tableBody(1, 8) = RealToStr(curCompLoad.supAirTemp, 2); // supply air temperature
-            if (kind == OutputType::airLoopOutput) {
+            if (kind == OutputType::AirLoop) {
                 tableBody(1, 9) = RealToStr(curCompLoad.mixAirTemp, 2); // mixed air temperature - not for zone or facility
             }
             tableBody(1, 10) = RealToStr(curCompLoad.mainFanAirFlow, 2);     // main fan air flow
@@ -15745,7 +15745,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
             }
 
             // write the list of zone for the AirLoop level report
-            if (kind == OutputType::airLoopOutput && curCompLoad.zoneIndices.allocated()) {
+            if (kind == OutputType::AirLoop && curCompLoad.zoneIndices.allocated()) {
                 int maxRow = 0;
                 for (size_t zi = 1; zi <= curCompLoad.zoneIndices.size(); ++zi) {
                     if (curCompLoad.zoneIndices(zi) > 0) {

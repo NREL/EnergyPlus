@@ -711,14 +711,14 @@ namespace UnitHeater {
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilTypeCh,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
             } else {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilTypeCh,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
             }
         }
@@ -1061,9 +1061,9 @@ namespace UnitHeater {
         CompName = state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name;
         state.dataSize->DataZoneNumber = state.dataUnitHeaters->UnitHeat(UnitHeatNum).ZonePtr;
         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index;
         // unit heater is always blow thru

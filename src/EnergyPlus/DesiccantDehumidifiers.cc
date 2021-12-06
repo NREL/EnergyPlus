@@ -1929,7 +1929,7 @@ namespace DesiccantDehumidifiers {
                                     SetPointErrorFlag = true;
                                 } else {
                                     CheckIfNodeSetPointManagedByEMS(
-                                        state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                                        state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
                                         ShowContinueError(state, "Dehumidifier:Desiccant:NoFans: " + DesicDehum(DesicDehumNum).Name);
@@ -2040,7 +2040,7 @@ namespace DesiccantDehumidifiers {
                                 SetPointErrorFlag = true;
                             } else {
                                 CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
+                                    state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
                                     ShowContinueError(state, DesicDehum(DesicDehumNum).DehumType + ": " + DesicDehum(DesicDehumNum).Name);

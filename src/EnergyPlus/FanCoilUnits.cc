@@ -1074,26 +1074,26 @@ namespace FanCoilUnits {
                                                                                          FanCoil(FanCoilNum).CCoilName,
                                                                                          FanCoil(FanCoilNum).CCoilType,
                                                                                          FanCoil(FanCoilNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          FanCoil(FanCoilNum).FanIndex);
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          FanCoil(FanCoilNum).HCoilName,
                                                                                          FanCoil(FanCoilNum).HCoilType,
                                                                                          FanCoil(FanCoilNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          FanCoil(FanCoilNum).FanIndex);
             } else {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          FanCoil(FanCoilNum).CCoilName,
                                                                                          FanCoil(FanCoilNum).CCoilType,
                                                                                          FanCoil(FanCoilNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          FanCoil(FanCoilNum).FanIndex);
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          FanCoil(FanCoilNum).HCoilName,
                                                                                          FanCoil(FanCoilNum).HCoilType,
                                                                                          FanCoil(FanCoilNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          FanCoil(FanCoilNum).FanIndex);
             }
         }
@@ -1482,9 +1482,9 @@ namespace FanCoilUnits {
         CompName = FanCoil(FanCoilNum).Name;
         state.dataSize->DataZoneNumber = FanCoil(FanCoilNum).ControlZoneNum;
         if (FanCoil(FanCoilNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = FanCoil(FanCoilNum).FanIndex;
         // fan coil unit is always blow thru

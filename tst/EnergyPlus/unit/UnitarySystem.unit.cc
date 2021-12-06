@@ -449,7 +449,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataFans->Fan(1).MotEff = 0.7;
     state->dataFans->Fan(1).MotInAirFrac = 1.0;
 
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanVecIndex = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
@@ -469,8 +469,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = DataSizing::AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
     // reset primary air system fan type and location as if is doesn't exist
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::fanPlaceNotSet;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::Invalid;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::Invalid;
 
     // size same coils in UnitarySystem
     int AirLoopNum(1);
@@ -11727,7 +11727,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::Invalid;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);

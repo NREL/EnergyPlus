@@ -8237,7 +8237,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     bool isKoppen = false;
     std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
     parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;
@@ -8246,7 +8246,7 @@ TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
     isKoppen = false;
     std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
     parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
-    EXPECT_TRUE(compare_enums(StatLineType::stdCDDLine, lineTypeReturn));
+    EXPECT_TRUE(compare_enums(StatLineType::StdCDDLine, lineTypeReturn));
 
     lineTypeReturn = StatLineType::Initialized;
     desCondLinePassed = false;

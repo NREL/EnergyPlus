@@ -869,8 +869,8 @@ namespace SteamCoils {
                 }
                 state.dataSize->DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
                 // Coil report, set fan info for airloopnum
-                switch (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum) {
-                case DataAirSystems::structArrayLegacyFanModels: {
+                switch (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType) {
+                case DataAirSystems::StructArrayLegacyFanModels: {
                     int SupFanNum = state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum;
                     if (SupFanNum > 0) {
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
@@ -878,25 +878,25 @@ namespace SteamCoils {
                             state.dataSteamCoils->SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
                             state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum).FanName,
-                            DataAirSystems::structArrayLegacyFanModels,
+                            DataAirSystems::StructArrayLegacyFanModels,
                             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum);
                     }
 
                     break;
                 }
-                case DataAirSystems::objectVectorOOFanSystemModel: {
+                case DataAirSystems::ObjectVectorOOFanSystemModel: {
                     if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex >= 0) {
                         state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                             state,
                             state.dataSteamCoils->SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
                             state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex]->name,
-                            DataAirSystems::objectVectorOOFanSystemModel,
+                            DataAirSystems::ObjectVectorOOFanSystemModel,
                             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex);
                     }
                     break;
                 }
-                case DataAirSystems::fanModelTypeNotYetSet: {
+                case DataAirSystems::Invalid: {
                     // do nothing
                     break;
                 }

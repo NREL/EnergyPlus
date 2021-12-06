@@ -454,7 +454,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::Invalid;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -491,7 +491,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     // With Test Fan 4 fan heat
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 1;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
@@ -512,7 +512,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 2;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanVecIndex = 2;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;

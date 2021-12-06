@@ -2014,8 +2014,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             RetFanIndex = 0;
             FoundOASys = false;
             PrimaryAirSystems(AirLoopNum).FanDesCoolLoad = 0.0;
-            fanModelTypeEnum supFanModelType = fanModelTypeNotYetSet;
-            fanModelTypeEnum retFanModelType = fanModelTypeNotYetSet;
+            FanModelType supFanModelType = FanModelType::Invalid;
+            FanModelType retFanModelType = FanModelType::Invalid;
 
             bool FoundCentralCoolCoil = false;
             for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
@@ -2040,7 +2040,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                                 SupFanIndex,
                                                 ErrorsFound,
                                                 ObjexxFCL::Optional_string_const());
-                                    supFanModelType = structArrayLegacyFanModels;
+                                    supFanModelType = StructArrayLegacyFanModels;
                                     goto EndOfAirLoop;
                                 }
                             } else {
@@ -2049,7 +2049,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                             RetFanIndex,
                                             ErrorsFound,
                                             ObjexxFCL::Optional_string_const());
-                                retFanModelType = structArrayLegacyFanModels;
+                                retFanModelType = StructArrayLegacyFanModels;
                             }
                         } else {
                             GetFanIndex(state,
@@ -2057,7 +2057,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                         SupFanIndex,
                                         ErrorsFound,
                                         ObjexxFCL::Optional_string_const());
-                            supFanModelType = structArrayLegacyFanModels;
+                            supFanModelType = StructArrayLegacyFanModels;
                             goto EndOfAirLoop;
                         }
                     }
@@ -2067,17 +2067,17 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (PrimaryAirSystems(AirLoopNum).Branch(BranchNum).DuctType != 3) {
                                     SupFanIndex =
                                         HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                                    supFanModelType = objectVectorOOFanSystemModel;
+                                    supFanModelType = ObjectVectorOOFanSystemModel;
                                     goto EndOfAirLoop;
                                 }
                             } else {
                                 RetFanIndex =
                                     HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                                retFanModelType = objectVectorOOFanSystemModel;
+                                retFanModelType = ObjectVectorOOFanSystemModel;
                             }
                         } else {
                             SupFanIndex = HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                            supFanModelType = objectVectorOOFanSystemModel;
+                            supFanModelType = ObjectVectorOOFanSystemModel;
                             goto EndOfAirLoop;
                         }
                     }
@@ -2087,12 +2087,12 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             } // end of Branch loop
         EndOfAirLoop:;
 
-            if (supFanModelType == structArrayLegacyFanModels) {
+            if (supFanModelType == StructArrayLegacyFanModels) {
                 PrimaryAirSystems(AirLoopNum).SupFanNum = SupFanIndex;
-                PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum = structArrayLegacyFanModels;
-            } else if (supFanModelType == objectVectorOOFanSystemModel) {
+                PrimaryAirSystems(AirLoopNum).supFanModelType = StructArrayLegacyFanModels;
+            } else if (supFanModelType == ObjectVectorOOFanSystemModel) {
                 PrimaryAirSystems(AirLoopNum).supFanVecIndex = SupFanIndex;
-                PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum = objectVectorOOFanSystemModel;
+                PrimaryAirSystems(AirLoopNum).supFanModelType = ObjectVectorOOFanSystemModel;
             }
             if (FoundCentralCoolCoil) { // parent systems with fan will need to set the fan placement
                 PrimaryAirSystems(AirLoopNum).supFanLocation = FanPlacement::DrawThru;
@@ -2100,11 +2100,11 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 PrimaryAirSystems(AirLoopNum).supFanLocation = FanPlacement::BlowThru;
             }
 
-            if (retFanModelType == structArrayLegacyFanModels) {
-                PrimaryAirSystems(AirLoopNum).retFanModelTypeEnum = structArrayLegacyFanModels;
+            if (retFanModelType == StructArrayLegacyFanModels) {
+                PrimaryAirSystems(AirLoopNum).retFanModelType = StructArrayLegacyFanModels;
                 PrimaryAirSystems(AirLoopNum).RetFanNum = RetFanIndex;
-            } else if (retFanModelType == objectVectorOOFanSystemModel) {
-                PrimaryAirSystems(AirLoopNum).retFanModelTypeEnum = objectVectorOOFanSystemModel;
+            } else if (retFanModelType == ObjectVectorOOFanSystemModel) {
+                PrimaryAirSystems(AirLoopNum).retFanModelType = ObjectVectorOOFanSystemModel;
                 PrimaryAirSystems(AirLoopNum).retFanVecIndex = RetFanIndex;
             }
         }
