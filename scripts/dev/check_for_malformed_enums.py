@@ -56,13 +56,14 @@
 
 import os
 import sys
+import unittest
 from pathlib import Path
 
-valid_null_enum_value_names = ["INVALID", "UNASSIGNED", "UNKNOWN"]
-valid_num_enum_value_names = ["COUNT", "NUM"]
+valid_null_enum_value_names = ["INVALID"]
+valid_num_enum_value_names = ["NUM"]
 
 
-def process_enum_str(input_str: str, file_name: str, line_no: int) -> int:
+def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors: bool = True) -> int:
     """Process enum string, return true false for errors found flag"""
 
     # skip "enum class SomeEnum;"
@@ -76,8 +77,9 @@ def process_enum_str(input_str: str, file_name: str, line_no: int) -> int:
     if ":" in tokens[0]:
         tokens[0] = tokens[0].replace(" ", "").split(":")[0]
 
-    enum_name = tokens[0]
+    enum_name = tokens[0].strip()
     enum_tokens = tokens[1].split(",")
+    enum_tokens = [x.strip() for x in enum_tokens]
 
     if enum_tokens[-1] == "":
         enum_tokens.pop(-1)
@@ -95,7 +97,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int) -> int:
                 values.append(tokens[1])
         else:
             names.append(e.upper())
-            values.append(-98789)
+            values.append("")
 
     # check for null names at 0-th position
     if names[0] not in valid_null_enum_value_names:
@@ -109,10 +111,28 @@ def process_enum_str(input_str: str, file_name: str, line_no: int) -> int:
     if names[-1] not in valid_num_enum_value_names:
         error_str += "\tMissing 'Num' at position N\n"
 
+    # check for "unassigned" in names
+    if "UNASSIGNED" in names:
+        error_str += "\tUNASSIGNED in enum names\n"
+
+    # check for "unknown" in names
+    if "UNKNOWN" in names:
+        error_str += "\tUNKNOWN in enum names\n"
+
+    # check for proper casing
+    if str(enum_name[0]).islower():
+        error_str += "\tenum name must begin with upper case letter\n"
+
+    # check for non-allowed enum values
+    found = any([x != -1 for x in values if type(x) == int])
+    if found:
+        error_str += "\texplicit numbers not allowed in enum values except 'Invalid=-1'\n"
+
     if error_str:
-        print(f"ERROR: malformed 'enum class'")
-        print(f"{file_name}: {line_no} - {enum_name}")
-        print(error_str)
+        if print_errors:
+            print(f"ERROR: malformed 'enum class'")
+            print(f"{file_name}: {line_no} - {enum_name}")
+            print(error_str)
         return 1
     else:
         return 0
@@ -136,6 +156,7 @@ def find_enums(search_path: Path) -> int:
     files_to_search.sort()
 
     for file in files_to_search:
+
         with open(file, "r") as f:
             lines = f.readlines()
 
@@ -165,7 +186,7 @@ def find_enums(search_path: Path) -> int:
                 start_found = True
                 start_line = idx + 1
 
-            if start_found and ";" in line:
+            if start_found and (";" in line):
                 end_found = True
 
             if start_found:
@@ -180,15 +201,35 @@ def find_enums(search_path: Path) -> int:
     return num_errors
 
 
+class TestProcessEnums(unittest.TestCase):
+    def test_process_enum_str(self):
+        # forward decl
+        s = "enum class SomeEnum;"
+        self.assertFalse(process_enum_str(s, "DummyFile", 1, False))
+
+        # proper format
+        s = "enum class SomeEnum : int {Invalid = -1, Valid, Num};"
+        self.assertFalse(process_enum_str(s, "DummyFile", 1, False))
+
+        # missing 'invalid'
+        s = "enum class SomeEnum {Valid, Num};"
+        self.assertTrue(process_enum_str(s, "DummyFile", 1, False))
+
+        # missing 'num'
+        s = "enum class SomeEnum {Invalid = -1, Valid};"
+        self.assertTrue(process_enum_str(s, "DummyFile", 1, False))
+
+
 if __name__ == "__main__":
+    print("**** Verifying script validates enums ****")
+    unittest.main(exit=False)
+    print("**** DONE ***")
+    print("")
     print("**** Checking EnergyPlus code for malformed enums ****")
     root_path = Path(__file__).parent.parent.parent
     src_path = root_path / "src" / "EnergyPlus"
+
     errors_found = find_enums(src_path)
-
-    if errors_found > 0:
-        print(f"**** {errors_found} malformed enum class errors found ****")
-
     print("**** DONE ****")
     if errors_found > 0:
         raise sys.exit(1)

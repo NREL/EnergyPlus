@@ -8779,7 +8779,7 @@ namespace SurfaceGeometry {
             int ExtSurfNum;
             for (Item = 1; Item <= state.dataSurface->TotSurfaces; ++Item) {
                 if (state.dataSurface->Surface(Item).ExtBoundCond > 0) {
-                    if ((state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::NotSet) ||
+                    if ((state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::Invalid) ||
                         (state.dataSurface->Surface(Item).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::None))
                         continue;
                     ExtSurfNum = state.dataSurface->Surface(Item).ExtBoundCond;

@@ -87,7 +87,6 @@ namespace SingleDuct {
         SingleDuctVAVReheatVSFan,
         SingleDuctCBVAVReheat,
         SingleDuctCBVAVNoReheat,
-        Unknown,
         Num,
     };
     enum class HeatingCoilType : int
@@ -132,8 +131,8 @@ namespace SingleDuct {
         // Members
         int SysNum;                                         // index to single duct air terminal unit
         std::string SysName;                                // Name of the Sys
-        std::string SysType;                                // Type of Sys ie. VAV, Mixing, Inducing, etc.
-        enum SysType SysType_Num;                           // Numeric Equivalent for System type
+        std::string sysType;                                // Type of Sys ie. VAV, Mixing, Inducing, etc.
+        SysType SysType_Num;                                // Numeric Equivalent for System type
         std::string Schedule;                               // Sys Operation Schedule
         int SchedPtr;                                       // Pointer to the correct schedule
         std::string ReheatComp;                             // Type of the Reheat Coil Object
@@ -227,7 +226,7 @@ namespace SingleDuct {
 
         // Default Constructor
         SingleDuctAirTerminal()
-            : SysNum(-1), SysType_Num(SysType::Unknown), SchedPtr(0), ReheatComp_Num(HeatingCoilType::None), ReheatComp_Index(0),
+            : SysNum(-1), SysType_Num(SysType::Invalid), SchedPtr(0), ReheatComp_Num(HeatingCoilType::None), ReheatComp_Index(0),
               ReheatComp_PlantType(DataPlant::PlantEquipmentType::Invalid), Fan_Num(0), Fan_Index(0), ControlCompTypeNum(0), CompErrIndex(0),
               MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0), HeatAirMassFlowRateMax(0.0),
               ZoneMinAirFracMethod(MinFlowFraction::Constant), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0),

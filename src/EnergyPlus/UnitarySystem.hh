@@ -216,7 +216,7 @@ namespace UnitarySystems {
         };
 
         // Parent models simulated using UnitarySystem source code
-        enum class SysType : int
+        enum class SysType
         {
             Invalid = -1,
             Unitary,          // AirloopHVAC:UnitarySystem

@@ -3835,15 +3835,6 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
         // check for node conflicts in all other setpoint managers
         for (TempSetPtMgrNum = SetPtMgrNum + 1; TempSetPtMgrNum <= state.dataSetPointManager->NumAllSetPtMgrs; ++TempSetPtMgrNum) {
 
-            //   check the air loop name in addition to the node names for these SP manager types
-            //    IF((AllSetPtMgr(SetPtMgrNum)%SPMType == SetPointManagerType::WarmestTempFlow .AND. &
-            //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == SetPointManagerType::WarmestTempFlow) .OR. &
-            //       (AllSetPtMgr(SetPtMgrNum)%SPMType == SetPointManagerType::RAB .AND. &
-            //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == SetPointManagerType::RAB) .OR. &
-            //       (AllSetPtMgr(SetPtMgrNum)%SPMType == SetPointManagerType::Coldest .AND. &
-            //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == SetPointManagerType::Coldest) .OR. &
-            //       (AllSetPtMgr(SetPtMgrNum)%SPMType == SetPointManagerType::Warmest .AND. &
-            //        AllSetPtMgr(TempSetPtMgrNum)%SPMType == SetPointManagerType::Warmest))THEN
             if ((state.dataSetPointManager->AllSetPtMgr(SetPtMgrNum).SPMType == SetPointManagerType::RAB &&
                  state.dataSetPointManager->AllSetPtMgr(TempSetPtMgrNum).SPMType == SetPointManagerType::RAB)) {
 

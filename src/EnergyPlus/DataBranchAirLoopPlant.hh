@@ -66,12 +66,10 @@ namespace DataBranchAirLoopPlant {
     // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a positive value which is the curve manager index)
     enum class PressureCurveType
     {
-        // TODO: enum check
-        Invalid = -2,
-        Error = -1,
-        None = 0,
-        Pressure = 1,
-        Generic = 2,
+        Invalid = -1,
+        None,
+        Pressure,
+        Generic,
         Num
     };
 
@@ -79,7 +77,6 @@ namespace DataBranchAirLoopPlant {
     enum class ControlType
     {
         Invalid = -1,
-        Unknown,
         Active,
         Passive,
         SeriesActive,

@@ -68,7 +68,6 @@ namespace EconomicTariff {
     enum class ObjType
     {
         Invalid = -1,
-        Unknown,
         Tariff,
         Qualify,
         ChargeSimple,
@@ -354,7 +353,7 @@ namespace EconomicTariff {
 
         // Default Constructor
         EconVarType()
-            : tariffIndx(0), kindOfObj(ObjType::Unknown), index(0), values(MaxNumMonths, 0.0), isArgument(false), isAssigned(false), specific(0),
+            : tariffIndx(0), kindOfObj(ObjType::Invalid), index(0), values(MaxNumMonths, 0.0), isArgument(false), isAssigned(false), specific(0),
               cntMeDependOn(0), Operator(0), firstOperand(0), lastOperand(0), activeNow(false), isEvaluated(false), isReported(false), varUnitType(0)
         {
         }

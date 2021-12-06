@@ -1131,7 +1131,7 @@ namespace BranchInputManager {
 
         state.dataBranchInputManager->Branch(BCount).Name = Alphas(1);
         GetPressureCurveTypeAndIndex(state, Alphas(2), pressureCurveType, PressureCurveIndex);
-        if (pressureCurveType == DataBranchAirLoopPlant::PressureCurveType::Error) {
+        if (pressureCurveType == DataBranchAirLoopPlant::PressureCurveType::Invalid) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
             ShowContinueError(state, "..Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
             ShowContinueError(state, "This curve could not be found in the input deck.  Ensure that this curve has been entered");

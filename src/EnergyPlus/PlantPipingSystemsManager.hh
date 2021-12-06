@@ -156,7 +156,7 @@ namespace PlantPipingSystemsManager {
 
     enum class CellType
     {
-        Unknown = -1,
+        Invalid = -1,
         Pipe,
         GeneralField,
         GroundSurface,
@@ -445,7 +445,7 @@ namespace PlantPipingSystemsManager {
         Real64 Z_min = 0.0;
         Real64 Z_max = 0.0;
         Point3DReal Centroid;
-        CellType cellType = CellType::Unknown;
+        CellType cellType = CellType::Invalid;
         std::map<Direction, NeighborInformation> NeighborInfo;
         CartesianPipeCellInformation PipeCellData;
 

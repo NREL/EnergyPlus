@@ -939,7 +939,7 @@ namespace DataPlant {
 
                     if (!DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(component.Type)]) {
 
-                        if (FlowPriorityStatus == DataPlant::LoopFlowStatus::Unknown) {
+                        if (FlowPriorityStatus == DataPlant::LoopFlowStatus::Invalid) {
                             // do nothing
                         } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn) {
                             ThisBranchFlowRequestNeedAndTurnOn = max(ThisBranchFlowRequestNeedAndTurnOn, node_with_request.MassFlowRateRequest);

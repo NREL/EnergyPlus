@@ -564,7 +564,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         // monthly charge
         tariff(iInObj).monthChgVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(8), isNotNumeric);
         tariff(iInObj).monthChgPt =
-            AssignVariablePt(state, state.dataIPShortCut->cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Unknown, 0, iInObj);
+            AssignVariablePt(state, state.dataIPShortCut->cAlphaArgs(8), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, iInObj);
         // minimum monthly charge
         if (len(state.dataIPShortCut->cAlphaArgs(9)) > 0) {
             tariff(iInObj).minMonthChgVal = UtilityRoutines::ProcessNumber(state.dataIPShortCut->cAlphaArgs(9), isNotNumeric);
@@ -572,7 +572,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
             tariff(iInObj).minMonthChgVal = -HUGE_(-1.0); // set to a very negative value
         }
         tariff(iInObj).minMonthChgPt =
-            AssignVariablePt(state, state.dataIPShortCut->cAlphaArgs(9), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Unknown, 0, iInObj);
+            AssignVariablePt(state, state.dataIPShortCut->cAlphaArgs(9), isNotNumeric, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, iInObj);
         // real time pricing
         tariff(iInObj).chargeSchedule = state.dataIPShortCut->cAlphaArgs(10);
         tariff(iInObj).chargeSchIndex = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(10));
@@ -689,7 +689,7 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
             state, state.dataIPShortCut->cAlphaArgs(1), true, varIsAssigned, varNotYetDefined, ObjType::Qualify, iInObj, qualify(iInObj).tariffIndx);
         // index of the variable in the variable array
         qualify(iInObj).sourcePt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Unknown, 0, qualify(iInObj).tariffIndx);
+            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, qualify(iInObj).tariffIndx);
         // indicator if maximum test otherwise minimum
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "Minimum")) {
             qualify(iInObj).isMaximum = false;
@@ -708,7 +708,7 @@ void GetInputEconomicsQualify(EnergyPlusData &state, bool &ErrorsFound) // true 
                                                        isNotNumeric,
                                                        varIsArgument,
                                                        varNotYetDefined,
-                                                       ObjType::Unknown,
+                                                       ObjType::Invalid,
                                                        0,
                                                        qualify(iInObj).tariffIndx);
         // enumerated list of the kind of season
@@ -785,7 +785,7 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
                                                        chargeSimple(iInObj).tariffIndx);
         // index of the variable in the variable array
         chargeSimple(iInObj).sourcePt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Unknown, 0, chargeSimple(iInObj).tariffIndx);
+            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, chargeSimple(iInObj).tariffIndx);
         // enumerated list of the kind of season
         chargeSimple(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
         // check to make sure a seasonal schedule is specified if the season is not annual
@@ -816,7 +816,7 @@ void GetInputEconomicsChargeSimple(EnergyPlusData &state, bool &ErrorsFound) // 
                                                           isNotNumeric,
                                                           varIsArgument,
                                                           varNotYetDefined,
-                                                          ObjType::Unknown,
+                                                          ObjType::Invalid,
                                                           0,
                                                           chargeSimple(iInObj).tariffIndx);
     }
@@ -882,7 +882,7 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
                                                       chargeBlock(iInObj).tariffIndx);
         // index of the variable in the variable array
         chargeBlock(iInObj).sourcePt = AssignVariablePt(
-            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Unknown, 0, chargeBlock(iInObj).tariffIndx);
+            state, state.dataIPShortCut->cAlphaArgs(3), true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, chargeBlock(iInObj).tariffIndx);
         // enumerated list of the kind of season
         chargeBlock(iInObj).season = LookUpSeason(state, state.dataIPShortCut->cAlphaArgs(4), state.dataIPShortCut->cAlphaArgs(1));
         // check to make sure a seasonal schedule is specified if the season is not annual
@@ -926,7 +926,7 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
                                                                isNotNumeric,
                                                                varIsArgument,
                                                                varNotYetDefined,
-                                                               ObjType::Unknown,
+                                                               ObjType::Invalid,
                                                                0,
                                                                chargeBlock(iInObj).tariffIndx);
         }
@@ -947,7 +947,7 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
                                                                      isNotNumeric,
                                                                      varIsArgument,
                                                                      varNotYetDefined,
-                                                                     ObjType::Unknown,
+                                                                     ObjType::Invalid,
                                                                      0,
                                                                      chargeBlock(iInObj).tariffIndx);
             }
@@ -958,7 +958,7 @@ void GetInputEconomicsChargeBlock(EnergyPlusData &state, bool &ErrorsFound) // t
                                                                    isNotNumeric,
                                                                    varIsArgument,
                                                                    varNotYetDefined,
-                                                                   ObjType::Unknown,
+                                                                   ObjType::Invalid,
                                                                    0,
                                                                    chargeBlock(iInObj).tariffIndx);
         }
@@ -1028,7 +1028,7 @@ void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true 
                                                         isNotNumeric,
                                                         varIsArgument,
                                                         varNotYetDefined,
-                                                        ObjType::Unknown,
+                                                        ObjType::Invalid,
                                                         0,
                                                         ratchet(iInObj).tariffIndx);
         // ratchet offset
@@ -1038,7 +1038,7 @@ void GetInputEconomicsRatchet(EnergyPlusData &state, bool &ErrorsFound) // true 
                                                     isNotNumeric,
                                                     varIsArgument,
                                                     varNotYetDefined,
-                                                    ObjType::Unknown,
+                                                    ObjType::Invalid,
                                                     0,
                                                     ratchet(iInObj).tariffIndx);
     }
@@ -1282,7 +1282,7 @@ void parseComputeLine(EnergyPlusData &state, std::string const &lineOfCompute, i
         if (token == 0) {
             // see if argument or assignment (assignment will be first string on line)
             if (endOfWord != std::string::npos) {
-                token = AssignVariablePt(state, word, true, varIsArgument, varNotYetDefined, ObjType::Unknown, 0, fromTariff);
+                token = AssignVariablePt(state, word, true, varIsArgument, varNotYetDefined, ObjType::Invalid, 0, fromTariff);
             } else {
                 token = AssignVariablePt(state, word, true, varIsAssigned, varNotYetDefined, ObjType::AssignCompute, 0, fromTariff);
             }
@@ -1892,7 +1892,7 @@ int AssignVariablePt(EnergyPlusData &state,
         }
         if (found > 0) {
             AssignVariablePt = found;
-            if (econVar(found).kindOfObj == ObjType::Unknown) {
+            if (econVar(found).kindOfObj == ObjType::Invalid) {
                 econVar(found).kindOfObj = econObjKind;
                 if (econVar(found).index == 0) econVar(found).index = objIndex;
             }
@@ -1947,7 +1947,7 @@ void incrementEconVar(EnergyPlusData &state)
     // initialize new record) //Autodesk Most of these match default initialization so not needed
     econVar(state.dataEconTariff->numEconVar).name = "";
     econVar(state.dataEconTariff->numEconVar).tariffIndx = 0;
-    econVar(state.dataEconTariff->numEconVar).kindOfObj = ObjType::Unknown;
+    econVar(state.dataEconTariff->numEconVar).kindOfObj = ObjType::Invalid;
     econVar(state.dataEconTariff->numEconVar).index = 0;
     econVar(state.dataEconTariff->numEconVar).values = 0.0;
     econVar(state.dataEconTariff->numEconVar).isArgument = false;
@@ -3215,7 +3215,7 @@ void pushStack(EnergyPlusData &state, Array1A<Real64> const monthlyArray, int co
             case ObjType::Qualify:
                 evaluateQualify(state, variablePointer);
                 break;
-            case ObjType::Unknown:
+            case ObjType::Invalid:
                 ShowWarningError(state, "UtilityCost variable not defined: " + econVar(variablePointer).name);
                 ShowContinueError(state, "   In tariff: " + tariff(econVar(variablePointer).tariffIndx).tariffName);
                 ShowContinueError(state, "   This may be the result of a misspelled variable name in the UtilityCost:Computation object.");

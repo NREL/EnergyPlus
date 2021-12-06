@@ -199,7 +199,7 @@ namespace HVACControllers {
               MinAvailActuated(0.0), MinAvailSensed(0.0), MaxVolFlowActuated(0.0), MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0),
               ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0),
               ActuatedNodePlantLoopBranchNum(0), SensedNode(0), IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0),
-              Offset(0.0), HumRatCntrlType(SetPointManager::CtrlVarType::Unknown), Range(0.0), Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0),
+              Offset(0.0), HumRatCntrlType(SetPointManager::CtrlVarType::Invalid), Range(0.0), Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0),
               BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false),
               AirLoopControllerIndex(0), HumRatCtrlOverride(false)
         {

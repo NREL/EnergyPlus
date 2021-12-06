@@ -77,28 +77,28 @@ namespace SetPointManager {
 
     enum class SupplyFlowTempStrategy
     {
-        Unknown = -1,
+        Invalid = -1,
         MaxTemp,
         MinTemp,
         Num
     };
     enum class ControlStrategy
     {
-        Unknown = -1,
+        Invalid = -1,
         TempFirst,
         FlowFirst,
         Num
     };
     enum class ReferenceTempType
     {
-        Unknown = -1,
+        Invalid = -1,
         WetBulb,
         DryBulb,
         Num
     };
     enum class ReferenceGroundTempObjectType
     {
-        Unknown = -1,
+        Invalid = -1,
         BuildingSurface,
         Shallow,
         Deep,
@@ -108,7 +108,7 @@ namespace SetPointManager {
 
     enum class CtrlVarType
     {
-        Unknown = -1,
+        Invalid = -1,
         Temp,
         MaxTemp,
         MinTemp,
@@ -144,7 +144,7 @@ namespace SetPointManager {
             return "MaximumMassFlowRate";
         case CtrlVarType::MinMassFlow:
             return "MinimumMassFlowRate";
-        case CtrlVarType::Unknown:
+        case CtrlVarType::Invalid:
             return "*UNKNOWN*";
         default:
             assert(false);
@@ -154,7 +154,7 @@ namespace SetPointManager {
 
     enum class SetPointManagerType
     {
-        Unknown = -1,
+        Invalid = -1,
         Scheduled,
         ScheduledDual,
         OutsideAir,
@@ -253,7 +253,7 @@ namespace SetPointManager {
             return "SetpointManager:ReturnTemperature:HotWater";
         case SetPointManagerType::TESScheduled:
             return "SetpointManager:ScheduledTES";
-        case SetPointManagerType::Unknown:
+        case SetPointManagerType::Invalid:
             return "*UNKNOWN*";
         default:
             assert(false);
@@ -266,7 +266,7 @@ namespace SetPointManager {
         std::string Name;
         CtrlVarType CtrlTypeMode; // set to CtrlVarType::*
         std::string ctrlVarType;
-        SPBase() : CtrlTypeMode(CtrlVarType::Unknown)
+        SPBase() : CtrlTypeMode(CtrlVarType::Invalid)
         {
         }
     };
@@ -283,7 +283,7 @@ namespace SetPointManager {
         int RefNode;                 // index to reference node
 
         // Default Constructor
-        DataSetPointManager() : SPMType(SetPointManagerType::Unknown), SPMIndex(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
+        DataSetPointManager() : SPMType(SetPointManagerType::Invalid), SPMIndex(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
         {
         }
     };
@@ -537,7 +537,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineWarmestSetPointManager()
-            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Invalid), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -559,7 +559,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineColdestSetPointManager()
-            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Invalid), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -585,7 +585,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefWarmestSetPtManagerTempFlow()
-            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(ControlStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0), MinTurndown(0.0),
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(ControlStrategy::Invalid), NumCtrlNodes(0), SetPt(0.0), MinTurndown(0.0),
               Turndown(0.0), CritZoneNum(0), SimReady(false)
         {
         }
@@ -748,7 +748,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineFollowOATempSetPointManager()
-            : RefTypeMode(ReferenceTempType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefTypeMode(ReferenceTempType::Invalid), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -770,7 +770,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineFollowSysNodeTempSetPointManager()
-            : RefNodeNum(0), RefTypeMode(ReferenceTempType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefNodeNum(0), RefTypeMode(ReferenceTempType::Invalid), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -795,7 +795,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineGroundTempSetPointManager()
-            : RefTypeMode(ReferenceGroundTempObjectType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefTypeMode(ReferenceGroundTempObjectType::Invalid), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 

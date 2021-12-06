@@ -127,7 +127,6 @@ enum class CalcForcedVentilation : int
 enum class CalculationOutcome
 {
     Invalid = -1,
-    Unknown,
     OK,
     Num
 };

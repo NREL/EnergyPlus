@@ -53,7 +53,7 @@ namespace EnergyPlus::DataPlant {
 // Parameters for loop flow request priority, used in logic to deal with Node%MassFlowRequest for determining overall loop flow rate
 enum class LoopFlowStatus
 {
-    Unknown = -1,        // component's status is not yet set
+    Invalid = -1,        // component's status is not yet set
     NeedyAndTurnsLoopOn, // component is a "winner" for loop flow requests active valve inside component that modulates flow gets the loop going under
                          // most conditions
     NeedyIfLoopOn, // component is a "winner" for loop flow requests but doesn't normally get the loop going to start with once loop is going, may
@@ -198,7 +198,7 @@ enum class PlantEquipmentType
 //  used in %HowLoadServed to facilitate load dispatch logic
 enum class HowMet
 {
-    Unknown = -1,                         // not yet set
+    Invalid = -1,                         // not yet set
     NoneDemand,                           // does not meet a load, demand component
     PassiveCap,                           // Passive machine, does what conditions allow but
     ByNominalCap,                         // MaxLoad, MinLoad, OptLoad should work

@@ -3384,7 +3384,7 @@ namespace PlantPipingSystemsManager {
                     RectangleF XYRectangle = RectangleF(CellXMinValue, CellYMinValue, CellWidth, CellHeight);
 
                     //'determine cell type
-                    CellType cellType = CellType::Unknown;
+                    CellType cellType = CellType::Invalid;
 
                     //'if this is a pipe node, some flags are needed
                     bool pipeCell = false;
@@ -3567,7 +3567,7 @@ namespace PlantPipingSystemsManager {
                     case CellType::BasementCutaway:
                         ++NumCutawayBasementCells;
                         break;
-                    case CellType::Unknown:
+                    case CellType::Invalid:
                         cellType = CellType::GeneralField;
                         // fallthrough
                     default:

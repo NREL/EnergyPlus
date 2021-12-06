@@ -215,9 +215,9 @@ namespace DataSurfaces {
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential
 
-    enum class HeatTransferModel : int
+    enum class HeatTransferModel
     {
-        NotSet = -1,
+        Invalid = -1,
         None, // shading surfaces
         CTF,
         EMPD,
@@ -742,11 +742,11 @@ namespace DataSurfaces {
         SurfaceData()
             : Construction(0), RepresentativeCalcSurfNum(-1), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None),
               Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0),
-              Width(0.0), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
+              Width(0.0), shapeCat(ShapeCat::Invalid), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
-              HeatTransferAlgorithm(HeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
+              HeatTransferAlgorithm(HeatTransferModel::Invalid), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
               ExtSolar(false), ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0),
               OSCMPtr(0), MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
               SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),

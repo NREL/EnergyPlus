@@ -84,7 +84,7 @@ namespace DataPlant {
 
         // Default Constructor
         BranchData()
-            : controlType(DataBranchAirLoopPlant::ControlType::Unknown), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false),
+            : controlType(DataBranchAirLoopPlant::ControlType::Invalid), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false),
               ConstantSpeedBranchMassFlow(0.0), BranchLevel(0), FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0),
               IsBypass(false), PumpIndex(0), PumpSizFac(1.0), EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false),
               PressureDrop(0.0), PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Invalid), PressureCurveIndex(0),

@@ -3084,7 +3084,7 @@ namespace CurveManager {
 
         // METHODOLOGY EMPLOYED:
         // Curve types are:
-        //  PressureCurveType::Error       = pressure name was given, but curve is not available
+        //  PressureCurveType::Invalid     = pressure name was given, but curve is not available
         //  PressureCurveType::None        = no pressure curve for this branch
         //  PressureCurveType::Pressure    = pressure curve based on friction/minor loss
         //  PressureCurveType::Generic     = curvemanager held curve which is function of flow rate
@@ -3151,7 +3151,7 @@ namespace CurveManager {
         }
 
         // At this point, we had a non-blank user entry with no match
-        PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Error;
+        PressureCurveType = DataBranchAirLoopPlant::PressureCurveType::Invalid;
     }
 
     Real64

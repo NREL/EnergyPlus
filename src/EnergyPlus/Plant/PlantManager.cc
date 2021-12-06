@@ -2852,7 +2852,7 @@ void CheckPlantOnAbort(EnergyPlusData &state)
                             {
                                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).controlType);
 
-                                if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlType::Unknown) {
+                                if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlType::Invalid) {
                                     ShowWarningError(state,
                                                      "Found potential problem with Control Type for Branch named: " +
                                                          state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
@@ -3554,9 +3554,9 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         auto const SELECT_CASE_var(this_component.Type);
 
                         if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Invalid) { //                             = -1
-                            this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Unknown;
-                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
-                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
+                            this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Invalid;
+                            this_component.HowLoadServed = DataPlant::HowMet::Invalid;
                         } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Boiler_Simple) { //         =  1
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
@@ -4038,20 +4038,20 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                         } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PlantComponentUserDefined) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
-                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Invalid;
+                            this_component.HowLoadServed = DataPlant::HowMet::Invalid;
                         } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoilUserDefined) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
-                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Invalid;
+                            this_component.HowLoadServed = DataPlant::HowMet::Invalid;
                         } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
-                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Invalid;
+                            this_component.HowLoadServed = DataPlant::HowMet::Invalid;
                         } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::AirTerminalUserDefined) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Unknown;
-                            this_component.HowLoadServed = DataPlant::HowMet::Unknown;
+                            this_component.FlowPriority = DataPlant::LoopFlowStatus::Invalid;
+                            this_component.HowLoadServed = DataPlant::HowMet::Invalid;
                         } else if (SELECT_CASE_var ==
                                    DataPlant::PlantEquipmentType::HeatPumpVRF) { //       =  82  ! AirConditioner:VariableRefrigerantFlow
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
@@ -4139,7 +4139,7 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                     {
                         auto const SELECT_CASE_var(ComponentFlowCtrl);
 
-                        if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlType::Unknown) {
+                        if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlType::Invalid) {
                             state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).controlType =
                                 DataBranchAirLoopPlant::ControlType::Passive;
                         } else if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlType::Active) {
