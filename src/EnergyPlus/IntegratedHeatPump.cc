@@ -2465,7 +2465,7 @@ void DecideWorkMode(EnergyPlusData &state,
                                                         state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankID);
             auto &tank = state.dataWaterThermalTanks->WaterThermalTank(tankIDX);
             tank.callerLoopNum = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).LoopNum;
-            PlantLocation A(0, 0, 0, 0);
+            PlantLocation A(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
             tank.simulate(state, A, true, MyLoad, true);
             tank.callerLoopNum = 0;
 
@@ -2483,7 +2483,7 @@ void DecideWorkMode(EnergyPlusData &state,
             auto &tank = state.dataWaterThermalTanks->WaterThermalTank(tankIDX);
             tank.callerLoopNum = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).LoopNum;
             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WHtankType = tankType;
-            PlantLocation A(0, 0, 0, 0);
+            PlantLocation A(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
             HPWH.simulate(state, A, true, MyLoad, true);
             tank.callerLoopNum = 0;
             break;

@@ -92,7 +92,7 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
                                                                          std::string const &PlantLoopName,
                                                                          int const PlantSizingIndex)
 {
-    using DataPlant::SupplySide;
+
     using namespace FluidProperties;
 
     Real64 density;
@@ -115,7 +115,7 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
 
             plantCoincAnalyObjs.emplace_back(PlantLoopName,
                                              i,
-                                             state.dataPlnt->PlantLoop(i).LoopSide(SupplySide).NodeNumIn,
+                                             state.dataPlnt->PlantLoop(i).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumIn,
                                              density,
                                              cp,
                                              state.dataSize->PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,

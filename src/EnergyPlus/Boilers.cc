@@ -118,7 +118,7 @@ void BoilerSpecs::simulate(EnergyPlusData &state,
                            Real64 &CurLoad,
                            bool const RunFlag)
 {
-    auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
+    auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[static_cast<int>(this->LoopSideNum)].Branch(this->BranchNum).Comp(this->CompNum));
     this->InitBoiler(state);
     this->CalcBoilerModel(state, CurLoad, RunFlag, sim_component.FlowCtrl);
     this->UpdateBoilerRecords(state, CurLoad, RunFlag);
@@ -491,7 +491,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
 
     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->FlowMode == DataPlant::FlowMode::Constant)) {
         // reset flow priority
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[static_cast<int>(this->LoopSideNum)].Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 }
@@ -833,7 +833,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // Initialize the delta temperature to zero
     Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference, set in all necessary code paths so no initialization required
 
-    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[static_cast<int>(this->LoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
         // Either set the flow to the Constant value or calculate the flow for the variable volume
         if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
             // Then find the flow rate and outlet temp

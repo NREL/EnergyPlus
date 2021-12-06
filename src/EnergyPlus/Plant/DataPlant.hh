@@ -80,11 +80,6 @@ namespace DataPlant {
     constexpr Real64 CriteriaDelta_Temperature(0.010);
     constexpr Real64 CriteriaDelta_HeatTransferRate(0.100);
 
-    // Parameters for loop side location
-    constexpr int DemandSupply_No(0);
-    constexpr int DemandSide(1);
-    constexpr int SupplySide(2);
-
     // Parameters for tolerance
     constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     constexpr Real64 DeltaTempTol(0.0001); // minimum significant loop temperature difference

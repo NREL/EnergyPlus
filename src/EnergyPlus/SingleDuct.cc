@@ -2557,7 +2557,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
             }
 
             this->ReheatCoilOutletNode =
-                state.dataPlnt->PlantLoop(this->HWLoopNum).LoopSide(this->HWLoopSide).Branch(this->HWBranchIndex).Comp(this->HWCompIndex).NodeNumOut;
+                state.dataPlnt->PlantLoop(this->HWLoopNum).LoopSide[static_cast<int>(this->HWLoopSide)].Branch(this->HWBranchIndex).Comp(this->HWCompIndex).NodeNumOut;
 
             this->PlantLoopScanFlag = false;
         } else {
@@ -6113,7 +6113,7 @@ void GetATMixers(EnergyPlusData &state)
         state.dataSingleDuct->SysATMixer(ATMixerNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         if (state.dataIPShortCut->cAlphaArgs(7) == "INLETSIDE") {
             state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_InletSide; // inlet side mixer
-        } else if (state.dataIPShortCut->cAlphaArgs(7) == "SUPPLYSIDE") {
+        } else if (state.dataIPShortCut->cAlphaArgs(7) == "LoopSideLocation::Supply") {
             state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_SupplySide; // supply side mixer
         }
         if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:WATERTOAIRHEATPUMP") {

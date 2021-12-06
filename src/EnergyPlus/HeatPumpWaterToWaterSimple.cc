@@ -739,7 +739,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     auto &PrevSimTime = state.dataHPWaterToWaterSimple->PrevSimTime;
 
     int LoopNum;
-    int LoopSideNum;
+    DataPlant::LoopSideLocation LoopSideNum;
     Real64 rho; // local fluid density
 
     this->MustRun = true; // Reset MustRun flag to TRUE

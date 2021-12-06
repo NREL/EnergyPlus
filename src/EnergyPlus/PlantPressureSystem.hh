@@ -66,16 +66,16 @@ namespace PlantPressureSystem {
                                int LoopNum,                        // Plant Loop to update pressure information
                                bool FirstHVACIteration,            // System flag
                                DataPlant::PressureCall CallType,   // Enumerated call type
-                               Optional_int_const LoopSideNum = _, // Loop side num for specific branch simulation
+                               DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid, // Loop side num for specific branch simulation
                                Optional_int_const BranchNum = _    // Branch num for specific branch simulation
     );
 
     void InitPressureDrop(EnergyPlusData &state, int LoopNum, bool FirstHVACIteration);
 
     void BranchPressureDrop(EnergyPlusData &state,
-                            int LoopNum,     // Plant Loop Index
-                            int LoopSideNum, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
-                            int BranchNum    // Branch Index on LoopSide LoopSideNum
+                            const int LoopNum,     // Plant Loop Index
+                            const DataPlant::LoopSideLocation LoopSideNum, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
+                            const int BranchNum    // Branch Index on LoopSide LoopSideNum
     );
 
     void UpdatePressureDrop(EnergyPlusData &state, int LoopNum);

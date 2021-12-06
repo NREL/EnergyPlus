@@ -67,12 +67,12 @@ void PlantLoopData::UpdateLoopSideReportVars(EnergyPlusData &state,
     //       MODIFIED       Aug 2010 Edwin Lee -- add per LoopSide variable support
     //       RE-ENGINEERED  na
 
-    this->InletNodeFlowrate = state.dataLoopNodes->Node(this->LoopSide(DataPlant::SupplySide).NodeNumIn).MassFlowRate;
-    this->InletNodeTemperature = state.dataLoopNodes->Node(this->LoopSide(DataPlant::SupplySide).NodeNumIn).Temp;
-    this->OutletNodeFlowrate = state.dataLoopNodes->Node(this->LoopSide(DataPlant::SupplySide).NodeNumOut).MassFlowRate;
-    this->OutletNodeTemperature = state.dataLoopNodes->Node(this->LoopSide(DataPlant::SupplySide).NodeNumOut).Temp;
+    this->InletNodeFlowrate = state.dataLoopNodes->Node(this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumIn).MassFlowRate;
+    this->InletNodeTemperature = state.dataLoopNodes->Node(this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumIn).Temp;
+    this->OutletNodeFlowrate = state.dataLoopNodes->Node(this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut).MassFlowRate;
+    this->OutletNodeTemperature = state.dataLoopNodes->Node(this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut).Temp;
 
-    // In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
+    // In the baseline code, only reported supply side demand. so putting in "LoopSideLocation::Supply" IF block for now but might expand later
     if (OtherSideDemand < 0.0) {
         this->CoolingDemand = std::abs(OtherSideDemand);
         this->HeatingDemand = 0.0;
@@ -143,7 +143,7 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
             if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
 
                 // Pick up the loop setpoint temperature
-                LoopSetPointTemperature = this->LoopSide(DataPlant::SupplySide).TempSetPoint;
+                LoopSetPointTemperature = this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TempSetPoint;
                 // Calculate the delta temperature
                 DeltaTemp = LoopSetPointTemperature - TargetTemp;
 
@@ -188,7 +188,7 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
             if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
 
                 // Pick up the loop setpoint temperature
-                LoopSetPointTemperature = this->LoopSide(DataPlant::SupplySide).TempSetPoint;
+                LoopSetPointTemperature = this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TempSetPoint;
 
                 // Calculate the delta temperature
                 DeltaTemp = LoopSetPointTemperature - TargetTemp;
@@ -231,7 +231,7 @@ void PlantLoopData::CheckLoopExitNode(EnergyPlusData &state, bool const FirstHVA
     // at the loop setpoint temperature.
 
     // Using/Aliasing
-    using DataPlant::SupplySide;
+
     ;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -239,9 +239,9 @@ void PlantLoopData::CheckLoopExitNode(EnergyPlusData &state, bool const FirstHVA
     int LoopOutlet; // plant loop outlet node num.
 
     // set local variables: loop inlet and outlet nodes
-    auto &supplySide = this->LoopSide(DataPlant::SupplySide);
-    LoopInlet = supplySide.NodeNumIn;
-    LoopOutlet = supplySide.NodeNumOut;
+    auto &Supply = this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)];
+    LoopInlet = Supply.NodeNumIn;
+    LoopOutlet = Supply.NodeNumOut;
     // Check continuity invalid...loop pumps now turned on and off
     if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
         if (std::abs(state.dataLoopNodes->Node(LoopOutlet).MassFlowRate - state.dataLoopNodes->Node(LoopInlet).MassFlowRate) >

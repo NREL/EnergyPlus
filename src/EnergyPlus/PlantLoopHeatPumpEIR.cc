@@ -119,7 +119,7 @@ void EIRPlantLoopHeatPump::simulate(
 Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
 {
     auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
-    auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
+    auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide[static_cast<int>(this->loadSideLocation.loopSideNum)];
     auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
     auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
     if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
@@ -1222,7 +1222,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                    this->name));
             ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
             errFlag = true;
-        } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
+        } else if (this->loadSideLocation.loopSideNum != DataPlant::LoopSideLocation::Supply) { // only check if !thisErrFlag
             ShowSevereError(state,
                             format("{}: Invalid connections for {} name = \"{}\"",
                                    routineName,
@@ -1256,7 +1256,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                        this->name));
                 ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
                 errFlag = true;
-            } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
+            } else if (this->sourceSideLocation.loopSideNum != DataPlant::LoopSideLocation::Demand) { // only check if !thisErrFlag
                 ShowSevereError(state,
                                 format("{}: Invalid connections for {} name = \"{}\"",
                                        routineName,

@@ -97,7 +97,7 @@ namespace DataPlant {
         bool EMSCtrl;
         Real64 EMSValue;
         // Loop Inlet and Outlet Nodes
-        Array1D<HalfLoopData> LoopSide;                       // Half loop data (Demand side or Supply Side)
+        std::array<HalfLoopData, 2> LoopSide;                       // Half loop data (Demand side or Supply Side)
         std::string OperationScheme;                          // Operation scheme name for the loop
         int NumOpSchemes;                                     // Number of items in list identified by "OpScheme"
         Array1D<OperationData> OpScheme;                      // Operation scheme data

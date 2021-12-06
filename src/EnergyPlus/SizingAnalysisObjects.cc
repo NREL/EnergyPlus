@@ -503,7 +503,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData &state, int 
         sizingFac = state.dataSize->GlobalCoolSizingFactor;
     } else if (state.dataSize->PlantSizData(plantSizingIndex).SizingFactorOption == LoopComponentSizingFactorMode) {
         // multiplier used for pumps, often 1.0, from component level sizing fractions
-        sizingFac = state.dataPlnt->PlantLoop(plantLoopIndex).LoopSide(SupplySide).Branch(1).PumpSizFac;
+        sizingFac = state.dataPlnt->PlantLoop(plantLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch(1).PumpSizFac;
     }
 
     newAdjustedMassFlowRate = newFoundMassFlowRate * sizingFac; // apply overall heating or cooling sizing factor

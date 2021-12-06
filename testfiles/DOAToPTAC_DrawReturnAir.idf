@@ -26,9 +26,9 @@
 !                          an induce node, and PTAC2 draws air from a zone exhaust node.   
 !                          PTAC3 is connected to a ternimal mixer with InletSide connection. The primary air is from DOAS disctribution and the Mixer
 !                          draws air from an induce node.   
-!                          PTAC4 is connected to a ternimal mixer with SupplySide connection. The primary air is from DOAS disctribution via return 
+!                          PTAC4 is connected to a ternimal mixer with LoopSideLocation::Supply connection. The primary air is from DOAS disctribution via return
 !                          plenum outlet, and the PTAC4 draws air from the zone directly.
-!                          PTAC5 is connected to a ternimal mixer with SupplySide connection. The primary air is from DOAS disctribution via return 
+!                          PTAC5 is connected to a ternimal mixer with LoopSideLocation::Supply connection. The primary air is from DOAS disctribution via return
 !                          plenum outlet, and the PTAC5 draws air from an induce node of zone plenum.
 !                          Mass balance: a sum of all zone return flows = a sum of mass flow rates from outlet node and all induce node. 
 !
@@ -2443,7 +2443,7 @@
     SPACE4-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE4-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
-    SupplySide,              !- Mixer Connection Type
+    LoopSideLocation::Supply,              !- Mixer Connection Type
     SZ DSOA SPACE4-1,        !- Design Specification Outdoor Air Object Name
     CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 
@@ -2454,7 +2454,7 @@
     SPACE5-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE5-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name
-    SupplySide,              !- Mixer Connection Type
+    LoopSideLocation::Supply,              !- Mixer Connection Type
     SZ DSOA SPACE5-1,        !- Design Specification Outdoor Air Object Name
     CurrentOccupancy;        !- Per Person Ventilation Rate Mode
 

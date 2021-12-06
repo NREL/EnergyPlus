@@ -135,7 +135,7 @@ namespace WaterToAirHeatPump {
         int LowPressHtgError;   // count for low pressure errors (heating)
         int HighPressHtgError;  // count for high pressure errors (heating)
         int LoopNum;            // plant loop index for water side
-        int LoopSide;           // plant loop side index
+        DataPlant::LoopSideLocation LoopSide;           // plant loop side index
         int BranchNum;          // plant branch index
         int CompNum;            // plant component index
 
@@ -151,7 +151,7 @@ namespace WaterToAirHeatPump {
               CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0), LossFactor(0.0),
               RefVolFlowRate(0.0), VolumeRatio(0.0), LeakRateCoeff(0.0), SourceSideHTR1(0.0), SourceSideHTR2(0.0), HighPressCutoff(0.0),
               LowPressCutoff(0.0), CompressorType(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0)
+              LowPressClgError(0), HighPressClgError(0), LowPressHtgError(0), HighPressHtgError(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0)
         {
         }
     };

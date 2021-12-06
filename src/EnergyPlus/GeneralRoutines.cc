@@ -130,7 +130,7 @@ void ControlCompOutput(EnergyPlusData &state,
                        Optional_int_const Action,             // 1=reverse; 2=normal
                        Optional_int_const EquipIndex,         // Identifier for equipment of Outdoor Air Unit "ONLY"
                        Optional_int_const LoopNum,            // for plant components, plant loop index
-                       Optional_int_const LoopSide,           // for plant components, plant loop side index
+                       DataPlant::LoopSideLocation LoopSide,           // for plant components, plant loop side index
                        Optional_int_const BranchIndex,        // for plant components, plant branch index
                        Optional_int_const ControlledZoneIndex // controlled zone index for the zone containing the component
 )

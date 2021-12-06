@@ -126,7 +126,7 @@ namespace HVACInterfaceManager {
 
     void UpdatePlantLoopInterface(EnergyPlusData &state,
                                   int LoopNum,                // The 'inlet/outlet node' loop number
-                                  int ThisLoopSideNum,        // The 'outlet node' LoopSide number
+                                  DataPlant::LoopSideLocation ThisLoopSideNum,        // The 'outlet node' LoopSide number
                                   int ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                                   int OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                                   bool &OutOfToleranceFlag,   // True when the other side of the loop need to be (re)simulated
@@ -134,19 +134,19 @@ namespace HVACInterfaceManager {
 
     //***************
 
-    void UpdateHalfLoopInletTemp(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, Real64 &TankOutletTemp);
+    void UpdateHalfLoopInletTemp(EnergyPlusData &state, const int LoopNum, DataPlant::LoopSideLocation TankInletLoopSide, Real64 &TankOutletTemp);
 
     void
-    UpdateCommonPipe(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, DataPlant::CommonPipeType CommonPipeType, Real64 &MixedOutletTemp);
+    UpdateCommonPipe(EnergyPlusData &state, int LoopNum, DataPlant::LoopSideLocation TankInletLoopSide, DataPlant::CommonPipeType CommonPipeType, Real64 &MixedOutletTemp);
 
     void ManageSingleCommonPipe(EnergyPlusData &state,
-                                int LoopNum,            // plant loop number
-                                int LoopSide,           // plant loop side number
-                                Real64 TankOutletTemp,  // inlet temperature to the common pipe passed in from the capacitance calculation
+                                const int LoopNum,            // plant loop number
+                                const DataPlant::LoopSideLocation LoopSide,           // plant loop side number
+                                const Real64 TankOutletTemp,  // inlet temperature to the common pipe passed in from the capacitance calculation
                                 Real64 &MixedOutletTemp // inlet temperature to the common pipe passed in from the capacitance calculation
     );
 
-    void ManageTwoWayCommonPipe(EnergyPlusData &state, int LoopNum, int LoopSide, Real64 TankOutletTemp);
+    void ManageTwoWayCommonPipe(EnergyPlusData &state, const int LoopNum, const DataPlant::LoopSideLocation LoopSide, const Real64 TankOutletTemp);
 
     void SetupCommonPipes(EnergyPlusData &state);
 

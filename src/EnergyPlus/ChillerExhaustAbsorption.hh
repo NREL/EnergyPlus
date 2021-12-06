@@ -130,15 +130,15 @@ namespace ChillerExhaustAbsorption {
         bool PossibleSubcooling;   // Flag to determine whether plant is overcooled
         // loop topology variables
         int CWLoopNum;                           // chilled water plant loop index number
-        int CWLoopSideNum;                       // chilled water plant loop side index
+        DataPlant::LoopSideLocation CWLoopSideNum;                       // chilled water plant loop side index
         int CWBranchNum;                         // chilled water plant loop branch index
         int CWCompNum;                           // chilled water plant loop component index
         int CDLoopNum;                           // condenser water plant loop index number
-        int CDLoopSideNum;                       // condenser water plant loop side index
+        DataPlant::LoopSideLocation CDLoopSideNum;                       // condenser water plant loop side index
         int CDBranchNum;                         // condenser water plant loop branch index
         int CDCompNum;                           // condenser water plant loop component index
         int HWLoopNum;                           // hot water plant loop side index
-        int HWLoopSideNum;                       // hot water plant loop side index
+        DataPlant::LoopSideLocation HWLoopSideNum;                       // hot water plant loop side index
         int HWBranchNum;                         // hot water plant loop branch index
         int HWCompNum;                           // hot water plant loop component index
         GeneratorType CompType_Num;              // Numeric designator for CompType (TypeOf)
@@ -200,8 +200,8 @@ namespace ChillerExhaustAbsorption {
               ElecCoolFTCurve(0), ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), ThermalEnergyHeatFHPLRCurve(0), isEnterCondensTemp(false),
               isWaterCooled(false), CHWLowLimitTemp(0.0), ExhaustAirInletNodeNum(0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0),
               DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0),
-              CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0),
-              HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), CompType_Num(GeneratorType::Unassigned), ExhTempLTAbsLeavingTempIndex(0),
+              CWLoopSideNum(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(DataPlant::LoopSideLocation::Invalid), CDBranchNum(0), CDCompNum(0), HWLoopNum(0),
+              HWLoopSideNum(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), CompType_Num(GeneratorType::Unassigned), ExhTempLTAbsLeavingTempIndex(0),
               ExhTempLTAbsLeavingHeatingTempIndex(0), envrnInit(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0),
               HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0), ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0),
               CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0), ElectricPower(0.0), ElectricEnergy(0.0),

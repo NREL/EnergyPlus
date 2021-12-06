@@ -126,7 +126,7 @@ namespace UnitVentilator {
         int HotCoilOutNodeNum;     // outlet of coil
         Real64 HotControlOffset;   // control tolerance
         int HWLoopNum;             // index for plant loop with hot water coil
-        int HWLoopSide;            // index for plant loop side for hot water coil
+        DataPlant::LoopSideLocation HWLoopSide;            // index for plant loop side for hot water coil
         int HWBranchNum;           // index for plant branch for hot water coil
         int HWCompNum;             // index for plant component for hot water coil
         bool CCoilPresent;         // .TRUE. if unit ventilator has a cooling coil
@@ -150,7 +150,7 @@ namespace UnitVentilator {
         int ColdCoilOutNodeNum;     // chilled water coil out node
         Real64 ColdControlOffset;   // control tolerance
         int CWLoopNum;              // index for plant loop with chilled water coil
-        int CWLoopSide;             // index for plant loop side for chilled water coil
+        DataPlant::LoopSideLocation CWLoopSide;             // index for plant loop side for chilled water coil
         int CWBranchNum;            // index for plant branch for chilled water coil
         int CWCompNum;              // index for plant component for chilled water coil
         // Report data
@@ -187,10 +187,10 @@ namespace UnitVentilator {
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
-              HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), CCoilPresent(false), CCoil_Index(0),
+              HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), CCoilPresent(false), CCoil_Index(0),
               CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
               MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
-              ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
+              ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
               TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanPartLoadRatio(0.0),
               PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0),
               ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)

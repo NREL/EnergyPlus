@@ -214,7 +214,7 @@ namespace PackagedTerminalHeatPump {
         Real64 CompPartLoadFrac;         // compressor part load ratio
         int PlantCoilOutletNode;         // outlet node for water coil
         int SuppCoilLoopNum;             // plant loop index for water heating coil
-        int SuppCoilLoopSide;            // plant loop side  index for water heating coil
+        DataPlant::LoopSideLocation SuppCoilLoopSide;            // plant loop side  index for water heating coil
         int SuppCoilBranchNum;           // plant loop branch index for water heating coil
         int SuppCoilCompNum;             // plant loop component index for water heating coil
         Real64 MaxSuppCoilFluidFlow;     // water or steam mass flow rate supp. heating coil [kg/s]
@@ -272,11 +272,11 @@ namespace PackagedTerminalHeatPump {
         Real64 MaxCoolCoilFluidFlow;     // water flow rate for cooling coil [kg/s] - NOT USED in PTHP
         Real64 MaxHeatCoilFluidFlow;     // water or steam mass flow rate for heating coil [kg/s]
         int CoolCoilLoopNum;             // plant loop index for water cooling coil - NOT USED in PTHP
-        int CoolCoilLoopSide;            // plant loop side  index for water cooling coil - NOT USED in PTHP
+        DataPlant::LoopSideLocation CoolCoilLoopSide;            // plant loop side  index for water cooling coil - NOT USED in PTHP
         int CoolCoilBranchNum;           // plant loop branch index for water cooling coil - NOT USED in PTHP
         int CoolCoilCompNum;             // plant loop component index for water cooling coil - NOT USED in PTHP
         int HeatCoilLoopNum;             // plant loop index for water heating coil
-        int HeatCoilLoopSide;            // plant loop side  index for water heating coil
+        DataPlant::LoopSideLocation HeatCoilLoopSide;            // plant loop side  index for water heating coil
         int HeatCoilBranchNum;           // plant loop branch index for water heating coil
         int HeatCoilCompNum;             // plant loop component index for water heating coil
         int CoolCoilFluidInletNode;      // water cooling coil water inlet node number NOT USED in PTHP
@@ -307,7 +307,7 @@ namespace PackagedTerminalHeatPump {
               LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0),
               CompPartLoadRatio(0.0), LastMode(iCompMode::Unassigned), AirFlowControl(iAirflowCtrlMode::Unassigned),
               ControlType(iCtrlType::Unassigned), validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false),
-              CompPartLoadFrac(0.0), PlantCoilOutletNode(0), SuppCoilLoopNum(0), SuppCoilLoopSide(0), SuppCoilBranchNum(0), SuppCoilCompNum(0),
+              CompPartLoadFrac(0.0), PlantCoilOutletNode(0), SuppCoilLoopNum(0), SuppCoilLoopSide(DataPlant::LoopSideLocation::Invalid), SuppCoilBranchNum(0), SuppCoilCompNum(0),
               MaxSuppCoilFluidFlow(0.0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0),
               CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(iCompMode::Unassigned), NumOfSpeedCooling(0),
               NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
@@ -320,8 +320,8 @@ namespace PackagedTerminalHeatPump {
               MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsiFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
-              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0),
-              HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilFluidInletNode(0),
+              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilLoopNum(0), CoolCoilLoopSide(DataPlant::LoopSideLocation::Invalid), CoolCoilBranchNum(0), CoolCoilCompNum(0),
+              HeatCoilLoopNum(0), HeatCoilLoopSide(DataPlant::LoopSideLocation::Invalid), HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilFluidInletNode(0),
               CoolCoilFluidOutletNodeNum(0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilFluidInletNode(0),
               HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0)
         {

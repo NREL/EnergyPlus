@@ -171,15 +171,15 @@ namespace ChillerReformulatedEIR {
         int DeltaTErrCount;            // Evaporator delta T equals 0 for variable flow chiller warning messages
         int DeltaTErrCountIndex;       // Index to evaporator delta T = 0 for variable flow chiller warning messages
         int CWLoopNum;                 // chilled water plant loop index number
-        int CWLoopSideNum;             // chilled water plant loop side index
+        DataPlant::LoopSideLocation CWLoopSideNum;             // chilled water plant loop side index
         int CWBranchNum;               // chilled water plant loop branch index
         int CWCompNum;                 // chilled water plant loop component index
         int CDLoopNum;                 // condenser water plant loop index number
-        int CDLoopSideNum;             // condenser water plant loop side index
+        DataPlant::LoopSideLocation CDLoopSideNum;             // condenser water plant loop side index
         int CDBranchNum;               // condenser water plant loop branch index
         int CDCompNum;                 // condenser water plant loop component index
         int HRLoopNum;                 // heat recovery water plant loop index
-        int HRLoopSideNum;             // heat recovery water plant loop side index
+        DataPlant::LoopSideLocation HRLoopSideNum;             // heat recovery water plant loop side index
         int HRBranchNum;               // heat recovery water plant loop branch index
         int HRCompNum;                 // heat recovery water plant loop component index
         int CondMassFlowIndex;
@@ -238,8 +238,8 @@ namespace ChillerReformulatedEIR {
               ChillerTdevNomMax(10.0), CAPFTXIter(0), CAPFTXIterIndex(0), CAPFTYIter(0), CAPFTYIterIndex(0), EIRFTXIter(0), EIRFTXIterIndex(0),
               EIRFTYIter(0), EIRFTYIterIndex(0), EIRFPLRTIter(0), EIRFPLRTIterIndex(0), EIRFPLRPLRIter(0), EIRFPLRPLRIterIndex(0),
               FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), IterLimitExceededNum(0), IterLimitErrIndex(0),
-              IterFailed(0), IterFailedIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0),
-              CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0),
+              IterFailed(0), IterFailedIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0), CWLoopNum(0), CWLoopSideNum(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0),
+              CWCompNum(0), CDLoopNum(0), CDLoopSideNum(DataPlant::LoopSideLocation::Invalid), CDBranchNum(0), CDCompNum(0), HRLoopNum(0), HRLoopSideNum(DataPlant::LoopSideLocation::Invalid), HRBranchNum(0),
               HRCompNum(0), CondMassFlowIndex(0), PossibleSubcooling(false), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
               FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true), MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0),
               ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0), ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0),

@@ -191,7 +191,7 @@ namespace SingleDuct {
         int OARequirementsPtr;                // - Index to DesignSpecification:OutdoorAir object
         int AirLoopNum;
         int HWLoopNum;                // plant topology, loop number
-        int HWLoopSide;               // plant topology, loop side number
+        DataPlant::LoopSideLocation HWLoopSide;               // plant topology, loop side number
         int HWBranchIndex;            // plant topology, Branch number
         int HWCompIndex;              // plant topology, Component number
         std::string ZoneHVACUnitType; // type of Zone HVAC unit for air terminal mixer units
@@ -230,7 +230,7 @@ namespace SingleDuct {
               MaxReheatTemp(0.0), MaxReheatTempSetByUser(false), DamperHeatingAction(Action::HeatingActionNotUsed), DamperPosition(0.0), ADUNum(0),
               FluidIndex(0), ErrCount1(0), ErrCount1c(0), ErrCount2(0), ZoneFloorArea(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), ActualZoneNum(0),
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
-              OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(0),
+              OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid),
               HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0),
               OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassgined), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
               ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), MyEnvrnFlag(true),

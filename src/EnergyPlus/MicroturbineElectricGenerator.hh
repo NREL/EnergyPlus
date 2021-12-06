@@ -131,7 +131,7 @@ namespace MicroturbineElectricGenerator {
         Real64 HeatRecMaxMassFlowRate;    // Maximum heat recovery water mass flow rate (kg/s)
         Real64 HeatRecMdot;               // Heat Recovery Loop Mass flow rate (kg/s)
         int HRLoopNum;                    // cooling water plant loop index number, for heat recovery
-        int HRLoopSideNum;                // cooling water plant loop side index, for heat recovery
+        DataPlant::LoopSideLocation HRLoopSideNum;                // cooling water plant loop side index, for heat recovery
         int HRBranchNum;                  // cooling water plant loop branch index, for heat recovery
         int HRCompNum;                    // cooling water plant loop component index, for heat recovery
         Real64 FuelMdot;                  // Fuel Amount used (kg/s)
@@ -183,7 +183,7 @@ namespace MicroturbineElectricGenerator {
               ExhAirTempFPLRCurveNum(0), ExhaustAirTemperature(0.0), ExhaustAirHumRat(0.0), CompType_Num(GeneratorType::Microturbine),
               RefCombustAirInletDensity(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), FuelEnergyUseRateHHV(0.0), FuelEnergyUseRateLHV(0.0),
               QHeatRecovered(0.0), ExhaustEnergyRec(0.0), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletTemp(0.0),
-              HeatRecOutletTemp(0.0), HeatRecMinMassFlowRate(0.0), HeatRecMaxMassFlowRate(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0),
+              HeatRecOutletTemp(0.0), HeatRecMinMassFlowRate(0.0), HeatRecMaxMassFlowRate(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(DataPlant::LoopSideLocation::Invalid),
               HRBranchNum(0), HRCompNum(0), FuelMdot(0.0), ElecPowerGenerated(0.0), StandbyPowerRate(0.0), AncillaryPowerRate(0.0),
               PowerFTempElevErrorIndex(0), EffFTempErrorIndex(0), EffFPLRErrorIndex(0), ExhFlowFTempErrorIndex(0), ExhFlowFPLRErrorIndex(0),
               ExhTempFTempErrorIndex(0), ExhTempFPLRErrorIndex(0), HRMinFlowErrorIndex(0), HRMaxFlowErrorIndex(0), ExhTempLTInletTempIndex(0),

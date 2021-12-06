@@ -332,11 +332,11 @@ namespace UnitarySystems {
         bool m_InitHeatPump; // Heat pump initialization flag (for error reporting)
 
         int m_HRLoopNum;
-        int m_HRLoopSideNum;
+        DataPlant::LoopSideLocation m_HRLoopSideNum {DataPlant::LoopSideLocation::Invalid};
         int m_HRBranchNum;
         int m_HRCompNum;
         int m_SuppCoilLoopNum;
-        int m_SuppCoilLoopSide;
+        DataPlant::LoopSideLocation m_SuppCoilLoopSide {DataPlant::LoopSideLocation::Invalid};
         int m_SuppCoilBranchNum;
         int m_SuppCoilCompNum;
         int m_SuppCoilFluidOutletNodeNum;
@@ -468,12 +468,12 @@ namespace UnitarySystems {
         int CoolCoilOutletNodeNum;       // Cooling coil air outlet node number
         int CoolCoilFluidOutletNodeNum;  // Cooling coil fluid outlet node number (from Plant Loop data)
         int CoolCoilLoopNum;             // Plant loop num of chilled water coil
-        int CoolCoilLoopSide;            // Supply side or demand side
+        DataPlant::LoopSideLocation CoolCoilLoopSide{DataPlant::LoopSideLocation::Invalid};            // Supply side or demand side
         int CoolCoilBranchNum;           // Branch of number of the cooling coil in the plant loop
         int CoolCoilCompNum;             // Comp num of the cooling coil in the plant loop
         int CoolCoilFluidInletNode;      // Cooling coil fluid inlet node
         int HeatCoilLoopNum;             // Plant loop num of hot water or steam coil
-        int HeatCoilLoopSide;            // Supply side or demand side
+        DataPlant::LoopSideLocation HeatCoilLoopSide{DataPlant::LoopSideLocation::Invalid};            // Supply side or demand side
         int HeatCoilBranchNum;           // Branch of number of the heating coil in the plant loop
         int HeatCoilCompNum;             // Comp num of the heating coil in the plant loop
         int HeatCoilFluidInletNode;      // Heating coil fluid inlet node

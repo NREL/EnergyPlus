@@ -467,9 +467,9 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
         ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
     }
     // set limits on outlet node temps to plant loop limits
-    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MinOutletTemp =
+    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[static_cast<int>(this->LoopSideNum)].Branch(this->BranchNum).Comp(this->CompNum).MinOutletTemp =
         state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
+    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[static_cast<int>(this->LoopSideNum)].Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
         state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
     // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);

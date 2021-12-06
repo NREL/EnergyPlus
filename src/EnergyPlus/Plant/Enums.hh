@@ -62,6 +62,20 @@ enum class LoopFlowStatus
     NUM
 };
 
+enum class LoopSideLocation
+{
+    Invalid = -1,
+    Demand,
+    Supply,
+    Num
+};
+
+constexpr LoopSideLocation InvertLoopSide (const LoopSideLocation &input) {
+    if (input == LoopSideLocation::Demand) return LoopSideLocation::Supply;
+    else if (input == LoopSideLocation::Supply) return LoopSideLocation::Demand;
+    else return LoopSideLocation::Invalid;
+}
+
 // Parameters for scheme types
 // Used in TYPE(OperationData)%Type
 // As in PlantLoop(:)%OpScheme(:)%Type

@@ -57,6 +57,7 @@
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -164,12 +165,12 @@ namespace AirLoopHVACDOAS {
         std::vector<int> m_OACtrlNum; // array of OA controller number
 
         int HWLoopNum;
-        int HWLoopSide;
+        DataPlant::LoopSideLocation HWLoopSide;
         int HWBranchNum;
         int HWCompNum;
         int HWCtrlNodeNum;
         int CWLoopNum;
-        int CWLoopSide;
+        DataPlant::LoopSideLocation CWLoopSide;
         int CWBranchNum;
         int CWCompNum;
         int CWCtrlNodeNum;
@@ -182,8 +183,8 @@ namespace AirLoopHVACDOAS {
               m_AvailManagerSchedPtr(0), m_AirLoopMixerIndex(-1), m_AirLoopSplitterIndex(-1), NumOfAirLoops(0), m_InletNodeNum(0), m_OutletNodeNum(0),
               m_FanIndex(-1), m_FanInletNodeNum(0), m_FanOutletNodeNum(0), m_FanTypeNum(SimAirServingZones::CompType::Unassigned), m_HeatCoilNum(0),
               m_CoolCoilNum(0), ConveCount(0), ConveIndex(0), m_HeatExchangerFlag(false), SizingOnceFlag(true), DXCoilFlag(false),
-              FanBlowTroughFlag(false), m_CompPointerAirLoopMixer(nullptr), m_CompPointerAirLoopSplitter(nullptr), HWLoopNum(0), HWLoopSide(0),
-              HWBranchNum(0), HWCompNum(0), HWCtrlNodeNum(0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), CWCtrlNodeNum(0),
+              FanBlowTroughFlag(false), m_CompPointerAirLoopMixer(nullptr), m_CompPointerAirLoopSplitter(nullptr), HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid),
+              HWBranchNum(0), HWCompNum(0), HWCtrlNodeNum(0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CWCtrlNodeNum(0),
               MyEnvrnFlag(true)
 
         {

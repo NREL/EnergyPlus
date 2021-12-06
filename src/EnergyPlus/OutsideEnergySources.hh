@@ -79,7 +79,7 @@ namespace OutsideEnergySources {
         DataPlant::PlantEquipmentType EnergyType{DataPlant::PlantEquipmentType::Invalid}; // flag for district heating OR cooling
         // loop topology variables
         int LoopNum = 0;
-        int LoopSideNum = 0;
+        DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid;
         int BranchNum = 0;
         int CompNum = 0;
         // flags

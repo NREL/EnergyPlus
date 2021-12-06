@@ -145,7 +145,7 @@ namespace VentilatedSlab {
         int HotCoilOutNodeNum;          // outlet of coil
         Real64 HotControlOffset;        // control tolerance
         int HWLoopNum;                  // index for plant loop with hot water coil
-        int HWLoopSide;                 // index for plant loop side for hot water coil
+        DataPlant::LoopSideLocation HWLoopSide;                 // index for plant loop side for hot water coil
         int HWBranchNum;                // index for plant branch for hot water coil
         int HWCompNum;                  // index for plant component for hot water coil
         std::string HotAirHiTempSched;  // Schedule name for the highest Air temperature
@@ -181,7 +181,7 @@ namespace VentilatedSlab {
         int ColdCoilOutNodeNum;          // chilled water coil out nod
         Real64 ColdControlOffset;        // control tolerance
         int CWLoopNum;                   // index for plant loop with chilled water coil
-        int CWLoopSide;                  // index for plant loop side for chilled water coil
+        DataPlant::LoopSideLocation CWLoopSide;                  // index for plant loop side for chilled water coil
         int CWBranchNum;                 // index for plant branch for chilled water coil
         int CWCompNum;                   // index for plant component for chilled water coil
         std::string ColdAirHiTempSched;  // Schedule name for the highest air temperature
@@ -244,10 +244,10 @@ namespace VentilatedSlab {
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
-              HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), HotAirHiTempSchedPtr(0), HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0),
+              HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), HotAirHiTempSchedPtr(0), HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0),
               HotCtrlLoTempSchedPtr(0), CCoilPresent(false), CCoil_Index(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0),
               CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
-              MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0),
+              MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0),
               CWCompNum(0), ColdAirHiTempSchedPtr(0), ColdAirLoTempSchedPtr(0), ColdCtrlHiTempSchedPtr(0), ColdCtrlLoTempSchedPtr(0), CondErrIndex(0),
               EnrgyImbalErrIndex(0), RadSurfNum(0), MSlabIn(0), MSlabOut(0), DirectHeatLossPower(0.0), DirectHeatLossEnergy(0.0),
               DirectHeatGainPower(0.0), DirectHeatGainEnergy(0.0), TotalVentSlabRadPower(0.0), RadHeatingPower(0.0), RadHeatingEnergy(0.0),

@@ -1612,13 +1612,13 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
             // Reset flow priority
             if (LoopNum == this->CWLoopNum) {
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             } else if (LoopNum == this->HWLoopNum) {
                 state.dataPlnt->PlantLoop(this->HWLoopNum)
-                    .LoopSide(this->HWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->HWLoopSideNum)]
                     .Branch(this->HWBranchNum)
                     .Comp(this->HWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -2860,12 +2860,12 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
         CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMaxAvail;
         HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
         GLHEInletMassFlowRate = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMaxAvail;
-        int LoopSideNum = this->CWLoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->CWLoopSideNum;
         this->WrapperCoolingLoad = 0.0;
         CurCoolingLoad = std::abs(MyLoad);
         this->WrapperCoolingLoad = CurCoolingLoad;
         // Set actual mass flow rate at the nodes when it's locked
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].FlowLock == DataPlant::FlowLock::Locked) {
             CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
         }
         if (CHWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;
@@ -2874,12 +2874,12 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
         CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
         HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRateMaxAvail;
         GLHEInletMassFlowRate = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMaxAvail;
-        int LoopSideNum = this->HWLoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->HWLoopSideNum;
         this->WrapperHeatingLoad = 0.0;
         CurHeatingLoad = MyLoad;
         this->WrapperHeatingLoad = CurHeatingLoad;
         // Set actual mass flow rate at the nodes when it's locked
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].FlowLock == DataPlant::FlowLock::Locked) {
             HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
         }
         if (HWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;

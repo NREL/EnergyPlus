@@ -6824,7 +6824,7 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
                                          std::string const &CoilName,
                                          [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
                                          int const LoopNum,                        // Plant loop index for where called from
-                                         int const LoopSide,                       // Plant loop side index for where called from
+                                         const DataPlant::LoopSideLocation LoopSide,                       // Plant loop side index for where called from
                                          int &CompIndex,                           // Chiller number pointer
                                          [[maybe_unused]] bool const FirstHVACIteration,
                                          bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
@@ -6910,13 +6910,13 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
 
     if (DidAnythingChange) {
         // set sim flag for this loop
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSide)].SimLoopSideNeeded = true;
         // set sim flags for air side users of coils
 
         state.dataHVACGlobal->SimAirLoopsFlag = true;
         state.dataHVACGlobal->SimZoneEquipmentFlag = true;
     } else { // nothing changed so turn off sim flag
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = false;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSide)].SimLoopSideNeeded = false;
     }
 }
 

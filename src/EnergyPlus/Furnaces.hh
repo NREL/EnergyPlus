@@ -211,12 +211,12 @@ namespace Furnaces {
         // when heat pumps operate on dehumidification mode
         int CoilOutletNode;                   // outlet node for hot water and steam heating coil
         int LoopNum;                          // plant loop index for water and steam heating coil
-        int LoopSide;                         // plant loop side  index for water and steam heating coil
+        DataPlant::LoopSideLocation LoopSide;                         // plant loop side  index for water and steam heating coil
         int BranchNum;                        // plant loop branch index for water and steam heating coil
         int CompNum;                          // plant loop component index for water and steam heating coil
         int SuppCoilOutletNode;               // outlet node for hot water and steam supplemental heating coil
         int LoopNumSupp;                      // plant loop index for water and steam supplemental heating coil
-        int LoopSideSupp;                     // plant loop side  index for  water and steam supplemental heating coil
+        DataPlant::LoopSideLocation LoopSideSupp;                     // plant loop side  index for  water and steam supplemental heating coil
         int BranchNumSupp;                    // plant loop branch index for water and steam supplemental heating coil
         int CompNumSupp;                      // plant loop component index for water and steam supplemental heating coil
         int HotWaterCoilMaxIterIndex;         // Index to recurring warning message
@@ -275,8 +275,8 @@ namespace Furnaces {
               WSHPHeatRegulaFalsiFailedIndex(0), DXHeatingMaxIterIndex(0), DXHeatingRegulaFalsiFailedIndex(0), HeatingMaxIterIndex(0),
               HeatingMaxIterIndex2(0), HeatingRegulaFalsiFailedIndex(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
               NoHeatCoolSpeedRatio(1.0), ZoneInletNode(0), SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0),
-              DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), SuppCoilOutletNode(0),
-              LoopNumSupp(0), LoopSideSupp(0), BranchNumSupp(0), CompNumSupp(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
+              DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), SuppCoilOutletNode(0),
+              LoopNumSupp(0), LoopSideSupp(DataPlant::LoopSideLocation::Invalid), BranchNumSupp(0), CompNumSupp(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
               EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0), EMSOverrideMoistZoneLoadRequest(false),
               EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Unassigned), NumOfSpeedCooling(0), NumOfSpeedHeating(0),
               IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),

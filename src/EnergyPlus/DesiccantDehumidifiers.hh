@@ -207,7 +207,7 @@ namespace DesiccantDehumidifiers {
         int CoilControlNode;                 // heating coil hot water or steam inlet node
         int CoilOutletNode;                  // outlet node for water coil
         int LoopNum;                         // plant loop index for water heating coil
-        int LoopSide;                        // plant loop side  index for water heating coil
+        DataPlant::LoopSideLocation LoopSide;                        // plant loop side  index for water heating coil
         int BranchNum;                       // plant loop branch index for water heating coil
         int CompNum;                         // plant loop component index for water heating coil
         int HotWaterCoilMaxIterIndex;        // Index to recurring warning message
@@ -233,7 +233,7 @@ namespace DesiccantDehumidifiers {
               CompanionCoilCapacity(0.0), RegenFanPlacement(0), ControlNodeNum(0), ExhaustFanCurveIndex(0), CompIndex(0), CoolingCoilOutletNode(0),
               RegenFanOutNode(0), RegenCoilInletNode(0), RegenCoilOutletNode(0), HXProcInNode(0), HXProcOutNode(0), HXRegenInNode(0),
               HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0), ErrIndex1(0), CoilUpstreamOfProcessSide(Selection::Unassigned),
-              RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0), CoilControlNode(0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0),
+              RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0), CoilControlNode(0), CoilOutletNode(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0),
               CompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxCoilFluidFlow(0.0), RegenCoilCapacity(0.0)
         {
         }

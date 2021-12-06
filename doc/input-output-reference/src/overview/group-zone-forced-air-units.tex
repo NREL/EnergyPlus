@@ -1006,7 +1006,7 @@ This field is a node name used to identify the node that serves as the inlet (ai
 
 \paragraph{Field: Air Outlet Node Name}\label{field-air-outlet-node-name-1-006}
 
-This field is a node name used to identify the node that serves as the outlet (air side) to the unit ventilator. In a unit ventilator, the air outlet node name must be zone inlet node name if there is no DOA Mixer, or if the unit ventilator is connected to DOA, then the air outlet node name must be the DOA mixer secondary air inlet node name for SupplySide mixer connection. In EnergyPlus, nodes represent points between components or at various points in the loops. While a node name may be referenced more than once in an input data file, each node must have a unique name.
+This field is a node name used to identify the node that serves as the outlet (air side) to the unit ventilator. In a unit ventilator, the air outlet node name must be zone inlet node name if there is no DOA Mixer, or if the unit ventilator is connected to DOA, then the air outlet node name must be the DOA mixer secondary air inlet node name for LoopSideLocation::Supply mixer connection. In EnergyPlus, nodes represent points between components or at various points in the loops. While a node name may be referenced more than once in an input data file, each node must have a unique name.
 
 \paragraph{Field: Outdoor Air Node Name}\label{field-outdoor-air-node-name-001}
 

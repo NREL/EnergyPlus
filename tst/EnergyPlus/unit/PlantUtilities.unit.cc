@@ -93,9 +93,9 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     // We only need a single component to check here
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    auto &thisComponent = state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
+    auto &thisComponent = state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1);
     Real64 flowRequest = 3.14;
     Real64 returnedFlow;
 
@@ -209,17 +209,17 @@ TEST_F(EnergyPlusFixture, TestAnyPlantSplitterMixerLacksContinuity)
     // We need to set up a two sided plant loop, we'll have one side not have a splitter for convenience
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Splitter.Exists = false;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).NodeNumOut = 2;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(2).NodeNumOut = 3;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.Exists = true;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.TotalOutletNodes = 2;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.BranchNumOut.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.BranchNumOut(1) = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Splitter.BranchNumOut(2) = 2;
+
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Splitter.Exists = false;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(2).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Splitter.Exists = true;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Splitter.NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Splitter.TotalOutletNodes = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Splitter.BranchNumOut.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Splitter.BranchNumOut(1) = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Splitter.BranchNumOut(2) = 2;
 
     state->dataLoopNodes->Node.allocate(3);
 
@@ -262,7 +262,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     state->dataPlnt->PlantLoop.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
     state->dataPlnt->PlantLoop(2).LoopSide.allocate(1);
-    auto &connectedLoopSide = state->dataPlnt->PlantLoop(2).LoopSide(1);
+    auto &connectedLoopSide = state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)];
 
     // the first time we call each criteria check, we should just get an index back and it should trigger the connected loop
     connectedLoopSide.SimLoopSideNeeded = false;
@@ -460,76 +460,76 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
     state->dataLoopNodes->Node.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumOut = 2;
     auto &inNode = state->dataLoopNodes->Node(1);
     auto &outNode = state->dataLoopNodes->Node(2);
     Real64 constexpr roomTemp = 25.0;
     Real64 constexpr nonZeroFlow = 3.14;
 
     // History terms should be allocated to 5 zeros
-    EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide(1).InletNode.TemperatureHistory.size());
-    EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide(1).OutletNode.TemperatureHistory.size());
-    EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide(1).InletNode.MassFlowRateHistory.size());
-    EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide(1).OutletNode.MassFlowRateHistory.size());
-    EXPECT_NEAR(0.0, sum(state->dataPlnt->PlantLoop(1).LoopSide(1).InletNode.TemperatureHistory), 0.001);
-    EXPECT_NEAR(0.0, sum(state->dataPlnt->PlantLoop(1).LoopSide(1).OutletNode.TemperatureHistory), 0.001);
-    EXPECT_NEAR(0.0, sum(state->dataPlnt->PlantLoop(1).LoopSide(1).InletNode.MassFlowRateHistory), 0.001);
-    EXPECT_NEAR(0.0, sum(state->dataPlnt->PlantLoop(1).LoopSide(1).OutletNode.MassFlowRateHistory), 0.001);
+    EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNode.TemperatureHistory.size());
+    EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].OutletNode.TemperatureHistory.size());
+    EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNode.MassFlowRateHistory.size());
+    EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].OutletNode.MassFlowRateHistory.size());
+    EXPECT_NEAR(0.0, sum(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNode.TemperatureHistory), 0.001);
+    EXPECT_NEAR(0.0, sum(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].OutletNode.TemperatureHistory), 0.001);
+    EXPECT_NEAR(0.0, sum(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNode.MassFlowRateHistory), 0.001);
+    EXPECT_NEAR(0.0, sum(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].OutletNode.MassFlowRateHistory), 0.001);
 
     // If we check the plant convergence right now with first hvac true, it should require a resimulation
-    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(true));
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(true));
 
     // But if we check it with first hvac false, everything should be stable and pass
-    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
 
     // Now let's introduce a disturbance by changing the inlet node temperature and logging it
     inNode.Temp = roomTemp;
     PlantUtilities::LogPlantConvergencePoints(*state, false);
     // We expect it to be false here since the temperature changed
-    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
     // But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
     // Need to call it 5 times total to fully initialize the history
     for (int i = 1; i < 5; ++i) {
         PlantUtilities::LogPlantConvergencePoints(*state, false);
     }
-    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
 
     // Repeat this for the outlet node temperature
     outNode.Temp = roomTemp;
     PlantUtilities::LogPlantConvergencePoints(*state, false);
     // We expect it to be false here since the temperature changed
-    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
     // But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
     // Need to call it 5 times total to fully initialize the history
     for (int i = 1; i < 5; ++i) {
         PlantUtilities::LogPlantConvergencePoints(*state, false);
     }
-    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
 
     // Repeat this for the inlet node mass flow rate
     inNode.MassFlowRate = nonZeroFlow;
     PlantUtilities::LogPlantConvergencePoints(*state, false);
     // We expect it to be false here since the temperature changed
-    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
     // But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
     // Need to call it 5 times total to fully initialize the history
     for (int i = 1; i < 5; ++i) {
         PlantUtilities::LogPlantConvergencePoints(*state, false);
     }
-    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
 
     // And finally the outlet node mass flow rate
     outNode.MassFlowRate = nonZeroFlow;
     PlantUtilities::LogPlantConvergencePoints(*state, false);
     // We expect it to be false here since the temperature changed
-    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
     // But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
     // Need to call it 5 times total to fully initialize the history
     for (int i = 1; i < 5; ++i) {
         PlantUtilities::LogPlantConvergencePoints(*state, false);
     }
-    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].CheckPlantConvergence(false));
 }
 
 TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
@@ -538,17 +538,17 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
     // test out some stuff on the scan plant loops function, for now just verifying errFlag is passed by reference
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+
     state->dataLoopNodes->Node.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumOut = 2;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "comp_name";
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::Boiler_Simple;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 0; // just skip the supply side search
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = "comp_name";
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::Boiler_Simple;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TotalBranches = 0; // just skip the supply side search
 
     int loopNum = 0, loopSideNum = 0, branchNum = 0, compNum = 0;
     bool errorFlag = false;

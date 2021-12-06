@@ -91,17 +91,17 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager)
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumIn = 1;  // Supply inlet, return
-    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumOut = 2; // Supply outlet, supply
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 2;
+
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumIn = 1;  // Supply inlet, return
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut = 2; // Supply outlet, supply
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumOut = 2;
 
     // Set up the required node data
     state->dataLoopNodes->Node.allocate(2);
@@ -160,7 +160,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager)
     state->dataLoopNodes->Node(1).Temp = 11;
     state->dataLoopNodes->Node(2).Temp = 7;
     state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumOut = 5; // Supply outlet, supply
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut = 5; // Supply outlet, supply
     mySPM.plantLoopIndex = 0;
     mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // this time it shouldn't detect which plant it was found on
@@ -181,17 +181,17 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager)
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumIn = 1;  // Supply inlet, return
-    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumOut = 2; // Supply outlet, supply
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 2;
+
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumIn = 1;  // Supply inlet, return
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut = 2; // Supply outlet, supply
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumOut = 2;
 
     // Set up the required node data
     state->dataLoopNodes->Node.allocate(2);
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager)
     // this code simply defaults to getting a fluid index of 1 (water) if it can't find a matching plant
     state->dataLoopNodes->Node(1).Temp = 56;
     state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumOut = 5; // Supply outlet, supply
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut = 5; // Supply outlet, supply
     mySPM.plantLoopIndex = 0;
     mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // this time it shouldn't detect which plant it was found on
@@ -346,8 +346,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     int constexpr condInletNodeNum = 2;
     int constexpr chwLoopIndex = 1;
     int constexpr condLoopIndex = 2;
-    int constexpr demandSide = 1;
-    int constexpr supplySide = 2;
+    int constexpr LoopSideLocation::Demand = 1;
+    int constexpr LoopSideLocation::Supply = 2;
     int constexpr chillerBranchChW = 1;
     int constexpr chillerBranchCW = 1;
     int constexpr chillerCompIndex = 1;
@@ -356,21 +356,21 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
 
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).NodeNumOut = evapOutletNodeNum;
-    Real64 constexpr designCondenserEnteringTemp = 20;
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn =
-        designCondenserEnteringTemp;
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesEvapOut = 5;
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MaxLoad = 5000;
 
-    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(demandSide).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).NodeNumIn = condInletNodeNum;
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch(chillerBranchChW).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch(chillerBranchChW).Comp(chillerCompIndex).NodeNumOut = evapOutletNodeNum;
+    Real64 constexpr designCondenserEnteringTemp = 20;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn =
+        designCondenserEnteringTemp;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesEvapOut = 5;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch(chillerBranchChW).Comp(chillerCompIndex).MaxLoad = 5000;
+
+
+    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Demand)].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Demand)].Branch(chillerBranchCW).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Demand)].Branch(chillerBranchCW).Comp(chillerCompIndex).NodeNumIn = condInletNodeNum;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
 
     state->dataLoopNodes->Node.allocate(2);
     state->dataLoopNodes->Node(evapOutletNodeNum).Temp = 7;

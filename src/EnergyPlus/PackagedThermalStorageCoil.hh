@@ -319,7 +319,7 @@ namespace PackagedThermalStorageCoil {
         int TESPlantInletNodeNum;            // plant loop inlet node index
         int TESPlantOutletNodeNum;           // plant loop outlet node index
         int TESPlantLoopNum;                 // plant loop connection index
-        int TESPlantLoopSideNum;             // plant loop side connection index
+        DataPlant::LoopSideLocation TESPlantLoopSideNum;             // plant loop side connection index
         int TESPlantBranchNum;               // plant loop branch connection index
         int TESPlantCompNum;                 // plant loop component connection index
         Real64 TESPlantDesignVolumeFlowRate; // plant connection design mass flow rate [m3/s]
@@ -408,7 +408,7 @@ namespace PackagedThermalStorageCoil {
               StorageMedia(iMedia::Unassigned), StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0),
               StorageCapacitySizingFactor(0.0), MinimumFluidTankTempLimit(0.0), MaximumFluidTankTempLimit(100.0), RatedFluidTankTemp(0.0),
               StorageAmbientNodeNum(0), StorageUA(0.0), TESPlantConnectionAvailable(false), TESPlantInletNodeNum(0), TESPlantOutletNodeNum(0),
-              TESPlantLoopNum(0), TESPlantLoopSideNum(0), TESPlantBranchNum(0), TESPlantCompNum(0), TESPlantDesignVolumeFlowRate(0.0),
+              TESPlantLoopNum(0), TESPlantLoopSideNum(DataPlant::LoopSideLocation::Invalid), TESPlantBranchNum(0), TESPlantCompNum(0), TESPlantDesignVolumeFlowRate(0.0),
               TESPlantDesignMassFlowRate(0.0), TESPlantEffectiveness(0.0), TimeElapsed(0.0), IceFracRemain(0.0), IceFracRemainLastTimestep(0.0),
               FluidTankTempFinal(0.0), FluidTankTempFinalLastTimestep(0.0), QdotPlant(0.0), Q_Plant(0.0), QdotAmbient(0.0), Q_Ambient(0.0),
               QdotTES(0.0), Q_TES(0.0), ElecCoolingPower(0.0), ElecCoolingEnergy(0.0), EvapTotCoolingRate(0.0), EvapTotCoolingEnergy(0.0),

@@ -501,7 +501,7 @@ namespace RefrigeratedCase {
         int OutletNode;                 // Water-cooled condenser outlet node number
         int PlantTypeOfNum;             // Water-cooled condenser plant equipment type
         int PlantLoopNum;               // Water-cooled condenser plant loop number
-        int PlantLoopSideNum;           // Water-cooled condenser plant loop side number
+        DataPlant::LoopSideLocation PlantLoopSideNum;           // Water-cooled condenser plant loop side number
         int PlantBranchNum;             // Water-cooled condenser plant branch number
         int PlantCompNum;               // Water-cooled condenser plant component number
         Real64 OutletTemp;              // Water-cooling condenser outlet temperature (C)
@@ -532,7 +532,7 @@ namespace RefrigeratedCase {
               ActualCondenserFanPower(0.0), CondenserFanConsumption(0.0), SensZoneCreditHeatRate(0.0), SensZoneCreditHeat(0.0),
               SensHVACCreditHeatRate(0.0), SensHVACCreditHeat(0.0), EvapFreezeWarnIndex(0), NoFlowWarnIndex(0), HighTempWarnIndex(0),
               LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), InletTemp(0.0), OutletNode(0), PlantTypeOfNum(0),
-              PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0), OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0),
+              PlantLoopNum(0), PlantLoopSideNum(DataPlant::LoopSideLocation::Invalid), PlantBranchNum(0), PlantCompNum(0), OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0),
               DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0), FlowType(iCndsrFlowType::VariableFlow), VolFlowRateMax(0.0),
               MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
         {
@@ -951,7 +951,7 @@ namespace RefrigeratedCase {
         int OutletNode;                                     // Water-cooled condenser outlet node number
         int PlantTypeOfNum;                                 // Water-cooled condenser plant equipment type
         int PlantLoopNum;                                   // Water-cooled condenser plant loop number
-        int PlantLoopSideNum;                               // Water-cooled condenser plant loop side number
+        DataPlant::LoopSideLocation PlantLoopSideNum;                               // Water-cooled condenser plant loop side number
         int PlantBranchNum;                                 // Water-cooled condenser plant branch number
         int PlantCompNum;                                   // Water-cooled condenser plant component number
         int OutletTempSchedPtr;                             // Schedule pointer for condenser outlet temp setting
@@ -1027,7 +1027,7 @@ namespace RefrigeratedCase {
               CondCreditWarnIndex1(0), CondCreditWarnIndex2(0), CondCreditWarnIndex3(0), CondCreditWarnIndex4(0), CondCreditWarnIndex5(0),
               CondCreditWarnIndex6(0), CondCreditWarnIndex7(0), NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0),
               HighInletWarnIndex(0), InletNode(0), EvapSchedPtr(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0),
-              EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0),
+              EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(DataPlant::LoopSideLocation::Invalid), PlantBranchNum(0), PlantCompNum(0),
               OutletTempSchedPtr(0), InletAirNodeNum(0), InletAirZoneNum(0), FanSpeedControlType(iFanSpeedCtrlType::Unassigned), CapCurvePtr(0),
               CascadeSysID(0), CascadeTempControl(iCascadeCndsrTempCtrlType::Unassigned), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0),
               MinCondLoad(0.0), TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0),

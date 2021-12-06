@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -136,7 +137,7 @@ namespace CoolingPanelSimple {
         Real64 ConvEnergy;
         Real64 RadEnergy;
         int LoopNum;     // plant loop index
-        int LoopSideNum; // plant loop side index
+        DataPlant::LoopSideLocation LoopSideNum; // plant loop side index
         int BranchNum;   // plant loop branch index
         int CompNum;     // plant loop component index
         int CoolingPanelLoadReSimIndex;
@@ -151,7 +152,7 @@ namespace CoolingPanelSimple {
               UA(0.0), Offset(0.0), WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), RatedWaterFlowRate(0.0), WaterVolFlowRateMax(0.0),
               WaterInletTempStd(0.0), WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0),
               WaterOutletEnthalpy(0.0), RatedZoneAirTemp(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0), TotPower(0.0), Power(0.0),
-              ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0),
+              ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0),
               CompNum(0), CoolingPanelLoadReSimIndex(0), CoolingPanelMassFlowReSimIndex(0), CoolingPanelInletTempFlowReSimIndex(0)
         {
         }

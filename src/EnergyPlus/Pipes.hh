@@ -77,7 +77,7 @@ namespace Pipes {
         int InletNodeNum;                   // Node number on the inlet side of the plant
         int OutletNodeNum;                  // Node number on the inlet side of the plant
         int LoopNum;                        // Index of plant loop where this pipe resides
-        int LoopSide;                       // Index of plant loop side where this pipe resides
+        DataPlant::LoopSideLocation LoopSide;                       // Index of plant loop side where this pipe resides
         int BranchIndex;                    // Index of plant Branch index where this pipe resides
         int CompIndex;                      // Index of plant Comp index where this pipe resides
         bool CheckEquipName;
@@ -85,7 +85,7 @@ namespace Pipes {
 
         // Default Constructor
         LocalPipeData()
-            : Type(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0),
+            : Type(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchIndex(0), CompIndex(0),
               CheckEquipName(true), EnvrnFlag(true)
         {
         }

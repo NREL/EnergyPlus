@@ -166,7 +166,7 @@ namespace HVACUnitaryBypassVAV {
         int CoilControlNode;              // heating coil hot water or steam inlet node
         int CoilOutletNode;               // outlet node for hot water and steam coil
         int LoopNum;                      // plant loop index for water heating coil
-        int LoopSide;                     // plant loop side  index for water heating coil
+        DataPlant::LoopSideLocation LoopSide;                     // plant loop side  index for water heating coil
         int BranchNum;                    // plant loop branch index for water heating coil
         int CompNum;                      // plant loop component index for water heating coil
         int HotWaterCoilMaxIterIndex;     // Index to recurring warning message
@@ -272,7 +272,7 @@ namespace HVACUnitaryBypassVAV {
               FanVolFlow(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), MaxONOFFCyclesperHourCycling(4.0),
               HPTimeConstantCycling(0.0), FanDelayTimeCycling(0.0), CheckFanFlow(true), DXCoolCoilType_Num(0), CoolCoilCompIndex(0),
               DXCoolCoilIndexNum(0), DXHeatCoilIndexNum(0), HeatCoilType_Num(0), HeatCoilIndex(0), OpMode(0), CoilControlNode(0), CoilOutletNode(0),
-              LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxHeatCoilFluidFlow(0.0),
+              LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxHeatCoilFluidFlow(0.0),
               DesignHeatingCapacity(0.0), DesignSuppHeatingCapacity(0.0), MinOATCompressor(0.0), MinLATCooling(0.0), MaxLATHeating(0.0),
               TotHeatEnergyRate(0.0), TotHeatEnergy(0.0), TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0),
               SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0),

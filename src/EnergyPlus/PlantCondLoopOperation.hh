@@ -61,7 +61,7 @@ namespace PlantCondLoopOperation {
 
     void ManagePlantLoadDistribution(EnergyPlusData &state,
                                      int const LoopNum,     // PlantLoop data structure loop counter
-                                     int const LoopSideNum, // PlantLoop data structure LoopSide counter
+                                     const DataPlant::LoopSideLocation LoopSideNum, // PlantLoop data structure LoopSide counter
                                      int const BranchNum,   // PlantLoop data structure branch counter
                                      int const CompNum,     // PlantLoop data structure component counter
                                      Real64 &LoopDemand,
@@ -117,7 +117,7 @@ namespace PlantCondLoopOperation {
 
     void DistributePlantLoad(EnergyPlusData &state,
                              int const LoopNum,
-                             int const LoopSideNum,
+                             const DataPlant::LoopSideLocation LoopSideNum,
                              int const CurSchemePtr, // use as index in PlantLoop()OpScheme() data structure
                              int const ListPtr,      // use as index in PlantLoop()OpScheme() data structure
                              Real64 const LoopDemand,
@@ -132,7 +132,7 @@ namespace PlantCondLoopOperation {
 
     void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
                                        int const LoopNum,     // component topology
-                                       int const LoopSideNum, // component topology
+                                       const DataPlant::LoopSideLocation LoopSideNum, // component topology
                                        int const BranchNum,   // component topology
                                        int const CompNum,     // component topology
                                        Real64 &ChangeInLoad   // positive magnitude of load change
@@ -140,7 +140,7 @@ namespace PlantCondLoopOperation {
 
     void FindCompSPLoad(EnergyPlusData &state,
                         int const LoopNum,
-                        int const LoopSideNum,
+                        const DataPlant::LoopSideLocation LoopSideNum,
                         int const BranchNum,
                         int const CompNum,
                         int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
@@ -148,7 +148,7 @@ namespace PlantCondLoopOperation {
 
     void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
                                         int const LoopNum,
-                                        int const LoopSideNum,
+                                        const DataPlant::LoopSideLocation LoopSideNum,
                                         int const BranchNum,
                                         int const CompNum,
                                         int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
@@ -162,20 +162,21 @@ namespace PlantCondLoopOperation {
                              DataPlant::OpScheme CurSchemeType // identifier set in PlantData
     );
 
-    void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
+    void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, const DataPlant::LoopSideLocation LoopSideNum);
 
     void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum);
 
-    void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
+    void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, const DataPlant::LoopSideLocation LoopSideNum);
 
     void SetupPlantEMSActuators(EnergyPlusData &state);
 
     void ActivateEMSControls(
-        EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
+        EnergyPlusData &state, int const LoopNum,
+                             const DataPlant::LoopSideLocation LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
 
     void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
                                          int const LoopNum,
-                                         int const LoopSideNum,
+                                         const DataPlant::LoopSideLocation LoopSideNum,
                                          int const BranchNum,
                                          int const CompNum,
                                          Real64 &ChangeInLoad // positive magnitude of load change

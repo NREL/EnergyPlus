@@ -118,7 +118,7 @@ namespace HVACCooledBeam {
         Real64 SupAirHeatingEnergy; // Total cooling energy from supply air [J]
         Real64 SupAirHeatingRate;   // Total cooling rate from supply air [W]
         int CWLoopNum;              // cooling water plant loop index number
-        int CWLoopSideNum;          // cooling water plant loop side index
+        DataPlant::LoopSideLocation CWLoopSideNum;          // cooling water plant loop side index
         int CWBranchNum;            // cooling water plant loop branch index
         int CWCompNum;              // cooling water plant loop component index
         int CBLoadReSimIndex;
@@ -139,7 +139,7 @@ namespace HVACCooledBeam {
               DesInletWaterTemp(0.0), DesOutletWaterTemp(0.0), CoilArea(0.0), a(0.0), n1(0.0), n2(0.0), n3(0.0), a0(0.0), K1(0.0), n(0.0), Kin(0.0),
               InDiam(0.0), TWIn(0.0), TWOut(0.0), EnthWaterOut(0.0), BeamFlow(0.0), CoolWaterMassFlow(0.0), BeamCoolingEnergy(0.0),
               BeamCoolingRate(0.0), SupAirCoolingEnergy(0.0), SupAirCoolingRate(0.0), SupAirHeatingEnergy(0.0), SupAirHeatingRate(0.0), CWLoopNum(0),
-              CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CBLoadReSimIndex(0), CBMassFlowReSimIndex(0), CBWaterOutletTempReSimIndex(0),
+              CWLoopSideNum(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CBLoadReSimIndex(0), CBMassFlowReSimIndex(0), CBWaterOutletTempReSimIndex(0),
               CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0), MyEnvrnFlag(true), MySizeFlag(true),
               PlantLoopScanFlag(true)
         {

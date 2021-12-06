@@ -112,11 +112,11 @@ namespace HeatPumpWaterToWaterSimple {
         int HeatPowerNegativeIndex;              // Index for recurring warning message regarding heating power curve is <= 0.0
         // loop topology variables
         int SourceLoopNum;         // source side plant loop index number
-        int SourceLoopSideNum;     // source side plant loop side index
+        DataPlant::LoopSideLocation SourceLoopSideNum;     // source side plant loop side index
         int SourceBranchNum;       // source side plant loop branch index
         int SourceCompNum;         // source side plant loop component index
         int LoadLoopNum;           // load side plant loop index number
-        int LoadLoopSideNum;       // load side plant loop side index
+        DataPlant::LoopSideLocation LoadLoopSideNum;       // load side plant loop side index
         int LoadBranchNum;         // load side plant loop branch index
         int LoadCompNum;           // load side plant loop component index
         int CondMassFlowIndex;     // index for criteria in PullCompInterconnectTrigger
@@ -157,8 +157,8 @@ namespace HeatPumpWaterToWaterSimple {
               ratedLoadVolFlowHeatWasAutoSized(false), RatedSourceVolFlowHeat(0.0), ratedSourceVolFlowHeatWasAutoSized(false), RatedCapHeat(0.0),
               ratedCapHeatWasAutoSized(false), RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCapCurveIndex(0), HeatPowCurveIndex(0),
               LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0), SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), HeatCapNegativeCounter(0),
-              HeatCapNegativeIndex(0), HeatPowerNegativeCounter(0), HeatPowerNegativeIndex(0), SourceLoopNum(0), SourceLoopSideNum(0),
-              SourceBranchNum(0), SourceCompNum(0), LoadLoopNum(0), LoadLoopSideNum(0), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0),
+              HeatCapNegativeIndex(0), HeatPowerNegativeCounter(0), HeatPowerNegativeIndex(0), SourceLoopNum(0), SourceLoopSideNum(DataPlant::LoopSideLocation::Invalid),
+              SourceBranchNum(0), SourceCompNum(0), LoadLoopNum(0), LoadLoopSideNum(DataPlant::LoopSideLocation::Invalid), LoadBranchNum(0), LoadCompNum(0), CondMassFlowIndex(0),
               refCOP(0.0), sizFac(0.0), companionIndex(0), companionIdentified(false), reportPower(0.0), reportEnergy(0.0), reportQLoad(0.0),
               reportQLoadEnergy(0.0), reportQSource(0.0), reportQSourceEnergy(0.0), reportLoadSideMassFlowRate(0.0), reportLoadSideInletTemp(0.0),
               reportLoadSideOutletTemp(0.0), reportSourceSideMassFlowRate(0.0), reportSourceSideInletTemp(0.0), reportSourceSideOutletTemp(0.0),

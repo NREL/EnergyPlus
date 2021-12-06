@@ -809,7 +809,7 @@ namespace PlantChillers {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(state, CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) { // condenser loop
@@ -1392,7 +1392,7 @@ namespace PlantChillers {
         if (MyLoad >= 0.0 || !RunFlag) {
             // call for zero flow before leaving
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
                 this->EvapMassFlowRate = 0.0;
@@ -1407,7 +1407,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 if (state.dataPlnt->PlantLoop(this->CDLoopNum)
-                        .LoopSide(this->CDLoopSideNum)
+                        .LoopSide[static_cast<int>(this->CDLoopSideNum)]
                         .Branch(this->CDBranchNum)
                         .Comp(this->CDCompNum)
                         .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
@@ -1590,10 +1590,10 @@ namespace PlantChillers {
 
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = !(state.dataPlnt->PlantLoop(this->CWLoopNum)
-                                             .LoopSide(this->CWLoopSideNum)
-                                             .Branch(this->CWLoopSideNum)
+                                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
+                                             .Branch(static_cast<int>(this->CWLoopSideNum))
                                              .Comp(this->CWCompNum)
                                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased);
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
@@ -1733,8 +1733,8 @@ namespace PlantChillers {
                 if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSideNum)
-                             .Branch(this->CWLoopSideNum)
+                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
+                             .Branch(static_cast<int>(this->CWLoopSideNum))
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
@@ -1745,8 +1745,8 @@ namespace PlantChillers {
                 } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSideNum)
-                             .Branch(this->CWLoopSideNum)
+                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
+                             .Branch(static_cast<int>(this->CWLoopSideNum))
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
@@ -2146,7 +2146,7 @@ namespace PlantChillers {
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -2155,7 +2155,7 @@ namespace PlantChillers {
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -2226,7 +2226,7 @@ namespace PlantChillers {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(state, CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) { // condenser loop
@@ -3551,7 +3551,7 @@ namespace PlantChillers {
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
                 this->EvapMassFlowRate = 0.0;
@@ -3568,7 +3568,7 @@ namespace PlantChillers {
 
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 if (state.dataPlnt->PlantLoop(this->CDLoopNum)
-                        .LoopSide(this->CDLoopSideNum)
+                        .LoopSide[static_cast<int>(this->CDLoopSideNum)]
                         .Branch(this->CDBranchNum)
                         .Comp(this->CDCompNum)
                         .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
@@ -3727,7 +3727,7 @@ namespace PlantChillers {
 
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
             Real64 FRAC;
@@ -3868,7 +3868,7 @@ namespace PlantChillers {
                 if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSideNum)
+                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -3880,7 +3880,7 @@ namespace PlantChillers {
                 } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSideNum)
+                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -4303,7 +4303,7 @@ namespace PlantChillers {
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -4312,7 +4312,7 @@ namespace PlantChillers {
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -4379,7 +4379,7 @@ namespace PlantChillers {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(state, CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) { // condenser loop
@@ -5654,7 +5654,7 @@ namespace PlantChillers {
         // flow resolver will not shut down the branch
         if (MyLoad >= 0.0 || !RunFlag) {
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
                 this->EvapMassFlowRate = 0.0;
@@ -5670,7 +5670,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 if (state.dataPlnt->PlantLoop(this->CDLoopNum)
-                        .LoopSide(this->CDLoopSideNum)
+                        .LoopSide[static_cast<int>(this->CDLoopSideNum)]
                         .Branch(this->CDBranchNum)
                         .Comp(this->CDCompNum)
                         .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
@@ -5822,7 +5822,7 @@ namespace PlantChillers {
                                                            RoutineName);
         // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
         // condenser side outlet temperature.
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
             Real64 FRAC;
@@ -5948,7 +5948,7 @@ namespace PlantChillers {
                 if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSideNum)
+                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -5960,7 +5960,7 @@ namespace PlantChillers {
                 } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSideNum)
+                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -6369,7 +6369,7 @@ namespace PlantChillers {
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -6378,7 +6378,7 @@ namespace PlantChillers {
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -6446,7 +6446,7 @@ namespace PlantChillers {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->initialize(state, RunFlag, CurLoad);
             auto &sim_component(
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum));
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum));
             this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
             this->update(state, CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) {
@@ -7342,7 +7342,7 @@ namespace PlantChillers {
         if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                 (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                     .LoopSide(this->CWLoopSideNum)
+                     .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                      .Branch(this->CWBranchNum)
                      .Comp(this->CWCompNum)
                      .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -7354,7 +7354,7 @@ namespace PlantChillers {
         } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                 (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                     .LoopSide(this->CWLoopSideNum)
+                     .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                      .Branch(this->CWBranchNum)
                      .Comp(this->CWCompNum)
                      .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -7388,7 +7388,7 @@ namespace PlantChillers {
             // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
             // flow resolver will not shut down the branch
             if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
                 this->EvapMassFlowRate = 0.0;
@@ -7403,7 +7403,7 @@ namespace PlantChillers {
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 if (state.dataPlnt->PlantLoop(this->CDLoopNum)
-                        .LoopSide(this->CDLoopSideNum)
+                        .LoopSide[static_cast<int>(this->CDLoopSideNum)]
                         .Branch(this->CDBranchNum)
                         .Comp(this->CDCompNum)
                         .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
@@ -7534,7 +7534,7 @@ namespace PlantChillers {
                                                     state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                     RoutineName);
 
-        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = false;
             this->QEvaporator = std::abs(MyLoad);
             this->Power = std::abs(MyLoad) / COP;
@@ -7877,7 +7877,7 @@ namespace PlantChillers {
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -7886,7 +7886,7 @@ namespace PlantChillers {
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
+                    .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;

@@ -34239,7 +34239,7 @@ ZoneHVAC:UnitVentilator,
         \type node
         \note Outlet node name must be zone inlet node name if there is no DOA Mixer, or if the
         \note unit ventilator is connected DOA, then the air outlet node name must be the mixer
-        \note secondary air inlet node name for SupplySide mixer connection.
+        \note secondary air inlet node name for LoopSideLocation::Supply mixer connection.
    A8,  \field Outdoor Air Node Name
         \type node
         \note this field is left blank only if the Unit Ventilator is connected to a central
@@ -41194,7 +41194,7 @@ AirTerminal:SingleDuct:Mixer,
        \note This is the outlet air node name of the mixer. This will be the inlet air node name
        \note of the ZoneHVAC equipment if the connection type in the input field Mixer Connection
        \note Type below is InletSide, else this will be an inlet air node name of the conditioned zone
-       \note if the connection type in the input field Mixer Connection Type below is SupplySide.
+       \note if the connection type in the input field Mixer Connection Type below is LoopSideLocation::Supply.
    A5, \field Mixer Primary Air Inlet Node Name
        \required-field
        \type node
@@ -41206,18 +41206,18 @@ AirTerminal:SingleDuct:Mixer,
        \type node
        \note The secondary air (recirculating air) inlet node name of the mixer. This will be
        \note the outlet air node name of the ZoneHVAC equipment if the connection type in the
-       \note input field mixer Connection Type below is SupplySide, or else this will be an exhaust
+       \note input field mixer Connection Type below is LoopSideLocation::Supply, or else this will be an exhaust
        \note air node name of the conditioned zone if the connection type in the input field
        \note Mixer Connection Type below is InletSide.
    A7; \field Mixer Connection Type
        \required-field
        \type choice
        \key InletSide
-       \key SupplySide
+       \key LoopSideLocation::Supply
        \note This input field allows user to specify the mixer connection type. Valid choices
-       \note are InletSide or SupplySide. This is a required input field. If the mixer connection
+       \note are InletSide or LoopSideLocation::Supply. This is a required input field. If the mixer connection
        \note type selected is InletSide, then the mixer is connected on the inlet side of the
-       \note ZoneHVAC equipment, or else if the mixer connection type selected is SupplySide, then
+       \note ZoneHVAC equipment, or else if the mixer connection type selected is LoopSideLocation::Supply, then
        \note the mixer is connected at the outlet side of the ZoneHVAC equipment.
 
 AirTerminal:DualDuct:ConstantVolume,

@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -139,7 +140,7 @@ void ControlCompOutput(EnergyPlusData &state,
                        Optional_int_const Action = _,             // 1=reverse; 2=normal
                        Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
                        Optional_int_const LoopNum = _,            // for plant components, plant loop index
-                       Optional_int_const LoopSide = _,           // for plant components, plant loop side index
+                       DataPlant::LoopSideLocation LoopSide = DataPlant::LoopSideLocation::Invalid,           // for plant components, plant loop side index
                        Optional_int_const BranchIndex = _,        // for plant components, plant branch index
                        Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
 );

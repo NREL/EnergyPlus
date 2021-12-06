@@ -104,7 +104,7 @@ protected:
         state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
             auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
+
         }
         state->dataPlnt->PlantLoop(1).Name = "Test Plant Loop 1";
         state->dataPlnt->PlantLoop(1).MaxVolFlowRateWasAutoSized = true;
@@ -113,7 +113,7 @@ protected:
         state->dataPlnt->PlantLoop(1).VolumeWasAutoSized = true;
         state->dataPlnt->PlantLoop(1).FluidName = "WATER";
         state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-        state->dataPlnt->PlantLoop(1).LoopSide(SupplySide).NodeNumIn = 1;
+        state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(LoopSideLocation::Supply)].NodeNumIn = 1;
 
         SetPredefinedTables(*state);
 

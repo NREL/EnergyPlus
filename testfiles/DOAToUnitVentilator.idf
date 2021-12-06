@@ -2549,7 +2549,7 @@
     TU4 Outlet Node,         !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     Zone4UnitVentAirOutletNode,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    LoopSideLocation::Supply;              !- Mixer Connection Type
 
   AirTerminal:SingleDuct:Mixer,
     SPACE5-1 DOAS Air Terminal,  !- Name
@@ -2558,7 +2558,7 @@
     TU5 Outlet Node,         !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     Zone5UnitVentAirOutletNode,  !- Mixer Secondary Air Inlet Node Name
-    SupplySide;              !- Mixer Connection Type
+    LoopSideLocation::Supply;              !- Mixer Connection Type
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 

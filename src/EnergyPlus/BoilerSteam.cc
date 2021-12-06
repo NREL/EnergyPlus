@@ -113,7 +113,7 @@ namespace BoilerSteam {
         EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         this->initialize(state);
-        auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
+        auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[static_cast<int>(this->LoopSideNum)].Branch(this->BranchNum).Comp(this->CompNum));
         this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
         this->update(state, CurLoad, RunFlag, FirstHVACIteration);
     }
@@ -685,7 +685,7 @@ namespace BoilerSteam {
         CpWater = FluidProperties::GetSatSpecificHeatRefrig(
             state, fluidNameSteam, state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp, 0.0, this->FluidIndex, RoutineName);
 
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock ==
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[static_cast<int>(this->LoopSideNum)].FlowLock ==
             DataPlant::FlowLock::Unlocked) { // TODO: Components shouldn't check FlowLock
             // Calculate the flow for the boiler
 

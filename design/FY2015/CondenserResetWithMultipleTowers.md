@@ -141,8 +141,8 @@ The "ideal" file includes the same curves that are required in the non-"ideal" f
 ## Chilled water loop
 
 - PlantLoop: "Chilled Water Loop"
-- DemandSide: Cooling Coil, Bypass
-- SupplySide: Pump, Chiller, Bypass
+- LoopSideLocation::Demand: Cooling Coil, Bypass
+- LoopSideLocation::Supply: Pump, Chiller, Bypass
 - OperationScheme: CoolingLoad, Chiller Only
 - SetPointManager: Scheduled
 - Pump: Pump:VariableSpeed "CW Circ Pump"
@@ -151,8 +151,8 @@ The "ideal" file includes the same curves that are required in the non-"ideal" f
 ## Condenser loop
 
 - CondenserLoop: "Condenser Water Loop"
-- DemandSide: Chiller, Bypass
-- SupplySide: Pump, Tower, Bypass
+- LoopSideLocation::Demand: Chiller, Bypass
+- LoopSideLocation::Supply: Pump, Tower, Bypass
 - OperationScheme: CoolingLoad, Tower only
 - SetPointManager: CondenserEnteringReset
 - Pump: Pump:VariableSpeed "Cond Circ Pump"

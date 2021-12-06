@@ -5436,7 +5436,7 @@ namespace Furnaces {
                 }
                 // fill outlet node for coil
                 state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode = state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum)
-                                                                             .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).LoopSide)
+                                                                             .LoopSide[static_cast<int>(state.dataFurnaces->Furnace(FurnaceNum).LoopSide)]
                                                                              .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNum)
                                                                              .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNum)
                                                                              .NodeNumOut;
@@ -5510,7 +5510,7 @@ namespace Furnaces {
                 // fill outlet node for coil
                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode =
                     state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp)
-                        .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp)
+                        .LoopSide[static_cast<int>(state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp)]
                         .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp)
                         .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp)
                         .NodeNumOut;
@@ -10363,7 +10363,7 @@ namespace Furnaces {
         int CoilControlNode(0);                                      // control node for hot water and steam heating coils
         int CoilOutletNode(0);                                       // air outlet node of the heatiing coils
         int LoopNum(0);                                              // plant loop number
-        int LoopSideNum(0);                                          // plant loop side number
+        DataPlant::LoopSideLocation LoopSideNum(DataPlant::LoopSideLocation::Invalid);                                          // plant loop side number
         int BranchNum(0);                                            // plant branch number
         int CompNum(0);                                              // Numeric Equivalent for Supplemental Heat Coil Type
 

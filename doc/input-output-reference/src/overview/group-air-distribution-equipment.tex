@@ -1819,7 +1819,7 @@ The name of ZoneHVAC equipment to which this mixer will be connected.
 
 \paragraph{Field: Mixer Outlet Node Name}\label{field-mixer-outlet-node-name}
 
-The outlet air node name of the mixer. This will be an inlet air node name of the conditioned zone if the connection type specified in the input field \textit{Mixer Connection Type} below is \textbf{SupplySide}, or else this will be the inlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{InletSide}.
+The outlet air node name of the mixer. This will be an inlet air node name of the conditioned zone if the connection type specified in the input field \textit{Mixer Connection Type} below is \textbf{LoopSideLocation::Supply}, or else this will be the inlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{InletSide}.
 
 \paragraph{Field: Mixer Primary Air Inlet Node Name}\label{field-mixer-primary-air-inlet-node-name}
 
@@ -1827,11 +1827,11 @@ The primary air (treated outdoor air) inlet node name of the mixer. This will be
 
 \paragraph{Field: Mixer Secondary Air Inlet Node Name}\label{field-mixer-secondary-air-inlet-node-name}
 
-The secondary air (recirculating air) inlet node name of the mixer. This will be the outlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{SupplySide}, or else this will be either an exhaust air node name of the conditioned zone (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} to draw air from a zone directly or an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum when the zone return node is connected to a return plenum.  The induced air outlet node will be the outlet air node name when the mixer connection type is SupplySide. If the mixer connection type is InletSide, then the induced air outlet node will be the mixer secondary air inlet node.
+The secondary air (recirculating air) inlet node name of the mixer. This will be the outlet air node name of the ZoneHVAC equipment if the connection type in the input field \textit{Mixer Connection Type} below is \textbf{LoopSideLocation::Supply}, or else this will be either an exhaust air node name of the conditioned zone (Ref. \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} to draw air from a zone directly or an induced air outlet node (Ref. \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}) to draw air from a return plenum when the zone return node is connected to a return plenum.  The induced air outlet node will be the outlet air node name when the mixer connection type is LoopSideLocation::Supply. If the mixer connection type is InletSide, then the induced air outlet node will be the mixer secondary air inlet node.
 
 \paragraph{Field: Mixer Connection Type}\label{field-mixer-connection-type}
 
-This input field allows user to specify the mixer connection type. Valid choices are \textbf{InletSide} or \textbf{SupplySide}. This is a required input field. If the mixer connection type selected is \textbf{InletSide}, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is \textbf{SupplySide}, then the mixer is connected at the outlet side of the ZoneHVAC equipment.\\
+This input field allows user to specify the mixer connection type. Valid choices are \textbf{InletSide} or \textbf{LoopSideLocation::Supply}. This is a required input field. If the mixer connection type selected is \textbf{InletSide}, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is \textbf{LoopSideLocation::Supply}, then the mixer is connected at the outlet side of the ZoneHVAC equipment.\\
 
 \paragraph{Field: Design Specification Outdoor Air Object Name}\label{field-DSOA-object-name}
 
@@ -1841,7 +1841,7 @@ This field allows modifying the behavior of this air terminal so that it is modu
 
 This field specifies how the outdoor air ventilation rates are calculated when based on a rate per person.~ It can be either based on the current number of people as affected by time-varying occupancy schedules, or on the constant value for the maximum number of people.~~ Enter the key CurrentOccupancy for the former and DesignOccupancy for the later.
 
-An IDF examples for InletSide and SupplySide connection type:
+An IDF examples for InletSide and LoopSideLocation::Supply connection type:
 
 \begin{lstlisting}
 
@@ -1864,7 +1864,7 @@ AirTerminal:SingleDuct:Mixer,
       SPACE1-1 Supply Inlet,      !- Mixer Outlet Node Name
       SPACE1-1 ATM Primary Inlet, !- Mixer Primary Air Inlet Node Name
       SPACE1-1 Fan Coil Outlet,   !- Mixer Secondary Air Inlet Node Name
-      SupplySide;                 !- Mixer Connection Type
+      LoopSideLocation::Supply;                 !- Mixer Connection Type
 \end{lstlisting}
 
 \subsection{AirTerminal:DualDuct:ConstantVolume}\label{airterminaldualductconstantvolume}

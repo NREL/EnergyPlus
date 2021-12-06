@@ -854,7 +854,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                       this->CWLoopNum,
                                                       this->CWLoopSideNum,
                                                       this->GenLoopNum,
-                                                      this->GenCompNum,
+                                                      static_cast<DataPlant::LoopSideLocation>(this->GenCompNum),
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       true);
     }
@@ -864,7 +864,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                       this->CDLoopNum,
                                                       this->CDLoopSideNum,
                                                       this->GenLoopNum,
-                                                      this->GenCompNum,
+                                                      static_cast<DataPlant::LoopSideLocation>(this->GenCompNum),
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       false);
     }
@@ -874,13 +874,13 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
         // reset flow priority
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
         // reset flow priority
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
         if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -946,7 +946,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
     }
 
     this->EquipFlowCtrl =
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowCtrl;
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowCtrl;
 
     // Initialize Supply Side Variables
     if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -1801,7 +1801,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
 
     // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
     // condenser side outlet temperature.
-    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
         this->PossibleSubcooling = false;
         this->QEvaporator = std::abs(MyLoad);
 
@@ -1896,7 +1896,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                 if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSideNum)
+                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -1908,7 +1908,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                 } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSideNum)
+                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||

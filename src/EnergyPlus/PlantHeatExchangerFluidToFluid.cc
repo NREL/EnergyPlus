@@ -678,11 +678,11 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
     if (this->ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
         // store current value for setpoint in central plant loop data structure
         int LoopNum2 = this->OtherCompSupplySideLoop.loopNum;
-        int LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
         int BranchNum = this->OtherCompSupplySideLoop.branchNum;
         int LoopCompNum = this->OtherCompSupplySideLoop.compNum;
 
-        state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMinCntrlTemp =
+        state.dataPlnt->PlantLoop(LoopNum2).LoopSide[static_cast<int>(LoopSideNum)].Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMinCntrlTemp =
             state.dataLoopNodes->Node(this->SetPointNodeNum).TempSetPoint - this->TempControlTol; // issue #5626, include control tolerance
     }
 }
@@ -1751,7 +1751,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
             Real64 DeltaTCooling = SetPointTemp - ControlSignalValue;
             // obtain shut down state
             bool ChillerShutDown = state.dataPlnt->PlantLoop(this->OtherCompSupplySideLoop.loopNum)
-                                       .LoopSide(this->OtherCompSupplySideLoop.loopSideNum)
+                                       .LoopSide[static_cast<int>(this->OtherCompSupplySideLoop.loopSideNum)]
                                        .Branch(this->OtherCompSupplySideLoop.branchNum)
                                        .Comp(this->OtherCompSupplySideLoop.compNum)
                                        .FreeCoolCntrlShutDown;
@@ -2331,7 +2331,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 this->DemandSideLoop.inletNodeNum,
                                                 _);
 
-        if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
+        if (this->DemandSideLoop.loopSideNum != DataPlant::LoopSideLocation::Demand) { // throw error
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
@@ -2355,7 +2355,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 this->SupplySideLoop.inletNodeNum,
                                                 _);
 
-        if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
+        if (this->SupplySideLoop.loopSideNum != DataPlant::LoopSideLocation::Supply) { // throw error
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
@@ -2406,19 +2406,19 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
             // revise how loads served category for other controlled equipment
             int LoopNum2 = this->OtherCompSupplySideLoop.loopNum;
-            int LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
+            DataPlant::LoopSideLocation LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
             int BranchNum = this->OtherCompSupplySideLoop.branchNum;
             int LoopCompNum = this->OtherCompSupplySideLoop.compNum;
 
-            switch (state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed) {
+            switch (state.dataPlnt->PlantLoop(LoopNum2).LoopSide[static_cast<int>(LoopSideNum)].Branch(BranchNum).Comp(LoopCompNum).HowLoadServed) {
 
             case DataPlant::HowMet::ByNominalCap: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide[static_cast<int>(LoopSideNum)].Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
                     DataPlant::HowMet::ByNominalCapFreeCoolCntrl;
                 break;
             }
             case DataPlant::HowMet::ByNominalCapLowOutLimit: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide[static_cast<int>(LoopSideNum)].Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
                     DataPlant::HowMet::ByNominalCapLowOutLimitFreeCoolCntrl;
                 break;
             }
@@ -2428,19 +2428,19 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
             switch (this->ControlSignalTemp) {
             case iCtrlTemp::WetBulbTemperature: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide[static_cast<int>(LoopSideNum)].Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
                     DataPlant::FreeCoolControlMode::WetBulb;
                 break;
             }
             case iCtrlTemp::DryBulbTemperature: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide[static_cast<int>(LoopSideNum)].Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
                     DataPlant::FreeCoolControlMode::DryBulb;
                 break;
             }
             case iCtrlTemp::LoopTemperature: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide[static_cast<int>(LoopSideNum)].Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
                     DataPlant::FreeCoolControlMode::Loop;
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide[static_cast<int>(LoopSideNum)].Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
                     this->OtherCompDemandSideLoop.inletNodeNum;
                 break;
             }
