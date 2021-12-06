@@ -3312,8 +3312,8 @@ namespace SurfaceGeometry {
         Real64 SchedMaxValue;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
-        if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
-            ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
+        if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
+            ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = Minimal");
         }
 
         if ((TotDetachedFixed + TotDetachedBldg) == 0) return;
@@ -3489,9 +3489,8 @@ namespace SurfaceGeometry {
         int ItemsToGet;
         SurfaceClass ClassItem;
 
-        if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 &&
-            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
-            ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
+        if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
+            ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = Minimal");
         }
 
         if (TotRectDetachedFixed + TotRectDetachedBldg == 0) return;
@@ -5979,7 +5978,7 @@ namespace SurfaceGeometry {
 
         if ((state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window ||
              state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor) &&
-            static_cast<int>(state.dataHeatBal->SolarDistribution) > static_cast<int>(DataHeatBalance::Shadowing::MinimalShadowing) &&
+            static_cast<int>(state.dataHeatBal->SolarDistribution) > static_cast<int>(DataHeatBalance::Shadowing::Minimal) &&
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier > 1.0) {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state,
@@ -6337,8 +6336,8 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
-            ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
+        if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
+            ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = Minimal");
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Shading:Zone:Detailed";
@@ -6551,8 +6550,8 @@ namespace SurfaceGeometry {
         bool MakeFin;
 
         if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 &&
-            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
-            ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
+            ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = Minimal");
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         for (Item = 1; Item <= 4; ++Item) {
@@ -15263,7 +15262,7 @@ namespace SurfaceGeometry {
             }
 
             if (SignFlag != PrevSignFlag) {
-                if (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::MinimalShadowing &&
+                if (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal &&
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state,

@@ -92,9 +92,9 @@ namespace Furnaces {
     enum class DehumidificationControlMode
     {
         Invalid = -1,
-        DehumidControl_None,
-        DehumidControl_Multimode,
-        DehumidControl_CoolReheat,
+        None,
+        Multimode,
+        CoolReheat,
         Num
     };
 
@@ -274,7 +274,7 @@ namespace Furnaces {
               FanPartLoadRatio(0.0), CompPartLoadRatio(0.0), WSHPRuntimeFrac(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0),
               MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), MaxOATSuppHeat(0.0), CondenserNodeNum(0), MaxONOFFCyclesperHour(0.0),
               HPTimeConstant(0.0), OnCyclePowerFraction(0.0), FanDelayTime(0.0), Humidistat(false), InitHeatPump(false),
-              DehumidControlType_Num(DehumidificationControlMode::DehumidControl_None), LatentMaxIterIndex(0), LatentRegulaFalsiFailedIndex(0),
+              DehumidControlType_Num(DehumidificationControlMode::None), LatentMaxIterIndex(0), LatentRegulaFalsiFailedIndex(0),
               LatentRegulaFalsiFailedIndex2(0), SensibleMaxIterIndex(0), SensibleRegulaFalsiFailedIndex(0), WSHPHeatMaxIterIndex(0),
               WSHPHeatRegulaFalsiFailedIndex(0), DXHeatingMaxIterIndex(0), DXHeatingRegulaFalsiFailedIndex(0), HeatingMaxIterIndex(0),
               HeatingMaxIterIndex2(0), HeatingRegulaFalsiFailedIndex(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),

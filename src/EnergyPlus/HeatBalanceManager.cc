@@ -689,8 +689,8 @@ namespace HeatBalanceManager {
             }
             // Solar Distribution
             if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || state.dataSysVars->lMinimalShadowing) {
-                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::MinimalShadowing;
-                AlphaName(3) = "MinimalShadowing";
+                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::Minimal;
+                AlphaName(3) = "Minimal";
                 state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIOR" || AlphaName(3) == "0") {
                 state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
@@ -6496,14 +6496,14 @@ namespace HeatBalanceManager {
 
         if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DoOutputReporting) {
             CalcMoreNodeInfo(state);
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                     state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
-            UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateTabularReports(state, OutputProcessor::TimeStepType::Zone);
             UpdateUtilityBills(state);
         } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && state.dataSysVars->ReportDuringWarmup) {
             if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
@@ -6541,7 +6541,7 @@ namespace HeatBalanceManager {
                 }
             }
             CalcMoreNodeInfo(state);
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
@@ -6549,7 +6549,7 @@ namespace HeatBalanceManager {
             }
 
         } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)

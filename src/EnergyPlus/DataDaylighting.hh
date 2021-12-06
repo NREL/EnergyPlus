@@ -98,9 +98,9 @@ namespace DataDaylighting {
     enum class DaylightingMethod
     {
         Invalid = -1,
-        NoDaylighting,
-        SplitFluxDaylighting,
-        DElightDaylighting,
+        None,
+        SplitFlux,
+        DElight,
         Num
     };
 
@@ -155,9 +155,9 @@ namespace DataDaylighting {
         int zoneIndex = 0;    // Index to zone where the daylighting:controls object is located
         int spaceIndex = 0;   // Index to space where the daylighting:controls object is located (0 if specified for a zone)
         int enclIndex = 0;    // Index to enclosure where the daylighting:controls object is located
-        DataDaylighting::DaylightingMethod DaylightMethod = DaylightingMethod::NoDaylighting; // Type of Daylighting (1=SplitFlux, 2=DElight)
-        int AvailSchedNum = 0;                                                                // pointer to availability schedule if present
-        int TotalDaylRefPoints = 0;        // Number of daylighting reference points for this control
+        DataDaylighting::DaylightingMethod DaylightMethod = DaylightingMethod::None; // Type of Daylighting (1=SplitFlux, 2=DElight)
+        int AvailSchedNum = 0;                                                       // pointer to availability schedule if present
+        int TotalDaylRefPoints = 0;                                                  // Number of daylighting reference points for this control
         Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
         Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)

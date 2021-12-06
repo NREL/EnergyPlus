@@ -130,7 +130,7 @@ struct SystemVarsData : BaseGlobalStruct
     Real64 Time_Finish = 0.0;       // Call to CPU_Time for end time of simulation
     std::string MinReportFrequency; // String for minimum reporting frequency
     bool SortedIDD = true;          // after processing, use sorted IDD to obtain Defs, etc.
-    bool lMinimalShadowing = false; // TRUE if MinimalShadowing is to override Solar Distribution flag
+    bool lMinimalShadowing = false; // TRUE if Minimal is to override Solar Distribution flag
     fs::path envinputpath1;
     fs::path envinputpath2;
     bool TestAllPaths = false;

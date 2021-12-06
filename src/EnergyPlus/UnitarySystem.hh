@@ -206,12 +206,11 @@ namespace UnitarySystems {
         };
 
         // Airflow control for constant fan mode
-        enum class UseCompFlow : int
+        enum class UseCompFlow
         {
             Invalid = -1,
-            FlowNotYetSet,
-            UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
-            UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+            On,  // set compressor OFF air flow rate equal to compressor ON air flow rate
+            Off, // set compressor OFF air flow rate equal to user defined value
             Num
         };
 

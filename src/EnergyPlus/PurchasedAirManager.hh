@@ -104,7 +104,7 @@ namespace PurchasedAirManager {
     enum class DCV
     {
         Invalid = -1,
-        NoDCV,
+        None,
         OccupancySchedule,
         CO2SetPoint,
         Num
@@ -124,7 +124,7 @@ namespace PurchasedAirManager {
     enum class HeatRecovery
     {
         Invalid = -1,
-        NoHeatRecovery,
+        None,
         Sensible,
         Enthalpy,
         Num

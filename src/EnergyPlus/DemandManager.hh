@@ -70,39 +70,39 @@ namespace DemandManager {
     enum class ManagerType
     {
         Invalid = -1,
-        ManagerTypeExtLights,
-        ManagerTypeLights,
-        ManagerTypeElecEquip,
-        ManagerTypeThermostats,
-        ManagerTypeVentilation,
+        ExtLights,
+        Lights,
+        ElecEquip,
+        Thermostats,
+        Ventilation,
         Num
     };
 
     enum class ManagePriorityType
     {
         Invalid = -1,
-        ManagerPrioritySequential,
-        ManagerPriorityOptimal,
-        ManagerPriorityAll,
+        Sequential,
+        Optimal,
+        All,
         Num
     };
 
-    enum class Limit
+    enum class ManagerLimit
     {
         Invalid = -1,
-        ManagerLimitOff,
-        ManagerLimitFixed,
-        ManagerLimitVariable,
-        ManagerLimitReductionRatio,
+        Off,
+        Fixed,
+        Variable,
+        ReductionRatio,
         Num
     };
 
-    enum class Selection
+    enum class ManagerSelection
     {
         Invalid = -1,
-        ManagerSelectionAll,
-        ManagerSelectionMany,
-        ManagerSelectionOne,
+        All,
+        Many,
+        One,
         Num
     };
 
@@ -160,8 +160,8 @@ namespace DemandManager {
         bool Available;        // Availability flag
         bool Activate;         // Flag to activate the manager
         bool Active;           // Flag to indicate that the manager is active
-        Limit LimitControl;
-        Selection SelectionControl;
+        ManagerLimit LimitControl;
+        ManagerSelection SelectionControl;
         int LimitDuration;       // Minimum duration of demand manager activity (min)
         int ElapsedTime;         // Elapsed time for the demand manager activity (min)
         int RotationDuration;    // Rotation duration (min)
@@ -181,7 +181,7 @@ namespace DemandManager {
         // Default Constructor
         DemandManagerData()
             : Type(ManagerType::Invalid), DemandManagerList(0), CanReduceDemand(false), AvailSchedule(0), Available(false), Activate(false),
-              Active(false), LimitControl(Limit::Invalid), SelectionControl(Selection::Invalid), LimitDuration(0), ElapsedTime(0),
+              Active(false), LimitControl(ManagerLimit::Invalid), SelectionControl(ManagerSelection::Invalid), LimitDuration(0), ElapsedTime(0),
               RotationDuration(0), ElapsedRotationTime(0), RotatedLoadNum(0), LowerLimit(0.0), UpperLimit(0.0), NumOfLoads(0), FixedRate(0.0),
               ReductionRatio(0.0)
         {

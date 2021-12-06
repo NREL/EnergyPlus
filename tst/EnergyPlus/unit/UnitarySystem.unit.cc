@@ -8680,7 +8680,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                       sensOut,
                       latOut);
     // reset air flow control since schedule value was not update prior to GetInput usage
-    thisSys->m_AirFlowControl = UnitarySys::UseCompFlow::UseCompressorOffFlow;
+    thisSys->m_AirFlowControl = UnitarySys::UseCompFlow::Off;
 
     // 4 general tests for heating and cooling:
     // 1 - low load, min fan speed and coil modulates to meet load

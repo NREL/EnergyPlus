@@ -147,9 +147,8 @@ namespace DataRoomAirModel {
     enum class Comfort
     {
         Invalid = -1,
-        VComfort_Invalid,
-        VComfort_Jet,
-        VComfort_Recirculation,
+        Jet,
+        Recirculation,
         Num
     };
 
@@ -220,7 +219,7 @@ namespace DataRoomAirModel {
         // for comfort models
 
         // Default Constructor
-        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::VComfort_Invalid)
+        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::Invalid)
         {
         }
     };

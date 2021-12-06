@@ -503,7 +503,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         // RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
         // Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
         if (state.dataEnvrn->SunIsUp && thisDaylightControl.TotalDaylRefPoints != 0 &&
-            (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElightDaylighting)) {
+            (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight)) {
             int zoneNum = thisDaylightControl.zoneIndex;
             // Call DElight interior illuminance and electric lighting control subroutine
             Real64 dPowerReducFac = 1.0; // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep

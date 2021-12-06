@@ -782,8 +782,7 @@ void CalcDayltgCoeffsRefMapPoints(EnergyPlusData &state)
 
     // Calc for daylighting reference points for daylighting controls that use SplitFlux method
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
-        if (state.dataDaylightingData->daylightControl(daylightCtrlNum).DaylightMethod != DataDaylighting::DaylightingMethod::SplitFluxDaylighting)
-            continue;
+        if (state.dataDaylightingData->daylightControl(daylightCtrlNum).DaylightMethod != DataDaylighting::DaylightingMethod::SplitFlux) continue;
         // Skip enclosures with no exterior windows or in adjacent enclosure(s) with which an interior window is shared
         if (state.dataDaylightingData->enclDaylight(state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex).NumOfDayltgExtWins == 0)
             continue;
@@ -3351,7 +3350,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 if (dot(Ray, state.dataSurface->Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
             }
             if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-                state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+                state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
                 SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky *
                                 state.dataSolarShading->SurfDifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
             } else {
@@ -5006,12 +5005,12 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         daylightControl.ZoneName = state.dataHeatBal->Zone(daylightControl.zoneIndex).Name;
 
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "SPLITFLUX")) { // Field: Daylighting Method
-            daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFluxDaylighting;
+            daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
             state.dataDaylightingData->enclDaylight(daylightControl.enclIndex).hasSplitFluxDaylighting = true;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DELIGHT")) {
-            daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::DElightDaylighting;
+            daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::DElight;
         } else if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFluxDaylighting;
+            daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
             state.dataDaylightingData->enclDaylight(daylightControl.enclIndex).hasSplitFluxDaylighting = true;
         } else {
             ShowWarningError(state,
@@ -5063,7 +5062,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                 ErrorsFound = true;
                 continue;
             }
-        } else if (daylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFluxDaylighting) {
+        } else if (daylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
             ShowWarningError(
                 state, "No " + state.dataIPShortCut->cAlphaFieldNames(6) + " provided for object named: " + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "No glare calculation performed, and the simulation continues.");
@@ -5142,7 +5141,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.IllumSetPoint(refPtNum) =
                 state.dataIPShortCut->rNumericArgs(7 + refPtNum * 2); // Field: Illuminance Setpoint at Reference Point
 
-            if (daylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFluxDaylighting) {
+            if (daylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Illuminance", refPtNum),
                                     OutputProcessor::Unit::lux,
@@ -5309,7 +5308,7 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
                 refName = curRefPt.Name;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtZone, refName, daylCntrl.ZoneName);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtCtrlName, refName, daylCntrl.Name);
-                if (daylCntrl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFluxDaylighting) {
+                if (daylCntrl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "SplitFlux");
                 } else {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDyLtKind, refName, "DElight");
@@ -5433,7 +5432,7 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
 bool doesDayLightingUseDElight(EnergyPlusData &state)
 {
     for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-        if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElightDaylighting) {
+        if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
             return true;
         }
     }
@@ -6202,7 +6201,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
     bool breakOuterLoop(false);
     bool continueOuterLoop(false);
 
-    if (thisDaylightControl.DaylightMethod != DataDaylighting::DaylightingMethod::SplitFluxDaylighting) return;
+    if (thisDaylightControl.DaylightMethod != DataDaylighting::DaylightingMethod::SplitFlux) return;
 
     NREFPT = thisDaylightControl.TotalDaylRefPoints;
 
@@ -7127,7 +7126,7 @@ void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum) // Da
             if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel &&
                 (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin)))
                 IS = 2;
-            if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFluxDaylighting) {
+            if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
                 int refPtCount = 0;
                 for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
                     auto &thisControl = state.dataDaylightingData->daylightControl(controlNum);
@@ -7254,7 +7253,7 @@ void DayltgElecLightingControl(EnergyPlusData &state)
     for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
 
-        if (thisDaylightControl.DaylightMethod != DataDaylighting::DaylightingMethod::SplitFluxDaylighting) {
+        if (thisDaylightControl.DaylightMethod != DataDaylighting::DaylightingMethod::SplitFlux) {
             // Set space power reduction factors
             if (thisDaylightControl.PowerReductionFactor < 1.0) {
                 if (thisDaylightControl.spaceIndex > 0) {
@@ -7849,7 +7848,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         if (dot(U, state.dataSurface->Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                     }
                     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-                        state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+                        state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
                         SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky *
                                         state.dataSolarShading->SurfDifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                     } else {

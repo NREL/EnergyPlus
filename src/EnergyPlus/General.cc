@@ -1087,7 +1087,7 @@ int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStep
     Real64 ActualTimeE; // End of current interval (HVAC time step)
     int ActualTimeHrS;
 
-    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
         ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
         ActualTimeE = ActualTimeS + TimeStepSys;
         ActualTimeHrS = int(ActualTimeS);

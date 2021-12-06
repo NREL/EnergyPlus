@@ -257,7 +257,7 @@ namespace OutputReportTabular {
         // Default Constructor
         OutputTableBinnedType()
             : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(OutputProcessor::VariableType::NotFound),
-              avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), scheduleIndex(0)
+              avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::Zone), scheduleIndex(0)
         {
         }
     };
@@ -347,7 +347,7 @@ namespace OutputReportTabular {
         // Default Constructor
         MonthlyFieldSetInputType()
             : aggregate(AggType::Invalid), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
-              varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::TimeStepZone)
+              varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::Zone)
         {
         }
     };
@@ -385,7 +385,7 @@ namespace OutputReportTabular {
         // Default Constructor
         MonthlyColumnsType()
             : varNum(0), typeOfVar(OutputProcessor::VariableType::NotFound), avgSum(OutputProcessor::StoreType::Averaged),
-              stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(AggType::Invalid), reslt(12, 0.0),
+              stepType(OutputProcessor::TimeStepType::Zone), units(OutputProcessor::Unit::None), aggType(AggType::Invalid), reslt(12, 0.0),
               duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }

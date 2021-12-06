@@ -1458,7 +1458,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
     state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
     state->dataGlobal->KindOfSim =
         DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-    UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
 
     // zone equipment should report single zone magnitude, multipliers do not apply, should be > 0 or what's the point
     EXPECT_EQ(state->dataHeatBal->ZnRpt(1).PeopleRadGain, state->dataHeatBal->ZnRpt(2).PeopleRadGain);
@@ -2500,7 +2500,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
     state->dataGlobal->DoWeathSim = true; // flag to trick tabular reports to scan meters
     state->dataGlobal->KindOfSim =
         DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-    UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    UpdateTabularReports(*state, OutputProcessor::TimeStepType::System);
 
     EXPECT_NEAR(1.86168, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
 }
@@ -3544,20 +3544,20 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     state->dataEnvrn->Month = 12;
 
-    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 1, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 2, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 3, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
     ResetMonthlyGathering(*state);
 
     EXPECT_EQ(0., state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherMonthlyResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 1, state->dataOutRptTab->MonthlyColumns(1).reslt(12));
 }
 
@@ -3611,8 +3611,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
@@ -3621,20 +3621,20 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     state->dataEnvrn->Month = 12;
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 3,
               state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 6,
               state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 9,
               state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
@@ -3643,8 +3643,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     EXPECT_EQ(0., state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_EQ(extLitUse * 3,
               state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)));
 }
@@ -3693,7 +3693,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
         28.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     EXPECT_EQ(123., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
@@ -3712,7 +3712,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
         38.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     EXPECT_EQ(133., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
@@ -3731,7 +3731,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
         42.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     EXPECT_EQ(133., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
@@ -3750,7 +3750,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     state->dataOutputProcessor->EnergyMeters(subEndUseMeterNum).CurTSValue =
         39.0 * state->dataGlobal->TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     EXPECT_EQ(143., state->dataOutRptTab->gatherDemandTotal(resourceNum));
 
@@ -3787,7 +3787,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
     Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
-    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::System);
 
     EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(reliefEnergy * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief);
@@ -3812,7 +3812,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->DXCoil(2).CrankcaseHeaterConsumption = 0.0;
 
     Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
-    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    GatherHeatEmissionReport(*state, OutputProcessor::TimeStepType::System);
     EXPECT_EQ(reliefEnergy, state->dataHeatBal->SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(2 * reliefEnergy * DataGlobalConstants::convertJtoGJ, state->dataHeatBal->BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, state->dataHeatBal->SysTotalHVACRejectHeatLoss);
@@ -8026,17 +8026,17 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
     state->dataEnvrn->Month = 12;
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 3,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -8050,9 +8050,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                 1.);
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 6,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -8066,9 +8066,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                 1.);
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 9,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -8488,7 +8488,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
     state->dataHeatBal->ZoneWinHeatLossRepEnergy.allocate(1);
 
-    GatherHeatGainReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+    GatherHeatGainReport(*state, OutputProcessor::TimeStepType::System);
 
     EXPECT_EQ(1.0 * (state->dataHVACGlobal->TimeStepSys) * DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqHt);
     EXPECT_EQ(0.0 * (state->dataHVACGlobal->TimeStepSys) * DataGlobalConstants::SecInHour, state->dataHeatBal->ZonePreDefRep(1).SHGSAnZoneEqCl);
@@ -9646,17 +9646,17 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
     SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
 
     GetInputOutputTableSummaryReports(*state);
 
     state->dataEnvrn->Month = 12;
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 3,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -9670,9 +9670,9 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                 1.);
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 6,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);
@@ -9686,9 +9686,9 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                 1.);
 
     UpdateMeterReporting(*state);
-    UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
-    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
     EXPECT_NEAR(extLitUse * 9,
                 state->dataOutRptTab->gatherEndUseBEPS(1, state->dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)),
                 1.);

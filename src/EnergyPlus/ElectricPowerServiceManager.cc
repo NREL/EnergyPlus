@@ -125,20 +125,19 @@ void ElectricPowerServiceManager::manageElectricPowerService(
     if (!state.dataGlobal->BeginEnvrnFlag) newEnvironmentFlag_ = true;
 
     // retrieve data from meters for demand and production
-    totalBldgElecDemand_ =
-        GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec;
-    totalHVACElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    totalBldgElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
+    totalHVACElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) /
                            (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
-    elecProducedPVRate_ = GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedPVRate_ = GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) /
                           (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedWTRate_ = GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedWTRate_ = GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) /
                           (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedStorageRate_ = GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedStorageRate_ = GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) /
                                (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedCoGenRate_ = GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedCoGenRate_ = GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) /
                              (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedPowerConversionRate_ = GetInstantMeterValue(state, elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedPowerConversionRate_ = GetInstantMeterValue(state, elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::System) /
                                        (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
     wholeBldgRemainingLoad_ = totalElectricDemand_;
@@ -479,20 +478,19 @@ void ElectricPowerServiceManager::updateWholeBuildingRecords(EnergyPlusData &sta
 {
 
     // main panel balancing.
-    totalBldgElecDemand_ =
-        GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec;
-    totalHVACElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    totalBldgElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec;
+    totalHVACElecDemand_ = GetInstantMeterValue(state, elecFacilityIndex_, OutputProcessor::TimeStepType::System) /
                            (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
     totalElectricDemand_ = totalBldgElecDemand_ + totalHVACElecDemand_;
-    elecProducedPVRate_ = GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedPVRate_ = GetInstantMeterValue(state, elecProducedPVIndex_, OutputProcessor::TimeStepType::System) /
                           (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedWTRate_ = GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedWTRate_ = GetInstantMeterValue(state, elecProducedWTIndex_, OutputProcessor::TimeStepType::System) /
                           (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedStorageRate_ = GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedStorageRate_ = GetInstantMeterValue(state, elecProducedStorageIndex_, OutputProcessor::TimeStepType::System) /
                                (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedCoGenRate_ = GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedCoGenRate_ = GetInstantMeterValue(state, elecProducedCoGenIndex_, OutputProcessor::TimeStepType::System) /
                              (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
-    elecProducedPowerConversionRate_ = GetInstantMeterValue(state, elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+    elecProducedPowerConversionRate_ = GetInstantMeterValue(state, elecProducedPowerConversionIndex_, OutputProcessor::TimeStepType::System) /
                                        (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
     electProdRate_ = elecProducedCoGenRate_ + elecProducedPVRate_ + elecProducedWTRate_ + elecProducedStorageRate_ + elecProducedPowerConversionRate_;
@@ -1431,10 +1429,9 @@ void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state,
         // The TRACK CUSTOM METER scheme tries to have the generators meet all of the
         //   electrical demand from a meter, it can also be a user-defined Custom Meter
         //   and PV is ignored.
-        customMeterDemand =
-            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
-            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::TimeStepSystem) /
-                (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+        customMeterDemand = GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
+                            GetInstantMeterValue(state, demandMeterPtr_, OutputProcessor::TimeStepType::System) /
+                                (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
 
         remainingLoad = customMeterDemand;
         loadCenterElectricLoad = remainingLoad;
@@ -1680,8 +1677,8 @@ void ElectPowerLoadCenter::dispatchStorage(EnergyPlusData &state,
     case StorageOpScheme::MeterDemandStoreExcessOnSite: {
         // Get meter rate
         subpanelFeedInRequest =
-            GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepZone) / state.dataGlobal->TimeStepZoneSec +
-            GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::TimeStepSystem) /
+            GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
+            GetInstantMeterValue(state, trackStorageOpMeterIndex_, OutputProcessor::TimeStepType::System) /
                 (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
         subpanelDrawRequest = 0.0;
         break;
@@ -4995,10 +4992,10 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
 
             if (state.dataGlobal->MetersHaveBeenInitialized) {
 
-                elecLoad += GetInstantMeterValue(state, wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepZone) /
-                                state.dataGlobal->TimeStepZoneSec +
-                            GetInstantMeterValue(state, wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::TimeStepSystem) /
-                                (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
+                elecLoad +=
+                    GetInstantMeterValue(state, wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::Zone) / state.dataGlobal->TimeStepZoneSec +
+                    GetInstantMeterValue(state, wiredMeterPtrs_[meterNum], OutputProcessor::TimeStepType::System) /
+                        (state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour);
                 // PastElecLoad store the metered value in the previous time step. This value will be used to check whether
                 // a transformer is overloaded or not.
                 pastElecLoad += GetCurrentMeterValue(state, wiredMeterPtrs_[meterNum]) / state.dataGlobal->TimeStepZoneSec;

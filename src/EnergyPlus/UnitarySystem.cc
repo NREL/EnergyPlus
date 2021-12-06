@@ -154,7 +154,7 @@ namespace UnitarySystems {
 
           m_SuppCoilFluidInletNode(0), m_MaxSuppCoilFluidFlow(0.0), m_SuppHeatCoilIndex(0), m_SuppHeatControlNodeNum(0), m_SupHeaterLoad(0.0),
           m_CoolingSAFMethod(0), m_HeatingSAFMethod(0), m_NoCoolHeatSAFMethod(0), m_MaxNoCoolHeatAirVolFlow(0.0),
-          m_AirFlowControl(UseCompFlow::FlowNotYetSet), m_CoolingCoilUpstream(true), m_MaxOATSuppHeat(0.0), m_MinOATCompressorCooling(0.0),
+          m_AirFlowControl(UseCompFlow::Invalid), m_CoolingCoilUpstream(true), m_MaxOATSuppHeat(0.0), m_MinOATCompressorCooling(0.0),
           m_MinOATCompressorHeating(0.0), m_MaxONOFFCyclesperHour(0.0), m_HPTimeConstant(0.0), m_OnCyclePowerFraction(0.0), m_FanDelayTime(0.0),
           m_AncillaryOnPower(0.0), m_AncillaryOffPower(0.0), m_DesignHRWaterVolumeFlow(0.0), m_MaxHROutletWaterTemp(0.0), m_HeatRecActive(false),
           m_HeatRecoveryInletNodeNum(0), m_HeatRecoveryOutletNodeNum(0), m_DesignSpecMSHPIndex(-1), m_NoLoadAirFlowRateRatio(1.0), m_SingleMode(0),
@@ -6337,9 +6337,9 @@ namespace UnitarySystems {
                 //             UseCompressorOffFlow = operate at value specified by user
                 //           AirFlowControl only valid if fan opmode = ContFanCycComp
                 if (this->m_MaxNoCoolHeatAirVolFlow == 0.0) {
-                    this->m_AirFlowControl = UseCompFlow::UseCompressorOnFlow;
+                    this->m_AirFlowControl = UseCompFlow::On;
                 } else {
-                    this->m_AirFlowControl = UseCompFlow::UseCompressorOffFlow;
+                    this->m_AirFlowControl = UseCompFlow::Off;
                 }
             }
         }
@@ -6662,9 +6662,9 @@ namespace UnitarySystems {
                 //             UseCompressorOffFlow = operate at value specified by user
                 //           AirFlowControl only valid IF fan opmode = ContFanCycComp
                 if (this->m_MaxNoCoolHeatAirVolFlow == 0.0) {
-                    this->m_AirFlowControl = UseCompFlow::UseCompressorOnFlow;
+                    this->m_AirFlowControl = UseCompFlow::On;
                 } else {
-                    this->m_AirFlowControl = UseCompFlow::UseCompressorOffFlow;
+                    this->m_AirFlowControl = UseCompFlow::Off;
                 }
             }
         }
@@ -10453,7 +10453,7 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->CompOnMassFlow = this->MaxHeatAirMassFlow;
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_HeatingFanSpeedRatio;
                     if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                        if (this->m_AirFlowControl == UseCompFlow::UseCompressorOnFlow) {
+                        if (this->m_AirFlowControl == UseCompFlow::On) {
                             state.dataUnitarySystems->CompOffMassFlow = this->MaxHeatAirMassFlow;
                             state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatingFanSpeedRatio;
                         } else {
@@ -10511,7 +10511,7 @@ namespace UnitarySystems {
                 state.dataUnitarySystems->CompOnMassFlow = this->MaxCoolAirMassFlow;
                 state.dataUnitarySystems->CompOnFlowRatio = this->m_CoolingFanSpeedRatio;
                 if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                    if (this->m_AirFlowControl == UseCompFlow::UseCompressorOnFlow) {
+                    if (this->m_AirFlowControl == UseCompFlow::On) {
                         state.dataUnitarySystems->CompOffMassFlow = this->MaxCoolAirMassFlow;
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_CoolingFanSpeedRatio;
                     } else {
@@ -10541,7 +10541,7 @@ namespace UnitarySystems {
                     }
 
                     if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                        if (this->m_AirFlowControl == UseCompFlow::UseCompressorOnFlow) {
+                        if (this->m_AirFlowControl == UseCompFlow::On) {
                             if (CoolSpeedNum <= 1) {
                                 state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
                                 state.dataUnitarySystems->CompOffFlowRatio = this->m_NoLoadAirFlowRateRatio;
@@ -10559,7 +10559,7 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->CompOnMassFlow = this->MaxCoolAirMassFlow;
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_CoolingFanSpeedRatio;
                     if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                        if (this->m_AirFlowControl == UseCompFlow::UseCompressorOnFlow) {
+                        if (this->m_AirFlowControl == UseCompFlow::On) {
                             state.dataUnitarySystems->CompOffMassFlow = this->MaxCoolAirMassFlow;
                             state.dataUnitarySystems->CompOffFlowRatio = this->m_CoolingFanSpeedRatio;
                         } else {
@@ -10627,7 +10627,7 @@ namespace UnitarySystems {
                 }         // IF(CompOnMassFlow .EQ. 0.0d0)THEN
 
                 if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                    if (this->m_AirFlowControl == UseCompFlow::UseCompressorOnFlow) {
+                    if (this->m_AirFlowControl == UseCompFlow::On) {
                         if (this->m_LastMode == HeatingMode) {
                             if (this->m_MultiOrVarSpeedHeatCoil) {
                                 HeatSpeedNum = this->m_HeatingSpeedNum;

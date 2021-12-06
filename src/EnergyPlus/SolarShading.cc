@@ -698,7 +698,7 @@ void GetShadowingInput(EnergyPlusData &state)
     }
 
     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm && state.dataSurface->ShadingTransmittanceVaries &&
-        state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::MinimalShadowing) {
+        state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
 
         ShowWarningError(state,
                          "GetShadowingInput: The shading transmittance for shading devices changes throughout the year. Choose "
@@ -713,11 +713,11 @@ void GetShadowingInput(EnergyPlusData &state)
                                   cCurrentModuleObject + " object.");
         }
     } else if (state.dataSysVars->DetailedSkyDiffuseAlgorithm) {
-        if (!state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+        if (!state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             ShowWarningError(state,
                              "GetShadowingInput: DetailedSkyDiffuseModeling is chosen but not needed as either the shading transmittance for "
                              "shading devices does not change throughout the year");
-            ShowContinueError(state, " or MinimalShadowing has been chosen.");
+            ShowContinueError(state, " or Minimal has been chosen.");
             ShowContinueError(state, "Simulation should be set to use SimpleSkyDiffuseModeling, but is left at Detailed for simulation.");
             ShowContinueError(state, "Choose SimpleSkyDiffuseModeling in the " + cCurrentModuleObject + " object to reduce computation time.");
         }
@@ -2579,7 +2579,7 @@ void AnisoSkyViewFactors(EnergyPlusData &state)
         state.dataSolarShading->SurfMultHorizonZenith(SurfNum) = F2 * state.dataSurface->Surface(SurfNum).SinTilt;
 
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             state.dataSolarShading->SurfAnisoSkyMult(SurfNum) =
                 state.dataSolarShading->SurfMultIsoSky(SurfNum) * state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum) +
                 state.dataSolarShading->SurfMultCircumSolar(SurfNum) *
@@ -5004,7 +5004,7 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
     }
     //   Note -- if not the below, values are set in SkyDifSolarShading routine (constant for simulation)
     if (state.dataSysVars->DetailedSkyDiffuseAlgorithm && state.dataSurface->ShadingTransmittanceVaries &&
-        state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::MinimalShadowing) {
+        state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSolarShading->SurfWithShdgIsoSky(SurfNum) = 0.;
             state.dataSolarShading->SurfWoShdgIsoSky(SurfNum) = 0.;
@@ -5299,8 +5299,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
 
         // Check every surface as a possible shadow casting surface ("SS" = shadow sending)
         NGSS = 0;
-        if (state.dataHeatBal->SolarDistribution !=
-            DataHeatBalance::Shadowing::MinimalShadowing) { // Except when doing simplified exterior shadowing.
+        if (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) { // Except when doing simplified exterior shadowing.
 
             for (GSSNR = 1; GSSNR <= state.dataSurface->TotSurfaces; ++GSSNR) { // Loop through all surfaces, looking for ones that could shade GRSNR
 
@@ -5453,7 +5452,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
     if (!state.dataSolarShading->penumbra) {
         if (state.dataSolarShading->shd_stream) {
             *state.dataSolarShading->shd_stream << "Shadowing Combinations\n";
-            if (state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+            if (state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
                 *state.dataSolarShading->shd_stream
                     << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
             } else if (state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::FullExterior) {
@@ -10290,7 +10289,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
 
     // Initialize Surfaces Arrays
     bool detailedShading = state.dataSysVars->DetailedSkyDiffuseAlgorithm && state.dataSurface->ShadingTransmittanceVaries &&
-                           state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::MinimalShadowing;
+                           state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal;
     state.dataSolarShading->SurfSunlitArea = 0.0;
     state.dataSolarShading->SurfWithShdgIsoSky.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSolarShading->SurfWoShdgIsoSky.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -10432,7 +10431,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum);
         } else {
             state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, 1, SurfNum);
@@ -10456,7 +10455,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
     //  DEALLOCATE(WoShdgHoriz)
 
     if (state.dataSysVars->DetailedSkyDiffuseAlgorithm && state.dataSurface->ShadingTransmittanceVaries &&
-        state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::MinimalShadowing) {
+        state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}, SurfNum) =
                 state.dataSolarShading->SurfDifShdgRatioIsoSky(SurfNum);

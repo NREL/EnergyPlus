@@ -280,8 +280,8 @@ namespace OutputProcessor {
     enum class TimeStepType
     {
         Invalid = -1,
-        TimeStepZone = 1,   // Type value for "zone" timestep variables
-        TimeStepSystem = 2, // Type value for "system" timestep variables
+        Zone = 1,   // Type value for "zone" timestep variables
+        System = 2, // Type value for "system" timestep variables
         Num
     };
 
@@ -373,7 +373,7 @@ namespace OutputProcessor {
 
         // Default Constructor
         VariableTypeForDDOutput()
-            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), variableType(VariableType::NotFound), Next(0),
+            : timeStepType(TimeStepType::Zone), storeType(StoreType::Averaged), variableType(VariableType::NotFound), Next(0),
               ReportedOnDDFile(false), units(OutputProcessor::Unit::None)
         {
         }
@@ -395,7 +395,7 @@ namespace OutputProcessor {
         RealVariables VarPtr;          // Pointer used to real Variables structure
 
         // Default Constructor
-        RealVariableType() : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
+        RealVariableType() : timeStepType(TimeStepType::Zone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
         {
         }
     };
@@ -415,8 +415,7 @@ namespace OutputProcessor {
         IntegerVariables VarPtr;     // Pointer used to integer Variables structure
 
         // Default Constructor
-        IntegerVariableType()
-            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
+        IntegerVariableType() : timeStepType(TimeStepType::Zone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
         {
         }
     };

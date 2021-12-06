@@ -1276,7 +1276,7 @@ namespace DaylightingDevices {
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             IsoSkyRad = state.dataSolarShading->SurfMultIsoSky(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioIsoSky(DomeSurf);
             HorizonRad = state.dataSolarShading->SurfMultHorizonZenith(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioHoriz(DomeSurf);
         } else {

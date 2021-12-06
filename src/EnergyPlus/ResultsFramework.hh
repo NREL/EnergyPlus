@@ -154,7 +154,7 @@ namespace ResultsFramework {
         std::string varName;
         std::string sReportFreq;
         OutputProcessor::ReportingFrequency iReportFreq = OutputProcessor::ReportingFrequency::EachCall;
-        OutputProcessor::TimeStepType m_timeStepType = OutputProcessor::TimeStepType::TimeStepZone;
+        OutputProcessor::TimeStepType m_timeStepType = OutputProcessor::TimeStepType::Zone;
         int rptID = -1;
         OutputProcessor::Unit Units;
         std::string m_customUnits;
@@ -370,12 +370,12 @@ namespace ResultsFramework {
         void initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                     const Array1D<OutputProcessor::RealVariableType> &RVariableTypes,
                                     const int NumOfRVariable,
-                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
+                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::Zone);
 
         void initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                     const Array1D<OutputProcessor::IntegerVariableType> &IVariableTypes,
                                     const int NumOfIVariable,
-                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
+                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::Zone);
 
         void initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency);
 

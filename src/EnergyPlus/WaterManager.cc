@@ -308,15 +308,15 @@ namespace WaterManager {
                     state.dataWaterData->WaterStorage(Item).SupplyTankName = cAlphaArgs(5); // set up later
 
                     if (UtilityRoutines::SameString(cAlphaArgs(6), "ScheduledTemperature")) {
-                        state.dataWaterData->WaterStorage(Item).ThermalMode = DataWater::TankThermalMode::ScheduledTankTemp;
+                        state.dataWaterData->WaterStorage(Item).ThermalMode = DataWater::TankThermalMode::Scheduled;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(6), "ThermalModel")) {
-                        state.dataWaterData->WaterStorage(Item).ThermalMode = DataWater::TankThermalMode::TankZoneThermalCoupled;
+                        state.dataWaterData->WaterStorage(Item).ThermalMode = DataWater::TankThermalMode::ZoneCoupled;
                     } else {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                     }
 
-                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == DataWater::TankThermalMode::ScheduledTankTemp) {
+                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == DataWater::TankThermalMode::Scheduled) {
                         state.dataWaterData->WaterStorage(Item).TempSchedID = GetScheduleIndex(state, cAlphaArgs(7));
                         if (state.dataWaterData->WaterStorage(Item).TempSchedID == 0) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(7) + '=' + cAlphaArgs(7));
@@ -339,7 +339,7 @@ namespace WaterManager {
                         }
                     }
 
-                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == DataWater::TankThermalMode::TankZoneThermalCoupled) {
+                    if (state.dataWaterData->WaterStorage(Item).ThermalMode == DataWater::TankThermalMode::ZoneCoupled) {
                         if (UtilityRoutines::SameString(cAlphaArgs(8), "Schedule")) {
                             state.dataWaterData->WaterStorage(Item).AmbientTempIndicator = DataWater::AmbientTempType::Schedule;
                         } else if (UtilityRoutines::SameString(cAlphaArgs(8), "Zone")) {
@@ -536,9 +536,9 @@ namespace WaterManager {
                     state.dataWaterData->GroundwaterWell(Item).WellRecoveryRate = rNumericArgs(6);
                     state.dataWaterData->GroundwaterWell(Item).NomWellStorageVol = rNumericArgs(7);
                     if (UtilityRoutines::SameString(cAlphaArgs(3), "Constant")) {
-                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::ConstantWaterTable;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::Constant;
                     } else if (UtilityRoutines::SameString(cAlphaArgs(3), "Scheduled")) {
-                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::ScheduledWaterTable;
+                        state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::Scheduled;
                     } else if (lAlphaFieldBlanks(3)) {
                         state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode = DataWater::GroundWaterTable::Invalid;
                     } else {
@@ -551,7 +551,7 @@ namespace WaterManager {
                     state.dataWaterData->GroundwaterWell(Item).WaterTableDepth = rNumericArgs(8);
                     // A4; \field water table depth schedule
                     state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID = GetScheduleIndex(state, cAlphaArgs(4));
-                    if ((state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode == DataWater::GroundWaterTable::ScheduledWaterTable) &&
+                    if ((state.dataWaterData->GroundwaterWell(Item).GroundwaterTableMode == DataWater::GroundWaterTable::Scheduled) &&
                         (state.dataWaterData->GroundwaterWell(Item).WaterTableDepthSchedID == 0)) {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -1158,11 +1158,11 @@ namespace WaterManager {
 
         {
             auto const SELECT_CASE_var(state.dataWaterData->WaterStorage(TankNum).ThermalMode);
-            if (SELECT_CASE_var == DataWater::TankThermalMode::ScheduledTankTemp) {
+            if (SELECT_CASE_var == DataWater::TankThermalMode::Scheduled) {
                 state.dataWaterData->WaterStorage(TankNum).Twater =
                     GetCurrentScheduleValue(state, state.dataWaterData->WaterStorage(TankNum).TempSchedID);
                 state.dataWaterData->WaterStorage(TankNum).TouterSkin = state.dataWaterData->WaterStorage(TankNum).Twater;
-            } else if (SELECT_CASE_var == DataWater::TankThermalMode::TankZoneThermalCoupled) {
+            } else if (SELECT_CASE_var == DataWater::TankThermalMode::ZoneCoupled) {
                 ShowFatalError(state, "WaterUse:Storage (Water Storage Tank) zone thermal model incomplete");
             }
         }

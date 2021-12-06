@@ -1787,10 +1787,10 @@ void GetTESCoilInput(EnergyPlusData &state)
         }
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(61)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectMode = CondensateAction::CondensateDiscarded;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectMode = CondensateAction::Discard;
         } else {
             state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectName = state.dataIPShortCut->cAlphaArgs(61);
-            state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectMode = CondensateAction::CondensateToTank;
+            state.dataPackagedThermalStorageCoil->TESCoil(item).CondensateCollectMode = CondensateAction::ToTank;
             SetupTankSupplyComponent(state,
                                      state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                      cCurrentModuleObject,

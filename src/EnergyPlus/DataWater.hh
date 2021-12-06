@@ -63,8 +63,8 @@ namespace DataWater {
     enum class TankThermalMode
     {
         Invalid = -1,
-        ScheduledTankTemp,      // tank water temperature is user input via schedule
-        TankZoneThermalCoupled, // tank water temperature is modeled using simple UA
+        Scheduled,   // tank water temperature is user input via schedule
+        ZoneCoupled, // tank water temperature is modeled using simple UA
         Num
     };
 
@@ -97,8 +97,8 @@ namespace DataWater {
     enum class GroundWaterTable
     {
         Invalid = -1,
-        ConstantWaterTable,
-        ScheduledWaterTable,
+        Constant,
+        Scheduled,
         Num
     };
 

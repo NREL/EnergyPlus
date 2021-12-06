@@ -201,7 +201,7 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
 
     auto &ort(state.dataOutRptTab);
 
-    if (t_timeStepType != OutputProcessor::TimeStepType::TimeStepZone && t_timeStepType != OutputProcessor::TimeStepType::TimeStepSystem) {
+    if (t_timeStepType != OutputProcessor::TimeStepType::Zone && t_timeStepType != OutputProcessor::TimeStepType::System) {
         ShowFatalError(state, "Invalid reporting requested -- UpdateTabularReports");
     }
 
@@ -225,7 +225,7 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
     }
     if (state.dataGlobal->DoOutputReporting && ort->WriteTabularFiles &&
         (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) {
-        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
+        if (t_timeStepType == OutputProcessor::TimeStepType::Zone) {
             ort->gatherElapsedTimeBEPS += state.dataGlobal->TimeStepZone;
         }
         if (state.dataGlobal->DoWeathSim) {
@@ -690,7 +690,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         e.varNum = 0;
         e.typeOfVar = OutputProcessor::VariableType::NotFound;
         e.avgSum = OutputProcessor::StoreType::Averaged;
-        e.stepType = OutputProcessor::TimeStepType::TimeStepZone;
+        e.stepType = OutputProcessor::TimeStepType::Zone;
         e.units = OutputProcessor::Unit::None;
         e.aggType = AggType::Invalid;
     }
@@ -908,7 +908,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     ort->MonthlyColumns(mColumn).varNum = 0;
                     ort->MonthlyColumns(mColumn).typeOfVar = OutputProcessor::VariableType::NotFound;
                     ort->MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
-                    ort->MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::TimeStepZone;
+                    ort->MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::Zone;
                     ort->MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
                     ort->MonthlyColumns(mColumn).aggType = AggType::SumOrAvg;
                 }
@@ -3463,14 +3463,12 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
         if (gatherThisTime) {
             for (jTable = 1; jTable <= curNumTables; ++jTable) {
                 repIndex = curResIndex + (jTable - 1);
-                if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
-                     (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
-                    ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
-                     (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
+                if (((curStepType == OutputProcessor::TimeStepType::Zone) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) ||
+                    ((curStepType == OutputProcessor::TimeStepType::System) && (t_timeStepType == OutputProcessor::TimeStepType::System))) {
                     // put actual value from OutputProcesser arrays
                     curValue = GetInternalVariableValue(state, curTypeOfVar, ort->BinObjVarID(repIndex).varMeterNum);
                     // per MJW when a summed variable is used divide it by the length of the time step
-                    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                         elapsedTime = TimeStepSys;
                     } else {
                         elapsedTime = state.dataGlobal->TimeStepZone;
@@ -3605,7 +3603,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
     }
 
     elapsedTime = TimeStepSys;
-    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
         elapsedTime = TimeStepSys;
     } else {
         elapsedTime = state.dataGlobal->TimeStepZone;
@@ -3619,9 +3617,8 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
             curCol = jColumn + state.dataOutRptTab->curFirstColumn - 1;
             curTypeOfVar = state.dataOutRptTab->MonthlyColumnsTypeOfVar(curCol);
             curStepType = state.dataOutRptTab->MonthlyColumnsStepType(curCol);
-            if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
-                ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
-                 (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
+            if (((curStepType == OutputProcessor::TimeStepType::Zone) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) ||
+                ((curStepType == OutputProcessor::TimeStepType::System) && (t_timeStepType == OutputProcessor::TimeStepType::System))) {
                 //  the above condition used to include the following prior to new scan method
                 //  (MonthlyColumns(curCol)%aggType .EQ. AggType::ValueWhenMaxMin)
                 curVarNum = state.dataOutRptTab->MonthlyColumnsVarNum(curCol);
@@ -3657,7 +3654,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                     } else if (SELECT_CASE_var == AggType::Maximum) {
                         // per MJW when a summed variable is used divide it by the length of the time step
                         if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                            if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                                 curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                             } else {
                                 curValue /= state.dataGlobal->TimeStepZoneSec;
@@ -3674,7 +3671,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                     } else if (SELECT_CASE_var == AggType::Minimum) {
                         // per MJW when a summed variable is used divide it by the length of the time step
                         if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                            if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                                 curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                             } else {
                                 curValue /= state.dataGlobal->TimeStepZoneSec;
@@ -3771,7 +3768,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                                 scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                                 // When a summed variable is used divide it by the length of the time step
                                 if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                                    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                                         scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                                     } else {
                                         scanValue /= state.dataGlobal->TimeStepZoneSec;
@@ -3815,7 +3812,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                                 ort->MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
                             } else if (SELECT_CASE_var == AggType::MaximumDuringHoursShown) {
                                 if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                                    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                                         scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                                     } else {
                                         scanValue /= state.dataGlobal->TimeStepZoneSec;
@@ -3827,7 +3824,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                                 }
                             } else if (SELECT_CASE_var == AggType::MinimumDuringHoursShown) {
                                 if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                                    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
                                         scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
                                     } else {
                                         scanValue /= state.dataGlobal->TimeStepZoneSec;
@@ -3907,7 +3904,7 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
 
     // if no beps report is called then skip
 
-    if ((ort->displayTabularBEPS || ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+    if ((ort->displayTabularBEPS || ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
         // add the current time to the total elapsed time
         // FOLLOWING LINE MOVED TO UPDATETABULARREPORTS because used even when beps is not called
         // gatherElapsedTimeBEPS = gatherElapsedTimeBEPS + TimeStepZone
@@ -4075,7 +4072,7 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
 
     // if no beps by source report is called then skip
 
-    if ((ort->displaySourceEnergyEndUseSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+    if ((ort->displaySourceEnergyEndUseSummary) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
         // loop through all of the resources and end uses for the entire facility
         for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
 
@@ -4197,7 +4194,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     assert(state.dataGlobal->TimeStepZoneSec > 0.0);
     auto &ort(state.dataOutRptTab);
 
-    if ((ort->displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+    if ((ort->displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
         // loop through all of the resources and end uses for the entire facility
         for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
             curMeterNumber = ort->meterNumTotalsBEPS(iResource);
@@ -4234,7 +4231,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     }
 
     // gather the peak demands of each individual enduse subcategory for the LEED report
-    if ((ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+    if ((ort->displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::Zone)) {
         // loop through all of the resources and end uses for the entire facility
         for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
             for (int jEndUse = 1; jEndUse <= DataGlobalConstantsData::iEndUseSize; ++jEndUse) {
@@ -4274,7 +4271,7 @@ void GatherHeatEmissionReport(EnergyPlusData &state, OutputProcessor::TimeStepTy
     if (!ort->displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
 
     // Only gather zone report at zone time steps
-    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
+    if (t_timeStepType == OutputProcessor::TimeStepType::Zone) {
         state.dataHeatBal->BuildingPreDefRep.emiEnvelopConv += state.dataHeatBalSurf->SumSurfaceHeatEmission * DataGlobalConstants::convertJtoGJ;
         return;
     }
@@ -4563,7 +4560,7 @@ void GatherHeatGainReport(EnergyPlusData &state, OutputProcessor::TimeStepType t
     if (!state.dataOutRptPredefined->reportName(state.dataOutRptPredefined->pdrSensibleGain).show)
         return; // don't gather data if report isn't requested
 
-    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) return; // only add values over the HVAC timestep basis
+    if (t_timeStepType == OutputProcessor::TimeStepType::Zone) return; // only add values over the HVAC timestep basis
 
     auto &ort(state.dataOutRptTab);
 

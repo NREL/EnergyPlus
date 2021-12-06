@@ -54,6 +54,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import difflib
 import os
 import sys
 import unittest
@@ -77,51 +78,60 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
     if ":" in tokens[0]:
         tokens[0] = tokens[0].replace(" ", "").split(":")[0]
 
-    enum_name = tokens[0].strip()
-    enum_tokens = tokens[1].split(",")
-    enum_tokens = [x.strip() for x in enum_tokens]
+    name = tokens[0].strip()
+    tokens = tokens[1].split(",")
+    tokens = [x.strip() for x in tokens]
 
-    if enum_tokens[-1] == "":
-        enum_tokens.pop(-1)
+    if tokens[-1] == "":
+        tokens.pop(-1)
 
     # split into names and integer values, in present
-    names = []
+    keys = []
+    keys_uc = []
     values = []
-    for e in enum_tokens:
+    for e in tokens:
         if "=" in e:
             tokens = e.replace(" ", "").split("=")
-            names.append(tokens[0].upper())
+            keys.append(tokens[0])
+            keys_uc.append(tokens[0].upper())
             try:
                 values.append(int(tokens[1]))
             except ValueError:
                 values.append(tokens[1])
         else:
-            names.append(e.upper())
+            keys.append(e)
+            keys_uc.append(e.upper())
             values.append("")
 
     # check for null names at 0-th position
-    if names[0] not in valid_null_enum_value_names:
+    if keys_uc[0] not in valid_null_enum_value_names:
         error_str += "\tMissing 'Invalid' at position 0\n"
 
     # check for null value = -1 at 0-th position
-    if names[0] in valid_null_enum_value_names and values[0] != -1:
-        error_str += f"\t{names[0]} must = -1\n"
+    if keys_uc[0] in valid_null_enum_value_names and values[0] != -1:
+        error_str += f"\t{keys_uc[0]} must = -1\n"
 
     # check for num names at N-th position
-    if names[-1] not in valid_num_enum_value_names:
+    if keys_uc[-1] not in valid_num_enum_value_names:
         error_str += "\tMissing 'Num' at position N\n"
 
     # check for "unassigned" in names
-    if "UNASSIGNED" in names:
+    if "UNASSIGNED" in keys_uc:
         error_str += "\tUNASSIGNED in enum names\n"
 
     # check for "unknown" in names
-    if "UNKNOWN" in names:
+    if "UNKNOWN" in keys_uc:
         error_str += "\tUNKNOWN in enum names\n"
 
     # check for proper casing
-    if str(enum_name[0]).islower():
+    if str(name[0]).islower():
         error_str += "\tenum name must begin with upper case letter\n"
+
+    if any([str(x[0]).islower() for x in keys]):
+        error_str += "\tenum keys must begin with upper case letter\n"
+
+    if difflib.get_close_matches(name, keys, cutoff=0.7):
+        error_str += "\tenum keys are too similar to enum name\n"
 
     # check for non-allowed enum values
     found = any([x != -1 for x in values if type(x) == int])
@@ -131,7 +141,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
     if error_str:
         if print_errors:
             print(f"ERROR: malformed 'enum class'")
-            print(f"{file_name}: {line_no} - {enum_name}")
+            print(f"{file_name}: {line_no} - {name}")
             print(error_str)
         return 1
     else:

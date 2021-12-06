@@ -115,7 +115,7 @@ namespace DataHeatBalance {
     enum class Shadowing
     {
         Invalid = -1,
-        MinimalShadowing,     // all incoming solar hits floor, no exterior shadowing except reveals
+        Minimal,              // all incoming solar hits floor, no exterior shadowing except reveals
         FullExterior,         // all incoming solar hits floor, full exterior shadowing
         FullInteriorExterior, // full interior solar distribution, full exterior solar shadowing
         FullExteriorWithRefl, // all incoming solar hits floor, full exterior shadowing and reflections

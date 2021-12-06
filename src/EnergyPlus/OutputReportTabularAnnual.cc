@@ -607,7 +607,7 @@ void AnnualTable::resetGathering()
 Real64 AnnualTable::getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
 {
     Real64 elapsedTime;
-    if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
+    if (kindOfTimeStep == OutputProcessor::TimeStepType::Zone) {
         elapsedTime = state.dataHVACGlobal->TimeStepSys;
     } else {
         elapsedTime = state.dataGlobal->TimeStepZone;
@@ -618,7 +618,7 @@ Real64 AnnualTable::getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeS
 Real64 AnnualTable::getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
 {
     Real64 secondsInTimeStep;
-    if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
+    if (kindOfTimeStep == OutputProcessor::TimeStepType::Zone) {
         secondsInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     } else {
         secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
