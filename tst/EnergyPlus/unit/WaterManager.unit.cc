@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -90,6 +91,36 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     Real64 CurrentRate = state->dataWaterData->RainFall.CurrentRate;
     EXPECT_NEAR(CurrentRate, ExpectedCurrentRate, 0.000001);
+}
+
+TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
+{
+    // with site:precipitation
+    std::string const idf_objects = delimited_string({
+
+        "Site:Precipitation,",
+        "ScheduleAndDesignLevel,  !- Precipitation Model Type",
+        "0.75,                    !- Design Level for Total Annual Precipitation {m/yr}",
+        "PrecipitationSchd,       !- Precipitation Rates Schedule Name",
+        "0.75;                    !- Average Total Annual Precipitation {m/yr}",
+
+        "Schedule:Constant,",
+        "PrecipitationSchd,",
+        ",",
+        "1;",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    WaterManager::GetWaterManagerInput(*state);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.5;
+
+    state->dataEnvrn->LiquidPrecipitation = 0.5;
+    WaterManager::UpdatePrecipitation(*state);
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 1.5 / 3600);
+
+    // without site:precipitation, use epw "LiquidPrecipitation"
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
+    WaterManager::UpdatePrecipitation(*state);
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / 3600);
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
