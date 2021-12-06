@@ -111,16 +111,26 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput(*state);
-    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.5;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 2.0;
 
     state->dataEnvrn->LiquidPrecipitation = 0.5;
     WaterManager::UpdatePrecipitation(*state);
-    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 1.5 / 3600);
+    // note even if LiquidPrecipitation is positive, since site:precipitation is precent, still use site:precipitation first
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 2.0 / 3600);
 
     // without site:precipitation, use epw "LiquidPrecipitation"
+    state->dataEnvrn->LiquidPrecipitation = 0.5;
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
     WaterManager::UpdatePrecipitation(*state);
     ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / 3600);
+
+    // without site:precipitation, "LiquidPrecipitation" is also missing, but rain flag is on
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
+    state->dataEnvrn->LiquidPrecipitation = 0;
+    state->dataEnvrn->IsRain = true;
+    WaterManager::UpdatePrecipitation(*state);
+    // default 1.5mm rain depth is used
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 1.5 / 3600);
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)

@@ -954,10 +954,16 @@ namespace WaterManager {
             state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
         // when there's no site:precipitation but non-zero epw precipitation, uset the epw precipitation as the CurrentRate
         } else {
+            // placeholder: add EP checks for out of range precipitation value later -- yujie
             if (state.dataEnvrn->LiquidPrecipitation > 0) {
+                ShowWarningMessage(state, "Please be aware that precipitation depth in the .epw weather file is used in the RainCollector calculation as the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
                 state.dataWaterData->RainFall.CurrentRate = state.dataEnvrn->LiquidPrecipitation / DataGlobalConstants::SecInHour;
-                state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
+            // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
+            } else if (state.dataEnvrn->IsRain) {
+                ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
+                state.dataWaterData->RainFall.CurrentRate = 1.5 / DataGlobalConstants::SecInHour;
             }
+            state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
         }
     }
 

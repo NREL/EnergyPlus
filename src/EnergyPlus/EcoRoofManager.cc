@@ -922,11 +922,16 @@ namespace EcoRoofManager {
             }
         } else {
             if (state.dataEnvrn->LiquidPrecipitation > 0) {
+                ShowWarningMessage(state, "Please be aware that precipitation depth in the .epw weather file is used in the RoofIrrigation calculation as the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
                 state.dataEcoRoofMgr->CurrentPrecipitation = state.dataEnvrn->LiquidPrecipitation * TimeStepSys; //  units of m
-                Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth;  // x (m) evenly put into top layer
-                if (!state.dataGlobal->WarmupFlag) {
-                    state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
-                }
+            // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
+            } else if (state.dataEnvrn->IsRain) {
+                ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
+                state.dataEcoRoofMgr->CurrentPrecipitation = 1.5 * TimeStepSys; //  units of m
+            }
+            Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth;  // x (m) evenly put into top layer
+            if (!state.dataGlobal->WarmupFlag) {
+                state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
             }
         }
 
