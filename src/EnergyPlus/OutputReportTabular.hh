@@ -126,7 +126,6 @@ namespace OutputReportTabular {
 
     enum column // These correspond to the columns in the load component table
     {
-        Invalid = -1,
         SensInst = 1,
         SensDelay,
         SensRA,
@@ -137,37 +136,44 @@ namespace OutputReportTabular {
         PerArea
     };
 
-    // internal gains
-    constexpr int rPeople(1);
-    constexpr int rLights(2);
-    constexpr int rEquip(3);
-    constexpr int rRefrig(4);
-    constexpr int rWaterUse(5);
-    constexpr int rHvacLoss(6);
-    constexpr int rPowerGen(7);
-    // misc
-    constexpr int rDOAS(8);
-    constexpr int rInfil(9);
-    constexpr int rZoneVent(10);
-    constexpr int rIntZonMix(11);
-    // opaque surfaces
-    constexpr int rRoof(12);
-    constexpr int rIntZonCeil(13);
-    constexpr int rOtherRoof(14);
-    constexpr int rExtWall(15);
-    constexpr int rIntZonWall(16);
-    constexpr int rGrdWall(17);
-    constexpr int rOtherWall(18);
-    constexpr int rExtFlr(19);
-    constexpr int rIntZonFlr(20);
-    constexpr int rGrdFlr(21);
-    constexpr int rOtherFlr(22);
-    // subsurfaces
-    constexpr int rFeneCond(23);
-    constexpr int rFeneSolr(24);
-    constexpr int rOpqDoor(25);
-    // total
-    constexpr int rGrdTot(26);
+    enum row
+    {
+        // internal gains
+        People = 1,
+        Lights,
+        Equip,
+        Refrig,
+        WaterUse,
+        HvacLoss,
+        PowerGen,
+        
+        // misc
+        DOAS,
+        Infil,
+        ZoneVent,
+        IntZonMix,
+        
+        // opaque surfaces
+        Roof,
+        IntZonCeil,
+        OtherRoof,
+        ExtWall,
+        IntZonWall,
+        GrdWall,
+        OtherWall,
+        ExtFlr,
+        IntZonFlr,
+        GrdFlr,
+        OtherFlr,
+
+        // subsurfaces
+        FeneCond,
+        FeneSolr,
+        OpqDoor,
+
+        // total
+        GrdTot
+    };
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
