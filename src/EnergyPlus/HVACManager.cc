@@ -937,7 +937,7 @@ void SimHVAC(EnergyPlusData &state)
     // Test plant loop for errors
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
         for (LoopSide = static_cast<int>(DataPlant::LoopSideLocation::Demand);
-             LoopSide <= static_cast<int>(DataPlant::LoopSideLocation::Supply);
+             LoopSide < static_cast<int>(DataPlant::LoopSideLocation::Num);
              ++LoopSide) {
             CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
             CheckForRunawayPlantTemps(state, LoopNum, static_cast<DataPlant::LoopSideLocation>(LoopSide));
@@ -1386,7 +1386,7 @@ void SimHVAC(EnergyPlusData &state)
                         ShowContinueError(state, "Supply-to-Demand interface mass flow rate check value iteration history trace: " + HistoryTrace);
 
                         // now work with history logs for mass flow to detect issues
-                        for (ThisLoopSide = 1; ThisLoopSide <= state.dataPlnt->PlantLoop(LoopNum).LoopSide.size(); ++ThisLoopSide) {
+                        for (ThisLoopSide = static_cast<int>(DataPlant::LoopSideLocation::Demand); ThisLoopSide < state.dataPlnt->PlantLoop(LoopNum).LoopSide.size(); ++ThisLoopSide) {
 
                             auto &mdotHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(ThisLoopSide)].InletNode.MassFlowRateHistory;
                             auto &mdotHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(ThisLoopSide)].OutletNode.MassFlowRateHistory;
@@ -1563,7 +1563,7 @@ void SimHVAC(EnergyPlusData &state)
                         ShowContinueError(state, "Supply-to-Demand interface temperature check value iteration history trace: " + HistoryTrace);
 
                         // now work with history logs for mass flow to detect issues
-                        for (ThisLoopSide = 1; ThisLoopSide <= state.dataPlnt->PlantLoop(LoopNum).LoopSide.size(); ++ThisLoopSide) {
+                        for (ThisLoopSide = static_cast<int>(DataPlant::LoopSideLocation::Demand); ThisLoopSide < state.dataPlnt->PlantLoop(LoopNum).LoopSide.size(); ++ThisLoopSide) {
 
                             auto &tempHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(ThisLoopSide)].InletNode.TemperatureHistory;
                             auto &tempHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(ThisLoopSide)].OutletNode.TemperatureHistory;

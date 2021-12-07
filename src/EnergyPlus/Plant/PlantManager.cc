@@ -237,7 +237,7 @@ void ManagePlantLoops(EnergyPlusData &state,
         // decide new status for SimPlantLoops flag
         SimPlantLoops = false;
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-            for (LoopSideNum = 1; LoopSideNum <= 2; ++LoopSideNum) {
+            for (LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand); LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Num); ++LoopSideNum) {
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].SimLoopSideNeeded) {
                     SimPlantLoops = true;
                     goto LoopLevel_exit;
@@ -812,7 +812,7 @@ void GetPlantInput(EnergyPlusData &state)
         plantLoop.LoopHasConnectionComp = false;
 
         for (LoopSideNum = static_cast<int>(LoopSideLocation::Demand);
-             LoopSideNum <= static_cast<int>(LoopSideLocation::Supply);
+             LoopSideNum < static_cast<int>(LoopSideLocation::Num);
              ++LoopSideNum) {
             auto &loopSide = plantLoop.LoopSide[LoopSideNum];
             ASeriesBranchHasPump = false;
@@ -1613,11 +1613,11 @@ void GetPlantInput(EnergyPlusData &state)
         }
 
         // set up some pump indexing for convenience later
-        for (int LoopSideCounter = 1; LoopSideCounter <= 2; ++LoopSideCounter) {
+        for (int LoopSideCounter = static_cast<int>(DataPlant::LoopSideLocation::Demand); LoopSideCounter < static_cast<int>(DataPlant::LoopSideLocation::Num); ++LoopSideCounter) {
             for (int PumpCounter = 1; PumpCounter <= plantLoop.LoopSide[static_cast<int>(LoopSideCounter)].TotalPumps; ++PumpCounter) {
-                int const PumpBranchNum = plantLoop.LoopSide[static_cast<int>(LoopSideCounter)].Pumps(PumpCounter).BranchNum;
-                int const PumpCompNum = plantLoop.LoopSide[static_cast<int>(LoopSideCounter)].Pumps(PumpCounter).CompNum;
-                plantLoop.LoopSide[static_cast<int>(LoopSideCounter)].Branch(PumpBranchNum).Comp(PumpCompNum).IndexInLoopSidePumps = PumpCounter;
+                int const PumpBranchNum = plantLoop.LoopSide[LoopSideCounter].Pumps(PumpCounter).BranchNum;
+                int const PumpCompNum = plantLoop.LoopSide[LoopSideCounter].Pumps(PumpCounter).CompNum;
+                plantLoop.LoopSide[LoopSideCounter].Branch(PumpBranchNum).Comp(PumpCompNum).IndexInLoopSidePumps = PumpCounter;
             }
         }
     }
@@ -2665,7 +2665,7 @@ void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state)
             }
         }
 
-        for (LoopSideNum = static_cast<int>(LoopSideLocation::Demand); LoopSideNum < static_cast<int>(LoopSideLocation::Supply); ++LoopSideNum) {
+        for (LoopSideNum = static_cast<int>(LoopSideLocation::Demand); LoopSideNum < static_cast<int>(LoopSideLocation::Num); ++LoopSideNum) {
             for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].TotalBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).TotalComponents; ++CompNum) {
                     ComponentInlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Comp(CompNum).NodeNumIn;

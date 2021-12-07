@@ -6113,7 +6113,7 @@ void GetATMixers(EnergyPlusData &state)
         state.dataSingleDuct->SysATMixer(ATMixerNum).Name = state.dataIPShortCut->cAlphaArgs(1);
         if (state.dataIPShortCut->cAlphaArgs(7) == "INLETSIDE") {
             state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_InletSide; // inlet side mixer
-        } else if (state.dataIPShortCut->cAlphaArgs(7) == "LoopSideLocation::Supply") {
+        } else if (state.dataIPShortCut->cAlphaArgs(7) == "SUPPLYSIDE") {
             state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_SupplySide; // supply side mixer
         }
         if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:WATERTOAIRHEATPUMP") {

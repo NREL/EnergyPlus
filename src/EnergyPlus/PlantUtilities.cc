@@ -795,7 +795,7 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
         LoopCapacity = 0.0;
         DispatchedCapacity = 0.0;
         for (LSN = static_cast<int>(DataPlant::LoopSideLocation::Demand);
-             LSN <= static_cast<int>(DataPlant::LoopSideLocation::Supply);
+             LSN < static_cast<int>(DataPlant::LoopSideLocation::Num);
              ++LSN) {
             for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LSN)].TotalBranches; ++BrN) {
                 for (CpN = 1; CpN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LSN)].Branch(BrN).TotalComponents; ++CpN) {
@@ -846,8 +846,8 @@ void SetAllFlowLocks(EnergyPlusData &state, DataPlant::FlowLock const Value)
     //  in order to provide the same behavior through phase I of the demand side rewrite
     // Eventually this routine may be employed again to quickly initialize all loops once phase III is complete
     for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-        for (int LoopSideNum = 1; LoopSideNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide.size(); ++LoopSideNum) {
-            state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].FlowLock = Value;
+        for (int LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand); LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Num); ++LoopSideNum) {
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].FlowLock = Value;
         }
     }
 }
@@ -1609,7 +1609,7 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
 
     for (int ThisLoopNum = 1; ThisLoopNum <= isize(state.dataPlnt->PlantLoop); ++ThisLoopNum) {
         auto &loop(state.dataPlnt->PlantLoop(ThisLoopNum));
-        for (int ThisLoopSide = 1; ThisLoopSide <= loop.LoopSide.size(); ++ThisLoopSide) {
+        for (int ThisLoopSide = static_cast<int>(DataPlant::LoopSideLocation::Demand); ThisLoopSide < loop.LoopSide.size(); ++ThisLoopSide) {
             auto &loop_side(loop.LoopSide[static_cast<int>(ThisLoopSide)]);
 
             if (FirstHVACIteration) {
@@ -1813,7 +1813,7 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
     for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
         auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
         for (LoopSideCtr = static_cast<int>(DataPlant::LoopSideLocation::Demand);
-             LoopSideCtr < static_cast<int>(DataPlant::LoopSideLocation::Supply);
+             LoopSideCtr < static_cast<int>(DataPlant::LoopSideLocation::Num);
              ++LoopSideCtr) {
             auto &this_loop_side(this_loop.LoopSide[LoopSideCtr]);
             for (BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr) {

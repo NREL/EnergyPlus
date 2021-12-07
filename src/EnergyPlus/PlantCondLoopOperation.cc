@@ -3367,7 +3367,7 @@ void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum)
     int LoopSideNum;
     int Num;
 
-    for (LoopSideNum = 1; LoopSideNum <= 2; ++LoopSideNum) {
+    for (LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand); LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Num); ++LoopSideNum) {
         for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].TotalBranches; ++Num) {
             for (MachineOnBranch = 1; MachineOnBranch <= state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].Branch(Num).TotalComponents;
                  ++MachineOnBranch) {

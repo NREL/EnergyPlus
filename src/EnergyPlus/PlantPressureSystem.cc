@@ -179,7 +179,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
         // Need to go along plant loop and set up component pressure drop data structure!
         for (int LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand);
-             LoopSideNum <= static_cast<int>(DataPlant::LoopSideLocation::Num); ++LoopSideNum) {
+             LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Num); ++LoopSideNum) {
             auto &loop_side(loop.LoopSide[static_cast<int>(LoopSideNum)]);
 
             // Loop through all branches on this loop side
@@ -247,7 +247,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
             // Check for illegal configurations on this plant loop
                 for (int LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand);
-         LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Supply);
+         LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Num);
          ++LoopSideNum) {
                 // Check for illegal parallel branch setups
                 auto &loop_side(loop.LoopSide[static_cast<int>(LoopSideNum)]);
@@ -322,7 +322,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
     // have a proper value for pressure
     if (loop.HasPressureComponents && FirstHVACIteration) {
             for (int LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand);
-         LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Supply);
+         LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Num);
          ++LoopSideNum) {
             auto const &loop_side(loop.LoopSide[static_cast<int>(LoopSideNum)]);
             for (int BranchNum = 1, BranchNum_end = isize(loop_side.Branch); BranchNum <= BranchNum_end; ++BranchNum) {
@@ -497,7 +497,7 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
     FoundAPumpOnBranch = false;
     LoopPressureDrop = 0.0;
     for (LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand);
-         LoopSideNum <= static_cast<int>(DataPlant::LoopSideLocation::Num); ++LoopSideNum) { // Start at demand side outlet
+         LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Num); ++LoopSideNum) { // Start at demand side outlet
 
         // Loop through all branches on this loop side
         LoopSidePressureDrop = 0.0;
@@ -602,7 +602,7 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
     EffectiveLoopKValue = 0.0;
 
     for (LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand);
-         LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Supply);
+         LoopSideNum < static_cast<int>(DataPlant::LoopSideLocation::Num);
          ++LoopSideNum) {
 
         EffectiveLoopSideKValue = 0.0;
@@ -841,7 +841,6 @@ Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
 
     // Using/Aliasing
     using CurveManager::CurveValue;
-
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetViscosityGlycol;
 

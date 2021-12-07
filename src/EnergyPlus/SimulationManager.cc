@@ -2468,7 +2468,7 @@ namespace SimulationManager {
 
         for (int Count = state.dataHVACGlobal->NumPlantLoops + 1; Count <= state.dataPlnt->TotNumLoops; ++Count) {
             for (int LoopSideNum = static_cast<int>(LoopSideLocation::Demand);
-                 LoopSideNum <= static_cast<int>(LoopSideLocation::Supply);
+                 LoopSideNum < static_cast<int>(LoopSideLocation::Num);
                  ++LoopSideNum) {
                 //  Plant Supply Side Loop
                 // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant

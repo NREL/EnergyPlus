@@ -2763,7 +2763,7 @@
     SPACE4-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE4-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
-    LoopSideLocation::Supply,              !- Mixer Connection Type
+    SupplySide,              !- Mixer Connection Type
     SZ DSOA SPACE4-1;        !- Design Specification Outdoor Air Object Name
 
   AirTerminal:SingleDuct:Mixer,
@@ -2773,7 +2773,7 @@
     SPACE5-1 Supply Inlet,   !- Mixer Outlet Node Name
     SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name
     SPACE5-1 Heat Pump Outlet,  !- Mixer Secondary Air Inlet Node Name
-    LoopSideLocation::Supply,              !- Mixer Connection Type
+    SupplySide,              !- Mixer Connection Type
     SZ DSOA SPACE5-1;        !- Design Specification Outdoor Air Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
