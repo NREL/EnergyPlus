@@ -6472,7 +6472,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccolumn::Total);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal);
 
         // Air loop times at OA limiting factors
         PreDefTableEntry(state,
@@ -11020,7 +11020,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
     using ScheduleManager::ScheduleAverageHoursPerWeek;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int constexpr wwrcolumn::Total(1);
+    int constexpr wwrcTotal(1);
     int constexpr wwrcNorth(2);
     int constexpr wwrcEast(3);
     int constexpr wwrcSouth(4);
@@ -11237,7 +11237,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(5, 5);
 
-            columnHead(wwrcolumn::Total) = "Total";
+            columnHead(wwrcTotal) = "Total";
             columnHead(wwrcNorth) = "North (315 to 45 deg)";
             columnHead(wwrcEast) = "East (45 to 135 deg)";
             columnHead(wwrcSouth) = "South (135 to 225 deg)";
@@ -11450,31 +11450,31 @@ void WriteVeriSumTable(EnergyPlusData &state)
             tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcolumn::Total, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaN * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcolumn::Total, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaN * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcolumn::Total, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, wallAreaN), 2);
             tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, wallAreaS), 2);
             tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, wallAreaE), 2);
             tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, wallAreaW), 2);
-            tableBody(wwrcolumn::Total, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
+            tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
 
             tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, aboveGroundWallAreaN), 2);
             tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, aboveGroundWallAreaS), 2);
             tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, aboveGroundWallAreaE), 2);
             tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, aboveGroundWallAreaW), 2);
-            tableBody(wwrcolumn::Total, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
+            tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
             if (produceTabular) {
                 WriteSubtitle(state, "Window-Wall Ratio");
@@ -11500,7 +11500,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(5, 5);
 
-            columnHead(wwrcolumn::Total) = "Total";
+            columnHead(wwrcTotal) = "Total";
             columnHead(wwrcNorth) = "North (315 to 45 deg)";
             columnHead(wwrcEast) = "East (45 to 135 deg)";
             columnHead(wwrcSouth) = "South (135 to 225 deg)";
@@ -11524,31 +11524,31 @@ void WriteVeriSumTable(EnergyPlusData &state)
             tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcolumn::Total, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaNcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcolumn::Total, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaNcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcolumn::Total, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, wallAreaNcond), 2);
             tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, wallAreaScond), 2);
             tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, wallAreaEcond), 2);
             tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, wallAreaWcond), 2);
-            tableBody(wwrcolumn::Total, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
+            tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
 
             tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, aboveGroundWallAreaNcond), 2);
             tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, aboveGroundWallAreaScond), 2);
             tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, aboveGroundWallAreaEcond), 2);
             tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, aboveGroundWallAreaWcond), 2);
-            tableBody(wwrcolumn::Total, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
+            tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
             if (produceTabular) {
                 WriteSubtitle(state, "Conditioned Window-Wall Ratio");
@@ -11743,12 +11743,12 @@ void WriteVeriSumTable(EnergyPlusData &state)
                 }
                 if (zoneIsCond) {
                     if (produceTabular) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcolumn::Area, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
                     }
                 } else {
                     if (produceTabular) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcolumn::Area, Zone(iZone).Name, "0.00");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                     }
                 }
@@ -11881,7 +11881,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal), 2);
                 PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchLeedSutOcolumn::Area, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal), 2);
+                    state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal), 2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedSutUnArea,
                                  "Totals",
