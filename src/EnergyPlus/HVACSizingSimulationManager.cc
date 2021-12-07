@@ -92,7 +92,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
                                                                          std::string const &PlantLoopName,
                                                                          int const PlantSizingIndex)
 {
-
     using namespace FluidProperties;
 
     Real64 density;

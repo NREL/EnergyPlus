@@ -618,9 +618,7 @@ void SimHVAC(EnergyPlusData &state)
     // this default control algorithm.
 
     // Using/Aliasing
-
     using DataPlant::NumConvergenceHistoryTerms;
-
     using EMSManager::ManageEMS;
     using General::CreateSysTimeIntervalString;
     using NonZoneEquipmentManager::ManageNonZoneEquipment;

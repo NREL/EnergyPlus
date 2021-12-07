@@ -529,7 +529,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:6)=InArgs(1:6)   ! No change to fields F1 - F6
                 CurArgs = CurArgs + 1      ! Add new input field F7: -> "Mixer Connection Type"
-                OutArgs(7)='LoopSideLocation::Supply'    ! Set field value to "LoopSideLocation::Supply"
+                OutArgs(7)='SupplySide'    ! Set field value to "SupplySide"
 
               CASE('ZONEHVAC:AIRDISTRIBUTIONUNIT')
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)

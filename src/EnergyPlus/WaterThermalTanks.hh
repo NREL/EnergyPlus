@@ -802,15 +802,15 @@ namespace WaterThermalTanks {
         Real64 getDeadBandTemp();
 
         Real64 PlantMassFlowRatesFunc(EnergyPlusData &state,
-                                      const int InNodeNum,
-                                      const bool FirstHVACIteration,
-                                      const WaterHeaterSide WaterThermalTankSide,
-                                      const DataPlant::LoopSideLocation PlantLoopSide,
-                                      const bool PlumbedInSeries, // !unused1208
-                                      const DataBranchAirLoopPlant::ControlTypeEnum BranchControlType,
-                                      const Real64 OutletTemp,
-                                      const Real64 DeadBandTemp,
-                                      const Real64 SetPointTemp_loc);
+                                      int InNodeNum,
+                                      bool FirstHVACIteration,
+                                      WaterHeaterSide WaterThermalTankSide,
+                                      DataPlant::LoopSideLocation PlantLoopSide,
+                                      bool PlumbedInSeries, // !unused1208
+                                      DataBranchAirLoopPlant::ControlTypeEnum BranchControlType,
+                                      Real64 OutletTemp,
+                                      Real64 DeadBandTemp,
+                                      Real64 SetPointTemp_loc);
 
         static Real64 CalcTimeNeeded(Real64 Ti, // Initial tank temperature (C)
                                      Real64 Tf, // Final tank temperature (C)

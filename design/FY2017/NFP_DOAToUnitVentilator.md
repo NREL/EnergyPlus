@@ -203,7 +203,7 @@ The name of the zoneHVAC equipment to which this air terminal unit will be conne
 
 **Field: Mixer Outlet Node Name**
 
-The name of the air outlet node of the mixer. This will be an inlet air node name of the conditioned zone if the connection type specified in the input field *Terminal Unit Connection Type* below is ***LoopSideLocation::Supply.***  This will be an inlet air node of the zoneHVAC equipment if the connection type in the input field *Terminal Unit Connection Type* below is ***InletSide.***
+The name of the air outlet node of the mixer. This will be an inlet air node name of the conditioned zone if the connection type specified in the input field *Terminal Unit Connection Type* below is ***SupplySide.***  This will be an inlet air node of the zoneHVAC equipment if the connection type in the input field *Terminal Unit Connection Type* below is ***InletSide.***
 
 **Field: Mixer Primary Air Inlet Node Name**
 
@@ -211,11 +211,11 @@ The name of the primary air (outdoor air) inlet node of the mixer. This will be 
 
 **Field: Mixer Secondary Air Inlet Node Name**
  
-The name of the secondary air (recirculating air) inlet node of the mixer. This will be the outlet air node name of the zoneHVAC equipment if the connection type in the input field *Terminal Unit Connection Type* below is ***LoopSideLocation::Supply,*** or else this will be exhaust air node name of the zone that is being conditioned if the connection type in the input field *Terminal Unit Connection Type* below is ***InletSide.***
+The name of the secondary air (recirculating air) inlet node of the mixer. This will be the outlet air node name of the zoneHVAC equipment if the connection type in the input field *Terminal Unit Connection Type* below is ***SupplySide,*** or else this will be exhaust air node name of the zone that is being conditioned if the connection type in the input field *Terminal Unit Connection Type* below is ***InletSide.***
 
 **Field: Mixer Connection Type**
 
-This mixer connection type. Valid choices are *InletSide* or *LoopSideLocation::Supply*. This is a required input field. If the mixer connection type selected is InletSide, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is LoopSideLocation::Supply, then the mixer is connected at the outlet side of the ZoneHVAC equipment.
+This mixer connection type. Valid choices are *InletSide* or *SupplySide*. This is a required input field. If the mixer connection type selected is InletSide, then the mixer is connected on the inlet side of the ZoneHVAC equipment, or else if the mixer connection type selected is SupplySide, then the mixer is connected at the outlet side of the ZoneHVAC equipment.
    
 The IDD entry for this object follows.
 
@@ -268,7 +268,7 @@ The IDD entry for this object follows.
        \required-field
        \type choice
        \key InletSide
-       \key LoopSideLocation::Supply
+       \key SupplySide
 
 An example is shown below.
 
@@ -280,7 +280,7 @@ An example is shown below.
     SPACE4-1 Supply Inlet,              !- Mixer Outlet Node Name
     SPACE4-1 AT Mixer Primary Inlet,    !- Mixer Primary Air Inlet Node Name
     SPACE4-1 Heat Pump Outlet,          !- Mixer Secondary Air Inlet Node Name
-    LoopSideLocation::Supply;                         !- Mixer Connection Type
+    SupplySide;                         !- Mixer Connection Type
 
 **AirTerminal:SingleDuct:Mixer,**
 

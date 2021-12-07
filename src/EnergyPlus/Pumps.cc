@@ -2211,7 +2211,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     } else {
         // might be able to remove this next block
         if (state.dataPumps->PumpEquip(PumpNum).LoopNum > 0) {
-            for (Side = 1; Side <= 2; ++Side) {
+            for (Side = static_cast<int>(DataPlant::LoopSideLocation::Demand); Side < static_cast<int>(DataPlant::LoopSideLocation::Supply); ++Side) {
                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide[static_cast<int>(Side)].TotalBranches;
                      ++BranchNum) {
                     for (CompNum = 1;

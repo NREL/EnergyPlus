@@ -99,7 +99,7 @@ namespace PlantManager {
 
     void RevisePlantCallingOrder(EnergyPlusData &state);
 
-    int FindLoopSideInCallingOrder(EnergyPlusData &state, const int LoopNum, const DataPlant::LoopSideLocation LoopSide);
+    int FindLoopSideInCallingOrder(EnergyPlusData &state, int LoopNum, DataPlant::LoopSideLocation LoopSide);
 
     void SetupBranchControlTypes(EnergyPlusData &state);
 

@@ -73,9 +73,9 @@ namespace PlantPressureSystem {
     void InitPressureDrop(EnergyPlusData &state, int LoopNum, bool FirstHVACIteration);
 
     void BranchPressureDrop(EnergyPlusData &state,
-                            const int LoopNum,     // Plant Loop Index
-                            const DataPlant::LoopSideLocation LoopSideNum, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
-                            const int BranchNum    // Branch Index on LoopSide LoopSideNum
+                            int LoopNum,     // Plant Loop Index
+                            DataPlant::LoopSideLocation LoopSideNum, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
+                            int BranchNum    // Branch Index on LoopSide LoopSideNum
     );
 
     void UpdatePressureDrop(EnergyPlusData &state, int LoopNum);

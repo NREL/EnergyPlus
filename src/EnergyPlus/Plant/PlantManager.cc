@@ -2357,7 +2357,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
         // Just clear away any trailing MyLoad for now...
         // This could likely be moved into InitLoadDistribution also...
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-            for (LoopSideNum = static_cast<int>(DataPlant::LoopSideLocation::Demand);
+            for (LoopSideNum = static_cast<int>(LoopSideLocation::Demand);
                  LoopSideNum < static_cast<int>(LoopSideLocation::Num);
                  ++LoopSideNum) {
                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].TotalBranches; ++BranchNum) {
@@ -4146,7 +4146,9 @@ void SetupBranchControlTypes(EnergyPlusData &state)
         NumCount = 0;
     }
     for (LoopCtr = 1; LoopCtr <= NumCount; ++LoopCtr) { // SIZE(PlantLoop)
-        for (LoopSideCtr = static_cast<int>(LoopSideLocation::Demand); LoopSideCtr < static_cast<int>(LoopSideLocation::Num); ++LoopSideCtr) {
+        for (LoopSideCtr = static_cast<int>(LoopSideLocation::Demand);
+             LoopSideCtr < static_cast<int>(LoopSideLocation::Num);
+             ++LoopSideCtr) {
             for (BranchCtr = 1; BranchCtr <= state.dataPlnt->PlantLoop(LoopCtr).LoopSide[static_cast<int>(LoopSideCtr)].TotalBranches; ++BranchCtr) {
                 ActiveCount = 0;
                 BypassCount = 0;

@@ -729,7 +729,6 @@ void UpdateCommonPipe(
     // Using/Aliasing
     auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
     using FluidProperties::GetSpecificHeatGlycol;
 
     // Locals
@@ -997,8 +996,6 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
 
     // Using/Aliasing
     using DataPlant::DeltaTempTol;
-
-
     using PlantUtilities::SetActuatedBranchFlowRate;
 
     // SUBROUTINE PARAMETER DEFINITIONS:

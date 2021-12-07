@@ -72,7 +72,7 @@ void PlantLoopData::UpdateLoopSideReportVars(EnergyPlusData &state,
     this->OutletNodeFlowrate = state.dataLoopNodes->Node(this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut).MassFlowRate;
     this->OutletNodeTemperature = state.dataLoopNodes->Node(this->LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut).Temp;
 
-    // In the baseline code, only reported supply side demand. so putting in "LoopSideLocation::Supply" IF block for now but might expand later
+    // In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
     if (OtherSideDemand < 0.0) {
         this->CoolingDemand = std::abs(OtherSideDemand);
         this->HeatingDemand = 0.0;
@@ -231,8 +231,6 @@ void PlantLoopData::CheckLoopExitNode(EnergyPlusData &state, bool const FirstHVA
     // at the loop setpoint temperature.
 
     // Using/Aliasing
-
-    ;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LoopInlet;  // plant loop inlet node num.

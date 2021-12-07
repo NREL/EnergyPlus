@@ -661,7 +661,6 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
     // na
 
     // Using/Aliasing
-    typedef DataPlant::LoopSideLocation LoopSideLocation;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -740,22 +739,22 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
         ShowContinueError(state,
                           format("PlantLoop Setpoint Temperature={:.1R} {{C}}",
                                  state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint));
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Supply)].InletNodeSetPt) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].InletNodeSetPt) {
             ShowContinueError(state, "PlantLoop Inlet Node (LoopSideLocation::Supply) has a Setpoint.");
         } else {
             ShowContinueError(state, "PlantLoop Inlet Node (LoopSideLocation::Supply) does not have a Setpoint.");
         }
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Demand)].InletNodeSetPt) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNodeSetPt) {
             ShowContinueError(state, "PlantLoop Inlet Node (LoopSideLocation::Demand) has a Setpoint.");
         } else {
             ShowContinueError(state, "PlantLoop Inlet Node (LoopSideLocation::Demand) does not have a Setpoint.");
         }
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Supply)].OutletNodeSetPt) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].OutletNodeSetPt) {
             ShowContinueError(state, "PlantLoop Outlet Node (LoopSideLocation::Supply) has a Setpoint.");
         } else {
             ShowContinueError(state, "PlantLoop Outlet Node (LoopSideLocation::Supply) does not have a Setpoint.");
         }
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Demand)].OutletNodeSetPt) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].OutletNodeSetPt) {
             ShowContinueError(state, "PlantLoop Outlet Node (LoopSideLocation::Demand) has a Setpoint.");
         } else {
             ShowContinueError(state, "PlantLoop Outlet Node (LoopSideLocation::Demand) does not have a Setpoint.");
@@ -774,19 +773,19 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
         ShowContinueError(state, format("PlantLoop Maximum Temperature={:.1R} {{C}}", state.dataPlnt->PlantLoop(LoopNum).MaxTemp));
         ShowContinueError(
             state,
-            format("PlantLoop Flow Request (LoopSideLocation::Supply)={:.1R} {{kg/s}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Supply)].FlowRequest));
+            format("PlantLoop Flow Request (LoopSideLocation::Supply)={:.1R} {{kg/s}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].FlowRequest));
         ShowContinueError(
             state,
-            format("PlantLoop Flow Request (LoopSideLocation::Demand)={:.1R} {{kg/s}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Demand)].FlowRequest));
+            format("PlantLoop Flow Request (LoopSideLocation::Demand)={:.1R} {{kg/s}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].FlowRequest));
         ShowContinueError(state,
                           format("PlantLoop Node ({}Side) \"{}\" has mass flow rate ={:.1R} {{kg/s}}",
                                  DemandSupply,
                                  state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].NodeNumOut),
                                  state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].NodeNumOut).MassFlowRate));
         ShowContinueError(
-            state, format("PlantLoop PumpHeat (LoopSideLocation::Supply)={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Supply)].TotalPumpHeat));
+            state, format("PlantLoop PumpHeat (LoopSideLocation::Supply)={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TotalPumpHeat));
         ShowContinueError(
-            state, format("PlantLoop PumpHeat (LoopSideLocation::Demand)={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Demand)].TotalPumpHeat));
+            state, format("PlantLoop PumpHeat (LoopSideLocation::Demand)={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].TotalPumpHeat));
         ShowContinueError(state, format("PlantLoop Cooling Demand={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).CoolingDemand));
         ShowContinueError(state, format("PlantLoop Heating Demand={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).HeatingDemand));
         ShowContinueError(state, format("PlantLoop Demand not Dispatched={:.1R} {{W}}", state.dataPlnt->PlantLoop(LoopNum).DemandNotDispatched));
@@ -1879,7 +1878,9 @@ bool AnyPlantLoopSidesNeedSim(EnergyPlusData &state)
 
     // Then check if there are any
     for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
-        for (LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr) {
+        for (LoopSideCtr = static_cast<int>(DataPlant::LoopSideLocation::Demand);
+             LoopSideCtr < static_cast<int>(DataPlant::LoopSideLocation::Num);
+             ++LoopSideCtr) {
             if (state.dataPlnt->PlantLoop(LoopCtr).LoopSide[static_cast<int>(LoopSideCtr)].SimLoopSideNeeded) {
                 AnyPlantLoopSidesNeedSim = true;
                 return AnyPlantLoopSidesNeedSim;
