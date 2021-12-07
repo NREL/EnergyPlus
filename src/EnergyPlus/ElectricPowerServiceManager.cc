@@ -2685,7 +2685,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             case InverterModelType::simpleConstantEff: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Inverter:Simple",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
                                       &qdotConvZone_,
@@ -2696,7 +2695,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             case InverterModelType::curveFuncOfPower: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Inverter:FunctionOfPower",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
                                       &qdotConvZone_,
@@ -2707,7 +2705,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             case InverterModelType::cECLookUpTableModel: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Inverter:LookUpTable",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
                                       &qdotConvZone_,
@@ -3142,7 +3139,6 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         if (zoneNum_ > 0) {
             SetupZoneInternalGain(state,
                                   zoneNum_,
-                                  "ElectricLoadCenter:Storage:Converter",
                                   name_,
                                   DataHeatBalance::IntGainType::ElectricLoadCenterConverter,
                                   &qdotConvZone_,
@@ -3725,7 +3721,6 @@ ElectricStorage::ElectricStorage( // main constructor
             case StorageModelType::simpleBucketStorage: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Storage:Simple",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
                                       &qdotConvZone_,
@@ -3736,7 +3731,6 @@ ElectricStorage::ElectricStorage( // main constructor
             case StorageModelType::kiBaMBattery: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Storage:Battery",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
                                       &qdotConvZone_,
@@ -3747,7 +3741,6 @@ ElectricStorage::ElectricStorage( // main constructor
             case StorageModelType::liIonNmcBattery: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Storage:LiIonNMCBattery",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
                                       &qdotConvZone_,
@@ -4913,7 +4906,6 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         if (zoneNum_ > 0) {
             SetupZoneInternalGain(state,
                                   zoneNum_,
-                                  "ElectricLoadCenter:Transformer",
                                   name_,
                                   DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
                                   &qdotConvZone_,

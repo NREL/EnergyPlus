@@ -774,7 +774,6 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
 
             SetupZoneInternalGain(state,
                                   state.dataPipeHT->PipeHT(Item).EnvrZonePtr,
-                                  "Pipe:Indoor",
                                   state.dataPipeHT->PipeHT(Item).Name,
                                   DataHeatBalance::IntGainType::PipeIndoor,
                                   &state.dataPipeHT->PipeHT(Item).ZoneHeatGainRate);

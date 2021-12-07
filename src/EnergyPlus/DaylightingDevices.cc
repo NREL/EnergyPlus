@@ -304,7 +304,6 @@ namespace DaylightingDevices {
 
                     SetupZoneInternalGain(state,
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum),
-                                          "DaylightingDevice:Tubular",
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name,
                                           DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                           &state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));

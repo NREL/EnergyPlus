@@ -921,7 +921,6 @@ namespace UserDefinedComponents {
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.DeviceHasInternalGains = true;
                         SetupZoneInternalGain(state,
                                               state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum,
-                                              cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainType::PlantComponentUserDefined,
                                               &state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ConvectionGainRate,
@@ -1308,7 +1307,6 @@ namespace UserDefinedComponents {
                             state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.DeviceHasInternalGains = true;
                             SetupZoneInternalGain(state,
                                                   state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum,
-                                                  cCurrentModuleObject,
                                                   cAlphaArgs(1),
                                                   DataHeatBalance::IntGainType::CoilUserDefined,
                                                   &state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ConvectionGainRate,
@@ -1783,7 +1781,6 @@ namespace UserDefinedComponents {
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.DeviceHasInternalGains = true;
                         SetupZoneInternalGain(state,
                                               state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum,
-                                              cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainType::ZoneHVACForcedAirUserDefined,
                                               &state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ConvectionGainRate,
@@ -2288,7 +2285,6 @@ namespace UserDefinedComponents {
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.DeviceHasInternalGains = true;
                         SetupZoneInternalGain(state,
                                               state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum,
-                                              cCurrentModuleObject,
                                               cAlphaArgs(1),
                                               DataHeatBalance::IntGainType::AirTerminalUserDefined,
                                               &state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ConvectionGainRate,
