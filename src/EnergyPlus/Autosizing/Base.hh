@@ -63,7 +63,6 @@ enum class AutoSizingType
 {
     // align with DataHVACGlobals so scalable sizing strings can be applied
     // this will not be necessary when scalable sizing is moved to BaseSizerWithScalableInputs
-    // TODO: enum check
     Invalid = -1,
     ASHRAEMinSATCoolingSizing = 30,
     ASHRAEMaxSATHeatingSizing = 31,
@@ -100,7 +99,6 @@ enum class AutoSizingType
     WaterHeatingCoilUASizing = 20,
     ZoneCoolingLoadSizing = 26,
     ZoneHeatingLoadSizing = 27,
-    Unknown = 0,
     Num
 };
 
@@ -125,7 +123,7 @@ struct BaseSizer
     bool isFanReportObject = false;  // provides access to fan reporting
     bool initialized = false;        // indicates initializeWithinEP was called
     AutoSizingResultType errorType = AutoSizingResultType::NoError;
-    AutoSizingType sizingType = AutoSizingType::Unknown;
+    AutoSizingType sizingType = AutoSizingType::Invalid;
     std::string sizingString;
     std::string sizingStringScalable;
     bool overrideSizeString = true;

@@ -259,13 +259,14 @@ namespace OutputProcessor {
 
     enum class ReportingFrequency
     {
-        EachCall = -1, // Write out each time UpdatedataandReport is called
-        TimeStep,      // Write out at 'EndTimeStepFlag'
-        Hourly,        // Write out at 'EndHourFlag'
-        Daily,         // Write out at 'EndDayFlag'
-        Monthly,       // Write out at end of month (must be determined)
-        Simulation,    // Write out once per environment 'EndEnvrnFlag'
-        Yearly,        // Write out at 'EndYearFlag'
+        Invalid = -1,
+        EachCall,   // Write out each time UpdatedataandReport is called
+        TimeStep,   // Write out at 'EndTimeStepFlag'
+        Hourly,     // Write out at 'EndHourFlag'
+        Daily,      // Write out at 'EndDayFlag'
+        Monthly,    // Write out at end of month (must be determined)
+        Simulation, // Write out once per environment 'EndEnvrnFlag'
+        Yearly,     // Write out at 'EndYearFlag'
         Num
     };
 

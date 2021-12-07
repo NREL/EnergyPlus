@@ -67,23 +67,21 @@ namespace ExteriorEnergyUse {
 
     enum class ExteriorFuelUsage
     {
-        // TODO: enum check
         Invalid = -1,
-        Unknown = 0,
-        ElecUse = 1,
-        GasUse = 2,
-        WaterUse = 3,
-        CoalUse = 4,
-        FuelOil1Use = 5,
-        FuelOil2Use = 6,
-        PropaneUse = 7,
-        GasolineUse = 8,
-        DieselUse = 9,
-        SteamUse = 10,
-        DistrictCoolUse = 11,
-        DistrictHeatUse = 12,
-        OtherFuel1Use = 13,
-        OtherFuel2Use = 14,
+        ElecUse,
+        GasUse,
+        WaterUse,
+        CoalUse,
+        FuelOil1Use,
+        FuelOil2Use,
+        PropaneUse,
+        GasolineUse,
+        DieselUse,
+        SteamUse,
+        DistrictCoolUse,
+        DistrictHeatUse,
+        OtherFuel1Use,
+        OtherFuel2Use,
         Num
     };
 
@@ -133,7 +131,7 @@ namespace ExteriorEnergyUse {
 
         // Default Constructor
         ExteriorEquipmentUsage()
-            : FuelType(ExteriorFuelUsage::Unknown), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
+            : FuelType(ExteriorFuelUsage::Invalid), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
     };

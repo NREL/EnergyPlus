@@ -105,7 +105,10 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
 
     # check for null names at 0-th position
     if keys_uc[0] not in valid_null_enum_value_names:
-        error_str += "\tMissing 'Invalid' at position 0\n"
+        # exceptions listed by <FILE>:<ENUM NAME>
+        exceptions = ["CsvParser.hh:Token", "IdfParser.hh:Token"]
+        if f"{file_name}:{name}" not in exceptions:
+            error_str += "\tMissing 'Invalid' at position 0\n"
 
     # check for null value = -1 at 0-th position
     if keys_uc[0] in valid_null_enum_value_names and values[0] != -1:
@@ -121,22 +124,30 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
 
     # check for "unknown" in names
     if "UNKNOWN" in keys_uc:
-        error_str += "\tUNKNOWN in enum names\n"
+        # exceptions listed by <FILE>:<ENUM NAME>
+        exceptions = ["OutputProcessor.hh:Unit"]
+        if f"{file_name}:{name}" not in exceptions:
+            error_str += "\tUNKNOWN in enum names\n"
 
     # check for proper casing
     if str(name[0]).islower():
         error_str += "\tenum name must begin with upper case letter\n"
 
+    if "ENUM" in str(name).upper():
+        error_str += "\tenum name should not contain 'enum'\n"
+
     if any([str(x[0]).islower() for x in keys]):
-        error_str += "\tenum keys must begin with upper case letter\n"
+        # exceptions listed by <FILE>:<ENUM NAME>
+        exceptions = ["FileSystem.hh:FileTypes", "OutputProcessor.hh:Unit"]
+        if f"{file_name}:{name}" not in exceptions:
+            error_str += "\tenum keys must begin with upper case letter\n"
 
     if difflib.get_close_matches(name, keys, cutoff=0.7):
         error_str += "\tenum keys are too similar to enum name\n"
 
-    # check for non-allowed enum values
-    found = any([x != -1 for x in values if type(x) == int])
-    if found:
-        error_str += "\texplicit numbers not allowed in enum values except 'Invalid=-1'\n"
+    # # check for non-allowed enum values
+    # if any([x != -1 for x in values if type(x) == int]):
+    #     error_str += "\texplicit numbers not allowed in enum values except 'Invalid=-1'\n"
 
     if error_str:
         if print_errors:
@@ -214,19 +225,19 @@ def find_enums(search_path: Path) -> int:
 class TestProcessEnums(unittest.TestCase):
     def test_process_enum_str(self):
         # forward decl
-        s = "enum class SomeEnum;"
+        s = "enum class SomeType;"
         self.assertFalse(process_enum_str(s, "DummyFile", 1, False))
 
         # proper format
-        s = "enum class SomeEnum : int {Invalid = -1, Valid, Num};"
+        s = "enum class SomeType : int {Invalid = -1, Valid, Num};"
         self.assertFalse(process_enum_str(s, "DummyFile", 1, False))
 
         # missing 'invalid'
-        s = "enum class SomeEnum {Valid, Num};"
+        s = "enum class SomeType {Valid, Num};"
         self.assertTrue(process_enum_str(s, "DummyFile", 1, False))
 
         # missing 'num'
-        s = "enum class SomeEnum {Invalid = -1, Valid};"
+        s = "enum class SomeType {Invalid = -1, Valid};"
         self.assertTrue(process_enum_str(s, "DummyFile", 1, False))
 
 

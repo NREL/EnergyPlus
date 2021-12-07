@@ -188,7 +188,7 @@ std::string BaseSizer::getLastErrorMessages()
 
 void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 {
-    if (this->sizingType == AutoSizingType::Unknown) {
+    if (this->sizingType == AutoSizingType::Invalid) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
         this->addErrorMessage(msg);
         ShowSevereError(state, msg);
