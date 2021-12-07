@@ -103,9 +103,9 @@ namespace PhotovoltaicThermalCollectors {
     //  the first model is a "simple" or "ideal" model useful for sizing, early design, or policy analyses
     //  Simple PV/T model just converts incoming solar to electricity and temperature rise of a working fluid.
 
-    int const SimplePVTmodel(1001);
+    int constexpr SimplePVTmodel(1001);
 
-    Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
+    Real64 constexpr SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
     PlantComponent *PVTCollectorStruct::factory(EnergyPlusData &state, std::string_view objectName)
     {
@@ -235,7 +235,7 @@ namespace PhotovoltaicThermalCollectors {
                 continue;
 
             state.dataPhotovoltaicThermalCollector->PVT(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataPhotovoltaicThermalCollector->PVT(Item).TypeNum = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
+            state.dataPhotovoltaicThermalCollector->PVT(Item).Type = DataPlant::PlantEquipmentType::PVTSolarCollectorFlatPlate;
 
             state.dataPhotovoltaicThermalCollector->PVT(Item).SurfNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
@@ -641,7 +641,7 @@ namespace PhotovoltaicThermalCollectors {
 
             if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
                 // heating only right now, so control flow requests based on incident solar;
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     this->MassFlowRate = this->MaxMassFlowRate;
                 } else {
                     this->MassFlowRate = 0.0;
@@ -858,7 +858,7 @@ namespace PhotovoltaicThermalCollectors {
         if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
 
             if (this->PVTModelType == SimplePVTmodel) {
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     //  Outlet node is required to have a setpoint.
                     if (state.dataLoopNodes->Node(this->HVACOutletNodeNum).TempSetPoint > state.dataLoopNodes->Node(this->HVACInletNodeNum).Temp) {
@@ -886,7 +886,7 @@ namespace PhotovoltaicThermalCollectors {
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             if (this->PVTModelType == SimplePVTmodel) {
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > state.dataPhotovoltaic->MinIrradiance) {
+                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
                     // is heating wanted?
                     this->HeatingUseful = true;
                     this->BypassDamperOff = true;
@@ -1128,7 +1128,7 @@ namespace PhotovoltaicThermalCollectors {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->TypeNum,
+                                                        this->Type,
                                                         this->WLoopNum,
                                                         this->WLoopSideNum,
                                                         this->WLoopBranchNum,

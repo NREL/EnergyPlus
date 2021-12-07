@@ -607,22 +607,22 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         }
     }
 
-    SumInternalConvectionGainsByTypes(state, ZoneNum, state.dataDispVentMgr->IntGainTypesOccupied, ConvGainsOccupiedSubzone);
+    ConvGainsOccupiedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesOccupied);
 
     ConvGainsOccupiedSubzone += 0.5 * state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, state.dataDispVentMgr->IntGainTypesOccupied, RetAirGain);
+        RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesOccupied);
         ConvGainsOccupiedSubzone += RetAirGain;
     }
 
-    SumInternalConvectionGainsByTypes(state, ZoneNum, state.dataDispVentMgr->IntGainTypesMixedSubzone, ConvGainsMixedSubzone);
+    ConvGainsMixedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesMixedSubzone);
     ConvGainsMixedSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                              0.5 * state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
     if (Zone(ZoneNum).NoHeatToReturnAir) {
-        SumReturnAirConvectionGainsByTypes(state, ZoneNum, state.dataDispVentMgr->IntGainTypesMixedSubzone, RetAirGain);
+        RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesMixedSubzone);
         ConvGainsMixedSubzone += RetAirGain;
     }
 

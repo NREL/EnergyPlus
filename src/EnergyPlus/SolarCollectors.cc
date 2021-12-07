@@ -304,8 +304,8 @@ namespace SolarCollectors {
                 GlobalNames::VerifyUniqueInterObjectName(
                     state, state.dataSolarCollectors->UniqueCollectorNames, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum =
-                    DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant
+                state.dataSolarCollectors->Collector(CollectorNum).Type =
+                    DataPlant::PlantEquipmentType::SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
                 int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
@@ -547,7 +547,8 @@ namespace SolarCollectors {
                                                          state.dataIPShortCut->cAlphaFieldNames(1),
                                                          ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
+                state.dataSolarCollectors->Collector(CollectorNum).Type =
+                    DataPlant::PlantEquipmentType::SolarCollectorICS; // parameter assigned in DataPlant
 
                 state.dataSolarCollectors->Collector(CollectorNum).InitICS = true;
 
@@ -717,7 +718,7 @@ namespace SolarCollectors {
 
     void CollectorData::setupOutputVars(EnergyPlusData &state)
     {
-        if (this->TypeNum == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+        if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
             // Setup report variables
             SetupOutputVariable(state,
                                 "Solar Collector Incident Angle Modifier",
@@ -771,7 +772,7 @@ namespace SolarCollectors {
                                 "HeatProduced",
                                 _,
                                 "Plant");
-        } else if (this->TypeNum == DataPlant::TypeOf_SolarCollectorICS) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
             SetupOutputVariable(state,
                                 "Solar Collector Transmittance Absorptance Product",
@@ -887,11 +888,11 @@ namespace SolarCollectors {
         this->initialize(state);
 
         {
-            auto const SELECT_CASE_var(this->TypeNum);
+            auto const SELECT_CASE_var(this->Type);
             // Select and CALL models based on collector type
-            if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorFlatPlate) {
+            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorFlatPlate) {
                 this->CalcSolarCollector(state);
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorICS) {
+            } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SolarCollectorICS) {
                 this->CalcICSSolarCollector(state);
             } else {
                 assert(false); // LCOV_EXCL_LINE
@@ -919,7 +920,7 @@ namespace SolarCollectors {
         // Inlet and outlet nodes are initialized.  The maximum collector flow rate is requested.
 
         static constexpr std::string_view RoutineName("InitSolarCollector");
-        Real64 const BigNumber(9999.9); // Component desired mass flow rate
+        Real64 constexpr BigNumber(9999.9); // Component desired mass flow rate
 
         if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNode, this->VolFlowRateMax);
@@ -1253,15 +1254,17 @@ namespace SolarCollectors {
                 if (qEquation < 0.0) {
                     if (this->ErrIndex == 0) {
                         ShowSevereMessage(state,
-                                          "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                              "\", possible bad input coefficients.");
+                                          format("CalcSolarCollector: {}=\"{}\", possible bad input coefficients.",
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                 this->Name));
                         ShowContinueError(state,
                                           "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid.");
                         ShowContinueError(state, "...examine input coefficients for accuracy. Calculation will be treated as linear.");
                     }
                     ShowRecurringSevereErrorAtEnd(state,
-                                                  "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                                      "\", coefficient error continues.",
+                                                  format("CalcSolarCollector: {}=\"{}\", coefficient error continues.",
+                                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                         this->Name),
                                                   this->ErrIndex,
                                                   qEquation,
                                                   qEquation);
@@ -1280,12 +1283,14 @@ namespace SolarCollectors {
             if (Iteration > 100) {
                 if (this->IterErrIndex == 0) {
                     ShowWarningMessage(state,
-                                       "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                           "\":  Solution did not converge.");
+                                       format("CalcSolarCollector: {}=\"{}\":  Solution did not converge.",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                              this->Name));
                 }
                 ShowRecurringWarningErrorAtEnd(state,
-                                               "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                                   "\", solution not converge error continues.",
+                                               format("CalcSolarCollector: {}=\"{}\", solution not converge error continues.",
+                                                      DataPlant::PlantEquipTypeNames[static_cast<int>(this->Type)],
+                                                      this->Name),
                                                this->IterErrIndex);
                 break;
             } else {
@@ -1664,7 +1669,7 @@ namespace SolarCollectors {
         // Duffie, J. A., and Beckman, W. A.  Solar Engineering of Thermal Processes, Second Edition.
         // Wiley-Interscience: New York (1991).
 
-        Real64 const AirRefIndex(1.0003); // refractive index of air
+        Real64 constexpr AirRefIndex(1.0003); // refractive index of air
 
         Array1D<Real64> TransPara(2);    // cover transmittance parallel component
         Array1D<Real64> TransPerp(2);    // cover transmittance perpendicular component
@@ -1947,54 +1952,53 @@ namespace SolarCollectors {
         //   Property data for air at atmospheric pressure were taken from Table A-11, Yunus A Cengel
         //   Heat Transfer: A Practical Approach, McGraw-Hill, Boston, MA, 1998.
 
-        Real64 const gravity(9.806); // gravitational constant [m/s^2]
+        Real64 constexpr gravity(9.806); // gravitational constant [m/s^2]
 
-        int const NumOfPropDivisions(11);
-        static Array1D<Real64> const Temps(NumOfPropDivisions,
-                                           {-23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(
-            NumOfPropDivisions,
-            {0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229}); // Viscosity, in
-                                                                                                                                      // kg/(m.s)
-        static Array1D<Real64> const Conductivity(
-            NumOfPropDivisions, {0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331}); // Conductivity, in W/mK
-        static Array1D<Real64> const Pr(
-            NumOfPropDivisions, {0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703}); // Prandtl number (dimensionless)
-        static Array1D<Real64> const Density(NumOfPropDivisions,
-                                             {1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883}); // Density, in kg/m3
+        int constexpr NumOfPropDivisions(11);
+        static constexpr std::array<Real64, NumOfPropDivisions> Temps = {
+            -23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85}; // Temperature, in C
+        static constexpr std::array<Real64, NumOfPropDivisions> Mu = {
+            0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229}; // Viscosity, in
+                                                                                                                                    // kg/(m.s)
+        static constexpr std::array<Real64, NumOfPropDivisions> Conductivity = {
+            0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331}; // Conductivity, in W/mK
+        static constexpr std::array<Real64, NumOfPropDivisions> Pr = {
+            0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703}; // Prandtl number (dimensionless)
+        static constexpr std::array<Real64, NumOfPropDivisions> Density = {
+            1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883}; // Density, in kg/m3
 
         Real64 CondOfAir; // thermal conductivity of air [W/mK]
         Real64 VisDOfAir; // dynamic viscosity of air [kg/m.s]
         Real64 DensOfAir; // density of air [W/mK]
-        Real64 PrOfAir;   // Prantle number of air [W/mK]
+        Real64 PrOfAir;   // Prandtl number of air [W/mK]
         Real64 VolExpAir; // volumetric expansion of air [1/K]
 
         Real64 DeltaT = std::abs(TempSurf1 - TempSurf2);
         Real64 Tref = 0.5 * (TempSurf1 + TempSurf2);
-        int Index = 1;
-        while (Index <= NumOfPropDivisions) {
-            if (Tref < Temps(Index)) break; // DO loop
+        int Index = 0;
+        while (Index < NumOfPropDivisions) {
+            if (Tref < Temps[Index]) break; // DO loop
             ++Index;
         }
 
         // Initialize thermal properties of air
-        if (Index == 1) {
-            VisDOfAir = Mu(Index);
-            CondOfAir = Conductivity(Index);
-            PrOfAir = Pr(Index);
-            DensOfAir = Density(Index);
+        if (Index == 0) {
+            VisDOfAir = Mu[Index];
+            CondOfAir = Conductivity[Index];
+            PrOfAir = Pr[Index];
+            DensOfAir = Density[Index];
         } else if (Index > NumOfPropDivisions) {
-            Index = NumOfPropDivisions;
-            VisDOfAir = Mu(Index);
-            CondOfAir = Conductivity(Index);
-            PrOfAir = Pr(Index);
-            DensOfAir = Density(Index);
+            Index = NumOfPropDivisions - 1;
+            VisDOfAir = Mu[Index];
+            CondOfAir = Conductivity[Index];
+            PrOfAir = Pr[Index];
+            DensOfAir = Density[Index];
         } else {
-            Real64 InterpFrac = (Tref - Temps(Index - 1)) / (Temps(Index) - Temps(Index - 1));
-            VisDOfAir = Mu(Index - 1) + InterpFrac * (Mu(Index) - Mu(Index - 1));
-            CondOfAir = Conductivity(Index - 1) + InterpFrac * (Conductivity(Index) - Conductivity(Index - 1));
-            PrOfAir = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
-            DensOfAir = Density(Index - 1) + InterpFrac * (Density(Index) - Density(Index - 1));
+            Real64 InterpFrac = (Tref - Temps[Index - 1]) / (Temps[Index] - Temps[Index - 1]);
+            VisDOfAir = Mu[Index - 1] + InterpFrac * (Mu[Index] - Mu[Index - 1]);
+            CondOfAir = Conductivity[Index - 1] + InterpFrac * (Conductivity[Index] - Conductivity[Index - 1]);
+            PrOfAir = Pr[Index - 1] + InterpFrac * (Pr[Index] - Pr[Index - 1]);
+            DensOfAir = Density[Index - 1] + InterpFrac * (Density[Index] - Density[Index - 1]);
         }
 
         VolExpAir = 1.0 / (Tref + DataGlobalConstants::KelvinConv);
@@ -2046,7 +2050,7 @@ namespace SolarCollectors {
 
         Real64 hConvA2W; // convection coefficient, [W/m2K]
 
-        Real64 const gravity(9.806); // gravitational constant [m/s^2]
+        Real64 constexpr gravity(9.806); // gravitational constant [m/s^2]
         static constexpr std::string_view CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
 
         Real64 DeltaT = std::abs(TAbsorber - TWater);
@@ -2199,7 +2203,7 @@ namespace SolarCollectors {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        this->TypeNum,
+                                                        this->Type,
                                                         this->WLoopNum,
                                                         this->WLoopSideNum,
                                                         this->WLoopBranchNum,

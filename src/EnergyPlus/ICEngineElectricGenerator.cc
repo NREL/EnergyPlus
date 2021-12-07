@@ -509,7 +509,7 @@ namespace ICEngineElectricGenerator {
         PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                         this->HRLoopNum,
                                                         this->HRLoopSideNum,
-                                                        DataPlant::TypeOf_Generator_ICEngine,
+                                                        DataPlant::PlantEquipmentType::Generator_ICEngine,
                                                         this->HeatRecInletNodeNum,
                                                         this->HeatRecOutletNodeNum,
                                                         this->QTotalHeatRecovered,
@@ -894,7 +894,7 @@ namespace ICEngineElectricGenerator {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_Generator_ICEngine,
+                                                    DataPlant::PlantEquipmentType::Generator_ICEngine,
                                                     this->HRLoopNum,
                                                     this->HRLoopSideNum,
                                                     this->HRBranchNum,

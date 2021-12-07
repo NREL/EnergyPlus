@@ -483,13 +483,14 @@ namespace DataRoomAirModel {
     {
         // Members
         // user variables
-        int TypeOfNum;                    // Internal type
-        std::string Name;                 // Intenral gain name
-        bool UseRoomAirModelTempForGains; // TRUE if user inputs temp for gains
-        bool FractionCheck;               // TRUE if a fraction of internal gain for each object is checked
+        DataHeatBalance::IntGainType Type; // Internal type
+        std::string Name;                  // Intenral gain name
+        bool UseRoomAirModelTempForGains;  // TRUE if user inputs temp for gains
+        bool FractionCheck;                // TRUE if a fraction of internal gain for each object is checked
 
         // Default Constructor
-        RoomAirflowNetworkNodeInternalGainsStruct() : TypeOfNum(0), UseRoomAirModelTempForGains(false), FractionCheck(false)
+        RoomAirflowNetworkNodeInternalGainsStruct()
+            : Type(DataHeatBalance::IntGainType::Unassigned), UseRoomAirModelTempForGains(false), FractionCheck(false)
         {
         }
     };

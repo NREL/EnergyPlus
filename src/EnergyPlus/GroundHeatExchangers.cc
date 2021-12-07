@@ -124,7 +124,7 @@ using namespace GroundTemperatureManager;
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
-constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
+static constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
 
@@ -821,19 +821,19 @@ void GLHEBase::simulate(EnergyPlusData &state,
 
 //******************************************************************************
 
-PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, std::string const &objectName)
+PlantComponent *GLHEBase::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     if (state.dataGroundHeatExchanger->GetInput) {
         GetGroundHeatExchangerInput(state);
         state.dataGroundHeatExchanger->GetInput = false;
     }
-    if (objectType == DataPlant::TypeOf_GrndHtExchgSystem) {
+    if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSystem) {
         for (auto &ghx : state.dataGroundHeatExchanger->verticalGLHE) {
             if (ghx.name == objectName) {
                 return &ghx;
             }
         }
-    } else if (objectType == DataPlant::TypeOf_GrndHtExchgSlinky) {
+    } else if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSlinky) {
         for (auto &ghx : state.dataGroundHeatExchanger->slinkyGLHE) {
             if (ghx.name == objectName) {
                 return &ghx;
@@ -1264,14 +1264,14 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
     }
 
     // set upper limit of time for the short time-step g-function calcs so there is some overlap
-    Real64 const lntts_max_for_short_timestep = -9.0;
+    Real64 constexpr lntts_max_for_short_timestep = -9.0;
     Real64 const t_s = pow_2(this->bhLength) / (9.0 * this->soil.diffusivity);
 
-    Real64 const time_step = 500;
+    Real64 constexpr time_step = 500;
     Real64 const time_max_for_short_timestep = exp(lntts_max_for_short_timestep) * t_s;
     Real64 total_time = 0;
 
-    Real64 const heat_flux = 40.4;
+    Real64 constexpr heat_flux = 40.4;
 
     // time step loop
     while (total_time < time_max_for_short_timestep) {
@@ -2800,7 +2800,7 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     if (reynoldsNum < lower_limit) {
         nusseltNum = 4.01; // laminar mean(4.36, 3.66)
     } else if (lower_limit <= reynoldsNum && reynoldsNum < upper_limit) {
-        Real64 const nu_low = 4.01;                   // laminar
+        Real64 constexpr nu_low = 4.01;               // laminar
         Real64 const f = frictionFactor(reynoldsNum); // turbulent
         Real64 const prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
         Real64 const nu_high = (f / 8) * (reynoldsNum - 1000) * prandtlNum / (1 + 12.7 * std::sqrt(f / 8) * (pow(prandtlNum, 2.0 / 3.0) - 1));
@@ -3158,13 +3158,23 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 {
 
-    using DataPlant::TypeOf_GrndHtExchgSystem;
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(
-        state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    ScanPlantLoopsForObject(state,
+                            this->name,
+                            DataPlant::PlantEquipmentType::GrndHtExchgSystem,
+                            this->loopNum,
+                            this->loopSideNum,
+                            this->branchNum,
+                            this->compNum,
+                            errFlag,
+                            _,
+                            _,
+                            _,
+                            _,
+                            _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
@@ -3244,13 +3254,23 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
 
 void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 {
-    using DataPlant::TypeOf_GrndHtExchgSlinky;
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(
-        state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    ScanPlantLoopsForObject(state,
+                            this->name,
+                            DataPlant::PlantEquipmentType::GrndHtExchgSlinky,
+                            this->loopNum,
+                            this->loopSideNum,
+                            this->branchNum,
+                            this->compNum,
+                            errFlag,
+                            _,
+                            _,
+                            _,
+                            _,
+                            _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }

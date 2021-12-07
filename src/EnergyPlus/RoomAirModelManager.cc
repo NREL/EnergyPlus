@@ -1366,8 +1366,6 @@ namespace RoomAirModelManager {
         // Use input processor to get input from idf file
 
         // Using/Aliasing
-        using DataHeatBalance::NumZoneIntGainDeviceTypes;
-        using DataHeatBalance::ZoneIntGainDeviceTypes;
         using DataHVACGlobals::NumZoneHVACTerminalTypes;
         using DataHVACGlobals::ZoneHVACTerminalTypes;
         using InternalHeatGains::GetInternalGainDeviceIndex;
@@ -1683,10 +1681,11 @@ namespace RoomAirModelManager {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HasIntGainsAssigned = true;
                         int numGainsFound = 0;
                         for (gainsLoop = 1; gainsLoop <= numInputGains; ++gainsLoop) {
-                            TypeNum = UtilityRoutines::FindItemInList(
-                                state.dataIPShortCut->cAlphaArgs(gainsLoop * 2), ZoneIntGainDeviceTypes, NumZoneIntGainDeviceTypes);
-                            if (TypeNum > 0) {
-                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum = TypeNum;
+                            TypeNum = getEnumerationValue(DataHeatBalance::IntGainTypeNamesUC,
+                                                          UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(gainsLoop * 2)));
+                            if (TypeNum >= 0) {
+                                state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Type =
+                                    static_cast<DataHeatBalance::IntGainType>(TypeNum);
                             } else {
                                 ShowSevereError(state,
                                                 "GetRoomAirflowNetworkData: Invalid " + state.dataIPShortCut->cAlphaFieldNames(gainsLoop * 2) +
@@ -1706,7 +1705,7 @@ namespace RoomAirModelManager {
                                 int intGainIndex = GetInternalGainDeviceIndex(
                                     state,
                                     spaceNum,
-                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum,
+                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Type,
                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Name);
                                 if (intGainIndex >= 0) {
                                     gainFound = true;
@@ -1866,14 +1865,16 @@ namespace RoomAirModelManager {
                          ++gainsLoop) {
                         if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).FractionCheck) continue;
                         SumFraction = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGainsFractions(gainsLoop);
-                        TypeNum = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).TypeOfNum;
+                        TypeNum =
+                            static_cast<int>(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Type);
                         Name = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Name;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).FractionCheck = true;
                         for (RAFNNum = 1; RAFNNum <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++RAFNNum) {
                             for (GainNum = 1; GainNum <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).NumIntGains;
                                  ++GainNum) {
                                 if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).FractionCheck) continue;
-                                if (TypeNum == state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).TypeOfNum &&
+                                if (TypeNum == static_cast<int>(
+                                                   state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).Type) &&
                                     UtilityRoutines::SameString(
                                         Name, state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).Name)) {
                                     SumFraction += state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGainsFractions(GainNum);
@@ -1957,7 +1958,7 @@ namespace RoomAirModelManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BaseDischargeCoef(0.62);
+        Real64 constexpr BaseDischargeCoef(0.62);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

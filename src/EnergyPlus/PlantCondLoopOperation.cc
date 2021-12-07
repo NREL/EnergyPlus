@@ -143,7 +143,6 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     int ListPtr; // !set by PL()%LoopSide()%Branch()%Comp()%OpScheme(CurCompLevelOpNum)%EquipList(CurListNum)ListPtr
     // used to locate data in PL()%OpScheme(CurSchemePtr)%EquipList(ListPtr)
     // Local values from the PlantLoop()%OpScheme() data structure
-    int CurSchemeType;         // identifier set in PlantData
     Real64 RangeVariable(0.0); // holds the 'loop demand', wetbulb temp, etc.
     Real64 TestRangeVariable;  // abs of RangeVariable for logic tests etc.
     Real64 RangeHiLimit;       // upper limit of the range variable
@@ -151,7 +150,6 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     // Local values from the PlantLoop()%LoopSide()%Branch()%Comp() data structure
     int NumEquipLists; // number of equipment lists
     // Error control flags
-    bool foundlist; // equipment list found
     int NumCompsOnList;
     int CompIndex;
     int EquipBranchNum;
@@ -184,18 +182,24 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     // set local variables from data structure
     NumEquipLists = this_component.OpScheme(CurCompLevelOpNum).NumEquipLists;
     CurSchemePtr = this_component.OpScheme(CurCompLevelOpNum).OpSchemePtr;
-    CurSchemeType = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).OpSchemeType;
+    DataPlant::OpScheme CurSchemeType = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).Type;
 
     // another reference
     auto &this_op_scheme(state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr));
 
     // Load the 'range variable' according to the type of control scheme specified
-    if ((CurSchemeType == UncontrolledOpSchemeType) || (CurSchemeType == CompSetPtBasedSchemeType)) {
+    switch (CurSchemeType) {
+    case OpScheme::Uncontrolled:
+    case OpScheme::CompSetPtBased: {
         // No RangeVariable specified for these types
-    } else if (CurSchemeType == EMSOpSchemeType) {
+        break;
+    }
+    case OpScheme::EMS: {
         InitLoadDistribution(state, FirstHVACIteration);
         // No RangeVariable specified for these types
-    } else if (CurSchemeType == HeatingRBOpSchemeType) {
+        break;
+    }
+    case OpScheme::HeatingRB: {
         // For zero demand, we need to clean things out before we leave
         if (LoopDemand < SmallLoad) {
             InitLoadDistribution(state, FirstHVACIteration);
@@ -204,7 +208,9 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             return;
         }
         RangeVariable = LoopDemand;
-    } else if (CurSchemeType == CoolingRBOpSchemeType) {
+        break;
+    }
+    case OpScheme::CoolingRB: {
         // For zero demand, we need to clean things out before we leave
         if (LoopDemand > (-1.0 * SmallLoad)) {
             InitLoadDistribution(state, FirstHVACIteration);
@@ -213,38 +219,57 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
             return;
         }
         RangeVariable = LoopDemand;
-    } else if (CurSchemeType == DryBulbRBOpSchemeType) {
+        break;
+    }
+    case OpScheme::DryBulbRB: {
         RangeVariable = state.dataEnvrn->OutDryBulbTemp;
-    } else if (CurSchemeType == WetBulbRBOpSchemeType) {
+        break;
+    }
+    case OpScheme::WetBulbRB: {
         RangeVariable = state.dataEnvrn->OutWetBulbTemp;
-    } else if (CurSchemeType == RelHumRBOpSchemeType) {
+        break;
+    }
+    case OpScheme::RelHumRB: {
         RangeVariable = state.dataEnvrn->OutRelHum;
-    } else if (CurSchemeType == DewPointRBOpSchemeType) {
+        break;
+    }
+    case OpScheme::DewPointRB: {
         RangeVariable = state.dataEnvrn->OutDewPointTemp;
-    } else if ((CurSchemeType == DryBulbTDBOpSchemeType) || (CurSchemeType == WetBulbTDBOpSchemeType) || (CurSchemeType == DewPointTDBOpSchemeType)) {
+        break;
+    }
+    case OpScheme::DryBulbTDB:
+    case OpScheme::WetBulbTDB:
+    case OpScheme::DewPointTDB: {
         RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
-    } else {
+        break;
+    }
+    default: {
         // No controls specified.  This is a fatal error
         ShowFatalError(state,
                        "Invalid Operation Scheme Type Requested=" + state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).TypeOf +
                            ", in ManagePlantLoadDistribution");
     }
+    }
 
-    // Find the proper list within the specified scheme
-    foundlist = false;
-    if (CurSchemeType == UncontrolledOpSchemeType) {
+    switch (CurSchemeType) {
+    case OpScheme::Uncontrolled: {
         //!***what else do we do with 'uncontrolled' equipment?
         // There's an equipment list...but I think the idea is to just
         // Set one component to run in an 'uncontrolled' way (whatever that means!)
-
-    } else if (CurSchemeType == CompSetPtBasedSchemeType) {
+        break;
+    }
+    case OpScheme::CompSetPtBased: {
         // check for EMS Control
         TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
         FindCompSPLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
-    } else if (CurSchemeType == EMSOpSchemeType) {
+        break;
+    }
+    case OpScheme::EMS: {
         TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
         DistributeUserDefinedPlantLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
-    } else { // it's a range based control type with multiple equipment lists
+        break;
+    }
+    default: { // it's a range based control type with multiple equipment lists
         CurListNum = 0;
         for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
             // setpointers to 'PlantLoop()%OpScheme()...'structure
@@ -289,6 +314,7 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
         }
 
     } // End of range based schemes
+    }
 }
 
 // Beginning of GetInput subroutines for the Module
@@ -392,33 +418,33 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
                         auto const plantLoopOperation(state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).TypeOf);
 
                         if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = CoolingRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::CoolingRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = HeatingRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::HeatingRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT") { //* Temp Based Control
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = CompSetPtBasedSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::CompSetPtBased;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE") { //* Simple TES Control
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType =
-                                CompSetPtBasedSchemeType; // set this to component based as it will be converted to this
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type =
+                                OpScheme::CompSetPtBased; // set this to component based as it will be converted to this
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:USERDEFINED") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = EMSOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::EMS;
                             state.dataPlnt->AnyEMSPlantOpSchemesInModel = true;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DryBulbRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::DryBulbRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = WetBulbRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::WetBulbRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DewPointRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::DewPointRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = RelHumRBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::RelHumRB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DryBulbTDBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::DryBulbTDB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = WetBulbTDBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::WetBulbTDB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = DewPointTDBOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::DewPointTDB;
                         } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:UNCONTROLLED") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).OpSchemeType = UncontrolledOpSchemeType;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).Type = OpScheme::Uncontrolled;
                         } else { // invalid op scheme type for plant loop
                             ShowSevereError(state,
                                             std::string{RoutineName} + "Invalid " + state.dataIPShortCut->cAlphaFieldNames(Num * 3 - 1) + '=' +
@@ -1219,10 +1245,9 @@ void LoadEquipList(EnergyPlusData &state,
             FoundIntendedList = true;
             // get object item for real this time
             {
-                auto const SELECT_CASE_var(state.dataPlantCondLoopOp->EquipListsTypeList(Num));
-                if (SELECT_CASE_var == LoopType::Plant) {
+                if (state.dataPlantCondLoopOp->EquipListsTypeList(Num) == LoopType::Plant) {
                     CurrentModuleObject = "PlantEquipmentList";
-                } else if (SELECT_CASE_var == LoopType::Condenser) {
+                } else if (state.dataPlantCondLoopOp->EquipListsTypeList(Num) == LoopType::Condenser) {
                     CurrentModuleObject = "CondenserEquipmentList";
                 }
             }
@@ -1311,7 +1336,7 @@ void FindCompSPInput(EnergyPlusData &state,
     Real64 OffPeakCHWTemp;
     int CompNumA;
     int CompNumN;
-    iCtrlType CompOpType; // 1=cooling, 2=dual(or other)
+    CtrlType CompOpType; // 1=cooling, 2=dual(or other)
 
     SchemeNameFound = true;
 
@@ -1425,7 +1450,7 @@ void FindCompSPInput(EnergyPlusData &state,
                     {
                         auto const controlType(state.dataIPShortCut->cAlphaArgs(CompNumA + 1));
                         if (controlType == "COOLING") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = iCtrlType::CoolingOp;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType = CtrlType::CoolingOp;
                         } else if (controlType == "HEATING") {
                             if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
                                 ShowSevereError(state,
@@ -1433,9 +1458,9 @@ void FindCompSPInput(EnergyPlusData &state,
                                                     state.dataIPShortCut->cAlphaArgs(1) + " in thermal energy storage control");
                                 ErrorsFound = true;
                             }
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = iCtrlType::HeatingOp;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType = CtrlType::HeatingOp;
                         } else if (controlType == "DUAL") {
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = iCtrlType::DualOp;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType = CtrlType::DualOp;
                         }
                     }
 
@@ -1461,19 +1486,19 @@ void FindCompSPInput(EnergyPlusData &state,
                                               "Equipment Operation Mode can only be 'DUAL' for " + state.dataIPShortCut->cAlphaArgs(CompNumA - 3) +
                                                   " objects.");
 
-                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum = iCtrlType::DualOp;
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType = CtrlType::DualOp;
                         }
 
                         // This block forces CompOpType to be either Cooling if explicitly provided, all other cases = Dual
-                        switch (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum) {
-                        case iCtrlType::DualOp:
-                            CompOpType = iCtrlType::CoolingOp;
+                        switch (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType) {
+                        case CtrlType::DualOp:
+                            CompOpType = CtrlType::CoolingOp;
                             break;
-                        case iCtrlType::CoolingOp:
-                            CompOpType = iCtrlType::HeatingOp;
+                        case CtrlType::CoolingOp:
+                            CompOpType = CtrlType::HeatingOp;
                             break;
-                        case iCtrlType::HeatingOp:
-                            CompOpType = iCtrlType::CoolingOp;
+                        case CtrlType::HeatingOp:
+                            CompOpType = CtrlType::CoolingOp;
                             break;
                         default:
                             assert(false);
@@ -1492,13 +1517,38 @@ void FindCompSPInput(EnergyPlusData &state,
                     }
 
                     // check that setpoint node has valid setpoint managers or EMS
-                    {
-                        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
-                        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
-                            if (state.dataLoopNodes
-                                    ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
-                                    .TempSetPoint == SensedNodeFlagValue) {
-                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+
+                    switch (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme) {
+                    case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+                        if (state.dataLoopNodes
+                                ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
+                                .TempSetPoint == SensedNodeFlagValue) {
+                            if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                                ShowSevereError(state,
+                                                "Missing temperature setpoint for " + CurrentModuleObject + " named " +
+                                                    state.dataIPShortCut->cAlphaArgs(1));
+                                ShowContinueError(
+                                    state,
+                                    "A temperature setpoint is needed at the node named " +
+                                        state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
+                                if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
+                                    ShowContinueError(state,
+                                                      "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                                          "\", Plant Loop Demand Calculation Scheme=SingleSetpoint");
+                                } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
+                                           LoopType::Condenser) { // not applicable to Condenser loops
+                                }
+                                ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
+                                ErrorsFound = true;
+                            } else {
+                                // need call to EMS to check node
+                                NodeEMSSetPointMissing = false;
+                                CheckIfNodeSetPointManagedByEMS(
+                                    state,
+                                    state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                    EMSManager::SPControlType::iTemperatureSetPoint,
+                                    NodeEMSSetPointMissing);
+                                if (NodeEMSSetPointMissing) {
                                     ShowSevereError(state,
                                                     "Missing temperature setpoint for " + CurrentModuleObject + " named " +
                                                         state.dataIPShortCut->cAlphaArgs(1));
@@ -1513,7 +1563,35 @@ void FindCompSPInput(EnergyPlusData &state,
                                     } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
                                                LoopType::Condenser) { // not applicable to Condenser loops
                                     }
-                                    ShowContinueError(state, " Use a setpoint manager to place a single temperature setpoint on the node");
+                                    ShowContinueError(state,
+                                                      " Use a setpoint manager or EMS actuator to place a single temperature setpoint on node");
+                                    ErrorsFound = true;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+                        if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType == CtrlType::CoolingOp) {
+                            if (state.dataLoopNodes
+                                    ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
+                                    .TempSetPointHi == SensedNodeFlagValue) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                                    ShowSevereError(state,
+                                                    "Missing temperature high setpoint for " + CurrentModuleObject + " named " +
+                                                        state.dataIPShortCut->cAlphaArgs(1));
+                                    ShowContinueError(
+                                        state,
+                                        "A temperature high setpoint is needed at the node named " +
+                                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
+                                    if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
+                                        ShowContinueError(state,
+                                                          "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                                              "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
+                                    } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
+                                               LoopType::Condenser) { // not applicable to Condenser loops
+                                    }
+                                    ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
                                     ErrorsFound = true;
                                 } else {
                                     // need call to EMS to check node
@@ -1521,203 +1599,143 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureSetPoint,
+                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,
-                                                        "Missing temperature setpoint for " + CurrentModuleObject + " named " +
+                                                        "Missing high temperature setpoint for " + CurrentModuleObject + " named " +
                                                             state.dataIPShortCut->cAlphaArgs(1));
                                         ShowContinueError(
                                             state,
-                                            "A temperature setpoint is needed at the node named " +
+                                            "A high temperature setpoint is needed at the node named " +
                                                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
                                         if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                             ShowContinueError(state,
                                                               "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                                                  "\", Plant Loop Demand Calculation Scheme=SingleSetpoint");
+                                                                  "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
+                                        } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
+                                                   LoopType::Condenser) { // not applicable to Condenser loops
+                                        }
+                                        ShowContinueError(
+                                            state, " Use a setpoint manager or EMS actuator to place a dual or high temperature setpoint on node");
+                                        ErrorsFound = true;
+                                    }
+                                }
+                            }
+                        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType ==
+                                   CtrlType::HeatingOp) {
+                            if (state.dataLoopNodes
+                                    ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
+                                    .TempSetPointLo == SensedNodeFlagValue) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                                    ShowSevereError(state,
+                                                    "Missing temperature low setpoint for " + CurrentModuleObject + " named " +
+                                                        state.dataIPShortCut->cAlphaArgs(1));
+                                    ShowContinueError(
+                                        state,
+                                        "A temperature low setpoint is needed at the node named " +
+                                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
+                                    if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
+                                        ShowContinueError(state,
+                                                          "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                                              "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
+                                    } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
+                                               LoopType::Condenser) { // not applicable to Condenser loops
+                                    }
+                                    ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
+                                    ErrorsFound = true;
+                                } else {
+                                    // need call to EMS to check node
+                                    NodeEMSSetPointMissing = false;
+                                    CheckIfNodeSetPointManagedByEMS(
+                                        state,
+                                        state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                        NodeEMSSetPointMissing);
+                                    CheckIfNodeSetPointManagedByEMS(
+                                        state,
+                                        state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
+                                        NodeEMSSetPointMissing);
+                                    if (NodeEMSSetPointMissing) {
+                                        ShowSevereError(state,
+                                                        "Missing low temperature setpoint for " + CurrentModuleObject + " named " +
+                                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        ShowContinueError(
+                                            state,
+                                            "A low temperature setpoint is needed at the node named " +
+                                                state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
+                                        if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
+                                            ShowContinueError(state,
+                                                              "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                                                  "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
+                                        } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
+                                                   LoopType::Condenser) { // not applicable to Condenser loops
+                                        }
+                                        ShowContinueError(
+                                            state, " Use a setpoint manager or EMS actuator to place a dual or low temperature setpoint on node");
+                                        ErrorsFound = true;
+                                    }
+                                }
+                            }
+                        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType == CtrlType::DualOp) {
+                            if ((state.dataLoopNodes
+                                     ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
+                                     .TempSetPointHi == SensedNodeFlagValue) ||
+                                (state.dataLoopNodes
+                                     ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
+                                     .TempSetPointLo == SensedNodeFlagValue)) {
+                                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                                    ShowSevereError(state,
+                                                    "Missing temperature dual setpoints for " + CurrentModuleObject + " named " +
+                                                        state.dataIPShortCut->cAlphaArgs(1));
+                                    ShowContinueError(
+                                        state,
+                                        "A dual temperaturesetpoint is needed at the node named " +
+                                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
+                                    if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
+                                        ShowContinueError(state,
+                                                          "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                                              "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
+                                    } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
+                                               LoopType::Condenser) { // not applicable to Condenser loops
+                                    }
+                                    ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
+                                    ErrorsFound = true;
+                                } else {
+                                    // need call to EMS to check node
+                                    NodeEMSSetPointMissing = false;
+                                    CheckIfNodeSetPointManagedByEMS(
+                                        state,
+                                        state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
+                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                        NodeEMSSetPointMissing);
+                                    if (NodeEMSSetPointMissing) {
+                                        ShowSevereError(state,
+                                                        "Missing dual temperature setpoint for " + CurrentModuleObject + " named " +
+                                                            state.dataIPShortCut->cAlphaArgs(1));
+                                        ShowContinueError(
+                                            state,
+                                            "A dual temperature setpoint is needed at the node named " +
+                                                state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
+                                        if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
+                                            ShowContinueError(state,
+                                                              "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
+                                                                  "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
                                         } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
                                                    LoopType::Condenser) { // not applicable to Condenser loops
                                         }
                                         ShowContinueError(state,
-                                                          " Use a setpoint manager or EMS actuator to place a single temperature setpoint on node");
+                                                          " Use a setpoint manager or EMS actuator to place a dual temperature setpoint on node");
                                         ErrorsFound = true;
-                                    }
-                                }
-                            }
-                        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
-                            if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum ==
-                                iCtrlType::CoolingOp) {
-                                if (state.dataLoopNodes
-                                        ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
-                                        .TempSetPointHi == SensedNodeFlagValue) {
-                                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                        ShowSevereError(state,
-                                                        "Missing temperature high setpoint for " + CurrentModuleObject + " named " +
-                                                            state.dataIPShortCut->cAlphaArgs(1));
-                                        ShowContinueError(
-                                            state,
-                                            "A temperature high setpoint is needed at the node named " +
-                                                state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                        if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                            ShowContinueError(state,
-                                                              "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                                                  "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                        } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
-                                                   LoopType::Condenser) { // not applicable to Condenser loops
-                                        }
-                                        ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
-                                        ErrorsFound = true;
-                                    } else {
-                                        // need call to EMS to check node
-                                        NodeEMSSetPointMissing = false;
-                                        CheckIfNodeSetPointManagedByEMS(
-                                            state,
-                                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                            EMSManager::SPControlType::iTemperatureMaxSetPoint,
-                                            NodeEMSSetPointMissing);
-                                        if (NodeEMSSetPointMissing) {
-                                            ShowSevereError(state,
-                                                            "Missing high temperature setpoint for " + CurrentModuleObject + " named " +
-                                                                state.dataIPShortCut->cAlphaArgs(1));
-                                            ShowContinueError(state,
-                                                              "A high temperature setpoint is needed at the node named " +
-                                                                  state.dataPlnt->PlantLoop(LoopNum)
-                                                                      .OpScheme(SchemeNum)
-                                                                      .EquipList(1)
-                                                                      .Comp(CompNum)
-                                                                      .SetPointNodeName);
-                                            if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                ShowContinueError(state,
-                                                                  "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                                                      "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                            } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
-                                                       LoopType::Condenser) { // not applicable to Condenser loops
-                                            }
-                                            ShowContinueError(
-                                                state,
-                                                " Use a setpoint manager or EMS actuator to place a dual or high temperature setpoint on node");
-                                            ErrorsFound = true;
-                                        }
-                                    }
-                                }
-                            } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum ==
-                                       iCtrlType::HeatingOp) {
-                                if (state.dataLoopNodes
-                                        ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
-                                        .TempSetPointLo == SensedNodeFlagValue) {
-                                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                        ShowSevereError(state,
-                                                        "Missing temperature low setpoint for " + CurrentModuleObject + " named " +
-                                                            state.dataIPShortCut->cAlphaArgs(1));
-                                        ShowContinueError(
-                                            state,
-                                            "A temperature low setpoint is needed at the node named " +
-                                                state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                        if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                            ShowContinueError(state,
-                                                              "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                                                  "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                        } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
-                                                   LoopType::Condenser) { // not applicable to Condenser loops
-                                        }
-                                        ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
-                                        ErrorsFound = true;
-                                    } else {
-                                        // need call to EMS to check node
-                                        NodeEMSSetPointMissing = false;
-                                        CheckIfNodeSetPointManagedByEMS(
-                                            state,
-                                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                            EMSManager::SPControlType::iTemperatureMinSetPoint,
-                                            NodeEMSSetPointMissing);
-                                        CheckIfNodeSetPointManagedByEMS(
-                                            state,
-                                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                            EMSManager::SPControlType::iTemperatureMaxSetPoint,
-                                            NodeEMSSetPointMissing);
-                                        if (NodeEMSSetPointMissing) {
-                                            ShowSevereError(state,
-                                                            "Missing low temperature setpoint for " + CurrentModuleObject + " named " +
-                                                                state.dataIPShortCut->cAlphaArgs(1));
-                                            ShowContinueError(state,
-                                                              "A low temperature setpoint is needed at the node named " +
-                                                                  state.dataPlnt->PlantLoop(LoopNum)
-                                                                      .OpScheme(SchemeNum)
-                                                                      .EquipList(1)
-                                                                      .Comp(CompNum)
-                                                                      .SetPointNodeName);
-                                            if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                ShowContinueError(state,
-                                                                  "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                                                      "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                            } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
-                                                       LoopType::Condenser) { // not applicable to Condenser loops
-                                            }
-                                            ShowContinueError(
-                                                state, " Use a setpoint manager or EMS actuator to place a dual or low temperature setpoint on node");
-                                            ErrorsFound = true;
-                                        }
-                                    }
-                                }
-                            } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum ==
-                                       iCtrlType::DualOp) {
-                                if ((state.dataLoopNodes
-                                         ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
-                                         .TempSetPointHi == SensedNodeFlagValue) ||
-                                    (state.dataLoopNodes
-                                         ->Node(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum)
-                                         .TempSetPointLo == SensedNodeFlagValue)) {
-                                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                        ShowSevereError(state,
-                                                        "Missing temperature dual setpoints for " + CurrentModuleObject + " named " +
-                                                            state.dataIPShortCut->cAlphaArgs(1));
-                                        ShowContinueError(
-                                            state,
-                                            "A dual temperaturesetpoint is needed at the node named " +
-                                                state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName);
-                                        if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                            ShowContinueError(state,
-                                                              "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                                                  "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                        } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
-                                                   LoopType::Condenser) { // not applicable to Condenser loops
-                                        }
-                                        ShowContinueError(state, " Use a setpoint manager to place a dual temperature setpoint on the node");
-                                        ErrorsFound = true;
-                                    } else {
-                                        // need call to EMS to check node
-                                        NodeEMSSetPointMissing = false;
-                                        CheckIfNodeSetPointManagedByEMS(
-                                            state,
-                                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                            EMSManager::SPControlType::iTemperatureMinSetPoint,
-                                            NodeEMSSetPointMissing);
-                                        if (NodeEMSSetPointMissing) {
-                                            ShowSevereError(state,
-                                                            "Missing dual temperature setpoint for " + CurrentModuleObject + " named " +
-                                                                state.dataIPShortCut->cAlphaArgs(1));
-                                            ShowContinueError(state,
-                                                              "A dual temperature setpoint is needed at the node named " +
-                                                                  state.dataPlnt->PlantLoop(LoopNum)
-                                                                      .OpScheme(SchemeNum)
-                                                                      .EquipList(1)
-                                                                      .Comp(CompNum)
-                                                                      .SetPointNodeName);
-                                            if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-                                                ShowContinueError(state,
-                                                                  "PlantLoop=\"" + state.dataPlnt->PlantLoop(LoopNum).Name +
-                                                                      "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband");
-                                            } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop ==
-                                                       LoopType::Condenser) { // not applicable to Condenser loops
-                                            }
-                                            ShowContinueError(state,
-                                                              " Use a setpoint manager or EMS actuator to place a dual temperature setpoint on node");
-                                            ErrorsFound = true;
-                                        }
                                     }
                                 }
                             }
                         }
+                        break;
+                    }
+                    default:
+                        break;
                     }
                 }
             } else {
@@ -1913,13 +1931,12 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     int Index;
     int OpSchemePtr;
     int thisSchemeNum;
-    int SchemeType;
 
     bool FoundScheme;
     bool FoundSchemeMatch;
     //  LOGICAL, SAVE                     :: FirstHVACInitsDone = .FALSE.
     //  LOGICAL, SAVE                     :: MyEnvrnFlag = .TRUE.
-    int ThisTypeOfNum;
+    DataPlant::PlantEquipmentType Type;
     int CompOpNum;
     int OldNumOpSchemes;
     int NewNumEquipLists;
@@ -1960,11 +1977,12 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     auto &this_equip_list(this_op_scheme.EquipList(ListNum));
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip(this_equip_list.Comp(EquipNum));
-                        ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
+                        Type = static_cast<DataPlant::PlantEquipmentType>(
+                            getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 this_equip.Name,
-                                                                ThisTypeOfNum,
+                                                                Type,
                                                                 DummyLoopNum,
                                                                 LoopSideNum,
                                                                 BranchNum,
@@ -1989,27 +2007,29 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         this_equip.BranchNumPtr = BranchNum;
                         this_equip.CompNumPtr = CompNum;
 
-                        if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
+                        if (ValidLoopEquipTypes[static_cast<int>(Type)] == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: CondenserLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
                             ShowContinueError(state,
                                               "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Condenser Loop");
-                            ShowContinueError(
-                                state, "Component " + ccSimPlantEquipTypes(ThisTypeOfNum) + " not allowed as supply equipment on this type of loop.");
+                            ShowContinueError(state,
+                                              format("Component {} not allowed as supply equipment on this type of loop.",
+                                                     PlantEquipTypeNames[static_cast<int>(Type)]));
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
-                        if (ValidLoopEquipTypes(ThisTypeOfNum) == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
+                        if (ValidLoopEquipTypes[static_cast<int>(Type)] == LoopType::Condenser && this_plant_loop.TypeOfLoop == LoopType::Plant) {
                             ShowSevereError(state,
                                             "InitLoadDistribution: PlantLoop=\"" + this_plant_loop.Name + "\", Operation Scheme=\"" +
                                                 this_plant_loop.OperationScheme + "\",");
                             ShowContinueError(state,
                                               "Scheme type=" + this_op_scheme.TypeOf + ", Name=\"" + this_op_scheme.Name +
                                                   "\" includes equipment that is not valid on a Plant Loop");
-                            ShowContinueError(
-                                state, "Component " + ccSimPlantEquipTypes(ThisTypeOfNum) + " not allowed as supply equipment on this type of loop.");
+                            ShowContinueError(state,
+                                              format("Component {} not allowed as supply equipment on this type of loop.",
+                                                     PlantEquipTypeNames[static_cast<int>(Type)]));
                             ShowContinueError(state, "Component name = " + this_equip.Name);
                             errFlag2 = true;
                         }
@@ -2102,10 +2122,11 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                     ShowContinueError(state, "Component name = " + this_component.Name);
                                     errFlag2 = true;
                                 }
+                                DataPlant::OpScheme SchemeType{};
                                 if (Index == 1) {
-                                    SchemeType = this_plant_loop.OpScheme(OpSchemePtr).OpSchemeType;
+                                    SchemeType = this_plant_loop.OpScheme(OpSchemePtr).Type;
                                 } else {
-                                    if (SchemeType != this_plant_loop.OpScheme(OpSchemePtr).OpSchemeType) {
+                                    if (SchemeType != this_plant_loop.OpScheme(OpSchemePtr).Type) {
                                         // CALL FATAL ERROR 'component may not be specified on two types of operation schemes
                                         // Cannot different op schemes be in effect at different times?
                                         //  I thought this would be allowed??
@@ -2124,7 +2145,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
             for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                 auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
                 // skip non-load based op schemes
-                if ((this_op_scheme.OpSchemeType != HeatingRBOpSchemeType) && (this_op_scheme.OpSchemeType != CoolingRBOpSchemeType)) continue;
+                if ((this_op_scheme.Type != OpScheme::HeatingRB) && (this_op_scheme.Type != OpScheme::CoolingRB)) continue;
                 HighestRange = 0.0;
                 for (int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum) {
                     HighestRange = max(HighestRange, this_op_scheme.EquipList(ListNum).RangeUpperLimit);
@@ -2145,7 +2166,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
             for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
                 auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
-                if (this_op_scheme.OpSchemeType == EMSOpSchemeType) {
+                if (this_op_scheme.Type == OpScheme::EMS) {
                     if (state.dataGlobal->BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag) {
                         if (this_op_scheme.ErlInitProgramMngr > 0) {
                             bool anyEMSRan;
@@ -2177,9 +2198,9 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         this_component.MyLoad = 0.0;
                         this_component.EMSLoadOverrideOn = false;
                         // Zero out the old curOpSchemePtr so that we don't get 'carry-over' when we update schedules
-                        if (this_component.CurOpSchemeType != DemandOpSchemeType && this_component.CurOpSchemeType != PumpOpSchemeType &&
-                            this_component.CurOpSchemeType != WSEconOpSchemeType && this_component.CurOpSchemeType != NoControlOpSchemeType) {
-                            this_component.CurOpSchemeType = NoControlOpSchemeType;
+                        if (this_component.CurOpSchemeType != OpScheme::Demand && this_component.CurOpSchemeType != OpScheme::Pump &&
+                            this_component.CurOpSchemeType != OpScheme::WSEcon && this_component.CurOpSchemeType != OpScheme::NoControl) {
+                            this_component.CurOpSchemeType = OpScheme::NoControl;
                         }
                         this_component.CurCompLevelOpNum = 0;
                     }
@@ -2214,8 +2235,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             // then set up a reference to the component on the plant data structure
                             auto &this_loop_component(state.dataPlnt->PlantLoop(LoopPtr).LoopSide(LoopSidePtr).Branch(BranchPtr).Comp(CompPtr));
 
-                            if (this_loop_component.CurOpSchemeType != PumpOpSchemeType) {
-                                this_loop_component.CurOpSchemeType = this_op_scheme.OpSchemeType;
+                            if (this_loop_component.CurOpSchemeType != OpScheme::Pump) {
+                                this_loop_component.CurOpSchemeType = this_op_scheme.Type;
                             } else {
                                 ShowSevereError(state,
                                                 "Invalid [pump] component found on equipment list.  Pumps are not allowed on equipment lists.");
@@ -2340,7 +2361,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
         // OPTIMAL DISTRIBUTION SCHEME
         switch (this_loop.LoadDistribution) {
-        case DataPlant::iLoadingScheme::Optimal:
+        case DataPlant::LoadingScheme::Optimal:
             // step 1: load all machines to optimal PLR
             numAvail = 0;
             for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
@@ -2423,7 +2444,7 @@ void DistributePlantLoad(EnergyPlusData &state,
             break;
 
         // SEQUENTIALLOAD DISTRIBUTION SCHEME
-        case DataPlant::iLoadingScheme::Sequential:
+        case DataPlant::LoadingScheme::Sequential:
 
             // step 1: Load machines in list order
             for (CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex) {
@@ -2458,7 +2479,7 @@ void DistributePlantLoad(EnergyPlusData &state,
             break;
 
         // UNIFORMLOAD DISTRIBUTION SCHEME
-        case DataPlant::iLoadingScheme::Uniform:
+        case DataPlant::LoadingScheme::Uniform:
 
             // step 1: distribute load equally to all available machines
             numAvail = 0;
@@ -2526,7 +2547,7 @@ void DistributePlantLoad(EnergyPlusData &state,
             break;
 
         // UNIFORMPLR LOAD DISTRIBUTION SCHEME
-        case DataPlant::iLoadingScheme::UniformPLR:
+        case DataPlant::LoadingScheme::UniformPLR:
             // Get total plant capacity and remove last component from list if load is less
             // than plant capacity at min PLR
             PlantCapacity = 0.0;
@@ -2630,7 +2651,7 @@ void DistributePlantLoad(EnergyPlusData &state,
             break;
 
         // SEQUENTIALUNIFORMPLR LOAD DISTRIBUTION SCHEME
-        case DataPlant::iLoadingScheme::SequentialUniformPLR:
+        case DataPlant::LoadingScheme::SequentialUniformPLR:
 
             PlantCapacity = 0.0;
             PlantPLR = 0.0;
@@ -2820,13 +2841,98 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
 
     // start of bad band-aid, need a general and comprehensive approach for determining current capacity of all kinds of equipment
     // Need to truncate the load down in case outlet temperature will hit a lower/upper limit
-    {
-        auto const SELECT_CASE_var(this_component.HowLoadServed);
 
-        // Chillers
-        if (SELECT_CASE_var == HowMet_ByNominalCapLowOutLimit) { // chillers with lower limit on outlet temperature
+    switch (this_component.HowLoadServed) {
 
+    // Chillers
+    case DataPlant::HowMet::ByNominalCapLowOutLimit: { // chillers with lower limit on outlet temperature
+
+        //- Retrieve data from the plant loop data structure
+        CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
+        ToutLowLimit = this_component.MinOutletTemp;
+        Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
+        CurSpecHeat = GetSpecificHeatGlycol(
+            state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+        QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
+
+        //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned on
+        if (CurMassFlowRate > 0.0) {
+            ChangeInLoad = min(ChangeInLoad, QdotTmp);
+        }
+
+        break;
+    }
+    case DataPlant::HowMet::ByNominalCapFreeCoolCntrl: {
+        // for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
+        // determine if free cooling controls shut off chiller
+        TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
+        switch (this_component.FreeCoolCntrlMode) {
+        case DataPlant::FreeCoolControlMode::WetBulb: {
+            Tsensor = state.dataEnvrn->OutWetBulbTemp;
+            break;
+        }
+        case DataPlant::FreeCoolControlMode::DryBulb: {
+            Tsensor = state.dataEnvrn->OutDryBulbTemp;
+            break;
+        }
+        case DataPlant::FreeCoolControlMode::Loop: {
+            ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
+            if (ControlNodeNum > 0) {
+                Tsensor = state.dataLoopNodes->Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
+            } else {
+                Tsensor = 23.0;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+
+        if (Tsensor < TinLowLimit) { // turn off chiller to initiate free cooling
+            ChangeInLoad = 0.0;
+            this_component.Available = false;
+            this_component.FreeCoolCntrlShutDown = true;
+        } else {
+            this_component.Available = true;
+            this_component.FreeCoolCntrlShutDown = false;
+        }
+
+        break;
+    }
+    case DataPlant::HowMet::ByNominalCapLowOutLimitFreeCoolCntrl: {
+        // for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
+        // determine if free cooling controls shut off chiller
+        TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
+        switch (this_component.FreeCoolCntrlMode) {
+        case DataPlant::FreeCoolControlMode::WetBulb: {
+            Tsensor = state.dataEnvrn->OutWetBulbTemp;
+            break;
+        }
+        case DataPlant::FreeCoolControlMode::DryBulb: {
+            Tsensor = state.dataEnvrn->OutDryBulbTemp;
+            break;
+        }
+        case DataPlant::FreeCoolControlMode::Loop: {
+            ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
+            if (ControlNodeNum > 0) {
+                Tsensor = state.dataLoopNodes->Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
+            } else {
+                Tsensor = 23.0;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+
+        if (Tsensor < TinLowLimit) { // turn off chiller to initiate free cooling
+            ChangeInLoad = 0.0;
+            this_component.Available = false;
+            this_component.FreeCoolCntrlShutDown = true;
+        } else {
             //- Retrieve data from the plant loop data structure
+            this_component.Available = true;
+            this_component.FreeCoolCntrlShutDown = false;
             CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
             ToutLowLimit = this_component.MinOutletTemp;
             Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
@@ -2834,99 +2940,36 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
                 state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
             QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
-            //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned on
+            //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned
+            //        on
             if (CurMassFlowRate > 0.0) {
                 ChangeInLoad = min(ChangeInLoad, QdotTmp);
             }
-
-        } else if (SELECT_CASE_var == HowMet_ByNominalCapFreeCoolCntrl) {
-            // for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
-            // determine if free cooling controls shut off chiller
-            TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
-            {
-                auto const SELECT_CASE_var1(this_component.FreeCoolCntrlMode);
-                if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::WetBulb) {
-                    Tsensor = state.dataEnvrn->OutWetBulbTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::DryBulb) {
-                    Tsensor = state.dataEnvrn->OutDryBulbTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::Loop) {
-                    ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
-                    if (ControlNodeNum > 0) {
-                        Tsensor = state.dataLoopNodes->Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
-                    } else {
-                        Tsensor = 23.0;
-                    }
-                }
-            }
-
-            if (Tsensor < TinLowLimit) { // turn off chiller to initiate free cooling
-                ChangeInLoad = 0.0;
-                this_component.Available = false;
-                this_component.FreeCoolCntrlShutDown = true;
-            } else {
-                this_component.Available = true;
-                this_component.FreeCoolCntrlShutDown = false;
-            }
-
-        } else if (SELECT_CASE_var == HowMet_ByNominalCapLowOutLimitFreeCoolCntrl) {
-            // for chillers with free cooling shutdown (HeatExchanger:Hydronic currently)
-            // determine if free cooling controls shut off chiller
-            TinLowLimit = this_component.FreeCoolCntrlMinCntrlTemp;
-            {
-                auto const SELECT_CASE_var1(this_component.FreeCoolCntrlMode);
-                if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::WetBulb) {
-                    Tsensor = state.dataEnvrn->OutWetBulbTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::DryBulb) {
-                    Tsensor = state.dataEnvrn->OutDryBulbTemp;
-                } else if (SELECT_CASE_var1 == DataPlant::iFreeCoolControlMode::Loop) {
-                    ControlNodeNum = this_component.FreeCoolCntrlNodeNum;
-                    if (ControlNodeNum > 0) {
-                        Tsensor = state.dataLoopNodes->Node(ControlNodeNum).TempLastTimestep; // use lagged value for stability
-                    } else {
-                        Tsensor = 23.0;
-                    }
-                }
-            }
-
-            if (Tsensor < TinLowLimit) { // turn off chiller to initiate free cooling
-                ChangeInLoad = 0.0;
-                this_component.Available = false;
-                this_component.FreeCoolCntrlShutDown = true;
-            } else {
-                //- Retrieve data from the plant loop data structure
-                this_component.Available = true;
-                this_component.FreeCoolCntrlShutDown = false;
-                CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
-                ToutLowLimit = this_component.MinOutletTemp;
-                Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
-                CurSpecHeat = GetSpecificHeatGlycol(
-                    state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-                QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
-
-                //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned
-                //        on
-                if (CurMassFlowRate > 0.0) {
-                    ChangeInLoad = min(ChangeInLoad, QdotTmp);
-                }
-            }
-
-        } else if (SELECT_CASE_var == HowMet_ByNominalCapHiOutLimit) { // boilers with upper limit on outlet temperature
-            //- Retrieve data from the plant loop data structure
-            CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
-            ToutHiLimit = this_component.MaxOutletTemp;
-            Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
-            CurSpecHeat = GetSpecificHeatGlycol(
-                state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-            QdotTmp = CurMassFlowRate * CurSpecHeat * (ToutHiLimit - Tinlet);
-
-            if (CurMassFlowRate > 0.0) {
-                ChangeInLoad = min(ChangeInLoad, QdotTmp);
-            }
-
-        } else if (SELECT_CASE_var == HowMet_PassiveCap) { // need to estimate current capacity if more or less passive devices ??
-
-        } else {
         }
+
+        break;
+    }
+    case DataPlant::HowMet::ByNominalCapHiOutLimit: { // boilers with upper limit on outlet temperature
+        //- Retrieve data from the plant loop data structure
+        CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
+        ToutHiLimit = this_component.MaxOutletTemp;
+        Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
+        CurSpecHeat = GetSpecificHeatGlycol(
+            state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+        QdotTmp = CurMassFlowRate * CurSpecHeat * (ToutHiLimit - Tinlet);
+
+        if (CurMassFlowRate > 0.0) {
+            ChangeInLoad = min(ChangeInLoad, QdotTmp);
+        }
+
+        break;
+    }
+    case DataPlant::HowMet::PassiveCap: { // need to estimate current capacity if more or less passive devices ??
+
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -3009,32 +3052,34 @@ void FindCompSPLoad(EnergyPlusData &state,
         DemandMdot = ActualMdot;
     }
 
-    {
-        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
-            TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
-            if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::CoolingOp) {
+    switch (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme) {
+    case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+        TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPoint;
+        break;
+    }
+    case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+        if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::CoolingOp) {
+            TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointHi;
+        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::HeatingOp) {
+            TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointLo;
+        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::DualOp) {
+            CurrentDemandForCoolingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointHi - TempIn);
+            CurrentDemandForHeatingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointLo - TempIn);
+            if ((CurrentDemandForCoolingOp < 0.0) && (CurrentDemandForHeatingOp <= 0.0)) { // cooling
                 TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointHi;
-            } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum ==
-                       iCtrlType::HeatingOp) {
+            } else if ((CurrentDemandForCoolingOp >= 0.0) && (CurrentDemandForHeatingOp > 0.0)) { // heating
                 TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointLo;
-            } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::DualOp) {
-                CurrentDemandForCoolingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointHi - TempIn);
-                CurrentDemandForHeatingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointLo - TempIn);
-                if ((CurrentDemandForCoolingOp < 0.0) && (CurrentDemandForHeatingOp <= 0.0)) { // cooling
-                    TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointHi;
-                } else if ((CurrentDemandForCoolingOp >= 0.0) && (CurrentDemandForHeatingOp > 0.0)) { // heating
-                    TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointLo;
-                } else { // deadband
-                    TempSetPt = TempIn;
-                }
-            } else {
-                assert(false);
+            } else { // deadband
+                TempSetPt = TempIn;
             }
         } else {
             assert(false);
         }
+        break;
+    }
+    default:
+        assert(false);
+        break;
     }
 
     if (TempSetPt == SensedNodeFlagValue) {
@@ -3049,7 +3094,7 @@ void FindCompSPLoad(EnergyPlusData &state,
         this_component.EquipDemand = CompDemand;
 
         // set MyLoad and runflag
-        if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::CoolingOp) {
+        if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::CoolingOp) {
             if (CompDemand < (-LoopDemandTol)) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
@@ -3057,7 +3102,7 @@ void FindCompSPLoad(EnergyPlusData &state,
                 this_component.ON = false;
                 this_component.MyLoad = 0.0;
             }
-        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::HeatingOp) {
+        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::HeatingOp) {
             if (CompDemand > LoopDemandTol) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
@@ -3065,7 +3110,7 @@ void FindCompSPLoad(EnergyPlusData &state,
                 this_component.ON = false;
                 this_component.MyLoad = 0.0;
             }
-        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlTypeNum == iCtrlType::DualOp) {
+        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::DualOp) {
             if (CompDemand > LoopDemandTol || CompDemand < (-LoopDemandTol)) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
@@ -3173,9 +3218,9 @@ void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
 //********************************
 
 Real64 FindRangeVariable(EnergyPlusData &state,
-                         int const LoopNum,      // PlantLoop data structure loop counter
-                         int const CurSchemePtr, // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
-                         int const CurSchemeType // identifier set in PlantData
+                         int const LoopNum,                // PlantLoop data structure loop counter
+                         int const CurSchemePtr,           // set by PL()%LoopSide()%Branch()%Comp()%OpScheme()%OpSchemePtr
+                         DataPlant::OpScheme CurSchemeType // identifier set in PlantData
 )
 {
 
@@ -3206,20 +3251,29 @@ Real64 FindRangeVariable(EnergyPlusData &state,
     int ReferenceNodeNum;
     Real64 NodeTemperature;
 
-    if (CurSchemeType == DryBulbTDBOpSchemeType) { // drybulb temp based controls
+    switch (CurSchemeType) {
+    case OpScheme::DryBulbTDB: { // drybulb temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDryBulbTemp;
-    } else if (CurSchemeType == WetBulbTDBOpSchemeType) { // wetbulb temp based controls
+        break;
+    }
+    case OpScheme::WetBulbTDB: { // wetbulb temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutWetBulbTemp;
-    } else if (CurSchemeType == DewPointTDBOpSchemeType) { // dewpoint temp based controls
+        break;
+    }
+    case OpScheme::DewPointTDB: { // dewpoint temp based controls
         ReferenceNodeNum = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).ReferenceNodeNumber;
         NodeTemperature = state.dataLoopNodes->Node(ReferenceNodeNum).Temp;
         FindRangeVariable = NodeTemperature - state.dataEnvrn->OutDewPointTemp;
-    } else {
+        break;
+    }
+    default: {
         assert(false);
+        break;
+    }
     } // OperationScheme
 
     return FindRangeVariable;
@@ -3264,14 +3318,16 @@ void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const Lo
     for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++Num) {
         for (MachineOnLoopNum = 1; MachineOnLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
              ++MachineOnLoopNum) {
-            {
-                auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).TypeOf_Num);
-                if ((SELECT_CASE_var == TypeOf_Pipe) || (SELECT_CASE_var == TypeOf_PipeInterior) || (SELECT_CASE_var == TypeOf_PipeExterior) ||
-                    (SELECT_CASE_var == TypeOf_PipeUnderground)) {
-                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).ON = true;
-                } else {
-                    // Don't do anything
-                }
+            switch (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).Type) {
+            case DataPlant::PlantEquipmentType::Pipe:
+            case DataPlant::PlantEquipmentType::PipeInterior:
+            case DataPlant::PlantEquipmentType::PipeExterior:
+            case DataPlant::PlantEquipmentType::PipeUnderground: {
+                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).ON = true;
+                break;
+            }
+            default:
+                break; // Don't do anything
             }
         }
     }
@@ -3312,7 +3368,8 @@ void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum)
             for (MachineOnBranch = 1; MachineOnBranch <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
                  ++MachineOnBranch) {
                 // Sankar Non Integrated Economizer
-                if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).isPump()) {
+                if (!DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).Type)]) {
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
                 }
@@ -3354,7 +3411,8 @@ void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, int cons
         for (MachineOnBranch = 1; MachineOnBranch <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
              ++MachineOnBranch) {
             // Sankar Non Integrated Economizer
-            if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).isPump()) {
+            if (!DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).Type)]) {
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
             }
@@ -3454,9 +3512,9 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideValue);
                 }
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                    ActuatorName =
-                        "Plant Component " +
-                        ccSimPlantEquipTypes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).TypeOf_Num);
+                    ActuatorName = format("Plant Component {}",
+                                          PlantEquipTypeNames[static_cast<int>(
+                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Type)]);
                     UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                     ActuatorType = "On/Off Supervisory";
                     SetupEMSActuator(state,
@@ -3562,30 +3620,32 @@ void ActivateEMSControls(
             this_comp.MyLoad = min(this_comp.MaxLoad, (this_comp.MaxLoad * this_comp.EMSLoadOverrideValue));
 
             // Check lower/upper temperature limit for chillers
-            {
-                auto const SELECT_CASE_var(this_comp.TypeOf_Num);
-                if ((SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) || (SELECT_CASE_var == TypeOf_Chiller_Electric) ||
-                    (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR)) {
+            switch (this_comp.Type) {
 
-                    //- Retrieve data from the plant loop data structure
-                    CurMassFlowRate = state.dataLoopNodes->Node(this_comp.NodeNumIn).MassFlowRate;
-                    ToutLowLimit = this_comp.MinOutletTemp;
-                    Tinlet = state.dataLoopNodes->Node(this_comp.NodeNumIn).Temp;
-                    CurSpecHeat = GetSpecificHeatGlycol(state, this_loop.FluidName, Tinlet, this_loop.FluidIndex, RoutineName);
-                    QTemporary = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
+            case DataPlant::PlantEquipmentType::Chiller_ElectricEIR:
+            case DataPlant::PlantEquipmentType::Chiller_Electric:
+            case DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR: {
 
-                    //- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented
-                    if (QTemporary > 0.0) {
-                        if (std::abs(this_comp.MyLoad) > this_comp.MaxLoad) {
-                            this_comp.MyLoad = sign(this_comp.MaxLoad, this_comp.MyLoad);
-                        }
-                        if (std::abs(this_comp.MyLoad) > QTemporary) {
-                            this_comp.MyLoad = sign(QTemporary, this_comp.MyLoad);
-                        }
+                //- Retrieve data from the plant loop data structure
+                CurMassFlowRate = state.dataLoopNodes->Node(this_comp.NodeNumIn).MassFlowRate;
+                ToutLowLimit = this_comp.MinOutletTemp;
+                Tinlet = state.dataLoopNodes->Node(this_comp.NodeNumIn).Temp;
+                CurSpecHeat = GetSpecificHeatGlycol(state, this_loop.FluidName, Tinlet, this_loop.FluidIndex, RoutineName);
+                QTemporary = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
+
+                //- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented
+                if (QTemporary > 0.0) {
+                    if (std::abs(this_comp.MyLoad) > this_comp.MaxLoad) {
+                        this_comp.MyLoad = sign(this_comp.MaxLoad, this_comp.MyLoad);
                     }
-                } else {
-                    // Nothing Changes for now, could add in case statements for boilers, which would use upper limit temp check
+                    if (std::abs(this_comp.MyLoad) > QTemporary) {
+                        this_comp.MyLoad = sign(QTemporary, this_comp.MyLoad);
+                    }
                 }
+                break;
+            }
+            default:
+                break; // Nothing Changes for now, could add in case statements for boilers, which would use upper limit temp check
             }
             return;
         } // EMSValue <=> 0

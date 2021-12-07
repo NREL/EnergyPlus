@@ -1193,8 +1193,8 @@ void AnnualTable::addTableOfContents(std::ostream &nameOfStream)
 void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const &unitsStyle_para)
 {
     std::vector<AnnualFieldSet>::iterator fldStIt;
-    Real64 const veryLarge = 1.0E280;
-    Real64 const verySmall = -1.0E280;
+    Real64 constexpr veryLarge = 1.0E280;
+    Real64 constexpr verySmall = -1.0E280;
     for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
         int curAgg = fldStIt->m_aggregate;
         // for columns with binning aggregation types compute the statistics

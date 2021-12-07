@@ -2014,7 +2014,7 @@ void incrementSteps(EnergyPlusData &state)
     //   Increment the step array counter and if
     //   necessary increase the size of the array.
 
-    int const sizeIncrement(100);
+    int constexpr sizeIncrement(100);
 
     if (!allocated(state.dataEconTariff->steps)) {
         state.dataEconTariff->steps.allocate(sizeIncrement);
@@ -2848,7 +2848,7 @@ void ComputeTariff(EnergyPlusData &state)
     int lMonth;
     int nVar;
     int curStep;
-    int const noVar(0);
+    int constexpr noVar(0);
 
     Real64 hugeValue;
     Real64 annualAggregate;

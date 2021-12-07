@@ -398,8 +398,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustMixingOnly));
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, AddInfiltrationFlow);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, MixingSourceZonesOnly);
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::Add));
+    EXPECT_TRUE(
+        compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
@@ -460,8 +461,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing));
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, AdjustInfiltrationFlow);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, AllZones);
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::Adjust));
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::AllZones));
 
     // setup mixing and infiltration objects
     state->dataGlobal->NumOfZones = 2;
@@ -606,8 +607,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing));
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, NoInfiltrationFlow);
-    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, 0);
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::InfiltrationFlow::No));
+    EXPECT_TRUE(compare_enums(state->dataHeatBal->ZoneAirMassFlow.InfiltrationForZones, DataHeatBalance::InfiltrationZoneType::Unassigned));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVariableTest)
@@ -2168,6 +2169,126 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
     int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     EXPECT_EQ(state->dataSurface->Surface(surfNum).Construction, state->dataSurface->SurfEMSConstructionOverrideValue(surfNum));
     EXPECT_TRUE(state->dataSurface->SurfEMSConstructionOverrideON(surfNum));
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_GetSpaceData)
+{
+    // Test input processing of Space object
+
+    // GetZoneData uses GetObjectItem with ipshortcuts so these need to be allocated
+    int NumAlphas = 4;
+    int NumNumbers = 9;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(NumNumbers);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(NumAlphas);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(NumAlphas);
+    state->dataIPShortCut->cNumericFieldNames.allocate(NumNumbers);
+    state->dataIPShortCut->cAlphaArgs.allocate(NumAlphas);
+    state->dataIPShortCut->rNumericArgs.allocate(NumNumbers);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
+
+    // Original method of initializing epJSON input objects, but couldn't get this to work for extensible arrays
+    // state->dataInputProcessing->inputProcessor->epJSON["Zone"]["Zone 1"] = {};
+    // state->dataInputProcessing->inputProcessor->epJSON["Zone"]["Zone 2"] = {};
+    // state->dataInputProcessing->inputProcessor->epJSON["Space"]["Space 1a"] = {{"zone_name", "Zone 1"}};
+
+    // Using R_json raw string parsing to get the arrays processed correctly
+    // Reference https://github.com/nlohmann/json#json-as-first-class-data-type
+    state->dataInputProcessing->inputProcessor->epJSON = R"(
+    {
+        "Zone": {
+            "Zone 1" : {
+            },
+            "Zone 2" : {
+            }
+        },
+        "Space": {
+            "Space 1a" : {
+                 "zone_name": "Zone 1"
+            },
+            "Space 1b" : {
+                 "zone_name": "Zone 1",
+                 "floor_area": 100.0,
+                 "space_type": "Office",
+                 "tags": [
+                    {
+                        "tag": "Tag1"
+                    },
+                    {
+                        "tag": "Tag2"
+                    }
+                ]
+            }
+        },
+        "SpaceList": {
+            "SomeSpaces" : {
+                 "spaces": [
+                    {
+                        "space_name": "Space 1a"
+                    },
+                    {
+                        "space_name": "Space 1b"
+                    }
+                ]
+            }
+        }
+    }
+    )"_json;
+
+    state->dataGlobal->isEpJSON = true;
+    state->dataInputProcessing->inputProcessor->initializeMaps();
+
+    bool ErrorsFound = false;
+    GetZoneData(*state, ErrorsFound);
+    compare_err_stream("");
+    EXPECT_FALSE(ErrorsFound);
+
+    int zoneNum = 1;
+    EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(zoneNum).Name);
+    EXPECT_EQ(2, state->dataHeatBal->Zone(zoneNum).numSpaces);
+    EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[0]).Name);
+    EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[1]).Name);
+    zoneNum = 2;
+    EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(zoneNum).Name);
+    EXPECT_EQ(1, state->dataHeatBal->Zone(zoneNum).numSpaces);
+    EXPECT_EQ("ZONE 2", state->dataHeatBal->space(state->dataHeatBal->Zone(zoneNum).spaceIndexes[0]).Name);
+
+    int spaceNum = 1;
+    EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(spaceNum).Name);
+    EXPECT_EQ("GENERAL", state->dataHeatBal->space(spaceNum).spaceType);
+    EXPECT_EQ("GENERAL", state->dataHeatBal->spaceTypes(state->dataHeatBal->space(spaceNum).spaceTypeNum));
+    EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
+    // Defaults
+    EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
+    EXPECT_TRUE(state->dataHeatBal->space(spaceNum).tags.empty());
+
+    spaceNum = 2;
+    EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(spaceNum).Name);
+    EXPECT_EQ("OFFICE", state->dataHeatBal->space(spaceNum).spaceType);
+    EXPECT_EQ("OFFICE", state->dataHeatBal->spaceTypes(state->dataHeatBal->space(spaceNum).spaceTypeNum));
+    EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
+    EXPECT_EQ(100, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
+    EXPECT_EQ("TAG1", state->dataHeatBal->space(spaceNum).tags(1));
+    EXPECT_EQ("TAG2", state->dataHeatBal->space(spaceNum).tags(2));
+
+    EXPECT_EQ("SOMESPACES", state->dataHeatBal->spaceList(1).Name);
+    EXPECT_EQ(2, state->dataHeatBal->spaceList(1).spaces.size());
+    EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(state->dataHeatBal->spaceList(1).spaces[0]).Name);
+    EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(state->dataHeatBal->spaceList(1).spaces[1]).Name);
+
+    // This space is auto-generated
+    spaceNum = 3;
+    EXPECT_EQ("ZONE 2", state->dataHeatBal->space(spaceNum).Name);
+    EXPECT_EQ("GENERAL", state->dataHeatBal->space(spaceNum).spaceType);
+    EXPECT_EQ("GENERAL", state->dataHeatBal->spaceTypes(state->dataHeatBal->space(spaceNum).spaceTypeNum));
+    EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
+    // Defaults
+    EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
+    EXPECT_TRUE(state->dataHeatBal->space(spaceNum).tags.empty());
 }
 
 } // namespace EnergyPlus

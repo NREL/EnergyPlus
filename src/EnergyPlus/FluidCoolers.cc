@@ -97,7 +97,7 @@ namespace EnergyPlus::FluidCoolers {
 std::string const cFluidCooler_SingleSpeed("FluidCooler:SingleSpeed");
 std::string const cFluidCooler_TwoSpeed("FluidCooler:TwoSpeed");
 
-PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
+PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     if (state.dataFluidCoolers->GetFluidCoolerInputFlag) {
         GetFluidCoolerInput(state);
@@ -105,7 +105,7 @@ PlantComponent *FluidCoolerspecs::factory(EnergyPlusData &state, int objectType,
     }
     // Now look for this particular fluid cooler in the list
     for (auto &fc : state.dataFluidCoolers->SimpleFluidCooler) {
-        if (fc.FluidCoolerType_Num == objectType && fc.Name == objectName) {
+        if (fc.FluidCoolerType == objectType && fc.Name == objectName) {
             return &fc;
         }
     }
@@ -122,7 +122,7 @@ void FluidCoolerspecs::simulate(EnergyPlusData &state,
                                 bool const RunFlag)
 {
     this->initialize(state);
-    if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
+    if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_SingleSpd) {
         this->calcSingleSpeed(state);
     } else {
         this->calcTwoSpeed(state);
@@ -219,8 +219,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                                                  ErrorsFound);
 
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = AlphArray(1);
-        state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerType = cCurrentModuleObject;
-        state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num = DataPlant::TypeOf_FluidCooler_SingleSpd;
+        state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerType = DataPlant::PlantEquipmentType::FluidCooler_SingleSpd;
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).indexInArray = FluidCoolerNum;
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum =
@@ -318,8 +317,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                                                  ErrorsFound);
 
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name = AlphArray(1);
-        state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerType = cCurrentModuleObject;
-        state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num = DataPlant::TypeOf_FluidCooler_TwoSpd;
+        state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerType = DataPlant::PlantEquipmentType::FluidCooler_TwoSpd;
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).indexInArray = FluidCoolerNum;
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum =
@@ -764,7 +762,7 @@ void FluidCoolerspecs::oneTimeInit_new(EnergyPlusData &state)
     bool ErrorsFound = false;
     // Locate the tower on the plant loops for later usage
     PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->FluidCoolerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+        state, this->Name, this->FluidCoolerType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
     if (ErrorsFound) {
         ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
@@ -912,12 +910,18 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             }
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Design Water Flow Rate [m3/s]",
+                                                 this->DesignWaterFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Initial Design Water Flow Rate [m3/s]",
+                                                 this->DesignWaterFlowRate);
                 }
             }
         } else {
@@ -1019,26 +1023,38 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 }
             }
         }
-        if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
+        if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_SingleSpd) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Fan Power at Design Air Flow Rate [W]",
+                                                 this->HighSpeedFanPower);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Initial Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Initial Fan Power at Design Air Flow Rate [W]",
+                                                 this->HighSpeedFanPower);
                 }
             }
-        } else if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
+        } else if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_TwoSpd) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Fan Power at High Fan Speed [W]",
+                                                 this->HighSpeedFanPower);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Initial Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Initial Fan Power at High Fan Speed [W]",
+                                                 this->HighSpeedFanPower);
                 }
             }
         }
@@ -1096,25 +1112,38 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 }
             }
         }
-        if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
+        if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_SingleSpd) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->FluidCoolerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Design Air Flow Rate [m3/s]",
+                                                 this->HighSpeedAirFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Initial Design Air Flow Rate [m3/s]",
+                                                 this->HighSpeedAirFlowRate);
                 }
             }
-        } else if (this->FluidCoolerType == "FluidCooler:TwoSpeed") {
+        } else if (DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)] == "FluidCooler:TwoSpeed") {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Air Flow Rate at High Fan Speed [m3/s]",
+                                                 this->HighSpeedAirFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, this->FluidCoolerType, this->Name, "Initial Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
+                    BaseSizer::reportSizerOutput(state,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                 this->Name,
+                                                 "Initial Air Flow Rate at High Fan Speed [m3/s]",
+                                                 this->HighSpeedAirFlowRate);
                 }
             }
         }
@@ -1208,35 +1237,35 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 tmpHighSpeedEvapFluidCoolerUA = 0.0;
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->HighSpeedFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
             }
-            if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
+            if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_SingleSpd) {
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
-                                                     this->FluidCoolerType,
+                                                     DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                                      this->Name,
                                                      "U-factor Times Area Value at Design Air Flow Rate [W/K]",
                                                      this->HighSpeedFluidCoolerUA);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
-                                                     this->FluidCoolerType,
+                                                     DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                                      this->Name,
                                                      "Initial U-factor Times Area Value at Design Air Flow Rate [W/K]",
                                                      this->HighSpeedFluidCoolerUA);
                     }
                 }
-            } else if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
+            } else if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_TwoSpd) {
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
-                                                     this->FluidCoolerType,
+                                                     DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                                      this->Name,
                                                      "U-factor Times Area Value at High Fan Speed [W/K]",
                                                      this->HighSpeedFluidCoolerUA);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
-                                                     this->FluidCoolerType,
+                                                     DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                                      this->Name,
                                                      "Initial U-factor Times Area Value at High Fan Speed [W/K]",
                                                      this->HighSpeedFluidCoolerUA);
@@ -1323,35 +1352,35 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
         } else {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->HighSpeedFluidCoolerUA = 0.0;
         }
-        if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
+        if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_SingleSpd) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
-                                                 this->FluidCoolerType,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                                  this->Name,
                                                  "Fluid cooler UA value at design air flow rate based on nominal capacity input [W/K]",
                                                  this->HighSpeedFluidCoolerUA);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
-                                                 this->FluidCoolerType,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                                  this->Name,
                                                  "Initial Fluid cooler UA value at design air flow rate based on nominal capacity input [W/K]",
                                                  this->HighSpeedFluidCoolerUA);
                 }
             }
-        } else if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
+        } else if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_TwoSpd) {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
-                                                 this->FluidCoolerType,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                                  this->Name,
                                                  "Fluid cooler UA value at high fan speed based on nominal capacity input [W/K]",
                                                  this->HighSpeedFluidCoolerUA);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
-                                                 this->FluidCoolerType,
+                                                 DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                                  this->Name,
                                                  "Initial Fluid cooler UA value at high fan speed based on nominal capacity input [W/K]",
                                                  this->HighSpeedFluidCoolerUA);
@@ -1363,47 +1392,74 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     if (this->LowSpeedAirFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
         this->LowSpeedAirFlowRate = this->LowSpeedAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(
-                state, this->FluidCoolerType, this->Name, "Air Flow Rate at Low Fan Speed [m3/s]", this->LowSpeedAirFlowRate);
+            BaseSizer::reportSizerOutput(state,
+                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                         this->Name,
+                                         "Air Flow Rate at Low Fan Speed [m3/s]",
+                                         this->LowSpeedAirFlowRate);
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(
-                state, this->FluidCoolerType, this->Name, "Initial Air Flow Rate at Low Fan Speed [m3/s]", this->LowSpeedAirFlowRate);
+            BaseSizer::reportSizerOutput(state,
+                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                         this->Name,
+                                         "Initial Air Flow Rate at Low Fan Speed [m3/s]",
+                                         this->LowSpeedAirFlowRate);
         }
     }
 
     if (this->LowSpeedFanPowerWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
         this->LowSpeedFanPower = this->LowSpeedFanPowerSizingFactor * this->HighSpeedFanPower;
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state, this->FluidCoolerType, this->Name, "Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
+            BaseSizer::reportSizerOutput(state,
+                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                         this->Name,
+                                         "Fan Power at Low Fan Speed [W]",
+                                         this->LowSpeedFanPower);
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state, this->FluidCoolerType, this->Name, "Initial Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
+            BaseSizer::reportSizerOutput(state,
+                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                         this->Name,
+                                         "Initial Fan Power at Low Fan Speed [W]",
+                                         this->LowSpeedFanPower);
         }
     }
 
     if (this->LowSpeedFluidCoolerUAWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
         this->LowSpeedFluidCoolerUA = this->LowSpeedFluidCoolerUASizingFactor * this->HighSpeedFluidCoolerUA;
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(
-                state, this->FluidCoolerType, this->Name, "U-factor Times Area Value at Low Fan Speed [W/K]", this->LowSpeedFluidCoolerUA);
+            BaseSizer::reportSizerOutput(state,
+                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                         this->Name,
+                                         "U-factor Times Area Value at Low Fan Speed [W/K]",
+                                         this->LowSpeedFluidCoolerUA);
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(
-                state, this->FluidCoolerType, this->Name, "Initial U-factor Times Area Value at Low Fan Speed [W/K]", this->LowSpeedFluidCoolerUA);
+            BaseSizer::reportSizerOutput(state,
+                                         DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                         this->Name,
+                                         "Initial U-factor Times Area Value at Low Fan Speed [W/K]",
+                                         this->LowSpeedFluidCoolerUA);
         }
     }
 
-    if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY && this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
+    if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY &&
+        this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_TwoSpd) {
         if (this->FluidCoolerLowSpeedNomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             this->FluidCoolerLowSpeedNomCap = this->FluidCoolerLowSpeedNomCapSizingFactor * this->FluidCoolerNominalCapacity;
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
-                    state, this->FluidCoolerType, this->Name, "Low Fan Speed Nominal Capacity [W]", this->FluidCoolerLowSpeedNomCap);
+                BaseSizer::reportSizerOutput(state,
+                                             DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                             this->Name,
+                                             "Low Fan Speed Nominal Capacity [W]",
+                                             this->FluidCoolerLowSpeedNomCap);
             }
             if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
-                    state, this->FluidCoolerType, this->Name, "Initial Low Fan Speed Nominal Capacity [W]", this->FluidCoolerLowSpeedNomCap);
+                BaseSizer::reportSizerOutput(state,
+                                             DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                             this->Name,
+                                             "Initial Low Fan Speed Nominal Capacity [W]",
+                                             this->FluidCoolerLowSpeedNomCap);
             }
         }
 
@@ -1474,12 +1530,15 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
         }
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                BaseSizer::reportSizerOutput(
-                    state, this->FluidCoolerType, this->Name, "U-factor Times Area Value at Low Fan Speed [W/C]", this->LowSpeedFluidCoolerUA);
+                BaseSizer::reportSizerOutput(state,
+                                             DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                             this->Name,
+                                             "U-factor Times Area Value at Low Fan Speed [W/C]",
+                                             this->LowSpeedFluidCoolerUA);
             }
             if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                 BaseSizer::reportSizerOutput(state,
-                                             this->FluidCoolerType,
+                                             DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
                                              this->Name,
                                              "Initial U-factor Times Area Value at Low Fan Speed [W/C]",
                                              this->LowSpeedFluidCoolerUA);
@@ -1492,11 +1551,12 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         // create predefined report
         equipName = this->Name;
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, this->FluidCoolerType);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchMechType, equipName, DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)]);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->FluidCoolerNominalCapacity);
     }
 
-    if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+    if (this->FluidCoolerType == DataPlant::PlantEquipmentType::FluidCooler_TwoSpd && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
         if (this->DesignWaterFlowRate > 0.0) {
             if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate) {
                 ShowSevereError(state,
@@ -1573,9 +1633,9 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
     this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
     {
         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
         }
     }
@@ -1679,16 +1739,16 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
     this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
     {
         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
         }
     }
 
     // MassFlowTol is a parameter to indicate a no flow condition
     if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance ||
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked)
+        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
         return;
 
     // set local variable for fluid cooler
@@ -1868,7 +1928,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     auto &waterOutletNode = this->WaterOutletNodeNum;
     state.dataLoopNodes->Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
-    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked ||
+    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
         state.dataGlobal->WarmupFlag)
         return;
 
@@ -1876,7 +1936,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     if (state.dataLoopNodes->Node(waterOutletNode).MassFlowRate > this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier) {
         ++this->HighMassFlowErrorCount;
         if (this->HighMassFlowErrorCount < 2) {
-            ShowWarningError(state, this->FluidCoolerType + " \"" + this->Name + "\"");
+            ShowWarningError(state, format("{} \"{}\"", DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)], this->Name));
             ShowContinueError(state, " Condenser Loop Mass Flow Rate is much greater than the fluid coolers design mass flow rate.");
             ShowContinueError(state, format(" Condenser Loop Mass Flow Rate = {:.6T}", state.dataLoopNodes->Node(waterOutletNode).MassFlowRate));
             ShowContinueError(state, format(" Fluid Cooler Design Mass Flow Rate   = {:.6T}", this->DesWaterMassFlowRate));
@@ -1884,8 +1944,9 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
         } else {
             ShowRecurringWarningErrorAtEnd(
                 state,
-                this->FluidCoolerType + " \"" + this->Name +
-                    "\"  Condenser Loop Mass Flow Rate is much greater than the fluid coolers design mass flow rate error continues...",
+                format("{} \"{}\"  Condenser Loop Mass Flow Rate is much greater than the fluid coolers design mass flow rate. Error continues...",
+                       DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                       this->Name),
                 this->HighMassFlowErrorIndex,
                 state.dataLoopNodes->Node(waterOutletNode).MassFlowRate,
                 state.dataLoopNodes->Node(waterOutletNode).MassFlowRate);
@@ -1898,7 +1959,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
         ++this->OutletWaterTempErrorCount;
 
         if (this->OutletWaterTempErrorCount < 2) {
-            ShowWarningError(state, format("{} \"{}\"", this->FluidCoolerType, this->Name));
+            ShowWarningError(state, format("{} \"{}\"", DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)], this->Name));
             ShowContinueError(state,
                               format(" Fluid cooler water outlet temperature ({.2F} C) is below the specified minimum condenser loop temp of {.2F} C",
                                      this->OutletWaterTemp,
@@ -1907,8 +1968,9 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
         } else {
             ShowRecurringWarningErrorAtEnd(
                 state,
-                this->FluidCoolerType + " \"" + this->Name +
-                    "\" Fluid cooler water outlet temperature is below the specified minimum condenser loop temp error continues...",
+                format("{} \"{}\"  Fluid cooler water outlet temperature is below the specified minimum condenser loop temp. Error continues...",
+                       DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                       this->Name),
                 this->OutletWaterTempErrorIndex,
                 this->OutletWaterTemp,
                 this->OutletWaterTemp);
@@ -1919,14 +1981,15 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     if (this->WaterMassFlowRate > 0.0 && this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
         ++this->SmallWaterMassFlowErrorCount;
         if (this->SmallWaterMassFlowErrorCount < 2) {
-            ShowWarningError(state, this->FluidCoolerType + " \"" + this->Name + "\"");
+            ShowWarningError(state, format("{} \"{}\"", DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)], this->Name));
             ShowContinueError(state, " Fluid cooler water mass flow rate near zero.");
             ShowContinueErrorTimeStamp(state, "");
             ShowContinueError(state, format("Actual Mass flow = {:.2T}", this->WaterMassFlowRate));
         } else {
             ShowRecurringWarningErrorAtEnd(state,
-                                           this->FluidCoolerType + " \"" + this->Name +
-                                               "\" Fluid cooler water mass flow rate near zero error continues...",
+                                           format("{} \"{}\"  Fluid cooler water mass flow rate is near zero. Error continues...",
+                                                  DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)],
+                                                  this->Name),
                                            this->SmallWaterMassFlowErrorIndex,
                                            this->WaterMassFlowRate,
                                            this->WaterMassFlowRate);

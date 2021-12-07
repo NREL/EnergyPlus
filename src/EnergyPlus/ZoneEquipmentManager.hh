@@ -69,14 +69,14 @@ namespace ZoneEquipmentManager {
     {
         // Members
         std::string EquipType;
-        int EquipType_Num;
+        int EquipTypeEnum;
         std::string EquipName;
         int EquipPtr;
         int CoolingPriority;
         int HeatingPriority;
 
         // Default Constructor
-        SimulationOrder() : EquipType_Num(0), EquipPtr(0), CoolingPriority(0), HeatingPriority(0)
+        SimulationOrder() : EquipTypeEnum(0), EquipPtr(0), CoolingPriority(0), HeatingPriority(0)
         {
         }
     };
