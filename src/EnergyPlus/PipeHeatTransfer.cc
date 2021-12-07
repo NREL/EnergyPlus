@@ -168,7 +168,7 @@ void PipeHTData::PushInnerTimeStepArrays()
                 for (int WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                     // This will store the old 'current' values as the new 'previous values'  This allows
                     // us to use the previous time array as history terms in the equations
-                    this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex);
+                    this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous) = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current);
                 }
             }
         }
@@ -692,7 +692,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         state.dataPipeHT->PipeHT(Item).T.allocate(state.dataPipeHT->PipeHT(Item).PipeNodeWidth,
                                                   state.dataPipeHT->PipeHT(Item).NumDepthNodes,
                                                   state.dataPipeHT->PipeHT(Item).NumSections,
-                                                  TentativeTimeIndex);
+                                                  TimeIndex::Tentative);
         state.dataPipeHT->PipeHT(Item).T = 0.0;
 
     } // PipeUG input loop
@@ -967,7 +967,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     if ((state.dataGlobal->BeginSimFlag && this->BeginSimInit) || (state.dataGlobal->BeginEnvrnFlag && this->BeginSimEnvrn)) {
 
         if (this->EnvironmentPtr == iEnvrnPtr::GroundEnv) {
-            for (TimeIndex = PreviousTimeIndex; TimeIndex <= TentativeTimeIndex; ++TimeIndex) {
+            for (TimeIndex = TimeIndex::Previous; TimeIndex <= TimeIndex::Tentative; ++TimeIndex) {
                 // Loop through all length, depth, and width of pipe to init soil temperature
                 for (LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex) {
                     for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
@@ -1013,7 +1013,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
         if (this->EnvironmentPtr == iEnvrnPtr::GroundEnv) {
 
             // And then update Ground Boundary Conditions
-            for (TimeIndex = 1; TimeIndex <= TentativeTimeIndex; ++TimeIndex) {
+            for (TimeIndex = 1; TimeIndex <= TimeIndex::Tentative; ++TimeIndex) {
                 for (LengthIndex = 1; LengthIndex <= this->NumSections; ++LengthIndex) {
                     for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                         // Farfield boundary
@@ -1075,8 +1075,8 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
                     for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                         // This will essentially 'accept' the tentative values that were calculated last iteration
                         // as the new officially 'current' values
-                        this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex) =
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex);
+                        this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current) =
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative);
                     }
                 }
             }
@@ -1095,7 +1095,7 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                     // This will essentially erase the past iterations and revert back to the correct values
-                    this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex);
+                    this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current);
                 }
             }
         }
@@ -1259,9 +1259,9 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const
 
         PipeDepth = this->PipeNodeDepth;
         PipeWidth = this->PipeNodeWidth;
-        TempBelow = this->T(PipeWidth, PipeDepth + 1, LengthIndex, CurrentTimeIndex);
-        TempBeside = this->T(PipeWidth - 1, PipeDepth, LengthIndex, CurrentTimeIndex);
-        TempAbove = this->T(PipeWidth, PipeDepth - 1, LengthIndex, CurrentTimeIndex);
+        TempBelow = this->T(PipeWidth, PipeDepth + 1, LengthIndex, TimeIndex::Current);
+        TempBeside = this->T(PipeWidth - 1, PipeDepth, LengthIndex, TimeIndex::Current);
+        TempAbove = this->T(PipeWidth, PipeDepth - 1, LengthIndex, TimeIndex::Current);
         state.dataPipeHT->nsvEnvironmentTemp = (TempBelow + TempBeside + TempAbove) / 3.0;
 
         this->TentativeFluidTemp(LengthIndex) = (A2 * this->TentativeFluidTemp(LengthIndex - 1) +
@@ -1380,7 +1380,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
         for (LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
-                    T_O(WidthIndex, DepthIndex, LengthIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex);
+                    T_O(WidthIndex, DepthIndex, LengthIndex) = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative);
                 }
             }
         }
@@ -1393,7 +1393,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                     if (DepthIndex == 1) { // Soil Surface Boundary
 
                         // If on soil boundary, load up local variables and perform calculations
-                        NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex);
+                        NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous);
                         PastNodeTempAbs = NodePast + DataGlobalConstants::KelvinConv;
                         SkyTempAbs = state.dataEnvrn->SkyTemp + DataGlobalConstants::KelvinConv;
                         TopRoughness = this->SoilRoughness;
@@ -1428,11 +1428,11 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         if (WidthIndex == this->PipeNodeWidth) { // Symmetric centerline boundary
 
                             //-Coefficients and Temperatures
-                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex);
-                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex);
+                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, TimeIndex::Current);
+                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
 
                             //-Update Equation, basically a detailed energy balance at the surface
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
                                 (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                  (kSoil / dS) * (NodeBelow + 2 * NodeLeft) + (rho * Cp / state.dataPipeHT->nsvDeltaTime) * NodePast) /
                                 (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / state.dataPipeHT->nsvDeltaTime));
@@ -1440,12 +1440,12 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         } else { // Soil surface, but not on centerline
 
                             //-Coefficients and Temperatures
-                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex);
-                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex);
-                            NodeRight = this->T(WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex);
+                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, TimeIndex::Current);
+                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
+                            NodeRight = this->T(WidthIndex + 1, DepthIndex, LengthIndex, TimeIndex::Current);
 
                             //-Update Equation
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
                                 (QSolAbsorbed + RadCoef * state.dataEnvrn->SkyTemp + ConvCoef * state.dataEnvrn->OutDryBulbTemp +
                                  (kSoil / dS) * (NodeBelow + NodeLeft + NodeRight) + (rho * Cp / state.dataPipeHT->nsvDeltaTime) * NodePast) /
                                 (RadCoef + ConvCoef + 3 * (kSoil / dS) + (rho * Cp / state.dataPipeHT->nsvDeltaTime));
@@ -1460,20 +1460,20 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                             this->CalcPipesHeatTransfer(state, LengthIndex);
 
                             //-Update node for cartesian system
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) = this->PipeTemp(LengthIndex);
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) = this->PipeTemp(LengthIndex);
 
                         } else if (DepthIndex != 1) { // Not surface node
 
                             //-Coefficients and Temperatures
-                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex);
-                            NodeAbove = this->T(WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex);
-                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex);
-                            NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1);
+                            NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
+                            NodeAbove = this->T(WidthIndex, DepthIndex - 1, LengthIndex, TimeIndex::Current);
+                            NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, TimeIndex::Current);
+                            NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current - 1);
                             A1 = this->CoefA1;
                             A2 = this->CoefA2;
 
                             //-Update Equation
-                            this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
+                            this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
                                 A1 * (NodeBelow + NodeAbove + 2 * NodeLeft) + A2 * NodePast;
 
                         } // Symmetric centerline node structure
@@ -1483,14 +1483,14 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         //-Coefficients and Temperatures
                         A1 = this->CoefA1;
                         A2 = this->CoefA2;
-                        NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex);
-                        NodeAbove = this->T(WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex);
-                        NodeRight = this->T(WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex);
-                        NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex);
-                        NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1);
+                        NodeBelow = this->T(WidthIndex, DepthIndex + 1, LengthIndex, TimeIndex::Current);
+                        NodeAbove = this->T(WidthIndex, DepthIndex - 1, LengthIndex, TimeIndex::Current);
+                        NodeRight = this->T(WidthIndex + 1, DepthIndex, LengthIndex, TimeIndex::Current);
+                        NodeLeft = this->T(WidthIndex - 1, DepthIndex, LengthIndex, TimeIndex::Current);
+                        NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current - 1);
 
                         //-Update Equation
-                        this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex) =
+                        this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
                             A1 * (NodeBelow + NodeAbove + NodeRight + NodeLeft) + A2 * NodePast; // Eq. D1
                     }
                 }
@@ -1501,7 +1501,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
         for (LengthIndex = 2; LengthIndex <= this->NumSections; ++LengthIndex) {
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes - 1; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
-                    Ttemp = this->T(WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex);
+                    Ttemp = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative);
                     if (std::abs(T_O(WidthIndex, DepthIndex, LengthIndex) - Ttemp) > ConvCrit) goto IterationLoop_loop;
                 }
             }

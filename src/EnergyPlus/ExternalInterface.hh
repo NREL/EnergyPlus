@@ -82,7 +82,7 @@ namespace ExternalInterface {
     int constexpr indexVariable(2); // Index for variable in inpVarTypes
     int constexpr indexActuator(3); // Index for actuator in inpVarTypes
 
-    // used in fmistatus defined in hmiModelFunctions.h
+    // can't change these to enum class since these are compared to fmistatus defined in hmiModelFunctions.h
     int constexpr fmiOK(0);      // fmiOK
     int constexpr fmiWarning(1); // fmiWarning
     int constexpr fmiDiscard(2); // fmiDiscard

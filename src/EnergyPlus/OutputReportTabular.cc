@@ -6472,7 +6472,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccolumn::Total);
 
         // Air loop times at OA limiting factors
         PreDefTableEntry(state,
@@ -11020,7 +11020,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
     using ScheduleManager::ScheduleAverageHoursPerWeek;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int constexpr wwrcTotal(1);
+    int constexpr wwrcolumn::Total(1);
     int constexpr wwrcNorth(2);
     int constexpr wwrcEast(3);
     int constexpr wwrcSouth(4);
@@ -11237,7 +11237,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(5, 5);
 
-            columnHead(wwrcTotal) = "Total";
+            columnHead(wwrcolumn::Total) = "Total";
             columnHead(wwrcNorth) = "North (315 to 45 deg)";
             columnHead(wwrcEast) = "East (45 to 135 deg)";
             columnHead(wwrcSouth) = "South (135 to 225 deg)";
@@ -11450,31 +11450,31 @@ void WriteVeriSumTable(EnergyPlusData &state)
             tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcolumn::Total, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaN * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcolumn::Total, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaN * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaS * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaE * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaW * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcolumn::Total, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, wallAreaN), 2);
             tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, wallAreaS), 2);
             tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, wallAreaE), 2);
             tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, wallAreaW), 2);
-            tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
+            tableBody(wwrcolumn::Total, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
 
             tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, aboveGroundWallAreaN), 2);
             tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, aboveGroundWallAreaS), 2);
             tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, aboveGroundWallAreaE), 2);
             tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, aboveGroundWallAreaW), 2);
-            tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
+            tableBody(wwrcolumn::Total, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
             if (produceTabular) {
                 WriteSubtitle(state, "Window-Wall Ratio");
@@ -11500,7 +11500,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(5, 5);
 
-            columnHead(wwrcTotal) = "Total";
+            columnHead(wwrcolumn::Total) = "Total";
             columnHead(wwrcNorth) = "North (315 to 45 deg)";
             columnHead(wwrcEast) = "East (45 to 135 deg)";
             columnHead(wwrcSouth) = "South (135 to 225 deg)";
@@ -11524,31 +11524,31 @@ void WriteVeriSumTable(EnergyPlusData &state)
             tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcolumn::Total, wwrrWall) = RealToStr(TotalWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaNcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcolumn::Total, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaNcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaScond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaEcond * state.dataOutRptTab->m2_unitConvWVST, 2);
             tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaWcond * state.dataOutRptTab->m2_unitConvWVST, 2);
-            tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            tableBody(wwrcolumn::Total, wwrrWindow) = RealToStr(TotalWindowArea * state.dataOutRptTab->m2_unitConvWVST, 2);
 
             tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, wallAreaNcond), 2);
             tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, wallAreaScond), 2);
             tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, wallAreaEcond), 2);
             tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, wallAreaWcond), 2);
-            tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
+            tableBody(wwrcolumn::Total, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
 
             tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, aboveGroundWallAreaNcond), 2);
             tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, aboveGroundWallAreaScond), 2);
             tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, aboveGroundWallAreaEcond), 2);
             tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, aboveGroundWallAreaWcond), 2);
-            tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
+            tableBody(wwrcolumn::Total, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
             if (produceTabular) {
                 WriteSubtitle(state, "Conditioned Window-Wall Ratio");
@@ -11743,12 +11743,12 @@ void WriteVeriSumTable(EnergyPlusData &state)
                 }
                 if (zoneIsCond) {
                     if (produceTabular) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcolumn::Area, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
                     }
                 } else {
                     if (produceTabular) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcolumn::Area, Zone(iZone).Name, "0.00");
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                     }
                 }
@@ -11881,7 +11881,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal), 2);
                 PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal), 2);
+                    state, state.dataOutRptPredefined->pdchLeedSutOcolumn::Area, "Totals", state.dataOutRptTab->zstArea(state.dataOutRptTab->condTotal), 2);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchLeedSutUnArea,
                                  "Totals",
@@ -14084,76 +14084,76 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
         if (ort->displayZoneComponentLoadSummary) {
             ZoneHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : ZoneHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(column::PerArea, rGrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(column::PerArea, rGrdTot);
                 e.cellUsed = false;
             }
             ZoneCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : ZoneCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(column::PerArea, rGrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(column::PerArea, rGrdTot);
                 e.cellUsed = false;
             }
         }
         if (ort->displayAirLoopComponentLoadSummary) {
             AirLoopHeatCompLoadTables.allocate(NumPrimaryAirSys);
             for (auto &e : AirLoopHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(column::PerArea, rGrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(column::PerArea, rGrdTot);
                 e.cellUsed = false;
                 e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
                 e.zoneIndices = 0;
             }
             AirLoopCoolCompLoadTables.allocate(NumPrimaryAirSys);
             for (auto &e : AirLoopCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(column::PerArea, rGrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(column::PerArea, rGrdTot);
                 e.cellUsed = false;
                 e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
                 e.zoneIndices = 0;
             }
             AirLoopZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : AirLoopZonesHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(column::PerArea, rGrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(column::PerArea, rGrdTot);
                 e.cellUsed = false;
             }
             AirLoopZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : AirLoopZonesCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(column::PerArea, rGrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(column::PerArea, rGrdTot);
                 e.cellUsed = false;
             }
         }
         if (ort->displayFacilityComponentLoadSummary) {
-            FacilityHeatCompLoadTables.cells.allocate(cPerArea, rGrdTot);
+            FacilityHeatCompLoadTables.cells.allocate(column::PerArea, rGrdTot);
             FacilityHeatCompLoadTables.cells = 0.;
-            FacilityHeatCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
+            FacilityHeatCompLoadTables.cellUsed.allocate(column::PerArea, rGrdTot);
             FacilityHeatCompLoadTables.cellUsed = false;
 
-            FacilityCoolCompLoadTables.cells.allocate(cPerArea, rGrdTot);
+            FacilityCoolCompLoadTables.cells.allocate(column::PerArea, rGrdTot);
             FacilityCoolCompLoadTables.cells = 0.;
-            FacilityCoolCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
+            FacilityCoolCompLoadTables.cellUsed.allocate(column::PerArea, rGrdTot);
             FacilityCoolCompLoadTables.cellUsed = false;
 
             FacilityZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : FacilityZonesHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(column::PerArea, rGrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(column::PerArea, rGrdTot);
                 e.cellUsed = false;
             }
             FacilityZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : FacilityZonesCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(column::PerArea, rGrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(column::PerArea, rGrdTot);
                 e.cellUsed = false;
             }
         }
@@ -14202,7 +14202,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                     CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     // send latent load info to coil summary report
                     state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(
-                        iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        iZone, ZoneCoolCompLoadTables(iZone).cells(column::Latent, rGrdTot));
 
                     heatDesSelected = state.dataSize->CalcFinalZoneSizing(iZone).HeatDDNum;
                     ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
@@ -14239,7 +14239,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
 
                     // send latent load info to coil summary report
                     state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(
-                        iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        iZone, ZoneHeatCompLoadTables(iZone).cells(column::Latent, rGrdTot));
 
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
@@ -14773,98 +14773,98 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
     if (desDaySelected != 0 && timeOfMax != 0) {
 
         // PEOPLE
-        resultCells(cSensInst, rPeople) =
+        resultCells(column::SensInst, rPeople) =
             MovingAvgAtMaxTime(state, ort->peopleInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rPeople) = true;
-        resultCells(cLatent, rPeople) = MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rPeople) = true;
-        resultCells(cSensDelay, rPeople) = MovingAvgAtMaxTime(state, peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rPeople) = true;
+        resCellsUsd(column::SensInst, rPeople) = true;
+        resultCells(column::Latent, rPeople) = MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::Latent, rPeople) = true;
+        resultCells(column::SensDelay, rPeople) = MovingAvgAtMaxTime(state, peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensDelay, rPeople) = true;
 
         // LIGHTS
-        resultCells(cSensInst, rLights) =
+        resultCells(column::SensInst, rLights) =
             MovingAvgAtMaxTime(state, ort->lightInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rLights) = true;
-        resultCells(cSensRA, rLights) = MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensRA, rLights) = true;
-        resultCells(cSensDelay, rLights) = MovingAvgAtMaxTime(state, lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rLights) = true;
+        resCellsUsd(column::SensInst, rLights) = true;
+        resultCells(column::SensRA, rLights) = MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensRA, rLights) = true;
+        resultCells(column::SensDelay, rLights) = MovingAvgAtMaxTime(state, lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensDelay, rLights) = true;
 
         // EQUIPMENT
-        resultCells(cSensInst, rEquip) = MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rEquip) = true;
-        resultCells(cLatent, rEquip) = MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rEquip) = true;
-        resultCells(cSensDelay, rEquip) = MovingAvgAtMaxTime(state, equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rEquip) = true;
+        resultCells(column::SensInst, rEquip) = MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensInst, rEquip) = true;
+        resultCells(column::Latent, rEquip) = MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::Latent, rEquip) = true;
+        resultCells(column::SensDelay, rEquip) = MovingAvgAtMaxTime(state, equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensDelay, rEquip) = true;
 
         // REFRIGERATION EQUIPMENT
-        resultCells(cSensInst, rRefrig) =
+        resultCells(column::SensInst, rRefrig) =
             MovingAvgAtMaxTime(state, ort->refrigInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rRefrig) = true;
-        resultCells(cSensRA, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensRA, rRefrig) = true;
-        resultCells(cLatent, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rRefrig) = true;
+        resCellsUsd(column::SensInst, rRefrig) = true;
+        resultCells(column::SensRA, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensRA, rRefrig) = true;
+        resultCells(column::Latent, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::Latent, rRefrig) = true;
 
         // WATER USE EQUIPMENT
-        resultCells(cSensInst, rWaterUse) =
+        resultCells(column::SensInst, rWaterUse) =
             MovingAvgAtMaxTime(state, ort->waterUseInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rWaterUse) = true;
-        resultCells(cLatent, rWaterUse) =
+        resCellsUsd(column::SensInst, rWaterUse) = true;
+        resultCells(column::Latent, rWaterUse) =
             MovingAvgAtMaxTime(state, ort->waterUseLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rWaterUse) = true;
+        resCellsUsd(column::Latent, rWaterUse) = true;
 
         // HVAC EQUIPMENT LOSSES
-        resultCells(cSensInst, rHvacLoss) =
+        resultCells(column::SensInst, rHvacLoss) =
             MovingAvgAtMaxTime(state, ort->hvacLossInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rHvacLoss) = true;
-        resultCells(cSensDelay, rHvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rHvacLoss) = true;
+        resCellsUsd(column::SensInst, rHvacLoss) = true;
+        resultCells(column::SensDelay, rHvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensDelay, rHvacLoss) = true;
 
         // POWER GENERATION EQUIPMENT
-        resultCells(cSensInst, rPowerGen) =
+        resultCells(column::SensInst, rPowerGen) =
             MovingAvgAtMaxTime(state, ort->powerGenInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rPowerGen) = true;
-        resultCells(cSensDelay, rPowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rPowerGen) = true;
+        resCellsUsd(column::SensInst, rPowerGen) = true;
+        resultCells(column::SensDelay, rPowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensDelay, rPowerGen) = true;
 
         // DOAS
-        resultCells(cSensInst, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
-        resCellsUsd(cSensInst, rDOAS) = true;
-        resultCells(cLatent, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
-        resCellsUsd(cLatent, rDOAS) = true;
+        resultCells(column::SensInst, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
+        resCellsUsd(column::SensInst, rDOAS) = true;
+        resultCells(column::Latent, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
+        resCellsUsd(column::Latent, rDOAS) = true;
 
         // INFILTRATION
-        resultCells(cSensInst, rInfil) = MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rInfil) = true;
-        resultCells(cLatent, rInfil) = MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rInfil) = true;
+        resultCells(column::SensInst, rInfil) = MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensInst, rInfil) = true;
+        resultCells(column::Latent, rInfil) = MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::Latent, rInfil) = true;
 
         // ZONE VENTILATION
-        resultCells(cSensInst, rZoneVent) =
+        resultCells(column::SensInst, rZoneVent) =
             MovingAvgAtMaxTime(state, ort->zoneVentInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rZoneVent) = true;
-        resultCells(cLatent, rZoneVent) =
+        resCellsUsd(column::SensInst, rZoneVent) = true;
+        resultCells(column::Latent, rZoneVent) =
             MovingAvgAtMaxTime(state, ort->zoneVentLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rZoneVent) = true;
+        resCellsUsd(column::Latent, rZoneVent) = true;
 
         // INTERZONE MIXING
-        resultCells(cSensInst, rIntZonMix) =
+        resultCells(column::SensInst, rIntZonMix) =
             MovingAvgAtMaxTime(state, ort->interZoneMixInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rIntZonMix) = true;
-        resultCells(cLatent, rIntZonMix) =
+        resCellsUsd(column::SensInst, rIntZonMix) = true;
+        resultCells(column::Latent, rIntZonMix) =
             MovingAvgAtMaxTime(state, ort->interZoneMixLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rIntZonMix) = true;
+        resCellsUsd(column::Latent, rIntZonMix) = true;
 
         // FENESTRATION CONDUCTION
-        resultCells(cSensInst, rFeneCond) =
+        resultCells(column::SensInst, rFeneCond) =
             MovingAvgAtMaxTime(state, feneCondInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rFeneCond) = true;
+        resCellsUsd(column::SensInst, rFeneCond) = true;
 
         // FENESTRATION SOLAR
-        resultCells(cSensDelay, rFeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rFeneSolr) = true;
+        resultCells(column::SensDelay, rFeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(column::SensDelay, rFeneSolr) = true;
 
         // opaque surfaces - must combine individual surfaces by class and other side conditions
         delayOpaque = 0.0;
@@ -14932,11 +14932,11 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             }
         }
         for (int k = rRoof; k <= rOtherFlr; ++k) {
-            resultCells(cSensDelay, k) = delayOpaque(k);
-            resCellsUsd(cSensDelay, k) = true;
+            resultCells(column::SensDelay, k) = delayOpaque(k);
+            resCellsUsd(column::SensDelay, k) = true;
         }
-        resultCells(cSensDelay, rOpqDoor) = delayOpaque(rOpqDoor);
-        resCellsUsd(cSensDelay, rOpqDoor) = true;
+        resultCells(column::SensDelay, rOpqDoor) = delayOpaque(rOpqDoor);
+        resCellsUsd(column::SensDelay, rOpqDoor) = true;
     }
 }
 
@@ -15179,72 +15179,72 @@ void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType
 // adds the area column for the load component tables
 void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoad)
 {
-    compLoad.cells(cArea, rPeople) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rPeople) = true;
+    compLoad.cells(column::Area, rPeople) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(column::Area, rPeople) = true;
 
-    compLoad.cells(cArea, rLights) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rLights) = true;
+    compLoad.cells(column::Area, rLights) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(column::Area, rLights) = true;
 
-    compLoad.cells(cArea, rEquip) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rEquip) = true;
+    compLoad.cells(column::Area, rEquip) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(column::Area, rEquip) = true;
 
-    compLoad.cells(cArea, rRefrig) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rRefrig) = true;
+    compLoad.cells(column::Area, rRefrig) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(column::Area, rRefrig) = true;
 
-    compLoad.cells(cArea, rWaterUse) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rWaterUse) = true;
+    compLoad.cells(column::Area, rWaterUse) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(column::Area, rWaterUse) = true;
 
-    compLoad.cells(cArea, rInfil) = compAreas(zoneNum).extWall;
-    compLoad.cellUsed(cArea, rInfil) = true;
+    compLoad.cells(column::Area, rInfil) = compAreas(zoneNum).extWall;
+    compLoad.cellUsed(column::Area, rInfil) = true;
 
-    compLoad.cells(cArea, rRoof) = compAreas(zoneNum).roof;
-    compLoad.cellUsed(cArea, rRoof) = true;
+    compLoad.cells(column::Area, rRoof) = compAreas(zoneNum).roof;
+    compLoad.cellUsed(column::Area, rRoof) = true;
 
-    compLoad.cells(cArea, rIntZonCeil) = compAreas(zoneNum).ceiling;
-    compLoad.cellUsed(cArea, rIntZonCeil) = true;
+    compLoad.cells(column::Area, rIntZonCeil) = compAreas(zoneNum).ceiling;
+    compLoad.cellUsed(column::Area, rIntZonCeil) = true;
 
-    compLoad.cells(cArea, rOtherRoof) = compAreas(zoneNum).roof;
-    compLoad.cellUsed(cArea, rOtherRoof) = true;
+    compLoad.cells(column::Area, rOtherRoof) = compAreas(zoneNum).roof;
+    compLoad.cellUsed(column::Area, rOtherRoof) = true;
 
-    compLoad.cells(cArea, rExtWall) = compAreas(zoneNum).extWall;
-    compLoad.cellUsed(cArea, rExtWall) = true;
+    compLoad.cells(column::Area, rExtWall) = compAreas(zoneNum).extWall;
+    compLoad.cellUsed(column::Area, rExtWall) = true;
 
-    compLoad.cells(cArea, rIntZonWall) = compAreas(zoneNum).intZoneWall;
-    compLoad.cellUsed(cArea, rIntZonWall) = true;
+    compLoad.cells(column::Area, rIntZonWall) = compAreas(zoneNum).intZoneWall;
+    compLoad.cellUsed(column::Area, rIntZonWall) = true;
 
-    compLoad.cells(cArea, rGrdWall) = compAreas(zoneNum).grndCntWall;
-    compLoad.cellUsed(cArea, rGrdWall) = true;
+    compLoad.cells(column::Area, rGrdWall) = compAreas(zoneNum).grndCntWall;
+    compLoad.cellUsed(column::Area, rGrdWall) = true;
 
-    compLoad.cells(cArea, rOtherWall) = compAreas(zoneNum).extWall;
-    compLoad.cellUsed(cArea, rOtherWall) = true;
+    compLoad.cells(column::Area, rOtherWall) = compAreas(zoneNum).extWall;
+    compLoad.cellUsed(column::Area, rOtherWall) = true;
 
-    compLoad.cells(cArea, rExtFlr) = compAreas(zoneNum).extFloor;
-    compLoad.cellUsed(cArea, rExtFlr) = true;
+    compLoad.cells(column::Area, rExtFlr) = compAreas(zoneNum).extFloor;
+    compLoad.cellUsed(column::Area, rExtFlr) = true;
 
-    compLoad.cells(cArea, rIntZonFlr) = compAreas(zoneNum).intZoneFloor;
-    compLoad.cellUsed(cArea, rIntZonFlr) = true;
+    compLoad.cells(column::Area, rIntZonFlr) = compAreas(zoneNum).intZoneFloor;
+    compLoad.cellUsed(column::Area, rIntZonFlr) = true;
 
-    compLoad.cells(cArea, rGrdFlr) = compAreas(zoneNum).grndCntFloor;
-    compLoad.cellUsed(cArea, rGrdFlr) = true;
+    compLoad.cells(column::Area, rGrdFlr) = compAreas(zoneNum).grndCntFloor;
+    compLoad.cellUsed(column::Area, rGrdFlr) = true;
 
-    compLoad.cells(cArea, rOtherFlr) = compAreas(zoneNum).intZoneFloor;
-    compLoad.cellUsed(cArea, rOtherFlr) = true;
+    compLoad.cells(column::Area, rOtherFlr) = compAreas(zoneNum).intZoneFloor;
+    compLoad.cellUsed(column::Area, rOtherFlr) = true;
 
-    compLoad.cells(cArea, rFeneCond) = compAreas(zoneNum).fenestration;
-    compLoad.cellUsed(cArea, rFeneCond) = true;
+    compLoad.cells(column::Area, rFeneCond) = compAreas(zoneNum).fenestration;
+    compLoad.cellUsed(column::Area, rFeneCond) = true;
 
-    compLoad.cells(cArea, rFeneSolr) = compAreas(zoneNum).fenestration;
-    compLoad.cellUsed(cArea, rFeneSolr) = true;
+    compLoad.cells(column::Area, rFeneSolr) = compAreas(zoneNum).fenestration;
+    compLoad.cellUsed(column::Area, rFeneSolr) = true;
 
-    compLoad.cells(cArea, rOpqDoor) = compAreas(zoneNum).door;
-    compLoad.cellUsed(cArea, rOpqDoor) = true;
+    compLoad.cells(column::Area, rOpqDoor) = compAreas(zoneNum).door;
+    compLoad.cellUsed(column::Area, rOpqDoor) = true;
 }
 
 // Used for the AirLoop and Facility level load component tables to sum the results from invidual zones
 void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 const &multiplier)
 {
     // sum the main results
-    for (int col = 1; col <= cPerArea; ++col) {
+    for (int col = 1; col <= column::PerArea; ++col) {
         for (int row = 1; row <= rGrdTot; ++row) {
             compLoadTotal.cells(col, row) += compLoadPartial.cells(col, row) * multiplier;
             compLoadTotal.cellUsed(col, row) = compLoadTotal.cellUsed(col, row) || compLoadPartial.cellUsed(col, row);
@@ -15282,42 +15282,42 @@ void AddTotalRowsForLoadSummary(CompLoadTablesType &compLoadTotal)
 {
 
     // zero the grand total -total cell
-    compLoadTotal.cells(cTotal, rGrdTot) = 0.;
-    compLoadTotal.cellUsed(cTotal, rGrdTot) = true;
+    compLoadTotal.cells(column::Total, rGrdTot) = 0.;
+    compLoadTotal.cellUsed(column::Total, rGrdTot) = true;
 
     // zero the grand total row
-    for (int col = 1; col <= cLatent; ++col) {
+    for (int col = 1; col <= column::Latent; ++col) {
         compLoadTotal.cells(col, rGrdTot) = 0.;
         compLoadTotal.cellUsed(col, rGrdTot) = true;
     }
 
     for (int row = 1; row <= rOpqDoor; ++row) {
         // zero the total column
-        compLoadTotal.cells(cTotal, row) = 0.;
-        compLoadTotal.cellUsed(cTotal, row) = true;
-        for (int col = 1; col <= cLatent; ++col) {
+        compLoadTotal.cells(column::Total, row) = 0.;
+        compLoadTotal.cellUsed(column::Total, row) = true;
+        for (int col = 1; col <= column::Latent; ++col) {
             // add the cell to the grand total row and total column
             if (compLoadTotal.cellUsed(col, row)) {
-                compLoadTotal.cells(cTotal, row) += compLoadTotal.cells(col, row);
+                compLoadTotal.cells(column::Total, row) += compLoadTotal.cells(col, row);
                 compLoadTotal.cells(col, rGrdTot) += compLoadTotal.cells(col, row);
-                compLoadTotal.cells(cTotal, rGrdTot) += compLoadTotal.cells(col, row);
+                compLoadTotal.cells(column::Total, rGrdTot) += compLoadTotal.cells(col, row);
             }
         }
     }
 
     // compute the % grand total column
-    Real64 grandTotalTotal = compLoadTotal.cells(cTotal, rGrdTot);
+    Real64 grandTotalTotal = compLoadTotal.cells(column::Total, rGrdTot);
     if (grandTotalTotal != 0.0) {
         for (int row = 1; row <= rOpqDoor; ++row) {
-            compLoadTotal.cells(cPerc, row) = 100 * compLoadTotal.cells(cTotal, row) / grandTotalTotal;
-            compLoadTotal.cellUsed(cPerc, row) = true;
+            compLoadTotal.cells(column::Perc, row) = 100 * compLoadTotal.cells(column::Total, row) / grandTotalTotal;
+            compLoadTotal.cellUsed(column::Perc, row) = true;
         }
     }
     // compute the Total per Area column
     for (int row = 1; row <= rOpqDoor; ++row) {
-        if (compLoadTotal.cellUsed(cTotal, row) && compLoadTotal.cells(cArea, row) != 0.) {
-            compLoadTotal.cells(cPerArea, row) = compLoadTotal.cells(cTotal, row) / compLoadTotal.cells(cArea, row);
-            compLoadTotal.cellUsed(cPerArea, row) = true;
+        if (compLoadTotal.cellUsed(column::Total, row) && compLoadTotal.cells(column::Area, row) != 0.) {
+            compLoadTotal.cells(column::PerArea, row) = compLoadTotal.cells(column::Total, row) / compLoadTotal.cells(column::Area, row);
+            compLoadTotal.cellUsed(column::PerArea, row) = true;
         }
     }
 }
@@ -15326,7 +15326,7 @@ void AddTotalRowsForLoadSummary(CompLoadTablesType &compLoadTotal)
 void ComputePeakDifference(CompLoadTablesType &compLoad)
 {
     // Estimated Instant + Delayed Sensible Load
-    compLoad.estInstDelSensLoad = compLoad.cells(cSensInst, rGrdTot) + compLoad.cells(cSensDelay, rGrdTot);
+    compLoad.estInstDelSensLoad = compLoad.cells(column::SensInst, rGrdTot) + compLoad.cells(column::SensDelay, rGrdTot);
 
     // Difference
     compLoad.diffPeakEst = compLoad.peakDesSensLoad - compLoad.estInstDelSensLoad;
@@ -15348,19 +15348,19 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
         Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
         Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
         for (int row = 1; row <= rGrdTot; ++row) {
-            for (int col = 1; col <= cTotal; ++col) {
+            for (int col = 1; col <= column::Total; ++col) {
                 if (compLoadTotal.cellUsed(col, row)) {
                     compLoadTotal.cells(col, row) *= powerConversion;
                 }
             }
-            if (compLoadTotal.cellUsed(cPerArea, row)) {
-                compLoadTotal.cells(cPerArea, row) *= powerConversion;
+            if (compLoadTotal.cellUsed(column::PerArea, row)) {
+                compLoadTotal.cells(column::PerArea, row) *= powerConversion;
             }
-            if (compLoadTotal.cellUsed(cArea, row)) {
-                compLoadTotal.cells(cArea, row) *= areaConversion;
+            if (compLoadTotal.cellUsed(column::Area, row)) {
+                compLoadTotal.cells(column::Area, row) *= areaConversion;
             }
-            if (compLoadTotal.cellUsed(cPerArea, row)) {
-                compLoadTotal.cells(cPerArea, row) *= powerPerAreaConversion;
+            if (compLoadTotal.cellUsed(column::PerArea, row)) {
+                compLoadTotal.cells(column::PerArea, row) *= powerPerAreaConversion;
             }
         }
         int tempConvIndx = getSpecificUnitIndex(state, "C", "F");
@@ -15407,19 +15407,19 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
         Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
         Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
         for (int row = 1; row <= rGrdTot; ++row) {
-            for (int col = 1; col <= cTotal; ++col) {
+            for (int col = 1; col <= column::Total; ++col) {
                 if (compLoadTotal.cellUsed(col, row)) {
                     compLoadTotal.cells(col, row) *= powerConversion;
                 }
             }
-            if (compLoadTotal.cellUsed(cPerArea, row)) {
-                compLoadTotal.cells(cPerArea, row) *= powerConversion;
+            if (compLoadTotal.cellUsed(column::PerArea, row)) {
+                compLoadTotal.cells(column::PerArea, row) *= powerConversion;
             }
-            if (compLoadTotal.cellUsed(cArea, row)) {
-                compLoadTotal.cells(cArea, row) *= areaConversion;
+            if (compLoadTotal.cellUsed(column::Area, row)) {
+                compLoadTotal.cells(column::Area, row) *= areaConversion;
             }
-            if (compLoadTotal.cellUsed(cPerArea, row)) {
-                compLoadTotal.cells(cPerArea, row) *= powerPerAreaConversion;
+            if (compLoadTotal.cellUsed(column::PerArea, row)) {
+                compLoadTotal.cells(column::PerArea, row) *= powerPerAreaConversion;
             }
         }
         int tempConvIndx = getSpecificUnitIndex(state, "C", "F");
@@ -15510,7 +15510,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         std::string zonesIncludedName;
         std::string engineeringCheckName;
         for (int coolHeat = 1; coolHeat <= 2; ++coolHeat) {
-            tableBody.allocate(cPerArea, rGrdTot);
+            tableBody.allocate(column::PerArea, rGrdTot);
             tableBody = "";
             if (coolHeat == 1) {
                 curCompLoad = compLoadCool;
@@ -15526,7 +15526,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
                 engineeringCheckName = "Engineering Checks for Heating";
             }
             // move number array into string array
-            for (int c = 1; c <= cPerArea; ++c) {
+            for (int c = 1; c <= column::PerArea; ++c) {
                 for (int r = 1; r <= rGrdTot; ++r) { // to last row before total
                     if (curCompLoad.cellUsed(c, r)) {
                         tableBody(c, r) = RealToStr(curCompLoad.cells(c, r), 2);
@@ -15566,27 +15566,27 @@ void OutputCompLoadSummary(EnergyPlusData &state,
             rowHead(rOpqDoor) = "Opaque Door";
             rowHead(rGrdTot) = "Grand Total";
 
-            columnHead.allocate(cPerArea);
+            columnHead.allocate(column::PerArea);
             if (unitsStyle_para != iUnitsStyle::InchPound) {
-                columnHead(cSensInst) = "Sensible - Instant [W]";
-                columnHead(cSensDelay) = "Sensible - Delayed [W]";
-                columnHead(cSensRA) = "Sensible - Return Air [W]";
-                columnHead(cLatent) = "Latent [W]";
-                columnHead(cTotal) = "Total [W]";
-                columnHead(cPerc) = "%Grand Total";
-                columnHead(cArea) = "Related Area [m2]";
-                columnHead(cPerArea) = "Total per Area [W/m2]";
+                columnHead(column::SensInst) = "Sensible - Instant [W]";
+                columnHead(column::SensDelay) = "Sensible - Delayed [W]";
+                columnHead(column::SensRA) = "Sensible - Return Air [W]";
+                columnHead(column::Latent) = "Latent [W]";
+                columnHead(column::Total) = "Total [W]";
+                columnHead(column::Perc) = "%Grand Total";
+                columnHead(column::Area) = "Related Area [m2]";
+                columnHead(column::PerArea) = "Total per Area [W/m2]";
             } else {
-                columnHead(cSensInst) = "Sensible - Instant [Btu/h]";
-                columnHead(cSensDelay) = "Sensible - Delayed [Btu/h]";
-                columnHead(cSensRA) = "Sensible - Return Air [Btu/h]";
-                columnHead(cLatent) = "Latent [Btu/h]";
-                columnHead(cTotal) = "Total [Btu/h]";
-                columnHead(cPerc) = "%Grand Total";
-                columnHead(cArea) = "Related Area [ft2]";
-                columnHead(cPerArea) = "Total per Area [Btu/h-ft2]";
+                columnHead(column::SensInst) = "Sensible - Instant [Btu/h]";
+                columnHead(column::SensDelay) = "Sensible - Delayed [Btu/h]";
+                columnHead(column::SensRA) = "Sensible - Return Air [Btu/h]";
+                columnHead(column::Latent) = "Latent [Btu/h]";
+                columnHead(column::Total) = "Total [Btu/h]";
+                columnHead(column::Perc) = "%Grand Total";
+                columnHead(column::Area) = "Related Area [ft2]";
+                columnHead(column::PerArea) = "Total per Area [Btu/h-ft2]";
             }
-            columnWidth.dimension(cPerArea, 14); // array assignment - same for all columns
+            columnWidth.dimension(column::PerArea, 14); // array assignment - same for all columns
 
             if (produceTabular_para) {
                 WriteSubtitle(state, peakLoadCompName);

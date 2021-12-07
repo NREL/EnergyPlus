@@ -124,15 +124,18 @@ namespace OutputReportTabular {
         bySpaceType
     };
 
-    // These correspond to the columns in the load component table
-    constexpr int cSensInst(1);
-    constexpr int cSensDelay(2);
-    constexpr int cSensRA(3);
-    constexpr int cLatent(4);
-    constexpr int cTotal(5);
-    constexpr int cPerc(6);
-    constexpr int cArea(7);
-    constexpr int cPerArea(8);
+    enum column // These correspond to the columns in the load component table
+    {
+        Invalid = -1,
+        SensInst = 1,
+        SensDelay,
+        SensRA,
+        Latent,
+        Total,
+        Perc,
+        Area,
+        PerArea
+    };
 
     // internal gains
     constexpr int rPeople(1);

@@ -79,16 +79,20 @@ namespace PipeHeatTransfer {
 
     enum class iEnvrnPtr
     {
-        None,
+        None = -1,
         ZoneEnv,
         ScheduleEnv,
         OutsideAirEnv,
         GroundEnv,
     };
 
-    constexpr int PreviousTimeIndex(1);
-    constexpr int CurrentTimeIndex(2);
-    constexpr int TentativeTimeIndex(3);
+    enum TimeIndex
+    {
+        Invalid = -1,
+        Previous = 1,
+        Current,
+        Tentative
+    };
 
     constexpr Real64 InnerDeltaTime(60.0); // one minute time step in seconds
 

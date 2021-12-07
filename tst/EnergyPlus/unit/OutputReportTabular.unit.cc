@@ -6762,47 +6762,47 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_AddTotalRowsForLoadSummary_test)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(column::PerArea, rGrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(column::PerArea, rGrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cSensInst, rRefrig) = 4.;
-    compLoad.cells(cLatent, rLights) = 10.;
-    compLoad.cells(cLatent, rRefrig) = 20.;
+    compLoad.cells(column::SensInst, rLights) = 3.;
+    compLoad.cells(column::SensInst, rRefrig) = 4.;
+    compLoad.cells(column::Latent, rLights) = 10.;
+    compLoad.cells(column::Latent, rRefrig) = 20.;
 
-    compLoad.cells(cArea, rLights) = 5.;
-    compLoad.cells(cArea, rRefrig) = 5.;
+    compLoad.cells(column::Area, rLights) = 5.;
+    compLoad.cells(column::Area, rRefrig) = 5.;
 
     AddTotalRowsForLoadSummary(compLoad);
 
-    EXPECT_EQ(3. + 4., compLoad.cells(cSensInst, rGrdTot));
-    EXPECT_EQ(10 + 20., compLoad.cells(cLatent, rGrdTot));
-    EXPECT_EQ(3. + 10., compLoad.cells(cTotal, rLights));
-    EXPECT_EQ(4 + 20., compLoad.cells(cTotal, rRefrig));
+    EXPECT_EQ(3. + 4., compLoad.cells(column::SensInst, rGrdTot));
+    EXPECT_EQ(10 + 20., compLoad.cells(column::Latent, rGrdTot));
+    EXPECT_EQ(3. + 10., compLoad.cells(column::Total, rLights));
+    EXPECT_EQ(4 + 20., compLoad.cells(column::Total, rRefrig));
 
-    EXPECT_EQ(37., compLoad.cells(cTotal, rGrdTot));
+    EXPECT_EQ(37., compLoad.cells(column::Total, rGrdTot));
 
-    EXPECT_EQ(100. * 13. / 37., compLoad.cells(cPerc, rLights));
-    EXPECT_EQ(100. * 24. / 37., compLoad.cells(cPerc, rRefrig));
+    EXPECT_EQ(100. * 13. / 37., compLoad.cells(column::Perc, rLights));
+    EXPECT_EQ(100. * 24. / 37., compLoad.cells(column::Perc, rRefrig));
 
-    EXPECT_EQ(13. / 5., compLoad.cells(cPerArea, rLights));
-    EXPECT_EQ(24. / 5., compLoad.cells(cPerArea, rRefrig));
+    EXPECT_EQ(13. / 5., compLoad.cells(column::PerArea, rLights));
+    EXPECT_EQ(24. / 5., compLoad.cells(column::PerArea, rRefrig));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(column::PerArea, rGrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(column::PerArea, rGrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cLatent, rLights) = 10.;
+    compLoad.cells(column::SensInst, rLights) = 3.;
+    compLoad.cells(column::Latent, rLights) = 10.;
 
-    compLoad.cells(cArea, rLights) = 5.;
+    compLoad.cells(column::Area, rLights) = 5.;
 
     compLoad.outsideDryBulb = 20.;
     compLoad.mainFanAirFlow = 0.7;
@@ -6818,10 +6818,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test
 
     LoadSummaryUnitConversion(*state, compLoad);
 
-    EXPECT_EQ(3. * powerConversion, compLoad.cells(cSensInst, rLights));
-    EXPECT_EQ(10. * powerConversion, compLoad.cells(cLatent, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
+    EXPECT_EQ(3. * powerConversion, compLoad.cells(column::SensInst, rLights));
+    EXPECT_EQ(10. * powerConversion, compLoad.cells(column::Latent, rLights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(column::Area, rLights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(column::Area, rLights));
 
     EXPECT_EQ(ConvertIP(*state, tempConvIndx, 20.), compLoad.outsideDryBulb);
     EXPECT_EQ(0.7 * airFlowConversion, compLoad.mainFanAirFlow);
@@ -9091,15 +9091,15 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
 TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(column::PerArea, rGrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(column::PerArea, rGrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cLatent, rLights) = 10.;
+    compLoad.cells(column::SensInst, rLights) = 3.;
+    compLoad.cells(column::Latent, rLights) = 10.;
 
-    compLoad.cells(cArea, rLights) = 5.;
+    compLoad.cells(column::Area, rLights) = 5.;
 
     compLoad.outsideDryBulb = 20.;
     compLoad.mainFanAirFlow = 0.7;
@@ -9116,10 +9116,10 @@ TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
     // LoadSummaryUnitConversion(*state, compLoad);
     LoadSummaryUnitConversion(*state, compLoad, state->dataOutRptTab->unitsStyle_SQLite);
 
-    EXPECT_EQ(3. * powerConversion, compLoad.cells(cSensInst, rLights));
-    EXPECT_EQ(10. * powerConversion, compLoad.cells(cLatent, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
+    EXPECT_EQ(3. * powerConversion, compLoad.cells(column::SensInst, rLights));
+    EXPECT_EQ(10. * powerConversion, compLoad.cells(column::Latent, rLights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(column::Area, rLights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(column::Area, rLights));
 
     EXPECT_EQ(ConvertIP(*state, tempConvIndx, 20.), compLoad.outsideDryBulb);
     EXPECT_EQ(0.7 * airFlowConversion, compLoad.mainFanAirFlow);
