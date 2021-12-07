@@ -82,16 +82,13 @@ namespace ExternalInterface {
     int constexpr indexVariable(2); // Index for variable in inpVarTypes
     int constexpr indexActuator(3); // Index for actuator in inpVarTypes
 
-    enum fmi
-    {
-        Unassigned = -1,
-        OK,
-        Warning,
-        Discard,
-        Error,
-        Fatal,
-        Pending
-    };
+    // used in fmistatus defined in hmiModelFunctions.h
+    int constexpr fmiOK(0);      // fmiOK
+    int constexpr fmiWarning(1); // fmiWarning
+    int constexpr fmiDiscard(2); // fmiDiscard
+    int constexpr fmiError(3);   // fmiError
+    int constexpr fmiFatal(4);   // fmiPending
+    int constexpr fmiPending(5); // fmiPending
 
     struct fmuInputVariableType
     {
