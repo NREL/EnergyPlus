@@ -2333,7 +2333,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.loopNum = 1;
-    state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.loopSideNum = 1;
+    state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.branchNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.compNum = 1;
 
@@ -2344,7 +2344,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.inletNodeNum;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.loopNum = 2;
-    state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.loopSideNum = 1;
+    state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.branchNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.compNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.MassFlowRateMax = 2.0;
@@ -2462,7 +2462,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataPlantHXFluidToFluid->FluidHX(1).ControlSignalTemp = PlantHeatExchangerFluidToFluid::iCtrlTemp::DryBulbTemperature;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.inletNodeNum = 5;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.loopNum = 1;
-    state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.loopSideNum = 2;
+    state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.loopSideNum = DataPlant::LoopSideLocation::Supply;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.branchNum = 2;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.compNum = 1;
 

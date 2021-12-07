@@ -296,7 +296,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     // expect node data to represent full flow
     // SetActuatedBranchFlowRate(*state, CompFlow, ActuatedNode, LoopNum, LoopSideNum, BranchNum, ResetMode )
-    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, DataPlant::LoopSideLocation::Demand, 1, false);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateRequest, NodeMdot);
-    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, DataPlant::LoopSideLocation::Demand, 1, false);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -323,7 +323,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
 
     EXPECT_FALSE(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
-    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, DataPlant::LoopSideLocation::Demand, 1, false);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateRequest, NodeMdot);
-    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, DataPlant::LoopSideLocation::Demand, 1, false);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -350,7 +350,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
 
     // expect node data to represent no flow. Request is also 0's in this function. Max and MaxAvail are not changed
-    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 1, 1, DataPlant::LoopSideLocation::Demand, 1, false);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.0);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateRequest, 0.0);
-    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, 1, 1, false);
+    SetActuatedBranchFlowRate(*state, NodeMdot, 2, 1, DataPlant::LoopSideLocation::Demand, 1, false);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRate, 0.0);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -459,7 +459,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
 
     // expect node data to represent full flow
     // SetComponentFlowRate(*state, CompFlow, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex )
-    SetComponentFlowRate(*state, NodeMdot, 1, 2, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, NodeMdot, 1, 2, 1, DataPlant::LoopSideLocation::Demand, 1, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateRequest, NodeMdot);
-    SetComponentFlowRate(*state, NodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, NodeMdot, 2, 3, 1, DataPlant::LoopSideLocation::Demand, 1, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -488,7 +488,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_NEAR(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).EMSLoadOverrideValue, 1.0, 0.000001);
 
     // expect node data to represent full flow
-    SetComponentFlowRate(*state, NodeMdot, 1, 2, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, NodeMdot, 1, 2, 1, DataPlant::LoopSideLocation::Demand, 1, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -497,7 +497,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateRequest, NodeMdot);
-    SetComponentFlowRate(*state, NodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, NodeMdot, 2, 3, 1, DataPlant::LoopSideLocation::Demand, 1, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRate, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
@@ -516,7 +516,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     Real64 tempNodeMdot(NodeMdot);
 
     // expect node data to represent no flow. Max, MaxAvail, and Request are not changed
-    SetComponentFlowRate(*state, tempNodeMdot, 1, 2, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, tempNodeMdot, 1, 2, 1, DataPlant::LoopSideLocation::Demand, 1, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.0);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRateMaxAvail, NodeMdot);
@@ -526,7 +526,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateRequest, NodeMdot);
     tempNodeMdot = NodeMdot;
-    SetComponentFlowRate(*state, tempNodeMdot, 2, 3, 1, 1, 1, 1);
+    SetComponentFlowRate(*state, tempNodeMdot, 2, 3, 1, DataPlant::LoopSideLocation::Demand, 1, 1);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRate, 0.0);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMax, NodeMdot);
     EXPECT_EQ(state->dataLoopNodes->Node(2).MassFlowRateMaxAvail, NodeMdot);

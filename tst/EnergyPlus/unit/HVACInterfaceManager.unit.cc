@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
 
     // LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt
     // Therefore CapExcessStorageTime AND TotalTime will increase by 1 timestep
-    UpdateHalfLoopInletTemp(*state, 1, 1, TankOutletTemp);
+    UpdateHalfLoopInletTemp(*state, 1, DataPlant::LoopSideLocation::Demand, TankOutletTemp);
     // Excess storage calcs moved here
     PlantManager::UpdateNodeThermalHistory(*state);
     EXPECT_NEAR((2928.82 - 500), state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_MdotCpDeltaT, 0.001);
@@ -104,7 +104,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
 
     // LoopSideInlet_MdotCpDeltaT should be > LoopSideInlet_McpDTdt
     // Therefore TotalTime will increase by 1 more timestep, but CapExcessStorageTime will NOT increase
-    UpdateHalfLoopInletTemp(*state, 1, 1, TankOutletTemp);
+    UpdateHalfLoopInletTemp(*state, 1, DataPlant::LoopSideLocation::Demand, TankOutletTemp);
     // Excess storage calcs moved here
     PlantManager::UpdateNodeThermalHistory(*state);
     EXPECT_NEAR((-588.264 - 500), state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_MdotCpDeltaT, 0.001);

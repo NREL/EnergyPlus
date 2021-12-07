@@ -92,7 +92,6 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     // This test captures all code paths through the RegulateCondenserCompFlowReqOp function
     // We only need a single component to check here
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
     auto &thisComponent = state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1);
@@ -105,49 +104,49 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     thisComponent.CurOpSchemeType = DataPlant::OpScheme::HeatingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = 1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = -1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
     thisComponent.CurOpSchemeType = DataPlant::OpScheme::CoolingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = 1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = -1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
     thisComponent.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased; // meaningful load
 
     thisComponent.MyLoad = 0.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = 1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = -1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
     thisComponent.CurOpSchemeType = DataPlant::OpScheme::Uncontrolled; // NOT meaningful load
 
     thisComponent.MyLoad = 0.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = 1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = -1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
     // if the component's ON flag is true, then it needs to make decisions
@@ -156,49 +155,49 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     thisComponent.CurOpSchemeType = DataPlant::OpScheme::HeatingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = 1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
     thisComponent.MyLoad = -1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
     thisComponent.CurOpSchemeType = DataPlant::OpScheme::CoolingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = 1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
     thisComponent.MyLoad = -1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
     thisComponent.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased; // meaningful load
 
     thisComponent.MyLoad = 0.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
     thisComponent.MyLoad = 1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
     thisComponent.MyLoad = -1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
     thisComponent.CurOpSchemeType = DataPlant::OpScheme::Uncontrolled; // NOT meaningful load
 
     thisComponent.MyLoad = 0.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
     thisComponent.MyLoad = 1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
     thisComponent.MyLoad = -1000.0;
-    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
+    returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, DataPlant::LoopSideLocation::Demand, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 }
 
@@ -254,14 +253,14 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
 
     // We'll set up two plant loops, the one to test and the connected one
     // each one will need a single loop side, but no branches are checked or anything like that
-    int thisLoopNum = 1, thisLoopSideNum = 1, thisBranchNum = 1, thisCompNum = 1;
-    int connectedLoopNum = 2, connectedLoopSideNum = 1;
+    int thisLoopNum = 1, thisBranchNum = 1, thisCompNum = 1;
+    DataPlant::LoopSideLocation thisLoopSideNum = DataPlant::LoopSideLocation::Demand;
+    int connectedLoopNum = 2;
+    DataPlant::LoopSideLocation connectedLoopSideNum = DataPlant::LoopSideLocation::Demand;
     int criteriaCheckIndex1 = 0, criteriaCheckIndex2 = 0, criteriaCheckIndex3 = 0;
     Real64 criteriaValue1 = 0.0, criteriaValue2 = 0.0, criteriaValue3 = 0.0;
 
     state->dataPlnt->PlantLoop.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide.allocate(1);
     auto &connectedLoopSide = state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)];
 
     // the first time we call each criteria check, we should just get an index back and it should trigger the connected loop
@@ -458,7 +457,6 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     // We will leverage the LogPlantConvergencePoints function to manage the history terms
     // That function is nice because it is very tightly contained, so we don't have to set up a lot of global state
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
     state->dataLoopNodes->Node.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumOut = 2;
@@ -538,7 +536,6 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
     // test out some stuff on the scan plant loops function, for now just verifying errFlag is passed by reference
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
-
     state->dataLoopNodes->Node.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumOut = 2;
@@ -550,14 +547,15 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::Boiler_Simple;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TotalBranches = 0; // just skip the supply side search
 
-    int loopNum = 0, loopSideNum = 0, branchNum = 0, compNum = 0;
+    int loopNum = 0, branchNum = 0, compNum = 0;
+    DataPlant::LoopSideLocation loopSideNum = DataPlant::LoopSideLocation::Invalid;
     bool errorFlag = false;
 
     // test simple searching first
     PlantUtilities::ScanPlantLoopsForObject(
         *state, "comp_name", DataPlant::PlantEquipmentType::Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_EQ(1, loopNum);
-    EXPECT_EQ(1, loopSideNum);
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, loopSideNum));
     EXPECT_EQ(1, branchNum);
     EXPECT_EQ(1, compNum);
     EXPECT_FALSE(errorFlag);

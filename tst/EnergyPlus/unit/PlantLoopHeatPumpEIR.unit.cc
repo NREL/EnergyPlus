@@ -446,7 +446,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
-    PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -469,11 +469,11 @@ TEST_F(EnergyPlusFixture, Initialization)
 
     // validate that location work got done correctly
     EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.loopNum);
-    EXPECT_EQ(2, thisCoolingPLHP->loadSideLocation.loopSideNum);
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Supply, thisCoolingPLHP->loadSideLocation.loopSideNum));
     EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.branchNum);
     EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.compNum);
     EXPECT_EQ(2, thisCoolingPLHP->sourceSideLocation.loopNum);
-    EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.loopSideNum);
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, thisCoolingPLHP->sourceSideLocation.loopSideNum));
     EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.branchNum);
     EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.compNum);
 
@@ -607,9 +607,9 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     loop2demandComponent2.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // the init call expects a "from" calling point
-    PlantLocation myCoolingLoadLocation = PlantLocation(1, 2, 1, 1);
-    PlantLocation myCoolingSourceLocation = PlantLocation(2, 1, 1, 1);
-    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+    PlantLocation myCoolingSourceLocation = PlantLocation(2, DataPlant::LoopSideLocation::Demand, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 2);
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -793,7 +793,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     loop2demandComponent2.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -922,8 +922,8 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     loop2demandComponent2.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
     // the init call expects a "from" calling point
-    PlantLocation myCoolingLoadLocation = PlantLocation(1, 2, 1, 1);
-    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 2);
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1025,7 +1025,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     loop2demandComponent1.NodeNumIn = thisHeatingPLHP->sourceSideNodes.inlet;
 
     // the init call expects a "from" calling point
-    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1114,7 +1114,7 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     loop2demandComponent1.NodeNumIn = thisHeatingPLHP->sourceSideNodes.inlet;
 
     // the init call expects a "from" calling point
-    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1184,7 +1184,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
 
     // do a little setup here
     thisCoolingPLHP->loadSideLocation.loopNum = 1;
-    thisCoolingPLHP->loadSideLocation.loopSideNum = 2;
+    thisCoolingPLHP->loadSideLocation.loopSideNum = DataPlant::LoopSideLocation::Supply;
     thisCoolingPLHP->loadSideLocation.branchNum = 1;
     thisCoolingPLHP->loadSideLocation.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
@@ -1260,7 +1260,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
-    PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -1414,7 +1414,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     PLHPPlantDemandSideComp.Name = thisCoolingPLHP->name;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1512,8 +1512,8 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
-    PlantLocation mySourceLocation = PlantLocation(2, 1, 1, 1);
+    PlantLocation myLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+    PlantLocation mySourceLocation = PlantLocation(2, DataPlant::LoopSideLocation::Demand, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -1646,7 +1646,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
     PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
@@ -1867,7 +1867,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -1984,7 +1984,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
@@ -2198,7 +2198,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
-    PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -2367,8 +2367,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     loop1supplyComponent2.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
 
     // the init call expects a "from" calling point
-    PlantLocation myCoolingLoadLocation = PlantLocation(1, 2, 1, 1);
-    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 2);
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -2527,8 +2527,8 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     loop1supplyComponent2.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
 
     // the init call expects a "from" calling point
-    PlantLocation myCoolingLoadLocation = PlantLocation(1, 2, 1, 1);
-    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 2);
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -2676,7 +2676,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
 
     // do a little setup here
     thisCoolingPLHP->loadSideLocation.loopNum = 1;
-    thisCoolingPLHP->loadSideLocation.loopSideNum = 2;
+    thisCoolingPLHP->loadSideLocation.loopSideNum = DataPlant::LoopSideLocation::Supply;
     thisCoolingPLHP->loadSideLocation.branchNum = 1;
     thisCoolingPLHP->loadSideLocation.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
@@ -2763,7 +2763,7 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
@@ -2864,7 +2864,7 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
-    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRHeating, "HP HEATING SIDE");
@@ -2955,7 +2955,7 @@ TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
     PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
-    PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");

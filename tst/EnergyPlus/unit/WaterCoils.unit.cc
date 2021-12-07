@@ -1127,7 +1127,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = 3;
     state->dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = 4;
     state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
@@ -1702,12 +1702,12 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataHeatBalFanSys->TempControlType(1) = 4;
 
     state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(2).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterCoils->WaterCoil(2).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(2).WaterLoopCompNum = 1;
 
     state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 2;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
@@ -1733,8 +1733,8 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
     state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopNum = 2;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopNum = 1;
-    state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopSide = 1;
-    state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopSide = 1;
+    state->dataFanCoilUnits->FanCoil(1).CoolCoilLoopSide = DataPlant::LoopSideLocation::Demand;
+    state->dataFanCoilUnits->FanCoil(1).HeatCoilLoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
     state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidOutletNodeNum = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
     state->dataFanCoilUnits->FanCoil(1).CoolCoilBranchNum = 1;

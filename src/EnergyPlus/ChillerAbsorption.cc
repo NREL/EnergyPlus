@@ -1788,7 +1788,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
             CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                              state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                              state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
-                                                             state.dataPlnt->PlantLoop(static_cast<int>(GenLoopSideNum)).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(static_cast<int>(GenLoopSideNum)+1).FluidIndex, // +1 is a dirty hack to escape without diffs for now, it should be GenLoopNum instead of GenLoopSideNum
                                                              RoutineName);
             if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide[static_cast<int>(this->GenLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
                 if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {

@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
         "    SPACE1-1 Supply Inlet,   !- Terminal Unit Outlet Node Name",
         "    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name",
         "    SPACE1-1 PTAC Outlet,    !- Terminal Unit Secondary Air Inlet Node Name",
-        "    LoopSideLocation::Supply;              !- Terminal Unit Connection Type",
+        "    SupplySide;              !- Terminal Unit Connection Type",
 
         "ZoneHVAC:AirDistributionUnit,",
         "    SPACE1-1 DOAS ATU,       !- Name",
@@ -1475,7 +1475,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
         "    SPACE1-1 Supply Inlet,      !- Terminal Unit Outlet Node Name",
         "    SPACE1-1 Air Terminal Mixer Primary Inlet,  !- Terminal Unit Primary Air Inlet Node Name",
         "    SPACE1-1 Heat Pump Outlet,  !- Terminal Unit Secondary Air Inlet Node Name",
-        "    LoopSideLocation::Supply;                 !- Terminal Unit Connection Type",
+        "    SupplySide;                 !- Terminal Unit Connection Type",
 
         "ZoneHVAC:AirDistributionUnit,",
         "    SPACE1-1 DOAS ATU,       !- Name",
@@ -2577,7 +2577,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
         "    TU1 Outlet Node,              !- Terminal Unit Outlet Node Name",
         "    SPACE1-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name",
         "    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name",
-        "    LoopSideLocation::Supply;                                   !- Terminal Unit Connection Type",
+        "    SupplySide;                                   !- Terminal Unit Connection Type",
 
         "ZoneHVAC:AirDistributionUnit,",
         "    SPACE1-1 DOAS ATU,       !- Name",
@@ -5018,7 +5018,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
         "    TU1 Outlet Node,             !- Terminal Unit Outlet Node Name",
         "    SPACE1-1 Air Terminal Mixer Primary Inlet,    !- Terminal Unit Primary Air Inlet Node Name",
         "    SPACE1-1 Air Terminal Mixer Secondary Inlet,  !- Terminal Unit Secondary Air Inlet Node Name",
-        "    LoopSideLocation::Supply;                                   !- Terminal Unit Connection Type",
+        "    SupplySide;                                   !- Terminal Unit Connection Type",
 
         "ZoneHVAC:AirDistributionUnit,",
         "    SPACE1-1 DOAS ATU,       !- Name",
@@ -7020,7 +7020,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
         "    SPACE1-1 Supply Inlet,      !- Terminal Unit Outlet Node Name",
         "    SPACE1-1 Primary Air Inlet, !- Terminal Unit Primary Air Inlet Node Name",
         "    SPACE1-1 Unit Vent Outlet,  !- Terminal Unit Secondary Air Inlet Node Name",
-        "    LoopSideLocation::Supply;                 !- Terminal Unit Connection Type",
+        "    SupplySide;                 !- Terminal Unit Connection Type",
 
         "  ZoneHVAC:AirDistributionUnit,",
         "    SPACE1-1 DOAS ATU,       !- Name",
@@ -7357,7 +7357,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
         "    SPACE1-2 Supply Inlet,!- Terminal Unit Outlet Node Name",
         "    SPACE1-2 Air Terminal Mixer Primary Inlet,   !- Terminal Unit Primary Air Inlet Node Name",
         "    SPACE1-2 Air Terminal Mixer Secondary Inlet, !- Terminal Unit Secondary Air Inlet Node Name",
-        "    LoopSideLocation::Supply,         !- Terminal Unit Connection Type",
+        "    SupplySide,         !- Terminal Unit Connection Type",
         "    ;                   !- Design Specification Outdoor Air Object Name",
 
         "ZoneHVAC:AirDistributionUnit,",
@@ -7623,7 +7623,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     thisFanCoil.CCoilName_Index = 2;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
     CWCoil.WaterLoopNum = 2;
-    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     CWCoil.WaterLoopBranchNum = 1;
     CWCoil.WaterLoopCompNum = 1;
     // hot water coil
@@ -7631,7 +7631,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     thisFanCoil.HCoilName_Index = 1;
     state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
     HWCoil.WaterLoopNum = 1;
-    HWCoil.WaterLoopSide = 1;
+    HWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     HWCoil.WaterLoopBranchNum = 1;
     HWCoil.WaterLoopCompNum = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
@@ -8056,7 +8056,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     thisFanCoil.CCoilName_Index = 2;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
     CWCoil.WaterLoopNum = 2;
-    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     CWCoil.WaterLoopBranchNum = 1;
     CWCoil.WaterLoopCompNum = 1;
     // hot water coil
@@ -8064,7 +8064,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     thisFanCoil.HCoilName_Index = 1;
     state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
     HWCoil.WaterLoopNum = 1;
-    HWCoil.WaterLoopSide = 1;
+    HWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     HWCoil.WaterLoopBranchNum = 1;
     HWCoil.WaterLoopCompNum = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {

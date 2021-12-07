@@ -1770,7 +1770,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
 
     // second call, turn off initLoopEquip so it tries to do a simulation
     initLoopEquip = false;
-    EnergyPlus::PlantLocation myLocation = EnergyPlus::PlantLocation(1, 2, 1, 1);
+    EnergyPlus::PlantLocation myLocation = EnergyPlus::PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
     Real64 curLoad = 0.0;
     thisCircuit->simulate(*state, myLocation, true, curLoad, true);
 

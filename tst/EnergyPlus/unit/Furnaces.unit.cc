@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum = 5;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterOutletNodeNum = 6;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopNum = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).BranchNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompNum = 1;
 
@@ -284,7 +284,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum = 7;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterOutletNodeNum = 8;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopNum = 2;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).BranchNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompNum = 1;
 
@@ -295,7 +295,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
         auto &loop(state->dataPlnt->PlantLoop(loopindex));
 
-        auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide[LoopSideLocation::Demand]);
+        auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)]);
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
         auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1));

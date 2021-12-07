@@ -109,7 +109,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     thisEFC.WaterOutletNodeNum = 2;
     thisEFC.OutdoorAirInletNodeNum = 0;
     thisEFC.LoopNum = 1;
-    thisEFC.LoopSideNum = 1;
+    thisEFC.LoopSideNum = DataPlant::LoopSideLocation::Demand;
     thisEFC.BranchNum = 1;
     thisEFC.CompNum = 1;
     PlantLocation pl;
@@ -126,7 +126,6 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     state->dataLoopNodes->Node(1).MassFlowRateMax = 0.05;
     state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = 0.05;
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].FlowLock = DataPlant::FlowLock::Locked;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
@@ -157,7 +156,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     ExpectedMinLoad = 0.0;
 
     // Call the routine to be tested and see if the fix is correct
-    PlantLocation loc = PlantLocation(1, 1, 1, 1);
+    PlantLocation loc = PlantLocation(1, DataPlant::LoopSideLocation::Demand, 1, 1);
     thisEFC.onInitLoopEquip(*state, loc);
     thisEFC.getDesignCapacities(*state, pl, MaxLoad, MinLoad, OptLoad);
     EXPECT_NEAR(MaxLoad, ExpectedMaxLoad, 0.01);

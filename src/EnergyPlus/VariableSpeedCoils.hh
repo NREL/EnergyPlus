@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {

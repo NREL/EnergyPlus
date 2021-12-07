@@ -605,7 +605,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     }
 
     state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
@@ -919,7 +919,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     }
 
     state->dataSteamCoils->SteamCoil(1).LoopNum = 1;
-    state->dataSteamCoils->SteamCoil(1).LoopSide = 1;
+    state->dataSteamCoils->SteamCoil(1).LoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataSteamCoils->SteamCoil(1).BranchNum = 1;
     state->dataSteamCoils->SteamCoil(1).CompNum = 1;
 

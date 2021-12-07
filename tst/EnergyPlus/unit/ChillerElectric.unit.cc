@@ -310,7 +310,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     thisChiller.size(*state);
 
     // simulate
-    PlantLocation loc(1, 1, 1, 1);
+    PlantLocation loc(1, DataPlant::LoopSideLocation::Demand, 1, 1);
     bool firstHVAC = true;
     Real64 curLoad = -10000.0;
     bool runFlag = true;

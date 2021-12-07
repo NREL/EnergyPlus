@@ -480,7 +480,6 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
-
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)]);
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
@@ -3390,7 +3389,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE4-1 Supply Inlet,   !- Mixer Outlet Node Name",
         "    SPACE4-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name",
         "    SPACE4-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name",
-        "    LoopSideLocation::Supply,              !- Mixer Connection Type",
+        "    SupplySide,              !- Mixer Connection Type",
         "    SZ DSOA SPACE4-1,        !- Design Specification Outdoor Air Object Name",
         "    CurrentOccupancy;        !- Per Person Ventilation Rate Mode",
 
@@ -3401,7 +3400,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE5-1 Supply Inlet,   !- Mixer Outlet Node Name",
         "    SPACE5-1 Air Terminal Mixer Primary Inlet,  !- Mixer Primary Air Inlet Node Name",
         "    SPACE5-1 PTAC Outlet,    !- Mixer Secondary Air Inlet Node Name",
-        "    LoopSideLocation::Supply,              !- Mixer Connection Type",
+        "    SupplySide,              !- Mixer Connection Type",
         "    SZ DSOA SPACE5-1,        !- Design Specification Outdoor Air Object Name",
         "    CurrentOccupancy;        !- Per Person Ventilation Rate Mode",
 

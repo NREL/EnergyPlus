@@ -709,7 +709,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.ActuatedNode = 2;
     thisController.ActuatedNodePlantLoopBranchNum = 0;
     thisController.ActuatedNodePlantLoopNum = 0;
-    thisController.ActuatedNodePlantLoopSide = 0;
+    thisController.ActuatedNodePlantLoopSide = DataPlant::LoopSideLocation::Invalid;
 
     // Case 1 - not converged yet, no override yet, return untouched
     isConverged = false;

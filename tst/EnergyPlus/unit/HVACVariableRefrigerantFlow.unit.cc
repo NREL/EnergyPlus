@@ -8330,7 +8330,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
 
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
 
@@ -8443,7 +8443,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
     state->dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
     state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
-    state->dataSteamCoils->SteamCoil(CoilNum).LoopSide = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).LoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;

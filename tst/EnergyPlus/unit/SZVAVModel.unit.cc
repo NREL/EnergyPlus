@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.CoolCoilFluidInletNode = 0;
     thisUnit.CoolCoilFluidOutletNodeNum = 0;
     thisUnit.CoolCoilLoopNum = 0;
-    thisUnit.CoolCoilLoopSide = 0;
+    thisUnit.CoolCoilLoopSide = DataPlant::LoopSideLocation::Invalid;
     thisUnit.CoolCoilBranchNum = 0;
     thisUnit.CoolCoilCompNum = 0;
     thisUnit.CoolCoilInletNodeNum = 2;
@@ -202,7 +202,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.HeatCoilFluidInletNode = 0;
     thisUnit.HeatCoilFluidOutletNodeNum = 0;
     thisUnit.HeatCoilLoopNum = 0;
-    thisUnit.HeatCoilLoopSide = 0;
+    thisUnit.HeatCoilLoopSide = DataPlant::LoopSideLocation::Invalid;
     thisUnit.HeatCoilBranchNum = 0;
     thisUnit.HeatCoilCompNum = 0;
     thisUnit.HeatCoilInletNodeNum = 4;
@@ -676,7 +676,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
     CWCoil.WaterLoopNum = 1;
-    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     CWCoil.WaterLoopBranchNum = 1;
     CWCoil.WaterLoopCompNum = 1;
     // electric heating coil
