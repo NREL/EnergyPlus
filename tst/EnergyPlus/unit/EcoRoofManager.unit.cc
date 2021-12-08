@@ -54,12 +54,12 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/WaterManager.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EcoRoofManager;
@@ -205,59 +205,23 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
     WaterManager::GetWaterManagerInput(*state);
     state->dataWaterData->RainFall.CurrentAmount = 0.002;
 
-    EcoRoofManager::UpdateSoilProps(*state,
-                                    Moisture,
-                                    MeanRootMoisture,
-                                    MoistureMax,
-                                    MoistureResidual,
-                                    SoilThickness,
-                                    Vfluxf,
-                                    Vfluxg,
-                                    ConstrNum,
-                                    Alphag,
-                                    unit,
-                                    Tg,
-                                    Tf,
-                                    Qsoil);
+    EcoRoofManager::UpdateSoilProps(
+        *state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
     ASSERT_EQ(state->dataEcoRoofMgr->CurrentPrecipitation, state->dataWaterData->RainFall.CurrentAmount);
 
     // Without site:precipitation, use epw "LiquidPrecipitation"
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
     state->dataEnvrn->LiquidPrecipitation = 0.005;
-    EcoRoofManager::UpdateSoilProps(*state,
-                                    Moisture,
-                                    MeanRootMoisture,
-                                    MoistureMax,
-                                    MoistureResidual,
-                                    SoilThickness,
-                                    Vfluxf,
-                                    Vfluxg,
-                                    ConstrNum,
-                                    Alphag,
-                                    unit,
-                                    Tg,
-                                    Tf,
-                                    Qsoil);
+    EcoRoofManager::UpdateSoilProps(
+        *state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
     ASSERT_EQ(state->dataEcoRoofMgr->CurrentPrecipitation, 0.005 * state->dataHVACGlobal->TimeStepSys);
 
     // without site:precipitation, "LiquidPrecipitation" is also missing, but rain flag is on
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
     state->dataEnvrn->LiquidPrecipitation = 0.0;
     state->dataEnvrn->IsRain = true;
-    EcoRoofManager::UpdateSoilProps(*state,
-                                    Moisture,
-                                    MeanRootMoisture,
-                                    MoistureMax,
-                                    MoistureResidual,
-                                    SoilThickness,
-                                    Vfluxf,
-                                    Vfluxg,
-                                    ConstrNum,
-                                    Alphag,
-                                    unit,
-                                    Tg,
-                                    Tf,
-                                    Qsoil);
+    EcoRoofManager::UpdateSoilProps(
+        *state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
     ASSERT_EQ(state->dataEcoRoofMgr->CurrentPrecipitation, 0.0015 * state->dataHVACGlobal->TimeStepSys);
 }
 
