@@ -704,7 +704,7 @@ namespace DataPlant {
         //  then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
         //  as the flow going through the actual supply side
         if (this->hasConstSpeedBranchPumps && this->myLoopSideNum == DataPlant::LoopSideLocation::Supply && thisPlantLoop.CommonPipeType != DataPlant::CommonPipeType::No) {
-            const DataPlant::LoopSideLocation OtherSide = InvertLoopSide(this->myLoopSideNum);
+            const DataPlant::LoopSideLocation OtherSide = LoopSideOther[static_cast<int>(this->myLoopSideNum)];
             const int otherSideOutletNodeNum = thisPlantLoop.LoopSide[static_cast<int>(OtherSide)].NodeNumOut;
             Real64 commonPipeFlow = state.dataLoopNodes->Node(otherSideOutletNodeNum).MassFlowRate - ThisLoopSideFlow;
             Real64 otherSideExitingTemperature = state.dataLoopNodes->Node(otherSideOutletNodeNum).Temp;

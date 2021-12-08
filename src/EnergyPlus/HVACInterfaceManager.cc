@@ -612,7 +612,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     Real64 TankAverageTemp;
 
     // find tank inlet and outlet nodes
-    TankOutletLoopSide = DataPlant::InvertLoopSide(TankInletLoopSide);
+    TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
     TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankInletLoopSide)].NodeNumOut;
     TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].NodeNumIn;
 
@@ -755,7 +755,7 @@ void UpdateCommonPipe(
     Real64 TankAverageTemp;
 
     // find tank inlet and outlet nodes
-    TankOutletLoopSide = DataPlant::InvertLoopSide(TankInletLoopSide);
+    TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
     TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankInletLoopSide)].NodeNumOut;
     TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].NodeNumIn;
 

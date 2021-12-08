@@ -70,11 +70,7 @@ enum class LoopSideLocation
     Num
 };
 
-constexpr LoopSideLocation InvertLoopSide (const LoopSideLocation &input) {
-    if (input == LoopSideLocation::Demand) return LoopSideLocation::Supply;
-    else if (input == LoopSideLocation::Supply) return LoopSideLocation::Demand;
-    else return LoopSideLocation::Invalid;
-}
+constexpr std::array<LoopSideLocation, static_cast<int>(LoopSideLocation::Num)> LoopSideOther = {LoopSideLocation::Supply, LoopSideLocation::Demand};
 
 // Parameters for scheme types
 // Used in TYPE(OperationData)%Type

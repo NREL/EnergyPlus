@@ -204,7 +204,7 @@ void ManagePlantLoops(EnergyPlusData &state,
 
             LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
             LoopSide = static_cast<int>(state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide);
-            OtherSide = static_cast<int>(InvertLoopSide(static_cast<LoopSideLocation>(LoopSide))); // will give us 1 if LoopSide is 2, or 2 if LoopSide is 1
+            OtherSide = static_cast<int>(LoopSideOther[LoopSide]); // will give us 1 if LoopSide is 2, or 2 if LoopSide is 1
 
             auto &this_loop(state.dataPlnt->PlantLoop(LoopNum));
             auto &this_loop_side(this_loop.LoopSide[static_cast<int>(LoopSide)]);
@@ -1585,7 +1585,7 @@ void GetPlantInput(EnergyPlusData &state)
             // TODO: this is just intended to be temporary
             loopSide.myLoopNum = LoopNum;
             loopSide.myLoopSideNum = static_cast<LoopSideLocation>(LoopSideNum);
-            loopSide.myOtherLoopSideNum = InvertLoopSide(static_cast<LoopSideLocation>(LoopSideNum));
+            loopSide.myOtherLoopSideNum = LoopSideOther[LoopSideNum];
 
         } // ... end LoopSideNum=LoopSideLocation::Demand,LoopSideLocation::Supply
 
