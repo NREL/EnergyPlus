@@ -1609,7 +1609,7 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
     for (int ThisLoopNum = 1; ThisLoopNum <= isize(state.dataPlnt->PlantLoop); ++ThisLoopNum) {
         auto &loop(state.dataPlnt->PlantLoop(ThisLoopNum));
         for (int ThisLoopSide = static_cast<int>(DataPlant::LoopSideLocation::Demand); ThisLoopSide < loop.LoopSide.size(); ++ThisLoopSide) {
-            auto &loop_side(loop.LoopSide[static_cast<int>(ThisLoopSide)]);
+            auto &loop_side(loop.LoopSide[ThisLoopSide]);
 
             if (FirstHVACIteration) {
                 loop_side.InletNode.TemperatureHistory = 0.0;

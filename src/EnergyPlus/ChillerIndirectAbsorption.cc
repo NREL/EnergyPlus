@@ -854,7 +854,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                       this->CWLoopNum,
                                                       this->CWLoopSideNum,
                                                       this->GenLoopNum,
-                                                      static_cast<DataPlant::LoopSideLocation>(this->GenCompNum),
+                                                      static_cast<DataPlant::LoopSideLocation>(this->GenCompNum -1), // -1 is a hack to escape without diffs for now, it should be GenLoopSideNum instead of GenCompNum
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       true);
     }
@@ -864,7 +864,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                       this->CDLoopNum,
                                                       this->CDLoopSideNum,
                                                       this->GenLoopNum,
-                                                      static_cast<DataPlant::LoopSideLocation>(this->GenCompNum),
+                                                      static_cast<DataPlant::LoopSideLocation>(this->GenCompNum-1), // -1 is a hack to escape without diffs for now, it should be GenLoopSideNum instead of GenCompNum
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       false);
     }
