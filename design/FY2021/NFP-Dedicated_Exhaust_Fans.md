@@ -5,7 +5,7 @@ Dedicated Exhaust System for Flexible Exhaust Configurations
 
  - Original Date: July 30, 2021
  - Revised: August 2, 2021, revise and start design
- - Revised: Dec 3, 2021, 
+ - Revised: Dec 7, 2021, 
 
 ## Justification for New Feature ##
 
@@ -78,8 +78,7 @@ Each zone that is connected to an inlet node of an AirLoopHVAC:ExhaustSystem is 
 
 A ZoneHVAC:ExhaustSystem object defines a controlled exhaust flow from a zone. The inlet node is a zone exaust node. The outlet node is an inlet to an AirLoopHVAC:ExhaustSystem object. Is it similar to Fan:ZoneExhaust but has additional control options and assumes a central exhaust fan drives the flow, with a damper for flow control.
 
-One piece of important information about each of the individual zone exhausts is the design flow rate. 
-This will be autosizable with options base on area, outdoor air flow or suppy flow.
+One piece of important information about each of the individual zone exhausts is the design flow rate. This will be autosizable with options base on area, outdoor air flow or suppy flow.
 
 **OPTION FOR DISCUSSION:** Should the sizing options for exhaust flow rate be here in the ZoneHVAC:ExhaustSystem object or in Sizing:Zone, or DesignSpeification:OutdoorAir, or ???.
 
@@ -100,7 +99,7 @@ ZoneHVAC:ExhaustSystem,
 
 #### ZoneHVAC:ExhaustSystem as Zone Equipment ####
 
-The newly ZoneHVAC:ExhaustSystem will be simulated as zone equipment, so it must be added to the zone equipment list. 
+The new ZoneHVAC:ExhaustSystem will be simulated as zone equipment, so it must be added to the zone equipment list. 
 
 It is also possible to included multiple ZoneHVAC:ExhaustSystem objects for a single zone, such as mutiple exhaust hoods in a laboratory [4, 5] which may operate on different schedules. 
 
@@ -123,7 +122,7 @@ AirLoopHVAC:ExhaustSystem,
   A1 , \field Name
        \required-field
        \note Name of the exhaust system
-  A2,  \field Availability Manager List Name
+  A2 , \field Availability Manager List Name
        \note Enter the name of an AvailabilityManagerAssignmentList object.
        \note If this field is blank, the exhaust system is always available.
        \type object-list
@@ -146,7 +145,7 @@ AirLoopHVAC:ExhaustSystem,
        \type node
   A7 , \field Inlet 3 Node Name
        \type node
-  A8 , \field Inlet 4 Node Name
+  A8 ; \field Inlet 4 Node Name
        \type node
 ```
 
@@ -201,7 +200,7 @@ ZoneHVAC:ExhaustSystem,
        \note Schedule name of the minimum exhaust flow fraction
        \type object-list
        \object-list ScheduleNames
-  A10, \field Balanced Exhaust Fraction Schedule Name
+  A10; \field Balanced Exhaust Fraction Schedule Name
        \note Schedule name of the Balance Exhaust Fraction
        \type object-list
        \object-list ScheduleNames
@@ -244,7 +243,7 @@ Since the feature is based on completely newly added blocks, an older version wo
 
 The proposed new feature development will add the following contents to the Input Output Reference document:
 
-The AirLoopHVAC:ExhaustSystem and ZoneHVAC:ExhaustSystem objects are used to describe the way that the exhaust air streams are configured. These objects provide a way for the exhaust air streams from multiple zones to be rerouted and recombined to form a new central exhausts. The exhaust system is  composed of a central exhaust fan, the inlet nodes, (and an implicit exhaust mixer).
+The AirLoopHVAC:ExhaustSystem and ZoneHVAC:ExhaustSystem objects are used to describe the way that the exhaust air streams are configured. These objects provide a way for the exhaust air streams from multiple zones to be rerouted and recombined to form a new central exhausts. The exhaust system is composed of a central exhaust fan, the inlet nodes, (and an implicit exhaust mixer).
 
 ### AirLoopHVAC:ExhaustSystem Input Fields ###
 
@@ -293,11 +292,11 @@ The input fields for the ZoneHVAC:ExhaustSystem object are as follows.
 
 #### Field: Name ####
 
-The name of the ZoneHVAC:ExhaustSystem.
+This is the name of the ZoneHVAC:ExhaustSystem.
 
 #### Field: Availablity Schedule Name ####
 
-This is the aviability schedule name of the ZoneHVAC:Exhaust equipment. A schedule value of zero means off, and >0 means on. If the connected AirloopHVAC:ExhaustSystem is on, then this schedule may be used to turn off the ZoneHVAC:Exhaust system. If the connected AirloopHVAC:Exhaust is off, then this ZoneHVAC;Exhuast system will be off, and this schedule will be ignored.
+This is the aviability schedule name of the ZoneHVAC:Exhaust equipment. A schedule value of zero means off, and >0 means on. If the connected AirloopHVAC:ExhaustSystem is on, then this schedule may be used to turn on (or off) the ZoneHVAC:Exhaust system. If the connected AirloopHVAC:Exhaust is off, then this ZoneHVAC:Exhuast system will be off, and this schedule will be ignored.
 
 #### Field: Inlet Node Name ####
 
@@ -332,9 +331,7 @@ This is the schedule name for the minimum exhaust flow fraction. If left empty, 
 
 #### Field: Balanced Exhaust Fraction Schedule Name ####
 
-This field is optional. If it is not used, then all the exhaust air flow is assumed to be unbalanced
-by any simple airflows, such as infiltration, ventilation, or zone mixing. Unbalanced exhaust is then
-modeled as being provided by the outdoor air system in the central air system... **copy the rest from Fan:ZoneExhaust**.
+This field is optional. If it is not used, then all the exhaust air flow is assumed to be unbalanced by any simple airflows, such as infiltration, ventilation, or zone mixing. Unbalanced exhaust is then modeled as being provided by the outdoor air system in the central air system. **copy the rest from Fan:ZoneExhaust**. The modeling of unbalanced will reduce the flow rates at the zone’s return air node by the flow rate that is being exhausted and will ensure that the outdoor air flow rate is sufficient to serve the exhaust. If this field is used, then enter the name of a schedule with fractional values between 0.0 and 1.0, inclusive. This fraction is applied to the exhaust fan flow rate and the model tracks the portion of the exhaust that is balanced. Balanced exhaust is then modeled as being provided by simple airflows and does not impact the central air system return air or outdoor air flow rates. For example, if a kitchen zone with an exhaust fan is designed to draw half of its make up air from a neighboring dining room and the other half from the outdoor air system, then a schedule value of 0.5 could be used here. This input field must be blank when the zone air flow balance is enforced. If user specifies a schedule and zone air flow balance is enforced, then EnergyPlus throws a warning error message, ignores the schedule and simulation continues.
 
 An example of the ZoneHVAC:ExhaustSystem input object is like this:
 ```
