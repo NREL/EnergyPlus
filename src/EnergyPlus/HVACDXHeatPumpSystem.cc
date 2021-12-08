@@ -564,8 +564,8 @@ namespace HVACDXHeatPumpSystem {
         using VariableSpeedCoils::SimVariableSpeedCoils;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIte(500);   // Maximum number of iterations for solver
-        Real64 const Acc(1.e-3); // Accuracy of solver result
+        int constexpr MaxIte(500);   // Maximum number of iterations for solver
+        Real64 constexpr Acc(1.e-3); // Accuracy of solver result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CompName; // Name of the DX cooling coil

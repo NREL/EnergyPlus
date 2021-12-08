@@ -51,7 +51,7 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    int const NumConvergenceHistoryTerms = 5;
+    int constexpr NumConvergenceHistoryTerms = 5;
 
     struct PlantConvergencePoint
     {

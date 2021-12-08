@@ -157,9 +157,6 @@ void SimPackagedTerminalUnit(EnergyPlusData &state,
     // Using/Aliasing
 
     using namespace DataZoneEnergyDemands;
-    using DataZoneEquipment::PkgTermACAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPWaterToAir_Num;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PTUnitNum(0); // index of packaged terminal heat pump being simulated
@@ -185,11 +182,11 @@ void SimPackagedTerminalUnit(EnergyPlusData &state,
     } else {
         {
             auto const SELECT_CASE_var(PTUnitType);
-            if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
+            if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
                 PTUnitNum = CompIndex;
-            } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
+            } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
                 PTUnitNum = CompIndex + state.dataPTHP->NumPTHP;
-            } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
+            } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
                 PTUnitNum = CompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
             } else {
                 assert(false);
@@ -476,9 +473,6 @@ void GetPTUnit(EnergyPlusData &state)
     using DataHVACGlobals::WaterConstant;
     using DataHVACGlobals::WaterConstantOnDemand;
     using DataHVACGlobals::WaterCycling;
-    using DataZoneEquipment::PkgTermACAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPWaterToAir_Num;
     using OutAirNodeManager::CheckOutAirNodeNumber;
     using SingleDuct::GetATMixer;
     using VariableSpeedCoils::GetCoilCapacityVariableSpeed;
@@ -621,7 +615,7 @@ void GetPTUnit(EnergyPlusData &state)
         state.dataPTHP->PTUnit(PTUnitNum).Name = Alphas(1);
         state.dataPTHP->PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
         state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTHPUnit;
-        state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = PkgTermHPAirToAir_Num;
+        state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir;
         if (lAlphaBlanks(2)) {
             state.dataPTHP->PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
@@ -1080,8 +1074,8 @@ void GetPTUnit(EnergyPlusData &state)
                    state.dataPTHP->PTUnit(PTUnitNum).ATMixerSecNode,
                    state.dataPTHP->PTUnit(PTUnitNum).ATMixerOutNode,
                    state.dataPTHP->PTUnit(PTUnitNum).AirOutNode);
-        state.dataPTHP->PTUnit(PTUnitNum).ZonePtr =
-            DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::PkgTermHPAirToAir_Num, state.dataPTHP->PTUnit(PTUnitNum).Name);
+        state.dataPTHP->PTUnit(PTUnitNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+            state, DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir, state.dataPTHP->PTUnit(PTUnitNum).Name);
         if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr == 0) {
             ShowSevereError(state,
                             std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\",");
@@ -1646,7 +1640,7 @@ void GetPTUnit(EnergyPlusData &state)
         state.dataPTHP->PTUnit(PTUnitNum).Name = Alphas(1);
         state.dataPTHP->PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
         state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTACUnit;
-        state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = PkgTermACAirToAir_Num;
+        state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
         if (lAlphaBlanks(2)) {
             state.dataPTHP->PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
@@ -1893,8 +1887,7 @@ void GetPTUnit(EnergyPlusData &state)
                         state, "...occurs in " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\"");
                     ErrorsFound = true;
                 }
-                if (GetTypeOfCoil(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) !=
-                    state.dataSteamCoils->ZoneLoadControl) {
+                if (GetTypeOfCoil(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex, ACHeatCoilName, errFlag) != SteamCoils::ZoneLoadControl) {
                     if (errFlag) {
                         ShowContinueError(state,
                                           "...occurs in " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + " \"" +
@@ -2037,8 +2030,8 @@ void GetPTUnit(EnergyPlusData &state)
                    state.dataPTHP->PTUnit(PTUnitNum).ATMixerSecNode,
                    state.dataPTHP->PTUnit(PTUnitNum).ATMixerOutNode,
                    state.dataPTHP->PTUnit(PTUnitNum).AirOutNode);
-        state.dataPTHP->PTUnit(PTUnitNum).ZonePtr =
-            DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::PkgTermACAirToAir_Num, state.dataPTHP->PTUnit(PTUnitNum).Name);
+        state.dataPTHP->PTUnit(PTUnitNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+            state, DataZoneEquipment::ZoneEquip::PkgTermACAirToAir, state.dataPTHP->PTUnit(PTUnitNum).Name);
         if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr == 0) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\",");
             ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
@@ -2564,7 +2557,7 @@ void GetPTUnit(EnergyPlusData &state)
         state.dataPTHP->PTUnit(PTUnitNum).Name = Alphas(1);
         state.dataPTHP->PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
         state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTWSHPUnit;
-        state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = PkgTermHPWaterToAir_Num;
+        state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir;
         if (lAlphaBlanks(2)) {
             state.dataPTHP->PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
         } else {
@@ -4040,8 +4033,7 @@ void InitPTUnit(EnergyPlusData &state,
     using SteamCoils::SimulateSteamCoilComponents;
     auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
     auto &GetSteamCoilCapacity(SteamCoils::GetCoilCapacity);
-    using DataPlant::TypeOf_CoilSteamAirHeating;
-    using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
     using Fans::GetFanVolFlow;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
@@ -4132,7 +4124,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
@@ -4169,7 +4161,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
@@ -4214,7 +4206,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                        TypeOf_CoilWaterSimpleHeating,
+                                        DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
@@ -4244,7 +4236,7 @@ void InitPTUnit(EnergyPlusData &state,
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
-                                        TypeOf_CoilSteamAirHeating,
+                                        DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
@@ -5144,10 +5136,6 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
     using DataHVACGlobals::CoolingCapacitySizing;
     using DataHVACGlobals::HeatingAirflowSizing;
     using DataHVACGlobals::HeatingCapacitySizing;
-    using DataZoneEquipment::PkgTermACAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPWaterToAir_Num;
-
     using VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed;
     using VariableSpeedCoils::SimVariableSpeedCoils;
     using WaterCoils::SetCoilDesFlow;
@@ -5542,8 +5530,8 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
             state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
             ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirFlow = false;
 
-            if (state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == PkgTermHPAirToAir_Num ||
-                state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == PkgTermACAirToAir_Num) {
+            if (state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir ||
+                state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == AutoSize &&
                     state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
                     SizingMethod = AutoCalculateSizing;
@@ -5942,8 +5930,8 @@ void ControlPTUnitOutput(EnergyPlusData &state,
     Real64 mdot; // coil fluid mass flow rate (kg/s)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIte(500);    // maximum number of iterations
-    Real64 const MinPLF(0.0); // minimum part load factor allowed
+    int constexpr MaxIte(500);    // maximum number of iterations
+    Real64 constexpr MinPLF(0.0); // minimum part load factor allowed
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 FullOutput;   // unit full output when compressor is operating [W]
@@ -6259,8 +6247,8 @@ void CalcPTUnit(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const ErrTolerance(0.001); // convergence limit for hotwater coil
-    int const SolveMaxIter(50);
+    Real64 constexpr ErrTolerance(0.001); // convergence limit for hotwater coil
+    int constexpr SolveMaxIter(50);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int OutletNode;            // PTHP air outlet node
@@ -6283,12 +6271,12 @@ void CalcPTUnit(EnergyPlusData &state,
     int ATMixOutNode(0); // outlet node of ATM Mixer
 
     // Tuned Named constants to avoid heap allocation when passed to Optional args
-    bool const True(true);
-    bool const False(false);
-    int const iZero(0);
-    int const iOne(1);
-    Real64 const dZero(0.0);
-    Real64 const dOne(1.0);
+    bool constexpr True(true);
+    bool constexpr False(false);
+    int constexpr iZero(0);
+    int constexpr iOne(1);
+    Real64 constexpr dZero(0.0);
+    Real64 constexpr dOne(1.0);
 
     OutletNode = state.dataPTHP->PTUnit(PTUnitNum).AirOutNode;
     InletNode = state.dataPTHP->PTUnit(PTUnitNum).AirInNode;
@@ -7301,7 +7289,7 @@ void ReportPTUnit(EnergyPlusData &state, int const PTUnitNum) // number of the c
         1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
 }
 
-int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)
+int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, DataZoneEquipment::ZoneEquip const PTUnitType)
 {
 
     // FUNCTION INFORMATION:
@@ -7318,11 +7306,6 @@ int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, 
 
     // REFERENCES:
     // na
-
-    // Using/Aliasing
-    using DataZoneEquipment::PkgTermACAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPWaterToAir_Num;
 
     // Return value
     int GetPTUnitZoneInletAirNode;
@@ -7358,11 +7341,11 @@ int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, 
 
     {
         auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
+        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
             PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
+        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
             PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
+        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
             PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
         } else {
             assert(false);
@@ -7376,7 +7359,7 @@ int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, 
     return GetPTUnitZoneInletAirNode;
 }
 
-int GetPTUnitOutAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)
+int GetPTUnitOutAirNode(EnergyPlusData &state, int const PTUnitCompIndex, DataZoneEquipment::ZoneEquip const PTUnitType)
 {
 
     // FUNCTION INFORMATION:
@@ -7393,11 +7376,6 @@ int GetPTUnitOutAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int co
 
     // REFERENCES:
     // na
-
-    // Using/Aliasing
-    using DataZoneEquipment::PkgTermACAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPWaterToAir_Num;
 
     // Return value
     int GetPTUnitOutAirNode;
@@ -7433,11 +7411,11 @@ int GetPTUnitOutAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int co
 
     {
         auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
+        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
             PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
+        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
             PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
+        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
             PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
         } else {
             assert(false);
@@ -7452,7 +7430,7 @@ int GetPTUnitOutAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int co
     return GetPTUnitOutAirNode;
 }
 
-int GetPTUnitReturnAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)
+int GetPTUnitReturnAirNode(EnergyPlusData &state, int const PTUnitCompIndex, DataZoneEquipment::ZoneEquip const PTUnitType)
 {
 
     // FUNCTION INFORMATION:
@@ -7471,9 +7449,6 @@ int GetPTUnitReturnAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int
     // na
 
     // Using/Aliasing
-    using DataZoneEquipment::PkgTermACAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPWaterToAir_Num;
     using MixedAir::GetOAMixerReturnNodeNumber;
 
     // Return value
@@ -7508,11 +7483,11 @@ int GetPTUnitReturnAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int
 
     {
         auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
+        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
             PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
+        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
             PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
+        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
             PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
         } else {
             assert(false);
@@ -7532,7 +7507,7 @@ int GetPTUnitReturnAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int
     return GetPTUnitReturnAirNode;
 }
 
-int GetPTUnitMixedAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)
+int GetPTUnitMixedAirNode(EnergyPlusData &state, int const PTUnitCompIndex, DataZoneEquipment::ZoneEquip const PTUnitType)
 {
 
     // FUNCTION INFORMATION:
@@ -7551,9 +7526,6 @@ int GetPTUnitMixedAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int 
     // na
 
     // Using/Aliasing
-    using DataZoneEquipment::PkgTermACAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPAirToAir_Num;
-    using DataZoneEquipment::PkgTermHPWaterToAir_Num;
     using MixedAir::GetOAMixerMixedNodeNumber;
 
     // Return value
@@ -7588,11 +7560,11 @@ int GetPTUnitMixedAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int 
 
     {
         auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == PkgTermHPAirToAir_Num) {
+        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
             PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == PkgTermACAirToAir_Num) {
+        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
             PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == PkgTermHPWaterToAir_Num) {
+        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
             PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
         } else {
             assert(false);
@@ -7828,7 +7800,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const MaxIte(500); // maximum number of iterations
+    int constexpr MaxIte(500); // maximum number of iterations
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

@@ -66,12 +66,23 @@ struct EnergyPlusData;
 
 namespace HeatBalFiniteDiffManager {
 
-    Real64 constexpr TempInitValue(23.0);       // Initialization value for Temperature
-    Real64 constexpr RhovInitValue(0.0115);     // Initialization value for Rhov
-    Real64 constexpr EnthInitValue(100.0);      // Initialization value for Enthalpy
-    constexpr Real64 smalldiff(1.e-8);          // Used in places where "equality" tests should not be used.
-    constexpr int CrankNicholsonSecondOrder(1); // original CondFD scheme.  semi implicit, second order in time
-    constexpr int FullyImplicitFirstOrder(2);   // fully implicit scheme, first order in time.
+    Real64 constexpr TempInitValue(23.0);   // Initialization value for Temperature
+    Real64 constexpr RhovInitValue(0.0115); // Initialization value for Rhov
+    Real64 constexpr EnthInitValue(100.0);  // Initialization value for Enthalpy
+    constexpr Real64 smalldiff(1.e-8);      // Used in places where "equality" tests should not be used.
+
+    enum class CondFDScheme
+    {
+        Unassigned = -1,
+        CrankNicholsonSecondOrder, // original CondFD scheme.  semi implicit, second order in time
+        FullyImplicitFirstOrder,   // fully implicit scheme, first order in time.
+        NUM
+    };
+
+    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesCC = {"CrankNicholsonSecondOrder",
+                                                                                                                  "FullyImplicitFirstOrder"};
+    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesUC = {"CRANKNICHOLSONSECONDORDER",
+                                                                                                                  "FULLYIMPLICITFIRSTORDER"};
 
     struct ConstructionDataFD
     {
@@ -294,19 +305,18 @@ namespace HeatBalFiniteDiffManager {
 
 struct HeatBalFiniteDiffMgr : BaseGlobalStruct
 {
-    Array1D_string const cCondFDSchemeType = Array1D_string(2, {"CrankNicholsonSecondOrder", "FullyImplicitFirstOrder"});
-
     Array1D<Real64> SigmaR; // Total Resistance of construction layers
     Array1D<Real64> SigmaC; // Total Capacitance of construction layers
 
     Array1D<Real64> QHeatInFlux;  // HeatFlux on Surface for reporting
     Array1D<Real64> QHeatOutFlux; // HeatFlux on Surface for reporting
 
-    int CondFDSchemeType = HeatBalFiniteDiffManager::FullyImplicitFirstOrder; // solution scheme for CondFD - default
-    Real64 SpaceDescritConstant = 3.0;                                        // spatial descritization constant,
-    Real64 MinTempLimit = -100.0;                                             // lower limit check, degree C
-    Real64 MaxTempLimit = 100.0;                                              // upper limit check, degree C
-    int MaxGSiter = 30;                                                       // maximum number of Gauss Seidel iterations
+    HeatBalFiniteDiffManager::CondFDScheme CondFDSchemeType =
+        HeatBalFiniteDiffManager::CondFDScheme::FullyImplicitFirstOrder; // solution scheme for CondFD - default
+    Real64 SpaceDescritConstant = 3.0;                                   // spatial descritization constant,
+    Real64 MinTempLimit = -100.0;                                        // lower limit check, degree C
+    Real64 MaxTempLimit = 100.0;                                         // upper limit check, degree C
+    int MaxGSiter = 30;                                                  // maximum number of Gauss Seidel iterations
     Real64 fracTimeStepZone_Hour = 0.0;
     bool GetHBFiniteDiffInputFlag = true;
     int WarmupSurfTemp = 0;
@@ -323,7 +333,7 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct
         this->SigmaC.deallocate();
         this->QHeatInFlux.deallocate();
         this->QHeatOutFlux.deallocate();
-        this->CondFDSchemeType = HeatBalFiniteDiffManager::FullyImplicitFirstOrder;
+        this->CondFDSchemeType = HeatBalFiniteDiffManager::CondFDScheme::FullyImplicitFirstOrder;
         this->SpaceDescritConstant = 3.0;
         this->MinTempLimit = -100.0;
         this->MaxTempLimit = 100.0;

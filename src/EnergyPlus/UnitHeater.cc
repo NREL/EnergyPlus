@@ -225,8 +225,7 @@ namespace UnitHeater {
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::FanType_SimpleVAV;
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
         using DataSizing::AutoSize;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanIndex;
@@ -459,22 +458,24 @@ namespace UnitHeater {
 
             // Heating coil information:
             {
-                auto const SELECT_CASE_var(Alphas(7));
-                if (SELECT_CASE_var == "COIL:HEATING:WATER") {
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->WaterHeatingCoil;
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-                } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->SteamCoil;
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
-                } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->ElectricCoil;
-                } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType = state.dataUnitHeaters->GasCoil;
-                } else {
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type =
+                    static_cast<HCoilType>(getEnumerationValue(HCoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(7))));
+                switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
+                case HCoilType::WaterHeatingCoil:
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+                    break;
+                case HCoilType::SteamCoil:
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
+                    break;
+                case HCoilType::Electric:
+                case HCoilType::Gas:
+                    break;
+                default: {
                     ShowSevereError(state, "Illegal " + cAlphaFields(7) + " = " + Alphas(7));
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + '=' + state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
                     ErrorsFound = true;
                     errFlag = true;
+                }
                 }
             }
             if (!errFlag) {
@@ -488,11 +489,11 @@ namespace UnitHeater {
                 } else {
                     // The heating coil control node is necessary for hot water and steam coils, but not necessary for an
                     // electric or gas coil.
-                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil ||
-                        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->SteamCoil) {
+                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::WaterHeatingCoil ||
+                        state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
                         // mine the hot water or steam node from the coil object
                         errFlag = false;
-                        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil) {
+                        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::WaterHeatingCoil) {
                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode =
                                 GetCoilWaterInletNode(state, "Coil:Heating:Water", state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName, errFlag);
                         } else { // its a steam coil
@@ -748,10 +749,8 @@ namespace UnitHeater {
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::UnitHeater_Num;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -789,21 +788,22 @@ namespace UnitHeater {
 
         if (allocated(ZoneComp)) {
             if (state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(UnitHeater_Num).ZoneCompAvailMgrs(UnitHeatNum).AvailManagerListName =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailManagerListName =
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
-                ZoneComp(UnitHeater_Num).ZoneCompAvailMgrs(UnitHeatNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).ZoneNum = ZoneNum;
                 state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum) = false;
             }
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus = ZoneComp(UnitHeater_Num).ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
         }
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
-                (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
+            if ((state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+                (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
-                                        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_PlantTypeNum,
+                                        state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
@@ -867,7 +867,7 @@ namespace UnitHeater {
             state.dataLoopNodes->Node(InNode).MassFlowRateMax = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirMassFlow;
             state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
 
-            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil) {
+            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::WaterHeatingCoil) {
                 rho = GetDensityGlycol(state,
                                        state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
@@ -886,7 +886,7 @@ namespace UnitHeater {
                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum);
             }
-            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->SteamCoil) {
+            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
                 TempSteamIn = 100.00;
                 SteamDensity = GetSatDensityRefrig(
                     state, fluidNameSteam, TempSteamIn, 1.0, state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_FluidIndex, RoutineName);
@@ -1155,7 +1155,7 @@ namespace UnitHeater {
             IsAutoSize = true;
         }
 
-        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil) {
+        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::WaterHeatingCoil) {
 
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
@@ -1310,7 +1310,7 @@ namespace UnitHeater {
             IsAutoSize = true;
         }
 
-        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->SteamCoil) {
+        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
 
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
@@ -1497,12 +1497,11 @@ namespace UnitHeater {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitHeater_Num;
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(100); // maximum number of iterations
+        int constexpr MaxIter(100); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControlNode;        // the hot water inlet node
@@ -1549,7 +1548,7 @@ namespace UnitHeater {
                 //         OR child fan in not available OR child fan not being cycled ON by sys avail manager
                 //         OR child fan being forced OFF by sys avail manager
                 state.dataUnitHeaters->HCoilOn = false;
-                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil) {
+                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::WaterHeatingCoil) {
                     mdot = 0.0; // try to turn off
 
                     SetComponentFlowRate(state,
@@ -1561,7 +1560,7 @@ namespace UnitHeater {
                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum);
                 }
-                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->SteamCoil) {
+                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
                     mdot = 0.0; // try to turn off
 
                     SetComponentFlowRate(state,
@@ -1582,7 +1581,7 @@ namespace UnitHeater {
                     // Case 2: NO LOAD OR COOLING/ON-OFF FAN CONTROL-->turn everything off
                     //         because there is no load on the unit heater
                     state.dataUnitHeaters->HCoilOn = false;
-                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil) {
+                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::WaterHeatingCoil) {
                         mdot = 0.0; // try to turn off
 
                         SetComponentFlowRate(state,
@@ -1594,7 +1593,7 @@ namespace UnitHeater {
                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum);
                     }
-                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->SteamCoil) {
+                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
                         mdot = 0.0; // try to turn off
 
                         SetComponentFlowRate(state,
@@ -1615,7 +1614,7 @@ namespace UnitHeater {
                     // so there is really nothing else left to do except call the components.
 
                     state.dataUnitHeaters->HCoilOn = false;
-                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->WaterHeatingCoil) {
+                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::WaterHeatingCoil) {
                         mdot = 0.0; // try to turn off
 
                         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum > 0) {
@@ -1629,7 +1628,7 @@ namespace UnitHeater {
                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum);
                         }
                     }
-                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType == state.dataUnitHeaters->SteamCoil) {
+                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
                         mdot = 0.0; // try to turn off
                         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum > 0) {
                             SetComponentFlowRate(state,
@@ -1648,47 +1647,51 @@ namespace UnitHeater {
 
             } else { // Case 4: HEATING-->unit is available and there is a heating load
 
-                {
-                    auto const SELECT_CASE_var(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType);
+                switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
 
-                    if (SELECT_CASE_var == state.dataUnitHeaters->WaterHeatingCoil) {
+                case HCoilType::WaterHeatingCoil: {
 
-                        // On the first HVAC iteration the system values are given to the controller, but after that
-                        // the demand limits are in place and there needs to be feedback to the Zone Equipment
-                        if (FirstHVACIteration) {
-                            MaxWaterFlow = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow;
-                            MinWaterFlow = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MinHotWaterFlow;
-                        } else {
-                            MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
-                            MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
-                        }
-                        // control water flow to obtain output matching QZnReq
-                        ControlCompOutput(state,
-                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
-                                          state.dataUnitHeaters->cMO_UnitHeater,
-                                          UnitHeatNum,
-                                          FirstHVACIteration,
-                                          state.dataUnitHeaters->QZnReq,
-                                          ControlNode,
-                                          MaxWaterFlow,
-                                          MinWaterFlow,
-                                          ControlOffset,
-                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).ControlCompTypeNum,
-                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).CompErrIndex,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
-                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
-                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum);
-
-                    } else if ((SELECT_CASE_var == state.dataUnitHeaters->ElectricCoil) || (SELECT_CASE_var == state.dataUnitHeaters->GasCoil) ||
-                               (SELECT_CASE_var == state.dataUnitHeaters->SteamCoil)) {
-                        state.dataUnitHeaters->HCoilOn = true;
-                        CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, QUnitOut);
+                    // On the first HVAC iteration the system values are given to the controller, but after that
+                    // the demand limits are in place and there needs to be feedback to the Zone Equipment
+                    if (FirstHVACIteration) {
+                        MaxWaterFlow = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow;
+                        MinWaterFlow = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MinHotWaterFlow;
+                    } else {
+                        MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
+                        MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
                     }
+                    // control water flow to obtain output matching QZnReq
+                    ControlCompOutput(state,
+                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
+                                      state.dataUnitHeaters->cMO_UnitHeater,
+                                      UnitHeatNum,
+                                      FirstHVACIteration,
+                                      state.dataUnitHeaters->QZnReq,
+                                      ControlNode,
+                                      MaxWaterFlow,
+                                      MinWaterFlow,
+                                      ControlOffset,
+                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).ControlCompTypeNum,
+                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).CompErrIndex,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
+                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
+                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum);
+                    break;
+                }
+                case HCoilType::Electric:
+                case HCoilType::Gas:
+                case HCoilType::SteamCoil: {
+                    state.dataUnitHeaters->HCoilOn = true;
+                    CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, QUnitOut);
+                    break;
+                }
+                default:
+                    break;
                 }
             }
             QUnitOut = state.dataLoopNodes->Node(OutletNode).MassFlowRate *
@@ -1796,7 +1799,6 @@ namespace UnitHeater {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitHeater_Num;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -1841,53 +1843,59 @@ namespace UnitHeater {
                     state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
 
-            {
-                auto const SELECT_CASE_var(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType);
+            switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
 
-                if (SELECT_CASE_var == state.dataUnitHeaters->WaterHeatingCoil) {
+            case HCoilType::WaterHeatingCoil: {
 
-                    SimulateWaterCoilComponents(state,
-                                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
-                                                FirstHVACIteration,
-                                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index);
-                } else if (SELECT_CASE_var == state.dataUnitHeaters->SteamCoil) {
+                SimulateWaterCoilComponents(state,
+                                            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
+                                            FirstHVACIteration,
+                                            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index);
+                break;
+            }
+            case HCoilType::SteamCoil: {
 
-                    if (!state.dataUnitHeaters->HCoilOn) {
-                        QCoilReq = 0.0;
-                    } else {
-                        HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
-                        QCoilReq = state.dataUnitHeaters->QZnReq -
-                                   state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                       (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
-                                        state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                    }
-                    if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SimulateSteamCoilComponents(state,
-                                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
-                                                FirstHVACIteration,
-                                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
-                                                QCoilReq);
-
-                } else if ((SELECT_CASE_var == state.dataUnitHeaters->ElectricCoil) || (SELECT_CASE_var == state.dataUnitHeaters->GasCoil)) {
-
-                    if (!state.dataUnitHeaters->HCoilOn) {
-                        QCoilReq = 0.0;
-                    } else {
-                        HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
-                        QCoilReq = state.dataUnitHeaters->QZnReq -
-                                   state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                       (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
-                                        state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                    }
-                    if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
-                                                  FirstHVACIteration,
-                                                  QCoilReq,
-                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index);
+                if (!state.dataUnitHeaters->HCoilOn) {
+                    QCoilReq = 0.0;
+                } else {
+                    HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
+                    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
+                    QCoilReq =
+                        state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
+                                                            (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
+                                                             state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
                 }
+                if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
+                SimulateSteamCoilComponents(state,
+                                            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
+                                            FirstHVACIteration,
+                                            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
+                                            QCoilReq);
+                break;
+            }
+            case HCoilType::Electric:
+            case HCoilType::Gas: {
+
+                if (!state.dataUnitHeaters->HCoilOn) {
+                    QCoilReq = 0.0;
+                } else {
+                    HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
+                    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
+                    QCoilReq =
+                        state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
+                                                            (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
+                                                             state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
+                }
+                if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
+                SimulateHeatingCoilComponents(state,
+                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
+                                              FirstHVACIteration,
+                                              QCoilReq,
+                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index);
+                break;
+            }
+            default:
+                break;
             }
 
             AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
@@ -1915,92 +1923,99 @@ namespace UnitHeater {
                 state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
                     state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
-            {
-                auto const SELECT_CASE_var(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilType);
+            switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
 
-                if (SELECT_CASE_var == state.dataUnitHeaters->WaterHeatingCoil) {
+            case HCoilType::WaterHeatingCoil: {
 
-                    if (!state.dataUnitHeaters->HCoilOn) {
-                        mdot = 0.0;
-                        QCoilReq = 0.0;
-                    } else {
-                        HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
-                        QCoilReq = state.dataUnitHeaters->QZnReq -
-                                   state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                       (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
-                                        state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                        mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadFrac;
-                    }
-                    if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum);
-                    SimulateWaterCoilComponents(state,
-                                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
-                                                FirstHVACIteration,
-                                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
-                                                QCoilReq,
-                                                FanOpMode,
-                                                PartLoadFrac);
-                } else if (SELECT_CASE_var == state.dataUnitHeaters->SteamCoil) {
-                    if (!state.dataUnitHeaters->HCoilOn) {
-                        mdot = 0.0;
-                        QCoilReq = 0.0;
-                    } else {
-                        HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
-                        QCoilReq = state.dataUnitHeaters->QZnReq -
-                                   state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                       (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
-                                        state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                        mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadFrac;
-                    }
-                    if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SetComponentFlowRate(state,
-                                         mdot,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum);
-                    SimulateSteamCoilComponents(state,
-                                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
-                                                FirstHVACIteration,
-                                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
-                                                QCoilReq,
-                                                _,
-                                                FanOpMode,
-                                                PartLoadFrac);
-                } else if ((SELECT_CASE_var == state.dataUnitHeaters->ElectricCoil) || (SELECT_CASE_var == state.dataUnitHeaters->GasCoil)) {
-
-                    if (!state.dataUnitHeaters->HCoilOn) {
-                        QCoilReq = 0.0;
-                    } else {
-                        HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
-                        QCoilReq = state.dataUnitHeaters->QZnReq -
-                                   state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
-                                       (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
-                                        state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                    }
-                    if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SimulateHeatingCoilComponents(state,
-                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
-                                                  FirstHVACIteration,
-                                                  QCoilReq,
-                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
-                                                  _,
-                                                  _,
-                                                  FanOpMode,
-                                                  PartLoadFrac);
+                if (!state.dataUnitHeaters->HCoilOn) {
+                    mdot = 0.0;
+                    QCoilReq = 0.0;
+                } else {
+                    HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
+                    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
+                    QCoilReq =
+                        state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
+                                                            (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
+                                                             state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
+                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadFrac;
                 }
+                if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum);
+                SimulateWaterCoilComponents(state,
+                                            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
+                                            FirstHVACIteration,
+                                            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
+                                            QCoilReq,
+                                            FanOpMode,
+                                            PartLoadFrac);
+                break;
+            }
+            case HCoilType::SteamCoil: {
+                if (!state.dataUnitHeaters->HCoilOn) {
+                    mdot = 0.0;
+                    QCoilReq = 0.0;
+                } else {
+                    HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
+                    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
+                    QCoilReq =
+                        state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
+                                                            (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
+                                                             state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
+                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadFrac;
+                }
+                if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
+                SetComponentFlowRate(state,
+                                     mdot,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum,
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum);
+                SimulateSteamCoilComponents(state,
+                                            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
+                                            FirstHVACIteration,
+                                            state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
+                                            QCoilReq,
+                                            _,
+                                            FanOpMode,
+                                            PartLoadFrac);
+                break;
+            }
+            case HCoilType::Electric:
+            case HCoilType::Gas: {
+
+                if (!state.dataUnitHeaters->HCoilOn) {
+                    QCoilReq = 0.0;
+                } else {
+                    HCoilInAirNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode;
+                    CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).HumRat);
+                    QCoilReq =
+                        state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
+                                                            (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
+                                                             state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
+                }
+                if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
+                SimulateHeatingCoilComponents(state,
+                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
+                                              FirstHVACIteration,
+                                              QCoilReq,
+                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
+                                              _,
+                                              _,
+                                              FanOpMode,
+                                              PartLoadFrac);
+                break;
+            }
+            default:
+                break;
             }
             state.dataLoopNodes->Node(OutletNode).MassFlowRate =
                 state.dataLoopNodes->Node(InletNode).MassFlowRate; // maintain continuity through unit heater

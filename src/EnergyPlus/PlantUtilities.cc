@@ -101,7 +101,6 @@ void InitComponentNodes(EnergyPlusData &state,
     //  reset inlet node if more restrictive
 
     // Using/Aliasing
-    using DataPlant::DemandOpSchemeType;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 tmpMinCompMdot; // local value
@@ -162,7 +161,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
     auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
     auto &comp(loop_side.Branch(BranchIndex).Comp(CompIndex));
 
-    if (comp.CurOpSchemeType == DataPlant::DemandOpSchemeType) {
+    if (comp.CurOpSchemeType == DataPlant::OpScheme::Demand) {
         // store flow request on inlet node
         state.dataLoopNodes->Node(InletNode).MassFlowRateRequest = CompFlow;
         state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail =
@@ -196,7 +195,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
     }
 
     // Set loop flow rate
-    if (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked) {
+    if (loop_side.FlowLock == DataPlant::FlowLock::Unlocked) {
         if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
             state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
             state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
@@ -279,14 +278,14 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
             }
         }
-    } else if (loop_side.FlowLock == DataPlant::iFlowLock::Locked) {
+    } else if (loop_side.FlowLock == DataPlant::FlowLock::Locked) {
         state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         CompFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
     } else {
         ShowFatalError(state, "SetComponentFlowRate: Flow lock out of range"); // DEBUG error...should never get here LCOV_EXCL_LINE
     }
 
-    if (comp.CurOpSchemeType == DataPlant::DemandOpSchemeType) {
+    if (comp.CurOpSchemeType == DataPlant::OpScheme::Demand) {
         if ((MdotOldRequest > 0.0) && (CompFlow > 0.0)) { // sure that not coming back from a no flow reset
             if (std::abs(MdotOldRequest - state.dataLoopNodes->Node(InletNode).MassFlowRateRequest) >
                 DataBranchAirLoopPlant::MassFlowTolerance) { // demand comp changed its flow request
@@ -336,7 +335,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
     if (LoopNum > 0 && LoopSideNum > 0 && (!ResetMode)) {
         if ((MdotOldRequest > 0.0) && (CompFlow > 0.0)) { // sure that not coming back from a no flow reset
             if ((std::abs(MdotOldRequest - a_node.MassFlowRateRequest) > DataBranchAirLoopPlant::MassFlowTolerance) &&
-                (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked)) {
+                (loop_side.FlowLock == DataPlant::FlowLock::Unlocked)) {
                 loop_side.SimLoopSideNeeded = true;
             }
         }
@@ -345,7 +344,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
 
     if (LoopNum > 0 && LoopSideNum > 0) {
         auto const &branch(loop_side.Branch(BranchNum));
-        if (loop_side.FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (loop_side.FlowLock == DataPlant::FlowLock::Unlocked) {
             if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
                 a_node.MassFlowRate = CompFlow;
             } else { // bound the flow by Min/Max available across entire branch
@@ -382,7 +381,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
                 }
             }
 
-        } else if (loop_side.FlowLock == DataPlant::iFlowLock::Locked) {
+        } else if (loop_side.FlowLock == DataPlant::FlowLock::Locked) {
 
             CompFlow = a_node.MassFlowRate;
             // do not change requested flow rate either
@@ -442,41 +441,39 @@ Real64 RegulateCondenserCompFlowReqOp(
     // If not then we will have no choice but to leave the flow request alone (uncontrolled operation?)
 
     // Using/Aliasing
-    using DataPlant::CompSetPtBasedSchemeType;
-    using DataPlant::CoolingRBOpSchemeType;
-    using DataPlant::HeatingRBOpSchemeType;
 
     // Return value
     Real64 FlowVal;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const ZeroLoad(0.0001);
+    Real64 constexpr ZeroLoad(0.0001);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 CompCurLoad;
     bool CompRunFlag;
-    int CompOpScheme;
 
     CompCurLoad = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad;
     CompRunFlag = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).ON;
-    CompOpScheme = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType;
+    auto CompOpScheme = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType;
 
     if (CompRunFlag) {
 
-        {
-            auto const SELECT_CASE_var(CompOpScheme);
+        switch (CompOpScheme) {
 
-            if ((SELECT_CASE_var == HeatingRBOpSchemeType) || (SELECT_CASE_var == CoolingRBOpSchemeType) ||
-                (SELECT_CASE_var == CompSetPtBasedSchemeType)) { // These provide meaningful MyLoad values
-                if (std::abs(CompCurLoad) > ZeroLoad) {
-                    FlowVal = TentativeFlowRequest;
-                } else { // no load
-                    FlowVal = 0.0;
-                }
-
-            } else { // Types that don't provide meaningful MyLoad values
+        case DataPlant::OpScheme::HeatingRB:
+        case DataPlant::OpScheme::CoolingRB:
+        case DataPlant::OpScheme::CompSetPtBased: { // These provide meaningful MyLoad values
+            if (std::abs(CompCurLoad) > ZeroLoad) {
                 FlowVal = TentativeFlowRequest;
+            } else { // no load
+                FlowVal = 0.0;
             }
+            break;
+        }
+        default: { // Types that don't provide meaningful MyLoad values
+            FlowVal = TentativeFlowRequest;
+            break;
+        }
         }
 
     } else { // runflag OFF
@@ -668,10 +665,10 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int con
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const OverShootOffset(5.0);
-    Real64 const UnderShootOffset(5.0);
-    Real64 const FatalOverShootOffset(200.0);
-    Real64 const FatalUnderShootOffset(100.0);
+    Real64 constexpr OverShootOffset(5.0);
+    Real64 constexpr UnderShootOffset(5.0);
+    Real64 constexpr FatalOverShootOffset(200.0);
+    Real64 constexpr FatalUnderShootOffset(100.0);
     // INTERFACE BLOCK SPECIFICATIONS:
     // na
 
@@ -830,7 +827,7 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, int con
     }
 }
 
-void SetAllFlowLocks(EnergyPlusData &state, DataPlant::iFlowLock const Value)
+void SetAllFlowLocks(EnergyPlusData &state, DataPlant::FlowLock const Value)
 {
 
     // SUBROUTINE INFORMATION:
@@ -874,15 +871,15 @@ void ResetAllPlantInterConnectFlags(EnergyPlusData &state)
 }
 
 void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                 int const LoopNum,                           // component's loop index
-                                 int const LoopSide,                          // component's loop side number
-                                 int const BranchNum,                         // Component's branch number
-                                 int const CompNum,                           // Component's comp number
-                                 int &UniqueCriteriaCheckIndex,               // An integer given to this particular check
-                                 int const ConnectedLoopNum,                  // Component's interconnected loop number
-                                 int const ConnectedLoopSide,                 // Component's interconnected loop side number
-                                 DataPlant::iCriteriaType const CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
-                                 Real64 const CriteriaValue                   // The value of the criteria check to evaluate
+                                 int const LoopNum,                          // component's loop index
+                                 int const LoopSide,                         // component's loop side number
+                                 int const BranchNum,                        // Component's branch number
+                                 int const CompNum,                          // Component's comp number
+                                 int &UniqueCriteriaCheckIndex,              // An integer given to this particular check
+                                 int const ConnectedLoopNum,                 // Component's interconnected loop number
+                                 int const ConnectedLoopSide,                // Component's interconnected loop side number
+                                 DataPlant::CriteriaType const CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
+                                 Real64 const CriteriaValue                  // The value of the criteria check to evaluate
 )
 {
 
@@ -953,17 +950,17 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
         // Initialize, then check if we are out of range
         {
             auto const SELECT_CASE_var(CriteriaType);
-            if (SELECT_CASE_var == DataPlant::iCriteriaType::MassFlowRate) {
+            if (SELECT_CASE_var == DataPlant::CriteriaType::MassFlowRate) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_MassFlowRate) {
                     state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                 }
 
-            } else if (SELECT_CASE_var == DataPlant::iCriteriaType::Temperature) {
+            } else if (SELECT_CASE_var == DataPlant::CriteriaType::Temperature) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_Temperature) {
                     state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                 }
 
-            } else if (SELECT_CASE_var == DataPlant::iCriteriaType::HeatTransferRate) {
+            } else if (SELECT_CASE_var == DataPlant::CriteriaType::HeatTransferRate) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_HeatTransferRate) {
                     state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
                 }
@@ -980,15 +977,15 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
 }
 
 void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
-                                         int const LoopNum,                    // component's loop index
-                                         int const LoopSide,                   // component's loop side number
-                                         [[maybe_unused]] int const TypeOfNum, // Component's type index
-                                         int const InletNodeNum,               // Component's inlet node pointer
-                                         int const OutletNodeNum,              // Component's outlet node pointer
-                                         Real64 const ModelCondenserHeatRate,  // model's heat rejection rate at condenser (W)
-                                         Real64 const ModelInletTemp,          // model's inlet temperature (C)
-                                         Real64 const ModelOutletTemp,         // model's outlet temperature (C)
-                                         Real64 const ModelMassFlowRate,       // model's condenser water mass flow rate (kg/s)
+                                         int const LoopNum,                                   // component's loop index
+                                         int const LoopSide,                                  // component's loop side number
+                                         [[maybe_unused]] DataPlant::PlantEquipmentType Type, // Component's type index
+                                         int const InletNodeNum,                              // Component's inlet node pointer
+                                         int const OutletNodeNum,                             // Component's outlet node pointer
+                                         Real64 const ModelCondenserHeatRate,                 // model's heat rejection rate at condenser (W)
+                                         Real64 const ModelInletTemp,                         // model's inlet temperature (C)
+                                         Real64 const ModelOutletTemp,                        // model's outlet temperature (C)
+                                         Real64 const ModelMassFlowRate,                      // model's condenser water mass flow rate (kg/s)
                                          bool const FirstHVACIteration)
 {
 
@@ -1067,15 +1064,15 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
 }
 
 void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
-                                     int const LoopNum,                    // component's loop index
-                                     int const LoopSide,                   // component's loop side number
-                                     [[maybe_unused]] int const TypeOfNum, // Component's type index
-                                     int const InletNodeNum,               // Component's inlet node pointer
-                                     int const OutletNodeNum,              // Component's outlet node pointer
-                                     Real64 const ModelRecoveryHeatRate,   // model's heat rejection rate at recovery (W)
-                                     Real64 const ModelInletTemp,          // model's inlet temperature (C)
-                                     Real64 const ModelOutletTemp,         // model's outlet temperature (C)
-                                     Real64 const ModelMassFlowRate,       // model's condenser water mass flow rate (kg/s)
+                                     int const LoopNum,                                   // component's loop index
+                                     int const LoopSide,                                  // component's loop side number
+                                     [[maybe_unused]] DataPlant::PlantEquipmentType Type, // Component's type index
+                                     int const InletNodeNum,                              // Component's inlet node pointer
+                                     int const OutletNodeNum,                             // Component's outlet node pointer
+                                     Real64 const ModelRecoveryHeatRate,                  // model's heat rejection rate at recovery (W)
+                                     Real64 const ModelInletTemp,                         // model's inlet temperature (C)
+                                     Real64 const ModelOutletTemp,                        // model's outlet temperature (C)
+                                     Real64 const ModelMassFlowRate,                      // model's condenser water mass flow rate (kg/s)
                                      bool const FirstHVACIteration)
 {
 
@@ -1155,7 +1152,7 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
 void UpdateAbsorberChillerComponentGeneratorSide(EnergyPlusData &state,
                                                  int const LoopNum,                                                 // component's loop index
                                                  int const LoopSide,                                                // component's loop side number
-                                                 [[maybe_unused]] int const TypeOfNum,                              // Component's type index
+                                                 [[maybe_unused]] DataPlant::PlantEquipmentType const Type,         // Component's type index
                                                  int const InletNodeNum,                                            // Component's inlet node pointer
                                                  [[maybe_unused]] int const OutletNodeNum,                          // Component's outlet node pointer
                                                  [[maybe_unused]] DataLoopNode::NodeFluidType const HeatSourceType, // Type of fluid in Generator loop
@@ -1220,7 +1217,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
                                    int const Loop1LoopSideNum,
                                    int const Loop2Num,
                                    int const Loop2LoopSideNum,
-                                   int const PlantComponentTypeOfNum,
+                                   DataPlant::PlantEquipmentType ComponentType,
                                    bool const Loop1DemandsOnLoop2)
 {
 
@@ -1255,7 +1252,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     }
     connected_1(TotalConnected).LoopNum = Loop2Num;
     connected_1(TotalConnected).LoopSideNum = Loop2LoopSideNum;
-    connected_1(TotalConnected).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
+    connected_1(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(ComponentType);
     connected_1(TotalConnected).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
 
     auto &loop_side_2(state.dataPlnt->PlantLoop(Loop2Num).LoopSide(Loop2LoopSideNum));
@@ -1269,7 +1266,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     }
     connected_2(TotalConnected).LoopNum = Loop1Num;
     connected_2(TotalConnected).LoopSideNum = Loop1LoopSideNum;
-    connected_2(TotalConnected).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
+    connected_2(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(ComponentType);
     connected_2(TotalConnected).LoopDemandsOnRemote = Loop2DemandsOnLoop1;
 }
 
@@ -1468,7 +1465,7 @@ void SafeCopyPlantNode(EnergyPlusData &state,
     // Only pass pressure if we aren't doing a pressure simulation
     if (present(LoopNum)) {
         switch (state.dataPlnt->PlantLoop(LoopNum).PressureSimType) {
-        case DataPlant::iPressSimType::NoPressure:
+        case DataPlant::PressSimType::NoPressure:
             state.dataLoopNodes->Node(OutletNodeNum).Press = state.dataLoopNodes->Node(InletNodeNum).Press;
         default:
             // Don't do anything
@@ -1636,7 +1633,7 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
 
 void ScanPlantLoopsForObject(EnergyPlusData &state,
                              std::string_view CompName,
-                             int const CompType,
+                             DataPlant::PlantEquipmentType CompType,
                              int &LoopNum,
                              int &LoopSideNum,
                              int &BranchNum,
@@ -1696,7 +1693,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                 auto &this_branch(this_loop_side.Branch(BranchCtr));
                 for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
                     auto &this_component(this_branch.Comp(CompCtr));
-                    if (this_component.TypeOf_Num == CompType) {
+                    if (this_component.Type == CompType) {
                         if (UtilityRoutines::SameString(CompName, this_component.Name)) {
                             FoundCompName = true;
                             if (present(InletNodeNumber)) {
@@ -1733,16 +1730,19 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
     }
 
     if (!FoundComponent) {
-        if (CompType >= 1 && CompType <= DataPlant::NumSimPlantEquipTypes) {
+        if (CompType != DataPlant::PlantEquipmentType::Invalid && CompType != DataPlant::PlantEquipmentType::Num) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + std::string{CompName} +
-                                    "\" was not found on any plant loops.");
-                AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
+                                format("Plant Component {} called \"{}\" was not found on any plant loops.",
+                                       DataPlant::PlantEquipTypeNames[static_cast<int>(CompType)],
+                                       std::string{CompName}));
+                AuditBranches(state, true, DataPlant::PlantEquipTypeNames[static_cast<int>(CompType)], CompName);
             } else {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + std::string{CompName} +
-                                    "\" was not found on plant loop=\"" + state.dataPlnt->PlantLoop(SingleLoopSearch).Name + "\".");
+                                format("Plant Component {} called \"{}\" was not found on plant loop=\"{}\".",
+                                       DataPlant::PlantEquipTypeNames[static_cast<int>(CompType)],
+                                       std::string{CompName},
+                                       state.dataPlnt->PlantLoop(SingleLoopSearch).Name));
             }
             if (present(InletNodeNumber)) {
                 if (FoundCompName) {
@@ -1757,7 +1757,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
             errFlag = true;
         } else {
             ShowSevereError(state, format("ScanPlantLoopsForObject: Invalid CompType passed [{}], Name={}", CompType, CompName));
-            ShowContinueError(state, format("Valid CompTypes are in the range [1 - {}].", DataPlant::NumSimPlantEquipTypes));
+            ShowContinueError(state, format("Valid CompTypes are in the range [0 - {}].", static_cast<int>(DataPlant::PlantEquipmentType::Num)));
             ShowFatalError(state, "Previous error causes program termination");
         }
     }

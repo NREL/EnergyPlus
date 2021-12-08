@@ -205,8 +205,8 @@ namespace ZoneDehumidifier {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetZoneDehumidifierInput");
         static std::string const CurrentModuleObject("ZoneHVAC:Dehumidifier:DX");
-        Real64 const RatedInletAirTemp(26.7);
-        Real64 const RatedInletAirRH(60.0);
+        Real64 constexpr RatedInletAirTemp(26.7);
+        Real64 constexpr RatedInletAirRH(60.0);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneDehumidIndex;          // Loop index

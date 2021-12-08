@@ -215,12 +215,12 @@ Real64 constexpr IcetoVaporEnthalpy(2833000.0);  // J/kg to freeze water vapor t
 Real64 constexpr SpecificHeatIce(2000.0);        // in the likely range (2040 at 0C and 1950 at -20C) (J/kg-C)
 Real64 constexpr CondAirVolExponentDry(1.58);    // exponent for forced air over a cylinder, = 1/.633 per ASHRAE 2005 (page 3.15)
 Real64 constexpr CondAirVolExponentEvap(1.32);   // exponent for evap condenser air vol flow, = 1/.76 per Manske, 1999
-Real64 constexpr EvaporatorAirVolExponent(1.54); // exponent for evapaporator air vol flow, = 1/.65 per Manske, 1999, page 35
+Real64 constexpr EvaporatorAirVolExponent(1.54); // exponent for evaporator air vol flow, = 1/.65 per Manske, 1999, page 35
 Real64 constexpr FanHalfSpeedRatio(0.1768);      // = 1/(2**2.5) for power step for two speed fan
 Real64 constexpr CapFac60Percent(0.60);          // = 60%, load served by half power 2-speed fan
 
-Array1D<Real64> const EuropeanWetCoilFactor(5, {1.35, 1.15, 1.05, 1.01, 1.0});
-Array1D<Real64> const EuropeanAirInletTemp(5, {10.0, 0.0, -18.0, -25.0, -34.0});
+static constexpr std::array<Real64, 5> EuropeanWetCoilFactor = {1.35, 1.15, 1.05, 1.01, 1.0};
+static constexpr std::array<Real64, 5> EuropeanAirInletTemp = {10.0, 0.0, -18.0, -25.0, -34.0};
 
 void ManageRefrigeratedCaseRacks(EnergyPlusData &state)
 {
@@ -308,28 +308,28 @@ void GetRefrigerationInput(EnergyPlusData &state)
     static constexpr std::string_view TrackMessageAlt("GetInput in RefrigeratedCase");
     static constexpr std::string_view RoutineNameNoColon("GetRefrigerationInput");
 
-    int const AlwaysOn(-1); // -1 pointer sent to schedule manager returns a value of 1.0
+    int constexpr AlwaysOn(-1); // -1 pointer sent to schedule manager returns a value of 1.0
     //     input in both watts and flow rate
-    int const NumWIAlphaFieldsBeforeZoneInput(9);   // Used to cycle through zones on input for walk in coolers
-    int const NumWIAlphaFieldsPerZone(4);           // Used to cycle through zones on input for walk in coolers
-    int const NumWINumberFieldsBeforeZoneInput(12); // Used to cycle through zones on input for walk in coolers
-    int const NumWINumberFieldsPerZone(8);          // Used to cycle through zones on input for walk in coolers
-    Real64 const CondARI460DelT(16.7);              // Rated sat cond temp - dry bulb air T for air-cooled Condensers, ARI460
-    Real64 const CondARI460Tcond(51.7);             // Rated sat cond temp for air-cooled cond, ARI 460
-    Real64 const CondARI490DelT(15.0);              // Rated sat cond temp - wet bulb air T for evap-cooled Cond w R22, ARI490
-    Real64 const CondARI490Tcond(40.6);             // Rated sat cond temp for evap-cooled cond with R22, ARI 490
-    Real64 const DelEvapTDefault(5.0);              // default difference between case T and evap T (C)
-    Real64 const HoursPerDay(24.0);
-    Real64 const SecondsPerHour(3600.0);
-    Real64 const DefaultCascadeCondApproach(3.0); // Cascade condenser approach temperature difference (deltaC)
-    Real64 const DefaultCircRate(2.5);            // Phase change liquid overfeed circulating rate (ASHRAE definition)
-    Real64 const DefaultWISurfaceUValue(0.3154);  // equiv R18 in Archaic American units (W/m2-delta T)
-    Real64 const DefaultWIUValueGlassDr(1.136);   // equiv R5 in Archaic American units (W/m2-delta T)
-    Real64 const DefaultWIUValueStockDr(0.3785);  // equiv R15 in Archaic American units (W/m2-delta T)
-    Real64 const DefaultWIHeightGlassDr(1.5);     // glass door height in walk-in cooler (m)
-    Real64 const DefaultWIHeightStockDr(3.0);     // stock door height in walk-in cooler (m)
-    Real64 const PumpImpellerEfficiency(0.78);    // same as used in pump auto-sizing, dimensionless
-    Real64 const PumpMotorEfficiency(0.85);       // suggested as average value in ITT/Gould pump references,
+    int constexpr NumWIAlphaFieldsBeforeZoneInput(9);   // Used to cycle through zones on input for walk in coolers
+    int constexpr NumWIAlphaFieldsPerZone(4);           // Used to cycle through zones on input for walk in coolers
+    int constexpr NumWINumberFieldsBeforeZoneInput(12); // Used to cycle through zones on input for walk in coolers
+    int constexpr NumWINumberFieldsPerZone(8);          // Used to cycle through zones on input for walk in coolers
+    Real64 constexpr CondARI460DelT(16.7);              // Rated sat cond temp - dry bulb air T for air-cooled Condensers, ARI460
+    Real64 constexpr CondARI460Tcond(51.7);             // Rated sat cond temp for air-cooled cond, ARI 460
+    Real64 constexpr CondARI490DelT(15.0);              // Rated sat cond temp - wet bulb air T for evap-cooled Cond w R22, ARI490
+    Real64 constexpr CondARI490Tcond(40.6);             // Rated sat cond temp for evap-cooled cond with R22, ARI 490
+    Real64 constexpr DelEvapTDefault(5.0);              // default difference between case T and evap T (C)
+    Real64 constexpr HoursPerDay(24.0);
+    Real64 constexpr SecondsPerHour(3600.0);
+    Real64 constexpr DefaultCascadeCondApproach(3.0); // Cascade condenser approach temperature difference (deltaC)
+    Real64 constexpr DefaultCircRate(2.5);            // Phase change liquid overfeed circulating rate (ASHRAE definition)
+    Real64 constexpr DefaultWISurfaceUValue(0.3154);  // equiv R18 in Archaic American units (W/m2-delta T)
+    Real64 constexpr DefaultWIUValueGlassDr(1.136);   // equiv R5 in Archaic American units (W/m2-delta T)
+    Real64 constexpr DefaultWIUValueStockDr(0.3785);  // equiv R15 in Archaic American units (W/m2-delta T)
+    Real64 constexpr DefaultWIHeightGlassDr(1.5);     // glass door height in walk-in cooler (m)
+    Real64 constexpr DefaultWIHeightStockDr(3.0);     // stock door height in walk-in cooler (m)
+    Real64 constexpr PumpImpellerEfficiency(0.78);    // same as used in pump auto-sizing, dimensionless
+    Real64 constexpr PumpMotorEfficiency(0.85);       // suggested as average value in ITT/Gould pump references,
 
     Array1D_string Alphas;             // Alpha items for object
     Array1D_string cAlphaFieldNames;   // Alpha field names (from input processor)
@@ -1876,7 +1876,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(1);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[0];
                         WarehouseCoil(CoilID).SCIndex = 1;
                     } else {
                         ShowSevereError(state,
@@ -1903,7 +1903,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(2);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[1];
                         WarehouseCoil(CoilID).SCIndex = 2;
                     } else {
                         ShowSevereError(state,
@@ -1930,7 +1930,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(3);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[2];
                         WarehouseCoil(CoilID).SCIndex = 3;
                     } else {
                         ShowSevereError(state,
@@ -1957,7 +1957,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(4);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[3];
                         WarehouseCoil(CoilID).SCIndex = 4;
                     } else {
                         ShowSevereError(state,
@@ -1984,7 +1984,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     NumNum = 2; // advance past rating in W/C to rating in W at N2
                     if (!lNumericBlanks(NumNum) && Numbers(NumNum) > 0.0) {
                         WarehouseCoil(CoilID).RatedCapTotal = Numbers(NumNum);
-                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor(5);
+                        WarehouseCoil(CoilID).RatedSensibleCap = Numbers(NumNum) / EuropeanWetCoilFactor[4];
                         WarehouseCoil(CoilID).SCIndex = 5;
                     } else {
                         ShowSevereError(state,
@@ -6834,7 +6834,7 @@ void SetupReportInput(EnergyPlusData &state)
                                           RefrigCase(caseNum).ActualZoneNum,
                                           "Refrigeration:Case",
                                           RefrigCase(caseNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_RefrigerationCase,
+                                          DataHeatBalance::IntGainType::RefrigerationCase,
                                           &RefrigCase(caseNum).SensZoneCreditRate,
                                           &RefrigCase(caseNum).SensHVACCreditRate,
                                           nullptr,
@@ -7046,7 +7046,7 @@ void SetupReportInput(EnergyPlusData &state)
                                               WalkIn(walkInNum).ZoneNum(zoneId),
                                               "Refrigeration:WalkIn",
                                               Walkin_and_zone_name,
-                                              DataHeatBalance::IntGainTypeOf_RefrigerationWalkIn,
+                                              DataHeatBalance::IntGainType::RefrigerationWalkIn,
                                               &WalkIn(walkInNum).SensZoneCreditRate(zoneId),
                                               nullptr,
                                               nullptr,
@@ -7613,7 +7613,7 @@ void SetupReportInput(EnergyPlusData &state)
                                           Secondary(secondNum).ReceiverZoneNum,
                                           "Refrigeration:SecondarySystem:Receiver",
                                           Secondary(secondNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_RefrigerationSecondaryReceiver,
+                                          DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
                                           &Secondary(secondNum).ReceiverZoneHeatGain);
                 }
                 if (Secondary(secondNum).DistPipeZoneNum > 0) {
@@ -7621,7 +7621,7 @@ void SetupReportInput(EnergyPlusData &state)
                                           Secondary(secondNum).DistPipeZoneNum,
                                           "Refrigeration:SecondarySystem:Pipe",
                                           Secondary(secondNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_RefrigerationSecondaryPipe,
+                                          DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
                                           &Secondary(secondNum).DistPipeZoneHeatGain);
                 }
             } // not an unused
@@ -7793,7 +7793,7 @@ void SetupReportInput(EnergyPlusData &state)
                                           RefrigCase(RefrigRack(rackNum).CaseNum(1)).ActualZoneNum,
                                           "Refrigeration:CompressorRack",
                                           RefrigRack(rackNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_RefrigerationCompressorRack,
+                                          DataHeatBalance::IntGainType::RefrigerationCompressorRack,
                                           &RefrigRack(rackNum).SensZoneCreditHeatRate,
                                           &RefrigRack(rackNum).SensHVACCreditHeatRate);
 
@@ -7960,7 +7960,7 @@ void SetupReportInput(EnergyPlusData &state)
                                           RefrigCase(RefrigRack(rackNum).CaseNum(1)).ActualZoneNum,
                                           "Refrigeration:CompressorRack",
                                           RefrigRack(rackNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_RefrigerationCompressorRack,
+                                          DataHeatBalance::IntGainType::RefrigerationCompressorRack,
                                           &RefrigRack(rackNum).SensZoneCreditHeatRate,
                                           &RefrigRack(rackNum).SensHVACCreditHeatRate);
 
@@ -8512,7 +8512,7 @@ void SetupReportInput(EnergyPlusData &state)
                                           Condenser(System(refrigSysNum).CondenserNum(1)).InletAirZoneNum,
                                           "Refrigeration:System:Condenser:AirCooled",
                                           System(refrigSysNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
+                                          DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
                                           &System(refrigSysNum).NetHeatRejectLoad);
 
                 if (System(refrigSysNum).SuctionPipeActualZoneNum > 0)
@@ -8520,7 +8520,7 @@ void SetupReportInput(EnergyPlusData &state)
                                           System(refrigSysNum).SuctionPipeActualZoneNum,
                                           "Refrigeration:System:SuctionPipe",
                                           System(refrigSysNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_RefrigerationSystemSuctionPipe,
+                                          DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
                                           &System(refrigSysNum).PipeHeatLoad);
             }
         } // numrefrigsystems
@@ -9212,7 +9212,7 @@ void SetupReportInput(EnergyPlusData &state)
                                           GasCooler(TransSystem(refrigSysNum).GasCoolerNum(1)).InletAirZoneNum,
                                           "Refrigeration:TranscriticalSystem:GasCooler:AirCooled",
                                           TransSystem(refrigSysNum).Name,
-                                          DataHeatBalance::IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler,
+                                          DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
                                           &TransSystem(refrigSysNum).NetHeatRejectLoad);
             } // (TransSystem(RefrigSysNum)%SystemRejectHeatToZone)
             if (TransSystem(refrigSysNum).SuctionPipeActualZoneNumMT > 0) {
@@ -9220,7 +9220,7 @@ void SetupReportInput(EnergyPlusData &state)
                                       TransSystem(refrigSysNum).SuctionPipeActualZoneNumMT,
                                       "Refrigeration:TranscriticalSystem:SuctionPipeMT",
                                       TransSystem(refrigSysNum).Name,
-                                      DataHeatBalance::IntGainTypeOf_RefrigerationTransSysSuctionPipeMT,
+                                      DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
                                       &TransSystem(refrigSysNum).PipeHeatLoadMT);
             } // TransSystem(RefrigSysNum)%SuctionPipeActualZoneNumMT > 0
             if (TransSystem(refrigSysNum).SuctionPipeActualZoneNumLT > 0) {
@@ -9228,7 +9228,7 @@ void SetupReportInput(EnergyPlusData &state)
                                       TransSystem(refrigSysNum).SuctionPipeActualZoneNumLT,
                                       "Refrigeration:TranscriticalSystem:SuctionPipeLT",
                                       TransSystem(refrigSysNum).Name,
-                                      DataHeatBalance::IntGainTypeOf_RefrigerationTransSysSuctionPipeLT,
+                                      DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT,
                                       &TransSystem(refrigSysNum).PipeHeatLoadLT);
             } // TransSystem(RefrigSysNum)%SuctionPipeActualZoneNumLT > 0
 
@@ -9807,7 +9807,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     Condenser(RefCondLoop).Name,
-                                                    DataPlant::TypeOf_RefrigSystemWaterCondenser,
+                                                    DataPlant::PlantEquipmentType::RefrigSystemWaterCondenser,
                                                     Condenser(RefCondLoop).PlantLoopNum,
                                                     Condenser(RefCondLoop).PlantLoopSideNum,
                                                     Condenser(RefCondLoop).PlantBranchNum,
@@ -9841,7 +9841,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     RefrigRack(RefCompRackLoop).Name,
-                                                    DataPlant::TypeOf_RefrigerationWaterCoolRack,
+                                                    DataPlant::PlantEquipmentType::RefrigerationWaterCoolRack,
                                                     RefrigRack(RefCompRackLoop).PlantLoopNum,
                                                     RefrigRack(RefCompRackLoop).PlantLoopSideNum,
                                                     RefrigRack(RefCompRackLoop).PlantBranchNum,
@@ -11116,7 +11116,7 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
     // ZoneEquipmentManager on the system time step, or only system driven by HVACManager on the zone time step.
 
     static constexpr std::string_view RoutineName("SimulateDetailedRefrigerationSystems");
-    Real64 const MaxDelTFloatFrac(0.5); // max fraction allowed for difference between case and evaporator temperature
+    Real64 constexpr MaxDelTFloatFrac(0.5); // max fraction allowed for difference between case and evaporator temperature
 
     auto &RefrigCase(state.dataRefrigCase->RefrigCase);
     auto &System(state.dataRefrigCase->System);
@@ -11801,7 +11801,7 @@ void RefrigSystemData::CalcDetailedSystem(EnergyPlusData &state, int const SysNu
     //  A thesis submitted in partial fulfillment of the requirements for the degree of
     //  Master of Science, University of Wisconsin-Madison, 1999
 
-    Real64 const ErrorTol(0.001); // Iterative solution tolerance
+    Real64 constexpr ErrorTol(0.001); // Iterative solution tolerance
 
     bool NotBalanced = true;
     int NumIter = 0;
@@ -11868,7 +11868,7 @@ void TransRefrigSystemData::CalcDetailedTransSystem(EnergyPlusData &state, int c
     // calculated refrigerant mass flow through the receiver bypass converges, which typically
     // requires less than 5 iterations.
 
-    Real64 const ErrorTol(0.001); // Iterative solution tolerance
+    Real64 constexpr ErrorTol(0.001); // Iterative solution tolerance
 
     int NumIter(0);            // Iteration counter
     bool NotBalanced(true);    // Flag to indicate convergence, based on system balance
@@ -11928,10 +11928,10 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
     //  A thesis submitted in partial fulfillment of the requirements for the degree of
     //  Master of Science, University of Wisconsin-Madison, 1999
 
-    // Lawrence Berkeley Laboratory and Resource Dynamics, Improving Fan Systrem Performance,
+    // Lawrence Berkeley Laboratory and Resource Dynamics, Improving Fan System Performance,
     //   A Sourcebook for Industry, DOE/GO-102003-1294, April 2003
 
-    Real64 const BleedRateConstant(5.0E-10); // water purge rate for evaporative
+    Real64 constexpr BleedRateConstant(5.0E-10); // water purge rate for evaporative
     //  condensers (m3/W-s) equal to 3 GPM per 100 tons (BAC Engineering Reference)
 
     auto &System(state.dataRefrigCase->System);
@@ -12509,8 +12509,8 @@ void RefrigSystemData::CalculateCompressors(EnergyPlusData &state)
     // Following constants approp for R22, R134a, R404a, R507, R410a, R407c, future allow input?
     //   May want to allow input to reflect larger pipes selected to reduce delta P and increase compressor efficiency.
     // NOTE, these DelT...Pipes reflect the decrease in Pressure in the pipes, NOT thermal transfer through the pipe walls.
-    Real64 const DelTSuctPipes(1.0);  // Tsat drop corresponding to P drop in suction pipes, ASHRAE 2006 p 2.4 (C)
-    Real64 const DelTDischPipes(0.5); // Tsat drop corresponding to P drop in discharge pipes, ASHRAE 2006 p 2.5 (C)
+    Real64 constexpr DelTSuctPipes(1.0);  // Tsat drop corresponding to P drop in suction pipes, ASHRAE 2006 p 2.4 (C)
+    Real64 constexpr DelTDischPipes(0.5); // Tsat drop corresponding to P drop in discharge pipes, ASHRAE 2006 p 2.5 (C)
 
     static constexpr std::string_view RoutineName("RefrigeratedCase:CalculateCompressors");
     Real64 CaseEnthalpyChangeRated;   // Enthalpy change in cases at compressor rated cond, J/kg
@@ -12874,7 +12874,7 @@ void TransRefrigSystemData::CalculateTransCompressors(EnergyPlusData &state)
     // ammonia and R-134a (ASHRAE Handbook of Refrigeration, 2010, p. 3.7).  Ignore pressure drop for CO2 calculations.
     // NOTE, these DelT...Pipes reflect the decrease in Pressure in the pipes, NOT thermal transfer through the pipe walls.
 
-    Real64 const ErrorTol(0.001); // Iterative solution tolerance
+    Real64 constexpr ErrorTol(0.001); // Iterative solution tolerance
 
     static constexpr std::string_view RoutineName("RefrigeratedCase:CalculateTransCompressors");
     int Iter;                           // Iteration counter
@@ -14167,7 +14167,7 @@ void WalkInData::CalculateWalkIn(EnergyPlusData &state) // Absolute pointer to  
     // Gosney, W.B., Olama, G.A.-L., Heat and Enthalpy Gains through Cold Room Doorways,
     //     Proceedings of the Institute of Refrigeration, vol. 72, pp 31-41, 1975
 
-    Real64 const DefaultWalkInDoorOpenFactor(0.05); // walk in door open factor (fraction time open)
+    Real64 constexpr DefaultWalkInDoorOpenFactor(0.05); // walk in door open factor (fraction time open)
 
     static constexpr std::string_view RoutineName("CalculateWalkIn");
     Real64 CapApplied(0.0);          // Walk In total capacity at specific operating conditions
@@ -14577,7 +14577,7 @@ void SecondaryLoopData::CalculateSecondary(EnergyPlusData &state, int const Seco
     // SCE report
     //  others
 
-    Real64 const ErrorTol(0.001); // Iterative solution tolerance
+    Real64 constexpr ErrorTol(0.001); // Iterative solution tolerance
 
     bool AtPartLoad;          // Whether or not need to iterate on pump power
     bool DeRate;              // If true, need to derate aircoils because don't carry over unmet energy
@@ -15340,15 +15340,15 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
                         if (CoilInletTemp <= -25.0) {
                             SHRCorrection = 1.0;
                         } else if (CoilInletTemp > -25.0 && CoilInletTemp <= 0.0) {
-                            SHRCorrection = (EuropeanWetCoilFactor(2) - EuropeanWetCoilFactor(4)) /
-                                                (EuropeanAirInletTemp(2) - EuropeanAirInletTemp(4)) * (EuropeanAirInletTemp(2) - CoilInletTemp) +
-                                            EuropeanWetCoilFactor(4);
+                            SHRCorrection = (EuropeanWetCoilFactor[1] - EuropeanWetCoilFactor[3]) /
+                                                (EuropeanAirInletTemp[1] - EuropeanAirInletTemp[3]) * (EuropeanAirInletTemp[1] - CoilInletTemp) +
+                                            EuropeanWetCoilFactor[3];
                         } else if (CoilInletTemp > 0.0 && CoilInletTemp <= 5.0) {
-                            SHRCorrection = (EuropeanWetCoilFactor(1) - EuropeanWetCoilFactor(2)) /
-                                                (EuropeanAirInletTemp(1) - EuropeanAirInletTemp(2)) * (EuropeanAirInletTemp(1) - CoilInletTemp) +
-                                            EuropeanWetCoilFactor(2);
+                            SHRCorrection = (EuropeanWetCoilFactor[0] - EuropeanWetCoilFactor[1]) /
+                                                (EuropeanAirInletTemp[0] - EuropeanAirInletTemp[1]) * (EuropeanAirInletTemp[0] - CoilInletTemp) +
+                                            EuropeanWetCoilFactor[1];
                         } else if (CoilInletTemp > 5.0) {
-                            SHRCorrection = EuropeanWetCoilFactor(1);
+                            SHRCorrection = EuropeanWetCoilFactor[0];
                         } // calc correction as a function of coil inlet temperature
                     }
                 }

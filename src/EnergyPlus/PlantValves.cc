@@ -285,7 +285,7 @@ namespace PlantValves {
                 errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
-                                                        DataPlant::TypeOf_ValveTempering,
+                                                        DataPlant::PlantEquipmentType::ValveTempering,
                                                         this->LoopNum,
                                                         this->LoopSideNum,
                                                         this->BranchNum,
@@ -317,7 +317,8 @@ namespace PlantValves {
                             branchCtr++;
                             for (auto &thisComp : thisBranch.Comp) {
 
-                                if ((thisComp.TypeOf_Num == DataPlant::TypeOf_ValveTempering) && (thisComp.Name == this->Name)) { // we found it.
+                                if ((thisComp.Type == DataPlant::PlantEquipmentType::ValveTempering) &&
+                                    (thisComp.Name == this->Name)) { // we found it.
 
                                     // is branch control type 'Active'
                                     if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) IsBranchActive = true;
@@ -356,7 +357,7 @@ namespace PlantValves {
                                     for (auto &thisInnerBranch : thisLoopSide.Branch) {
                                         if (thisInnerBranch.NodeNumOut == this->PltPumpOutletNodeNum) {
                                             for (auto &thisInnerComp : thisInnerBranch.Comp) {
-                                                if (thisInnerComp.isPump()) {
+                                                if (DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(thisInnerComp.Type)]) {
                                                     PumpOutNodeOkay = true;
                                                 }
                                             }
@@ -476,7 +477,7 @@ namespace PlantValves {
 
         if (state.dataGlobal->KickOffSimulation) return;
 
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             Tin = this->InletTemp;
             Tset = this->SetPointTemp;
             Ts2 = this->Stream2SourceTemp;
@@ -491,7 +492,7 @@ namespace PlantValves {
                 }
             }
         } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock ==
-                   DataPlant::iFlowLock::Locked) { // don't recalc diversion, just reuse current flows
+                   DataPlant::FlowLock::Locked) { // don't recalc diversion, just reuse current flows
             if (this->MixedMassFlowRate > 0.0) {
                 this->FlowDivFract = state.dataLoopNodes->Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;
             } else {

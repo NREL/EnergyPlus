@@ -408,7 +408,7 @@ int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int const SizeAdder(25);
+    int constexpr SizeAdder(25);
     auto &ort(state.dataOutRptTab);
 
     if (!allocated(ort->MonthlyInput)) {
@@ -453,7 +453,7 @@ void AddMonthlyFieldSetInput(
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const sizeIncrement(50);
+    int constexpr sizeIncrement(50);
     auto &ort(state.dataOutRptTab);
 
     // INTERFACE BLOCK SPECIFICATIONS:
@@ -1029,7 +1029,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
     int firstReport;
     int repIndex;
     int found;
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
     Array1D_string objNames;
     Array1D_int objVarIDs;
@@ -4444,7 +4444,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Water heater and thermal storage
     auto &WaterThermalTank(state.dataWaterThermalTanks->WaterThermalTank);
     for (int iTank = 1; iTank <= state.dataWaterThermalTanks->numWaterThermalTank; ++iTank) {
-        if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTempEnum::OutsideAir) {
+        if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::WTTAmbientTemp::OutsideAir) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
         }
     }
@@ -7760,12 +7760,12 @@ void WriteBEPSTable(EnergyPlusData &state)
     //   that will split up very long header lines for the fixed width
     //   table is the header rows.
 
-    int const colElectricity(1);
-    int const colGas(2);
-    int const colPurchCool(11);
-    int const colPurchHeat(12);
+    int constexpr colElectricity(1);
+    int constexpr colGas(2);
+    int constexpr colPurchCool(11);
+    int constexpr colPurchHeat(12);
 
-    Real64 const SmallValue(1.e-14);
+    Real64 constexpr SmallValue(1.e-14);
     auto &ort(state.dataOutRptTab);
 
     // all arrays are in the format: (row, column)
@@ -11020,16 +11020,16 @@ void WriteVeriSumTable(EnergyPlusData &state)
     using ScheduleManager::ScheduleAverageHoursPerWeek;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const wwrcTotal(1);
-    int const wwrcNorth(2);
-    int const wwrcEast(3);
-    int const wwrcSouth(4);
-    int const wwrcWest(5);
-    int const wwrrWall(1);
-    int const wwrrAbvGndWall(2);
-    int const wwrrWindow(3);
-    int const wwrrWWR(4);
-    int const wwrrAbvGndWWR(5);
+    int constexpr wwrcTotal(1);
+    int constexpr wwrcNorth(2);
+    int constexpr wwrcEast(3);
+    int constexpr wwrcSouth(4);
+    int constexpr wwrcWest(5);
+    int constexpr wwrrWall(1);
+    int constexpr wwrrAbvGndWall(2);
+    int constexpr wwrrWindow(3);
+    int constexpr wwrrWWR(4);
+    int constexpr wwrrAbvGndWWR(5);
 
     // all arrays are in the format: (row, column)
     Array1D_string columnHead;
@@ -13845,7 +13845,7 @@ void GatherComponentLoadsSurface(EnergyPlusData &state)
         }
         for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
             Real64 tubularGain = 0.0;
-            InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, state.dataOutRptTab->IntGainTypesTubularGCLS, tubularGain);
+            tubularGain = InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, OutputReportTabular::IntGainTypesTubularGCLS);
             ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, state.dataOutRptTab->TimeStepInDayGCLS, izone) += tubularGain;
         }
     }
@@ -16767,7 +16767,7 @@ void ResetBinGathering(EnergyPlusData &state)
     // Jason Glazer - October 2015
     // Reset all timebins gathering arrays to zero for multi-year simulations
     // so that only last year is reported in tabular reports
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
     auto &ort(state.dataOutRptTab);
 
     // clear the binning arrays to zeros
@@ -16967,7 +16967,7 @@ void ResetRemainingPredefinedEntries(EnergyPlusData &state)
     // Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year
     // simulations so that only last year is reported in tabular reports
 
-    Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
+    Real64 constexpr bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
     int iLight;
     int iZone;
     auto &Zone(state.dataHeatBal->Zone);
@@ -17874,10 +17874,10 @@ void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int 
 
     std::string unitSIOnly;
     int modeInString;
-    int const misBrac(1);
-    int const misParen(2);
-    int const misBrce(3);
-    int const misNoHint(4);
+    int constexpr misBrac(1);
+    int constexpr misParen(2);
+    int constexpr misBrce(3);
+    int constexpr misNoHint(4);
     std::string const stringInUpper(UtilityRoutines::MakeUPPERCase(stringInWithSI));
     auto &ort(state.dataOutRptTab);
 

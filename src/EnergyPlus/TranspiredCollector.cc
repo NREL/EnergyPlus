@@ -114,6 +114,11 @@ namespace TranspiredCollector {
     // Using/Aliasing
     using DataVectorTypes::Vector;
 
+    int constexpr Layout_Square = 1;
+    int constexpr Layout_Triangle = 2;
+    int constexpr Correlation_Kutscher1994 = 1;
+    int constexpr Correlation_VanDeckerHollandsBrunger2001 = 2;
+
     void SimTranspiredCollector(EnergyPlusData &state,
                                 std::string_view CompName, // component name
                                 int &CompIndex             // component index (to reduce string compares during simulation)
@@ -486,9 +491,9 @@ namespace TranspiredCollector {
             }
 
             if (UtilityRoutines::SameString(Alphas(9), "Triangle")) {
-                state.dataTranspiredCollector->UTSC(Item).Layout = state.dataTranspiredCollector->Layout_Triangle;
+                state.dataTranspiredCollector->UTSC(Item).Layout = Layout_Triangle;
             } else if (UtilityRoutines::SameString(Alphas(9), "Square")) {
-                state.dataTranspiredCollector->UTSC(Item).Layout = state.dataTranspiredCollector->Layout_Square;
+                state.dataTranspiredCollector->UTSC(Item).Layout = Layout_Square;
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cAlphaFieldNames(9) + " has incorrect entry of " + Alphas(9) + " in " + CurrentModuleObject +
@@ -498,9 +503,9 @@ namespace TranspiredCollector {
             }
 
             if (UtilityRoutines::SameString(Alphas(10), "Kutscher1994")) {
-                state.dataTranspiredCollector->UTSC(Item).Correlation = state.dataTranspiredCollector->Correlation_Kutscher1994;
+                state.dataTranspiredCollector->UTSC(Item).Correlation = Correlation_Kutscher1994;
             } else if (UtilityRoutines::SameString(Alphas(10), "VanDeckerHollandsBrunger2001")) {
-                state.dataTranspiredCollector->UTSC(Item).Correlation = state.dataTranspiredCollector->Correlation_VanDeckerHollandsBrunger2001;
+                state.dataTranspiredCollector->UTSC(Item).Correlation = Correlation_VanDeckerHollandsBrunger2001;
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cAlphaFieldNames(10) + " has incorrect entry of " + Alphas(9) + " in " + CurrentModuleObject +
@@ -686,11 +691,11 @@ namespace TranspiredCollector {
             //  need to update this for slots as well as holes
             {
                 auto const SELECT_CASE_var(state.dataTranspiredCollector->UTSC(Item).Layout);
-                if (SELECT_CASE_var == state.dataTranspiredCollector->Layout_Triangle) { // 'TRIANGLE'
+                if (SELECT_CASE_var == Layout_Triangle) { // 'TRIANGLE'
                     state.dataTranspiredCollector->UTSC(Item).Porosity =
                         0.907 * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia /
-                                      state.dataTranspiredCollector->UTSC(Item).Pitch);       // Kutscher equation, Triangle layout
-                } else if (SELECT_CASE_var == state.dataTranspiredCollector->Layout_Square) { // 'SQUARE'
+                                      state.dataTranspiredCollector->UTSC(Item).Pitch); // Kutscher equation, Triangle layout
+                } else if (SELECT_CASE_var == Layout_Square) {                          // 'SQUARE'
                     state.dataTranspiredCollector->UTSC(Item).Porosity =
                         (DataGlobalConstants::Pi / 4.0) * pow_2(state.dataTranspiredCollector->UTSC(Item).HoleDia) /
                         pow_2(state.dataTranspiredCollector->UTSC(Item).Pitch); // Waterloo equation, square layout
@@ -845,24 +850,22 @@ namespace TranspiredCollector {
         if (state.dataTranspiredCollector->MyOneTimeFlag) {
             // do various one time setups and pitch adjustments across all UTSC
             for (thisUTSC = 1; thisUTSC <= state.dataTranspiredCollector->NumUTSC; ++thisUTSC) {
-                if (state.dataTranspiredCollector->UTSC(thisUTSC).Layout == state.dataTranspiredCollector->Layout_Triangle) {
+                if (state.dataTranspiredCollector->UTSC(thisUTSC).Layout == Layout_Triangle) {
                     {
                         auto const SELECT_CASE_var(state.dataTranspiredCollector->UTSC(thisUTSC).Correlation);
-                        if (SELECT_CASE_var == state.dataTranspiredCollector->Correlation_Kutscher1994) { // Kutscher1994
+                        if (SELECT_CASE_var == Correlation_Kutscher1994) { // Kutscher1994
                             state.dataTranspiredCollector->UTSC(thisUTSC).Pitch = state.dataTranspiredCollector->UTSC(thisUTSC).Pitch;
-                        } else if (SELECT_CASE_var ==
-                                   state.dataTranspiredCollector->Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
+                        } else if (SELECT_CASE_var == Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
                             state.dataTranspiredCollector->UTSC(thisUTSC).Pitch /= 1.6;
                         }
                     }
                 }
-                if (state.dataTranspiredCollector->UTSC(thisUTSC).Layout == state.dataTranspiredCollector->Layout_Square) {
+                if (state.dataTranspiredCollector->UTSC(thisUTSC).Layout == Layout_Square) {
                     {
                         auto const SELECT_CASE_var(state.dataTranspiredCollector->UTSC(thisUTSC).Correlation);
-                        if (SELECT_CASE_var == state.dataTranspiredCollector->Correlation_Kutscher1994) { // Kutscher1994
+                        if (SELECT_CASE_var == Correlation_Kutscher1994) { // Kutscher1994
                             state.dataTranspiredCollector->UTSC(thisUTSC).Pitch *= 1.6;
-                        } else if (SELECT_CASE_var ==
-                                   state.dataTranspiredCollector->Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
+                        } else if (SELECT_CASE_var == Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
                             state.dataTranspiredCollector->UTSC(thisUTSC).Pitch = state.dataTranspiredCollector->UTSC(thisUTSC).Pitch;
                         }
                     }
@@ -970,11 +973,11 @@ namespace TranspiredCollector {
         using namespace DataHeatBalance; // , ONLY: SurfQRadSWOutIncident, Construct, Material
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const nu(15.66e-6); // kinematic viscosity (m**2/s) for air at 300 K
+        Real64 constexpr nu(15.66e-6); // kinematic viscosity (m**2/s) for air at 300 K
         // (Mills 1999 Heat Transfer)
-        Real64 const k(0.0267); // thermal conductivity (W/m K) for air at 300 K
+        Real64 constexpr k(0.0267); // thermal conductivity (W/m K) for air at 300 K
         // (Mills 1999 Heat Transfer)
-        Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
+        Real64 constexpr Sigma(5.6697e-08); // Stefan-Boltzmann constant
 
         // following arrays are used to temporarily hold results from multiple underlying surfaces
         Array1D<Real64> HSkyARR;
@@ -1196,7 +1199,7 @@ namespace TranspiredCollector {
         {
             auto const SELECT_CASE_var(state.dataTranspiredCollector->UTSC(UTSCNum).Correlation);
 
-            if (SELECT_CASE_var == state.dataTranspiredCollector->Correlation_Kutscher1994) { // Kutscher1994
+            if (SELECT_CASE_var == Correlation_Kutscher1994) { // Kutscher1994
 
                 AlessHoles = A - holeArea;
 
@@ -1204,7 +1207,7 @@ namespace TranspiredCollector {
                 U = k * NuD / D;
                 HXeff = 1.0 - std::exp(-1.0 * ((U * AlessHoles) / (Mdot * CpAir)));
 
-            } else if (SELECT_CASE_var == state.dataTranspiredCollector->Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
+            } else if (SELECT_CASE_var == Correlation_VanDeckerHollandsBrunger2001) { // VanDeckerHollandsBrunger2001
                 t = state.dataTranspiredCollector->UTSC(UTSCNum).CollectThick;
                 ReS = Vsuction * P / nu;
                 ReW = Vwind * P / nu;

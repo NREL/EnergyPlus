@@ -107,111 +107,95 @@ namespace StandardRatings {
     // OTHER NOTES: none
 
     // Data
-    Real64 const IndoorCoilInletAirWetBulbTempRated(19.44);   // 19.44C (67F)  Tests A2, B2, B1, and F1
-    Real64 const OutdoorCoilInletAirDryBulbTempRated(35.0);   // 35.00C (95F)  Tests A2, B2, B1, and F1
-    Real64 const OutdoorCoilInletAirDryBulbTempTestA2(35.0);  // 35.00C (95F)  Test A2 (high speed)
-    Real64 const OutdoorCoilInletAirDryBulbTempTestB2(27.78); // 27.78C (82F)  Test B2 (high speed)
-    Real64 const OutdoorCoilInletAirDryBulbTempTestB1(27.78); // 27.78C (82F)  Test B1 (Low speed)
-    Real64 const OutdoorCoilInletAirDryBulbTempTestF1(19.44); // 19.44C (67F)  Test B1 (Low speed)
+    Real64 constexpr IndoorCoilInletAirWetBulbTempRated(19.44);   // 19.44C (67F)  Tests A2, B2, B1, and F1
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempRated(35.0);   // 35.00C (95F)  Tests A2, B2, B1, and F1
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestA2(35.0);  // 35.00C (95F)  Test A2 (high speed)
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestB2(27.78); // 27.78C (82F)  Test B2 (high speed)
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestB1(27.78); // 27.78C (82F)  Test B1 (Low speed)
+    Real64 constexpr OutdoorCoilInletAirDryBulbTempTestF1(19.44); // 19.44C (67F)  Test B1 (Low speed)
 
     // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    Real64 const CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
-    Real64 const OutdoorUnitInletAirDryBulbTemp(27.78);      // 27.78C (82F)  Test B (for SEER)
-    Real64 const OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
-    Real64 const AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate
+    Real64 constexpr CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
+    Real64 constexpr OutdoorUnitInletAirDryBulbTemp(27.78);      // 27.78C (82F)  Test B (for SEER)
+    Real64 constexpr OutdoorUnitInletAirDryBulbTempRated(35.0);  // 35.00C (95F)  Test A (rated capacity)
+    Real64 constexpr AirMassFlowRatioRated(1.0);                 // AHRI test is at the design flow rate
     // and hence AirMassFlowRatio is 1.0
-    Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
-    Real64 const DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
+    Real64 constexpr DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
     // specifies a nominal/default fan electric power consumption per rated air
     // volume flow rate to account for indoor fan electric power consumption
     // when the standard tests are conducted on units that do not have an
-    // indoor air circulting fan. Used if user doesn't enter a specific value.
-    Real64 const PLRforSEER(0.5);                                 // Part-load ratio for SEER calculation (single speed DX cooling coils)
-    Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
-    Array1D<Real64> const IEERWeightingFactor(4, {0.020, 0.617, 0.238, 0.125}); // EER Weighting factors (IEER)
-    Real64 const OADBTempLowReducedCapacityTest(18.3);                          // Outdoor air dry-bulb temp in degrees C (65F)
+    // indoor air circulating fan. Used if user doesn't enter a specific value.
+    Real64 constexpr PLRforSEER(0.5); // Part-load ratio for SEER calculation (single speed DX cooling coils)
+    static constexpr std::array<Real64, 4> ReducedPLR = {1.0, 0.75, 0.50, 0.25};               // Reduced Capacity part-load conditions
+    static constexpr std::array<Real64, 4> IEERWeightingFactor = {0.020, 0.617, 0.238, 0.125}; // EER Weighting factors (IEER)
+    Real64 constexpr OADBTempLowReducedCapacityTest(18.3);                                     // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
-    int const TotalNumOfStandardDHRs(16);                                   // Total number of standard design heating requirements
-    Array1D_int const TotalNumOfTemperatureBins(6, {9, 10, 13, 15, 18, 9}); // Total number of temperature
-    // bins for a region
-    Array1D<Real64> const StandardDesignHeatingRequirement(16,
-                                                           {1465.36,
-                                                            2930.71,
-                                                            4396.07,
-                                                            5861.42,
-                                                            7326.78,
-                                                            8792.14,
-                                                            10257.49,
-                                                            11722.85,
-                                                            14653.56,
-                                                            17584.27,
-                                                            20514.98,
-                                                            23445.70,
-                                                            26376.41,
-                                                            29307.12,
-                                                            32237.83,
-                                                            38099.26});
+    int constexpr TotalNumOfStandardDHRs(16);                                                  // Total number of standard design heating requirements
+    static constexpr std::array<Real64, 6> TotalNumOfTemperatureBins = {9, 10, 13, 15, 18, 9}; // Total number of temperature bins for a region
+    static constexpr std::array<Real64, 16> StandardDesignHeatingRequirement = {1465.36,
+                                                                                2930.71,
+                                                                                4396.07,
+                                                                                5861.42,
+                                                                                7326.78,
+                                                                                8792.14,
+                                                                                10257.49,
+                                                                                11722.85,
+                                                                                14653.56,
+                                                                                17584.27,
+                                                                                20514.98,
+                                                                                23445.70,
+                                                                                26376.41,
+                                                                                29307.12,
+                                                                                32237.83,
+                                                                                38099.26};
+
     // Standardized DHRs from ANSI/AHRI 210/240
-    Real64 const CorrectionFactor(0.77); // A correction factor which tends to improve the agreement
+    Real64 constexpr CorrectionFactor(0.77); // A correction factor which tends to improve the agreement
     // between calculated and measured building loads, dimensionless.
-    Real64 const CyclicDegradationCoeff(0.25);
-    Array1D<Real64> const OutdoorDesignTemperature(6, {2.78, -2.78, -8.33, -15.0, -23.33, -1.11});
+    Real64 constexpr CyclicDegradationCoeff(0.25);
+    static constexpr std::array<Real64, 6> OutdoorDesignTemperature = {2.78, -2.78, -8.33, -15.0, -23.33, -1.11};
     // Outdoor design temperature for a region from ANSI/AHRI 210/240
-    Array1D<Real64> const OutdoorBinTemperature(
-        18, {16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56});
-    // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp(
-        18, {0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
-    // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp(
-        18, {0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
-    // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp(
-        18, {0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0});
-    // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp(
-        18, {0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0});
-    // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp(
-        18, {0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001});
-    // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp(
-        18, {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+    static constexpr std::array<Real64, 18> OutdoorBinTemperature = {
+        16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56};
+    int constexpr NumberOfRegions{6};
+    int constexpr NumberOfBins{18};
+    // Fractional bin hours for different bin temperatures from ANSI/AHRI 210/240
+    static constexpr std::array<std::array<Real64, NumberOfBins>, NumberOfRegions> FracBinHoursAtOutdoorBinTemp = {
+        {{0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+         {0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+         {0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0},
+         {0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0},
+         {0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001},
+         {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}}};
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
-    int const NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
-    Array1D<Real64> const OutdoorBinTemperatureSEER(NumOfOATempBins, {19.44, 22.22, 25.00, 27.78, 30.56, 33.33, 36.11, 38.89});
+    int constexpr NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
+    static constexpr std::array<Real64, NumOfOATempBins> OutdoorBinTemperatureSEER = {19.44, 22.22, 25.00, 27.78, 30.56, 33.33, 36.11, 38.89};
     // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
-    Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp(NumOfOATempBins, {0.214, 0.231, 0.216, 0.161, 0.104, 0.052, 0.018, 0.004});
+    static constexpr std::array<Real64, NumOfOATempBins> CoolFracBinHoursAtOutdoorBinTemp = {0.214, 0.231, 0.216, 0.161, 0.104, 0.052, 0.018, 0.004};
 
-    Real64 const HeatingIndoorCoilInletAirDBTempRated(21.11); // Heating coil entering air dry-bulb temperature in
+    Real64 constexpr HeatingIndoorCoilInletAirDBTempRated(21.11); // Heating coil entering air dry-bulb temperature in
     // degrees C (70F) Test H1, H2 and H3
     // (low and High Speed) Std. AHRI 210/240
-    Real64 const HeatingOutdoorCoilInletAirDBTempH0Test(16.67); // Outdoor air dry-bulb temp in degrees C (47F)
+    Real64 constexpr HeatingOutdoorCoilInletAirDBTempH0Test(16.67); // Outdoor air dry-bulb temp in degrees C (47F)
     // Test H0 (low and High Speed) Std. AHRI 210/240
-    Real64 const HeatingOutdoorCoilInletAirDBTempRated(8.33); // Outdoor air dry-bulb temp in degrees C (47F)
-    // Test H1 or rated (low and High Speed) Std. AHRI 210/240
-    Real64 const HeatingOutdoorCoilInletAirDBTempH2Test(1.67); // Outdoor air dry-bulb temp in degrees C (35F)
-    // Test H2 (low and High Speed) Std. AHRI 210/240
-    Real64 const HeatingOutdoorCoilInletAirDBTempH3Test(-8.33); // Outdoor air dry-bulb temp in degrees C (17F)
-    // Test H3 (low and High Speed) Std. AHRI 210/240
 
     // ANSI/ASHRAE Standard 127-2012 -- Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
     //  Class 1 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F ) 23.9C( 75.0F )
     //    Class 2 29.4C( 85.0F ) 29.4C( 85.0F ) 29.4C( 85.0F ) 29.4C( 85.0F )
     //    Class 3 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F )
     //    Class 4 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F )
-    Array1D<Real64> const IndoorDBTempClassI2IV(4, {23.9, 29.4, 35.0, 40.5});
-    Real64 const IndoorTDPA2D(11.1);
+    static constexpr std::array<Real64, 4> IndoorDBTempClassI2IV = {23.9, 29.4, 35.0, 40.5};
+    Real64 constexpr IndoorTDPA2D(11.1);
     // 35.0C( 95.0F ) 26.7C( 80.0F ) 18.3C( 65.0F ) 4.4C( 40.0F )
-    Array1D<Real64> const OutdoorDBTempAllClassA2D(4, {35.0, 26.7, 18.3, 4.4});
+    static constexpr std::array<Real64, 4> OutdoorDBTempAllClassA2D = {35.0, 26.7, 18.3, 4.4};
 
     // Functions
 
     void CalcChillerIPLV(EnergyPlusData &state,
                          std::string const &ChillerName,               // Name of Chiller for which IPLV is calculated
-                         int const ChillerType,                        // Type of Chiller - EIR or Reformulated EIR
+                         DataPlant::PlantEquipmentType ChillerType,    // Type of Chiller - EIR or Reformulated EIR
                          Real64 const RefCap,                          // Reference capacity of chiller [W]
                          Real64 const RefCOP,                          // Reference coefficient of performance [W/W]
                          DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
@@ -247,34 +231,19 @@ namespace StandardRatings {
         //                                  Compression Cycle. Arlington, VA:  Air-Conditioning, Heating,
         //                                  and Refrigeration Institute.
 
-        // USE STATEMENTS:
-
         // Using/Aliasing
         using namespace OutputReportPredefined;
         using CurveManager::CurveValue;
         using CurveManager::GetCurveName;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-
         using General::SolveRoot;
 
-        // Locals
-        Real64 const ConvFromSIToIP(3.412141633);                            // Conversion from SI to IP [3.412 Btu/hr-W]
-        static Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // (function of leaving chilled water temperature and
-        //  entering condenser fluid temperature)
-        // (function of leaving chilled water temperature and
-        //  entering condenser fluid temperature)
-
-        Real64 const EvapOutletTemp(6.67); // (44F)
-        Real64 const Acc(0.0001);          // Accuracy of result
-        int const NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
-        int const IterMax(500);            // Maximum number of iterations
-        static Array1D<Real64> const IPLVWeightingFactor(4, {0.010, 0.42, 0.45, 0.12}); // EER Weighting factors (IPLV)
+        Real64 constexpr EvapOutletTemp(6.67); // (44F)
+        Real64 constexpr Acc(0.0001);          // Accuracy of result
+        int constexpr NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
+        int constexpr IterMax(500);            // Maximum number of iterations
+        static constexpr std::array<Real64, 4> IPLVWeightingFactor = {0.010, 0.42, 0.45, 0.12}; // EER Weighting factors (IPLV)
         static constexpr std::string_view RoutineName("CalcChillerIPLV");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -340,125 +309,121 @@ namespace StandardRatings {
         CheckCurveLimitsForIPLV(state, ChillerName, ChillerType, CondenserType, CapFTempCurveIndex, EIRFTempCurveIndex);
 
         // IPLV calculations:
-        for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
+        for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
             if (CondenserType == DataPlant::CondenserType::WaterCooled) {
                 // get the entering water temperature for the reduced capacity test conditions
-                if (ReducedPLR(RedCapNum) > 0.50) {
-                    EnteringWaterTempReduced = 8.0 + 22.0 * ReducedPLR(RedCapNum);
+                if (ReducedPLR[RedCapNum] > 0.50) {
+                    EnteringWaterTempReduced = 8.0 + 22.0 * ReducedPLR[RedCapNum];
                 } else {
                     EnteringWaterTempReduced = 19.0;
                 }
                 CondenserInletTemp = EnteringWaterTempReduced;
             } else if (CondenserType == DataPlant::CondenserType::AirCooled) {
                 // get the outdoor air dry bulb temperature for the reduced capacity test conditions
-                if (ReducedPLR(RedCapNum) > 0.3125) {
-                    EnteringAirDryBulbTempReduced = 3.0 + 32.0 * ReducedPLR(RedCapNum);
+                if (ReducedPLR[RedCapNum] > 0.3125) {
+                    EnteringAirDryBulbTempReduced = 3.0 + 32.0 * ReducedPLR[RedCapNum];
                 } else {
                     EnteringAirDryBulbTempReduced = 13.0;
                 }
                 CondenserInletTemp = EnteringAirDryBulbTempReduced;
             } else { // EvaporativelyCooled Condenser
                 // get the outdoor air wet bulb temperature for the reduced capacity test conditions
-                EnteringAirWetBulbTempReduced = 10.0 + 14.0 * ReducedPLR(RedCapNum);
+                EnteringAirWetBulbTempReduced = 10.0 + 14.0 * ReducedPLR[RedCapNum];
                 CondenserInletTemp = EnteringAirWetBulbTempReduced;
             }
 
-            {
-                auto const SELECT_CASE_var(ChillerType);
+            if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
+                if (RedCapNum == 0) {
+                    // Get curve modifier values at rated conditions (load = 100%)
+                    ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+                    ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
-                    if (RedCapNum == 1.0) {
-                        // Get curve modifier values at rated conditions (load = 100%)
-                        ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
-                        ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+                    // Report rated capacity and chiller COP
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                }
 
-                        // Report rated capacity and chiller COP
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
-                    }
+                // Get capacity curve info with respect to CW setpoint and entering condenser temps
+                ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                    // Get capacity curve info with respect to CW setpoint and entering condenser temps
-                    ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+                ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                    ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
+                PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
 
-                    PartLoadRatio = ReducedPLR(RedCapNum) * ChillerCapFT_rated / ChillerCapFT;
+                if (PartLoadRatio >= MinUnloadRat) {
+                    ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, PartLoadRatio);
+                } else {
+                    ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, MinUnloadRat);
+                    PartLoadRatio = MinUnloadRat;
+                }
 
-                    if (PartLoadRatio >= MinUnloadRat) {
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, PartLoadRatio);
-                    } else {
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, MinUnloadRat);
-                        PartLoadRatio = MinUnloadRat;
-                    }
-
-                } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
-                    Cp = GetSpecificHeatGlycol(state,
-                                               state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
-                                               EnteringWaterTempReduced,
-                                               state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex,
-                                               RoutineName);
-
-                    Rho = GetDensityGlycol(state,
+            } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
+                Cp = GetSpecificHeatGlycol(state,
                                            state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
                                            EnteringWaterTempReduced,
                                            state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex,
                                            RoutineName);
 
-                    Par(1) = EnteringWaterTempReduced;
-                    Par(2) = EvapOutletTemp;
-                    Par(3) = Cp;
-                    Par(4) = ReducedPLR(RedCapNum);
-                    Par(5) = EvapVolFlowRate * Rho;
-                    Par(6) = CapFTempCurveIndex;
-                    Par(7) = EIRFTempCurveIndex;
-                    Par(8) = EIRFPLRCurveIndex;
-                    Par(9) = RefCap;
-                    Par(10) = RefCOP;
-                    Par(11) = OpenMotorEff;
-                    CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
-                    CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
-                    General::SolveRoot(state,
-                                       Acc,
-                                       IterMax,
-                                       SolFla,
-                                       CondenserOutletTemp,
-                                       ReformEIRChillerCondInletTempResidual,
-                                       CondenserOutletTemp0,
-                                       CondenserOutletTemp1,
-                                       Par);
-                    if (SolFla == -1) {
-                        ShowWarningError(state, "Iteration limit exceeded in calculating Reform Chiller IPLV");
-                        ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
-                    } else if (SolFla == -2) {
-                        ShowWarningError(state, "Bad starting values for calculating Reform Chiller IPLV");
-                        ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
-                    }
+                Rho = GetDensityGlycol(state,
+                                       state.dataPlnt->PlantLoop(CondLoopNum).FluidName,
+                                       EnteringWaterTempReduced,
+                                       state.dataPlnt->PlantLoop(CondLoopNum).FluidIndex,
+                                       RoutineName);
 
-                    if (RedCapNum == 1.0) {
-                        // Get curve modifier values at rated conditions (load = 100%)
-                        ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
-                        ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
-
-                        // Report rated capacity and chiller COP
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
-                    }
-
-                    ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
-
-                    ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
-
-                    PartLoadRatio = ReducedPLR(RedCapNum) * ChillerCapFT_rated / ChillerCapFT;
-
-                    if (PartLoadRatio >= MinUnloadRat) {
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
-                    } else {
-                        ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
-                        PartLoadRatio = MinUnloadRat;
-                    }
-                } else {
-                    // should not come here, do nothing
+                Par(1) = EnteringWaterTempReduced;
+                Par(2) = EvapOutletTemp;
+                Par(3) = Cp;
+                Par(4) = ReducedPLR[RedCapNum];
+                Par(5) = EvapVolFlowRate * Rho;
+                Par(6) = CapFTempCurveIndex;
+                Par(7) = EIRFTempCurveIndex;
+                Par(8) = EIRFPLRCurveIndex;
+                Par(9) = RefCap;
+                Par(10) = RefCOP;
+                Par(11) = OpenMotorEff;
+                CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
+                CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
+                General::SolveRoot(state,
+                                   Acc,
+                                   IterMax,
+                                   SolFla,
+                                   CondenserOutletTemp,
+                                   ReformEIRChillerCondInletTempResidual,
+                                   CondenserOutletTemp0,
+                                   CondenserOutletTemp1,
+                                   Par);
+                if (SolFla == -1) {
+                    ShowWarningError(state, "Iteration limit exceeded in calculating Reform Chiller IPLV");
+                    ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
+                } else if (SolFla == -2) {
+                    ShowWarningError(state, "Bad starting values for calculating Reform Chiller IPLV");
+                    ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
                 }
+
+                if (RedCapNum == 0) {
+                    // Get curve modifier values at rated conditions (load = 100%)
+                    ChillerCapFT_rated = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+                    ChillerEIRFT_rated = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+
+                    // Report rated capacity and chiller COP
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatCap, ChillerName, RefCap * ChillerCapFT_rated);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechRatEff, ChillerName, RefCOP / ChillerEIRFT_rated);
+                }
+
+                ChillerCapFT = CurveValue(state, CapFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+
+                ChillerEIRFT = CurveValue(state, EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
+
+                PartLoadRatio = ReducedPLR[RedCapNum] * ChillerCapFT_rated / ChillerCapFT;
+
+                if (PartLoadRatio >= MinUnloadRat) {
+                    ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
+                } else {
+                    ChillerEIRFPLR = CurveValue(state, EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
+                    PartLoadRatio = MinUnloadRat;
+                }
+            } else {
+                // should not come here, do nothing
             }
 
             // Available chiller capacity as a function of temperature
@@ -467,21 +432,20 @@ namespace StandardRatings {
                 Power = (AvailChillerCap / RefCOP) * ChillerEIRFPLR * ChillerEIRFT;
                 EIR = Power / (PartLoadRatio * AvailChillerCap);
 
-                if (ReducedPLR(RedCapNum) >= MinUnloadRat) {
+                if (ReducedPLR[RedCapNum] >= MinUnloadRat) {
                     COPReduced = 1.0 / EIR;
                 } else {
-                    LoadFactor = (ReducedPLR(RedCapNum) * RefCap) / (MinUnloadRat * AvailChillerCap);
+                    LoadFactor = (ReducedPLR[RedCapNum] * RefCap) / (MinUnloadRat * AvailChillerCap);
                     DegradationCoeff = 1.130 - 0.130 * LoadFactor;
                     COPReduced = 1.0 / (DegradationCoeff * EIR);
                 }
-                IPLV += IPLVWeightingFactor(RedCapNum) * COPReduced;
+                IPLV += IPLVWeightingFactor[RedCapNum] * COPReduced;
             } else {
                 {
-                    auto const SELECT_CASE_var(ChillerType);
-                    if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+                    if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
                         ShowWarningError(state,
                                          "Chiller:Electric:EIR = " + ChillerName + ":  Integrated Part Load Value (IPLV) cannot be calculated.");
-                    } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+                    } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                         ShowWarningError(state,
                                          "Chiller:Electric:ReformulatedEIR = " + ChillerName +
@@ -611,10 +575,10 @@ namespace StandardRatings {
     }
 
     void ReportChillerIPLV(EnergyPlusData &state,
-                           std::string const &ChillerName, // Name of Chiller for which IPLV is calculated
-                           int const ChillerType,          // Type of Chiller - EIR or Reformulated EIR
-                           Real64 const IPLVValueSI,       // IPLV value in SI units {W/W}
-                           Real64 const IPLVValueIP        // IPLV value in IP units {Btu/W-h}
+                           std::string const &ChillerName,            // Name of Chiller for which IPLV is calculated
+                           DataPlant::PlantEquipmentType ChillerType, // Type of Chiller - EIR or Reformulated EIR
+                           Real64 const IPLVValueSI,                  // IPLV value in SI units {W/W}
+                           Real64 const IPLVValueIP                   // IPLV value in IP units {Btu/W-h}
     )
     {
 
@@ -630,8 +594,6 @@ namespace StandardRatings {
 
         // Using/Aliasing
         using namespace OutputReportPredefined;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &StandardRatingsMyOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyOneTimeFlag;
@@ -639,21 +601,20 @@ namespace StandardRatings {
         // Formats
 
         if (StandardRatingsMyOneTimeFlag) {
-            static constexpr std::string_view Format_990(
-                "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
-            print(state.files.eio, "{}\n", Format_990);
+            print(state.files.eio,
+                  "{}\n",
+                  "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
             StandardRatingsMyOneTimeFlag = false;
         }
 
         {
             static constexpr std::string_view Format_991(" Chiller Standard Rating Information, {}, {}, {:.2R}, {:.2R}\n");
-            auto const SELECT_CASE_var(ChillerType);
-            if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+            if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
 
                 print(state.files.eio, Format_991, "Chiller:Electric:EIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, ChillerName, "Chiller:Electric:EIR");
 
-            } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+            } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
                 print(state.files.eio, Format_991, "Chiller:Electric:ReformulatedEIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, ChillerName, "Chiller:Electric:ReformulatedEIR");
@@ -667,7 +628,7 @@ namespace StandardRatings {
 
     void CheckCurveLimitsForIPLV(EnergyPlusData &state,
                                  std::string const &ChillerName,               // Name of Chiller
-                                 int const ChillerType,                        // Type of Chiller - EIR or ReformulatedEIR
+                                 DataPlant::PlantEquipmentType ChillerType,    // Type of Chiller - EIR or ReformulatedEIR
                                  DataPlant::CondenserType const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
                                  int const CapFTempCurveIndex,                 // Index for the total cooling capacity modifier curve
                                  int const EIRFTempCurveIndex                  // Index for the energy input ratio modifier curve
@@ -687,31 +648,25 @@ namespace StandardRatings {
         // Using/Aliasing
         using CurveManager::GetCurveMinMaxValues;
         using CurveManager::GetCurveName;
-        using DataPlant::TypeOf_Chiller_ElectricEIR;
-        using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 
         // Following parameters are taken from AHRI 551/591,2011 Table 3
-        Real64 const HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
-        Real64 const LowEWTemp(19.0);        // Entering water temp in degrees C at minimum reduced capacity (65F)
-        Real64 const OAHighEDBTemp(35.0);    // Outdoor air dry-bulb temp in degrees C at full load capacity (95F)
-        Real64 const OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
-        Real64 const LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
+        Real64 constexpr HighEWTemp(30.0);       // Entering water temp in degrees C at full load capacity (85F)
+        Real64 constexpr LowEWTemp(19.0);        // Entering water temp in degrees C at minimum reduced capacity (65F)
+        Real64 constexpr OAHighEDBTemp(35.0);    // Outdoor air dry-bulb temp in degrees C at full load capacity (95F)
+        Real64 constexpr OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
+        Real64 constexpr LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
 
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
         Real64 CapacityLWTempMin(0.0);           // Capacity modifier Min value (leaving water temp), from the Curve:BiQuadratic object
         Real64 CapacityLWTempMax(0.0);           // Capacity modifier Max value (leaving water temp), from the Curve:BiQuadratic object
-        Real64 CapacityEnteringCondTempMin(0.0); // Capacity modifier Min value (entering cond temp),
-        // from the Curve:BiQuadratic object
-        Real64 CapacityEnteringCondTempMax(0.0); // Capacity modifier Max value (entering cond temp),
-        // from the Curve:BiQuadratic object
+        Real64 CapacityEnteringCondTempMin(0.0); // Capacity modifier Min value (entering cond temp), from the Curve:BiQuadratic object
+        Real64 CapacityEnteringCondTempMax(0.0); // Capacity modifier Max value (entering cond temp), from the Curve:BiQuadratic object
 
         //  Minimum and Maximum independent variable limits from Energy Input Ratio (EIR) Function of Temperature Curve
         Real64 EIRLWTempMin(0.0);           // EIR modifier Min value (leaving water temp), from the Curve:BiQuadratic object
         Real64 EIRLWTempMax(0.0);           // EIR modifier Max value (leaving water temp), from the Curve:BiQuadratic object
-        Real64 EIREnteringCondTempMin(0.0); // EIR modifier Min value (entering cond temp),
-        // from the Curve:BiQuadratic object
-        Real64 EIREnteringCondTempMax(0.0); // EIR modifier Max value (entering cond temp),
-        // from the Curve:BiQuadratic object
+        Real64 EIREnteringCondTempMin(0.0); // EIR modifier Min value (entering cond temp), from the Curve:BiQuadratic object
+        Real64 EIREnteringCondTempMax(0.0); // EIR modifier Max value (entering cond temp), from the Curve:BiQuadratic object
 
         Real64 HighCondenserEnteringTempLimit(0.0); // High limit of entering condenser temperature
         Real64 LowCondenserEnteringTempLimit(0.0);  // Low limit of entering condenser temperature
@@ -748,20 +703,17 @@ namespace StandardRatings {
         // For IPLV:
         if (CapCurveIPLVLimitsExceeded || EIRCurveIPLVLimitsExceeded) {
             if (state.dataGlobal->DisplayExtraWarnings) {
-                {
-                    auto const SELECT_CASE_var(ChillerType);
 
-                    if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
+                if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricEIR) {
 
-                        ShowWarningError(state,
-                                         "Chiller:Electric:EIR = " + ChillerName +
-                                             ":  Integrated Part Load Value (IPLV) calculated is not at the AHRI test condition.");
-                    } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
+                    ShowWarningError(state,
+                                     "Chiller:Electric:EIR = " + ChillerName +
+                                         ":  Integrated Part Load Value (IPLV) calculated is not at the AHRI test condition.");
+                } else if (ChillerType == DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR) {
 
-                        ShowWarningError(state,
-                                         "Chiller:Electric:ReformulatedEIR = " + ChillerName +
-                                             ":  Integrated Part Load Value (IPLV) calculated is not at the AHRI test condition.");
-                    }
+                    ShowWarningError(state,
+                                     "Chiller:Electric:ReformulatedEIR = " + ChillerName +
+                                         ":  Integrated Part Load Value (IPLV) calculated is not at the AHRI test condition.");
                 }
                 if (CapCurveIPLVLimitsExceeded) {
                     ShowContinueError(state,
@@ -962,218 +914,223 @@ namespace StandardRatings {
 
         NetCoolingCapRated = 0.0;
 
-        {
-            auto const SELECT_CASE_var(DXCoilType_Num);
+        switch (DXCoilType_Num) {
 
-            if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) { // Coil:Cooling:DX:SingleSpeed
+        case CoilDX_CoolingSingleSpeed: { // Coil:Cooling:DX:SingleSpeed
 
-                CheckCurveLimitsForStandardRatings(state,
-                                                   DXCoilName,
-                                                   DXCoilType,
-                                                   DXCoilType_Num,
-                                                   CapFTempCurveIndex(1),
-                                                   CapFFlowCurveIndex(1),
-                                                   EIRFTempCurveIndex(1),
-                                                   EIRFFlowCurveIndex(1),
-                                                   PLFFPLRCurveIndex(1));
+            CheckCurveLimitsForStandardRatings(state,
+                                               DXCoilName,
+                                               DXCoilType,
+                                               DXCoilType_Num,
+                                               CapFTempCurveIndex(1),
+                                               CapFFlowCurveIndex(1),
+                                               EIRFTempCurveIndex(1),
+                                               EIRFFlowCurveIndex(1),
+                                               PLFFPLRCurveIndex(1));
 
-                // Calculated Net Cooling Capacity, SEER, SEER Default, EER, and IEER of single speed DX cooling coils
-                SingleSpeedDXCoolingCoilStandardRatings(state,
-                                                        DXCoilName,
-                                                        DXCoilType,
-                                                        CapFTempCurveIndex(1),
-                                                        CapFFlowCurveIndex(1),
-                                                        EIRFTempCurveIndex(1),
-                                                        EIRFFlowCurveIndex(1),
-                                                        PLFFPLRCurveIndex(1),
-                                                        RatedTotalCapacity(1),
-                                                        RatedCOP(1),
-                                                        RatedAirVolFlowRate(1),
-                                                        FanPowerPerEvapAirFlowRateFromInput(1),
-                                                        NetCoolingCapRated(1),
-                                                        SEER_User,
-                                                        SEER_Standard,
-                                                        EER,
-                                                        IEER);
+            // Calculated Net Cooling Capacity, SEER, SEER Default, EER, and IEER of single speed DX cooling coils
+            SingleSpeedDXCoolingCoilStandardRatings(state,
+                                                    DXCoilName,
+                                                    DXCoilType,
+                                                    CapFTempCurveIndex(1),
+                                                    CapFFlowCurveIndex(1),
+                                                    EIRFTempCurveIndex(1),
+                                                    EIRFFlowCurveIndex(1),
+                                                    PLFFPLRCurveIndex(1),
+                                                    RatedTotalCapacity(1),
+                                                    RatedCOP(1),
+                                                    RatedAirVolFlowRate(1),
+                                                    FanPowerPerEvapAirFlowRateFromInput(1),
+                                                    NetCoolingCapRated(1),
+                                                    SEER_User,
+                                                    SEER_Standard,
+                                                    EER,
+                                                    IEER);
 
-                // Writes the net rated cooling capacity, SEER, SEER Default, EER and IEER values to the EIO file and standard tabular output tables
-                ReportDXCoilRating(state,
-                                   DXCoilType,
-                                   DXCoilName,
-                                   DXCoilType_Num,
-                                   NetCoolingCapRated(1),
-                                   SEER_User * ConvFromSIToIP,
-                                   SEER_Standard * ConvFromSIToIP,
-                                   EER,
-                                   EER * ConvFromSIToIP,
-                                   IEER * ConvFromSIToIP,
-                                   NetHeatingCapRatedHighTemp,
-                                   NetHeatingCapRatedLowTemp,
-                                   HSPF * ConvFromSIToIP,
-                                   RegionNum);
+            // Writes the net rated cooling capacity, SEER, SEER Default, EER and IEER values to the EIO file and standard tabular output tables
+            ReportDXCoilRating(state,
+                               DXCoilType,
+                               DXCoilName,
+                               DXCoilType_Num,
+                               NetCoolingCapRated(1),
+                               SEER_User * ConvFromSIToIP,
+                               SEER_Standard * ConvFromSIToIP,
+                               EER,
+                               EER * ConvFromSIToIP,
+                               IEER * ConvFromSIToIP,
+                               NetHeatingCapRatedHighTemp,
+                               NetHeatingCapRatedLowTemp,
+                               HSPF * ConvFromSIToIP,
+                               RegionNum);
 
-                if (ASHRAE127StdRprt) {
-                    DXCoolingCoilDataCenterStandardRatings(state,
-                                                           DXCoilName,
-                                                           DXCoilType,
-                                                           CapFTempCurveIndex(1),
-                                                           CapFFlowCurveIndex(1),
-                                                           EIRFTempCurveIndex(1),
-                                                           EIRFFlowCurveIndex(1),
-                                                           PLFFPLRCurveIndex(1),
-                                                           RatedTotalCapacity(1),
-                                                           RatedCOP(1),
-                                                           RatedAirVolFlowRate(1),
-                                                           FanPowerPerEvapAirFlowRateFromInput(1),
-                                                           NetTotCoolingCapRated,
-                                                           TotElectricPowerRated);
-                    ReportDXCoolCoilDataCenterApplication(
-                        state, DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated);
-                }
-            } else if (SELECT_CASE_var == CoilDX_HeatingEmpirical) { // Coil:Heating:DX:SingleSpeed
-
-                CheckCurveLimitsForStandardRatings(state,
-                                                   DXCoilName,
-                                                   DXCoilType,
-                                                   DXCoilType_Num,
-                                                   CapFTempCurveIndex(1),
-                                                   CapFFlowCurveIndex(1),
-                                                   EIRFTempCurveIndex(1),
-                                                   EIRFFlowCurveIndex(1),
-                                                   PLFFPLRCurveIndex(1));
-                // Calculate the standard ratings for single speed DX heating coil
-                SingleSpeedDXHeatingCoilStandardRatings(state,
-                                                        RatedTotalCapacity(1),
-                                                        RatedCOP(1),
-                                                        CapFFlowCurveIndex(1),
-                                                        CapFTempCurveIndex(1),
-                                                        EIRFFlowCurveIndex(1),
-                                                        EIRFTempCurveIndex(1),
-                                                        RatedAirVolFlowRate(1),
-                                                        FanPowerPerEvapAirFlowRateFromInput(1),
-                                                        NetHeatingCapRatedHighTemp,
-                                                        NetHeatingCapRatedLowTemp,
-                                                        HSPF,
-                                                        RegionNum,
-                                                        MinOATCompressor,
-                                                        OATempCompressorOn,
-                                                        OATempCompressorOnOffBlank,
-                                                        DefrostControl);
-
-                // Writes the HSPF value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(state,
-                                   DXCoilType,
-                                   DXCoilName,
-                                   DXCoilType_Num,
-                                   NetCoolingCapRated(1),
-                                   SEER_User * ConvFromSIToIP,
-                                   SEER_Standard * ConvFromSIToIP,
-                                   EER,
-                                   EER * ConvFromSIToIP,
-                                   IEER * ConvFromSIToIP,
-                                   NetHeatingCapRatedHighTemp,
-                                   NetHeatingCapRatedLowTemp,
-                                   HSPF * ConvFromSIToIP,
-                                   RegionNum);
-
-            } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) { // Coil:Cooling:DX:MultiSpeed,
-
-                for (spnum = 1; spnum <= ns; ++spnum) {
-                    CheckCurveLimitsForStandardRatings(state,
+            if (ASHRAE127StdRprt) {
+                DXCoolingCoilDataCenterStandardRatings(state,
                                                        DXCoilName,
                                                        DXCoilType,
-                                                       DXCoilType_Num,
-                                                       CapFTempCurveIndex(spnum),
-                                                       CapFFlowCurveIndex(spnum),
-                                                       EIRFTempCurveIndex(spnum),
-                                                       EIRFFlowCurveIndex(spnum),
-                                                       PLFFPLRCurveIndex(spnum));
-                }
-                // Calculate the standard ratings for multispeed DX cooling coil
-                MultiSpeedDXCoolingCoilStandardRatings(state,
-                                                       CapFTempCurveIndex,
-                                                       CapFFlowCurveIndex,
-                                                       EIRFTempCurveIndex,
-                                                       EIRFFlowCurveIndex,
-                                                       PLFFPLRCurveIndex,
-                                                       RatedTotalCapacity,
-                                                       RatedCOP,
-                                                       RatedAirVolFlowRate,
-                                                       FanPowerPerEvapAirFlowRateFromInput,
-                                                       ns,
-                                                       NetCoolingCapRated(ns),
-                                                       SEER_User,
-                                                       SEER_Standard);
-                // Writes the SEER value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(state,
-                                   DXCoilType,
-                                   DXCoilName,
-                                   DXCoilType_Num,
-                                   NetCoolingCapRated(ns),
-                                   SEER_User * ConvFromSIToIP,
-                                   SEER_Standard * ConvFromSIToIP,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0.0,
-                                   0);
-
-            } else if (SELECT_CASE_var == CoilDX_MultiSpeedHeating) { // Coil:Heating:DX:MultiSpeed
-
-                for (spnum = 1; spnum <= ns; ++spnum) {
-                    CheckCurveLimitsForStandardRatings(state,
-                                                       DXCoilName,
-                                                       DXCoilType,
-                                                       DXCoilType_Num,
-                                                       CapFTempCurveIndex(spnum),
-                                                       CapFFlowCurveIndex(spnum),
-                                                       EIRFTempCurveIndex(spnum),
-                                                       EIRFFlowCurveIndex(spnum),
-                                                       PLFFPLRCurveIndex(spnum));
-                }
-                // Calculate Net heatig capacity and HSPF of multispeed DX heating coils
-                MultiSpeedDXHeatingCoilStandardRatings(state,
-                                                       DXCoilName,
-                                                       DXCoilType,
-                                                       CapFTempCurveIndex,
-                                                       CapFFlowCurveIndex,
-                                                       EIRFTempCurveIndex,
-                                                       EIRFFlowCurveIndex,
-                                                       PLFFPLRCurveIndex,
-                                                       RatedTotalCapacity,
-                                                       RatedCOP,
-                                                       RatedAirVolFlowRate,
-                                                       FanPowerPerEvapAirFlowRateFromInput,
-                                                       ns,
-                                                       NetHeatingCapRatedHighTemp,
-                                                       NetHeatingCapRatedLowTemp,
-                                                       HSPF,
-                                                       RegionNum,
-                                                       MinOATCompressor,
-                                                       OATempCompressorOn,
-                                                       OATempCompressorOnOffBlank,
-                                                       DefrostControl);
-                // Writes the HSPF value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(state,
-                                   DXCoilType,
-                                   DXCoilName,
-                                   DXCoilType_Num,
-                                   NetCoolingCapRated(ns),
-                                   SEER_User * ConvFromSIToIP,
-                                   SEER_Standard * ConvFromSIToIP,
-                                   EER,
-                                   EER * ConvFromSIToIP,
-                                   IEER * ConvFromSIToIP,
-                                   NetHeatingCapRatedHighTemp,
-                                   NetHeatingCapRatedLowTemp,
-                                   HSPF * ConvFromSIToIP,
-                                   RegionNum);
-
-            } else {
-                //... other DX Coil types will follow here
+                                                       CapFTempCurveIndex(1),
+                                                       CapFFlowCurveIndex(1),
+                                                       EIRFTempCurveIndex(1),
+                                                       EIRFFlowCurveIndex(1),
+                                                       PLFFPLRCurveIndex(1),
+                                                       RatedTotalCapacity(1),
+                                                       RatedCOP(1),
+                                                       RatedAirVolFlowRate(1),
+                                                       FanPowerPerEvapAirFlowRateFromInput(1),
+                                                       NetTotCoolingCapRated,
+                                                       TotElectricPowerRated);
+                ReportDXCoolCoilDataCenterApplication(state, DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated);
             }
+            break;
+        }
+        case CoilDX_HeatingEmpirical: { // Coil:Heating:DX:SingleSpeed
+
+            CheckCurveLimitsForStandardRatings(state,
+                                               DXCoilName,
+                                               DXCoilType,
+                                               DXCoilType_Num,
+                                               CapFTempCurveIndex(1),
+                                               CapFFlowCurveIndex(1),
+                                               EIRFTempCurveIndex(1),
+                                               EIRFFlowCurveIndex(1),
+                                               PLFFPLRCurveIndex(1));
+            // Calculate the standard ratings for single speed DX heating coil
+            SingleSpeedDXHeatingCoilStandardRatings(state,
+                                                    RatedTotalCapacity(1),
+                                                    RatedCOP(1),
+                                                    CapFFlowCurveIndex(1),
+                                                    CapFTempCurveIndex(1),
+                                                    EIRFFlowCurveIndex(1),
+                                                    EIRFTempCurveIndex(1),
+                                                    RatedAirVolFlowRate(1),
+                                                    FanPowerPerEvapAirFlowRateFromInput(1),
+                                                    NetHeatingCapRatedHighTemp,
+                                                    NetHeatingCapRatedLowTemp,
+                                                    HSPF,
+                                                    RegionNum,
+                                                    MinOATCompressor,
+                                                    OATempCompressorOn,
+                                                    OATempCompressorOnOffBlank,
+                                                    DefrostControl);
+
+            // Writes the HSPF value to the EIO file and standard tabular output tables
+            ReportDXCoilRating(state,
+                               DXCoilType,
+                               DXCoilName,
+                               DXCoilType_Num,
+                               NetCoolingCapRated(1),
+                               SEER_User * ConvFromSIToIP,
+                               SEER_Standard * ConvFromSIToIP,
+                               EER,
+                               EER * ConvFromSIToIP,
+                               IEER * ConvFromSIToIP,
+                               NetHeatingCapRatedHighTemp,
+                               NetHeatingCapRatedLowTemp,
+                               HSPF * ConvFromSIToIP,
+                               RegionNum);
+
+            break;
+        }
+        case CoilDX_MultiSpeedCooling: { // Coil:Cooling:DX:MultiSpeed,
+
+            for (spnum = 1; spnum <= ns; ++spnum) {
+                CheckCurveLimitsForStandardRatings(state,
+                                                   DXCoilName,
+                                                   DXCoilType,
+                                                   DXCoilType_Num,
+                                                   CapFTempCurveIndex(spnum),
+                                                   CapFFlowCurveIndex(spnum),
+                                                   EIRFTempCurveIndex(spnum),
+                                                   EIRFFlowCurveIndex(spnum),
+                                                   PLFFPLRCurveIndex(spnum));
+            }
+            // Calculate the standard ratings for multispeed DX cooling coil
+            MultiSpeedDXCoolingCoilStandardRatings(state,
+                                                   CapFTempCurveIndex,
+                                                   CapFFlowCurveIndex,
+                                                   EIRFTempCurveIndex,
+                                                   EIRFFlowCurveIndex,
+                                                   PLFFPLRCurveIndex,
+                                                   RatedTotalCapacity,
+                                                   RatedCOP,
+                                                   RatedAirVolFlowRate,
+                                                   FanPowerPerEvapAirFlowRateFromInput,
+                                                   ns,
+                                                   NetCoolingCapRated(ns),
+                                                   SEER_User,
+                                                   SEER_Standard);
+            // Writes the SEER value to the EIO file and standard tabular output tables
+            ReportDXCoilRating(state,
+                               DXCoilType,
+                               DXCoilName,
+                               DXCoilType_Num,
+                               NetCoolingCapRated(ns),
+                               SEER_User * ConvFromSIToIP,
+                               SEER_Standard * ConvFromSIToIP,
+                               0.0,
+                               0.0,
+                               0.0,
+                               0.0,
+                               0.0,
+                               0.0,
+                               0);
+
+            break;
+        }
+        case CoilDX_MultiSpeedHeating: { // Coil:Heating:DX:MultiSpeed
+
+            for (spnum = 1; spnum <= ns; ++spnum) {
+                CheckCurveLimitsForStandardRatings(state,
+                                                   DXCoilName,
+                                                   DXCoilType,
+                                                   DXCoilType_Num,
+                                                   CapFTempCurveIndex(spnum),
+                                                   CapFFlowCurveIndex(spnum),
+                                                   EIRFTempCurveIndex(spnum),
+                                                   EIRFFlowCurveIndex(spnum),
+                                                   PLFFPLRCurveIndex(spnum));
+            }
+            // Calculate Net heatig capacity and HSPF of multispeed DX heating coils
+            MultiSpeedDXHeatingCoilStandardRatings(state,
+                                                   DXCoilName,
+                                                   DXCoilType,
+                                                   CapFTempCurveIndex,
+                                                   CapFFlowCurveIndex,
+                                                   EIRFTempCurveIndex,
+                                                   EIRFFlowCurveIndex,
+                                                   PLFFPLRCurveIndex,
+                                                   RatedTotalCapacity,
+                                                   RatedCOP,
+                                                   RatedAirVolFlowRate,
+                                                   FanPowerPerEvapAirFlowRateFromInput,
+                                                   ns,
+                                                   NetHeatingCapRatedHighTemp,
+                                                   NetHeatingCapRatedLowTemp,
+                                                   HSPF,
+                                                   RegionNum,
+                                                   MinOATCompressor,
+                                                   OATempCompressorOn,
+                                                   OATempCompressorOnOffBlank,
+                                                   DefrostControl);
+            // Writes the HSPF value to the EIO file and standard tabular output tables
+            ReportDXCoilRating(state,
+                               DXCoilType,
+                               DXCoilName,
+                               DXCoilType_Num,
+                               NetCoolingCapRated(ns),
+                               SEER_User * ConvFromSIToIP,
+                               SEER_Standard * ConvFromSIToIP,
+                               EER,
+                               EER * ConvFromSIToIP,
+                               IEER * ConvFromSIToIP,
+                               NetHeatingCapRatedHighTemp,
+                               NetHeatingCapRatedLowTemp,
+                               HSPF * ConvFromSIToIP,
+                               RegionNum);
+
+            break;
+        }
+        default:
+            break; //... other DX Coil types will follow here
         }
     }
 
@@ -1422,55 +1379,43 @@ namespace StandardRatings {
         if (RegionNum == 5) {
             DesignHeatingRequirementMin = NetHeatingCapRated;
         } else {
-            DesignHeatingRequirementMin = NetHeatingCapRated * 1.8 * (18.33 - OutdoorDesignTemperature(RegionNum)) / 60.0;
+            DesignHeatingRequirementMin = NetHeatingCapRated * 1.8 * (18.33 - OutdoorDesignTemperature[RegionNum - 1]) / 60.0;
         }
 
-        for (StandardDHRNum = 1; StandardDHRNum <= TotalNumOfStandardDHRs - 1; ++StandardDHRNum) {
-            if (StandardDesignHeatingRequirement(StandardDHRNum) <= DesignHeatingRequirementMin &&
-                StandardDesignHeatingRequirement(StandardDHRNum + 1) >= DesignHeatingRequirementMin) {
-                if ((DesignHeatingRequirementMin - StandardDesignHeatingRequirement(StandardDHRNum)) >
-                    (StandardDesignHeatingRequirement(StandardDHRNum + 1) - DesignHeatingRequirementMin)) {
-                    DesignHeatingRequirementMin = StandardDesignHeatingRequirement(StandardDHRNum + 1);
+        for (StandardDHRNum = 0; StandardDHRNum < TotalNumOfStandardDHRs - 1; ++StandardDHRNum) {
+            if (StandardDesignHeatingRequirement[StandardDHRNum] <= DesignHeatingRequirementMin &&
+                StandardDesignHeatingRequirement[StandardDHRNum + 1] >= DesignHeatingRequirementMin) {
+                if ((DesignHeatingRequirementMin - StandardDesignHeatingRequirement[StandardDHRNum]) >
+                    (StandardDesignHeatingRequirement[StandardDHRNum + 1] - DesignHeatingRequirementMin)) {
+                    DesignHeatingRequirementMin = StandardDesignHeatingRequirement[StandardDHRNum + 1];
                 } else {
-                    DesignHeatingRequirementMin = StandardDesignHeatingRequirement(StandardDHRNum);
+                    DesignHeatingRequirementMin = StandardDesignHeatingRequirement[StandardDHRNum];
                 }
             }
         }
-        if (StandardDesignHeatingRequirement(1) >= DesignHeatingRequirementMin) {
-            DesignHeatingRequirement = StandardDesignHeatingRequirement(1);
-        } else if (StandardDesignHeatingRequirement(TotalNumOfStandardDHRs) <= DesignHeatingRequirementMin) {
-            DesignHeatingRequirement = StandardDesignHeatingRequirement(TotalNumOfStandardDHRs);
+        if (StandardDesignHeatingRequirement[0] >= DesignHeatingRequirementMin) {
+            DesignHeatingRequirement = StandardDesignHeatingRequirement[0];
+        } else if (StandardDesignHeatingRequirement[TotalNumOfStandardDHRs - 1] <= DesignHeatingRequirementMin) {
+            DesignHeatingRequirement = StandardDesignHeatingRequirement[TotalNumOfStandardDHRs - 1];
         } else {
             DesignHeatingRequirement = DesignHeatingRequirementMin;
         }
 
-        for (BinNum = 1; BinNum <= TotalNumOfTemperatureBins(RegionNum); ++BinNum) {
+        for (BinNum = 0; BinNum < TotalNumOfTemperatureBins[RegionNum - 1]; ++BinNum) {
 
-            if (RegionNum == 1) {
-                FractionalBinHours = RegionOneFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 2) {
-                FractionalBinHours = RegionTwoFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 3) {
-                FractionalBinHours = RegionThreeFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 4) {
-                FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 5) {
-                FractionalBinHours = RegionFiveFracBinHoursAtOutdoorBinTemp(BinNum);
-            } else if (RegionNum == 6) {
-                FractionalBinHours = RegionSixFracBinHoursAtOutdoorBinTemp(BinNum);
-            }
+            FractionalBinHours = FracBinHoursAtOutdoorBinTemp[RegionNum - 1][BinNum];
 
-            BuildingLoad =
-                (18.33 - OutdoorBinTemperature(BinNum)) / (18.33 - OutdoorDesignTemperature(RegionNum)) * CorrectionFactor * DesignHeatingRequirement;
+            BuildingLoad = (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum - 1]) * CorrectionFactor *
+                           DesignHeatingRequirement;
 
-            if ((OutdoorBinTemperature(BinNum) <= -8.33) || (OutdoorBinTemperature(BinNum) >= 7.22)) {
+            if ((OutdoorBinTemperature[BinNum] <= -8.33) || (OutdoorBinTemperature[BinNum] >= 7.22)) {
                 NetHeatingCapReduced =
-                    NetHeatingCapH3Test + (NetHeatingCapRated - NetHeatingCapH3Test) * (OutdoorBinTemperature(BinNum) + 8.33) / (16.67);
-                ElectricalPowerConsumption = ElecPowerH3Test + (ElecPowerRated - ElecPowerH3Test) * (OutdoorBinTemperature(BinNum) + 8.33) / (16.67);
+                    NetHeatingCapH3Test + (NetHeatingCapRated - NetHeatingCapH3Test) * (OutdoorBinTemperature[BinNum] + 8.33) / (16.67);
+                ElectricalPowerConsumption = ElecPowerH3Test + (ElecPowerRated - ElecPowerH3Test) * (OutdoorBinTemperature[BinNum] + 8.33) / (16.67);
             } else {
                 NetHeatingCapReduced =
-                    NetHeatingCapH3Test + (NetHeatingCapH2Test - NetHeatingCapH3Test) * (OutdoorBinTemperature(BinNum) + 8.33) / (10.0);
-                ElectricalPowerConsumption = ElecPowerH3Test + (ElecPowerH2Test - ElecPowerH3Test) * (OutdoorBinTemperature(BinNum) + 8.33) / (10.0);
+                    NetHeatingCapH3Test + (NetHeatingCapH2Test - NetHeatingCapH3Test) * (OutdoorBinTemperature[BinNum] + 8.33) / (10.0);
+                ElectricalPowerConsumption = ElecPowerH3Test + (ElecPowerH2Test - ElecPowerH3Test) * (OutdoorBinTemperature[BinNum] + 8.33) / (10.0);
             }
 
             if (NetHeatingCapReduced != 0.0) {
@@ -1493,9 +1438,9 @@ namespace StandardRatings {
                 LowTempCutOutFactor = 0.0;
             } else {
                 if (!OATempCompressorOnOffBlank) {
-                    if (OutdoorBinTemperature(BinNum) <= OATempCompressorOff) {
+                    if (OutdoorBinTemperature[BinNum] <= OATempCompressorOff) {
                         LowTempCutOutFactor = 0.0;
-                    } else if (OutdoorBinTemperature(BinNum) > OATempCompressorOff && OutdoorBinTemperature(BinNum) <= OATempCompressorOn) {
+                    } else if (OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) {
                         LowTempCutOutFactor = 0.5;
                     } else {
                         LowTempCutOutFactor = 1.0;
@@ -1578,7 +1523,7 @@ namespace StandardRatings {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const NumOfReducedCap(4); // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
+        int constexpr NumOfReducedCap(4); // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1669,10 +1614,10 @@ namespace StandardRatings {
             // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
             TotCapTempModFac = CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
             NetCoolingCapRated = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
-            for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
+            for (RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
                 // get the outdoor air dry bulb temperature for the reduced capacity test conditions
-                if (ReducedPLR(RedCapNum) > 0.444) {
-                    OutdoorUnitInletAirDryBulbTempReduced = 5.0 + 30.0 * ReducedPLR(RedCapNum);
+                if (ReducedPLR[RedCapNum] > 0.444) {
+                    OutdoorUnitInletAirDryBulbTempReduced = 5.0 + 30.0 * ReducedPLR[RedCapNum];
                 } else {
                     OutdoorUnitInletAirDryBulbTempReduced = OADBTempLowReducedCapacityTest;
                 }
@@ -1685,7 +1630,7 @@ namespace StandardRatings {
                     EIR = 0.0;
                 }
                 if (NetCoolingCapReduced > 0.0) {
-                    LoadFactor = ReducedPLR(RedCapNum) * NetCoolingCapRated / NetCoolingCapReduced;
+                    LoadFactor = ReducedPLR[RedCapNum] * NetCoolingCapRated / NetCoolingCapReduced;
                 } else {
                     LoadFactor = 1.0;
                 }
@@ -1693,7 +1638,7 @@ namespace StandardRatings {
                 ElecPowerReducedCap = DegradationCoeff * EIR * (RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac);
                 EERReduced =
                     (LoadFactor * NetCoolingCapReduced) / (LoadFactor * ElecPowerReducedCap + FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate);
-                IEER += IEERWeightingFactor(RedCapNum) * EERReduced;
+                IEER += IEERWeightingFactor[RedCapNum] * EERReduced;
             }
 
         } else {
@@ -1780,11 +1725,11 @@ namespace StandardRatings {
 
             for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
                 TWBIndoor = PsyTwbFnTdbWPb(state,
-                                           IndoorDBTempClassI2IV(ClassNum),
+                                           IndoorDBTempClassI2IV[ClassNum - 1],
                                            PsyWFnTdpPb(state, IndoorTDPA2D, state.dataEnvrn->StdBaroPress),
                                            state.dataEnvrn->StdBaroPress);
                 for (TestNum = 1; TestNum <= 4; ++TestNum) {
-                    TDBOutdoor = OutdoorDBTempAllClassA2D(TestNum);
+                    TDBOutdoor = OutdoorDBTempAllClassA2D[TestNum - 1];
                     Num = (ClassNum - 1) * 4 + TestNum;
                     // Standard Rating Net Cooling Capacity at Test A:
                     TotCapFlowModFac = CurveValue(state, CapFFlowCurveIndex, AirMassFlowRatioRated);
@@ -1863,7 +1808,7 @@ namespace StandardRatings {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // CHARACTER(len=*), PARAMETER    :: RoutineName='MultiSpeedDXCoolingCoilStandardRatings: ' ! Include trailing blank space
-        Real64 const SizingFactor(1.10); // sizing factor per AHRI Std 210/240-2008
+        Real64 constexpr SizingFactor(1.10); // sizing factor per AHRI Std 210/240-2008
         // INTERFACE BLOCK SPECIFICATIONS
         // na
 
@@ -1975,30 +1920,30 @@ namespace StandardRatings {
         NetCoolingCapRatedMaxSpeed = NetCoolingCapRated(nsp);
 
         // Calculate the SEER value based on contribution of each outdoor air bin temperature
-        for (BinNum = 1; BinNum <= NumOfOATempBins; ++BinNum) {
-            BuildingCoolingLoad = (OutdoorBinTemperatureSEER(BinNum) - 18.3) / (35.0 - 18.3) * (TotCoolCapTestA2(nsp) / SizingFactor);
+        for (BinNum = 0; BinNum < NumOfOATempBins; ++BinNum) {
+            BuildingCoolingLoad = (OutdoorBinTemperatureSEER[BinNum] - 18.3) / (35.0 - 18.3) * (TotCoolCapTestA2(nsp) / SizingFactor);
             // determine the speed number
             CoolingCapacityMax = TotCoolCapTestB2(nsp) + ((TotCoolCapTestA2(nsp) - TotCoolCapTestB2(nsp)) /
                                                           (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
-                                                             (OutdoorBinTemperatureSEER(BinNum) - OutdoorCoilInletAirDryBulbTempTestB2);
+                                                             (OutdoorBinTemperatureSEER[BinNum] - OutdoorCoilInletAirDryBulbTempTestB2);
             CoolingElecPowerMax = OutdoorUnitPowerTestB2(nsp) + ((OutdoorUnitPowerTestA2(nsp) - OutdoorUnitPowerTestB2(nsp)) /
                                                                  (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
-                                                                    (OutdoorBinTemperatureSEER(BinNum) - OutdoorCoilInletAirDryBulbTempTestB2);
+                                                                    (OutdoorBinTemperatureSEER[BinNum] - OutdoorCoilInletAirDryBulbTempTestB2);
 
             for (spnum = 1; spnum <= nsp - 1; ++spnum) {
                 CoolingCapacityLS = TotCoolCapTestF1(spnum) + ((TotCoolCapTestB1(spnum) - TotCoolCapTestF1(spnum)) /
                                                                (OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1)) *
-                                                                  (OutdoorBinTemperatureSEER(BinNum) - OutdoorCoilInletAirDryBulbTempTestF1);
+                                                                  (OutdoorBinTemperatureSEER[BinNum] - OutdoorCoilInletAirDryBulbTempTestF1);
                 CoolingElecPowerLS = OutdoorUnitPowerTestF1(spnum) + ((OutdoorUnitPowerTestB1(spnum) - OutdoorUnitPowerTestF1(spnum)) /
                                                                       (OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1)) *
-                                                                         (OutdoorBinTemperatureSEER(BinNum) - OutdoorCoilInletAirDryBulbTempTestF1);
+                                                                         (OutdoorBinTemperatureSEER[BinNum] - OutdoorCoilInletAirDryBulbTempTestF1);
                 CoolingCapacityHS = TotCoolCapTestB2(spnum + 1) + ((TotCoolCapTestA2(spnum + 1) - TotCoolCapTestB2(spnum + 1)) /
                                                                    (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
-                                                                      (OutdoorBinTemperatureSEER(BinNum) - OutdoorCoilInletAirDryBulbTempTestB2);
+                                                                      (OutdoorBinTemperatureSEER[BinNum] - OutdoorCoilInletAirDryBulbTempTestB2);
                 CoolingElecPowerHS =
                     OutdoorUnitPowerTestB2(spnum + 1) + ((OutdoorUnitPowerTestA2(spnum + 1) - OutdoorUnitPowerTestB2(spnum + 1)) /
                                                          (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
-                                                            (OutdoorBinTemperatureSEER(BinNum) - OutdoorCoilInletAirDryBulbTempTestB2);
+                                                            (OutdoorBinTemperatureSEER[BinNum] - OutdoorCoilInletAirDryBulbTempTestB2);
 
                 if (BuildingCoolingLoad <= CoolingCapacityLS) {
                     PartLoadRatio = min(1.0, BuildingCoolingLoad / CoolingCapacityLS);
@@ -2025,9 +1970,9 @@ namespace StandardRatings {
             }
         SpeedLoop_exit:;
 
-            NetCoolingCapWeighted += NetTotCoolCapBinned * CoolFracBinHoursAtOutdoorBinTemp(BinNum);
-            TotCoolingElecPowerWeighted += TotCoolElecPowerBinned * CoolFracBinHoursAtOutdoorBinTemp(BinNum);
-            TotCoolingElecPowerWeightedDefault += TotCoolElecPowerBinnedDefault * CoolFracBinHoursAtOutdoorBinTemp(BinNum);
+            NetCoolingCapWeighted += NetTotCoolCapBinned * CoolFracBinHoursAtOutdoorBinTemp[BinNum];
+            TotCoolingElecPowerWeighted += TotCoolElecPowerBinned * CoolFracBinHoursAtOutdoorBinTemp[BinNum];
+            TotCoolingElecPowerWeightedDefault += TotCoolElecPowerBinnedDefault * CoolFracBinHoursAtOutdoorBinTemp[BinNum];
         }
 
         SEER_User = 0.0;
@@ -2248,128 +2193,111 @@ namespace StandardRatings {
             DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp;
             DesignHeatingRequirementMax = 2.20 * NetHeatingCapRatedHighTemp;
         } else {
-            DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp * (18.33 - OutdoorDesignTemperature(RegionNum)) / (60.0 / 1.80);
+            DesignHeatingRequirementMin = NetHeatingCapRatedHighTemp * (18.33 - OutdoorDesignTemperature[RegionNum - 1]) / (60.0 / 1.80);
             DesignHeatingRequirementMax = 2.20 * DesignHeatingRequirementMin;
         }
         // Set the Design Heating Requirement to nearest standard value (From Table 18, AHRI/ANSI Std 210/240)
-        for (StandardDHRNum = 1; StandardDHRNum <= TotalNumOfStandardDHRs - 1; ++StandardDHRNum) {
-            if (DesignHeatingRequirementMin < StandardDesignHeatingRequirement(1)) {
+        for (StandardDHRNum = 0; StandardDHRNum < TotalNumOfStandardDHRs - 1; ++StandardDHRNum) {
+            if (DesignHeatingRequirementMin < StandardDesignHeatingRequirement[0]) {
 
-                DesignHeatingRequirement = min(StandardDesignHeatingRequirement(1), DesignHeatingRequirementMax);
+                DesignHeatingRequirement = min(StandardDesignHeatingRequirement[0], DesignHeatingRequirementMax);
 
-            } else if (DesignHeatingRequirementMin >= StandardDesignHeatingRequirement(StandardDHRNum) &&
-                       DesignHeatingRequirementMin < StandardDesignHeatingRequirement(StandardDHRNum + 1)) {
-                if ((DesignHeatingRequirementMin - StandardDesignHeatingRequirement(StandardDHRNum)) >
-                    (StandardDesignHeatingRequirement(StandardDHRNum + 1) - DesignHeatingRequirementMin)) {
+            } else if (DesignHeatingRequirementMin >= StandardDesignHeatingRequirement[StandardDHRNum] &&
+                       DesignHeatingRequirementMin < StandardDesignHeatingRequirement[StandardDHRNum + 1]) {
+                if ((DesignHeatingRequirementMin - StandardDesignHeatingRequirement[StandardDHRNum]) >
+                    (StandardDesignHeatingRequirement[StandardDHRNum + 1] - DesignHeatingRequirementMin)) {
 
-                    DesignHeatingRequirement = min(StandardDesignHeatingRequirement(StandardDHRNum + 1), DesignHeatingRequirementMax);
+                    DesignHeatingRequirement = min(StandardDesignHeatingRequirement[StandardDHRNum + 1], DesignHeatingRequirementMax);
                 } else {
-                    DesignHeatingRequirement = min(StandardDesignHeatingRequirement(StandardDHRNum), DesignHeatingRequirementMax);
+                    DesignHeatingRequirement = min(StandardDesignHeatingRequirement[StandardDHRNum], DesignHeatingRequirementMax);
                 }
-            } else if (DesignHeatingRequirementMin >= StandardDesignHeatingRequirement(TotalNumOfStandardDHRs)) {
-                DesignHeatingRequirement = min(StandardDesignHeatingRequirement(StandardDHRNum), DesignHeatingRequirementMax);
+            } else if (DesignHeatingRequirementMin >= StandardDesignHeatingRequirement[TotalNumOfStandardDHRs - 1]) {
+                DesignHeatingRequirement = min(StandardDesignHeatingRequirement[StandardDHRNum], DesignHeatingRequirementMax);
             }
         }
         // The minimum temperature below which the compressor is turned off
         OATempCompressorOff = MinOATCompressor;
 
-        for (BinNum = 1; BinNum <= TotalNumOfTemperatureBins(RegionNum); ++BinNum) { // NumOfOATempBins
+        for (BinNum = 0; BinNum < TotalNumOfTemperatureBins[RegionNum - 1]; ++BinNum) { // NumOfOATempBins
 
-            {
-                auto const SELECT_CASE_var(RegionNum);
-                if (SELECT_CASE_var == 1) {
-                    FractionalBinHours = RegionOneFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (SELECT_CASE_var == 2) {
-                    FractionalBinHours = RegionTwoFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (SELECT_CASE_var == 3) {
-                    FractionalBinHours = RegionThreeFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (SELECT_CASE_var == 4) {
-                    FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (SELECT_CASE_var == 5) {
-                    FractionalBinHours = RegionFiveFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else if (SELECT_CASE_var == 6) {
-                    FractionalBinHours = RegionSixFracBinHoursAtOutdoorBinTemp(BinNum);
-                } else {
-                    FractionalBinHours = RegionFourFracBinHoursAtOutdoorBinTemp(BinNum);
-                }
-            }
+            FractionalBinHours = FracBinHoursAtOutdoorBinTemp[RegionNum - 1][BinNum];
 
             // Calculate the building heating load
-            BuildingHeatingLoad =
-                (18.33 - OutdoorBinTemperature(BinNum)) / (18.33 - OutdoorDesignTemperature(RegionNum)) * CorrectionFactor * DesignHeatingRequirement;
+            BuildingHeatingLoad = (18.33 - OutdoorBinTemperature[BinNum]) / (18.33 - OutdoorDesignTemperature[RegionNum - 1]) * CorrectionFactor *
+                                  DesignHeatingRequirement;
 
-            if ((OutdoorBinTemperature(BinNum) <= -8.33) || (OutdoorBinTemperature(BinNum) >= 7.20)) {
+            if ((OutdoorBinTemperature[BinNum] <= -8.33) || (OutdoorBinTemperature[BinNum] >= 7.20)) {
                 HeatingCapacityMax = TotHeatCapTestH3(nsp) + ((TotHeatCapTestH1(nsp) - TotHeatCapTestH3(nsp)) *
-                                                              (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                              (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                               (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
                 HeatingElecPowerMax =
                     OutdoorUnitPowerTestH3(nsp) + ((OutdoorUnitPowerTestH1(nsp) - OutdoorUnitPowerTestH3(nsp)) *
-                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                    (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
             } else {
                 HeatingCapacityMax = TotHeatCapTestH3(nsp) + ((TotHeatCapTestH2(nsp) - TotHeatCapTestH3(nsp)) *
-                                                              (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                              (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                               (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                 HeatingElecPowerMax =
                     OutdoorUnitPowerTestH3(nsp) + ((OutdoorUnitPowerTestH2(nsp) - OutdoorUnitPowerTestH3(nsp)) *
-                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                    (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
             }
 
             // determine the speed number
             for (spnum = 1; spnum <= nsp - 1; ++spnum) {
                 // Low Speed
-                if (OutdoorBinTemperature(BinNum) < -8.33) {
+                if (OutdoorBinTemperature[BinNum] < -8.33) {
                     HeatingCapacityLS = TotHeatCapTestH3(spnum) + ((TotHeatCapTestH1(spnum) - TotHeatCapTestH3(spnum)) *
-                                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                                    (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
                     HeatingElecPowerLS =
                         OutdoorUnitPowerTestH3(spnum) + ((OutdoorUnitPowerTestH1(spnum) - OutdoorUnitPowerTestH3(spnum)) *
-                                                         (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                         (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                          (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
 
-                } else if (OutdoorBinTemperature(BinNum) >= 4.44) {
+                } else if (OutdoorBinTemperature[BinNum] >= 4.44) {
                     HeatingCapacityLS = TotHeatCapTestH1(spnum) + ((TotHeatCapTestH0(spnum) - TotHeatCapTestH1(spnum)) *
-                                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempRated) /
+                                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempRated) /
                                                                    (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
                     HeatingElecPowerLS =
                         OutdoorUnitPowerTestH1(spnum) + ((OutdoorUnitPowerTestH0(spnum) - OutdoorUnitPowerTestH1(spnum)) *
-                                                         (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempRated) /
+                                                         (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempRated) /
                                                          (HeatingOutdoorCoilInletAirDBTempH0Test - HeatingOutdoorCoilInletAirDBTempRated));
                 } else {
                     HeatingCapacityLS = TotHeatCapTestH3(spnum) + ((TotHeatCapTestH2(spnum) - TotHeatCapTestH3(spnum)) *
-                                                                   (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                                   (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                                    (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                     HeatingElecPowerLS =
                         OutdoorUnitPowerTestH3(spnum) + ((OutdoorUnitPowerTestH2(spnum) - OutdoorUnitPowerTestH3(spnum)) *
-                                                         (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                         (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                          (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                 }
                 // High Speed
-                if ((OutdoorBinTemperature(BinNum) <= -8.33) || (OutdoorBinTemperature(BinNum) >= 7.20)) {
+                if ((OutdoorBinTemperature[BinNum] <= -8.33) || (OutdoorBinTemperature[BinNum] >= 7.20)) {
                     HeatingCapacityHS =
                         TotHeatCapTestH3(spnum + 1) + ((TotHeatCapTestH1(spnum + 1) - TotHeatCapTestH3(spnum + 1)) *
-                                                       (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                       (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                        (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
                     HeatingElecPowerHS =
                         OutdoorUnitPowerTestH3(spnum + 1) + ((OutdoorUnitPowerTestH1(spnum + 1) - OutdoorUnitPowerTestH3(spnum + 1)) *
-                                                             (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                             (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                              (HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test));
                 } else {
                     HeatingCapacityHS =
                         TotHeatCapTestH3(spnum + 1) + ((TotHeatCapTestH2(spnum + 1) - TotHeatCapTestH3(spnum + 1)) *
-                                                       (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                       (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                        (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                     HeatingElecPowerHS =
                         OutdoorUnitPowerTestH3(spnum + 1) + ((OutdoorUnitPowerTestH2(spnum + 1) - OutdoorUnitPowerTestH3(spnum + 1)) *
-                                                             (OutdoorBinTemperature(BinNum) - HeatingOutdoorCoilInletAirDBTempH3Test) /
+                                                             (OutdoorBinTemperature[BinNum] - HeatingOutdoorCoilInletAirDBTempH3Test) /
                                                              (HeatingOutdoorCoilInletAirDBTempH2Test - HeatingOutdoorCoilInletAirDBTempH3Test));
                 }
                 LowTempCutOutFactor = 0.0;
                 if (!OATempCompressorOnOffBlank) {
-                    if (OutdoorBinTemperature(BinNum) <= OATempCompressorOff) {
+                    if (OutdoorBinTemperature[BinNum] <= OATempCompressorOff) {
                         LowTempCutOutFactor = 0.0;
-                    } else if (OutdoorBinTemperature(BinNum) > OATempCompressorOff && OutdoorBinTemperature(BinNum) <= OATempCompressorOn) {
+                    } else if (OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) {
                         LowTempCutOutFactor = 0.5;
                     } else {
                         LowTempCutOutFactor = 1.0;
@@ -2402,12 +2330,12 @@ namespace StandardRatings {
                 } else if (BuildingHeatingLoad >= HeatingCapacityMax) {
                     NetTotHeatCapBinned = BuildingHeatingLoad;
                     if (!OATempCompressorOnOffBlank && HeatingElecPowerMax > 0.0) {
-                        if ((OutdoorBinTemperature(BinNum) <= OATempCompressorOff) || (HeatingCapacityMax / HeatingElecPowerMax < 1.0)) {
+                        if ((OutdoorBinTemperature[BinNum] <= OATempCompressorOff) || (HeatingCapacityMax / HeatingElecPowerMax < 1.0)) {
                             LowTempCutOutFactor = 0.0;
-                        } else if ((OutdoorBinTemperature(BinNum) > OATempCompressorOff && OutdoorBinTemperature(BinNum) <= OATempCompressorOn) &&
+                        } else if ((OutdoorBinTemperature[BinNum] > OATempCompressorOff && OutdoorBinTemperature[BinNum] <= OATempCompressorOn) &&
                                    (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
                             LowTempCutOutFactor = 0.5;
-                        } else if ((OutdoorBinTemperature(BinNum) > OATempCompressorOn) && (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
+                        } else if ((OutdoorBinTemperature[BinNum] > OATempCompressorOn) && (HeatingCapacityMax / HeatingElecPowerMax > 1.0)) {
                             LowTempCutOutFactor = 1.0;
                         }
                     } else {
@@ -2500,86 +2428,92 @@ namespace StandardRatings {
         auto &MyCoolOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag;
         auto &MyHeatOneTimeFlag = state.dataHVACGlobal->StandardRatingsMyHeatOneTimeFlag;
 
-        {
-            auto const SELECT_CASE_var(CompTypeNum);
+        switch (CompTypeNum) {
 
-            if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
-                if (MyCoolOneTimeFlag) {
-                    static constexpr std::string_view Format_990(
-                        "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                        "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
-                        "{Btu/W-h}\n");
-                    print(state.files.eio, "{}", Format_990);
-                    MyCoolOneTimeFlag = false;
-                }
-
-                static constexpr std::string_view Format_991(
-                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
-                print(state.files.eio, Format_991, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
-
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                // W/W is the same as Btuh/Btuh so that's fine too
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
-                // Btu/W-h will convert to itself
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, CompName, EERValueIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 2);
-                addFootNoteSubTable(state,
-                                    state.dataOutRptPredefined->pdstDXCoolCoil,
-                                    "ANSI/AHRI ratings account for supply air fan heat and electric power. "
-                                    "SEER User is calculated using user-input PLF curve and cooling coefficient of degradation whereas SEER Standard "
-                                    "is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");
-
-            } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
-                if (MyHeatOneTimeFlag) {
-                    static constexpr std::string_view Format_992(
-                        "! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating "
-                        "(net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region "
-                        "Number\n");
-                    print(state.files.eio, "{}", Format_992);
-                    MyHeatOneTimeFlag = false;
-                }
-
-                static constexpr std::string_view Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
-                print(state.files.eio, Format_993, CompType, CompName, HighHeatingCapVal, LowHeatingCapVal, HSPFValueIP, RegionNum);
-
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilType, CompName, CompType);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilHighCap, CompName, HighHeatingCapVal, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilLowCap, CompName, LowHeatingCapVal, 1);
-                // Btu/W-h will convert to itself
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilHSPFIP, CompName, HSPFValueIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilRegionNum, CompName, RegionNum);
-                addFootNoteSubTable(
-                    state, state.dataOutRptPredefined->pdstDXHeatCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
-
-            } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
-                if (MyCoolOneTimeFlag) {
-                    static constexpr std::string_view Format_994(
-                        "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                        "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
-                        "{Btu/W-h}");
-                    print(state.files.eio, "{}\n", Format_994);
-                    MyCoolOneTimeFlag = false;
-                }
-
-                static constexpr std::string_view Format_995(
-                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
-                print(state.files.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
-
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
-                addFootNoteSubTable(state,
-                                    state.dataOutRptPredefined->pdstDXCoolCoil,
-                                    "ANSI/AHRI ratings account for supply air fan heat and electric power. "
-                                    "SEER User is calculated using user-input PLF curve and cooling coefficient of degradation whereas SEER Standard "
-                                    "is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");
-
-            } else {
+        case CoilDX_CoolingSingleSpeed: {
+            if (MyCoolOneTimeFlag) {
+                print(state.files.eio,
+                      "{}",
+                      "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                      "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
+                      "{Btu/W-h}\n");
+                MyCoolOneTimeFlag = false;
             }
+
+            static constexpr std::string_view Format_991(
+                " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
+            print(state.files.eio, Format_991, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
+
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
+            // W/W is the same as Btuh/Btuh so that's fine too
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
+            // Btu/W-h will convert to itself
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, CompName, EERValueIP, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 2);
+            addFootNoteSubTable(state,
+                                state.dataOutRptPredefined->pdstDXCoolCoil,
+                                "ANSI/AHRI ratings account for supply air fan heat and electric power. "
+                                "SEER User is calculated using user-input PLF curve and cooling coefficient of degradation whereas SEER Standard "
+                                "is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");
+
+            break;
+        }
+        case CoilDX_HeatingEmpirical:
+        case CoilDX_MultiSpeedHeating: {
+            if (MyHeatOneTimeFlag) {
+                static constexpr std::string_view Format_992(
+                    "! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating "
+                    "(net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region "
+                    "Number\n");
+                print(state.files.eio, "{}", Format_992);
+                MyHeatOneTimeFlag = false;
+            }
+
+            static constexpr std::string_view Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
+            print(state.files.eio, Format_993, CompType, CompName, HighHeatingCapVal, LowHeatingCapVal, HSPFValueIP, RegionNum);
+
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilType, CompName, CompType);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilHighCap, CompName, HighHeatingCapVal, 1);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilLowCap, CompName, LowHeatingCapVal, 1);
+            // Btu/W-h will convert to itself
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilHSPFIP, CompName, HSPFValueIP, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilRegionNum, CompName, RegionNum);
+            addFootNoteSubTable(
+                state, state.dataOutRptPredefined->pdstDXHeatCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
+
+            break;
+        }
+        case CoilDX_MultiSpeedCooling: {
+            if (MyCoolOneTimeFlag) {
+                static constexpr std::string_view Format_994(
+                    "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                    "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
+                    "{Btu/W-h}");
+                print(state.files.eio, "{}\n", Format_994);
+                MyCoolOneTimeFlag = false;
+            }
+
+            static constexpr std::string_view Format_995(
+                " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
+            print(state.files.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
+
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
+            addFootNoteSubTable(state,
+                                state.dataOutRptPredefined->pdstDXCoolCoil,
+                                "ANSI/AHRI ratings account for supply air fan heat and electric power. "
+                                "SEER User is calculated using user-input PLF curve and cooling coefficient of degradation whereas SEER Standard "
+                                "is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");
+
+            break;
+        }
+        default:
+            break;
         }
     }
 
@@ -2635,62 +2569,56 @@ namespace StandardRatings {
 
         // Formats
 
-        {
-            auto const SELECT_CASE_var(CompTypeNum);
+        if (CompTypeNum == CoilDX_CoolingSingleSpeed) {
+            if (MyCoolOneTimeFlag) {
+                static constexpr std::string_view Format_101(
+                    "! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
+                    "Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net "
+                    "Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, "
+                    "Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric "
+                    "Power Test D {W} \n");
+                print(state.files.eio, "{}", Format_101);
+                MyCoolOneTimeFlag = false;
+            }
+            for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
+                Num = (ClassNum - 1) * 4;
+                std::string ClassName = format("Class {}", ClassNum);
+                std::string CompNameNew = fmt::format("{}({})", CompName, ClassName);
+                static constexpr std::string_view Format_102(
+                    " DX Cooling Coil ASHRAE 127 Standard Ratings Information, {}, {}, {}, {:.1R}, {:.1R}, {:.1R}, "
+                    "{:.1R}, {:.1R}, {:.1R}, {:.1R}, {:.1R}\n");
+                print(state.files.eio,
+                      Format_102,
+                      CompType,
+                      CompName,
+                      ClassName,
+                      NetCoolingCapRated(Num + 1),
+                      TotElectricPowerRated(Num + 1),
+                      NetCoolingCapRated(Num + 2),
+                      TotElectricPowerRated(Num + 2),
+                      NetCoolingCapRated(Num + 3),
+                      TotElectricPowerRated(Num + 3),
+                      NetCoolingCapRated(Num + 4),
+                      TotElectricPowerRated(Num + 4));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompNameNew, CompType);
+                // Note: If you call format("{:.1R}", NetCoolingCapRated(Num + 1)),
+                // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
+                // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur
+                // Bad: PreDefTableEntry(state, pdchDXCoolCoilNetCapSIA, CompNameNew, format("{:.1R}", NetCoolingCapRated(Num + 1)));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompNameNew, NetCoolingCapRated(Num + 1), 1);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSIB, CompNameNew, NetCoolingCapRated(Num + 2), 1);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSIC, CompNameNew, NetCoolingCapRated(Num + 3), 1);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSID, CompNameNew, NetCoolingCapRated(Num + 4), 1);
 
-            if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
-                if (MyCoolOneTimeFlag) {
-                    static constexpr std::string_view Format_101(
-                        "! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
-                        "Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net "
-                        "Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, "
-                        "Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric "
-                        "Power Test D {W} \n");
-                    print(state.files.eio, "{}", Format_101);
-                    MyCoolOneTimeFlag = false;
-                }
-                for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
-                    Num = (ClassNum - 1) * 4;
-                    std::string ClassName = format("Class {}", ClassNum);
-                    std::string CompNameNew = fmt::format("{}({})", CompName, ClassName);
-                    static constexpr std::string_view Format_102(
-                        " DX Cooling Coil ASHRAE 127 Standard Ratings Information, {}, {}, {}, {:.1R}, {:.1R}, {:.1R}, "
-                        "{:.1R}, {:.1R}, {:.1R}, {:.1R}, {:.1R}\n");
-                    print(state.files.eio,
-                          Format_102,
-                          CompType,
-                          CompName,
-                          ClassName,
-                          NetCoolingCapRated(Num + 1),
-                          TotElectricPowerRated(Num + 1),
-                          NetCoolingCapRated(Num + 2),
-                          TotElectricPowerRated(Num + 2),
-                          NetCoolingCapRated(Num + 3),
-                          TotElectricPowerRated(Num + 3),
-                          NetCoolingCapRated(Num + 4),
-                          TotElectricPowerRated(Num + 4));
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompNameNew, CompType);
-                    // Note: If you call format("{:.1R}", NetCoolingCapRated(Num + 1)),
-                    // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
-                    // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur
-                    // Bad: PreDefTableEntry(state, pdchDXCoolCoilNetCapSIA, CompNameNew, format("{:.1R}", NetCoolingCapRated(Num + 1)));
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompNameNew, NetCoolingCapRated(Num + 1), 1);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSIB, CompNameNew, NetCoolingCapRated(Num + 2), 1);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSIC, CompNameNew, NetCoolingCapRated(Num + 3), 1);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSID, CompNameNew, NetCoolingCapRated(Num + 4), 1);
+                // These will stay in W, so it doesn't matter as much, but let's be consistent
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilElecPowerA, CompNameNew, TotElectricPowerRated(Num + 1), 1);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilElecPowerB, CompNameNew, TotElectricPowerRated(Num + 2), 1);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilElecPowerC, CompNameNew, TotElectricPowerRated(Num + 3), 1);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilElecPowerD, CompNameNew, TotElectricPowerRated(Num + 4), 1);
 
-                    // These will stay in W, so it doesn't matter as much, but let's be consistent
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilElecPowerA, CompNameNew, TotElectricPowerRated(Num + 1), 1);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilElecPowerB, CompNameNew, TotElectricPowerRated(Num + 2), 1);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilElecPowerC, CompNameNew, TotElectricPowerRated(Num + 3), 1);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilElecPowerD, CompNameNew, TotElectricPowerRated(Num + 4), 1);
-
-                    addFootNoteSubTable(state,
-                                        state.dataOutRptPredefined->pdstDXCoolCoil2,
-                                        "ANSI/ASHRAE Standard 127 includes supply fan heat effect and electric power.");
-                }
-
-            } else {
+                addFootNoteSubTable(state,
+                                    state.dataOutRptPredefined->pdstDXCoolCoil2,
+                                    "ANSI/ASHRAE Standard 127 includes supply fan heat effect and electric power.");
             }
         }
     }
@@ -2804,491 +2732,493 @@ namespace StandardRatings {
         bool HeatingEIRCurveHSPFLimitsExceeded(false); // Logical for EIR curve temperature limits being exceeded
         // (HSPF calcs)
 
-        {
-            auto const SELECT_CASE_var(DXCoilTypeNum);
+        switch (DXCoilTypeNum) {
 
-            if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
-                GetCurveMinMaxValues(state, CapFTempCurveIndex, CapacityWBTempMin, CapacityWBTempMax, CapacityDBTempMin, CapacityDBTempMax);
-                GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRWBTempMin, EIRWBTempMax, EIRDBTempMin, EIRDBTempMax);
-                GetCurveMinMaxValues(state, CapFFlowCurveIndex, CapacityFlowRatioMin, CapacityFlowRatioMax);
-                GetCurveMinMaxValues(state, EIRFFlowCurveIndex, EIRFlowRatioMin, EIRFlowRatioMax);
-                GetCurveMinMaxValues(state, PLFFPLRCurveIndex, PLFFPLRMin, PLFFPLRMax);
+        case CoilDX_CoolingSingleSpeed: {
+            GetCurveMinMaxValues(state, CapFTempCurveIndex, CapacityWBTempMin, CapacityWBTempMax, CapacityDBTempMin, CapacityDBTempMax);
+            GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRWBTempMin, EIRWBTempMax, EIRDBTempMin, EIRDBTempMax);
+            GetCurveMinMaxValues(state, CapFFlowCurveIndex, CapacityFlowRatioMin, CapacityFlowRatioMax);
+            GetCurveMinMaxValues(state, EIRFFlowCurveIndex, EIRFlowRatioMin, EIRFlowRatioMax);
+            GetCurveMinMaxValues(state, PLFFPLRCurveIndex, PLFFPLRMin, PLFFPLRMax);
 
-                // Checking the limits of capacity modifying curve for temperatures
-                if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempRated || CapacityDBTempMin > OutdoorCoilInletAirDryBulbTempRated ||
-                    CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    CapCurveHighOATLimitsExceeded = true;
-                }
-                // Checking the limits of capacity modifying curve for flow fraction
-                if (CapacityFlowRatioMax < AirMassFlowRatioRated || CapacityFlowRatioMin > AirMassFlowRatioRated) {
-                    CapCurveFlowLimitsExceeded = true;
-                }
-                // Checking the limits of EIR modifying curve for temperatures
-                if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempRated || EIRDBTempMin > OutdoorCoilInletAirDryBulbTempRated ||
-                    EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    EIRCurveHighOATLimitsExceeded = true;
-                }
-                // Checking the limits of EIR modifying curve for flow fraction
-                if (EIRFlowRatioMax < AirMassFlowRatioRated || EIRFlowRatioMin > AirMassFlowRatioRated) {
-                    EIRCurveFlowLimitsExceeded = true;
-                }
-                // Checking the limits of capacity modifying curve for temperatures (SEER calculation)
-                if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempTestB2 || CapacityDBTempMin > OutdoorCoilInletAirDryBulbTempTestB2 ||
-                    CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    CapCurveMidOATLimitsExceeded = true;
-                }
-                // Checking the limits of EIR modifying curve for temperatures (SEER calculation)
-                if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempTestB2 || EIRDBTempMin > OutdoorCoilInletAirDryBulbTempTestB2 ||
-                    EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    EIRCurveMidOATLimitsExceeded = true;
-                }
-                // Checking the limits of Part Load Fraction for PLR (SEER calculation)
-                if (PLFFPLRMax < PLRforSEER || PLFFPLRMin > PLRforSEER) {
-                    PLFfPLRforSEERLimitsExceeded = true;
-                }
-                // Checking the limits of capacity modifying curve for temperatures (IEER high and low test conditions)
-                if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempRated || CapacityDBTempMin > OADBTempLowReducedCapacityTest ||
-                    CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    CapCurveIEERLimitsExceeded = true;
-                }
-                // Checking the limits of EIR modifying curve for temperatures (IEER high and low test conditions)
-                if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempRated || EIRDBTempMin > OADBTempLowReducedCapacityTest ||
-                    EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    EIRCurveIEERLimitsExceeded = true;
-                }
+            // Checking the limits of capacity modifying curve for temperatures
+            if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempRated || CapacityDBTempMin > OutdoorCoilInletAirDryBulbTempRated ||
+                CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                CapCurveHighOATLimitsExceeded = true;
+            }
+            // Checking the limits of capacity modifying curve for flow fraction
+            if (CapacityFlowRatioMax < AirMassFlowRatioRated || CapacityFlowRatioMin > AirMassFlowRatioRated) {
+                CapCurveFlowLimitsExceeded = true;
+            }
+            // Checking the limits of EIR modifying curve for temperatures
+            if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempRated || EIRDBTempMin > OutdoorCoilInletAirDryBulbTempRated ||
+                EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                EIRCurveHighOATLimitsExceeded = true;
+            }
+            // Checking the limits of EIR modifying curve for flow fraction
+            if (EIRFlowRatioMax < AirMassFlowRatioRated || EIRFlowRatioMin > AirMassFlowRatioRated) {
+                EIRCurveFlowLimitsExceeded = true;
+            }
+            // Checking the limits of capacity modifying curve for temperatures (SEER calculation)
+            if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempTestB2 || CapacityDBTempMin > OutdoorCoilInletAirDryBulbTempTestB2 ||
+                CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                CapCurveMidOATLimitsExceeded = true;
+            }
+            // Checking the limits of EIR modifying curve for temperatures (SEER calculation)
+            if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempTestB2 || EIRDBTempMin > OutdoorCoilInletAirDryBulbTempTestB2 ||
+                EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                EIRCurveMidOATLimitsExceeded = true;
+            }
+            // Checking the limits of Part Load Fraction for PLR (SEER calculation)
+            if (PLFFPLRMax < PLRforSEER || PLFFPLRMin > PLRforSEER) {
+                PLFfPLRforSEERLimitsExceeded = true;
+            }
+            // Checking the limits of capacity modifying curve for temperatures (IEER high and low test conditions)
+            if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempRated || CapacityDBTempMin > OADBTempLowReducedCapacityTest ||
+                CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                CapCurveIEERLimitsExceeded = true;
+            }
+            // Checking the limits of EIR modifying curve for temperatures (IEER high and low test conditions)
+            if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempRated || EIRDBTempMin > OADBTempLowReducedCapacityTest ||
+                EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                EIRCurveIEERLimitsExceeded = true;
+            }
 
-                if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveHighOATLimitsExceeded || EIRCurveFlowLimitsExceeded ||
-                    CapCurveMidOATLimitsExceeded || EIRCurveMidOATLimitsExceeded || PLFfPLRforSEERLimitsExceeded || CapCurveIEERLimitsExceeded ||
-                    EIRCurveIEERLimitsExceeded) {
+            if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveHighOATLimitsExceeded || EIRCurveFlowLimitsExceeded ||
+                CapCurveMidOATLimitsExceeded || EIRCurveMidOATLimitsExceeded || PLFfPLRforSEERLimitsExceeded || CapCurveIEERLimitsExceeded ||
+                EIRCurveIEERLimitsExceeded) {
 
-                    ShowWarningError(state,
-                                     "The Standard Ratings is calculated for " + DXCoilType + " = " + DXCoilName +
-                                         " but not at the AHRI test condition due to curve out of bound.");
+                ShowWarningError(state,
+                                 "The Standard Ratings is calculated for " + DXCoilType + " = " + DXCoilName +
+                                     " but not at the AHRI test condition due to curve out of bound.");
+                ShowContinueError(state,
+                                  " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
+                                  "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
+
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                     ShowContinueError(state,
-                                      " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
-                                      "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
-
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
-                        ShowContinueError(
-                            state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
-                    }
-
-                    // For Standard Rating Cooling Capacity:
-                    if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowContinueError(state,
-                                              DXCoilType + '=' + DXCoilName +
-                                                  ":  Standard Rating Cooling Capacity calculated is not at the AHRI test condition.");
-                            if (CapCurveHighOATLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
-                            }
-                            if (CapCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
-                            }
-                        }
-                    }
-
-                    // For EER:
-                    if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveHighOATLimitsExceeded || EIRCurveFlowLimitsExceeded) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowContinueError(state,
-                                              DXCoilType + '=' + DXCoilName +
-                                                  ":  Energy Efficiency Ratio (EER) calculated is not at the AHRI test condition.");
-                            if (CapCurveHighOATLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
-                            }
-                            if (CapCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
-                            }
-                            if (EIRCurveHighOATLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
-                            }
-                            if (EIRCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(EIRFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, EIRFFlowCurveIndex));
-                            }
-                        }
-                    }
-
-                    // For SEER:
-                    if (CapCurveMidOATLimitsExceeded || EIRCurveMidOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveFlowLimitsExceeded ||
-                        PLFfPLRforSEERLimitsExceeded) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowContinueError(state,
-                                              DXCoilType + '=' + DXCoilName +
-                                                  ":  Seasonal Energy Efficiency Ratio (SEER) calculated is not at the AHRI test condition.");
-                            if (CapCurveMidOATLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
-                            }
-                            if (CapCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
-                            }
-                            if (EIRCurveMidOATLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
-                            }
-                            if (EIRCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(EIRFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, EIRFFlowCurveIndex));
-                            }
-                            if (PLFfPLRforSEERLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Part Load Fraction Correlation Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(PLFFPLRCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, PLFFPLRCurveIndex));
-                            }
-                        }
-                    }
-
-                    // For IEER:
-                    if (CapCurveIEERLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveIEERLimitsExceeded || EIRCurveFlowLimitsExceeded) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowContinueError(state,
-                                              DXCoilType + '=' + DXCoilName +
-                                                  ":  Integrated Energy Efficiency Ratio (IEER) calculated is not at the AHRI test condition.");
-                            if (CapCurveIEERLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
-                            }
-                            if (CapCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
-                            }
-                            if (EIRCurveIEERLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in EIR Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
-                            }
-                            if (EIRCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(EIRFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, EIRFFlowCurveIndex));
-                            }
-                        }
-                    }
-
-                } // End of curve error messages
-            } else if (SELECT_CASE_var == CoilDX_HeatingEmpirical) {
-                {
-                    if (state.dataCurveManager->PerfCurve(CapFTempCurveIndex).NumDims == 1) {
-                        GetCurveMinMaxValues(state, CapFTempCurveIndex, HeatingCapODBTempMin, HeatingCapODBTempMax);
-
-                        // Checking the limits of capacity modifying curve for temperatures (IEER high and low test conditions)
-                        if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test) {
-                            HeatingCapCurveHSPFLimitsExceeded = true;
-                        }
-                    } else {
-                        GetCurveMinMaxValues(
-                            state, CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin, HeatingCapODBTempMax);
-
-                        // Checking the limits of capacity modifying curve for temperatures (IEER high and low test conditions)
-                        if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
-                            HeatingCapIDBTempMax < HeatingIndoorCoilInletAirDBTempRated ||
-                            HeatingCapIDBTempMin > HeatingIndoorCoilInletAirDBTempRated) {
-                            HeatingCapCurveHSPFLimitsExceeded = true;
-                        }
-                    }
+                                      " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                 }
-                {
-                    if (state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).NumDims == 1) {
-                        GetCurveMinMaxValues(state, EIRFTempCurveIndex, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
 
-                        // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
-                        if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test) {
-                            HeatingEIRCurveHSPFLimitsExceeded = true;
-                        }
-                    } else {
-                        GetCurveMinMaxValues(
-                            state, EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
-
-                        // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
-                        if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
-                            HeatingEIRIDBTempMax < HeatingIndoorCoilInletAirDBTempRated ||
-                            HeatingEIRIDBTempMin > HeatingIndoorCoilInletAirDBTempRated) {
-                            HeatingEIRCurveHSPFLimitsExceeded = true;
-                        }
-                    }
-                }
-                if (HeatingCapCurveHSPFLimitsExceeded || HeatingEIRCurveHSPFLimitsExceeded) {
-                    ShowWarningError(state,
-                                     "The Standard Ratings is calculated for " + DXCoilType + " = " + DXCoilName +
-                                         " but not at the AHRI test condition due to curve out of bound.");
-                    ShowContinueError(state,
-                                      " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
-                                      "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
+                // For Standard Rating Cooling Capacity:
+                if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
-                        ShowContinueError(
-                            state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
-                    }
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowWarningError(state,
-                                         DXCoilType + '=' + DXCoilName +
-                                             ":  Heating Seasonal Performance Factor calculated is not at the AHRI test condition.");
-                        ShowContinueError(state, " Review the Standard Ratings calculations in the Engineering Reference for this coil type.");
-                        if (HeatingCapCurveHSPFLimitsExceeded) {
+                        ShowContinueError(state,
+                                          DXCoilType + '=' + DXCoilName +
+                                              ":  Standard Rating Cooling Capacity calculated is not at the AHRI test condition.");
+                        if (CapCurveHighOATLimitsExceeded) {
                             ShowContinueError(state,
-                                              " Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
+                                              " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
                                                   state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
                                                   ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
                         }
-                        if (HeatingEIRCurveHSPFLimitsExceeded) {
+                        if (CapCurveFlowLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
+                        }
+                    }
+                }
+
+                // For EER:
+                if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveHighOATLimitsExceeded || EIRCurveFlowLimitsExceeded) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowContinueError(
+                            state, DXCoilType + '=' + DXCoilName + ":  Energy Efficiency Ratio (EER) calculated is not at the AHRI test condition.");
+                        if (CapCurveHighOATLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                        }
+                        if (CapCurveFlowLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
+                        }
+                        if (EIRCurveHighOATLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                        }
+                        if (EIRCurveFlowLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(EIRFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, EIRFFlowCurveIndex));
+                        }
+                    }
+                }
+
+                // For SEER:
+                if (CapCurveMidOATLimitsExceeded || EIRCurveMidOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveFlowLimitsExceeded ||
+                    PLFfPLRforSEERLimitsExceeded) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowContinueError(state,
+                                          DXCoilType + '=' + DXCoilName +
+                                              ":  Seasonal Energy Efficiency Ratio (SEER) calculated is not at the AHRI test condition.");
+                        if (CapCurveMidOATLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                        }
+                        if (CapCurveFlowLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
+                        }
+                        if (EIRCurveMidOATLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                        }
+                        if (EIRCurveFlowLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(EIRFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, EIRFFlowCurveIndex));
+                        }
+                        if (PLFfPLRforSEERLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Part Load Fraction Correlation Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(PLFFPLRCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, PLFFPLRCurveIndex));
+                        }
+                    }
+                }
+
+                // For IEER:
+                if (CapCurveIEERLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveIEERLimitsExceeded || EIRCurveFlowLimitsExceeded) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowContinueError(state,
+                                          DXCoilType + '=' + DXCoilName +
+                                              ":  Integrated Energy Efficiency Ratio (IEER) calculated is not at the AHRI test condition.");
+                        if (CapCurveIEERLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                        }
+                        if (CapCurveFlowLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
+                        }
+                        if (EIRCurveIEERLimitsExceeded) {
                             ShowContinueError(state,
                                               " Check limits in EIR Function of Temperature Curve, Curve Type = " +
                                                   state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
                                                   ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
                         }
-                    }
-                }
-
-                //   MultiSpeed DX Coil Net Cooling Capacity and SEER:
-            } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
-                GetCurveMinMaxValues(state, CapFTempCurveIndex, CapacityWBTempMin, CapacityWBTempMax, CapacityDBTempMin, CapacityDBTempMax);
-                GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRWBTempMin, EIRWBTempMax, EIRDBTempMin, EIRDBTempMax);
-                GetCurveMinMaxValues(state, CapFFlowCurveIndex, CapacityFlowRatioMin, CapacityFlowRatioMax);
-                GetCurveMinMaxValues(state, EIRFFlowCurveIndex, EIRFlowRatioMin, EIRFlowRatioMax);
-
-                // Checking the limits of capacity modifying curve for temperatures
-                if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempRated || CapacityDBTempMin > OutdoorCoilInletAirDryBulbTempRated ||
-                    CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    CapCurveHighOATLimitsExceeded = true;
-                }
-                // Checking the limits of capacity modifying curve for flow fraction
-                if (CapacityFlowRatioMax < AirMassFlowRatioRated || CapacityFlowRatioMin > AirMassFlowRatioRated) {
-                    CapCurveFlowLimitsExceeded = true;
-                }
-                // Checking the limits of EIR modifying curve for temperatures
-                if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempRated || EIRDBTempMin > OutdoorCoilInletAirDryBulbTempRated ||
-                    EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    EIRCurveHighOATLimitsExceeded = true;
-                }
-                // Checking the limits of EIR modifying curve for flow fraction
-                if (EIRFlowRatioMax < AirMassFlowRatioRated || EIRFlowRatioMin > AirMassFlowRatioRated) {
-                    EIRCurveFlowLimitsExceeded = true;
-                }
-                // Checking the limits of capacity modifying curve for temperatures (SEER calculation)
-                if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempTestF1 || CapacityDBTempMin > OutdoorCoilInletAirDryBulbTempTestF1 ||
-                    CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    CapCurveLowOATLimitsExceeded = true;
-                }
-                // Checking the limits of EIR modifying curve for temperatures (SEER calculation)
-                if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempTestF1 || EIRDBTempMin > OutdoorCoilInletAirDryBulbTempTestF1 ||
-                    EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
-                    EIRCurveLowOATLimitsExceeded = true;
-                }
-
-                if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveHighOATLimitsExceeded || EIRCurveFlowLimitsExceeded ||
-                    CapCurveLowOATLimitsExceeded || EIRCurveLowOATLimitsExceeded) {
-
-                    ShowWarningError(state,
-                                     "The Standard Ratings is calculated for " + DXCoilType + " = " + DXCoilName +
-                                         " but not at the AHRI test condition due to curve out of bound.");
-                    ShowContinueError(state,
-                                      " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
-                                      "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
-
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
-                        ShowContinueError(
-                            state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
-                    }
-
-                    // For Standard Rating Cooling Capacity:
-                    if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
+                        if (EIRCurveFlowLimitsExceeded) {
                             ShowContinueError(state,
-                                              DXCoilType + '=' + DXCoilName +
-                                                  ":  The Standard Rating Cooling Capacity calculated is not at the AHRI test condition.");
-                            if (CapCurveHighOATLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
-                            }
-                            if (CapCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
-                            }
-                        }
-                    }
-
-                    // For MultiSpeed DX Coil SEER:
-
-                    if (CapCurveLowOATLimitsExceeded || EIRCurveLowOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveFlowLimitsExceeded) {
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowContinueError(state,
-                                              DXCoilType + '=' + DXCoilName +
-                                                  ":  The Seasonal Energy Efficiency Ratio (SEER) calculated is not at the AHRI test condition.");
-                            if (CapCurveLowOATLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
-                            }
-                            if (CapCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
-                            }
-                            if (EIRCurveLowOATLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
-                            }
-                            if (EIRCurveFlowLimitsExceeded) {
-                                ShowContinueError(state,
-                                                  " Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
-                                                      state.dataCurveManager->PerfCurve(EIRFFlowCurveIndex).ObjectType +
-                                                      ", Curve Name = " + GetCurveName(state, EIRFFlowCurveIndex));
-                            }
-                        }
-                    }
-
-                } // End of curve error messages
-
-            } else if (SELECT_CASE_var == CoilDX_MultiSpeedHeating) {
-
-                {
-                    if (state.dataCurveManager->PerfCurve(CapFTempCurveIndex).NumDims == 1) {
-                        GetCurveMinMaxValues(state, CapFTempCurveIndex, HeatingCapODBTempMin, HeatingCapODBTempMax);
-
-                        if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test) {
-                            CapCurveOATLimitsExceeded = true;
-                        }
-                        // Checking the limits of capacity modifying curve for temperatures (HSPF high and low test conditions)
-                        if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
-                            HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
-                            HeatingCapCurveHSPFLimitsExceeded = true;
-                        }
-
-                    } else {
-                        GetCurveMinMaxValues(
-                            state, CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin, HeatingCapODBTempMax);
-
-                        // Checking the limits of capacity modifying curve for temperatures (HSPF high and low test conditions)
-                        if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
-                            HeatingCapIDBTempMax < HeatingIndoorCoilInletAirDBTempRated ||
-                            HeatingCapIDBTempMin > HeatingIndoorCoilInletAirDBTempRated ||
-                            HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
-                            HeatingCapCurveHSPFLimitsExceeded = true;
+                                              " Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(EIRFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, EIRFFlowCurveIndex));
                         }
                     }
                 }
 
-                {
-                    if (state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).NumDims == 1) {
-                        GetCurveMinMaxValues(state, EIRFTempCurveIndex, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
-                        // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
-                        if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
-                            HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
-                            HeatingEIRCurveHSPFLimitsExceeded = true;
-                        }
-                    } else {
-                        GetCurveMinMaxValues(
-                            state, EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
+            } // End of curve error messages
+            break;
+        }
+        case CoilDX_HeatingEmpirical: {
+            {
+                if (state.dataCurveManager->PerfCurve(CapFTempCurveIndex).NumDims == 1) {
+                    GetCurveMinMaxValues(state, CapFTempCurveIndex, HeatingCapODBTempMin, HeatingCapODBTempMax);
 
-                        // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
-                        if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
-                            HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
-                            HeatingEIRIDBTempMax < HeatingIndoorCoilInletAirDBTempRated ||
-                            HeatingEIRIDBTempMin > HeatingIndoorCoilInletAirDBTempRated ||
-                            HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
-                            HeatingEIRCurveHSPFLimitsExceeded = true;
-                        }
+                    // Checking the limits of capacity modifying curve for temperatures (IEER high and low test conditions)
+                    if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test) {
+                        HeatingCapCurveHSPFLimitsExceeded = true;
+                    }
+                } else {
+                    GetCurveMinMaxValues(
+                        state, CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin, HeatingCapODBTempMax);
+
+                    // Checking the limits of capacity modifying curve for temperatures (IEER high and low test conditions)
+                    if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
+                        HeatingCapIDBTempMax < HeatingIndoorCoilInletAirDBTempRated || HeatingCapIDBTempMin > HeatingIndoorCoilInletAirDBTempRated) {
+                        HeatingCapCurveHSPFLimitsExceeded = true;
                     }
                 }
-                if (HeatingCapCurveHSPFLimitsExceeded || HeatingEIRCurveHSPFLimitsExceeded || CapCurveOATLimitsExceeded) {
+            }
+            {
+                if (state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).NumDims == 1) {
+                    GetCurveMinMaxValues(state, EIRFTempCurveIndex, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
 
-                    ShowWarningError(state,
-                                     "The Standard Ratings is calculated for " + DXCoilType + " = " + DXCoilName +
-                                         " but not at the AHRI test condition due to curve out of bound.");
+                    // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
+                    if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test) {
+                        HeatingEIRCurveHSPFLimitsExceeded = true;
+                    }
+                } else {
+                    GetCurveMinMaxValues(
+                        state, EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
+
+                    // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
+                    if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
+                        HeatingEIRIDBTempMax < HeatingIndoorCoilInletAirDBTempRated || HeatingEIRIDBTempMin > HeatingIndoorCoilInletAirDBTempRated) {
+                        HeatingEIRCurveHSPFLimitsExceeded = true;
+                    }
+                }
+            }
+            if (HeatingCapCurveHSPFLimitsExceeded || HeatingEIRCurveHSPFLimitsExceeded) {
+                ShowWarningError(state,
+                                 "The Standard Ratings is calculated for " + DXCoilType + " = " + DXCoilName +
+                                     " but not at the AHRI test condition due to curve out of bound.");
+                ShowContinueError(state,
+                                  " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
+                                  "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                     ShowContinueError(state,
-                                      " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
-                                      "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
-
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
-                        ShowContinueError(
-                            state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
-                    }
+                                      " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                 }
-                if (CapCurveOATLimitsExceeded) {
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowWarningError(state,
-                                         DXCoilType + '=' + DXCoilName + ":  The Net Heating Capacity Calculated is not at the AHRI test condition.");
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowWarningError(state,
+                                     DXCoilType + '=' + DXCoilName +
+                                         ":  Heating Seasonal Performance Factor calculated is not at the AHRI test condition.");
+                    ShowContinueError(state, " Review the Standard Ratings calculations in the Engineering Reference for this coil type.");
+                    if (HeatingCapCurveHSPFLimitsExceeded) {
                         ShowContinueError(state,
                                           " Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
                                               state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
                                               ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
                     }
+                    if (HeatingEIRCurveHSPFLimitsExceeded) {
+                        ShowContinueError(state,
+                                          " Check limits in EIR Function of Temperature Curve, Curve Type = " +
+                                              state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
+                                              ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                    }
                 }
-                if (HeatingCapCurveHSPFLimitsExceeded || HeatingEIRCurveHSPFLimitsExceeded) {
+            }
+
+            //   MultiSpeed DX Coil Net Cooling Capacity and SEER:
+            break;
+        }
+        case CoilDX_MultiSpeedCooling: {
+            GetCurveMinMaxValues(state, CapFTempCurveIndex, CapacityWBTempMin, CapacityWBTempMax, CapacityDBTempMin, CapacityDBTempMax);
+            GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRWBTempMin, EIRWBTempMax, EIRDBTempMin, EIRDBTempMax);
+            GetCurveMinMaxValues(state, CapFFlowCurveIndex, CapacityFlowRatioMin, CapacityFlowRatioMax);
+            GetCurveMinMaxValues(state, EIRFFlowCurveIndex, EIRFlowRatioMin, EIRFlowRatioMax);
+
+            // Checking the limits of capacity modifying curve for temperatures
+            if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempRated || CapacityDBTempMin > OutdoorCoilInletAirDryBulbTempRated ||
+                CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                CapCurveHighOATLimitsExceeded = true;
+            }
+            // Checking the limits of capacity modifying curve for flow fraction
+            if (CapacityFlowRatioMax < AirMassFlowRatioRated || CapacityFlowRatioMin > AirMassFlowRatioRated) {
+                CapCurveFlowLimitsExceeded = true;
+            }
+            // Checking the limits of EIR modifying curve for temperatures
+            if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempRated || EIRDBTempMin > OutdoorCoilInletAirDryBulbTempRated ||
+                EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                EIRCurveHighOATLimitsExceeded = true;
+            }
+            // Checking the limits of EIR modifying curve for flow fraction
+            if (EIRFlowRatioMax < AirMassFlowRatioRated || EIRFlowRatioMin > AirMassFlowRatioRated) {
+                EIRCurveFlowLimitsExceeded = true;
+            }
+            // Checking the limits of capacity modifying curve for temperatures (SEER calculation)
+            if (CapacityDBTempMax < OutdoorCoilInletAirDryBulbTempTestF1 || CapacityDBTempMin > OutdoorCoilInletAirDryBulbTempTestF1 ||
+                CapacityWBTempMax < CoolingCoilInletAirWetBulbTempRated || CapacityWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                CapCurveLowOATLimitsExceeded = true;
+            }
+            // Checking the limits of EIR modifying curve for temperatures (SEER calculation)
+            if (EIRDBTempMax < OutdoorCoilInletAirDryBulbTempTestF1 || EIRDBTempMin > OutdoorCoilInletAirDryBulbTempTestF1 ||
+                EIRWBTempMax < CoolingCoilInletAirWetBulbTempRated || EIRWBTempMin > CoolingCoilInletAirWetBulbTempRated) {
+                EIRCurveLowOATLimitsExceeded = true;
+            }
+
+            if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveHighOATLimitsExceeded || EIRCurveFlowLimitsExceeded ||
+                CapCurveLowOATLimitsExceeded || EIRCurveLowOATLimitsExceeded) {
+
+                ShowWarningError(state,
+                                 "The Standard Ratings is calculated for " + DXCoilType + " = " + DXCoilName +
+                                     " but not at the AHRI test condition due to curve out of bound.");
+                ShowContinueError(state,
+                                  " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
+                                  "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
+
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
+                    ShowContinueError(state,
+                                      " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
+                }
+
+                // For Standard Rating Cooling Capacity:
+                if (CapCurveHighOATLimitsExceeded || CapCurveFlowLimitsExceeded) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowWarningError(state,
-                                         DXCoilType + '=' + DXCoilName +
-                                             ":  The Heating Seasonal Performance Factor calculated is not at the AHRI test condition.");
-                        if (HeatingCapCurveHSPFLimitsExceeded) {
+                        ShowContinueError(state,
+                                          DXCoilType + '=' + DXCoilName +
+                                              ":  The Standard Rating Cooling Capacity calculated is not at the AHRI test condition.");
+                        if (CapCurveHighOATLimitsExceeded) {
                             ShowContinueError(state,
-                                              " Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
+                                              " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
                                                   state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
                                                   ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
                         }
-                        if (HeatingEIRCurveHSPFLimitsExceeded) {
+                        if (CapCurveFlowLimitsExceeded) {
                             ShowContinueError(state,
-                                              " Check limits in EIR Function of Temperature Curve, Curve Type = " +
-                                                  state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
-                                                  ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                                              " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
                         }
                     }
                 }
-            } else {
+
+                // For MultiSpeed DX Coil SEER:
+
+                if (CapCurveLowOATLimitsExceeded || EIRCurveLowOATLimitsExceeded || CapCurveFlowLimitsExceeded || EIRCurveFlowLimitsExceeded) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowContinueError(state,
+                                          DXCoilType + '=' + DXCoilName +
+                                              ":  The Seasonal Energy Efficiency Ratio (SEER) calculated is not at the AHRI test condition.");
+                        if (CapCurveLowOATLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Temperature Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                        }
+                        if (CapCurveFlowLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Total Cooling Capacity Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(CapFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, CapFFlowCurveIndex));
+                        }
+                        if (EIRCurveLowOATLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Energy Input Ratio Function of Temperature Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                        }
+                        if (EIRCurveFlowLimitsExceeded) {
+                            ShowContinueError(state,
+                                              " Check limits in Energy Input Ratio Function of Flow Fraction Curve, Curve Type = " +
+                                                  state.dataCurveManager->PerfCurve(EIRFFlowCurveIndex).ObjectType +
+                                                  ", Curve Name = " + GetCurveName(state, EIRFFlowCurveIndex));
+                        }
+                    }
+                }
+
+            } // End of curve error messages
+
+            break;
+        }
+        case CoilDX_MultiSpeedHeating: {
+
+            {
+                if (state.dataCurveManager->PerfCurve(CapFTempCurveIndex).NumDims == 1) {
+                    GetCurveMinMaxValues(state, CapFTempCurveIndex, HeatingCapODBTempMin, HeatingCapODBTempMax);
+
+                    if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test) {
+                        CapCurveOATLimitsExceeded = true;
+                    }
+                    // Checking the limits of capacity modifying curve for temperatures (HSPF high and low test conditions)
+                    if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
+                        HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
+                        HeatingCapCurveHSPFLimitsExceeded = true;
+                    }
+
+                } else {
+                    GetCurveMinMaxValues(
+                        state, CapFTempCurveIndex, HeatingCapIDBTempMin, HeatingCapIDBTempMax, HeatingCapODBTempMin, HeatingCapODBTempMax);
+
+                    // Checking the limits of capacity modifying curve for temperatures (HSPF high and low test conditions)
+                    if (HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingCapODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
+                        HeatingCapIDBTempMax < HeatingIndoorCoilInletAirDBTempRated || HeatingCapIDBTempMin > HeatingIndoorCoilInletAirDBTempRated ||
+                        HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
+                        HeatingCapCurveHSPFLimitsExceeded = true;
+                    }
+                }
             }
+
+            {
+                if (state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).NumDims == 1) {
+                    GetCurveMinMaxValues(state, EIRFTempCurveIndex, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
+                    // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
+                    if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
+                        HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
+                        HeatingEIRCurveHSPFLimitsExceeded = true;
+                    }
+                } else {
+                    GetCurveMinMaxValues(
+                        state, EIRFTempCurveIndex, HeatingEIRIDBTempMin, HeatingEIRIDBTempMax, HeatingEIRODBTempMin, HeatingEIRODBTempMax);
+
+                    // Checking the limits of EIR modifying curve for temperatures (HSPF high and low test conditions)
+                    if (HeatingEIRODBTempMax < HeatingOutdoorCoilInletAirDBTempRated ||
+                        HeatingEIRODBTempMin > HeatingOutdoorCoilInletAirDBTempH3Test ||
+                        HeatingEIRIDBTempMax < HeatingIndoorCoilInletAirDBTempRated || HeatingEIRIDBTempMin > HeatingIndoorCoilInletAirDBTempRated ||
+                        HeatingCapODBTempMax < HeatingOutdoorCoilInletAirDBTempH0Test) {
+                        HeatingEIRCurveHSPFLimitsExceeded = true;
+                    }
+                }
+            }
+            if (HeatingCapCurveHSPFLimitsExceeded || HeatingEIRCurveHSPFLimitsExceeded || CapCurveOATLimitsExceeded) {
+
+                ShowWarningError(state,
+                                 "The Standard Ratings is calculated for " + DXCoilType + " = " + DXCoilName +
+                                     " but not at the AHRI test condition due to curve out of bound.");
+                ShowContinueError(state,
+                                  " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
+                                  "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
+
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
+                    ShowContinueError(state,
+                                      " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
+                }
+            }
+            if (CapCurveOATLimitsExceeded) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowWarningError(state,
+                                     DXCoilType + '=' + DXCoilName + ":  The Net Heating Capacity Calculated is not at the AHRI test condition.");
+                    ShowContinueError(state,
+                                      " Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
+                                          state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
+                                          ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                }
+            }
+            if (HeatingCapCurveHSPFLimitsExceeded || HeatingEIRCurveHSPFLimitsExceeded) {
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowWarningError(state,
+                                     DXCoilType + '=' + DXCoilName +
+                                         ":  The Heating Seasonal Performance Factor calculated is not at the AHRI test condition.");
+                    if (HeatingCapCurveHSPFLimitsExceeded) {
+                        ShowContinueError(state,
+                                          " Check limits in Total Heating Capacity Function of Temperature Curve, Curve Type = " +
+                                              state.dataCurveManager->PerfCurve(CapFTempCurveIndex).ObjectType +
+                                              ", Curve Name = " + GetCurveName(state, CapFTempCurveIndex));
+                    }
+                    if (HeatingEIRCurveHSPFLimitsExceeded) {
+                        ShowContinueError(state,
+                                          " Check limits in EIR Function of Temperature Curve, Curve Type = " +
+                                              state.dataCurveManager->PerfCurve(EIRFTempCurveIndex).ObjectType +
+                                              ", Curve Name = " + GetCurveName(state, EIRFTempCurveIndex));
+                    }
+                }
+            }
+            break;
+        }
+        default:
+            break;
         }
     }
 

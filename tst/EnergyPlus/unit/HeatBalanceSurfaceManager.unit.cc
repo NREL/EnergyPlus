@@ -173,7 +173,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     EXPECT_TRUE(ErrorFlag);
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(10.0 * 1.0 * (state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) - state->dataSurface->SurfOutDryBulbTemp(SurfNum)),
-              state->dataHeatBalSurf->QAirExtReport(SurfNum));
+              state->dataHeatBalSurf->SurfQAirExtReport(SurfNum));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurf)
@@ -355,11 +355,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     UpdateThermalHistories(*state); // First check to see if it is calculating the user location temperature properly
 
     EXPECT_EQ(12.5, state->dataHeatBalSurf->SurfTempUserLoc(1));
-    EXPECT_EQ(0.0, state->dataHeatBalSurf->TuserHist(1, 3));
+    EXPECT_EQ(0.0, state->dataHeatBalSurf->SurfTuserHist(1, 3));
 
     UpdateThermalHistories(*state);
 
-    EXPECT_EQ(12.5, state->dataHeatBalSurf->TuserHist(1, 3)); // Now check to see that it is shifting the temperature history properly
+    EXPECT_EQ(12.5, state->dataHeatBalSurf->SurfTuserHist(1, 3)); // Now check to see that it is shifting the temperature history properly
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceInsideSurfAirRefT)
@@ -2589,13 +2589,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     state->dataSurface->SurfOutWetBulbTemp(1) = 6.66143784594778;
     state->dataSurface->SurfOutDryBulbTemp(1) = 7.2;
 
-    // If Rain Flag = on, GetQdotConvOutRep uses Outdoor Air Wet Bulb Temp.
+    // If Rain Flag = on, GetSurfQdotConvOutRep uses Outdoor Air Wet Bulb Temp.
     state->dataEnvrn->IsRain = true;
     Real64 ExpectedQconvPerArea1 = -1000 * (6.71793958923051 - 6.66143784594778);
 
     EXPECT_NEAR(ExpectedQconvPerArea1, GetQdotConvOutPerArea(*state, 1), 0.01);
 
-    // Otherwise, GetQdotConvOutRep uses Outdoor Air Dry Bulb Temp.
+    // Otherwise, GetSurfQdotConvOutRep uses Outdoor Air Dry Bulb Temp.
     state->dataEnvrn->IsRain = false;
     state->dataHeatBalSurf->SurfHcExt(1) = 5.65361106051348;
     Real64 ExpectedQconvPerArea2 = -5.65361106051348 * (6.71793958923051 - 7.2);

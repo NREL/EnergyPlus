@@ -2088,7 +2088,6 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::SmallLoad;
     auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-    using DataZoneEquipment::PurchasedAir_Num;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcPurchAirLoads");
@@ -2164,8 +2163,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     QZnCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
 
     if (allocated(ZoneComp)) {
-        ZoneComp(PurchasedAir_Num).ZoneCompAvailMgrs(PurchAirNum).ZoneNum = ActualZoneNum;
-        PurchAir(PurchAirNum).AvailStatus = ZoneComp(PurchasedAir_Num).ZoneCompAvailMgrs(PurchAirNum).AvailStatus;
+        ZoneComp(DataZoneEquipment::ZoneEquip::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum).ZoneNum = ActualZoneNum;
+        PurchAir(PurchAirNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::PurchasedAir).ZoneCompAvailMgrs(PurchAirNum).AvailStatus;
         // Check if the hybrid ventilation availability manager is turning the unit off
         if (PurchAir(PurchAirNum).AvailStatus == ForceOff) {
             UnitOn = false;
@@ -2965,7 +2964,7 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     // User input defines method used to calculate OA.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+    bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     bool UseOccSchFlag;      // TRUE = use actual occupancy, FALSE = use total zone people
@@ -3152,7 +3151,7 @@ void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const
         if (all(state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
             SimAirZonePlenum(state,
                              PurchAir(PurchAirNum).ReturnPlenumName,
-                             DataZoneEquipment::ZoneReturnPlenum_Type,
+                             DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum,
                              PurchAir(PurchAirNum).ReturnPlenumIndex,
                              FirstHVACIteration,
                              FirstCall,

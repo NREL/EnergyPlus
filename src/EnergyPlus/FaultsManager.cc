@@ -859,7 +859,7 @@ namespace FaultsManager {
                         state.dataFaultsMgr->ErrorsFound = true;
                     } else {
 
-                        if (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil != state.dataSteamCoils->TemperatureSetPointControl) {
+                        if (state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil != SteamCoils::TemperatureSetPointControl) {
                             // The fault model is only applicable to the coils controlled on leaving air temperature
                             ShowWarningError(
                                 state,
@@ -1066,14 +1066,15 @@ namespace FaultsManager {
                     state.dataCondenserLoopTowers->towers(TowerNum).FaultyTowerFoulingIndex = jFault_TowerFouling;
 
                     // Check the faulty tower type
-                    if (!UtilityRoutines::SameString(state.dataCondenserLoopTowers->towers(TowerNum).TowerType,
-                                                     state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerType)) {
+                    if (!UtilityRoutines::SameString(
+                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
+                            state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerType)) {
                         ShowWarningError(state,
                                          cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                              cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) +
                                              ". Tower type in the fault model is updated. ");
                         state.dataFaultsMgr->FaultsTowerFouling(jFault_TowerFouling).TowerType =
-                            state.dataCondenserLoopTowers->towers(TowerNum).TowerType;
+                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)];
                     }
 
                     // Check the tower model
@@ -1181,13 +1182,14 @@ namespace FaultsManager {
                     state.dataCondenserLoopTowers->towers(TowerNum).FaultyCondenserSWTIndex = jFault_CondenserSWT;
 
                     // Check the faulty tower type
-                    if (!UtilityRoutines::SameString(state.dataCondenserLoopTowers->towers(TowerNum).TowerType,
-                                                     state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType)) {
+                    if (!UtilityRoutines::SameString(
+                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
+                            state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType)) {
                         ShowWarningError(state,
                                          cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                              cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) + ". Tower type is updated. ");
                         state.dataFaultsMgr->FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType =
-                            state.dataCondenserLoopTowers->towers(TowerNum).TowerType;
+                            DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)];
                     }
                 }
             }
@@ -1750,14 +1752,13 @@ namespace FaultsManager {
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
                     // Coil is found: check if the right type
-                    if ((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) ||
-                        (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling)) {
+                    if ((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+                        (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling)) {
                         // Link the Coil with the fault model
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
                         state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
 
-                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoiledType =
-                            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
+                        state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
                         state.dataFaultsMgr->FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
 
                         SetupOutputVariable(state,
@@ -1770,7 +1771,7 @@ namespace FaultsManager {
 
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
                         // but here, it's useful since we do change it via fouling, so report it
-                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                             SetupOutputVariable(state,
                                                 "Cooling Coil Total U Factor Times Area Value",
                                                 OutputProcessor::Unit::W_K,

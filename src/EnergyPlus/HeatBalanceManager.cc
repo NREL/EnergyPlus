@@ -386,7 +386,7 @@ namespace HeatBalanceManager {
         // Using/Aliasing
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const NumConstrObjects(6);
+        int constexpr NumConstrObjects(6);
         Array1D_string const ConstrObjects(NumConstrObjects,
                                            {"Pipe:Indoor",
                                             "Pipe:Outdoor",
@@ -1211,27 +1211,15 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
-                    auto const SELECT_CASE_var(AlphaName(1));
-                    if (SELECT_CASE_var == "ADJUSTMIXINGONLY") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustMixingOnly;
+                    int FlowTypeNum = getEnumerationValue(AdjustmentTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(1)));
+                    state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = static_cast<DataHeatBalance::AdjustmentType>(FlowTypeNum);
+                    AlphaName(1) = AdjustmentTypeNamesCC[FlowTypeNum];
+                    if (BITF_TEST_ANY(BITF(state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment),
+                                      BITF(AdjustmentType::AdjustMixingOnly) | BITF(AdjustmentType::AdjustReturnOnly) |
+                                          BITF(AdjustmentType::AdjustMixingThenReturn) | BITF(AdjustmentType::AdjustReturnThenMixing))) {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjustMixingOnly";
-                    } else if (SELECT_CASE_var == "ADJUSTRETURNONLY") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustReturnOnly;
-                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjustReturnOnly";
-                    } else if (SELECT_CASE_var == "ADJUSTMIXINGTHENRETURN") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustMixingThenReturn;
-                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjustMixingThenReturn";
-                    } else if (SELECT_CASE_var == "ADJUSTRETURNTHENMIXING") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::AdjustReturnThenMixing;
-                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "AdjustReturnThenMixing";
-                    } else if (SELECT_CASE_var == "NONE") {
-                        state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
-                        AlphaName(1) = "None";
-                    } else {
+                    }
+                    if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == AdjustmentType::Unassigned) {
                         state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                         ShowWarningError(state,
@@ -1244,24 +1232,16 @@ namespace HeatBalanceManager {
             }
             if (NumAlpha > 1) {
                 {
-                    auto const SELECT_CASE_var(AlphaName(2));
-                    if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                    int FlowTypeNum = getEnumerationValue(InfiltrationFlowTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(2)));
+                    state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = static_cast<DataHeatBalance::InfiltrationFlow>(FlowTypeNum);
+                    AlphaName(2) = InfiltrationFlowTypeNamesCC[FlowTypeNum];
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add ||
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(2) = "AddInfiltrationFlow";
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
                             state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
-                    } else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
-                        state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(2) = "AddInfiltrationFlow";
-                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
-                            state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
-                    } else if (SELECT_CASE_var == "NONE") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
-                        AlphaName(2) = "None";
-                    } else {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                    } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Unassigned) {
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
                         ShowWarningError(state,
@@ -1270,24 +1250,20 @@ namespace HeatBalanceManager {
                     }
                 }
             } else {
-                state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                 state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                 AlphaName(2) = "AddInfiltrationFlow";
             }
-            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
+            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::No) {
                 AlphaName(3) = "N/A";
             } else {
                 if (NumAlpha > 2) {
                     {
-                        auto const SELECT_CASE_var(AlphaName(3));
-                        if (SELECT_CASE_var == "MIXINGSOURCEZONESONLY") {
-                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
-                            AlphaName(3) = "MixingSourceZonesOnly";
-                        } else if (SELECT_CASE_var == "ALLZONES") {
-                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = AllZones;
-                            AlphaName(3) = "AllZones";
-                        } else {
-                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+                        int FlowTypeNum = getEnumerationValue(InfiltrationZoneTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(3)));
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = static_cast<DataHeatBalance::InfiltrationZoneType>(FlowTypeNum);
+                        AlphaName(3) = InfiltrationZoneTypeNamesCC[FlowTypeNum];
+                        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Unassigned) {
+                            state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                             ShowWarningError(state,
                                              state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
@@ -1296,14 +1272,14 @@ namespace HeatBalanceManager {
                         }
                     }
                 } else {
-                    state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
+                    state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                     AlphaName(3) = "MixingSourceZonesOnly";
                 }
             }
         } else {
             state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
-        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow)
+        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No)
             state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow = true;
 
         constexpr const char *Format_732(
@@ -2534,12 +2510,12 @@ namespace HeatBalanceManager {
 
             GasType = state.dataMaterial->Material(MaterNum).GasType(1);
             if (GasType >= 1 && GasType <= 4) {
-                state.dataMaterial->Material(MaterNum).GasWght(1) = GasWght(GasType);
-                state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio(GasType);
+                state.dataMaterial->Material(MaterNum).GasWght(1) = GasWght[GasType - 1];
+                state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio[GasType - 1];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    state.dataMaterial->Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon(ICoeff, GasType);
-                    state.dataMaterial->Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis(ICoeff, GasType);
-                    state.dataMaterial->Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp(ICoeff, GasType);
+                    state.dataMaterial->Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][GasType - 1];
                 }
             }
 
@@ -2653,12 +2629,12 @@ namespace HeatBalanceManager {
 
             GasType = state.dataMaterial->Material(MaterNum).GasType(1);
             if (GasType >= 1 && GasType <= 4) {
-                state.dataMaterial->Material(MaterNum).GasWght(1) = GasWght(GasType);
-                state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio(GasType);
+                state.dataMaterial->Material(MaterNum).GasWght(1) = GasWght[GasType - 1];
+                state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(1) = GasSpecificHeatRatio[GasType - 1];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    state.dataMaterial->Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon(ICoeff, GasType);
-                    state.dataMaterial->Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis(ICoeff, GasType);
-                    state.dataMaterial->Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp(ICoeff, GasType);
+                    state.dataMaterial->Material(MaterNum).GasCon(ICoeff, 1) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasVis(ICoeff, 1) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasCp(ICoeff, 1) = GasCoeffsCp[ICoeff - 1][GasType - 1];
                 }
             }
 
@@ -2787,13 +2763,13 @@ namespace HeatBalanceManager {
             for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
                 GasType = state.dataMaterial->Material(MaterNum).GasType(NumGas);
                 if (GasType >= 1 && GasType <= 4) {
-                    state.dataMaterial->Material(MaterNum).GasWght(NumGas) = GasWght(GasType);
-                    state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio(GasType);
+                    state.dataMaterial->Material(MaterNum).GasWght(NumGas) = GasWght[GasType - 1];
+                    state.dataMaterial->Material(MaterNum).GasSpecHeatRatio(NumGas) = GasSpecificHeatRatio[GasType - 1];
                     state.dataMaterial->Material(MaterNum).GasFract(NumGas) = MaterialProps(2 + NumGas);
                     for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                        state.dataMaterial->Material(MaterNum).GasCon(ICoeff, NumGas) = GasCoeffsCon(ICoeff, GasType);
-                        state.dataMaterial->Material(MaterNum).GasVis(ICoeff, NumGas) = GasCoeffsVis(ICoeff, GasType);
-                        state.dataMaterial->Material(MaterNum).GasCp(ICoeff, NumGas) = GasCoeffsCp(ICoeff, GasType);
+                        state.dataMaterial->Material(MaterNum).GasCon(ICoeff, NumGas) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+                        state.dataMaterial->Material(MaterNum).GasVis(ICoeff, NumGas) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+                        state.dataMaterial->Material(MaterNum).GasCp(ICoeff, NumGas) = GasCoeffsCp[ICoeff - 1][GasType - 1];
                     }
                 }
             }
@@ -6117,11 +6093,11 @@ namespace HeatBalanceManager {
             if (state.dataHeatBalFanSys->ZTAV(ZoneNum) < state.dataHeatBalMgr->MinTempZone(ZoneNum)) {
                 state.dataHeatBalMgr->MinTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
-            if (state.dataHeatBal->SNLoadHeatRate(ZoneNum) > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
+            if (state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) > state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum);
             }
-            if (state.dataHeatBal->SNLoadCoolRate(ZoneNum) > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
-                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->SNLoadCoolRate(ZoneNum);
+            if (state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum) > state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum)) {
+                state.dataHeatBalMgr->MaxCoolLoadZone(ZoneNum) = state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
             }
 
             // Record temperature and load for individual zone
@@ -6131,7 +6107,7 @@ namespace HeatBalanceManager {
             state.dataHeatBalMgr->LoadZonePrevDay(ZoneNum) = state.dataHeatBalMgr->LoadZone(ZoneNum);
             state.dataHeatBalMgr->TempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             state.dataHeatBalMgr->LoadZone(ZoneNum) =
-                max(state.dataHeatBal->SNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->SNLoadCoolRate(ZoneNum)));
+                max(state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
             if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim == 1 && !state.dataGlobal->DoingSizing) {
@@ -6203,7 +6179,7 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinLoad(100.0); // Minimum laods for convergence check
+        Real64 constexpr MinLoad(100.0); // Minimum loads for convergence check
         // To avoid big percentage difference in low load situations
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -6887,7 +6863,7 @@ namespace HeatBalanceManager {
         auto NextLine = W5DataFile.readLine();
         endcol = len(NextLine.data);
         if (endcol > 0) {
-            if (int(NextLine.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
+            if (int(NextLine.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
                 ShowSevereError(state,
                                 "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFilePath.string() +
                                     " fiile, appears to be a Unicode or binary file.");
@@ -7786,9 +7762,9 @@ namespace HeatBalanceManager {
 
         // ASHRAE Handbook Fundamental 2005
         // Thermal resistance of the inside air film, m2.K/W. Average of 0.14 (heat flow up) and 0.11 (heat flow down)
-        Real64 const Rfilm_in(0.125);
+        Real64 constexpr Rfilm_in(0.125);
         // Thermal resistance of the outside air film used in calculating the Ffactor, m2.K/W. 0.17/5.678
-        Real64 const Rfilm_out(0.03);
+        Real64 constexpr Rfilm_out(0.03);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
