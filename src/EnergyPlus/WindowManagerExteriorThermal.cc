@@ -464,7 +464,6 @@ namespace WindowManager {
         auto aIGU = getIGU(width, height, tilt);
 
         m_SolidLayerIndex = 0;
-
         // pick-up all layers and put them in IGU (this includes gap layers as well)
         for (auto i = 0; i < m_TotLay; ++i) {
             auto aLayer = getIGULayer(state, i + 1);
@@ -490,8 +489,11 @@ namespace WindowManager {
     {
         auto ConstrNum = m_Surface.Construction;
 
-        if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
-            ConstrNum = state.dataSurface->SurfWinActiveShadedConstruction(m_SurfNum);
+        // BSDF window do not have special shading flag
+        if (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) {
+            if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
+                ConstrNum = state.dataSurface->SurfWinActiveShadedConstruction(m_SurfNum);
+            }
         }
 
         auto &construction(state.dataConstruction->Construct(ConstrNum));
