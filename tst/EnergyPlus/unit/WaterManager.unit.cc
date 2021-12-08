@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     state->dataEnvrn->IsRain = true;
     WaterManager::UpdatePrecipitation(*state);
     // default 1.5mm rain depth is used
-    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 1.5 / 3600);
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, (1.5 / 1000.0) / 3600);
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)

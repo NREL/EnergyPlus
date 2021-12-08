@@ -927,7 +927,7 @@ namespace EcoRoofManager {
             // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
             } else if (state.dataEnvrn->IsRain) {
                 ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
-                state.dataEcoRoofMgr->CurrentPrecipitation = 1.5 * TimeStepSys; //  units of m
+                state.dataEcoRoofMgr->CurrentPrecipitation = (1.5 / 1000.0) * TimeStepSys; //  units of m
             }
             Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth;  // x (m) evenly put into top layer
             if (!state.dataGlobal->WarmupFlag) {
