@@ -106,7 +106,7 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
     # check for null names at 0-th position
     if keys_uc[0] not in valid_null_enum_value_names:
         # exceptions listed by <FILE>:<ENUM NAME>
-        exceptions = ["CsvParser.hh:Token", "IdfParser.hh:Token"]
+        exceptions = ["CsvParser.hh:Token", "IdfParser.hh:Token", "OutputProcessor.hh:ReportingFrequency"]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Invalid' at position 0\n"
 
