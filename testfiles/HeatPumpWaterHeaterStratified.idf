@@ -4690,7 +4690,7 @@
     Domestic Hot Water,      !- End-Use Subcategory
     0.00379,                 !- Peak Flow Rate {m3/s}
     Hot Water Demand Schedule,  !- Flow Rate Fraction Schedule Name
-    HPWHTempSch;             !- Target Temperature Schedule Name
+    ;                        !- Target Temperature Schedule Name
 
   Schedule:Constant,SSBWaterTempSchedule,TEMPERATURE,43.333333333333336;
 
