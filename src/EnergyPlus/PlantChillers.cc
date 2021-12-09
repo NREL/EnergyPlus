@@ -1593,7 +1593,7 @@ namespace PlantChillers {
         if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = !(state.dataPlnt->PlantLoop(this->CWLoopNum)
                                              .LoopSide[static_cast<int>(this->CWLoopSideNum)]
-                                             .Branch(static_cast<int>(this->CWLoopSideNum)+1) // +1 is a hack to escape without diffs for now, it should be CWBranchNum instead of CWLoopSideNum
+                                             .Branch(this->CWBranchNum)
                                              .Comp(this->CWCompNum)
                                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased);
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
@@ -1734,7 +1734,7 @@ namespace PlantChillers {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide[static_cast<int>(this->CWLoopSideNum)]
-                             .Branch(static_cast<int>(this->CWLoopSideNum))
+                             .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
@@ -1746,7 +1746,7 @@ namespace PlantChillers {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide[static_cast<int>(this->CWLoopSideNum)]
-                             .Branch(static_cast<int>(this->CWLoopSideNum))
+                             .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {
