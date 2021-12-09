@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <iomanip>
@@ -5390,6 +5391,12 @@ void parseStatLine(const std::string &lineIn,
         lineType = StatLineType::wthHDDLine;
     } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
         lineType = StatLineType::wthCDDLine;
+    } else if (has(lineIn, "Max Hourly")) {
+        lineType = StatLineType::maxHourlyPrec;
+    } else if (has(lineIn, "Total")) {
+        if (!has(lineIn, "Statistics for Total Sky Cover")) {
+            lineType = StatLineType::monthlyPrec;
+        }
     }
     // these not part of big if/else because sequential
     if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
@@ -5900,6 +5907,46 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                     } else {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
                     }
+                } else if (SELECT_CASE_var == StatLineType::monthlyPrec) { //   - Monthly precipitation mm
+                    std::stringstream ss(lineIn);
+                    std::vector<std::string> result;
+                    while (ss.good()) {
+                        std::string substr;
+                        getline(ss, substr, '\t');
+                        substr.erase(remove_if(substr.begin(), substr.end(), isspace), substr.end());
+                        result.push_back(substr);
+                    }
+                    int monthlyTotalPrec [12];
+                    int annualTotalPrec = 0;
+                    for (int i = 0; i < 12; i++) {
+                        monthlyTotalPrec[i] = std::stoi(result[i + 2]);
+                        annualTotalPrec += monthlyTotalPrec[i];
+                    }
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Annual Total Precipitation [mm]", annualTotalPrec);
+                    // fixme: store the monthly data in some data structure
+                } else if (SELECT_CASE_var == StatLineType::maxHourlyPrec) { //   - Highest hourly precipitation in each month
+                    // Split string by \t into substrings and remove the space in each substring
+                    std::stringstream ss(lineIn);
+                    std::vector<std::string> result;
+                    while (ss.good()) {
+                        std::string substr;
+                        getline(ss, substr, '\t');
+                        substr.erase(remove_if(substr.begin(), substr.end(), isspace), substr.end());
+                        result.push_back(substr);
+                    }
+                    int maxHourlyPrecEachMonth[12];
+                    int maxHourlyPrec = 0;
+                    int maxHourlyPrecIdx = 0;
+                    for (int i = 0; i < 12; i++) {
+                        maxHourlyPrecEachMonth[i] = std::stoi(result[i + 2]);
+                        if (maxHourlyPrecEachMonth[i] > maxHourlyPrec) {
+                            maxHourlyPrec = maxHourlyPrecEachMonth[i];
+                            maxHourlyPrecIdx = i;
+                        }
+                    }
+                    std::string Months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Max Hourly Precipitation [mm]", maxHourlyPrec);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Max Hourly Precipitation Occurs in", Months[maxHourlyPrecIdx]);
                 } else if (SELECT_CASE_var == StatLineType::wthHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
                     if (storeASHRAEHDD != "") {
                         if (ort->unitsStyle == iUnitsStyle::InchPound) {
