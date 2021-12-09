@@ -460,6 +460,8 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     state->dataLoopNodes->Node.allocate(2);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumIn = 1;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumOut = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut = 1;
     auto &inNode = state->dataLoopNodes->Node(1);
     auto &outNode = state->dataLoopNodes->Node(2);
     Real64 constexpr roomTemp = 25.0;
