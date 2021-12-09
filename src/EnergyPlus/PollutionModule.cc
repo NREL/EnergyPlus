@@ -4035,7 +4035,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     _,
                                     "");
                 SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 CO2 Water Consumption Volume",
+                                    "Environmental Impact OtherFuel1 Water Consumption Volume",
                                     OutputProcessor::Unit::L,
                                     Pollution.OtherFuel1Comp.WaterPollution,
                                     OutputProcessor::SOVTimeStepType::System,
@@ -4242,7 +4242,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     _,
                                     "");
                 SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 CO2 Water Consumption Volume",
+                                    "Environmental Impact OtherFuel2 Water Consumption Volume",
                                     OutputProcessor::Unit::L,
                                     Pollution.OtherFuel2Comp.WaterPollution,
                                     OutputProcessor::SOVTimeStepType::System,

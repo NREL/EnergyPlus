@@ -39,3 +39,12 @@ A number of meters in the emission system were renamed to use "Electricity" inst
 
 See pull request [#9101](https://github.com/NREL/EnergyPlus/pull/9101) for more details.
 
+
+### Emission Variable Renaming
+
+Two variables in the emission system were renamed to use "OtherFuel" instead of "CO2".  The variables that were renamed are:
+
+- Environmental Impact OtherFuel1 CO2 Water Consumption Volume -> Environmental Impact OtherFuel1 Water Consumption Volume
+- Environmental Impact OtherFuel2 CO2 Water Consumption Volume -> Environmental Impact OtherFuel2 Water Consumption Volume
+
+See pull request [#9089](https://github.com/NREL/EnergyPlus/pull/9089) for more details.
