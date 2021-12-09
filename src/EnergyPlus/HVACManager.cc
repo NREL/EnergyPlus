@@ -122,6 +122,11 @@ using namespace DataHVACGlobals;
 using namespace DataLoopNode;
 using namespace DataAirLoop;
 
+static constexpr std::array<Real64, DataPlant::NumConvergenceHistoryTerms> ConvergenceHistoryARR = {0.0, -1.0, -2.0, -3.0, -4.0};
+constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
+constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
+constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
+
 void ManageHVAC(EnergyPlusData &state)
 {
 
@@ -613,12 +618,8 @@ void SimHVAC(EnergyPlusData &state)
     // this default control algorithm.
 
     // Using/Aliasing
-    using DataPlant::ConvergenceHistoryARR;
     using DataPlant::DemandSide;
     using DataPlant::NumConvergenceHistoryTerms;
-    using DataPlant::square_sum_ConvergenceHistoryARR;
-    using DataPlant::sum_ConvergenceHistoryARR;
-    using DataPlant::sum_square_ConvergenceHistoryARR;
     using DataPlant::SupplySide;
     using EMSManager::ManageEMS;
     using General::CreateSysTimeIntervalString;
@@ -665,10 +666,11 @@ void SimHVAC(EnergyPlusData &state)
     bool MonotonicIncreaseFound;
     bool MonotonicDecreaseFound;
 
-    Array1D<Real64> const ConvergLogStackARR(DataConvergParams::ConvergLogStackDepth, {0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0});
-    Real64 const sum_ConvergLogStackARR(sum(ConvergLogStackARR));
-    Real64 const square_sum_ConvergLogStackARR(pow_2(sum_ConvergLogStackARR));
-    Real64 const sum_square_ConvergLogStackARR(sum(pow(ConvergLogStackARR, 2)));
+    static constexpr std::array<Real64, DataConvergParams::ConvergLogStackDepth> ConvergLogStackARR = {
+        0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0};
+    Real64 constexpr sum_ConvergLogStackARR(-45);
+    Real64 constexpr square_sum_ConvergLogStackARR(2025);
+    Real64 constexpr sum_square_ConvergLogStackARR(285);
 
     auto &SimZoneEquipmentFlag = state.dataHVACGlobal->SimZoneEquipmentFlag;
     auto &SimNonZoneEquipmentFlag = state.dataHVACGlobal->SimNonZoneEquipmentFlag;
@@ -1105,47 +1107,46 @@ void SimHVAC(EnergyPlusData &state)
 
                     for (NodeIndex = 1; NodeIndex <= state.dataConvergeParams->ZoneInletConvergence(ZoneNum).NumInletNodes; ++NodeIndex) {
 
+                        auto &humRatInletNode = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio;
+                        auto &mdotInletNode = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate;
+                        auto &inletTemp = state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature;
+
                         // Check humidity ratio
                         FoundOscillationByDuplicate = false;
                         MonotonicDecreaseFound = false;
                         MonotonicIncreaseFound = false;
                         // check for evidence of oscillation by identifying duplicates when latest value not equal to average
-                        AvgValue = sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio) /
-                                   double(DataConvergParams::ConvergLogStackDepth);
-                        if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) - AvgValue) >
+                        AvgValue = sum(humRatInletNode) / double(DataConvergParams::ConvergLogStackDepth);
+                        if (std::abs(humRatInletNode(1) - AvgValue) >
                             DataConvergParams::HVACHumRatOscillationToler) { // last iterate differs from average
                             FoundOscillationByDuplicate = false;
                             for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1) -
-                                             state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth)) <
-                                    DataConvergParams::HVACHumRatOscillationToler) {
+                                if (std::abs(humRatInletNode(1) - humRatInletNode(StackDepth)) < DataConvergParams::HVACHumRatOscillationToler) {
                                     FoundOscillationByDuplicate = true;
                                     ShowContinueError(
                                         state,
                                         format("Node named {} shows oscillating humidity ratio across iterations with a repeated value of {:.6R}",
                                                state.dataLoopNodes->NodeID(
                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
-                                               state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(1)));
+                                               humRatInletNode(1)));
                                     break;
                                 }
                             }
                             if (!FoundOscillationByDuplicate) {
+
+                                auto humRatInletNodDotProd = std::inner_product(
+                                    std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(humRatInletNode), 0.0);
+
                                 SlopeHumRat =
-                                    (sum_ConvergLogStackARR *
-                                         sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio) -
-                                     double(DataConvergParams::ConvergLogStackDepth) *
-                                         sum((ConvergLogStackARR *
-                                              state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio))) /
+                                    (sum_ConvergLogStackARR * sum(humRatInletNode) -
+                                     double(DataConvergParams::ConvergLogStackDepth) * humRatInletNodDotProd) /
                                     (square_sum_ConvergLogStackARR - double(DataConvergParams::ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
                                 if (std::abs(SlopeHumRat) > DataConvergParams::HVACHumRatSlopeToler) {
 
-                                    if (SlopeHumRat < 0.0) { // check for monotic decrease
+                                    if (SlopeHumRat < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                            if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(
-                                                    StackDepth - 1) >
-                                                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(
-                                                    StackDepth)) {
+                                            if (humRatInletNode(StackDepth - 1) > humRatInletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
                                             }
@@ -1159,13 +1160,10 @@ void SimHVAC(EnergyPlusData &state)
                                                            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                        SlopeHumRat));
                                         }
-                                    } else { // check for monotic incrase
+                                    } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                            if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(
-                                                    StackDepth - 1) <
-                                                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(
-                                                    StackDepth)) {
+                                            if (humRatInletNode(StackDepth - 1) < humRatInletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
                                             }
@@ -1187,9 +1185,7 @@ void SimHVAC(EnergyPlusData &state)
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace +=
-                                    format("{:.6R},",
-                                           state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).HumidityRatio(StackDepth));
+                                HistoryTrace += format("{:.6R},", humRatInletNode(StackDepth));
                             }
                             ShowContinueError(
                                 state,
@@ -1204,42 +1200,37 @@ void SimHVAC(EnergyPlusData &state)
                         FoundOscillationByDuplicate = false;
                         MonotonicDecreaseFound = false;
                         MonotonicIncreaseFound = false;
-                        // check for evidence of oscillation by indentify duplicates when latest value not equal to average
-                        AvgValue = sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate) /
-                                   double(DataConvergParams::ConvergLogStackDepth);
-                        if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) - AvgValue) >
+                        // check for evidence of oscillation by identify duplicates when latest value not equal to average
+                        AvgValue = sum(mdotInletNode) / double(DataConvergParams::ConvergLogStackDepth);
+                        if (std::abs(mdotInletNode(1) - AvgValue) >
                             DataConvergParams::HVACFlowRateOscillationToler) { // last iterate differs from average
                             FoundOscillationByDuplicate = false;
                             for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1) -
-                                             state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth)) <
-                                    DataConvergParams::HVACFlowRateOscillationToler) {
+                                if (std::abs(mdotInletNode(1) - mdotInletNode(StackDepth)) < DataConvergParams::HVACFlowRateOscillationToler) {
                                     FoundOscillationByDuplicate = true;
                                     ShowContinueError(
                                         state,
                                         format("Node named {} shows oscillating mass flow rate across iterations with a repeated value of {:.6R}",
                                                state.dataLoopNodes->NodeID(
                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
-                                               state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(1)));
+                                               mdotInletNode(1)));
                                     break;
                                 }
                             }
                             if (!FoundOscillationByDuplicate) {
+
+                                auto humRatInletNodDotProd =
+                                    std::inner_product(std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(mdotInletNode), 0.0);
+
                                 SlopeMdot =
-                                    (sum_ConvergLogStackARR *
-                                         sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate) -
-                                     double(DataConvergParams::ConvergLogStackDepth) *
-                                         sum((ConvergLogStackARR *
-                                              state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate))) /
+                                    (sum_ConvergLogStackARR * sum(mdotInletNode) -
+                                     double(DataConvergParams::ConvergLogStackDepth) * humRatInletNodDotProd) /
                                     (square_sum_ConvergLogStackARR - double(DataConvergParams::ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
                                 if (std::abs(SlopeMdot) > DataConvergParams::HVACFlowRateSlopeToler) {
-                                    if (SlopeMdot < 0.0) { // check for monotic decrease
+                                    if (SlopeMdot < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                            if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth -
-                                                                                                                                          1) >
-                                                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(
-                                                    StackDepth)) {
+                                            if (mdotInletNode(StackDepth - 1) > mdotInletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
                                             }
@@ -1253,13 +1244,10 @@ void SimHVAC(EnergyPlusData &state)
                                                            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                        SlopeMdot));
                                         }
-                                    } else { // check for monotic incrase
+                                    } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                            if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth -
-                                                                                                                                          1) <
-                                                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(
-                                                    StackDepth)) {
+                                            if (mdotInletNode(StackDepth - 1) < mdotInletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
                                             }
@@ -1275,14 +1263,13 @@ void SimHVAC(EnergyPlusData &state)
                                         }
                                     }
                                 } // significant slope in iterates
-                            }     // no osciallation
+                            }     // no oscillation
                         }         // last value does not equal average of stack.
 
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format(
-                                    "{:.6R},", state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).MassFlowRate(StackDepth));
+                                HistoryTrace += format("{:.6R},", mdotInletNode(StackDepth));
                             }
                             ShowContinueError(state,
                                               "Node named " +
@@ -1296,42 +1283,36 @@ void SimHVAC(EnergyPlusData &state)
                         FoundOscillationByDuplicate = false;
                         MonotonicDecreaseFound = false;
                         MonotonicIncreaseFound = false;
-                        // check for evidence of oscillation by indentify duplicates when latest value not equal to average
-                        AvgValue = sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature) /
-                                   double(DataConvergParams::ConvergLogStackDepth);
-                        if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) - AvgValue) >
+                        // check for evidence of oscillation by identify duplicates when latest value not equal to average
+                        AvgValue = sum(inletTemp) / double(DataConvergParams::ConvergLogStackDepth);
+                        if (std::abs(inletTemp(1) - AvgValue) >
                             DataConvergParams::HVACTemperatureOscillationToler) { // last iterate differs from average
                             FoundOscillationByDuplicate = false;
                             for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                if (std::abs(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1) -
-                                             state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth)) <
-                                    DataConvergParams::HVACTemperatureOscillationToler) {
+                                if (std::abs(inletTemp(1) - inletTemp(StackDepth)) < DataConvergParams::HVACTemperatureOscillationToler) {
                                     FoundOscillationByDuplicate = true;
                                     ShowContinueError(
                                         state,
                                         format("Node named {} shows oscillating temperatures across iterations with a repeated value of {:.6R}",
                                                state.dataLoopNodes->NodeID(
                                                    state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
-                                               state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(1)));
+                                               inletTemp(1)));
                                     break;
                                 }
                             }
                             if (!FoundOscillationByDuplicate) {
+
+                                auto inletTempDotProd =
+                                    std::inner_product(std::begin(ConvergLogStackARR), std::end(ConvergLogStackARR), std::begin(inletTemp), 0.0);
+
                                 SlopeTemps =
-                                    (sum_ConvergLogStackARR *
-                                         sum(state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature) -
-                                     double(DataConvergParams::ConvergLogStackDepth) *
-                                         sum((ConvergLogStackARR *
-                                              state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature))) /
+                                    (sum_ConvergLogStackARR * sum(inletTemp) - double(DataConvergParams::ConvergLogStackDepth) * inletTempDotProd) /
                                     (square_sum_ConvergLogStackARR - double(DataConvergParams::ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
                                 if (std::abs(SlopeTemps) > DataConvergParams::HVACTemperatureSlopeToler) {
                                     if (SlopeTemps < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                            if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth -
-                                                                                                                                         1) >
-                                                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(
-                                                    StackDepth)) {
+                                            if (inletTemp(StackDepth - 1) > inletTemp(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
                                             }
@@ -1345,13 +1326,10 @@ void SimHVAC(EnergyPlusData &state)
                                                            state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).NodeNum),
                                                        SlopeTemps));
                                         }
-                                    } else { // check for monotic incrase
+                                    } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                            if (state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth -
-                                                                                                                                         1) <
-                                                state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(
-                                                    StackDepth)) {
+                                            if (inletTemp(StackDepth - 1) < inletTemp(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
                                             }
@@ -1373,8 +1351,7 @@ void SimHVAC(EnergyPlusData &state)
                         if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
-                                HistoryTrace += format(
-                                    "{:.6R},", state.dataConvergeParams->ZoneInletConvergence(ZoneNum).InletNode(NodeIndex).Temperature(StackDepth));
+                                HistoryTrace += format("{:.6R},", inletTemp(StackDepth));
                             }
                             ShowContinueError(state,
                                               "Node named " +
@@ -1408,46 +1385,44 @@ void SimHVAC(EnergyPlusData &state)
 
                         // now work with history logs for mass flow to detect issues
                         for (ThisLoopSide = 1; ThisLoopSide <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide); ++ThisLoopSide) {
+
+                            auto &mdotHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory;
+                            auto &mdotHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory;
+
                             // loop side inlet node
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory) /
-                                       double(NumConvergenceHistoryTerms);
-                            if (std::abs(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(1) - AvgValue) >
-                                DataConvergParams::PlantFlowRateOscillationToler) {
+                            AvgValue = sum(mdotHistInletNode) / double(NumConvergenceHistoryTerms);
+                            if (std::abs(mdotHistInletNode(1) - AvgValue) > DataConvergParams::PlantFlowRateOscillationToler) {
                                 FoundOscillationByDuplicate = false;
                                 for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                    if (std::abs(
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(1) -
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(StackDepth)) <
+                                    if (std::abs(mdotHistInletNode(1) - mdotHistInletNode(StackDepth)) <
                                         DataConvergParams::PlantFlowRateOscillationToler) {
                                         FoundOscillationByDuplicate = true;
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating flow rates across iterations with a repeated value of {:.7R}",
                                                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
-                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(1)));
+                                                   mdotHistInletNode(1)));
                                         break;
                                     }
                                 }
                             }
                             if (!FoundOscillationByDuplicate) {
+
+                                Real64 mdotHistInletNodeDotProd = std::inner_product(
+                                    std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(mdotHistInletNode), 0.0);
+
                                 SlopeMdot =
-                                    (sum_ConvergenceHistoryARR *
-                                         sum(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory) -
-                                     double(NumConvergenceHistoryTerms) *
-                                         sum((ConvergenceHistoryARR *
-                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory))) /
+                                    (sum_ConvergenceHistoryARR * sum(mdotHistInletNode) -
+                                     double(NumConvergenceHistoryTerms) * mdotHistInletNodeDotProd) /
                                     (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeMdot) > DataConvergParams::PlantFlowRateSlopeToler) {
                                     if (SlopeMdot < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                            if (state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide(ThisLoopSide)
-                                                    .InletNode.MassFlowRateHistory(StackDepth - 1) >
-                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(StackDepth)) {
+                                            if (mdotHistInletNode(StackDepth - 1) > mdotHistInletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
                                             }
@@ -1459,13 +1434,10 @@ void SimHVAC(EnergyPlusData &state)
                                                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
                                                                      SlopeMdot));
                                         }
-                                    } else { // check for monotonic incrase
+                                    } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                            if (state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide(ThisLoopSide)
-                                                    .InletNode.MassFlowRateHistory(StackDepth - 1) <
-                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(StackDepth)) {
+                                            if (mdotHistInletNode(StackDepth - 1) < mdotHistInletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
                                             }
@@ -1484,9 +1456,7 @@ void SimHVAC(EnergyPlusData &state)
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                    HistoryTrace +=
-                                        format("{:.7R},",
-                                               state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory(StackDepth));
+                                    HistoryTrace += format("{:.7R},", mdotHistInletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
                                                   "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
@@ -1498,44 +1468,36 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory) /
-                                       double(NumConvergenceHistoryTerms);
-                            if (std::abs(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(1) - AvgValue) >
-                                DataConvergParams::PlantFlowRateOscillationToler) {
+                            AvgValue = sum(mdotHistOutletNode) / double(NumConvergenceHistoryTerms);
+                            if (std::abs(mdotHistOutletNode(1) - AvgValue) > DataConvergParams::PlantFlowRateOscillationToler) {
                                 FoundOscillationByDuplicate = false;
                                 for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                    if (std::abs(
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(1) -
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(StackDepth)) <
+                                    if (std::abs(mdotHistOutletNode(1) - mdotHistOutletNode(StackDepth)) <
                                         DataConvergParams::PlantFlowRateOscillationToler) {
                                         FoundOscillationByDuplicate = true;
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating flow rates across iterations with a repeated value of {:.7R}",
                                                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
-                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(1)));
+                                                   mdotHistOutletNode(1)));
                                         break;
                                     }
                                 }
                             }
                             if (!FoundOscillationByDuplicate) {
+
+                                Real64 mdotHistOutletNodeDotProd = std::inner_product(
+                                    std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(mdotHistOutletNode), 0.0);
+
                                 SlopeMdot =
-                                    (sum_ConvergenceHistoryARR *
-                                         sum(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory) -
-                                     double(NumConvergenceHistoryTerms) *
-                                         sum((ConvergenceHistoryARR *
-                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory))) /
+                                    (sum_ConvergenceHistoryARR * sum(mdotHistOutletNode) -
+                                     double(NumConvergenceHistoryTerms) * mdotHistOutletNodeDotProd) /
                                     (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeMdot) > DataConvergParams::PlantFlowRateSlopeToler) {
                                     if (SlopeMdot < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                            if (state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide(ThisLoopSide)
-                                                    .OutletNode.MassFlowRateHistory(StackDepth - 1) >
-                                                state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide(ThisLoopSide)
-                                                    .OutletNode.MassFlowRateHistory(StackDepth)) {
+                                            if (mdotHistOutletNode(StackDepth - 1) > mdotHistOutletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
                                             }
@@ -1547,15 +1509,10 @@ void SimHVAC(EnergyPlusData &state)
                                                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
                                                                      SlopeMdot));
                                         }
-                                    } else { // check for monotonic incrase
+                                    } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                            if (state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide(ThisLoopSide)
-                                                    .OutletNode.MassFlowRateHistory(StackDepth - 1) <
-                                                state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide(ThisLoopSide)
-                                                    .OutletNode.MassFlowRateHistory(StackDepth)) {
+                                            if (mdotHistOutletNode(StackDepth - 1) < mdotHistOutletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
                                             }
@@ -1574,9 +1531,7 @@ void SimHVAC(EnergyPlusData &state)
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                    HistoryTrace +=
-                                        format("{:.7R},",
-                                               state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory(StackDepth));
+                                    HistoryTrace += format("{:.7R},", mdotHistOutletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
                                                   "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
@@ -1607,45 +1562,44 @@ void SimHVAC(EnergyPlusData &state)
 
                         // now work with history logs for mass flow to detect issues
                         for (ThisLoopSide = 1; ThisLoopSide <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide); ++ThisLoopSide) {
+
+                            auto &tempHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory;
+                            auto &tempHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory;
+
                             // loop side inlet node
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory) /
-                                       double(NumConvergenceHistoryTerms);
-                            if (std::abs(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(1) - AvgValue) >
-                                DataConvergParams::PlantTemperatureOscillationToler) {
+                            AvgValue = sum(tempHistInletNode) / double(NumConvergenceHistoryTerms);
+                            if (std::abs(tempHistInletNode(1) - AvgValue) > DataConvergParams::PlantTemperatureOscillationToler) {
                                 FoundOscillationByDuplicate = false;
                                 for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                    if (std::abs(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(1) -
-                                                 state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(StackDepth)) <
+                                    if (std::abs(tempHistInletNode(1) - tempHistInletNode(StackDepth)) <
                                         DataConvergParams::PlantTemperatureOscillationToler) {
                                         FoundOscillationByDuplicate = true;
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating temperatures across iterations with a repeated value of {:.5R}",
                                                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
-                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(1)));
+                                                   tempHistInletNode(1)));
                                         break;
                                     }
                                 }
                             }
                             if (!FoundOscillationByDuplicate) {
+
+                                Real64 tempHistInletNodeDotProd = std::inner_product(
+                                    std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(tempHistInletNode), 0.0);
+
                                 SlopeTemps =
-                                    (sum_ConvergenceHistoryARR *
-                                         sum(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory) -
-                                     double(NumConvergenceHistoryTerms) *
-                                         sum((ConvergenceHistoryARR *
-                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory))) /
+                                    (sum_ConvergenceHistoryARR * sum(tempHistInletNode) -
+                                     double(NumConvergenceHistoryTerms) * tempHistInletNodeDotProd) /
                                     (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeTemps) > DataConvergParams::PlantTemperatureSlopeToler) {
-                                    if (SlopeTemps < 0.0) { // check for monotic decrease
+                                    if (SlopeTemps < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                            if (state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide(ThisLoopSide)
-                                                    .InletNode.TemperatureHistory(StackDepth - 1) >
-                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(StackDepth)) {
+                                            if (tempHistInletNode(StackDepth - 1) > tempHistInletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
                                             }
@@ -1657,13 +1611,10 @@ void SimHVAC(EnergyPlusData &state)
                                                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
                                                                      SlopeTemps));
                                         }
-                                    } else { // check for monotic incrase
+                                    } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                            if (state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide(ThisLoopSide)
-                                                    .InletNode.TemperatureHistory(StackDepth - 1) <
-                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(StackDepth)) {
+                                            if (tempHistInletNode(StackDepth - 1) < tempHistInletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
                                             }
@@ -1682,9 +1633,7 @@ void SimHVAC(EnergyPlusData &state)
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                    HistoryTrace +=
-                                        format("{:.5R},",
-                                               state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory(StackDepth));
+                                    HistoryTrace += format("{:.5R},", tempHistInletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
                                                   "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
@@ -1696,42 +1645,38 @@ void SimHVAC(EnergyPlusData &state)
                             FoundOscillationByDuplicate = false;
                             MonotonicDecreaseFound = false;
                             MonotonicIncreaseFound = false;
-                            AvgValue = sum(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory) /
-                                       double(NumConvergenceHistoryTerms);
-                            if (std::abs(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(1) - AvgValue) >
-                                DataConvergParams::PlantTemperatureOscillationToler) {
+                            AvgValue = sum(tempHistOutletNode) / double(NumConvergenceHistoryTerms);
+                            if (std::abs(tempHistOutletNode(1) - AvgValue) > DataConvergParams::PlantTemperatureOscillationToler) {
                                 FoundOscillationByDuplicate = false;
                                 for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                    if (std::abs(
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(1) -
-                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(StackDepth)) <
+                                    if (std::abs(tempHistOutletNode(1) - tempHistOutletNode(StackDepth)) <
                                         DataConvergParams::PlantTemperatureOscillationToler) {
                                         FoundOscillationByDuplicate = true;
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating temperatures across iterations with a repeated value of {:.5R}",
                                                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
-                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(1)));
+                                                   tempHistOutletNode(1)));
                                         break;
                                     }
                                 }
                             }
                             if (!FoundOscillationByDuplicate) {
+
+                                Real64 tempHistOutletNodeDotProd = std::inner_product(
+                                    std::begin(ConvergenceHistoryARR), std::end(ConvergenceHistoryARR), std::begin(tempHistOutletNode), 0.0);
+
                                 SlopeTemps =
-                                    (sum_ConvergenceHistoryARR *
-                                         sum(state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory) -
-                                     double(NumConvergenceHistoryTerms) *
-                                         sum((ConvergenceHistoryARR *
-                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory))) /
+                                    (sum_ConvergenceHistoryARR * sum(tempHistOutletNode) -
+                                     double(NumConvergenceHistoryTerms) * tempHistOutletNodeDotProd) /
                                     (square_sum_ConvergenceHistoryARR - double(NumConvergenceHistoryTerms) * sum_square_ConvergenceHistoryARR);
                                 if (std::abs(SlopeTemps) > DataConvergParams::PlantFlowRateSlopeToler) {
-                                    if (SlopeTemps < 0.0) { // check for monotic decrease
+                                    if (SlopeTemps < 0.0) { // check for monotonic decrease
                                         MonotonicDecreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (state.dataPlnt->PlantLoop(LoopNum)
                                                     .LoopSide(ThisLoopSide)
-                                                    .OutletNode.TemperatureHistory(StackDepth - 1) >
-                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(StackDepth)) {
+                                                    .OutletNode.TemperatureHistory(StackDepth - 1) > tempHistOutletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
                                             }
@@ -1743,13 +1688,12 @@ void SimHVAC(EnergyPlusData &state)
                                                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
                                                                      SlopeTemps));
                                         }
-                                    } else { // check for monotic incrase
+                                    } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (state.dataPlnt->PlantLoop(LoopNum)
                                                     .LoopSide(ThisLoopSide)
-                                                    .OutletNode.TemperatureHistory(StackDepth - 1) <
-                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(StackDepth)) {
+                                                    .OutletNode.TemperatureHistory(StackDepth - 1) < tempHistOutletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
                                             }
@@ -1768,9 +1712,7 @@ void SimHVAC(EnergyPlusData &state)
                             if (MonotonicDecreaseFound || MonotonicIncreaseFound || FoundOscillationByDuplicate) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
-                                    HistoryTrace +=
-                                        format("{:.5R},",
-                                               state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory(StackDepth));
+                                    HistoryTrace += format("{:.5R},", tempHistOutletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
                                                   "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +

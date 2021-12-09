@@ -431,11 +431,11 @@ namespace BoilerSteam {
             int BoilerOutletNode = this->BoilerOutletNodeNum;
             switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
 
-            case (DataPlant::LoopDemandCalcScheme::SingleSetPoint):
+            case DataPlant::LoopDemandCalcScheme::SingleSetPoint:
                 state.dataLoopNodes->Node(BoilerOutletNode).TempSetPoint =
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
                 break;
-            case (DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand):
+            case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand:
                 state.dataLoopNodes->Node(BoilerOutletNode).TempSetPointLo =
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
                 break;
