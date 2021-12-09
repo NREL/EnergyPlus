@@ -2237,14 +2237,14 @@ namespace OutputProcessor {
                        endUseMeter == "HEATRECOVERYHEATING") {
                 EndUse = "HeatRecoveryForHeating";
 
-            } else if (endUseMeter == "ELECTRICEMISSIONS") {
-                EndUse = "ElectricEmissions";
+            } else if (endUseMeter == "ELECTRICITYEMISSIONS") {
+                EndUse = "ElectricityEmissions";
 
-            } else if (endUseMeter == "PURCHASEDELECTRICEMISSIONS") {
-                EndUse = "PurchasedElectricEmissions";
+            } else if (endUseMeter == "PURCHASEDELECTRICITYEMISSIONS") {
+                EndUse = "PurchasedElectricityEmissions";
 
-            } else if (endUseMeter == "SOLDELECTRICEMISSIONS") {
-                EndUse = "SoldElectricEmissions";
+            } else if (endUseMeter == "SOLDELECTRICITYEMISSIONS") {
+                EndUse = "SoldElectricityEmissions";
 
             } else if (endUseMeter == "NATURALGASEMISSIONS") {
                 EndUse = "NaturalGasEmissions";
