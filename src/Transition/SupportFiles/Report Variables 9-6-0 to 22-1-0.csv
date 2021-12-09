@@ -1,5 +1,5 @@
 9.6.0,22.1.0,Transition notes - some of these are EMS variable names,,,,,,
-16,16,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.,,,,,,
+18,18,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.,,,,,,
 ElectricEmissions:CO2,ElectricityEmissions:CO2,
 ElectricEmissions:CO,ElectricityEmissions:CO,
 ElectricEmissions:CH4,ElectricityEmissions:CH4,
@@ -16,4 +16,5 @@ ElectricEmissions:Pb,ElectricityEmissions:Pb,
 ElectricEmissions:WaterEnvironmentalFactors,ElectricityEmissions:WaterEnvironmentalFactors,
 ElectricEmissions:Nuclear High,ElectricityEmissions:Nuclear High,
 ElectricEmissions:Nuclear Low,ElectricityEmissions:Nuclear Low,
-
+PurchasedElectricEmissions:Source,PurchasedElectricityEmissions:Source,
+SoldElectricEmissions:Source,SoldElectricityEmissions:Source,
