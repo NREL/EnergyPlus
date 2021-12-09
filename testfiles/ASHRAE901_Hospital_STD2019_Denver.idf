@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.6;
+  Version,22.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1232,13 +1232,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    ER_Exam1_Mult4_Flr_1 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     ER_Exam1_Mult4_Flr_1 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1258,13 +1251,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    ER_Trauma1_Flr_1 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     ER_Trauma1_Flr_1 sub catHot Supply Temp Sched,  !- Name
@@ -1288,13 +1274,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    ER_Exam3_Mult4_Flr_1 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     ER_Exam3_Mult4_Flr_1 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1314,13 +1293,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    ER_Trauma2_Flr_1 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     ER_Trauma2_Flr_1 sub catHot Supply Temp Sched,  !- Name
@@ -1344,13 +1316,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    ER_Triage_Mult4_Flr_1 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     ER_Triage_Mult4_Flr_1 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1370,13 +1335,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    OR1_Flr_2 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     OR1_Flr_2 sub catHot Supply Temp Sched,  !- Name
@@ -1400,13 +1358,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    OR2_Mult5_Flr_2 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     OR2_Mult5_Flr_2 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1426,13 +1377,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    OR3_Flr_2 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     OR3_Flr_2 sub catHot Supply Temp Sched,  !- Name
@@ -1456,13 +1400,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    OR4_Flr_2 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     OR4_Flr_2 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1482,13 +1419,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom1_Mult10_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom1_Mult10_Flr_3 sub catHot Supply Temp Sched,  !- Name
@@ -1512,13 +1442,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    PatRoom2_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     PatRoom2_Flr_3 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1538,13 +1461,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom3_Mult10_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom3_Mult10_Flr_3 sub catHot Supply Temp Sched,  !- Name
@@ -1568,13 +1484,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    PatRoom4_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     PatRoom4_Flr_3 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1594,13 +1503,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom5_Mult10_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom5_Mult10_Flr_3 sub catHot Supply Temp Sched,  !- Name
@@ -1624,13 +1526,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    PhysTherapy_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     PhysTherapy_Flr_3 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1650,13 +1545,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom6_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom6_Flr_3 sub catHot Supply Temp Sched,  !- Name
@@ -1680,13 +1568,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    PatRoom7_Mult10_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     PatRoom7_Mult10_Flr_3 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1706,13 +1587,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom8_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom8_Flr_3 sub catHot Supply Temp Sched,  !- Name
@@ -1736,13 +1610,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Lab_Flr_3 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     Lab_Flr_3 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1762,13 +1629,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom1_Mult10_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom1_Mult10_Flr_4 sub catHot Supply Temp Sched,  !- Name
@@ -1792,13 +1652,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    PatRoom2_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     PatRoom2_Flr_4 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1818,13 +1671,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom3_Mult10_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom3_Mult10_Flr_4 sub catHot Supply Temp Sched,  !- Name
@@ -1848,13 +1694,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    PatRoom4_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     PatRoom4_Flr_4 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1874,13 +1713,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom5_Mult10_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom5_Mult10_Flr_4 sub catHot Supply Temp Sched,  !- Name
@@ -1904,13 +1736,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Radiology_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     Radiology_Flr_4 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1930,13 +1755,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom6_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom6_Flr_4 sub catHot Supply Temp Sched,  !- Name
@@ -1960,13 +1778,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    PatRoom7_Mult10_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     PatRoom7_Mult10_Flr_4 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1986,13 +1797,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    PatRoom8_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     PatRoom8_Flr_4 sub catHot Supply Temp Sched,  !- Name
@@ -2016,13 +1820,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Lab_Flr_4 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
     Lab_Flr_4 sub catHot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2042,13 +1839,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Kitchen_Flr_5 sub cat Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
 
   Schedule:Compact,
     Kitchen_Flr_5 sub catHot Supply Temp Sched,  !- Name
@@ -29274,7 +29064,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    ER_Exam1_Mult4_Flr_1 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ER_Exam1_Mult4_Flr_1 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     ER_Exam1_Mult4_Flr_1,    !- Zone Name
@@ -29286,7 +29076,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    ER_Trauma1_Flr_1 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ER_Trauma1_Flr_1 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     ER_Trauma1_Flr_1,        !- Zone Name
@@ -29298,7 +29088,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    ER_Exam3_Mult4_Flr_1 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ER_Exam3_Mult4_Flr_1 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     ER_Exam3_Mult4_Flr_1,    !- Zone Name
@@ -29310,7 +29100,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    ER_Trauma2_Flr_1 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ER_Trauma2_Flr_1 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     ER_Trauma2_Flr_1,        !- Zone Name
@@ -29322,7 +29112,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    ER_Triage_Mult4_Flr_1 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     ER_Triage_Mult4_Flr_1 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     ER_Triage_Mult4_Flr_1,   !- Zone Name
@@ -29334,7 +29124,7 @@
     WaterUse,                !- End-Use Subcategory
     2.11111111111111E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    OR1_Flr_2 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     OR1_Flr_2 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     OR1_Flr_2,               !- Zone Name
@@ -29346,7 +29136,7 @@
     WaterUse,                !- End-Use Subcategory
     2.11111111111111E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    OR2_Mult5_Flr_2 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     OR2_Mult5_Flr_2 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     OR2_Mult5_Flr_2,         !- Zone Name
@@ -29358,7 +29148,7 @@
     WaterUse,                !- End-Use Subcategory
     2.11111111111111E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    OR3_Flr_2 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     OR3_Flr_2 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     OR3_Flr_2,               !- Zone Name
@@ -29370,7 +29160,7 @@
     WaterUse,                !- End-Use Subcategory
     6.30555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    OR4_Flr_2 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     OR4_Flr_2 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     OR4_Flr_2,               !- Zone Name
@@ -29382,7 +29172,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom1_Mult10_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom1_Mult10_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom1_Mult10_Flr_3,   !- Zone Name
@@ -29394,7 +29184,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom2_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom2_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom2_Flr_3,          !- Zone Name
@@ -29406,7 +29196,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom3_Mult10_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom3_Mult10_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom3_Mult10_Flr_3,   !- Zone Name
@@ -29418,7 +29208,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom4_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom4_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom4_Flr_3,          !- Zone Name
@@ -29430,7 +29220,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom5_Mult10_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom5_Mult10_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom5_Mult10_Flr_3,   !- Zone Name
@@ -29442,7 +29232,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    PhysTherapy_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PhysTherapy_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PhysTherapy_Flr_3,       !- Zone Name
@@ -29454,7 +29244,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom6_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom6_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom6_Flr_3,          !- Zone Name
@@ -29466,7 +29256,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom7_Mult10_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom7_Mult10_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom7_Mult10_Flr_3,   !- Zone Name
@@ -29478,7 +29268,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom8_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom8_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom8_Flr_3,          !- Zone Name
@@ -29490,7 +29280,7 @@
     WaterUse,                !- End-Use Subcategory
     2.11111111111111E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Lab_Flr_3 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Lab_Flr_3 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Lab_Flr_3,               !- Zone Name
@@ -29502,7 +29292,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom1_Mult10_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom1_Mult10_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom1_Mult10_Flr_4,   !- Zone Name
@@ -29514,7 +29304,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom2_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom2_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom2_Flr_4,          !- Zone Name
@@ -29526,7 +29316,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom3_Mult10_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom3_Mult10_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom3_Mult10_Flr_4,   !- Zone Name
@@ -29538,7 +29328,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom4_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom4_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom4_Flr_4,          !- Zone Name
@@ -29550,7 +29340,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom5_Mult10_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom5_Mult10_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom5_Mult10_Flr_4,   !- Zone Name
@@ -29562,7 +29352,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    Radiology_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Radiology_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Radiology_Flr_4,         !- Zone Name
@@ -29574,7 +29364,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom6_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom6_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom6_Flr_4,          !- Zone Name
@@ -29586,7 +29376,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom7_Mult10_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom7_Mult10_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom7_Mult10_Flr_4,   !- Zone Name
@@ -29598,7 +29388,7 @@
     WaterUse,                !- End-Use Subcategory
     1.05555555555556E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    PatRoom8_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     PatRoom8_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     PatRoom8_Flr_4,          !- Zone Name
@@ -29610,7 +29400,7 @@
     WaterUse,                !- End-Use Subcategory
     2.11111111111111E-6,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Lab_Flr_4 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Lab_Flr_4 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Lab_Flr_4,               !- Zone Name
@@ -29622,7 +29412,7 @@
     WaterUse,                !- End-Use Subcategory
     6.059182e-5,             !- Peak Flow Rate {m3/s}
     BLDG_SWH_EXTD_SCH,       !- Flow Rate Fraction Schedule Name
-    Kitchen_Flr_5 sub cat Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Kitchen_Flr_5 sub catHot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Kitchen_Flr_5,           !- Zone Name

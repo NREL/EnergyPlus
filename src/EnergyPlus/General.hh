@@ -121,7 +121,7 @@ namespace General {
         static_assert(std::is_invocable_v<decltype(f), EnergyPlusData &, Real64, const Payload &>,
                       "Function passed in (f) cannot be called with the Payload (Par) passed in, the expected types do not match.");
 
-        Real64 const SMALL(1.e-10);
+        Real64 constexpr SMALL(1.e-10);
 
         Real64 X0;       // present 1st bound
         Real64 X1;       // present 2nd bound

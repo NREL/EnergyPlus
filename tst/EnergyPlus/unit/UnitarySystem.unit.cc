@@ -140,7 +140,7 @@ protected:
         int maxEquipCount = 1;
         state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = maxEquipCount;
         state->dataZoneEquip->ZoneEquipList(1).EquipType.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
-        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
+        state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipName.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes);
         state->dataZoneEquip->ZoneEquipList(1).EquipIndex = 1;
@@ -151,7 +151,7 @@ protected:
         state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = "UNITARY SYSTEM MODEL";
         state->dataZoneEquip->ZoneEquipList(1).CoolingPriority(1) = 1;
         state->dataZoneEquip->ZoneEquipList(1).HeatingPriority(1) = 1;
-        state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
+        state->dataZoneEquip->ZoneEquipList(1).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
         state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = NumNodes;
         state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(NumNodes);
         state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(NumNodes);
@@ -16072,6 +16072,32 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     EXPECT_NEAR(thisSys->m_CycRatio, 1.000, 0.001);
     // EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.001);
+    EXPECT_NEAR(sensOut, -11998.0, 210.0);
+
+    // test EMS override
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.12, 0.01);
+    EXPECT_EQ(thisSys->m_NumOfSpeedCooling, 2);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
+
+    thisSys->m_EMSOverrideCoilSpeedNumOn = true;
+    thisSys->m_EMSOverrideCoilSpeedNumValue = 1.12;
+    state->dataGlobal->DoCoilDirectSolutions = false;
+    thisSys->simulate(*state,
+                      thisSys->Name,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatActive,
+                      CoolActive,
+                      ZoneOAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipment,
+                      sensOut,
+                      latOut);
+    EXPECT_NEAR(thisSys->m_CycRatio, 1.00, 0.01);
+    EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.01);
+    EXPECT_NEAR(thisSys->m_CoolingSpeedRatio, 0.12, 0.01);
+    EXPECT_EQ(thisSys->m_CoolingSpeedNum, 2);
     EXPECT_NEAR(sensOut, -11998.0, 210.0);
 
     // coil cost estimates

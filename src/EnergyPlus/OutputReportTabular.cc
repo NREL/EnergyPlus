@@ -1743,8 +1743,8 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->sourceTypeNames(6) = "FuelOilNo1";
         ort->sourceTypeNames(7) = "FuelOilNo2";
         ort->sourceTypeNames(8) = "Propane";
-        ort->sourceTypeNames(9) = "PurchasedElectric";
-        ort->sourceTypeNames(10) = "SoldElectric";
+        ort->sourceTypeNames(9) = "PurchasedElectricity";
+        ort->sourceTypeNames(10) = "SoldElectricity";
         ort->sourceTypeNames(11) = "OtherFuel1";
         ort->sourceTypeNames(12) = "OtherFuel2";
 
@@ -4046,8 +4046,8 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
     //          sourceTypeNames(6)='FuelOilNo1'
     //          sourceTypeNames(7)='FuelOilNo2'
     //          sourceTypeNames(8)='Propane'
-    //          sourceTypeNames(9)='PurchasedElectric'
-    //          sourceTypeNames(10)='SoldElectric'
+    //          sourceTypeNames(9)='PurchasedElectricity'
+    //          sourceTypeNames(10)='SoldElectricity'
     //          sourceTypeNames(11)='OtherFuel1'
     //          sourceTypeNames(12)='OtherFuel2'
 
@@ -4444,7 +4444,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Water heater and thermal storage
     auto &WaterThermalTank(state.dataWaterThermalTanks->WaterThermalTank);
     for (int iTank = 1; iTank <= state.dataWaterThermalTanks->numWaterThermalTank; ++iTank) {
-        if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTempEnum::OutsideAir) {
+        if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::WTTAmbientTemp::OutsideAir) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
         }
     }

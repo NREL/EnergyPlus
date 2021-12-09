@@ -124,7 +124,7 @@ using namespace GroundTemperatureManager;
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
-constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
+static constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
 

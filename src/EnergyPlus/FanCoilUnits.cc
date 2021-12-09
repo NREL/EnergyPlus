@@ -709,7 +709,7 @@ namespace FanCoilUnits {
                        state.dataFanCoilUnits->ATMixerOutNode,
                        FanCoil(FanCoilNum).AirOutNode);
             FanCoil(FanCoilNum).ControlZoneNum =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::FanCoil4Pipe_Num, FanCoil(FanCoilNum).Name);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::FanCoil4Pipe, FanCoil(FanCoilNum).Name);
             if (FanCoil(FanCoilNum).ControlZoneNum == 0) {
                 ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                 ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
@@ -1121,7 +1121,6 @@ namespace FanCoilUnits {
         // Using/Aliasing
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::FanCoil4Pipe_Num;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1161,11 +1160,12 @@ namespace FanCoilUnits {
 
         if (allocated(ZoneComp)) {
             if (state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(FanCoil4Pipe_Num).ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName = FanCoil(FanCoilNum).AvailManagerListName;
-                ZoneComp(FanCoil4Pipe_Num).ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName =
+                    FanCoil(FanCoilNum).AvailManagerListName;
+                ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ZoneNum;
                 state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum) = false;
             }
-            FanCoil(FanCoilNum).AvailStatus = ZoneComp(FanCoil4Pipe_Num).ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
+            FanCoil(FanCoilNum).AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
         }
 
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {

@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -161,7 +162,7 @@ namespace ZonePlenum {
 
     void SimAirZonePlenum(EnergyPlusData &state,
                           std::string_view CompName,
-                          int const iCompType,
+                          DataZoneEquipment::AirLoopHVAC const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
                           Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check

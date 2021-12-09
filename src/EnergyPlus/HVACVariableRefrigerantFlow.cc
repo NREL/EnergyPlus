@@ -5888,7 +5888,6 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
     using DataSizing::AutoSize;
     using DataZoneEquipment::CheckZoneEquipmentList;
-    using DataZoneEquipment::VRFTerminalUnit_Num;
     using Fans::GetFanVolFlow;
     using FluidProperties::GetDensityGlycol;
 
@@ -5990,13 +5989,13 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
         if (state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum)) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailManagerListName =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).AvailManagerListName =
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).ZoneNum = ZoneNum;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).ZoneNum = ZoneNum;
             state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum) = false;
         }
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus =
-            state.dataHVACGlobal->ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
     }
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
@@ -6266,7 +6265,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             EquipList_exit:;
                 if (ctrlZoneNum > 0) {
                     int inletNodeADUNum = 0;
-                    int sysType_Num = 0;
+                    DataZoneEquipment::ZoneEquip sysType_Num = DataZoneEquipment::ZoneEquip::Unassigned;
                     std::string sysName = "";
                     for (int inletNode = 1; inletNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; inletNode++) {
                         if (state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(inletNode) !=
@@ -6274,7 +6273,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             continue;
                         inletNodeADUNum = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeADUNum(inletNode);
                         if (inletNodeADUNum > 0 && inletNodeADUNum <= state.dataDefineEquipment->NumAirDistUnits) {
-                            sysType_Num = DataZoneEquipment::AirDistUnit_Num;
+                            sysType_Num = DataZoneEquipment::ZoneEquip::AirDistUnit;
                             sysName = state.dataDefineEquipment->AirDistUnit(inletNodeADUNum).Name;
                             break;
                         }
@@ -6286,7 +6285,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                  state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex).NumOfEquipTypes;
                                  ++EquipNum) {
                                 if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
-                                         .EquipType_Num(EquipNum) != sysType_Num) ||
+                                         .EquipTypeEnum(EquipNum) != sysType_Num) ||
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                             .EquipName(EquipNum) != sysName)
                                     continue;
@@ -10223,7 +10222,6 @@ void SetAverageAirFlow(EnergyPlusData &state,
     // Set the average air mass flow rates using the part load fraction of the heat pump for this time step
     // Set OnOffAirFlowRatio to be used by DX coils
 
-    using DataZoneEquipment::VRFTerminalUnit_Num;
     using ScheduleManager::GetCurrentScheduleValue;
 
     int InletNode;                   // inlet node number
@@ -15588,8 +15586,8 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
 
     // Locals
     // subroutine parameter definitions:
-    int constexpr MaxIte(500); // Maximum number of iterations for solver
-    Real64 const Acc(1.e-3);   // Accuracy of solver result
+    int constexpr MaxIte(500);   // Maximum number of iterations for solver
+    Real64 constexpr Acc(1.e-3); // Accuracy of solver result
 
     // local variable declaration:
     std::vector<Real64> Par; // Parameter array passed to solver
