@@ -885,8 +885,8 @@ bool CalcdoLoadComponentPulseNow(EnergyPlusData &state,
     // This needs to be done not just on the first day of a simulation because when the user picks a design day derived from
     // an attached weather file the design day is not necessarily the first day of the simulation.
 
-    int const HourDayToPulse(10);
-    int const TimeStepToPulse(1);
+    int constexpr HourDayToPulse(10);
+    int constexpr TimeStepToPulse(1);
 
     if ((isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
         ((KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) || (state.dataGlobal->DayOfSim == 1))) {
@@ -2356,18 +2356,8 @@ void GetOARequirements(EnergyPlusData &state)
 
             state.dataSize->OARequirements(OAIndex).Name = Alphas(1);
 
-            ProcessInputOARequirements(state,
-                                       CurrentModuleObject,
-                                       OAIndex,
-                                       Alphas,
-                                       NumAlphas,
-                                       Numbers,
-                                       NumNumbers,
-                                       lNumericBlanks,
-                                       lAlphaBlanks,
-                                       cAlphaFields,
-                                       cNumericFields,
-                                       ErrorsFound);
+            ProcessInputOARequirements(
+                state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
         }
 
         Alphas.deallocate();
@@ -2422,6 +2412,10 @@ void GetOARequirements(EnergyPlusData &state)
                             ErrorsFound = true;
                         }
                     }
+                } else {
+                    ShowSevereError(state, std::string(RoutineName) + cCurrentModuleObject2 + "=" + thisOAReq.Name + " is empty.");
+                    ShowContinueError(state, "At least one pair of Space Name and Space Design Specification Outdoor Air Object Name is required.");
+                    ErrorsFound = true;
                 }
             }
 
@@ -2439,11 +2433,9 @@ void ProcessInputOARequirements(EnergyPlusData &state,
                                 int &NumAlphas,
                                 Array1D<Real64> const &Numbers,
                                 int &NumNumbers,
-                                [[maybe_unused]] Array1D_bool const &lNumericBlanks, // Unused
                                 Array1D_bool const &lAlphaBlanks,
                                 Array1D_string const &cAlphaFields,
-                                [[maybe_unused]] Array1D_string const &cNumericFields, // Unused
-                                bool &ErrorsFound                                      // If errors found in input
+                                bool &ErrorsFound // If errors found in input
 )
 {
 

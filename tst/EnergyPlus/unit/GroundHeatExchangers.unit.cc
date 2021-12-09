@@ -1298,7 +1298,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UHF)
 
     thisGLHE.calcGFunctions(*state);
 
-    Real64 const tolerance = 0.1;
+    Real64 constexpr tolerance = 0.1;
 
     // Test g-function values from GLHEPro
     EXPECT_NEAR(thisGLHE.interpGFunc(-11.939864), 0.37, tolerance);
@@ -1652,7 +1652,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UBHWT)
 
     thisGLHE.calcGFunctions(*state);
 
-    Real64 const tolerance = 0.1;
+    Real64 constexpr tolerance = 0.1;
 
     // Test g-function values from GLHEPro
     EXPECT_NEAR(thisGLHE.interpGFunc(-11.939864), 0.37, tolerance);
@@ -1745,7 +1745,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_re
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     EXPECT_NEAR(thisGLHE.calcPipeConductionResistance(), 0.082204, tolerance);
 }
@@ -1809,7 +1809,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor)
 
     Real64 reynoldsNum;
 
-    Real64 const tolerance = 0.000001;
+    Real64 constexpr tolerance = 0.000001;
 
     // laminar tests
     reynoldsNum = 100;
@@ -2133,7 +2133,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     Real64 rho = 999.380058; // Density at 13 C using CoolProp
     thisGLHE.massFlowRate = thisGLHE.designFlow * rho;
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     // Turbulent
     EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(*state), 0.004453, tolerance);
@@ -2438,7 +2438,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     Real64 rho = 999.380058; // Density at 13 C using CoolProp
     thisGLHE.massFlowRate = thisGLHE.designFlow * rho;
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     EXPECT_NEAR(thisGLHE.calcPipeResistance(*state), 0.082204 + 0.004453, tolerance);
 }
@@ -2732,7 +2732,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
     EXPECT_NEAR(thisGLHE.theta_1, 0.33333, tolerance);
@@ -3031,7 +3031,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
     EXPECT_NEAR(thisGLHE.theta_1, 0.44444, tolerance);
@@ -3330,7 +3330,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
     EXPECT_NEAR(thisGLHE.theta_1, 0.37037, tolerance);
@@ -3629,7 +3629,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
     EXPECT_NEAR(thisGLHE.theta_1, 0.33333, tolerance);
@@ -3928,7 +3928,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
     EXPECT_NEAR(thisGLHE.theta_1, 0.166667, tolerance);
@@ -4227,7 +4227,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
-    Real64 const tolerance = 0.00001;
+    Real64 constexpr tolerance = 0.00001;
 
     // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
     EXPECT_NEAR(thisGLHE.theta_1, 0.37037, tolerance);

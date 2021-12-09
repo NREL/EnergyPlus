@@ -110,8 +110,8 @@ void GASSES90(EnergyPlusData &state,
     Real64 phikup;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const ENpressure(1.0e5); // Gap gas pressure (Pa)
-    Real64 const gaslaw(8314.51);   // Molar gas constant (J/kMol-K)
+    Real64 constexpr ENpressure(1.0e5); // Gap gas pressure (Pa)
+    Real64 constexpr gaslaw(8314.51);   // Molar gas constant (J/kMol-K)
 
     //!! Body of GASSES90
 

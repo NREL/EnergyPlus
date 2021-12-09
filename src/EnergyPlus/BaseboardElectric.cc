@@ -169,14 +169,13 @@ namespace BaseboardElectric {
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
-        using DataZoneEquipment::BBElectricConvective_Num;
         using GlobalNames::VerifyUniqueBaseboardName;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
-        int const iHeatCAPMAlphaNum(3);                                       // get input index to baseboard heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(1);                           // get input index to baseboard heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(2);                     // get input index to baseboard heating capacity per floor area sizing
+        int constexpr iHeatCAPMAlphaNum(3);                                   // get input index to baseboard heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(1);                       // get input index to baseboard heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(2);                 // get input index to baseboard heating capacity per floor area sizing
         int const iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to baseboard heating capacity sizing as fraction of autozized heating capacity
 
@@ -338,7 +337,8 @@ namespace BaseboardElectric {
 
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++ZoneEquipTypeNum) {
-                        if (state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType_Num(ZoneEquipTypeNum) == BBElectricConvective_Num &&
+                        if (state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeEnum(ZoneEquipTypeNum) ==
+                                DataZoneEquipment::ZoneEquip::BBElectricConvective &&
                             state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipName) {
                             thisBaseboard.ZonePtr = CtrlZone;
                         }

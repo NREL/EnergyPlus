@@ -75,9 +75,6 @@ namespace DataPlant {
     // Using/Aliasing
     using DataLoopNode::SensedNodeFlagValue;
 
-    constexpr int LoadRangeBasedMin(0);
-    constexpr int LoadRangeBasedMax(2);
-
     // Criteria percentage limits for determining re-simulation of connected loop sides
     constexpr Real64 CriteriaDelta_MassFlowRate(0.001);
     constexpr Real64 CriteriaDelta_Temperature(0.010);
@@ -92,136 +89,217 @@ namespace DataPlant {
     constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     constexpr Real64 DeltaTempTol(0.0001); // minimum significant loop temperature difference
 
-    constexpr std::string_view cPressureSimType(DataPlant::iPressSimType const &d)
-    {
-        switch (d) {
-        case DataPlant::iPressSimType::NoPressure:
-            return "NONE";
-        case DataPlant::iPressSimType::PumpPowerCorrection:
-            return "PUMPPOWERCORRECTION";
-        case DataPlant::iPressSimType::FlowCorrection:
-            return "LOOPFLOWCORRECTION";
-        case DataPlant::iPressSimType::FlowSimulation:
-            return "PRESSURESIMULATION";
-        default:
-            assert(false);
-            return "";
-        }
-    }
-
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    constexpr int NumSimPlantEquipTypes(96);
-    extern Array1D_string const SimPlantEquipTypes;
-    extern Array1D_string const ccSimPlantEquipTypes;
-    extern Array1D<LoopType> const ValidLoopEquipTypes;
 
-    constexpr int TypeOf_Other(-1);
-    constexpr int TypeOf_Boiler_Simple(1);
-    constexpr int TypeOf_Boiler_Steam(2);
-    constexpr int TypeOf_Chiller_Absorption(3);          // older BLAST absorption chiller
-    constexpr int TypeOf_Chiller_Indirect_Absorption(4); // revised absorption chiller
-    constexpr int TypeOf_Chiller_CombTurbine(5);
-    constexpr int TypeOf_Chiller_ConstCOP(6);
-    constexpr int TypeOf_Chiller_DFAbsorption(7);
-    constexpr int TypeOf_Chiller_Electric(8); // basic BLAST Chiller
-    constexpr int TypeOf_Chiller_ElectricEIR(9);
-    constexpr int TypeOf_Chiller_ElectricReformEIR(10);
-    constexpr int TypeOf_Chiller_EngineDriven(11);
-    constexpr int TypeOf_CoolingTower_SingleSpd(12);
-    constexpr int TypeOf_CoolingTower_TwoSpd(13);
-    constexpr int TypeOf_CoolingTower_VarSpd(14);
-    constexpr int TypeOf_Generator_FCExhaust(15);
-    constexpr int TypeOf_HeatPumpWtrHeaterPumped(16);
-    constexpr int TypeOf_HPWaterEFCooling(17);
-    constexpr int TypeOf_HPWaterEFHeating(18);
-    constexpr int TypeOf_HPWaterPECooling(19);
-    constexpr int TypeOf_HPWaterPEHeating(20);
-    constexpr int TypeOf_Pipe(21);
-    constexpr int TypeOf_PipeSteam(22);
-    constexpr int TypeOf_PipeExterior(23);
-    constexpr int TypeOf_PipeInterior(24);
-    constexpr int TypeOf_PipeUnderground(25);
-    constexpr int TypeOf_PurchChilledWater(26);
-    constexpr int TypeOf_PurchHotWater(27);
-    constexpr int TypeOf_TS_IceDetailed(28);
-    constexpr int TypeOf_TS_IceSimple(29);
-    constexpr int TypeOf_ValveTempering(30);
-    constexpr int TypeOf_WtrHeaterMixed(31);
-    constexpr int TypeOf_WtrHeaterStratified(32);
-    constexpr int TypeOf_PumpVariableSpeed(33);
-    constexpr int TypeOf_PumpConstantSpeed(34);
-    constexpr int TypeOf_PumpCondensate(35);
-    constexpr int TypeOf_PumpBankVariableSpeed(36);
-    constexpr int TypeOf_PumpBankConstantSpeed(37);
-    constexpr int TypeOf_WaterUseConnection(38);
-    constexpr int TypeOf_CoilWaterCooling(39);             // demand side component
-    constexpr int TypeOf_CoilWaterDetailedFlatCooling(40); // demand side component
-    constexpr int TypeOf_CoilWaterSimpleHeating(41);       // demand side component
-    constexpr int TypeOf_CoilSteamAirHeating(42);          // demand side component
-    constexpr int TypeOf_SolarCollectorFlatPlate(43);      // demand side component
-    constexpr int TypeOf_PlantLoadProfile(44);             // demand side component
-    constexpr int TypeOf_GrndHtExchgSystem(45);
-    constexpr int TypeOf_GrndHtExchgSurface(46);
-    constexpr int TypeOf_GrndHtExchgPond(47);
-    constexpr int TypeOf_Generator_MicroTurbine(48); // newer FSEC turbine
-    constexpr int TypeOf_Generator_ICEngine(49);
-    constexpr int TypeOf_Generator_CTurbine(50); // older BLAST turbine
-    constexpr int TypeOf_Generator_MicroCHP(51);
-    constexpr int TypeOf_Generator_FCStackCooler(52);
-    constexpr int TypeOf_FluidCooler_SingleSpd(53);
-    constexpr int TypeOf_FluidCooler_TwoSpd(54);
-    constexpr int TypeOf_EvapFluidCooler_SingleSpd(55);
-    constexpr int TypeOf_EvapFluidCooler_TwoSpd(56);
-    constexpr int TypeOf_ChilledWaterTankMixed(57);
-    constexpr int TypeOf_ChilledWaterTankStratified(58);
-    constexpr int TypeOf_PVTSolarCollectorFlatPlate(59);
-    constexpr int TypeOf_Baseboard_Conv_Water(60);
-    constexpr int TypeOf_Baseboard_Rad_Conv_Steam(61);
-    constexpr int TypeOf_Baseboard_Rad_Conv_Water(62);
-    constexpr int TypeOf_LowTempRadiant_VarFlow(63);
-    constexpr int TypeOf_LowTempRadiant_ConstFlow(64);
-    constexpr int TypeOf_CooledBeamAirTerminal(65);
-    constexpr int TypeOf_CoilWAHPHeatingEquationFit(66);
-    constexpr int TypeOf_CoilWAHPCoolingEquationFit(67);
-    constexpr int TypeOf_CoilWAHPHeatingParamEst(68);
-    constexpr int TypeOf_CoilWAHPCoolingParamEst(69);
-    constexpr int TypeOf_RefrigSystemWaterCondenser(70);
-    constexpr int TypeOf_RefrigerationWaterCoolRack(71);
-    constexpr int TypeOf_MultiSpeedHeatPumpRecovery(72);
-    constexpr int TypeOf_Chiller_ExhFiredAbsorption(73);
-    constexpr int TypeOf_PipingSystemPipeCircuit(74);
-    constexpr int TypeOf_SolarCollectorICS(75);
-    constexpr int TypeOf_CoilVSWAHPHeatingEquationFit(76);
-    constexpr int TypeOf_CoilVSWAHPCoolingEquationFit(77);
-    constexpr int TypeOf_PlantComponentUserDefined(78);
-    constexpr int TypeOf_CoilUserDefined(79);
-    constexpr int TypeOf_ZoneHVACAirUserDefined(80);
-    constexpr int TypeOf_AirTerminalUserDefined(81);
-    constexpr int TypeOf_HeatPumpVRF(82);
-    constexpr int TypeOf_GrndHtExchgHorizTrench(83);
-    constexpr int TypeOf_FluidToFluidPlantHtExchg(84);
-    constexpr int TypeOf_WaterSource(85);
-    constexpr int TypeOf_CentralGroundSourceHeatPump(86);
-    constexpr int TypeOf_UnitarySysRecovery(87);
-    constexpr int TypeOf_PackagedTESCoolingCoil(88);
-    constexpr int TypeOf_CoolingTower_VarSpdMerkel(89);
-    constexpr int TypeOf_SwimmingPool_Indoor(90);
-    constexpr int TypeOf_GrndHtExchgSlinky(91);
-    constexpr int TypeOf_HeatPumpWtrHeaterWrapped(92);
-    constexpr int TypeOf_FourPipeBeamAirTerminal(93);
-    constexpr int TypeOf_CoolingPanel_Simple(94);
-    constexpr int TypeOf_HeatPumpEIRCooling(95);
-    constexpr int TypeOf_HeatPumpEIRHeating(96);
+    static constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNames{
+        "Boiler:HotWater",
+        "Boiler:Steam",
+        "Chiller:Absorption",
+        "Chiller:Absorption:Indirect",
+        "Chiller:CombustionTurbine",
+        "Chiller:ConstantCOP",
+        "ChillerHeater:Absorption:DirectFired",
+        "Chiller:Electric",
+        "Chiller:Electric:EIR",
+        "Chiller:Electric:ReformulatedEIR",
+        "Chiller:EngineDriven",
+        "CoolingTower:SingleSpeed",
+        "CoolingTower:TwoSpeed",
+        "CoolingTower:VariableSpeed",
+        "Generator:Fuelcell:ExhaustGastoWaterHeatExchanger",
+        "WaterHeater:HeatPump:PumpedCondenser",
+        "Heatpump:WatertoWater:Equationfit:Cooling",
+        "Heatpump:WatertoWater:Equationfit:Heating",
+        "Heatpump:WatertoWater:ParameterEstimation:Cooling",
+        "Heatpump:WatertoWater:ParameterEstimation:Heating",
+        "Pipe:Adiabatic",
+        "Pipe:Adiabatic:Steam",
+        "Pipe:Outdoor",
+        "Pipe:Indoor",
+        "Pipe:Underground",
+        "DistrictCooling",
+        "DistrictHeating",
+        "ThermalStorage:Ice:Detailed",
+        "ThermalStorage:Ice:Simple",
+        "TemperingValve",
+        "WaterHeater:Mixed",
+        "WaterHeater:Stratified",
+        "Pump:VariableSpeed",
+        "Pump:ConstantSpeed",
+        "Pump:VariableSpeed:Condensate",
+        "HeaderedPumps:VariableSpeed",
+        "HeaderedPumps:ConstantSpeed",
+        "WaterUse:Connections",
+        "Coil:Cooling:Water",
+        "Coil:Cooling:Water:DetailedGeometry",
+        "Coil:Heating:Water",
+        "Coil:Heating:Steam",
+        "Solarcollector:Flatplate:Water",
+        "LoadProfile:Plant",
+        "GroundHeatExchanger:System",
+        "GroundHeatExchanger:Surface",
+        "GroundHeatExchanger:Pond",
+        "Generator:Microturbine",
+        "Generator:InternalCombustionEngine",
+        "Generator:CombustionTurbine",
+        "Generator:Microchp",
+        "Generator:Fuelcell:StackCooler",
+        "FluidCooler:SingleSpeed",
+        "FluidCooler:TwoSpeed",
+        "EvaporativeFluidCooler:SingleSpeed",
+        "EvaporativeFluidCooler:TwoSpeed",
+        "ThermalStorage:ChilledWater:Mixed",
+        "ThermalStorage:ChilledWater:Stratified",
+        "SolarCollector:FlatPlate:PhotovoltaicThermal",
+        "ZoneHVAC:Baseboard:Convective:Water",
+        "ZoneHVAC:Baseboard:RadiantConvective:Steam",
+        "ZoneHVAC:Baseboard:RadiantConvective:Water",
+        "ZoneHVAC:LowTemperatureRadiant:VariableFlow",
+        "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
+        "AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
+        "Coil:Heating:WaterToAirHeatPump:EquationFit",
+        "Coil:Cooling:WaterToAirHeatPump:EquationFit",
+        "Coil:Heating:WaterToAirHeatPump:ParameterEstimation",
+        "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation",
+        "Refrigeration:Condenser:WaterCooled",
+        "Refrigeration:CompressorRack",
+        "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed",
+        "ChillerHeater:Absorption:DoubleEffect",
+        "PipingSystem:Underground:PipeCircuit",
+        "SolarCollector:IntegralCollectorStorage",
+        "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit",
+        "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit",
+        "PlantComponent:UserDefined",
+        "Coil:UserDefined",
+        "ZoneHVAC:ForcedAir:UserDefined",
+        "AirTerminal:SingleDuct:UserDefined",
+        "AirConditioner:VariableRefrigerantFlow",
+        "GroundHeatExchanger:HorizontalTrench",
+        "HeatExchanger:FluidToFluid",
+        "PlantComponent:TemperatureSource",
+        "CentralHeatPumpSystem",
+        "AirLoopHVAC:UnitarySystem",
+        "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+        "CoolingTower:VariableSpeed:Merkel",
+        "SwimmingPool:Indoor",
+        "GroundHeatExchanger:Slinky",
+        "WaterHeater:HeatPump:WrappedCondenser",
+        "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
+        "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
+        "HeatPump:PlantLoop:EIR:Cooling",
+        "HeatPump:PlantLoop:EIR:Heating"};
 
-    extern Array1D<Real64> const ConvergenceHistoryARR;
+    static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
+        "BOILER:HOTWATER",
+        "BOILER:STEAM",
+        "CHILLER:ABSORPTION",
+        "CHILLER:ABSORPTION:INDIRECT",
+        "CHILLER:COMBUSTIONTURBINE",
+        "CHILLER:CONSTANTCOP",
+        "CHILLERHEATER:ABSORPTION:DIRECTFIRED",
+        "CHILLER:ELECTRIC",
+        "CHILLER:ELECTRIC:EIR",
+        "CHILLER:ELECTRIC:REFORMULATEDEIR",
+        "CHILLER:ENGINEDRIVEN",
+        "COOLINGTOWER:SINGLESPEED",
+        "COOLINGTOWER:TWOSPEED",
+        "COOLINGTOWER:VARIABLESPEED",
+        "GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER",
+        "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",
+        "HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING",
+        "HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING",
+        "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING",
+        "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING",
+        "PIPE:ADIABATIC",
+        "PIPE:ADIABATIC:STEAM",
+        "PIPE:OUTDOOR",
+        "PIPE:INDOOR",
+        "PIPE:UNDERGROUND",
+        "DISTRICTCOOLING",
+        "DISTRICTHEATING",
+        "THERMALSTORAGE:ICE:DETAILED",
+        "THERMALSTORAGE:ICE:SIMPLE",
+        "TEMPERINGVALVE",
+        "WATERHEATER:MIXED",
+        "WATERHEATER:STRATIFIED",
+        "PUMP:VARIABLESPEED",
+        "PUMP:CONSTANTSPEED",
+        "PUMP:VARIABLESPEED:CONDENSATE",
+        "HEADEREDPUMPS:VARIABLESPEED",
+        "HEADEREDPUMPS:CONSTANTSPEED",
+        "WATERUSE:CONNECTIONS",
+        "COIL:COOLING:WATER",
+        "COIL:COOLING:WATER:DETAILEDGEOMETRY",
+        "COIL:HEATING:WATER",
+        "COIL:HEATING:STEAM",
+        "SOLARCOLLECTOR:FLATPLATE:WATER",
+        "LOADPROFILE:PLANT",
+        "GROUNDHEATEXCHANGER:SYSTEM",
+        "GROUNDHEATEXCHANGER:SURFACE",
+        "GROUNDHEATEXCHANGER:POND",
+        "GENERATOR:MICROTURBINE",
+        "GENERATOR:INTERNALCOMBUSTIONENGINE",
+        "GENERATOR:COMBUSTIONTURBINE",
+        "GENERATOR:MICROCHP",
+        "GENERATOR:FUELCELL:STACKCOOLER",
+        "FLUIDCOOLER:SINGLESPEED",
+        "FLUIDCOOLER:TWOSPEED",
+        "EVAPORATIVEFLUIDCOOLER:SINGLESPEED",
+        "EVAPORATIVEFLUIDCOOLER:TWOSPEED",
+        "THERMALSTORAGE:CHILLEDWATER:MIXED",
+        "THERMALSTORAGE:CHILLEDWATER:STRATIFIED",
+        "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL",
+        "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",
+        "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",
+        "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
+        "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",
+        "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW",
+        "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",
+        "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT",
+        "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT",
+        "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
+        "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
+        "REFRIGERATION:CONDENSER:WATERCOOLED",
+        "REFRIGERATION:COMPRESSORRACK",
+        "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED",
+        "CHILLERHEATER:ABSORPTION:DOUBLEEFFECT",
+        "PIPINGSYSTEM:UNDERGROUND:PIPECIRCUIT",
+        "SOLARCOLLECTOR:INTEGRALCOLLECTORSTORAGE",
+        "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
+        "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
+        "PLANTCOMPONENT:USERDEFINED",
+        "COIL:USERDEFINED",
+        "ZONEHVAC:FORCEDAIR:USERDEFINED",
+        "AIRTERMINAL:SINGLEDUCT:USERDEFINED",
+        "AIRCONDITIONER:VARIABLEREFRIGERANTFLOW",
+        "GROUNDHEATEXCHANGER:HORIZONTALTRENCH",
+        "HEATEXCHANGER:FLUIDTOFLUID",
+        "PLANTCOMPONENT:TEMPERATURESOURCE",
+        "CENTRALHEATPUMPSYSTEM",
+        "AIRLOOPHVAC:UNITARYSYSTEM",
+        "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
+        "COOLINGTOWER:VARIABLESPEED:MERKEL",
+        "SWIMMINGPOOL:INDOOR",
+        "GROUNDHEATEXCHANGER:SLINKY",
+        "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER",
+        "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
+        "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
+        "HEATPUMP:PLANTLOOP:EIR:COOLING",
+        "HEATPUMP:PLANTLOOP:EIR:HEATING"};
 
-    // These all are going to be hard coded for now, but when we move to C++20 we will have constexpr methods available to fix this
-    // const Real64 sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
-    // const Real64 square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
-    // const Real64 sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
-    constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
-    constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
-    constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
+    static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
+        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
+        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
+        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant,
+        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
+        LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
+        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant,
+        LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
+        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
+        LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both};
 
 } // namespace DataPlant
 

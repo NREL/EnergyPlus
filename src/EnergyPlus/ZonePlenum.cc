@@ -92,7 +92,7 @@ using Psychrometrics::PsyTdbFnHW;
 
 void SimAirZonePlenum(EnergyPlusData &state,
                       std::string_view CompName,
-                      int const iCompType,
+                      DataZoneEquipment::AirLoopHVAC const iCompType,
                       int &CompIndex,
                       Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
                       Optional_bool_const FirstCall,          // Autodesk:OPTIONAL Used without PRESENT check
@@ -111,10 +111,6 @@ void SimAirZonePlenum(EnergyPlusData &state,
     // return and supply plenums.
     // It is called from the SimAirLoopComponent at the system time step.
 
-    // Using/Aliasing
-    using DataZoneEquipment::ZoneReturnPlenum_Type;
-    using DataZoneEquipment::ZoneSupplyPlenum_Type;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZonePlenumNum; // The ZonePlenum that you are currently loading input into
 
@@ -124,7 +120,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
         state.dataZonePlenum->GetInputFlag = false;
     }
 
-    if (iCompType == ZoneReturnPlenum_Type) { // 'AirLoopHVAC:ReturnPlenum'
+    if (iCompType == DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum) { // 'AirLoopHVAC:ReturnPlenum'
         // Find the correct ZonePlenumNumber
         if (CompIndex == 0) {
             ZonePlenumNum =
@@ -162,7 +158,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
 
         UpdateAirZoneReturnPlenum(state, ZonePlenumNum); // Update the current ZonePlenum to the outlet nodes
 
-    } else if (iCompType == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
+    } else if (iCompType == DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum) { // 'AirLoopHVAC:SupplyPlenum'
         // Find the correct ZonePlenumNumber
         if (CompIndex == 0) {
             ZonePlenumNum =
@@ -1204,7 +1200,7 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
 
     // Using/Aliasing
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
+    Real64 constexpr FlowRateToler(0.01); // Tolerance for mass flow rate convergence (in kg/s)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int OutletNode;

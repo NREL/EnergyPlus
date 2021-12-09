@@ -671,7 +671,7 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                               this->ZoneID,
                               "Generator:MicroCHP",
                               this->Name,
-                              DataHeatBalance::IntGainTypeOf_GeneratorMicroCHP,
+                              DataHeatBalance::IntGainType::GeneratorMicroCHP,
                               &this->A42Model.SkinLossConvect,
                               nullptr,
                               &this->A42Model.SkinLossRadiat);
@@ -691,7 +691,7 @@ void MicroCHPDataStruct::simulate(EnergyPlusData &state,
     PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
-                                                    DataPlant::TypeOf_Generator_MicroCHP,
+                                                    DataPlant::PlantEquipmentType::Generator_MicroCHP,
                                                     this->PlantInletNodeID,
                                                     this->PlantOutletNodeID,
                                                     this->A42Model.QdotHR,
@@ -1528,7 +1528,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_Generator_MicroCHP,
+                                                    DataPlant::PlantEquipmentType::Generator_MicroCHP,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,
@@ -1551,7 +1551,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
                         .LoopSide(this->CWLoopSideNum)
                         .Branch(this->CWBranchNum)
                         .Comp(this->CWCompNum)
-                        .FlowPriority = DataPlant::LoopFlowStatus_TakesWhatGets;
+                        .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                 }
             }
 

@@ -866,7 +866,7 @@ bool CheckNonSingularity(RootFinderDataType const &RootFinderData) // Data used 
     // Safety factor used to detect a singular residual function between the min and max
     // points.
     // NOTE: Requesting exactly the same value is obtained by setting SafetyFactor = 0.0
-    Real64 const SafetyFactor(0.1);
+    Real64 constexpr SafetyFactor(0.1);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 DeltaY; // Difference between min and max Y-values

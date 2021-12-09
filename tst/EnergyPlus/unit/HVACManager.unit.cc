@@ -276,23 +276,31 @@ TEST_F(EnergyPlusFixture, InfiltrationObjectLevelReport)
     EXPECT_NEAR(ZnAirRpt(3).InfilHeatGain, state->dataHeatBal->Infiltration(3).InfilHeatGain, 0.000001); // zone level reporting matches object level
     EXPECT_NEAR(ZnAirRpt(4).InfilHeatGain, state->dataHeatBal->Infiltration(4).InfilHeatGain, 0.000001); // zone level reporting matches object level
 
-    EXPECT_NEAR(
-        ZnAirRpt(1).InfilTotalLoss, state->dataHeatBal->Infiltration(1).InfilTotalLoss, 0.000001); // zone level reporting matches object level
-    EXPECT_NEAR(
-        ZnAirRpt(2).InfilTotalLoss, state->dataHeatBal->Infiltration(2).InfilTotalLoss, 0.000001); // zone level reporting matches object level
-    EXPECT_NEAR(
-        ZnAirRpt(3).InfilTotalLoss, state->dataHeatBal->Infiltration(3).InfilTotalLoss, 0.000001); // zone level reporting matches object level
-    EXPECT_NEAR(
-        ZnAirRpt(4).InfilTotalLoss, state->dataHeatBal->Infiltration(4).InfilTotalLoss, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(1).InfilTotalLoss,
+                state->dataHeatBal->Infiltration(1).InfilTotalLoss,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilTotalLoss,
+                state->dataHeatBal->Infiltration(2).InfilTotalLoss,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilTotalLoss,
+                state->dataHeatBal->Infiltration(3).InfilTotalLoss,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilTotalLoss,
+                state->dataHeatBal->Infiltration(4).InfilTotalLoss,
+                0.000001); // zone level reporting matches object level
 
-    EXPECT_NEAR(
-        ZnAirRpt(1).InfilTotalGain, state->dataHeatBal->Infiltration(1).InfilTotalGain, 0.000001); // zone level reporting matches object level
-    EXPECT_NEAR(
-        ZnAirRpt(2).InfilTotalGain, state->dataHeatBal->Infiltration(2).InfilTotalGain, 0.000001); // zone level reporting matches object level
-    EXPECT_NEAR(
-        ZnAirRpt(3).InfilTotalGain, state->dataHeatBal->Infiltration(3).InfilTotalGain, 0.000001); // zone level reporting matches object level
-    EXPECT_NEAR(
-        ZnAirRpt(4).InfilTotalGain, state->dataHeatBal->Infiltration(4).InfilTotalGain, 0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(1).InfilTotalGain,
+                state->dataHeatBal->Infiltration(1).InfilTotalGain,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(2).InfilTotalGain,
+                state->dataHeatBal->Infiltration(2).InfilTotalGain,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(3).InfilTotalGain,
+                state->dataHeatBal->Infiltration(3).InfilTotalGain,
+                0.000001); // zone level reporting matches object level
+    EXPECT_NEAR(ZnAirRpt(4).InfilTotalGain,
+                state->dataHeatBal->Infiltration(4).InfilTotalGain,
+                0.000001); // zone level reporting matches object level
 
     EXPECT_NEAR(ZnAirRpt(1).InfilMass, state->dataHeatBal->Infiltration(1).InfilMass, 0.000001); // zone level reporting matches object level
     EXPECT_NEAR(ZnAirRpt(2).InfilMass, state->dataHeatBal->Infiltration(2).InfilMass, 0.000001); // zone level reporting matches object level

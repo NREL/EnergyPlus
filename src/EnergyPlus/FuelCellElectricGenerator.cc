@@ -808,7 +808,7 @@ namespace FuelCellElectricGenerator {
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameExhaustHX);
 
             if (thisFuelCell > 0) {
-                state.dataFuelCellElectGen->FuelCell(thisFuelCell).TypeOf = DataPlant::TypeOf_Generator_FCExhaust;
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).Type = DataPlant::PlantEquipmentType::Generator_FCExhaust;
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.Name = AlphArray(1);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterInNodeName = AlphArray(2);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterOutNodeName = AlphArray(3);
@@ -1039,7 +1039,7 @@ namespace FuelCellElectricGenerator {
                     UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameStackCooler);
 
                 if (thisFuelCell > 0) {
-                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).TypeOf = DataPlant::TypeOf_Generator_FCStackCooler;
+                    state.dataFuelCellElectGen->FuelCell(thisFuelCell).Type = DataPlant::PlantEquipmentType::Generator_FCStackCooler;
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).StackCooler.Name = AlphArray(1);
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).StackCooler.WaterInNodeName = AlphArray(2);
 
@@ -1209,7 +1209,7 @@ namespace FuelCellElectricGenerator {
                                   this->FCPM.ZoneID,
                                   "Generator:FuelCell",
                                   this->Name,
-                                  DataHeatBalance::IntGainTypeOf_GeneratorFuelCell,
+                                  DataHeatBalance::IntGainType::GeneratorFuelCell,
                                   &this->Report.SkinLossConvect,
                                   nullptr,
                                   &this->Report.SkinLossRadiat);
@@ -2844,12 +2844,12 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 const A = 29.0373;                                                   // shomate coeff
-        Real64 const B = 10.2573;                                                   // shomate coeff
-        Real64 const C = 2.81048;                                                   // shomate coeff
-        Real64 const D = -0.95914;                                                  // shomate coeff
-        Real64 const E = 0.11725;                                                   // shomate coeff
-        Real64 const F = -250.569;                                                  // shomate coeff
+        Real64 constexpr A = 29.0373;                                               // shomate coeff
+        Real64 constexpr B = 10.2573;                                               // shomate coeff
+        Real64 constexpr C = 2.81048;                                               // shomate coeff
+        Real64 constexpr D = -0.95914;                                              // shomate coeff
+        Real64 constexpr E = 0.11725;                                               // shomate coeff
+        Real64 constexpr F = -250.569;                                              // shomate coeff
         Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
         HGasWater = A * Tsho + B * pow_2(Tsho) / 2.0 + C * pow_3(Tsho) / 3.0 + D * pow_4(Tsho) / 4.0 - E / Tsho + F; //- H
@@ -2873,12 +2873,12 @@ namespace FuelCellElectricGenerator {
         // REFERENCES:
         // NIST Webbook on gas phase thermochemistry
 
-        Real64 const A = -203.606;  // shomate coeff
-        Real64 const B = 1523.29;   // shomate coeff
-        Real64 const C = -3196.413; // shomate coeff
-        Real64 const D = 2474.455;  // shomate coeff
-        Real64 const E = 3.85533;   // shomate coeff
-        Real64 const F = -256.5478; // shomate coeff
+        Real64 constexpr A = -203.606;  // shomate coeff
+        Real64 constexpr B = 1523.29;   // shomate coeff
+        Real64 constexpr C = -3196.413; // shomate coeff
+        Real64 constexpr D = 2474.455;  // shomate coeff
+        Real64 constexpr E = 3.85533;   // shomate coeff
+        Real64 constexpr F = -256.5478; // shomate coeff
 
         Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv) / 1000.0; // temp for Shomate eq  in (Kelvin/1000)
 
@@ -2899,11 +2899,11 @@ namespace FuelCellElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate shomate eq. for pure liquid water
 
-        Real64 const A = -203.606;  // shomate coeff
-        Real64 const B = 1523.29;   // shomate coeff
-        Real64 const C = -3196.413; // shomate coeff
-        Real64 const D = 2474.455;  // shomate coeff
-        Real64 const E = 3.85533;   // shomate coeff
+        Real64 constexpr A = -203.606;  // shomate coeff
+        Real64 constexpr B = 1523.29;   // shomate coeff
+        Real64 constexpr C = -3196.413; // shomate coeff
+        Real64 constexpr D = 2474.455;  // shomate coeff
+        Real64 constexpr E = 3.85533;   // shomate coeff
         Real64 const Tsho = (FluidTemp + DataGlobalConstants::KelvinConv) / 1000.0;
 
         Cp = A + B * Tsho + C * pow_2(Tsho) + D * pow_3(Tsho) + E / pow_2(Tsho);
@@ -3349,11 +3349,11 @@ namespace FuelCellElectricGenerator {
                                 [[maybe_unused]] Real64 &CurLoad,
                                 [[maybe_unused]] bool RunFlag)
     {
-        if (this->TypeOf == DataPlant::TypeOf_Generator_FCStackCooler) {
+        if (this->Type == DataPlant::PlantEquipmentType::Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->CWLoopNum,
                                                             this->CWLoopSideNum,
-                                                            DataPlant::TypeOf_Generator_FCStackCooler,
+                                                            DataPlant::PlantEquipmentType::Generator_FCStackCooler,
                                                             this->StackCooler.WaterInNode,
                                                             this->StackCooler.WaterOutNode,
                                                             this->Report.qHX,
@@ -3361,11 +3361,11 @@ namespace FuelCellElectricGenerator {
                                                             this->Report.HeatRecOutletTemp,
                                                             this->Report.HeatRecMdot,
                                                             FirstHVACIteration);
-        } else if (this->TypeOf == DataPlant::TypeOf_Generator_FCExhaust) {
+        } else if (this->Type == DataPlant::PlantEquipmentType::Generator_FCExhaust) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->CWLoopNum,
                                                             this->CWLoopSideNum,
-                                                            DataPlant::TypeOf_Generator_FCExhaust,
+                                                            DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                             this->ExhaustHX.WaterInNode,
                                                             this->ExhaustHX.WaterOutNode,
                                                             this->ExhaustHX.qHX,
@@ -3733,7 +3733,7 @@ namespace FuelCellElectricGenerator {
 
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->NameExhaustHX,
-                                                    DataPlant::TypeOf_Generator_FCExhaust,
+                                                    DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
                                                     this->CWBranchNum,

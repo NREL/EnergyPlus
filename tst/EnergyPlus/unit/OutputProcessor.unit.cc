@@ -76,7 +76,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_TestGetMeteredVariables)
     {
-        int const NumVariables = 2;
+        int constexpr NumVariables = 2;
         Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
         Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
@@ -2824,9 +2824,9 @@ namespace OutputProcessor {
                                                            {"J", "ELECTRICITY", "HEAT RECOVERY FOR HEATING", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "HEATRECOVERYFORHEATING", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "HEATRECOVERYHEATING", "endUseSub", "HVAC"},
-                                                           {"J", "ELECTRICITY", "ELECTRICEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELECTRICITY", "PURCHASEDELECTRICEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELECTRICITY", "SOLDELECTRICEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "ELECTRICITYEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASEDELECTRICITYEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "SOLDELECTRICITYEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "NATURALGASEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "FUELOILNO1EMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "FUELOILNO2EMISSIONS", "endUseSub", "HVAC"},
@@ -2913,12 +2913,12 @@ namespace OutputProcessor {
                                                      "endUseSub:HeatRecoveryForCooling:Electricity",
                                                      "HeatRecoveryForHeating:Electricity",
                                                      "endUseSub:HeatRecoveryForHeating:Electricity",
-                                                     "ElectricEmissions:Electricity",
-                                                     "endUseSub:ElectricEmissions:Electricity",
-                                                     "PurchasedElectricEmissions:Electricity",
-                                                     "endUseSub:PurchasedElectricEmissions:Electricity",
-                                                     "SoldElectricEmissions:Electricity",
-                                                     "endUseSub:SoldElectricEmissions:Electricity",
+                                                     "ElectricityEmissions:Electricity",
+                                                     "endUseSub:ElectricityEmissions:Electricity",
+                                                     "PurchasedElectricityEmissions:Electricity",
+                                                     "endUseSub:PurchasedElectricityEmissions:Electricity",
+                                                     "SoldElectricityEmissions:Electricity",
+                                                     "endUseSub:SoldElectricityEmissions:Electricity",
                                                      "NaturalGasEmissions:Electricity",
                                                      "endUseSub:NaturalGasEmissions:Electricity",
                                                      "FuelOilNo1Emissions:Electricity",
