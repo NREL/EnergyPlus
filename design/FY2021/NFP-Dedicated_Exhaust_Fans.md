@@ -5,7 +5,7 @@ Dedicated Exhaust System for Flexible Exhaust Configurations
 
  - Original Date: July 30, 2021
  - Revised: August 2, 2021, revise and start design
- - Revised: Dec 7, 2021, 
+ - Revised: Dec 9, 2021, 
 
 ## Justification for New Feature ##
 
@@ -50,40 +50,37 @@ The following new objects will be added to specify an exhaust system which serve
 
 ### AirLoopHVAC:ExhaustSystem ###
 
-An AirLoopHVAC:ExhaustSystem defines how the exhaust air goes out from the zone(s). It is similar to a "Return Path", however it includes a central exhaust fan, and the inlets are not limited to zones on a single airloop. The individual zone's exhaust flow is specified in detail as zone equipment. The central exhaust fan outlet node can be the inlet to a heat exchanger.
+An AirLoopHVAC:ExhaustSystem defines how the exhaust air goes out from the zone(s). It is similar to a "Return Path", however it includes a central exhaust fan (Fan:SystemModel type) and a zone mixer (AirLoopHVAC:ZoneMixer type). The outlet of the mixer will be the inlet of the central exhaust fan. The inlets of the mixer will be from the exhaust system outlets (newly added ZoneHVAC:ExhaustControl, to be introduced soon) from one more more zones that are not necessarily belong to the same airloop. The outlet node of the central exhaust fan can furthe served as the the inlet to an energy recovery heat exchanger further downstream.
 
 ```
 AirLoopHVAC:ExhaustSystem,
-    Central Exhaust,            !- Name
+    Central Exhaust 1,            !- Name
     Exhaust Avail List,         !- Availability Manager List Name
+    AirLoopExhaustMixer1,        !- AirLoopHVAC:ZoneMixer Name    
     Fan:SystemModel,            !- Fan Object Type
-    Central Exhaust Fan,        !- Fan Name
-    Zone 1 ExhaustSystem Node,        !- Inlet 1 Node Name
-    Zone 2 ExhaustSystem Node,        !- Inlet 2 Node Name
-    Zone 3 ExhaustSystem Node,        !- Inlet 3 Node Name
-    Zone 4 ExhaustSystem Node;        !- Inlet 4 Node Name
+    CentralExhaustFan1;        !- Fan Name
 ```
 
 The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:COMPONENTMODEL. The older fan models such as Fan:OnOff, Fan:ConstantVolume, or Fan:VariableVolume will not be allowed.
 
-#### Implicit Mixer object similar to AirLoopHVAC:ZoneMixer or AirLoopHVAC:Mixer ####
+#### Expand the usage of the current AirLoopHVAC:ZoneMixer object ####
 
-The new AirLoopHVAC:ExhaustSytem contains an implicit mixer object which will connect the airflows coming through the exhaust inlets and mix them. The mixed air outlet will be the central exhaust fan's inlet node. 
+If the design exhaust flow rate can be obtained someplace else, the existing AirLoopHVAC:ZoneMixer object will be expanded for use in the exhaust system. The originally the AirLoopHVAC:ZoneMixer is only allowed in a return path, or in a PIU like zone equipment. A severe warning would show up if the zone mixer is not used (or referenced) with one of the following objects: AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction. 
 
-**OPTION FOR DISCUSSION:** An alternate approach would be to use a separate AirLoopHVAC:ZoneMixer object and reference it in the the AirloopHVAC:ExhaustSystem object.
+In the current development, the AirLoopHVAC:Mixer will be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust nodes (actually the outlet nodes of the newly developed ZoneHVAC:ExhaustControl object, to be introduced soon below) of one or more zones as inlets, and the outlet node of the mixer will be the inlet node of the central exhaust fan in the AirLoopHVAC:ExhaustSystem. 
 
-### ZoneHVAC:ExhaustSystem ###
+### ZoneHVAC:ExhaustControl ###
 
-Each zone that is connected to an inlet node of an AirLoopHVAC:ExhaustSystem is required to have a ZoneHVAC:ExhaustSystem to describe the zone exhaust connections, design flow rate, and controls. 
+Each zone that is connected to an inlet node of an AirLoopHVAC:ExhaustSystem is required to have a ZoneHVAC:ExhaustControl to describe the zone exhaust connections, design flow rate, and controls. 
 
-A ZoneHVAC:ExhaustSystem object defines a controlled exhaust flow from a zone. The inlet node is a zone exaust node. The outlet node is an inlet to an AirLoopHVAC:ExhaustSystem object. Is it similar to Fan:ZoneExhaust but has additional control options and assumes a central exhaust fan drives the flow, with a damper for flow control.
+A ZoneHVAC:ExhaustControl object defines a controlled exhaust flow from a zone. The inlet node is a zone exaust node. The outlet node is an inlet to an AirLoopHVAC:ExhaustSystem object. It is similar to Fan:ZoneExhaust but has additional control options and assumes a central exhaust fan drives the flow, with a damper for flow control.
 
 One piece of important information about each of the individual zone exhausts is the design flow rate. This will be autosizable with options base on area, outdoor air flow or suppy flow.
 
-**OPTION FOR DISCUSSION:** Should the sizing options for exhaust flow rate be here in the ZoneHVAC:ExhaustSystem object or in Sizing:Zone, or DesignSpeification:OutdoorAir, or ???.
+**OPTION FOR DISCUSSION:** Should the sizing options for exhaust flow rate be here in the ZoneHVAC:ExhaustControl object or in Sizing:Zone, or DesignSpeification:OutdoorAir, or ???.
 
 ```
-ZoneHVAC:ExhaustSystem,
+ZoneHVAC:ExhaustControl,
     Zone2 Exhaust System,           !-Name
     HVACOperationSchd,              !- Availability Schedule Name
     Zone2 Exhaust Node,             !- Inlet Node Name
@@ -97,11 +94,7 @@ ZoneHVAC:ExhaustSystem,
     FlowBalancedSched;              !- Balanced Exhaust Fraction Schedule Name
 ```
 
-#### ZoneHVAC:ExhaustSystem as Zone Equipment ####
-
-The new ZoneHVAC:ExhaustSystem will be simulated as zone equipment, so it must be added to the zone equipment list. 
-
-It is also possible to included multiple ZoneHVAC:ExhaustSystem objects for a single zone, such as mutiple exhaust hoods in a laboratory [4, 5] which may operate on different schedules. 
+It is also possible to included multiple ZoneHVAC:ExhaustControl objects for a single zone, such as mutiple exhaust hoods in a laboratory [4, 5] which may operate on different schedules. 
 
 ### Reporting ###
 
@@ -116,9 +109,8 @@ The following IDD blocks will be added to the Energy+.idd file.
 After the AirLoopHVAC:ReturnPath block:
 ```
 AirLoopHVAC:ExhaustSystem,
-       \extensible:1
        \memo Defines a general exhaust systems with a central exhaust fan drawing from one or more
-       \memo ZoneHVAC:ExhaustSystem outlet nodes.
+       \memo ZoneHVAC:ExhaustControl outlet nodes.
   A1 , \field Name
        \required-field
        \note Name of the exhaust system
@@ -127,34 +119,29 @@ AirLoopHVAC:ExhaustSystem,
        \note If this field is blank, the exhaust system is always available.
        \type object-list
        \object-list SystemAvailabilityManagerLists
-  A3 , \field Fan Object Type
+  A3 , \field AirLoopHVAC:ZoneMixer Name
+       \required-field
+       \note The name of the exhaust system AirLoopHVAC:ZoneMixer
+       \object-list ZoneMixers
+  A4 , \field Fan Object Type
        \required-field
        \type choice
        \key Fan:SystemModel
        \key Fan:ComponentModel
-  A4 , \field Fan Name
+  A5 ; \field Fan Name
        \required-field
        \type object-list
        \object-list FansSystemModel
        \object-list FansComponentModel
-  A5 , \field Inlet 1 Node Name
-       \begin-extensible
-       \required-field
-       \type node
-  A6 , \field Inlet 2 Node Name
-       \type node
-  A7 , \field Inlet 3 Node Name
-       \type node
-  A8 ; \field Inlet 4 Node Name
-       \type node
+
 ```
 
-#### #### IDD Addition for ZoneHVAC:ExhaustSystem ####
+#### #### IDD Addition for ZoneHVAC:ExhaustControl ####
 
 At the end of the `ZoneHVAC Forced Air Units` group (or another position might be at the end of the `Zone HVAC Air Loop Terminal Units` group):
 
 ```
-ZoneHVAC:ExhaustSystem,
+ZoneHVAC:ExhaustControl,
        \memo Defines a controlled exhaust flow from a zone which feeds into 
        \memo an AirloopHVAC:Exhaust system inlet.
   A1 , \field Name
@@ -208,13 +195,13 @@ ZoneHVAC:ExhaustSystem,
 
 ### Air mass and heat balance ###
 
-The exhaust flows from ZoneHVAC:ExhaustSystem will be treated the same as any exhaust flow from a zone. The existing zone and airloop mass balances will work the same as the currently do with Fan:ZoneExhaust. 
+The exhaust flows from ZoneHVAC:ExhaustControl will be treated the same as any exhaust flow from a zone. The existing zone and airloop mass balances will work the same as the currently do with Fan:ZoneExhaust. 
 
 ### Controls and operation modes ###
 
 For the control and operation modes of such an exhaust system, two scenarios will be considered: 
 
-1. The first scenario will cover the mode where the central exhaust flow will be driven by the upstream airflow rates; in this case the exhaust system main flow will be determined by the individual ZoneHVAC:ExhaustSystem flow rates and fraction schedules.
+1. The first scenario will cover the mode where the central exhaust flow will be driven by the upstream airflow rates; in this case the exhaust system main flow will be determined by the individual ZoneHVAC:ExhaustControl flow rates and fraction schedules.
 
 2. The second operation mode would consider that the exhaust fan can operate at a given flow rate, while the upstream zones may need re-balancing if one or more upstream zone exhausts are not actively controlled. In this scenario, the exhaust system will impact the upstream zone exhaust flow rate and a re-balancing scheme will be need to re-balance the exhaust flow rate at the upstream exhaust nodes.
 
@@ -243,7 +230,7 @@ Since the feature is based on completely newly added blocks, an older version wo
 
 The proposed new feature development will add the following contents to the Input Output Reference document:
 
-The AirLoopHVAC:ExhaustSystem and ZoneHVAC:ExhaustSystem objects are used to describe the way that the exhaust air streams are configured. These objects provide a way for the exhaust air streams from multiple zones to be rerouted and recombined to form a new central exhausts. The exhaust system is composed of a central exhaust fan, the inlet nodes, (and an implicit exhaust mixer).
+The AirLoopHVAC:ExhaustSystem and ZoneHVAC:ExhaustControl objects are used to describe the way that the exhaust air streams are configured. These objects provide a way for the exhaust air streams from multiple zones to be rerouted and recombined to form a new central exhausts. The exhaust system is composed of a central exhaust fan, the inlet nodes, (and an implicit exhaust mixer).
 
 ### AirLoopHVAC:ExhaustSystem Input Fields ###
 
@@ -257,6 +244,10 @@ The name of the exhaust system.
 
 This is the availability manager list name for the exhaust system. 
 
+#### Field: AirLoopHVAC:ZoneMixer Name ####
+
+This is the name of the AirLoopHVAC:ZoneMixer object that connects the exhaust air streams from multiple zones. The zone mixer will have the inlet nodes for the exhaust system defined; and typically each inlet nodee must be the outlet node of a ZoneHVAC:ExhaustControl object.
+
 #### Field: Fan Object Type ####
 
 This is the type of fan object for the central exhaust fan. The avaiable choices are Fan:SystemModel or Fan:ComponentModel.
@@ -265,46 +256,35 @@ This is the type of fan object for the central exhaust fan. The avaiable choices
 
 This is a required field for the name of the central exhaust fan.
 
-#### Field: Inlet Node 1 ####
-
-This is the name of the first component object in the exhaust system. This is a required field.
-
-#### Field: Inlet <#> Node Name ####
-
-The remaining fields are one repeated item: the inlet nodes. These fields define the inlet nodes for the exhaust system. Each inlet nodee must be the outlet node of a ZoneHVAC:ExhaustSystem object.
-
 An example of the AirLoopHVAC:ExhaustSystem input object is like this:
 ```
 AirLoopHVAC:ExhaustSystem,
-    Central Exhaust,            !- Name
+    Central Exhaust 1,            !- Name
     Exhaust Avail List,         !- Availability Manager List Name
+    AirLoopExhaustMixer1,        !- AirLoopHVAC:ZoneMixer Name    
     Fan:SystemModel,            !- Fan Object Type
-    Central Exhaust Fan,        !- Fan Name
-    Zone 1 ExhaustSystem Node,        !- Inlet 1 Node Name
-    Zone 2 ExhaustSystem Node,        !- Inlet 2 Node Name
-    Zone 3 ExhaustSystem Node,        !- Inlet 3 Node Name
-    Zone 4 ExhaustSystem Node;        !- Inlet 4 Node Name
+    CentralExhaustFan1;        !- Fan Name
 ```
 
-### ZoneHVAC:ExhaustSystem Input Fields ###
+### ZoneHVAC:ExhaustControl Input Fields ###
 
-The input fields for the ZoneHVAC:ExhaustSystem object are as follows.
+The input fields for the ZoneHVAC:ExhaustControl object are as follows.
 
 #### Field: Name ####
 
-This is the name of the ZoneHVAC:ExhaustSystem.
+This is the name of the ZoneHVAC:ExhaustControl.
 
 #### Field: Availablity Schedule Name ####
 
-This is the aviability schedule name of the ZoneHVAC:Exhaust equipment. A schedule value of zero means off, and >0 means on. If the connected AirloopHVAC:ExhaustSystem is on, then this schedule may be used to turn on (or off) the ZoneHVAC:Exhaust system. If the connected AirloopHVAC:Exhaust is off, then this ZoneHVAC:Exhuast system will be off, and this schedule will be ignored.
+This is the aviability schedule name of the ZoneHVAC:ExhaustControl equipment. A schedule value of zero means off, and >0 means on. If the connected AirloopHVAC:ExhaustSystem is on, then this schedule may be used to turn on (or off) the ZoneHVAC:ExhaustControl system. If the connected AirloopHVAC:ExhaustSystem is off, then this ZoneHVAC:ExhaustControl system will be off, and this schedule will be ignored.
 
 #### Field: Inlet Node Name ####
 
-This is the inlet node name of the ZoneHVAC:ExhaustSystem object. This must be an exhaust node of the zone. 
+This is the inlet node name of the ZoneHVAC:ExhaustControl object. This must be an exhaust node of the zone. 
 
 #### Field: Outlet Node Name ####
 
-This is the outlet node name of the ZoneHVAC:ExhaustSystem object. This node must be connected to an AirLoopHVAC:ExhaustSystem object as an inlet node. 
+This is the outlet node name of the ZoneHVAC:ExhaustControl object. This node must be connected to an AirLoopHVAC:ExhaustSystem object as an inlet node. 
 
 #### Field: Design Flow Rate {m3/s} ####
 
@@ -333,9 +313,9 @@ This is the schedule name for the minimum exhaust flow fraction. If left empty, 
 
 This field is optional. If it is not used, then all the exhaust air flow is assumed to be unbalanced by any simple airflows, such as infiltration, ventilation, or zone mixing. Unbalanced exhaust is then modeled as being provided by the outdoor air system in the central air system. **copy the rest from Fan:ZoneExhaust**. The modeling of unbalanced will reduce the flow rates at the zone’s return air node by the flow rate that is being exhausted and will ensure that the outdoor air flow rate is sufficient to serve the exhaust. If this field is used, then enter the name of a schedule with fractional values between 0.0 and 1.0, inclusive. This fraction is applied to the exhaust fan flow rate and the model tracks the portion of the exhaust that is balanced. Balanced exhaust is then modeled as being provided by simple airflows and does not impact the central air system return air or outdoor air flow rates. For example, if a kitchen zone with an exhaust fan is designed to draw half of its make up air from a neighboring dining room and the other half from the outdoor air system, then a schedule value of 0.5 could be used here. This input field must be blank when the zone air flow balance is enforced. If user specifies a schedule and zone air flow balance is enforced, then EnergyPlus throws a warning error message, ignores the schedule and simulation continues.
 
-An example of the ZoneHVAC:ExhaustSystem input object is like this:
+An example of the ZoneHVAC:ExhaustControl input object is like this:
 ```
-ZoneHVAC:ExhaustSystem,
+ZoneHVAC:ExhaustControl,
     Zone2 Exhaust System,           !-Name
     HVACOperationSchd,              !- Availability Schedule Name
     Zone2 Exhaust Node,             !- Inlet Node Name
@@ -397,7 +377,7 @@ This function will be added to size the central exhaust system fans.
 
 This function will be added to simulate the central exhaust system in the airloop. Here, since we choose not to tie a central exhaust system to a particular airloop, in this function it could loop through all the central exhaust systems to do the simulation. 
 
-One piece of information that needed exchange from the Zone Equipment calling tree is about the flow conditions from the incoming inlet of the AirLoopHVAC:ExhaustSystem objects. This could be done by calling `SimAirLoopExhaustSystem()` right before `CalcZoneMassBalance()` in `SimZoneEquipment()`. At this point, all of the target exhaust flow rates would have been set by the ZoneHVAC:ExhaustSystem objects, and the central exhaust system can set the final exhaust node flow rates based on its availability and maximum fan flow.
+One piece of information that needed exchange from the Zone Equipment calling tree is about the flow conditions from the incoming inlet of the AirLoopHVAC:ExhaustSystem objects. This could be done by calling `SimAirLoopExhaustSystem()` right before `CalcZoneMassBalance()` in `SimZoneEquipment()`. At this point, all of the target exhaust flow rates would have been set by the ZoneHVAC:ExhaustControl objects, and the central exhaust system can set the final exhaust node flow rates based on its availability and maximum fan flow.
 
 #### AirLoopHVAC:ExhaustSystem data struct ####
 
@@ -411,9 +391,9 @@ A new case will be added to `SimZoneEquipment` to call `SimZoneExhaustAirSystem(
 
 However, the situation could be complicated by the general exhaust system's operation. Here based on If the AirloopHVAC:ExhaustSystem's condition, (e.g. "is on" or "is off"), the zone air balance will be treated differently. For example, when the AirLoopHVAC:ExhaustSystem is off, all inlet flows for the connected zone exhausts should be set to zero. This needs to be known at the time of the zone air mass balance. The call to `SimAirLoopExhaustSystem()` will be before the zone mass balance calculation (`CalcZoneMassBalance()`) which is near the end of `SimZoneEquipment`. `SimAirLoopExhaustSystem()` will reset the zone exhaust flow rates if needed.
 
-#### ZoneHVAC:ExhaustSystem data struct #### 
+#### ZoneHVAC:ExhaustControl data struct #### 
 
-This struct definition and declaration will create a new data struct for the ZoneHVAC:ExhaustSystem object.
+This struct definition and declaration will create a new data struct for the ZoneHVAC:ExhaustControl object.
 
 ### ReportAirLoopExhaustSystem() ###
 
