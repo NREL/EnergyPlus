@@ -12361,7 +12361,7 @@ namespace SurfaceGeometry {
 
     // inserts a vertex in the polygon describing the face (wall) of polyhedron (zone)
     void insertVertexOnFace(DataVectorTypes::Face &face,
-                            int const &indexAt, // index of where to insert new vertex - remaining vertices are moved later
+                            int const indexAt, // index of where to insert new vertex - remaining vertices are moved later
                             DataVectorTypes::Vector const &vertexToInsert)
     {
         // J. Glazer - March 2017
@@ -12541,7 +12541,7 @@ namespace SurfaceGeometry {
     }
 
     // provides a list of indices of polyhedron faces that are facing a specific azimuth
-    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth)
+    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 const azimuth)
     {
         // J. Glazer - March 2017
 
@@ -12558,7 +12558,7 @@ namespace SurfaceGeometry {
     }
 
     // returns the index of the face of a polyhedron that is probably opposite of the face index provided
-    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex)
+    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int const faceIndex)
     {
         // J. Glazer - March 2017
 
@@ -12582,7 +12582,7 @@ namespace SurfaceGeometry {
     }
 
     // tests if the corners of one face of the polyhedron are the same distance from corners of another face
-    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex, int const &opFaceIndex, Real64 &distanceBetween)
+    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const faceIndex, int const opFaceIndex, Real64 &distanceBetween)
     {
         // J. Glazer - March 2017
 
@@ -14740,7 +14740,7 @@ namespace SurfaceGeometry {
     void
     SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
                                     Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
-                                    SurfaceGeometry::enclosureType const &EnclosureType,                            // Radiant or Solar
+                                    SurfaceGeometry::enclosureType const EnclosureType,                             // Radiant or Solar
                                     bool &ErrorsFound)                                                              // Set to true if errors found
     {
         static constexpr std::string_view RoutineName = "SetupEnclosuresAndAirBoundaries";

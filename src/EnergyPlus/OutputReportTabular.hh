@@ -672,9 +672,9 @@ namespace OutputReportTabular {
     void WriteLoadComponentSummaryTables(EnergyPlusData &state);
 
     void GetDelaySequences(EnergyPlusData &state,
-                           int const &desDaySelected,
-                           bool const &isCooling,
-                           int const &zoneIndex,
+                           int desDaySelected,
+                           bool isCooling,
+                           int zoneIndex,
                            Array1D<Real64> &peopleDelaySeq,
                            Array1D<Real64> &equipDelaySeq,
                            Array1D<Real64> &hvacLossDelaySeq,
@@ -684,14 +684,14 @@ namespace OutputReportTabular {
                            Array3D<Real64> &feneCondInstantSeq,
                            Array2D<Real64> &surfDelaySeq);
 
-    Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep);
+    Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int numTimeSteps, int maxTimeStep);
 
     void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                         Array2D<Real64> &resultCells,
                                         Array2D_bool &resultCellsUsed,
-                                        int const &desDaySelected,
-                                        int const &timeOfMax,
-                                        int const &zoneIndex,
+                                        int desDaySelected,
+                                        int timeOfMax,
+                                        int zoneIndex,
                                         Array1D<Real64> const &peopleDelaySeq,
                                         Array1D<Real64> const &equipDelaySeq,
                                         Array1D<Real64> const &hvacLossDelaySeq,
@@ -701,20 +701,16 @@ namespace OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeqLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
-    void CollectPeakZoneConditions(EnergyPlusData &state,
-                                   CompLoadTablesType &compLoad,
-                                   int const &desDaySelected,
-                                   int const &timeOfMax,
-                                   int const &zoneIndex,
-                                   bool const &isCooling);
+    void
+    CollectPeakZoneConditions(EnergyPlusData &state, CompLoadTablesType &compLoad, int desDaySelected, int timeOfMax, int zoneIndex, bool isCooling);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
     void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType> &areas);
 
-    void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
+    void AddAreaColumnForZone(int zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
 
-    void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 const &multiplier);
+    void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 multiplier);
 
     void AddTotalRowsForLoadSummary(CompLoadTablesType &compLoadTotal);
 
@@ -724,13 +720,13 @@ namespace OutputReportTabular {
 
     void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, iUnitsStyle unitsStyle_para);
 
-    void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
+    void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int curAirLoop);
 
     void OutputCompLoadSummary(EnergyPlusData &state,
-                               iOutputType const &kind,
+                               EnergyPlus::OutputReportTabular::iOutputType kind,
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
-                               int const &zoneOrAirLoopIndex,
+                               int zoneOrAirLoopIndex,
                                iUnitsStyle unitsStyle_para,
                                bool produceTabular_para,
                                bool produceSQLite_para);
@@ -752,9 +748,9 @@ namespace OutputReportTabular {
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
 
-    bool produceDualUnitsFlags(const int &iUnit_Sys,
-                               const iUnitsStyle &unitsStyle_Tab,
-                               const iUnitsStyle &unitsStyle_Sql,
+    bool produceDualUnitsFlags(int iUnit_Sys,
+                               EnergyPlus::OutputReportTabular::iUnitsStyle unitsStyle_Tab,
+                               EnergyPlus::OutputReportTabular::iUnitsStyle unitsStyle_Sql,
                                iUnitsStyle &unitsStyle_Cur,
                                bool &produce_Tab,
                                bool &produce_Sql);
