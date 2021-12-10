@@ -3024,7 +3024,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Source",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3036,7 +3036,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "CO2",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3048,7 +3048,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "CO",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3060,7 +3060,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "CH4",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3072,7 +3072,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "NOx",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3084,7 +3084,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "N2O",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3096,7 +3096,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "SO2",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3108,7 +3108,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "PM",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3120,7 +3120,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "PM10",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3132,7 +3132,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "PM2.5",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3144,7 +3144,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "NH3",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3156,7 +3156,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "NMVOC",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3168,7 +3168,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Hg",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3180,7 +3180,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Pb",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3192,7 +3192,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "WaterEnvironmentalFactors",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3204,7 +3204,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Nuclear High",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3216,7 +3216,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Nuclear Low",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3228,7 +3228,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Source",
-                                    "PurchasedElectricEmissions",
+                                    "PurchasedElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3240,7 +3240,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Source",
-                                    "SoldElectricEmissions",
+                                    "SoldElectricityEmissions",
                                     _,
                                     "");
             } else if (SELECT_CASE_var == "GASOLINE") {
@@ -4035,7 +4035,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     _,
                                     "");
                 SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 CO2 Water Consumption Volume",
+                                    "Environmental Impact OtherFuel1 Water Consumption Volume",
                                     OutputProcessor::Unit::L,
                                     Pollution.OtherFuel1Comp.WaterPollution,
                                     OutputProcessor::SOVTimeStepType::System,
@@ -4242,7 +4242,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     _,
                                     "");
                 SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 CO2 Water Consumption Volume",
+                                    "Environmental Impact OtherFuel2 Water Consumption Volume",
                                     OutputProcessor::Unit::L,
                                     Pollution.OtherFuel2Comp.WaterPollution,
                                     OutputProcessor::SOVTimeStepType::System,

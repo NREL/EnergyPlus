@@ -360,7 +360,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const &str)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view str)
     {
         return FindItem(first, last, str, is_shared_ptr<typename std::iterator_traits<InputIterator>::value_type>{});
     }
@@ -588,7 +588,7 @@ namespace UtilityRoutines {
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
-                          bool const &AllowSteamAndDistrict = false);
+                          bool AllowSteamAndDistrict = false);
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,

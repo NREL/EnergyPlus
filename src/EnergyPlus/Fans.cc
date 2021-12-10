@@ -2696,8 +2696,8 @@ int GetFanInletNode(EnergyPlusData &state,
 }
 
 int getFanInNodeIndex(EnergyPlusData &state,
-                      int const &FanIndex, // fan index
-                      bool &ErrorsFound    // set to true if problem
+                      int const FanIndex, // fan index
+                      bool &ErrorsFound   // set to true if problem
 )
 {
 
@@ -3079,7 +3079,7 @@ Real64 FanDesHeatGain(EnergyPlusData &state,
 } // FanDesHeatGain
 
 void FanInputsForDesHeatGain(EnergyPlusData &state,
-                             int const &fanIndex,
+                             int const fanIndex,
                              Real64 &deltaP,
                              Real64 &motEff,
                              Real64 &totEff,

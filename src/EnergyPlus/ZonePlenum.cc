@@ -1256,7 +1256,7 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
     } // For FirstCall
 }
 
-int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)
+int GetReturnPlenumIndex(EnergyPlusData &state, int const ExNodeNum)
 {
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1292,7 +1292,7 @@ int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)
     return WhichPlenum;
 }
 
-void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
+void GetReturnPlenumName(EnergyPlusData &state, int const ReturnPlenumIndex, std::string &ReturnPlenumName)
 {
 
     // Obtains and Allocates ZonePlenum related parameters from input file
@@ -1307,7 +1307,7 @@ void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, st
     }
 }
 
-int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
+int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const InNodeNum)
 {
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
