@@ -124,7 +124,7 @@ namespace OutputReportTabular {
         bySpaceType
     };
 
-    enum column // These correspond to the columns in the load component table
+    enum LoadCompCol // These correspond to the columns in the load component table
     {
         SensInst = 1,
         SensDelay,
@@ -136,7 +136,7 @@ namespace OutputReportTabular {
         PerArea
     };
 
-    enum row
+    enum LoadCompRow
     {
         // internal gains
         People = 1,
@@ -146,13 +146,13 @@ namespace OutputReportTabular {
         WaterUse,
         HvacLoss,
         PowerGen,
-        
+
         // misc
         DOAS,
         Infil,
         ZoneVent,
         IntZonMix,
-        
+
         // opaque surfaces
         Roof,
         IntZonCeil,
