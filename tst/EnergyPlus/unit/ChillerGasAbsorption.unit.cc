@@ -177,27 +177,27 @@ TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)
     state->dataPlnt->TotNumLoops = 3;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].TotalBranches = 3;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(3);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).TotalComponents = 2;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 100;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(2).NodeNumIn = 111;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].TotalBranches = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch.allocate(3);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 100;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(2).NodeNumIn = 111;
 
 
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].TotalBranches = 3;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(3);
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).TotalComponents = 2;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 200;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(2).NodeNumIn = 222;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].TotalBranches = 3;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch.allocate(3);
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 200;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(2).NodeNumIn = 222;
 
-    state->dataPlnt->PlantLoop(3).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].TotalBranches = 4;
-    state->dataPlnt->PlantLoop(3).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(4);
-    state->dataPlnt->PlantLoop(3).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).TotalComponents = 2;
-    state->dataPlnt->PlantLoop(3).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(3).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 300;
-    state->dataPlnt->PlantLoop(3).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(2).NodeNumIn = 333;
+    state->dataPlnt->PlantLoop(3).LoopSide[DataPlant::LoopSideLocation::Demand].TotalBranches = 4;
+    state->dataPlnt->PlantLoop(3).LoopSide[DataPlant::LoopSideLocation::Demand].Branch.allocate(4);
+    state->dataPlnt->PlantLoop(3).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(3).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(3).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 300;
+    state->dataPlnt->PlantLoop(3).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(2).NodeNumIn = 333;
 
     GasAbsorberSpecs thisChillerHeater;
     thisChillerHeater.ChillReturnNodeNum = 111;
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_calculateHeater_Fix_Test)
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].FlowLock = DataPlant::FlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(3).Temp = 60.0;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.5;
     state->dataLoopNodes->Node(4).TempSetPoint = 70.0;

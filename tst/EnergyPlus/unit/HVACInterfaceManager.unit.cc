@@ -80,11 +80,11 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     state->dataPlnt->PlantLoop(1).Mass = 50;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumOut = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].NodeNumOut = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].NodeNumIn = 1;
     // Note LastTempInterfaceTankOutlet ends up getting reset to zero on the first pass
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LastTempInterfaceTankOutlet = 80;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TotalPumpHeat = 500;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LastTempInterfaceTankOutlet = 80;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].TotalPumpHeat = 500;
     state->dataLoopNodes->Node.allocate(state->dataPlnt->TotNumLoops);
     state->dataLoopNodes->Node(1).Temp = 100;
     state->dataLoopNodes->Node(1).MassFlowRate = 10;
@@ -95,21 +95,21 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     UpdateHalfLoopInletTemp(*state, 1, DataPlant::LoopSideLocation::Demand, TankOutletTemp);
     // Excess storage calcs moved here
     PlantManager::UpdateNodeThermalHistory(*state);
-    EXPECT_NEAR((2928.82 - 500), state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_MdotCpDeltaT, 0.001);
-    EXPECT_NEAR(2928.82, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_McpDTdt, 0.001);
-    EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_CapExcessStorageTime);
-    EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_TotalTime);
+    EXPECT_NEAR((2928.82 - 500), state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_MdotCpDeltaT, 0.001);
+    EXPECT_NEAR(2928.82, state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_McpDTdt, 0.001);
+    EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_CapExcessStorageTime);
+    EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_TotalTime);
 
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LastTempInterfaceTankOutlet = 120; // random
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LastTempInterfaceTankOutlet = 120; // random
 
     // LoopSideInlet_MdotCpDeltaT should be > LoopSideInlet_McpDTdt
     // Therefore TotalTime will increase by 1 more timestep, but CapExcessStorageTime will NOT increase
     UpdateHalfLoopInletTemp(*state, 1, DataPlant::LoopSideLocation::Demand, TankOutletTemp);
     // Excess storage calcs moved here
     PlantManager::UpdateNodeThermalHistory(*state);
-    EXPECT_NEAR((-588.264 - 500), state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_MdotCpDeltaT, 0.001);
-    EXPECT_NEAR(-588.264, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_McpDTdt, .001);
-    EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_CapExcessStorageTime);
-    EXPECT_EQ(2, state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_TotalTime);
+    EXPECT_NEAR((-588.264 - 500), state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_MdotCpDeltaT, 0.001);
+    EXPECT_NEAR(-588.264, state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_McpDTdt, .001);
+    EXPECT_EQ(1, state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_CapExcessStorageTime);
+    EXPECT_EQ(2, state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_TotalTime);
 }
 } // namespace EnergyPlus

@@ -1822,7 +1822,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // calc generator flow
     int GenLoopNum = thisChiller.GenLoopNum;
     DataPlant::LoopSideLocation GenLoopSideNum = thisChiller.GenLoopSideNum;
-    state->dataPlnt->PlantLoop(GenLoopNum).LoopSide[static_cast<int>(GenLoopSideNum)].FlowLock = DataPlant::FlowLock::Unlocked;
+    state->dataPlnt->PlantLoop(GenLoopNum).LoopSide[GenLoopSideNum].FlowLock = DataPlant::FlowLock::Unlocked;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;
     thisChiller.calculate(*state, AbsChillEvapLoad, AbsChillRunFlag);

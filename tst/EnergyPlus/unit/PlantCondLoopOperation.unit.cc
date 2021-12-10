@@ -655,7 +655,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
 {
-    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
 
     state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::SequentialUniformPLR;
 
