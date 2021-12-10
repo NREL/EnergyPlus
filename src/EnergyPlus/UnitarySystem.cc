@@ -196,7 +196,7 @@ namespace UnitarySystems {
     void UnitarySys::simulate(EnergyPlusData &state,
                               std::string_view Name,
                               bool const FirstHVACIteration,
-                              int const &AirLoopNum,
+                              int const AirLoopNum,
                               int &CompIndex,
                               bool &HeatActive,
                               bool &CoolActive,
@@ -223,7 +223,7 @@ namespace UnitarySystems {
     void UnitarySys::simulateSys(EnergyPlusData &state,
                                  std::string_view Name,
                                  bool const FirstHVACIteration,
-                                 int const &AirLoopNum,
+                                 int const AirLoopNum,
                                  int &CompIndex,
                                  bool &HeatActive,
                                  bool &CoolActive,
@@ -516,7 +516,7 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::initUnitarySystems(
-        EnergyPlusData &state, int const &AirLoopNum, bool const &FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp)
+        EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp)
     {
         static constexpr std::string_view routineName("InitUnitarySystems");
         bool errorsFound = false; // error flag for mining functions

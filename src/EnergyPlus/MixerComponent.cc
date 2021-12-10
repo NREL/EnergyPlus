@@ -626,32 +626,25 @@ void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int 
     }
 }
 
-int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
+int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const InNodeNum)
 {
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MixerNum;  // loop counter
-    int InNodeCtr; // loop counter
-    int thisMixer;
 
     if (state.dataMixerComponent->GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
         GetMixerInput(state);
         state.dataMixerComponent->GetZoneMixerIndexInputFlag = false;
     }
 
-    thisMixer = 0;
     if (state.dataMixerComponent->NumMixers > 0) {
-        for (MixerNum = 1; MixerNum <= state.dataMixerComponent->NumMixers; ++MixerNum) {
-            for (InNodeCtr = 1; InNodeCtr <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeCtr) {
-                if (InNodeNum != state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeCtr)) continue;
-                thisMixer = MixerNum;
-                break;
+        for (int MixerNum = 1; MixerNum <= state.dataMixerComponent->NumMixers; ++MixerNum) {
+            for (int InNodeCtr = 1; InNodeCtr <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeCtr) {
+                if (InNodeNum == state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeCtr)) {
+                    return MixerNum;
+                }
             }
-            if (thisMixer > 0) break;
         }
     }
 
-    return thisMixer;
+    return 0;
 }
 
 // End of Utility subroutines for the Mixer Component

@@ -3383,7 +3383,7 @@ Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int const PurchAirNu
     return state.dataPurchasedAirMgr->PurchAir(PurchAirNum).MixedAirHumRat;
 }
 
-bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex)
+bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const ReturnPlenumIndex)
 {
 
     // FUNCTION INFORMATION:

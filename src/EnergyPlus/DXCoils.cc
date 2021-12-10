@@ -16061,8 +16061,8 @@ int GetCoilInletNode(EnergyPlusData &state,
 }
 
 int getCoilInNodeIndex(EnergyPlusData &state,
-                       int const &CoilIndex, // coil index
-                       bool &ErrorsFound     // set to true if problem
+                       int const CoilIndex, // coil index
+                       bool &ErrorsFound    // set to true if problem
 )
 {
 
@@ -16128,8 +16128,8 @@ int GetCoilOutletNode(EnergyPlusData &state,
 }
 
 int getCoilOutNodeIndex(EnergyPlusData &state,
-                        int const &CoilIndex, // must match coil types in this module
-                        bool &ErrorsFound     // set to true if problem
+                        int const CoilIndex, // must match coil types in this module
+                        bool &ErrorsFound    // set to true if problem
 )
 {
 
