@@ -1603,7 +1603,7 @@ namespace VentilatedSlab {
 
                 state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum =
                     state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum)
-                        .LoopSide[state.dataVentilatedSlab->VentSlab(Item).HWLoopSide]
+                        .LoopSide(state.dataVentilatedSlab->VentSlab(Item).HWLoopSide)
                         .Branch(state.dataVentilatedSlab->VentSlab(Item).HWBranchNum)
                         .Comp(state.dataVentilatedSlab->VentSlab(Item).HWCompNum)
                         .NodeNumOut;
@@ -1626,7 +1626,7 @@ namespace VentilatedSlab {
                 }
                 state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum =
                     state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum)
-                        .LoopSide[state.dataVentilatedSlab->VentSlab(Item).CWLoopSide]
+                        .LoopSide(state.dataVentilatedSlab->VentSlab(Item).CWLoopSide)
                         .Branch(state.dataVentilatedSlab->VentSlab(Item).CWBranchNum)
                         .Comp(state.dataVentilatedSlab->VentSlab(Item).CWCompNum)
                         .NodeNumOut;

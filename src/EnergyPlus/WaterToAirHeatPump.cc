@@ -1030,7 +1030,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).FanDelayTime = FanDelayTime;
 
             PlantOutletNode = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum)
-                                  .LoopSide[state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide]
+                                  .LoopSide(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide)
                                   .Branch(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum)
                                   .Comp(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum)
                                   .NodeNumOut;

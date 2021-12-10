@@ -341,10 +341,10 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand]);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -353,9 +353,9 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType;
-    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn =
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
         state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum;
 
     int CompOp(1);
@@ -478,9 +478,9 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     state->dataPlnt->PlantLoop(2).FluidName = "HotWater";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
-    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType;
-    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn =
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
         state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum;
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).DesignWaterMassFlowRate = DesignWaterflow;
@@ -773,10 +773,10 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand]);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -785,9 +785,9 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     state->dataPlnt->PlantLoop(1).FluidName = "ChilledWater";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType;
-    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn =
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
         state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum;
 
     int CompOp(1);
@@ -909,9 +909,9 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     state->dataPlnt->PlantLoop(2).FluidName = "HotWater";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
-    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType;
-    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn =
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
         state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum;
 
     state->dataLoopNodes->Node(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterInletNodeNum).Temp = 35.0;

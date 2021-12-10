@@ -822,7 +822,7 @@ namespace UnitHeater {
 
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum =
                     state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum)
-                        .LoopSide[state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide]
+                        .LoopSide(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopSide)
                         .Branch(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWBranchNum)
                         .Comp(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWCompNum)
                         .NodeNumOut;

@@ -87,9 +87,9 @@ public:
         thisEquipList.NumComps = 12;
         thisEquipList.Comp.allocate(thisEquipList.NumComps);
 
-        state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch.allocate(1);
-        state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp.allocate(thisEquipList.NumComps);
-        auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+        state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+        state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(thisEquipList.NumComps);
+        auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
 
         for (int compNum = 1; compNum <= state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
             // set up equipment list data
@@ -109,7 +109,7 @@ public:
     virtual void ResetLoads()
     {
         // reset loads
-        auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+        auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         for (int compNum = 1; compNum <= state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
             thisBranch.Comp(compNum).MyLoad = 0.0;
         }
@@ -122,7 +122,7 @@ public:
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 {
-    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
 
     state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::Sequential;
 
@@ -287,7 +287,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
 {
-    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
 
     state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::Uniform;
 
@@ -403,7 +403,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
 {
-    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
 
     state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::Optimal;
 
@@ -533,7 +533,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
 {
-    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
 
     state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::UniformPLR;
 
@@ -655,7 +655,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
 {
-    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
 
     state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::SequentialUniformPLR;
 

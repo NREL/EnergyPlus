@@ -1384,8 +1384,8 @@ void SimHVAC(EnergyPlusData &state)
                         // now work with history logs for mass flow to detect issues
                         for (auto ThisLoopSide : DataPlant::LoopSideKeys) {
 
-                            auto &mdotHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].InletNode.MassFlowRateHistory;
-                            auto &mdotHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].OutletNode.MassFlowRateHistory;
+                            auto &mdotHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory;
+                            auto &mdotHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory;
 
                             // loop side inlet node
                             FoundOscillationByDuplicate = false;
@@ -1401,7 +1401,7 @@ void SimHVAC(EnergyPlusData &state)
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating flow rates across iterations with a repeated value of {:.7R}",
-                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameIn,
+                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
                                                    mdotHistInletNode(1)));
                                         break;
                                     }
@@ -1429,7 +1429,7 @@ void SimHVAC(EnergyPlusData &state)
                                             ShowContinueError(state,
                                                               format("Node named {} shows monotonically decreasing mass flow rate with a trend "
                                                                      "rate across iterations of {:.7R} [kg/s/iteration]",
-                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameIn,
+                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
                                                                      SlopeMdot));
                                         }
                                     } else { // check for monotonic increase
@@ -1444,7 +1444,7 @@ void SimHVAC(EnergyPlusData &state)
                                             ShowContinueError(state,
                                                               format("Node named {} shows monotonically increasing mass flow rate with a trend "
                                                                      "rate across iterations of {:.7R} [kg/s/iteration]",
-                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameIn,
+                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
                                                                      SlopeMdot));
                                         }
                                     }
@@ -1457,7 +1457,7 @@ void SimHVAC(EnergyPlusData &state)
                                     HistoryTrace += format("{:.7R},", mdotHistInletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameIn +
+                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
                                                       " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                             // end of inlet node
@@ -1476,7 +1476,7 @@ void SimHVAC(EnergyPlusData &state)
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating flow rates across iterations with a repeated value of {:.7R}",
-                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameOut,
+                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
                                                    mdotHistOutletNode(1)));
                                         break;
                                     }
@@ -1504,7 +1504,7 @@ void SimHVAC(EnergyPlusData &state)
                                             ShowContinueError(state,
                                                               format("Node named {} shows monotonically decreasing mass flow rate with a trend "
                                                                      "rate across iterations of {:.7R} [kg/s/iteration]",
-                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameOut,
+                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
                                                                      SlopeMdot));
                                         }
                                     } else { // check for monotonic increase
@@ -1519,7 +1519,7 @@ void SimHVAC(EnergyPlusData &state)
                                             ShowContinueError(state,
                                                               format("Node named {} shows monotonically increasing mass flow rate with a trend "
                                                                      "rate across iterations of {:.7R} [kg/s/iteration]",
-                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameOut,
+                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
                                                                      SlopeMdot));
                                         }
                                     }
@@ -1532,7 +1532,7 @@ void SimHVAC(EnergyPlusData &state)
                                     HistoryTrace += format("{:.7R},", mdotHistOutletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameOut +
+                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
                                                       " mass flow rate [kg/s] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                               // end of Outlet node
@@ -1561,8 +1561,8 @@ void SimHVAC(EnergyPlusData &state)
                         // now work with history logs for mass flow to detect issues
                         for (auto ThisLoopSide : DataPlant::LoopSideKeys) {
 
-                            auto &tempHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].InletNode.TemperatureHistory;
-                            auto &tempHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].OutletNode.TemperatureHistory;
+                            auto &tempHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory;
+                            auto &tempHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory;
 
                             // loop side inlet node
                             FoundOscillationByDuplicate = false;
@@ -1578,7 +1578,7 @@ void SimHVAC(EnergyPlusData &state)
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating temperatures across iterations with a repeated value of {:.5R}",
-                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameIn,
+                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
                                                    tempHistInletNode(1)));
                                         break;
                                     }
@@ -1606,7 +1606,7 @@ void SimHVAC(EnergyPlusData &state)
                                             ShowContinueError(state,
                                                               format("Node named {} shows monotonically decreasing temperatures with a trend "
                                                                      "rate across iterations of {:.5R} [C/iteration]",
-                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameIn,
+                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
                                                                      SlopeTemps));
                                         }
                                     } else { // check for monotonic increase
@@ -1621,7 +1621,7 @@ void SimHVAC(EnergyPlusData &state)
                                             ShowContinueError(state,
                                                               format("Node named {} shows monotonically increasing temperatures with a trend "
                                                                      "rate across iterations of {:.5R} [C/iteration]",
-                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameIn,
+                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn,
                                                                      SlopeTemps));
                                         }
                                     }
@@ -1634,7 +1634,7 @@ void SimHVAC(EnergyPlusData &state)
                                     HistoryTrace += format("{:.5R},", tempHistInletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameIn +
+                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameIn +
                                                       " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                             // end of inlet node
@@ -1653,7 +1653,7 @@ void SimHVAC(EnergyPlusData &state)
                                         ShowContinueError(
                                             state,
                                             format("Node named {} shows oscillating temperatures across iterations with a repeated value of {:.5R}",
-                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameOut,
+                                                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
                                                    tempHistOutletNode(1)));
                                         break;
                                     }
@@ -1673,7 +1673,7 @@ void SimHVAC(EnergyPlusData &state)
                                         MonotonicDecreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide[ThisLoopSide]
+                                                    .LoopSide(ThisLoopSide)
                                                     .OutletNode.TemperatureHistory(StackDepth - 1) > tempHistOutletNode(StackDepth)) {
                                                 MonotonicDecreaseFound = false;
                                                 break;
@@ -1683,14 +1683,14 @@ void SimHVAC(EnergyPlusData &state)
                                             ShowContinueError(state,
                                                               format("Node named {} shows monotonically decreasing temperatures with a trend "
                                                                      "rate across iterations of {:.5R} [C/iteration]",
-                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameOut,
+                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
                                                                      SlopeTemps));
                                         }
                                     } else { // check for monotonic increase
                                         MonotonicIncreaseFound = true;
                                         for (StackDepth = 2; StackDepth <= NumConvergenceHistoryTerms; ++StackDepth) {
                                             if (state.dataPlnt->PlantLoop(LoopNum)
-                                                    .LoopSide[ThisLoopSide]
+                                                    .LoopSide(ThisLoopSide)
                                                     .OutletNode.TemperatureHistory(StackDepth - 1) < tempHistOutletNode(StackDepth)) {
                                                 MonotonicIncreaseFound = false;
                                                 break;
@@ -1700,7 +1700,7 @@ void SimHVAC(EnergyPlusData &state)
                                             ShowContinueError(state,
                                                               format("Node named {} shows monotonically increasing temperatures with a trend "
                                                                      "rate across iterations of {:.5R} [C/iteration]",
-                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameOut,
+                                                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut,
                                                                      SlopeTemps));
                                         }
                                     }
@@ -1713,7 +1713,7 @@ void SimHVAC(EnergyPlusData &state)
                                     HistoryTrace += format("{:.5R},", tempHistOutletNode(StackDepth));
                                 }
                                 ShowContinueError(state,
-                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSide].NodeNameOut +
+                                                  "Node named " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNameOut +
                                                       " temperature [C] iteration history trace (most recent first): " + HistoryTrace);
                             } // need to report trace
                               // end of Outlet node

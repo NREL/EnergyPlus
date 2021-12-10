@@ -166,7 +166,7 @@ namespace IceThermalStorage {
 
         // this was happening in PlantLoopEquip before
         auto &thisComp(state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                           .LoopSide[calledFromLocation.loopSideNum]
+                           .LoopSide(calledFromLocation.loopSideNum)
                            .Branch(calledFromLocation.branchNum)
                            .Comp(calledFromLocation.compNum));
 
@@ -1376,10 +1376,10 @@ namespace IceThermalStorage {
                 // up flow priority of other components on the same branch as the Ice tank
                 for (CompNum = 1;
                      CompNum <=
-                     state.dataPlnt->PlantLoop(this->PlantLoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(this->PlantBranchNum).TotalComponents;
+                     state.dataPlnt->PlantLoop(this->PlantLoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(this->PlantBranchNum).TotalComponents;
                      ++CompNum) {
                     state.dataPlnt->PlantLoop(this->PlantLoopNum)
-                        .LoopSide[DataPlant::LoopSideLocation::Supply]
+                        .LoopSide(DataPlant::LoopSideLocation::Supply)
                         .Branch(this->PlantBranchNum)
                         .Comp(CompNum)
                         .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
@@ -1450,9 +1450,9 @@ namespace IceThermalStorage {
                 (this->LoopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
                 for (int compNum = 1;
-                     compNum <= state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(this->BranchNum).TotalComponents;
+                     compNum <= state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(this->BranchNum).TotalComponents;
                      ++compNum) {
-                    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(this->BranchNum).Comp(compNum).FlowPriority =
+                    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(this->BranchNum).Comp(compNum).FlowPriority =
                         DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                 }
             }

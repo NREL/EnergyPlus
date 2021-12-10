@@ -68,7 +68,7 @@ namespace DataPlant {
     };
 
     struct HalfLoopContainer : std::array<HalfLoopData, static_cast<int>(DataPlant::LoopSideLocation::Num)> {
-        HalfLoopData &operator[](LoopSideLocation ls) {
+        HalfLoopData &operator()(LoopSideLocation ls) {
                 return this->at(static_cast<int>(ls));
         }
     };

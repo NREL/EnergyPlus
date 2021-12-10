@@ -119,7 +119,7 @@ void EIRPlantLoopHeatPump::simulate(
 Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
 {
     auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
-    auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide[this->loadSideLocation.loopSideNum];
+    auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
     auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
     auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
     if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {

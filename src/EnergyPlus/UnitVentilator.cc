@@ -1535,7 +1535,7 @@ namespace UnitVentilator {
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum =
                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum)
-                        .LoopSide[state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide]
+                        .LoopSide(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide)
                         .Branch(state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum)
                         .Comp(state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum)
                         .NodeNumOut;
@@ -1564,7 +1564,7 @@ namespace UnitVentilator {
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ColdCoilOutNodeNum =
                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopNum)
-                        .LoopSide[state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopSide]
+                        .LoopSide(state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopSide)
                         .Branch(state.dataUnitVentilators->UnitVent(UnitVentNum).CWBranchNum)
                         .Comp(state.dataUnitVentilators->UnitVent(UnitVentNum).CWCompNum)
                         .NodeNumOut;

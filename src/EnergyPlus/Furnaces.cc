@@ -5436,7 +5436,7 @@ namespace Furnaces {
                 }
                 // fill outlet node for coil
                 state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode = state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum)
-                                                                             .LoopSide[state.dataFurnaces->Furnace(FurnaceNum).LoopSide]
+                                                                             .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).LoopSide)
                                                                              .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNum)
                                                                              .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNum)
                                                                              .NodeNumOut;
@@ -5510,7 +5510,7 @@ namespace Furnaces {
                 // fill outlet node for coil
                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode =
                     state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp)
-                        .LoopSide[state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp]
+                        .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp)
                         .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp)
                         .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp)
                         .NodeNumOut;

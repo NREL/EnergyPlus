@@ -179,7 +179,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
         // Need to go along plant loop and set up component pressure drop data structure!
         for (auto LoopSideNum : DataPlant::LoopSideKeys) {
-            auto &loop_side(loop.LoopSide[LoopSideNum]);
+            auto &loop_side(loop.LoopSide(LoopSideNum));
 
             // Loop through all branches on this loop side
             for (int BranchNum = 1; BranchNum <= isize(loop_side.Branch); ++BranchNum) {
@@ -247,7 +247,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
             // Check for illegal configurations on this plant loop
         for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 // Check for illegal parallel branch setups
-                auto &loop_side(loop.LoopSide[LoopSideNum]);
+                auto &loop_side(loop.LoopSide(LoopSideNum));
                 BranchPressureTally = 0;
                 NumBranches = size(loop_side.Branch);
                 if (NumBranches > 2) {
@@ -319,7 +319,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
     // have a proper value for pressure
     if (loop.HasPressureComponents && FirstHVACIteration) {
         for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
-            auto const &loop_side(loop.LoopSide[LoopSideNum]);
+            auto const &loop_side(loop.LoopSide(LoopSideNum));
             for (int BranchNum = 1, BranchNum_end = isize(loop_side.Branch); BranchNum <= BranchNum_end; ++BranchNum) {
                 auto const &branch(loop_side.Branch(BranchNum));
                 for (int CompNum = 1, CompNum_end = isize(branch.Comp); CompNum <= CompNum_end; ++CompNum) {
@@ -394,17 +394,17 @@ void BranchPressureDrop(EnergyPlusData &state,
     Real64 BranchDeltaPress(0.0);                                // Pressure drop for component, {Pa}
 
     // Exit early if need be
-    if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).HasPressureComponents) {
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureDrop = 0.0;
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureEffectiveK = 0.0;
+    if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).HasPressureComponents) {
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureDrop = 0.0;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureEffectiveK = 0.0;
         return;
     }
 
     // Get data from data structure
     FluidIndex = state.dataPlnt->PlantLoop(LoopNum).FluidIndex;
-    InletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).NodeNumIn;
-    pressureCurveType = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureCurveType;
-    PressureCurveIndex = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureCurveIndex;
+    InletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn;
+    pressureCurveType = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveType;
+    PressureCurveIndex = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveIndex;
 
     // Get nodal conditions
     NodeMassFlow = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
@@ -429,7 +429,7 @@ void BranchPressureDrop(EnergyPlusData &state,
             ++state.dataPlantPressureSys->ErrorCounter;
             if (state.dataPlantPressureSys->ErrorCounter == 1) {
                 ShowSevereError(state, "Plant pressure simulation encountered a branch which contains invalid branch pressure curve type.");
-                ShowContinueError(state, "Occurs for branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Name);
+                ShowContinueError(state, "Occurs for branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
                 ShowContinueError(state, "This error will be issued only once, although other branches may encounter the same problem");
                 ShowContinueError(state, "For now, pressure drop on this branch will be set to zero.");
                 ShowContinueError(state, "Verify all pressure inputs and pressure drop output variables to ensure proper simulation");
@@ -438,13 +438,13 @@ void BranchPressureDrop(EnergyPlusData &state,
     }
 
     // Log this pressure in the data structure to be handled by the update routine later
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureDrop = BranchDeltaPress;
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureDrop = BranchDeltaPress;
 
     // Update the effective K-value for this branch
     if (NodeMassFlow > 0.0) {
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureEffectiveK = BranchDeltaPress / pow_2(NodeMassFlow);
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureEffectiveK = BranchDeltaPress / pow_2(NodeMassFlow);
     } else {
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureEffectiveK = 0.0;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureEffectiveK = 0.0;
     }
 }
 
@@ -494,7 +494,7 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
 
         // Loop through all branches on this loop side
         LoopSidePressureDrop = 0.0;
-        NumBranches = size(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch);
+        NumBranches = size(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch);
 
         // Split here based on a single branch loop or a splitter/mixer configuration
         if (NumBranches == 1) { // Just do the single branch
@@ -516,7 +516,7 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
             //*******************!
 
             //***MIXER SIMULATION***!
-            MixerPressure = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).NodeNumIn).Press;
+            MixerPressure = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn).Press;
             PassPressureAcrossMixer(state, LoopNum, LoopSideNum, MixerPressure, NumBranches);
             //**********************!
 
@@ -535,7 +535,7 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
                     state, LoopNum, LoopSideNum, BranchNum, ParallelBranchPressureDrops(ParallelBranchCounter), FoundAPumpOnBranch);
                 // Store the branch inlet pressure so we can pass it properly across the splitter
                 ParallelBranchInletPressures(ParallelBranchCounter) =
-                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).NodeNumIn).Press;
+                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn).Press;
             }
 
             // Now take max inlet pressure to pass across splitter and max branch pressure for bookkeeping
@@ -585,7 +585,7 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
             }
         }
 
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].PressureDrop = LoopSidePressureDrop;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).PressureDrop = LoopSidePressureDrop;
 
     } // LoopSides on this loop
 
@@ -599,19 +599,19 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
         EffectiveLoopSideKValue = 0.0;
 
         // Always take the first branch K, it may be the only branch on this half loop
-        EffectiveLoopSideKValue += state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(1).PressureEffectiveK;
+        EffectiveLoopSideKValue += state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(1).PressureEffectiveK;
 
         // If there is only one branch then move to the other loop side
-        if (size(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch) == 1) continue;
+        if (size(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch) == 1) continue;
 
         // Add parallel branches if necessary by adding them as SUM(1/(sqrt(K_i)))
         TempVal_SumOfOneByRootK = 0.0;
-        for (BranchNum = 2; BranchNum <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch) - 1; ++BranchNum) {
+        for (BranchNum = 2; BranchNum <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch) - 1; ++BranchNum) {
 
             // Only add this branch if the K value is non-zero
-            if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureEffectiveK > 0.0) {
+            if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureEffectiveK > 0.0) {
                 TempVal_SumOfOneByRootK +=
-                    (1.0 / std::sqrt(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureEffectiveK));
+                    (1.0 / std::sqrt(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureEffectiveK));
             }
         }
 
@@ -619,11 +619,11 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
         if (TempVal_SumOfOneByRootK > 0.0) EffectiveLoopSideKValue += (1.0 / pow_2(TempVal_SumOfOneByRootK));
 
         // Always take the last branch K, it will be in series
-        BranchNum = size(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch);
-        EffectiveLoopSideKValue += state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureEffectiveK;
+        BranchNum = size(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch);
+        EffectiveLoopSideKValue += state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureEffectiveK;
 
         // Assign this loop side's K-value
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].PressureEffectiveK = EffectiveLoopSideKValue;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).PressureEffectiveK = EffectiveLoopSideKValue;
 
         // Keep adding the overall loop K-value
         EffectiveLoopKValue += EffectiveLoopSideKValue;
@@ -662,25 +662,25 @@ void DistributePressureOnBranch(
     // Initialize
     TempBranchPressureDrop = 0.0;
     BranchPressureDrop = 0.0;
-    NumCompsOnBranch = size(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Comp);
+    NumCompsOnBranch = size(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp);
 
     // Retrieve temporary branch pressure drop
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).HasPressureComponents) {
-        TempBranchPressureDrop = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).PressureDrop;
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).HasPressureComponents) {
+        TempBranchPressureDrop = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureDrop;
     }
 
     // If the last component on the branch is the pump, then check if a pressure drop is detected and set the flag and leave
     if (DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(
-            state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Comp(NumCompsOnBranch).Type)]) {
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).Type)]) {
         PumpFound = true;
         if (TempBranchPressureDrop != 0.0) {
             ShowSevereError(state, "Error in plant pressure simulation for plant loop: " + state.dataPlnt->PlantLoop(LoopNum).Name);
             if (LoopSideNum == DataPlant::LoopSideLocation::Demand) {
                 ShowContinueError(
-                    state, "Occurs for demand side, branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Name);
+                    state, "Occurs for demand side, branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
             } else if (LoopSideNum == DataPlant::LoopSideLocation::Supply) {
                 ShowContinueError(
-                    state, "Occurs for supply side, branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Name);
+                    state, "Occurs for supply side, branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
             }
             ShowContinueError(state, "Branch contains only a single pump component, yet also a pressure drop component.");
             ShowContinueError(state, "Either add a second component to this branch after the pump, or move pressure drop data.");
@@ -690,14 +690,14 @@ void DistributePressureOnBranch(
     }
 
     // Assign official branch pressure drop
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).HasPressureComponents) {
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).HasPressureComponents) {
         BranchPressureDrop = TempBranchPressureDrop;
     }
 
     // Otherwise update the inlet node of the last component on the branch with this corrected pressure
     // This essentially sets all the pressure drop on the branch to be accounted for on the last component
-    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumIn).Press =
-        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumOut)
+    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumIn).Press =
+        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).NodeNumOut)
             .Press +
         BranchPressureDrop;
 
@@ -708,14 +708,14 @@ void DistributePressureOnBranch(
 
             // If this component is a pump, stop passing pressure upstream, and set flag to true for calling routine
             if (DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(
-                    state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Comp(CompNum).Type)]) {
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Type)]) {
                 PumpFound = true;
                 break;
             }
 
             // Otherwise just pass pressure upstream and move on
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Comp(CompNum).NodeNumIn).Press =
-                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).Comp(CompNum).NodeNumOut).Press;
+            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumIn).Press =
+                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut).Press;
         }
     }
 }
@@ -741,7 +741,7 @@ void PassPressureAcrossMixer(EnergyPlusData &state, int const LoopNum, const Dat
     int BranchNum;
 
     for (BranchNum = 2; BranchNum <= NumBranchesOnLoopSide - 1; ++BranchNum) {
-        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(BranchNum).NodeNumOut).Press = MixerPressure;
+        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut).Press = MixerPressure;
     }
 }
 
@@ -766,7 +766,7 @@ void PassPressureAcrossSplitter(EnergyPlusData &state, int const LoopNum,
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr InletBranchNum(1);
 
-    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].Branch(InletBranchNum).NodeNumOut).Press =
+    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(InletBranchNum).NodeNumOut).Press =
         SplitterInletPressure;
 }
 
@@ -797,8 +797,8 @@ void PassPressureAcrossInterface(EnergyPlusData &state, int const LoopNum)
     int DemandInletNodeNum;
     int SupplyOutletNodeNum;
 
-    DemandInletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Demand].NodeNumIn;
-    SupplyOutletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].NodeNumOut;
+    DemandInletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
+    SupplyOutletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut;
 
     state.dataLoopNodes->Node(SupplyOutletNodeNum).Press = state.dataLoopNodes->Node(DemandInletNodeNum).Press;
 }
@@ -870,7 +870,7 @@ Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
     SystemPressureDrop = LoopEffectiveK * pow_2(SystemMassFlow);
 
     // Read data off the node data structure
-    NodeTemperature = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].NodeNumIn).Temp;
+    NodeTemperature = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn).Temp;
     NodeDensity = GetDensityGlycol(state, std::string(), NodeTemperature, FluidIndex, RoutineName);
 
     // Store the passed in (requested, design) flow to the local value for performing iterations

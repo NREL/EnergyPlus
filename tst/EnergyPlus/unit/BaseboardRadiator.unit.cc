@@ -378,10 +378,10 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
         auto &loop(state->dataPlnt->PlantLoop(l));
         loop.PlantSizNum = 1;
         loop.FluidName = "WATER";
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand]);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }

@@ -6041,7 +6041,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             // fill fluid outlet node for hot water coil SuppHeatCoilFluidOutletNode
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode =
                 state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
-                    .LoopSide[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide]
+                    .LoopSide(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                     .Branch(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
                     .Comp(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilCompNum)
                     .NodeNumOut;
@@ -6079,7 +6079,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             // fill fluid outlet node for steam coil SuppHeatCoilFluidOutletNode
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode =
                 state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
-                    .LoopSide[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide]
+                    .LoopSide(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                     .Branch(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
                     .Comp(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilCompNum)
                     .NodeNumOut;

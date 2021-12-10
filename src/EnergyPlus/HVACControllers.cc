@@ -298,7 +298,7 @@ void ManageControllers(EnergyPlusData &state,
     if (ControllerProps(ControlNum).ActuatedNodePlantLoopNum > 0) {
 
         if (state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum)
-                .LoopSide[ControllerProps(ControlNum).ActuatedNodePlantLoopSide]
+                .LoopSide(ControllerProps(ControlNum).ActuatedNodePlantLoopSide)
                 .FlowLock == DataPlant::FlowLock::Locked) {
             // plant is rigid so controller cannot change anything.
             // Update the current Controller to the outlet nodes

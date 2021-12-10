@@ -2002,7 +2002,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
                 // fill outlet node for coil
                 MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
-                                                               .LoopSide[MSHeatPump(MSHeatPumpNum).LoopSide]
+                                                               .LoopSide(MSHeatPump(MSHeatPumpNum).LoopSide)
                                                                .Branch(MSHeatPump(MSHeatPumpNum).BranchNum)
                                                                .Comp(MSHeatPump(MSHeatPumpNum).CompNum)
                                                                .NodeNumOut;
@@ -2036,7 +2036,7 @@ namespace HVACMultiSpeedHeatPump {
 
                 // fill outlet node for coil
                 MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
-                                                               .LoopSide[MSHeatPump(MSHeatPumpNum).LoopSide]
+                                                               .LoopSide(MSHeatPump(MSHeatPumpNum).LoopSide)
                                                                .Branch(MSHeatPump(MSHeatPumpNum).BranchNum)
                                                                .Comp(MSHeatPump(MSHeatPumpNum).CompNum)
                                                                .NodeNumOut;
@@ -2074,7 +2074,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
                 // fill outlet node for coil
                 MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
-                                                                   .LoopSide[MSHeatPump(MSHeatPumpNum).SuppLoopSide]
+                                                                   .LoopSide(MSHeatPump(MSHeatPumpNum).SuppLoopSide)
                                                                    .Branch(MSHeatPump(MSHeatPumpNum).SuppBranchNum)
                                                                    .Comp(MSHeatPump(MSHeatPumpNum).SuppCompNum)
                                                                    .NodeNumOut;
@@ -2108,7 +2108,7 @@ namespace HVACMultiSpeedHeatPump {
 
                 // fill outlet node for coil
                 MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
-                                                                   .LoopSide[MSHeatPump(MSHeatPumpNum).SuppLoopSide]
+                                                                   .LoopSide(MSHeatPump(MSHeatPumpNum).SuppLoopSide)
                                                                    .Branch(MSHeatPump(MSHeatPumpNum).SuppBranchNum)
                                                                    .Comp(MSHeatPump(MSHeatPumpNum).SuppCompNum)
                                                                    .NodeNumOut;

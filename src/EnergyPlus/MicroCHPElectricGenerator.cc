@@ -1548,7 +1548,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
                 // IF this is on the supply side and not internal flow control then reset flow priority to lower
                 if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Supply) {
                     state.dataPlnt->PlantLoop(this->CWLoopNum)
-                        .LoopSide[this->CWLoopSideNum]
+                        .LoopSide(this->CWLoopSideNum)
                         .Branch(this->CWBranchNum)
                         .Comp(this->CWCompNum)
                         .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
