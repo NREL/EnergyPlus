@@ -2672,7 +2672,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
     state->dataPlnt->PlantLoop.allocate(LoopNum);
     state->dataPlnt->PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
-    auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(EnergyPlus::DataPlant::LoopSideLocation::Supply)]);
+    auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide[EnergyPlus::DataPlant::LoopSideLocation::Supply]);
     SupplySideloop.TotalBranches = 1;
     SupplySideloop.Branch.allocate(BranchNum);
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));

@@ -80,13 +80,13 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::WaterSource;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).Name = "FLUIDSOURCE";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::WaterSource;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).Name = "FLUIDSOURCE";
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).NodeNumIn = 1;
 
     // define the INOUT variables that are passed back
     Real64 myLoad = 0.0;

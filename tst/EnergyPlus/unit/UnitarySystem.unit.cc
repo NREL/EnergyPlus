@@ -201,10 +201,10 @@ protected:
 
         for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
             auto &loop(state->dataPlnt->PlantLoop(loopindex));
-            auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)]);
+            auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide[DataPlant::LoopSideLocation::Demand]);
             loopside.TotalBranches = 1;
             loopside.Branch.allocate(1);
-            auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1));
+            auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
             loopsidebranch.TotalComponents = 2;
             loopsidebranch.Comp.allocate(2);
         }
@@ -307,10 +307,10 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)]);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand]);
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -359,7 +359,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = 2;
     state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = 3;
     state->dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = 4;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
 
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
@@ -370,8 +370,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataSize->PlantSizData(1).ExitTemp = 5.7;
     state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
     state->dataSize->DataWaterLoopNum = 1;
     state->dataFluidProps->NumOfGlycols = 1;
 
@@ -417,9 +417,9 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat = DataSizing::AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = DataSizing::AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
     state->dataSize->DataWaterLoopNum = 2;
     state->dataSize->PlantSizData(2).DeltaT = 5.0;
 
@@ -3134,20 +3134,20 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.6);
     EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, 0.8);
 
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = "WATER COOLING COIL";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 10;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = 11;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = "WATER COOLING COIL";
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 10;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumOut = 11;
 
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = "WATER HEATING COIL";
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 4;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = 5;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = "WATER HEATING COIL";
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 4;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumOut = 5;
 
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(2).Name = "SUPP WATER HEATING COIL";
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(2).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(2).NodeNumIn = 8;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(2).NodeNumOut = 9;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(2).Name = "SUPP WATER HEATING COIL";
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(2).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(2).NodeNumIn = 8;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(2).NodeNumOut = 9;
 
     OutputReportPredefined::SetPredefinedTables(*state);
 
@@ -3510,10 +3510,10 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     auto coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", state->dataLoopNodes->NodeID);   // was Node 10
     auto coolingCoilWaterOutletNodeIndex = UtilityRoutines::FindItemInList("CHWOUTLETNODE", state->dataLoopNodes->NodeID); // was Node 10
 
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = "WATER COOLING COIL";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = coolingCoilWaterInletNodeIndex;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = coolingCoilWaterOutletNodeIndex;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = "WATER COOLING COIL";
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = coolingCoilWaterInletNodeIndex;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumOut = coolingCoilWaterOutletNodeIndex;
 
     OutputReportPredefined::SetPredefinedTables(*state);
 
@@ -4366,10 +4366,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
 
-        auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)]);
+        auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand]);
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -4377,9 +4377,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataPlnt->PlantLoop(1).FluidName = "FluidWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
     thisSys.m_HeatingCoilIndex = 1;
     thisSys.m_HeatingCoilName = state->dataWaterCoils->WaterCoil(1).Name;
@@ -4518,10 +4518,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
-        auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)]);
+        auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand]);
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -4529,9 +4529,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state->dataPlnt->PlantLoop(1).FluidName = "FluidWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
 
     thisSys.m_CoolingCoilIndex = 1;
     thisSys.m_CoolingCoilName = state->dataWaterCoils->WaterCoil(1).Name;
@@ -8224,10 +8224,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)]);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand]);
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -8235,17 +8235,17 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     state->dataPlnt->PlantLoop(1).FluidName = "FluidWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP COOLING MODE";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 6;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP COOLING MODE";
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 6;
 
     state->dataPlnt->PlantLoop(2).Name = "HotWaterLoop";
     state->dataPlnt->PlantLoop(2).FluidName = "FluidWaterLoop";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP HEATING MODE";
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 9;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = "SYS 1 HEAT PUMP HEATING MODE";
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 9;
 
     std::string compName = "UNITARY SYSTEM MODEL";
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
@@ -8562,10 +8562,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)]);
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand]);
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -8573,19 +8573,19 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     state->dataPlnt->PlantLoop(1).FluidName = "FluidWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = "WATER COOLING COIL";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 9;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = 10;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = "WATER COOLING COIL";
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 9;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumOut = 10;
 
     state->dataPlnt->PlantLoop(2).Name = "HotWaterLoop";
     state->dataPlnt->PlantLoop(2).FluidName = "FluidWaterLoop";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = "WATER HEATING COIL";
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 6;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = 7;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = "WATER HEATING COIL";
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = 6;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumOut = 7;
 
     std::string compName = "UNITARY SYSTEM MODEL";
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
@@ -12461,15 +12461,15 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
     state->dataSize->ZoneSizingRunDone = true;
     // DataSizing::NumPltSizInput = 2;
 
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(2).Name;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(2).WaterOutletNodeNum;
 
     // check user specified values before overriding during sizing
     Real64 userspecifiedFractionOfAutoSizedCoolingFlowRateValue = thisSys->m_MaxNoCoolHeatAirVolFlow;
@@ -12602,8 +12602,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSize->ZoneSizingRunDone = true;
 
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Demand].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 

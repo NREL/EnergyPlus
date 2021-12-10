@@ -104,7 +104,10 @@ namespace PlantUtilities {
 
     bool AnyPlantSplitterMixerLacksContinuity(EnergyPlusData &state);
 
-    void CheckPlantMixerSplitterConsistency(EnergyPlusData &state, int LoopNum, int LoopSideNum, bool FirstHVACIteration);
+    void CheckPlantMixerSplitterConsistency(EnergyPlusData &state,
+                                            const int LoopNum,
+                                            const DataPlant::LoopSideLocation LoopSideNum,
+                                            const bool FirstHVACIteration);
 
     void CheckForRunawayPlantTemps(EnergyPlusData &state, int LoopNum, const DataPlant::LoopSideLocation LoopSideNum);
 

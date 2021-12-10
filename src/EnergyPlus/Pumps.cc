@@ -188,7 +188,7 @@ void SimPumps(EnergyPlusData &state,
     InitializePumps(state, PumpNum);
 
     // If all we need is to set outlet min/max avail, then just do it and get out.  Also, we only do min/max avail on flow query
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)].FlowLock == DataPlant::FlowLock::PumpQuery) {
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[state.dataPumps->PumpEquip(PumpNum).LoopSideNum].FlowLock == DataPlant::FlowLock::PumpQuery) {
         SetupPumpMinMaxFlows(state, LoopNum, PumpNum);
         return;
     }
@@ -1475,21 +1475,21 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
         brnum = state.dataPumps->PumpEquip(PumpNum).BranchNum;
         cpnum = state.dataPumps->PumpEquip(PumpNum).CompNum;
         if (plloopnum > 0 && lsnum != DataPlant::LoopSideLocation::Invalid && brnum > 0 && cpnum > 0) {
-            if (state.dataPlnt->PlantLoop(plloopnum).LoopSide[static_cast<int>(lsnum)].Branch(brnum).Comp(cpnum).NodeNumIn != InletNode ||
-                state.dataPlnt->PlantLoop(plloopnum).LoopSide[static_cast<int>(lsnum)].Branch(brnum).Comp(cpnum).NodeNumOut != OutletNode) {
+            if (state.dataPlnt->PlantLoop(plloopnum).LoopSide[lsnum].Branch(brnum).Comp(cpnum).NodeNumIn != InletNode ||
+                state.dataPlnt->PlantLoop(plloopnum).LoopSide[lsnum].Branch(brnum).Comp(cpnum).NodeNumOut != OutletNode) {
                 ShowSevereError(state,
                                 "InitializePumps: " + cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType] + "=\"" +
                                     state.dataPumps->PumpEquip(PumpNum).Name + "\", non-matching nodes.");
                 ShowContinueError(state,
-                                  "...in Branch=\"" + state.dataPlnt->PlantLoop(plloopnum).LoopSide[static_cast<int>(lsnum)].Branch(brnum).Name +
+                                  "...in Branch=\"" + state.dataPlnt->PlantLoop(plloopnum).LoopSide[lsnum].Branch(brnum).Name +
                                       "\", Component referenced with:");
                 ShowContinueError(state,
                                   "...Inlet Node=\"" + state.dataLoopNodes->NodeID(
-                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide[static_cast<int>(lsnum)].Branch(brnum).Comp(cpnum).NodeNumIn));
+                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide[lsnum].Branch(brnum).Comp(cpnum).NodeNumIn));
                 ShowContinueError(
                     state,
                     "...Outlet Node=\"" +
-                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide[static_cast<int>(lsnum)].Branch(brnum).Comp(cpnum).NodeNumOut));
+                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide[lsnum].Branch(brnum).Comp(cpnum).NodeNumOut));
                 ShowContinueError(state, "...Pump Inlet Node=\"" + state.dataLoopNodes->NodeID(InletNode));
                 ShowContinueError(state, "...Pump Outlet Node=\"" + state.dataLoopNodes->NodeID(OutletNode));
                 errFlag = true;
@@ -1505,7 +1505,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
             ShowFatalError(state, "InitializePumps: Program terminated due to previous condition(s).");
         }
         state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-            .LoopSide[static_cast<int>(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)]
+            .LoopSide[state.dataPumps->PumpEquip(PumpNum).LoopSideNum]
             .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
             .Comp(state.dataPumps->PumpEquip(PumpNum).CompNum)
             .CompNum = PumpNum;
@@ -1579,7 +1579,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
         if (state.dataPumps->PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
             // reset flow priority appropriately (default was for Intermittent)
             state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                .LoopSide[static_cast<int>(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)]
+                .LoopSide[state.dataPumps->PumpEquip(PumpNum).LoopSideNum]
                 .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
                 .Comp(state.dataPumps->PumpEquip(PumpNum).CompNum)
                 .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
@@ -1943,7 +1943,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).pumpType),
                       BITF(PumpType::VarSpeed) | BITF(PumpType::Bank_VarSpeed) | BITF(PumpType::Cond))) {
         if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                .LoopSide[static_cast<int>(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)]
+                .LoopSide[state.dataPumps->PumpEquip(PumpNum).LoopSideNum]
                 .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
                 .Comp(state.dataPumps->PumpEquip(PumpNum).CompNum)
                 .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
@@ -2178,7 +2178,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     int PlantSizNum; // index of Plant Sizing array
     bool ErrorsFound;
     Real64 TotalEffic; // pump total efficiency
-    int Side;          // half loop index
+    DataPlant::LoopSideLocation Side;          // half loop index
     int BranchNum;     // index of branch
     int CompNum;       // index of component on branch
     Real64 PumpSizFac; // pump sizing factor
@@ -2211,28 +2211,28 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     } else {
         // might be able to remove this next block
         if (state.dataPumps->PumpEquip(PumpNum).LoopNum > 0) {
-            for (Side = static_cast<int>(DataPlant::LoopSideLocation::Demand); Side < static_cast<int>(DataPlant::LoopSideLocation::Supply); ++Side) {
-                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide[static_cast<int>(Side)].TotalBranches;
+            for (DataPlant::LoopSideLocation Side : DataPlant::LoopSideKeys) {
+                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide[Side].TotalBranches;
                      ++BranchNum) {
                     for (CompNum = 1;
                          CompNum <=
-                         state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide[static_cast<int>(Side)].Branch(BranchNum).TotalComponents;
+                         state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide[Side].Branch(BranchNum).TotalComponents;
                          ++CompNum) {
                         if (state.dataPumps->PumpEquip(PumpNum).InletNodeNum == state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                                                                                    .LoopSide[static_cast<int>(Side)]
+                                                                                    .LoopSide[Side]
                                                                                     .Branch(BranchNum)
                                                                                     .Comp(CompNum)
                                                                                     .NodeNumIn &&
                             state.dataPumps->PumpEquip(PumpNum).OutletNodeNum ==
                                 state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                                    .LoopSide[static_cast<int>(Side)]
+                                    .LoopSide[Side]
                                     .Branch(BranchNum)
                                     .Comp(CompNum)
                                     .NodeNumOut) {
-                            if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide[static_cast<int>(Side)].Branch(BranchNum).PumpSizFac >
+                            if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide[Side].Branch(BranchNum).PumpSizFac >
                                 0.0) {
                                 PumpSizFac = state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                                                 .LoopSide[static_cast<int>(Side)]
+                                                 .LoopSide[Side]
                                                  .Branch(BranchNum)
                                                  .PumpSizFac;
                             } else {
@@ -2252,7 +2252,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
         if (PlantSizNum > 0) {
             if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                 if (!state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                         .LoopSide[static_cast<int>(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)]
+                         .LoopSide[state.dataPumps->PumpEquip(PumpNum).LoopSideNum]
                          .BranchPumpsExist) {
                     // size pump to full flow of plant loop
                     if (state.dataPumps->PumpEquip(PumpNum).pumpType == PumpType::Cond) {
@@ -2270,7 +2270,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
                     // Distribute sizes evenly across all branch pumps
                     DesVolFlowRatePerBranch = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate /
                                               state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                                                  .LoopSide[static_cast<int>(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)]
+                                                  .LoopSide[state.dataPumps->PumpEquip(PumpNum).LoopSideNum]
                                                   .TotalPumps;
                     if (state.dataPumps->PumpEquip(PumpNum).pumpType == PumpType::Cond) {
                         TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);

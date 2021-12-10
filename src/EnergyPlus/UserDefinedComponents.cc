@@ -2426,14 +2426,14 @@ namespace UserDefinedComponents {
                 }
                 // set user input for flow priority
                 state.dataPlnt->PlantLoop(this->Loop.LoopNum)
-                    .LoopSide[static_cast<int>(this->Loop.LoopSideNum)]
+                    .LoopSide[this->Loop.LoopSideNum]
                     .Branch(this->Loop.BranchNum)
                     .Comp(this->Loop.CompNum)
                     .FlowPriority = this->Loop.FlowPriority;
 
                 // set user input for how loads served
                 state.dataPlnt->PlantLoop(this->Loop.LoopNum)
-                    .LoopSide[static_cast<int>(this->Loop.LoopSideNum)]
+                    .LoopSide[this->Loop.LoopSideNum]
                     .Branch(this->Loop.BranchNum)
                     .Comp(this->Loop.CompNum)
                     .HowLoadServed = this->Loop.HowLoadServed;
@@ -2506,14 +2506,14 @@ namespace UserDefinedComponents {
                     }
                     // set user input for flow priority
                     state.dataPlnt->PlantLoop(this->Loop(loop).LoopNum)
-                        .LoopSide[static_cast<int>(this->Loop(loop).LoopSideNum)]
+                        .LoopSide[this->Loop(loop).LoopSideNum]
                         .Branch(this->Loop(loop).BranchNum)
                         .Comp(this->Loop(loop).CompNum)
                         .FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
                     state.dataPlnt->PlantLoop(this->Loop(loop).LoopNum)
-                        .LoopSide[static_cast<int>(this->Loop(loop).LoopSideNum)]
+                        .LoopSide[this->Loop(loop).LoopSideNum]
                         .Branch(this->Loop(loop).BranchNum)
                         .Comp(this->Loop(loop).CompNum)
                         .HowLoadServed = this->Loop(loop).HowLoadServed;
@@ -2597,14 +2597,14 @@ namespace UserDefinedComponents {
                     }
                     // set user input for flow priority
                     state.dataPlnt->PlantLoop(this->Loop(loop).LoopNum)
-                        .LoopSide[static_cast<int>(this->Loop(loop).LoopSideNum)]
+                        .LoopSide[this->Loop(loop).LoopSideNum]
                         .Branch(this->Loop(loop).BranchNum)
                         .Comp(this->Loop(loop).CompNum)
                         .FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
                     state.dataPlnt->PlantLoop(this->Loop(loop).LoopNum)
-                        .LoopSide[static_cast<int>(this->Loop(loop).LoopSideNum)]
+                        .LoopSide[this->Loop(loop).LoopSideNum]
                         .Branch(this->Loop(loop).BranchNum)
                         .Comp(this->Loop(loop).CompNum)
                         .HowLoadServed = this->Loop(loop).HowLoadServed;
@@ -2706,7 +2706,7 @@ namespace UserDefinedComponents {
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapLowOutLimit) {
             state.dataPlnt->PlantLoop(this->Loop(LoopNum).LoopNum)
-                .LoopSide[static_cast<int>(this->Loop(LoopNum).LoopSideNum)]
+                .LoopSide[this->Loop(LoopNum).LoopSideNum]
                 .Branch(this->Loop(LoopNum).BranchNum)
                 .Comp(this->Loop(LoopNum).CompNum)
                 .MinOutletTemp = this->Loop(LoopNum).LowOutTempLimit;
@@ -2714,7 +2714,7 @@ namespace UserDefinedComponents {
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapHiOutLimit) {
             state.dataPlnt->PlantLoop(this->Loop(LoopNum).LoopNum)
-                .LoopSide[static_cast<int>(this->Loop(LoopNum).LoopSideNum)]
+                .LoopSide[this->Loop(LoopNum).LoopSideNum]
                 .Branch(this->Loop(LoopNum).BranchNum)
                 .Comp(this->Loop(LoopNum).CompNum)
                 .MaxOutletTemp = this->Loop(LoopNum).HiOutTempLimit;
@@ -2745,14 +2745,14 @@ namespace UserDefinedComponents {
 
                 // set user input for flow priority
                 state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
-                    .LoopSide[static_cast<int>(this->Loop(ConnectionNum).LoopSideNum)]
+                    .LoopSide[this->Loop(ConnectionNum).LoopSideNum]
                     .Branch(this->Loop(ConnectionNum).BranchNum)
                     .Comp(this->Loop(ConnectionNum).CompNum)
                     .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
 
                 // set user input for how loads served
                 state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
-                    .LoopSide[static_cast<int>(this->Loop(ConnectionNum).LoopSideNum)]
+                    .LoopSide[this->Loop(ConnectionNum).LoopSideNum]
                     .Branch(this->Loop(ConnectionNum).BranchNum)
                     .Comp(this->Loop(ConnectionNum).CompNum)
                     .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;

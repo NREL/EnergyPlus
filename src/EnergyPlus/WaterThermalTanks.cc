@@ -294,7 +294,7 @@ void WaterThermalTankData::simulate(
     }
     this->UseSideLoadRequested = std::abs(CurLoad);
     if (this->UseSide.loopNum > 0 && this->UseSide.loopSideNum != DataPlant::LoopSideLocation::Invalid && !state.dataGlobal->KickOffSimulation) {
-        this->UseCurrentFlowLock = state.dataPlnt->PlantLoop(this->UseSide.loopNum).LoopSide[static_cast<int>(this->UseSide.loopSideNum)].FlowLock;
+        this->UseCurrentFlowLock = state.dataPlnt->PlantLoop(this->UseSide.loopNum).LoopSide[this->UseSide.loopSideNum].FlowLock;
     } else {
         this->UseCurrentFlowLock = DataPlant::FlowLock::Locked;
     }
@@ -386,7 +386,7 @@ void HeatPumpWaterHeaterData::simulate(
     }
     Tank.UseSideLoadRequested = std::abs(CurLoad);
     if (Tank.UseSide.loopNum > 0 && Tank.UseSide.loopSideNum != DataPlant::LoopSideLocation::Invalid && !state.dataGlobal->KickOffSimulation) {
-        Tank.UseCurrentFlowLock = state.dataPlnt->PlantLoop(Tank.UseSide.loopNum).LoopSide[static_cast<int>(Tank.UseSide.loopSideNum)].FlowLock;
+        Tank.UseCurrentFlowLock = state.dataPlnt->PlantLoop(Tank.UseSide.loopNum).LoopSide[Tank.UseSide.loopSideNum].FlowLock;
     } else {
         Tank.UseCurrentFlowLock = DataPlant::FlowLock::Locked;
     }
@@ -6129,7 +6129,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
 
             this->Mass = this->Volume * rho;
             this->UseBranchControlType = state.dataPlnt->PlantLoop(this->UseSide.loopNum)
-                                             .LoopSide[static_cast<int>(this->UseSide.loopSideNum)]
+                                             .LoopSide[this->UseSide.loopSideNum]
                                              .Branch(this->UseSide.branchNum)
                                              .Comp(this->UseSide.compNum)
                                              .FlowCtrl;
@@ -6157,7 +6157,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->SavedSourceOutletTemp = 0.0;
 
             this->SourceBranchControlType = state.dataPlnt->PlantLoop(this->SrcSide.loopNum)
-                                                .LoopSide[static_cast<int>(this->SrcSide.loopSideNum)]
+                                                .LoopSide[this->SrcSide.loopSideNum]
                                                 .Branch(this->SrcSide.branchNum)
                                                 .Comp(this->SrcSide.compNum)
                                                 .FlowCtrl;
@@ -10803,10 +10803,10 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
             ErrorsFound = true;
         }
         // Is this wh Use side plumbed in series (default) or are there other branches in parallel?
-        if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide[static_cast<int>(LoopSideNum)].Splitter.Exists) {
-            if (any_eq(state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide[static_cast<int>(LoopSideNum)].Splitter.NodeNumOut,
+        if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide[LoopSideNum].Splitter.Exists) {
+            if (any_eq(state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide[LoopSideNum].Splitter.NodeNumOut,
                        this->UseInletNode)) { // this wh is on the splitter
-                if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide[static_cast<int>(LoopSideNum)].Splitter.TotalOutletNodes > 1) {
+                if (state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide[LoopSideNum].Splitter.TotalOutletNodes > 1) {
                     this->UseSideSeries = false;
                 }
             }
@@ -10823,10 +10823,10 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
             ErrorsFound = true;
         }
         // Is this wh Source side plumbed in series (default) or are there other branches in parallel?
-        if (state.dataPlnt->PlantLoop(this->SrcSide.loopNum).LoopSide[static_cast<int>(this->SrcSide.loopSideNum)].Splitter.Exists) {
-            if (any_eq(state.dataPlnt->PlantLoop(this->SrcSide.loopNum).LoopSide[static_cast<int>(this->SrcSide.loopSideNum)].Splitter.NodeNumOut,
+        if (state.dataPlnt->PlantLoop(this->SrcSide.loopNum).LoopSide[this->SrcSide.loopSideNum].Splitter.Exists) {
+            if (any_eq(state.dataPlnt->PlantLoop(this->SrcSide.loopNum).LoopSide[this->SrcSide.loopSideNum].Splitter.NodeNumOut,
                        this->SourceInletNode)) { // this wh is on the splitter
-                if (state.dataPlnt->PlantLoop(this->SrcSide.loopNum).LoopSide[static_cast<int>(this->SrcSide.loopSideNum)].Splitter.TotalOutletNodes > 1) {
+                if (state.dataPlnt->PlantLoop(this->SrcSide.loopNum).LoopSide[this->SrcSide.loopSideNum].Splitter.TotalOutletNodes > 1) {
                     this->SourceSideSeries = false;
                 }
             }

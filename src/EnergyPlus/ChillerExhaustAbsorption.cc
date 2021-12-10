@@ -135,14 +135,14 @@ void ExhaustAbsorberSpecs::simulate(
     DataPlant::BrLoopType brIdentity(DataPlant::BrLoopType::NoMatch);
 
     int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                              .LoopSide[static_cast<int>(calledFromLocation.loopSideNum)]
+                              .LoopSide[calledFromLocation.loopSideNum]
                               .Branch(calledFromLocation.branchNum)
                               .TotalComponents;
 
     for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                                   .LoopSide[static_cast<int>(calledFromLocation.loopSideNum)]
+                                   .LoopSide[calledFromLocation.loopSideNum]
                                    .Branch(calledFromLocation.branchNum)
                                    .Comp(iComp)
                                    .NodeNumIn;
@@ -200,14 +200,14 @@ void ExhaustAbsorberSpecs::getDesignCapacities(
     bool matchfound(false);
 
     int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                              .LoopSide[static_cast<int>(calledFromLocation.loopSideNum)]
+                              .LoopSide[calledFromLocation.loopSideNum]
                               .Branch(calledFromLocation.branchNum)
                               .TotalComponents;
 
     for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                                   .LoopSide[static_cast<int>(calledFromLocation.loopSideNum)]
+                                   .LoopSide[calledFromLocation.loopSideNum]
                                    .Branch(calledFromLocation.branchNum)
                                    .Comp(iComp)
                                    .NodeNumIn;
@@ -256,7 +256,7 @@ void ExhaustAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLoc
 
     // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
     int BranchInletNodeNum =
-        state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide[static_cast<int>(calledFromLocation.loopSideNum)].Branch(calledFromLocation.branchNum).NodeNumIn;
+        state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide[calledFromLocation.loopSideNum].Branch(calledFromLocation.branchNum).NodeNumIn;
 
     if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
         this->size(state);                                // only call from chilled water loop
@@ -1721,7 +1721,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
         LoopNum = this->CWLoopNum;
         LoopSideNum = this->CWLoopSideNum;
         {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].FlowLock);
+            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].FlowLock);
             if (SELECT_CASE_var == DataPlant::FlowLock::Unlocked) { // mass flow rates may be changed by loop components
                 this->PossibleSubcooling = false;
                 lCoolingLoad = std::abs(MyLoad);
@@ -2069,7 +2069,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
         //    cooling load taken by the chiller, and
         //    supply temperature
         {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].FlowLock);
+            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].FlowLock);
             if (SELECT_CASE_var == DataPlant::FlowLock::Unlocked) { // mass flow rates may be changed by loop components
                 lHeatingLoad = std::abs(MyLoad);
                 if (HeatDeltaTemp != 0) {

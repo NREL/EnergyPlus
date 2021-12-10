@@ -444,7 +444,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     convergence.PlantTempNotConverged = false;
 
     // set the LoopSide inlet node
-    ThisLoopSideInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(ThisLoopSideNum)].NodeNumIn;
+    ThisLoopSideInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[ThisLoopSideNum].NodeNumIn;
 
     // save the inlet node temp for DeltaEnergy check
     OldOtherLoopSideInletMdot = state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate;
@@ -613,20 +613,20 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
 
     // find tank inlet and outlet nodes
     TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
-    TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankInletLoopSide)].NodeNumOut;
-    TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].NodeNumIn;
+    TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankInletLoopSide].NodeNumOut;
+    TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].NodeNumIn;
 
     TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
 
     // This needs to be based on time to deal with system downstepping and repeated timesteps
     TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TimeElapsed != TimeElapsed) {
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].LastTempInterfaceTankOutlet =
-            state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TempInterfaceTankOutlet;
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TimeElapsed = TimeElapsed;
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TimeElapsed != TimeElapsed) {
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].LastTempInterfaceTankOutlet =
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TempInterfaceTankOutlet;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TimeElapsed = TimeElapsed;
     }
 
-    LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].LastTempInterfaceTankOutlet;
+    LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].LastTempInterfaceTankOutlet;
 
     // calculate the specific heat for the capacitance calculation
     Cp = GetSpecificHeatGlycol(
@@ -643,7 +643,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
 
     TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
     MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
-    PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TotalPumpHeat;
+    PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TotalPumpHeat;
     ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
 
     if (ThisTankMass <= 0.0) { // no mass, no plant loop volume
@@ -681,16 +681,16 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     }
 
     // update last tank outlet temperature
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TempInterfaceTankOutlet = TankFinalTemp;
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TempInterfaceTankOutlet = TankFinalTemp;
 
     // update heat transport and heat storage rates
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].LoopSideInlet_MdotCpDeltaT =
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].LoopSideInlet_MdotCpDeltaT =
         (TankInletTemp - TankAverageTemp) * Cp * MassFlowRate;
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].LoopSideInlet_McpDTdt =
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].LoopSideInlet_McpDTdt =
         (ThisTankMass * Cp * (TankFinalTemp - LastTankOutletTemp)) / TimeStepSeconds;
 
     // update report variable
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].LoopSideInlet_TankTemp = TankAverageTemp;
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].LoopSideInlet_TankTemp = TankAverageTemp;
 
     TankOutletTemp = TankAverageTemp;
 }
@@ -756,8 +756,8 @@ void UpdateCommonPipe(
 
     // find tank inlet and outlet nodes
     TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
-    TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankInletLoopSide)].NodeNumOut;
-    TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].NodeNumIn;
+    TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankInletLoopSide].NodeNumOut;
+    TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].NodeNumIn;
 
     TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
 
@@ -770,13 +770,13 @@ void UpdateCommonPipe(
 
     // This needs to be based on time to deal with system downstepping and repeated timesteps
     TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TimeElapsed != TimeElapsed) {
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].LastTempInterfaceTankOutlet =
-            state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TempInterfaceTankOutlet;
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TimeElapsed = TimeElapsed;
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TimeElapsed != TimeElapsed) {
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].LastTempInterfaceTankOutlet =
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TempInterfaceTankOutlet;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TimeElapsed = TimeElapsed;
     }
 
-    LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].LastTempInterfaceTankOutlet;
+    LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].LastTempInterfaceTankOutlet;
 
     // calculate the specific heat for the capacitance calculation
     Cp = GetSpecificHeatGlycol(
@@ -796,7 +796,7 @@ void UpdateCommonPipe(
     // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
     TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
     MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
-    PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankInletLoopSide)].TotalPumpHeat;
+    PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankInletLoopSide].TotalPumpHeat;
     ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
 
     if (ThisTankMass <= 0.0) { // no mass, no plant loop volume
@@ -833,9 +833,9 @@ void UpdateCommonPipe(
         MixedOutletTemp = state.dataLoopNodes->Node(TankOutletNode).Temp;
     }
 
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].TempInterfaceTankOutlet = TankFinalTemp;
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].TempInterfaceTankOutlet = TankFinalTemp;
 
-    state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(TankOutletLoopSide)].LoopSideInlet_TankTemp = TankAverageTemp;
+    state.dataPlnt->PlantLoop(LoopNum).LoopSide[TankOutletLoopSide].LoopSideInlet_TankTemp = TankAverageTemp;
 }
 
 void ManageSingleCommonPipe(EnergyPlusData &state,
@@ -893,10 +893,10 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     }
 
     // fill local node indexes
-    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Supply)].NodeNumIn;
-    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Supply)].NodeNumOut;
-    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Demand)].NodeNumIn;
-    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Demand)].NodeNumOut;
+    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideLocation::Supply].NodeNumIn;
+    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideLocation::Supply].NodeNumOut;
+    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideLocation::Demand].NodeNumIn;
+    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideLocation::Demand].NodeNumOut;
 
     if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
         PlantCommonPipe(LoopNum).Flow = 0.0;
@@ -914,10 +914,10 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
 
     if (LoopSide == LoopSideLocation::Supply) {
         TempSecOutTankOut = TankOutletTemp;
-        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Demand)].LoopSideInlet_TankTemp;
+        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideLocation::Demand].LoopSideInlet_TankTemp;
     } else {
         TempPriOutTankOut = TankOutletTemp;
-        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideLocation::Supply)].LoopSideInlet_TankTemp;
+        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideLocation::Supply].LoopSideInlet_TankTemp;
     }
 
     // first do mass balances and find common pipe flow rate and direction
@@ -1037,10 +1037,10 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
     }
 
     // fill local node indexes
-    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumIn;
-    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].NodeNumOut;
-    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumIn;
-    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].NodeNumOut;
+    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].NodeNumIn;
+    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].NodeNumOut;
+    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Demand].NodeNumIn;
+    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Demand].NodeNumOut;
 
     // begin environment inits
     if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
@@ -1070,10 +1070,10 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
 
     if (LoopSide == DataPlant::LoopSideLocation::Supply) {
         TempSecOutTankOut = TankOutletTemp;
-        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].LoopSideInlet_TankTemp;
+        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Demand].LoopSideInlet_TankTemp;
     } else {
         TempPriOutTankOut = TankOutletTemp;
-        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].LoopSideInlet_TankTemp;
+        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].LoopSideInlet_TankTemp;
     }
 
     // determine current case
@@ -1081,21 +1081,21 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
     // commonpipe control point is the inlet of one of the half loops
     CurCallingCase = 0;
     if (LoopSide == DataPlant::LoopSideLocation::Supply) { // update primary inlet
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].InletNodeSetPt &&
-            !state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNodeSetPt) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].InletNodeSetPt &&
+            !state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Demand].InletNodeSetPt) {
             CurCallingCase = SupplyLedPrimaryInletUpdate;
 
-        } else if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].InletNodeSetPt &&
-                   state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNodeSetPt) {
+        } else if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].InletNodeSetPt &&
+                   state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Demand].InletNodeSetPt) {
             CurCallingCase = DemandLedPrimaryInletUpdate;
         }
     } else { // update secondary inlet
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].InletNodeSetPt &&
-            !state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNodeSetPt) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].InletNodeSetPt &&
+            !state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Demand].InletNodeSetPt) {
             CurCallingCase = SupplyLedSecondaryInletUpdate;
 
-        } else if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].InletNodeSetPt &&
-                   state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].InletNodeSetPt) {
+        } else if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Supply].InletNodeSetPt &&
+                   state.dataPlnt->PlantLoop(LoopNum).LoopSide[DataPlant::LoopSideLocation::Demand].InletNodeSetPt) {
             CurCallingCase = DemandLedSecondaryInletUpdate;
         }
     }
@@ -1240,8 +1240,8 @@ void SetupCommonPipes(EnergyPlusData &state)
     for (CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
 
         // reference to easily lookup the first item once
-        auto &first_demand_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide[static_cast<int>(LoopSideLocation::Demand)].Branch(1).Comp(1).Type);
-        auto &first_supply_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide[static_cast<int>(LoopSideLocation::Supply)].Branch(1).Comp(1).Type);
+        auto &first_demand_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide[LoopSideLocation::Demand].Branch(1).Comp(1).Type);
+        auto &first_supply_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide[LoopSideLocation::Supply].Branch(1).Comp(1).Type);
 
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);

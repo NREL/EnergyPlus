@@ -1818,7 +1818,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // lock the evap flow at test condition specified
     int LoopNum = thisChiller.CWLoopNum;
     DataPlant::LoopSideLocation LoopSideNum = thisChiller.CWLoopSideNum;
-    state->dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSideNum)].FlowLock = DataPlant::FlowLock::Locked;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSideNum].FlowLock = DataPlant::FlowLock::Locked;
     // calc generator flow
     int GenLoopNum = thisChiller.GenLoopNum;
     DataPlant::LoopSideLocation GenLoopSideNum = thisChiller.GenLoopSideNum;

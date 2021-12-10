@@ -4193,7 +4193,7 @@ void InitPTUnit(EnergyPlusData &state,
 
             // fill outlet node for coil
             state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum)
-                                                                        .LoopSide[static_cast<int>(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide)]
+                                                                        .LoopSide[state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide]
                                                                         .Branch(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum)
                                                                         .Comp(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum)
                                                                         .NodeNumOut;
@@ -4263,7 +4263,7 @@ void InitPTUnit(EnergyPlusData &state,
             }
             // fill outlet node for coil
             state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum)
-                                                                        .LoopSide[static_cast<int>(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide)]
+                                                                        .LoopSide[state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide]
                                                                         .Branch(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum)
                                                                         .Comp(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum)
                                                                         .NodeNumOut;

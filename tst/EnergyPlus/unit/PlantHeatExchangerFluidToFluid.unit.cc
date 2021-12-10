@@ -2426,30 +2426,30 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TotalBranches = 2;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(2).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(2).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(2).Comp(1).NodeNumIn = 5;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].TotalBranches = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(2).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(2).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(2).Comp(1).NodeNumIn = 5;
 
     // loop 2 is like a condenser loop, demand side of HX
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].TotalBranches = 1;
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].TotalBranches = 1;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp.allocate(1);
 
     state->dataPlnt->PlantLoop(1).Name = "HX supply side loop ";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).Name = state->dataPlantHXFluidToFluid->FluidHX(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).Name = state->dataPlantHXFluidToFluid->FluidHX(1).Name;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum;
 
     state->dataPlnt->PlantLoop(2).Name = "HX demand side loop ";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
@@ -2468,7 +2468,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
 
     state->dataPlantHXFluidToFluid->NumberOfPlantFluidHXs = 1;
 
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(2).Comp(1).HowLoadServed = DataPlant::HowMet::ByNominalCap;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(2).Comp(1).HowLoadServed = DataPlant::HowMet::ByNominalCap;
     state->dataEnvrn->OutDryBulbTemp = 9.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).TempControlTol = 0.0;
     state->dataLoopNodes->Node(3).TempSetPoint = 11.0;

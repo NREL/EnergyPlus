@@ -1548,7 +1548,7 @@ namespace HVACUnitaryBypassVAV {
 
                 // fill outlet node for heating coil
                 CBVAV(CBVAVNum).CoilOutletNode = state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum)
-                                                     .LoopSide[static_cast<int>(CBVAV(CBVAVNum).LoopSide)]
+                                                     .LoopSide[CBVAV(CBVAVNum).LoopSide]
                                                      .Branch(CBVAV(CBVAVNum).BranchNum)
                                                      .Comp(CBVAV(CBVAVNum).CompNum)
                                                      .NodeNumOut;

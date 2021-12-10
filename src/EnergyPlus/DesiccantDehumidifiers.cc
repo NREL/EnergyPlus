@@ -1898,7 +1898,7 @@ namespace DesiccantDehumidifiers {
 
                 // fill outlet node for regenartion hot water or steam heating coil
                 DesicDehum(DesicDehumNum).CoilOutletNode = state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum)
-                                                               .LoopSide[static_cast<int>(DesicDehum(DesicDehumNum).LoopSide)]
+                                                               .LoopSide[DesicDehum(DesicDehumNum).LoopSide]
                                                                .Branch(DesicDehum(DesicDehumNum).BranchNum)
                                                                .Comp(DesicDehum(DesicDehumNum).CompNum)
                                                                .NodeNumOut;

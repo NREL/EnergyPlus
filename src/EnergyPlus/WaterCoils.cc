@@ -6910,13 +6910,13 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
 
     if (DidAnythingChange) {
         // set sim flag for this loop
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSide)].SimLoopSideNeeded = true;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSide].SimLoopSideNeeded = true;
         // set sim flags for air side users of coils
 
         state.dataHVACGlobal->SimAirLoopsFlag = true;
         state.dataHVACGlobal->SimZoneEquipmentFlag = true;
     } else { // nothing changed so turn off sim flag
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide[static_cast<int>(LoopSide)].SimLoopSideNeeded = false;
+        state.dataPlnt->PlantLoop(LoopNum).LoopSide[LoopSide].SimLoopSideNeeded = false;
     }
 }
 

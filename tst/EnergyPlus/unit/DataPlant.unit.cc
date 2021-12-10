@@ -83,22 +83,22 @@ TEST_F(EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop)
 
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.allocate(1);
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp.allocate(1);
 
     // initialize all node numbers to zero
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 0;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumIn = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).NodeNumOut = 0;
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 0;
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumOut = 0;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumIn = 0;
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).NodeNumOut = 0;
 
     // specify the node numbers of interest
     int constexpr nodeNumA = 1;
@@ -106,12 +106,12 @@ TEST_F(EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop)
 
     // first test, expected pass
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).NodeNumIn = 2;
     EXPECT_TRUE(PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(*state, nodeNumA, nodeNumB));
 
     // reset node numbers
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 0;
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp(1).NodeNumIn = 0;
 
     // second test, expected false
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp(1).NodeNumIn = 1;
@@ -121,11 +121,11 @@ TEST_F(EnergyPlusFixture, DataPlant_verifyTwoNodeNumsOnSamePlantLoop)
     state->dataPlnt->TotNumLoops = 0;
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.deallocate();
     state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.deallocate();
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.deallocate();
-    state->dataPlnt->PlantLoop(1).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.deallocate();
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp.deallocate();
+    state->dataPlnt->PlantLoop(1).LoopSide[DataPlant::LoopSideLocation::Supply].Branch.deallocate();
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch(1).Comp.deallocate();
     state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Demand)].Branch.deallocate();
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch(1).Comp.deallocate();
-    state->dataPlnt->PlantLoop(2).LoopSide[static_cast<int>(DataPlant::LoopSideLocation::Supply)].Branch.deallocate();
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch(1).Comp.deallocate();
+    state->dataPlnt->PlantLoop(2).LoopSide[DataPlant::LoopSideLocation::Supply].Branch.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
 }

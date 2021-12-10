@@ -133,7 +133,7 @@ void BLASTAbsorberSpecs::simulate(
 {
 
     this->EquipFlowCtrl = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                              .LoopSide[static_cast<int>(calledFromLocation.loopSideNum)]
+                              .LoopSide[calledFromLocation.loopSideNum]
                               .Branch(calledFromLocation.branchNum)
                               .Comp(calledFromLocation.compNum)
                               .FlowCtrl;
@@ -761,12 +761,12 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     }
 
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[this->CWLoopSideNum].Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[this->CWLoopSideNum].Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
         if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -1545,7 +1545,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
 
     // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
     // condenser side outlet temperature.
-    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[static_cast<int>(this->CWLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide[this->CWLoopSideNum].FlowLock == DataPlant::FlowLock::Unlocked) {
         this->PossibleSubcooling = false;
         this->QEvaporator = std::abs(MyLoad);
         // limit by max capacity
@@ -1645,7 +1645,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                 if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
+                             .LoopSide[this->CWLoopSideNum]
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -1657,7 +1657,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                 } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide[static_cast<int>(this->CWLoopSideNum)]
+                             .LoopSide[this->CWLoopSideNum]
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -1790,7 +1790,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                              state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                              state.dataPlnt->PlantLoop(GenLoopNum).FluidIndex,
                                                              RoutineName);
-            if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide[static_cast<int>(this->GenLoopSideNum)].FlowLock == DataPlant::FlowLock::Unlocked) {
+            if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide[this->GenLoopSideNum].FlowLock == DataPlant::FlowLock::Unlocked) {
                 if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
                     GenMassFlowRate = this->GenMassFlowRateMax;
                 } else { // LeavingSetpointModulated

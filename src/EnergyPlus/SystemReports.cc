@@ -3178,7 +3178,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     // in making this change, over 700 lines of code were dropped down to a single block
 
     for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops + state.dataHVACGlobal->NumCondLoops; ++PlantLoopNum) {
-        for (int LoopSideNum = static_cast<int>(LoopSideLocation::Demand); LoopSideNum < static_cast<int>(LoopSideLocation::Num); ++LoopSideNum) {
+        for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
 
             // Report selection
             ReportLoopData *select_ThisReportData(nullptr);
@@ -3186,9 +3186,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             if (PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops) {
                 {
                     auto const SELECT_CASE_var(LoopSideNum);
-                    if (SELECT_CASE_var == static_cast<int>(LoopSideLocation::Demand)) {
+                    if (SELECT_CASE_var == LoopSideLocation::Demand) {
                         select_ThisReportData = &state.dataPlnt->VentRepPlantDemandSide(PlantLoopNum);
-                    } else if (SELECT_CASE_var == static_cast<int>(LoopSideLocation::Supply)) {
+                    } else if (SELECT_CASE_var == LoopSideLocation::Supply) {
                         select_ThisReportData = &state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum);
                     } else {
                         assert(false);
@@ -3197,9 +3197,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             } else { // CondLoop
                 {
                     auto const SELECT_CASE_var(LoopSideNum);
-                    if (SELECT_CASE_var == static_cast<int>(LoopSideLocation::Demand)) {
+                    if (SELECT_CASE_var == LoopSideLocation::Demand) {
                         select_ThisReportData = &state.dataPlnt->VentRepCondDemandSide(PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
-                    } else if (SELECT_CASE_var == static_cast<int>(LoopSideLocation::Supply)) {
+                    } else if (SELECT_CASE_var == LoopSideLocation::Supply) {
                         select_ThisReportData = &state.dataPlnt->VentRepCondSupplySide(PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
                     } else {
                         assert(false);
@@ -3321,7 +3321,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
     for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops + state.dataHVACGlobal->NumCondLoops; ++PlantLoopNum) {
 
-        for (int LoopSideNum = static_cast<int>(LoopSideLocation::Demand); LoopSideNum < static_cast<int>(LoopSideLocation::Num); ++LoopSideNum) {
+        for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
 
             // Report selection
             ReportLoopData *select_ThisReportData(nullptr);
@@ -3329,9 +3329,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             if (PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops) {
                 {
                     auto const SELECT_CASE_var(LoopSideNum);
-                    if (SELECT_CASE_var == static_cast<int>(LoopSideLocation::Demand)) {
+                    if (SELECT_CASE_var == LoopSideLocation::Demand) {
                         select_ThisReportData = &state.dataPlnt->VentRepPlantDemandSide(PlantLoopNum);
-                    } else if (SELECT_CASE_var == static_cast<int>(LoopSideLocation::Supply)) {
+                    } else if (SELECT_CASE_var == LoopSideLocation::Supply) {
                         select_ThisReportData = &state.dataPlnt->VentRepPlantSupplySide(PlantLoopNum);
                     } else {
                         assert(false);
@@ -3340,9 +3340,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             } else { // CondLoop
                 {
                     auto const SELECT_CASE_var(LoopSideNum);
-                    if (SELECT_CASE_var == static_cast<int>(LoopSideLocation::Demand)) {
+                    if (SELECT_CASE_var == LoopSideLocation::Demand) {
                         select_ThisReportData = &state.dataPlnt->VentRepCondDemandSide(PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
-                    } else if (SELECT_CASE_var == static_cast<int>(LoopSideLocation::Supply)) {
+                    } else if (SELECT_CASE_var == LoopSideLocation::Supply) {
                         select_ThisReportData = &state.dataPlnt->VentRepCondSupplySide(PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
                     } else {
                         assert(false);

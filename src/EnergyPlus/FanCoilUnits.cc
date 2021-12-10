@@ -1191,7 +1191,7 @@ namespace FanCoilUnits {
                 }
 
                 FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum)
-                                                                     .LoopSide[static_cast<int>(FanCoil(FanCoilNum).HeatCoilLoopSide)]
+                                                                     .LoopSide[FanCoil(FanCoilNum).HeatCoilLoopSide]
                                                                      .Branch(FanCoil(FanCoilNum).HeatCoilBranchNum)
                                                                      .Comp(FanCoil(FanCoilNum).HeatCoilCompNum)
                                                                      .NodeNumOut;
@@ -1222,7 +1222,7 @@ namespace FanCoilUnits {
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
                 }
                 FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum)
-                                                                     .LoopSide[static_cast<int>(FanCoil(FanCoilNum).CoolCoilLoopSide)]
+                                                                     .LoopSide[FanCoil(FanCoilNum).CoolCoilLoopSide]
                                                                      .Branch(FanCoil(FanCoilNum).CoolCoilBranchNum)
                                                                      .Comp(FanCoil(FanCoilNum).CoolCoilCompNum)
                                                                      .NodeNumOut;
@@ -2415,7 +2415,7 @@ namespace FanCoilUnits {
                                      FanCoil(FanCoilNum).CoolCoilLoopSide,
                                      FanCoil(FanCoilNum).CoolCoilBranchNum,
                                      FanCoil(FanCoilNum).CoolCoilCompNum);
-                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).LoopSide[static_cast<int>(FanCoil(FanCoilNum).CoolCoilLoopSide)].FlowLock ==
+                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).LoopSide[FanCoil(FanCoilNum).CoolCoilLoopSide].FlowLock ==
                     DataPlant::FlowLock::Locked) {
                     ColdFlowLocked = true; // check for flow lock
                 }
@@ -2429,7 +2429,7 @@ namespace FanCoilUnits {
                                          FanCoil(FanCoilNum).HeatCoilLoopSide,
                                          FanCoil(FanCoilNum).HeatCoilBranchNum,
                                          FanCoil(FanCoilNum).HeatCoilCompNum);
-                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).LoopSide[static_cast<int>(FanCoil(FanCoilNum).HeatCoilLoopSide)].FlowLock ==
+                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).LoopSide[FanCoil(FanCoilNum).HeatCoilLoopSide].FlowLock ==
                         DataPlant::FlowLock::Locked) {
                         HotFlowLocked = true; // save locked flow
                     }
@@ -2798,7 +2798,7 @@ namespace FanCoilUnits {
                                      FanCoil(FanCoilNum).CoolCoilLoopSide,
                                      FanCoil(FanCoilNum).CoolCoilBranchNum,
                                      FanCoil(FanCoilNum).CoolCoilCompNum);
-                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).LoopSide[static_cast<int>(FanCoil(FanCoilNum).CoolCoilLoopSide)].FlowLock ==
+                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).LoopSide[FanCoil(FanCoilNum).CoolCoilLoopSide].FlowLock ==
                     DataPlant::FlowLock::Locked) {
                     ColdFlowLocked = true; // check for flow lock
                 }
@@ -2812,7 +2812,7 @@ namespace FanCoilUnits {
                                          FanCoil(FanCoilNum).HeatCoilLoopSide,
                                          FanCoil(FanCoilNum).HeatCoilBranchNum,
                                          FanCoil(FanCoilNum).HeatCoilCompNum);
-                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).LoopSide[static_cast<int>(FanCoil(FanCoilNum).HeatCoilLoopSide)].FlowLock ==
+                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).LoopSide[FanCoil(FanCoilNum).HeatCoilLoopSide].FlowLock ==
                         DataPlant::FlowLock::Locked) {
                         HotFlowLocked = true; // save locked flow
                     }

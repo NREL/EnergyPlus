@@ -80,11 +80,19 @@ namespace PlantPressureSystem {
 
     void UpdatePressureDrop(EnergyPlusData &state, int LoopNum);
 
-    void DistributePressureOnBranch(EnergyPlusData &state, int LoopNum, int LoopSideNum, int BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
+    void DistributePressureOnBranch(EnergyPlusData &state,
+                                    const int LoopNum,
+                                    const DataPlant::LoopSideLocation LoopSideNum,
+                                    const int BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
 
-    void PassPressureAcrossMixer(EnergyPlusData &state, int LoopNum, int LoopSideNum, Real64 &MixerPressure, int NumBranchesOnLoopSide);
+    void PassPressureAcrossMixer(EnergyPlusData &state,
+                                 const int LoopNum,
+                                 const DataPlant::LoopSideLocation LoopSideNum, Real64 &MixerPressure,
+                                 const int NumBranchesOnLoopSide);
 
-    void PassPressureAcrossSplitter(EnergyPlusData &state, int LoopNum, int LoopSideNum, Real64 &SplitterInletPressure);
+    void PassPressureAcrossSplitter(EnergyPlusData &state,
+                                    const int LoopNum,
+                                    const DataPlant::LoopSideLocation LoopSideNum, Real64 &SplitterInletPressure);
 
     void PassPressureAcrossInterface(EnergyPlusData &state, int LoopNum);
 

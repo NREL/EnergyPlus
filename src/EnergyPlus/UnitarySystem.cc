@@ -755,7 +755,7 @@ namespace UnitarySystems {
                 }
                 // fill outlet node for coil
                 this->CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->CoolCoilLoopNum)
-                                                       .LoopSide[static_cast<int>(this->CoolCoilLoopSide)]
+                                                       .LoopSide[this->CoolCoilLoopSide]
                                                        .Branch(this->CoolCoilBranchNum)
                                                        .Comp(this->CoolCoilCompNum)
                                                        .NodeNumOut;
@@ -820,7 +820,7 @@ namespace UnitarySystems {
                 }
                 // fill outlet node for coil
                 this->HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->HeatCoilLoopNum)
-                                                       .LoopSide[static_cast<int>(this->HeatCoilLoopSide)]
+                                                       .LoopSide[this->HeatCoilLoopSide]
                                                        .Branch(this->HeatCoilBranchNum)
                                                        .Comp(this->HeatCoilCompNum)
                                                        .NodeNumOut;
@@ -874,7 +874,7 @@ namespace UnitarySystems {
                 }
                 // fill outlet node for coil
                 this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum)
-                                                         .LoopSide[static_cast<int>(this->m_SuppCoilLoopSide)]
+                                                         .LoopSide[this->m_SuppCoilLoopSide]
                                                          .Branch(this->m_SuppCoilBranchNum)
                                                          .Comp(this->m_SuppCoilCompNum)
                                                          .NodeNumOut;
@@ -908,7 +908,7 @@ namespace UnitarySystems {
 
                 // fill outlet node for coil
                 this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum)
-                                                         .LoopSide[static_cast<int>(this->m_SuppCoilLoopSide)]
+                                                         .LoopSide[this->m_SuppCoilLoopSide]
                                                          .Branch(this->m_SuppCoilBranchNum)
                                                          .Comp(this->m_SuppCoilCompNum)
                                                          .NodeNumOut;

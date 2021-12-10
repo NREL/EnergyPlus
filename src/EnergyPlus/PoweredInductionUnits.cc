@@ -892,7 +892,7 @@ void InitPIU(EnergyPlusData &state,
             }
             state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum =
                 state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum)
-                    .LoopSide[static_cast<int>(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide)]
+                    .LoopSide[state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide]
                     .Branch(state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum)
                     .Comp(state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum)
                     .NodeNumOut;
