@@ -67,17 +67,17 @@ The central fan model for this object needs to be either FAN:SYSTEMMODEL or FAN:
 
 If the design exhaust flow rate can be obtained someplace else, the existing AirLoopHVAC:ZoneMixer object will be expanded for use in the exhaust system. The originally the AirLoopHVAC:ZoneMixer is only allowed in a return path, or in a PIU like zone equipment. A severe warning would show up if the zone mixer is not used (or referenced) with one of the following objects: AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction. 
 
-In the current development, the AirLoopHVAC:Mixer will be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust nodes (actually the outlet nodes of the newly developed ZoneHVAC:ExhaustControl object, to be introduced soon below) of one or more zones as inlets, and the outlet node of the mixer will be the inlet node of the central exhaust fan in the AirLoopHVAC:ExhaustSystem. 
+In the current development, the AirLoopHVAC:ZoneMixer will be used as the connectors in the "Exhaust Path" system. This means that the zone mixer can be connected to the exhaust nodes (actually the outlet nodes of the newly developed ZoneHVAC:ExhaustControl object, to be introduced soon below) of one or more zones as inlets, and the outlet node of the mixer will be the inlet node of the central exhaust fan in the AirLoopHVAC:ExhaustSystem. 
 
 ### ZoneHVAC:ExhaustControl ###
 
 Each zone that is connected to an inlet node of an AirLoopHVAC:ExhaustSystem is required to have a ZoneHVAC:ExhaustControl to describe the zone exhaust connections, design flow rate, and controls. 
 
-A ZoneHVAC:ExhaustControl object defines a controlled exhaust flow from a zone. The inlet node is a zone exaust node. The outlet node is an inlet to an AirLoopHVAC:ExhaustSystem object. It is similar to Fan:ZoneExhaust but has additional control options and assumes a central exhaust fan drives the flow, with a damper for flow control.
+A ZoneHVAC:ExhaustControl object defines a controlled exhaust flow from a zone. The inlet node is a zone exhaust node. The outlet node is an inlet to an AirLoopHVAC:ExhaustSystem object. It is similar to Fan:ZoneExhaust but has additional control options and assumes a central exhaust fan drives the flow, with a damper for flow control.
 
 One piece of important information about each of the individual zone exhausts is the design flow rate. This will be autosizable with options base on area, outdoor air flow or suppy flow.
 
-**OPTION FOR DISCUSSION:** Should the sizing options for exhaust flow rate be here in the ZoneHVAC:ExhaustControl object or in Sizing:Zone, or DesignSpeification:OutdoorAir, or ???.
+**OPTION FOR DISCUSSION:** Should the sizing options for exhaust flow rate be here in the ZoneHVAC:ExhaustControl object or in Sizing:Zone, or ???.
 
 ```
 ZoneHVAC:ExhaustControl,
