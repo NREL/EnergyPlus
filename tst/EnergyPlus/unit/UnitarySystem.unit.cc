@@ -14753,7 +14753,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.1991, 0.001);
     EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
     EXPECT_NEAR(thisSys->CoilSHR, 0.5266, 0.001);
-    EXPECT_NEAR(SenOutput, -397.162, 0.13);
+    EXPECT_NEAR(SenOutput, -397.162, 0.1);
     EXPECT_NEAR(LatOutput, -338.8, 0.1);
 
     // OperatingMode 2

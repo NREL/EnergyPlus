@@ -117,12 +117,12 @@ namespace ResultsFramework {
                  const OutputProcessor::ReportingFrequency reportFrequency,
                  const OutputProcessor::TimeStepType timeStepType,
                  const int ReportID,
-                 const OutputProcessor::Unit &units);
+                 OutputProcessor::Unit units);
         Variable(const std::string &VarName,
                  const OutputProcessor::ReportingFrequency reportFrequency,
                  const OutputProcessor::TimeStepType timeStepType,
                  const int ReportID,
-                 const OutputProcessor::Unit &units,
+                 OutputProcessor::Unit units,
                  const std::string &customUnits);
 
         std::string variableName() const;
@@ -139,7 +139,7 @@ namespace ResultsFramework {
         void setReportID(const int Id);
 
         OutputProcessor::Unit units() const;
-        void setUnits(const OutputProcessor::Unit &units);
+        void setUnits(OutputProcessor::Unit units);
 
         std::string customUnits() const;
         void setCustomUnits(const std::string &customUnits);
@@ -168,13 +168,13 @@ namespace ResultsFramework {
                        const OutputProcessor::ReportingFrequency reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       const OutputProcessor::Unit &units);
+                       OutputProcessor::Unit units);
 
         OutputVariable(const std::string &VarName,
                        const OutputProcessor::ReportingFrequency reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       const OutputProcessor::Unit &units,
+                       OutputProcessor::Unit units,
                        const std::string &customUnits);
     };
 
@@ -185,7 +185,7 @@ namespace ResultsFramework {
         MeterVariable(const std::string &VarName,
                       const OutputProcessor::ReportingFrequency reportFrequency,
                       const int ReportID,
-                      const OutputProcessor::Unit &units,
+                      OutputProcessor::Unit units,
                       const bool MeterOnly,
                       const bool Acculumative = false);
 

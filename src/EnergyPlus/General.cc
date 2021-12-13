@@ -876,9 +876,9 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
 
 // returns the Julian date for the first, second, etc. day of week for a given month
 int nthDayOfWeekOfMonth(EnergyPlusData &state,
-                        int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
-                        int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
-                        int const &monthNumber // January = 1
+                        int const dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+                        int const nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
+                        int const monthNumber // January = 1
 )
 {
     // J. Glazer - August 2017

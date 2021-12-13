@@ -414,7 +414,7 @@ namespace DataAirSystems {
         }
     };
 
-    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
+    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int dataFanEnumType, int dataFanIndex, Real64 desVolFlow);
 
 } // namespace DataAirSystems
 
