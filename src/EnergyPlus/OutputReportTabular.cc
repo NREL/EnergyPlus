@@ -854,41 +854,52 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     ort->MonthlyColumns(mColumn).units = UnitsVar;
                     ort->MonthlyColumns(mColumn).aggType = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).aggregate;
                     // set accumulator values to default as appropriate for aggregation type
-                    {
-                        auto const SELECT_CASE_var(ort->MonthlyColumns(mColumn).aggType);
-                        if (SELECT_CASE_var == iAggType::SumOrAvg) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                            ort->MonthlyColumns(mColumn).duration = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::Maximum) {
-                            ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
-                            ort->MonthlyColumns(mColumn).timeStamp = 0;
-                        } else if (SELECT_CASE_var == iAggType::Minimum) {
-                            ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
-                            ort->MonthlyColumns(mColumn).timeStamp = 0;
-                        } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::HoursZero) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::HoursNonZero) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::HoursPositive) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::HoursNonPositive) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::HoursNegative) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::HoursNonNegative) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::SumOrAverageHoursShown) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                            ort->MonthlyColumns(mColumn).duration = 0.0;
-                        } else if (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) {
-                            ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
-                            ort->MonthlyColumns(mColumn).timeStamp = 0;
-                        } else if (SELECT_CASE_var == iAggType::MinimumDuringHoursShown) {
-                            ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
-                            ort->MonthlyColumns(mColumn).timeStamp = 0;
-                        }
+                    switch (ort->MonthlyColumns(mColumn).aggType) {
+                    case iAggType::SumOrAvg: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                        ort->MonthlyColumns(mColumn).duration = 0.0;
+                    } break;
+                    case iAggType::Maximum: {
+                        ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
+                        ort->MonthlyColumns(mColumn).timeStamp = 0;
+                    } break;
+                    case iAggType::Minimum: {
+                        ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
+                        ort->MonthlyColumns(mColumn).timeStamp = 0;
+                    } break;
+                    case iAggType::ValueWhenMaxMin: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case iAggType::HoursZero: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case iAggType::HoursNonZero: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case iAggType::HoursPositive: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case iAggType::HoursNonPositive: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case iAggType::HoursNegative: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case iAggType::HoursNonNegative: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case iAggType::SumOrAverageHoursShown: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                        ort->MonthlyColumns(mColumn).duration = 0.0;
+                    } break;
+                    case iAggType::MaximumDuringHoursShown: {
+                        ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
+                        ort->MonthlyColumns(mColumn).timeStamp = 0;
+                    } break;
+                    case iAggType::MinimumDuringHoursShown: {
+                        ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
+                        ort->MonthlyColumns(mColumn).timeStamp = 0;
+                    } break;
                     }
                 } else { // if no key corresponds to this instance of the report
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
@@ -3649,104 +3660,111 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                     timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                 // perform the selected aggregation type
                 // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
-                {
-                    auto const SELECT_CASE_var(state.dataOutRptTab->MonthlyColumnsAggType(curCol));
-                    if (SELECT_CASE_var == iAggType::SumOrAvg) {
-                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            newResultValue = oldResultValue + curValue;
-                        } else {
-                            newResultValue = oldResultValue + curValue * elapsedTime; // for averaging - weight by elapsed time
-                        }
-                        newDuration = oldDuration + elapsedTime;
-                        activeNewValue = true;
-                    } else if (SELECT_CASE_var == iAggType::Maximum) {
-                        // per MJW when a summed variable is used divide it by the length of the time step
-                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                            } else {
-                                curValue /= state.dataGlobal->TimeStepZoneSec;
-                            }
-                        }
-                        if (curValue > oldResultValue) {
-                            newResultValue = curValue;
-                            newTimeStamp = timestepTimeStamp;
-                            activeMinMax = true;
-                            activeNewValue = true;
-                        } else {
-                            activeMinMax = false; // reset this
-                        }
-                    } else if (SELECT_CASE_var == iAggType::Minimum) {
-                        // per MJW when a summed variable is used divide it by the length of the time step
-                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                            } else {
-                                curValue /= state.dataGlobal->TimeStepZoneSec;
-                            }
-                        }
-                        if (curValue < oldResultValue) {
-                            newResultValue = curValue;
-                            newTimeStamp = timestepTimeStamp;
-                            activeMinMax = true;
-                            activeNewValue = true;
-                        } else {
-                            activeMinMax = false; // reset this
-                        }
-                    } else if (SELECT_CASE_var == iAggType::HoursZero) {
-                        if (curValue == 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == iAggType::HoursNonZero) {
-                        if (curValue != 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == iAggType::HoursPositive) {
-                        if (curValue > 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == iAggType::HoursNonPositive) {
-                        if (curValue <= 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == iAggType::HoursNegative) {
-                        if (curValue < 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == iAggType::HoursNonNegative) {
-                        if (curValue >= 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                        // The valueWhenMaxMin is picked up now during the activeMinMax if block below.
-                        // CASE (iAggType::ValueWhenMaxMin)
-                        // CASE (iAggType::SumOrAverageHoursShown)
-                        // CASE (iAggType::MaximumDuringHoursShown)
-                        // CASE (iAggType::MinimumDuringHoursShown)
+                switch (state.dataOutRptTab->MonthlyColumnsAggType(curCol)) {
+                case iAggType::SumOrAvg: {
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        newResultValue = oldResultValue + curValue;
+                    } else {
+                        newResultValue = oldResultValue + curValue * elapsedTime; // for averaging - weight by elapsed time
                     }
+                    newDuration = oldDuration + elapsedTime;
+                    activeNewValue = true;
+                } break;
+                case iAggType::Maximum: {
+                    // per MJW when a summed variable is used divide it by the length of the time step
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                            curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                        } else {
+                            curValue /= state.dataGlobal->TimeStepZoneSec;
+                        }
+                    }
+                    if (curValue > oldResultValue) {
+                        newResultValue = curValue;
+                        newTimeStamp = timestepTimeStamp;
+                        activeMinMax = true;
+                        activeNewValue = true;
+                    } else {
+                        activeMinMax = false; // reset this
+                    }
+                } break;
+                case iAggType::Minimum: {
+                    // per MJW when a summed variable is used divide it by the length of the time step
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                            curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                        } else {
+                            curValue /= state.dataGlobal->TimeStepZoneSec;
+                        }
+                    }
+                    if (curValue < oldResultValue) {
+                        newResultValue = curValue;
+                        newTimeStamp = timestepTimeStamp;
+                        activeMinMax = true;
+                        activeNewValue = true;
+                    } else {
+                        activeMinMax = false; // reset this
+                    }
+                } break;
+                case iAggType::HoursZero: {
+                    if (curValue == 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case iAggType::HoursNonZero: {
+                    if (curValue != 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case iAggType::HoursPositive: {
+                    if (curValue > 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case iAggType::HoursNonPositive: {
+                    if (curValue <= 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case iAggType::HoursNegative: {
+                    if (curValue < 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case iAggType::HoursNonNegative: {
+                    if (curValue >= 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                    // The valueWhenMaxMin is picked up now during the activeMinMax if block below.
+                    // CASE (iAggType::ValueWhenMaxMin)
+                    // CASE (iAggType::SumOrAverageHoursShown)
+                    // CASE (iAggType::MaximumDuringHoursShown)
+                    // CASE (iAggType::MinimumDuringHoursShown)
+                } break;
                 }
                 // if the new value has been set then set the monthly values to the
                 // new columns. This skips the aggregation types that don't even get
@@ -3764,28 +3782,26 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                 if (activeMinMax) {
                     for (kOtherColumn = jColumn + 1; kOtherColumn <= ort->MonthlyTables(iTable).numColumns; ++kOtherColumn) {
                         scanColumn = kOtherColumn + ort->MonthlyTables(iTable).firstColumn - 1;
-                        {
-                            auto const SELECT_CASE_var(ort->MonthlyColumns(scanColumn).aggType);
-                            if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum)) {
-                                // end scanning since these might reset
-                                break; // do
-                            } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
-                                // this case is when the value should be set
-                                scanTypeOfVar = ort->MonthlyColumns(scanColumn).typeOfVar;
-                                scanVarNum = ort->MonthlyColumns(scanColumn).varNum;
-                                scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
-                                // When a summed variable is used divide it by the length of the time step
-                                if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                        scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                                    } else {
-                                        scanValue /= state.dataGlobal->TimeStepZoneSec;
-                                    }
+                        switch (ort->MonthlyColumns(scanColumn).aggType) {
+                        case iAggType::Maximum:
+                        case iAggType::Minimum:
+                            // end scanning since these might reset
+                            break; // do
+                        case iAggType::ValueWhenMaxMin: {
+                            // this case is when the value should be set
+                            scanTypeOfVar = ort->MonthlyColumns(scanColumn).typeOfVar;
+                            scanVarNum = ort->MonthlyColumns(scanColumn).varNum;
+                            scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
+                            // When a summed variable is used divide it by the length of the time step
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                } else {
+                                    scanValue /= state.dataGlobal->TimeStepZoneSec;
                                 }
-                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
-                            } else {
-                                // do nothing
                             }
+                            ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                        } break;
                         }
                     }
                 }
@@ -3798,53 +3814,52 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                         scanVarNum = ort->MonthlyColumns(scanColumn).varNum;
                         scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                         oldScanValue = ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month);
-                        {
-                            auto const SELECT_CASE_var(ort->MonthlyColumns(scanColumn).aggType);
-                            if ((SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero)) {
-                                // end scanning since these might reset
-                                break; // do
-                            } else if ((SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive)) {
-                                // end scanning since these might reset
-                                break; // do
-                            } else if ((SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative)) {
-                                // end scanning since these might reset
-                                break; // do
-                            } else if (SELECT_CASE_var == iAggType::SumOrAverageHoursShown) {
-                                // this case is when the value should be set
-                                if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
-                                } else {
-                                    // for averaging - weight by elapsed time
-                                    ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue * elapsedTime;
-                                }
-                                ort->MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
-                            } else if (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) {
-                                if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                        scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                                    } else {
-                                        scanValue /= state.dataGlobal->TimeStepZoneSec;
-                                    }
-                                }
-                                if (scanValue > oldScanValue) {
-                                    ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
-                                    ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
-                                }
-                            } else if (SELECT_CASE_var == iAggType::MinimumDuringHoursShown) {
-                                if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
-                                        scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                                    } else {
-                                        scanValue /= state.dataGlobal->TimeStepZoneSec;
-                                    }
-                                }
-                                if (scanValue < oldScanValue) {
-                                    ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
-                                    ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
-                                }
+                        switch (ort->MonthlyColumns(scanColumn).aggType) {
+                        case iAggType::HoursZero:
+                        case iAggType::HoursNonZero:
+                        case iAggType::HoursPositive:
+                        case iAggType::HoursNonPositive:
+                        case iAggType::HoursNegative:
+                        case iAggType::HoursNonNegative:
+                            // end scanning since these might reset
+                            break; // do
+
+                        case iAggType::SumOrAverageHoursShown: {
+                            // this case is when the value should be set
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
                             } else {
-                                // do nothing
+                                // for averaging - weight by elapsed time
+                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue * elapsedTime;
                             }
+                            ort->MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
+                        } break;
+                        case iAggType::MaximumDuringHoursShown: {
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                } else {
+                                    scanValue /= state.dataGlobal->TimeStepZoneSec;
+                                }
+                            }
+                            if (scanValue > oldScanValue) {
+                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
+                            }
+                        } break;
+                        case iAggType::MinimumDuringHoursShown: {
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                } else {
+                                    scanValue /= state.dataGlobal->TimeStepZoneSec;
+                                }
+                            }
+                            if (scanValue < oldScanValue) {
+                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
+                            }
+                        } break;
                         }
                         activeHoursShown = false; // fixed CR8317
                     }
