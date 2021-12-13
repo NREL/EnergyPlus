@@ -126,6 +126,7 @@ namespace OutputReportTabular {
 
     enum LoadCompCol // These correspond to the columns in the load component table
     {
+        // Invalid is not necessary since this is not specified by the user in the IDF
         SensInst = 1,
         SensDelay,
         SensRA,
@@ -138,6 +139,7 @@ namespace OutputReportTabular {
 
     enum LoadCompRow
     {
+        // Invalid is not necessary since this is not specified by the user in the IDF
         // internal gains
         People = 1,
         Lights,
