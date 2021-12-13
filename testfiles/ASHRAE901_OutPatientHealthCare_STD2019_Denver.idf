@@ -307,13 +307,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Floor 1 Anesthesia Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Floor 1 Anesthesia Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -335,13 +328,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Floor 1 MRI Control Room Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Floor 1 MRI Control Room Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -361,13 +347,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Floor 1 MRI Room Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Floor 1 MRI Room Water Equipment Hot Supply Temp Sched,  !- Name
@@ -398,13 +377,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Floor 1 Operating Room 1 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Floor 1 Operating Room 1 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -424,13 +396,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Floor 1 Operating Room 2 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Floor 1 Operating Room 2 Water Equipment Hot Supply Temp Sched,  !- Name
@@ -454,13 +419,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Floor 1 Operating Room 3 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Floor 1 Operating Room 3 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -480,13 +438,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Floor 1 PACU Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Floor 1 PACU Water Equipment Hot Supply Temp Sched,  !- Name
@@ -510,13 +461,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Floor 1 Pre-Op Room 1 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Floor 1 Pre-Op Room 1 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -536,13 +480,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Floor 1 Pre-Op Room 2 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Floor 1 Pre-Op Room 2 Water Equipment Hot Supply Temp Sched,  !- Name
@@ -566,13 +503,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Floor 1 Procedure Room Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Floor 1 Procedure Room Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -592,13 +522,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Floor 1 Recovery Room Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Floor 1 Recovery Room Water Equipment Hot Supply Temp Sched,  !- Name
@@ -622,13 +545,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Floor 1 Step Down Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Floor 1 Step Down Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -648,13 +564,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Floor 2 X-Ray Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Floor 2 X-Ray Water Equipment Hot Supply Temp Sched,  !- Name
@@ -678,13 +587,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Floor 3 Physical Therapy 1 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Floor 3 Physical Therapy 1 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -704,13 +606,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Floor 3 Physical Therapy 2 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Floor 3 Physical Therapy 2 Water Equipment Hot Supply Temp Sched,  !- Name
@@ -50759,7 +50654,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Anesthesia Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Anesthesia Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Anesthesia,      !- Zone Name
@@ -50771,7 +50666,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 MRI Control Room Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 MRI Control Room Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 MRI Control Room,!- Zone Name
@@ -50783,7 +50678,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 MRI Room Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 MRI Room Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 MRI Room,        !- Zone Name
@@ -50795,7 +50690,7 @@
     WaterUse,                !- End-Use Subcategory
     1.261111e-05,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Operating Room 1 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Operating Room 1 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Operating Room 1,!- Zone Name
@@ -50807,7 +50702,7 @@
     WaterUse,                !- End-Use Subcategory
     1.261111e-05,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Operating Room 2 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Operating Room 2 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Operating Room 2,!- Zone Name
@@ -50819,7 +50714,7 @@
     WaterUse,                !- End-Use Subcategory
     1.261111e-05,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Operating Room 3 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Operating Room 3 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Operating Room 3,!- Zone Name
@@ -50831,7 +50726,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 PACU Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 PACU Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 PACU,            !- Zone Name
@@ -50843,7 +50738,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Pre-Op Room 1 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Pre-Op Room 1 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Pre-Op Room 1,   !- Zone Name
@@ -50855,7 +50750,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Pre-Op Room 2 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Pre-Op Room 2 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Pre-Op Room 2,   !- Zone Name
@@ -50867,7 +50762,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Procedure Room Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Procedure Room Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Procedure Room,  !- Zone Name
@@ -50879,7 +50774,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Recovery Room Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Recovery Room Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Recovery Room,   !- Zone Name
@@ -50891,7 +50786,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 1 Step Down Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 1 Step Down Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 1 Step Down,       !- Zone Name
@@ -50903,7 +50798,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 2 X-Ray Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 2 X-Ray Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 2 X-Ray,           !- Zone Name
@@ -50915,7 +50810,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 3 Physical Therapy 1 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 3 Physical Therapy 1 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 3 Physical Therapy 1,  !- Zone Name
@@ -50927,7 +50822,7 @@
     WaterUse,                !- End-Use Subcategory
     2.111111e-06,            !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Floor 3 Physical Therapy 2 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Floor 3 Physical Therapy 2 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Floor 3 Physical Therapy 2,  !- Zone Name

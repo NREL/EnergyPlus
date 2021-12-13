@@ -429,6 +429,7 @@ namespace EconomicLifeCycleCost {
     void GetInputLifeCycleCostUsePriceEscalation(EnergyPlusData &state);
 
     void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state);
+
     //======================================================================================================================
     //======================================================================================================================
 

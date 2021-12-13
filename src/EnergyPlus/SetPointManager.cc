@@ -9117,7 +9117,7 @@ void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
                                   int const SchedPtrCharge,
                                   Real64 NonChargeCHWTemp,
                                   Real64 ChargeCHWTemp,
-                                  DataPlant::CtrlType const &CompOpType,
+                                  DataPlant::CtrlType CompOpType,
                                   int const ControlNodeNum)
 {
     // SUBROUTINE INFORMATION:

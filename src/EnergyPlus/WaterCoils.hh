@@ -482,9 +482,9 @@ namespace WaterCoils {
     );
 
     void CheckForSensorAndSetPointNode(EnergyPlusData &state,
-                                       int const SensorNodeNum,                     // controller sensor node number
-                                       HVACControllers::iCtrl const &ControlledVar, // controlled variable type
-                                       bool &NodeNotFound                           // true if matching air outlet node not found
+                                       int const SensorNodeNum,              // controller sensor node number
+                                       HVACControllers::iCtrl ControlledVar, // controlled variable type
+                                       bool &NodeNotFound                    // true if matching air outlet node not found
     );
 
     Real64 TdbFnHRhPb(EnergyPlusData &state,

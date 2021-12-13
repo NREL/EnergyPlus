@@ -14629,6 +14629,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataScheduleMgr->Schedule(6).CurrentValue = 1.0; // Enable schedule without calling schedule manager
     state->dataScheduleMgr->Schedule(7).CurrentValue = 4.0; // Enable schedule without calling schedule manager
 
+    state->dataEnvrn->OutBaroPress = 101325;
     ZoneEquipmentManager::GetZoneEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
     state->dataScheduleMgr->Schedule(7).MinValue = 4.0; // Enable schedule without calling schedule manager
@@ -14674,6 +14675,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataLoopNodes->Node(1).Temp = 24.0;      // 24C db
     state->dataLoopNodes->Node(1).HumRat = 0.01522; // 17C wb
     state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
+    state->dataLoopNodes->Node(1).Press = state->dataEnvrn->OutBaroPress;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
@@ -14684,9 +14686,10 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = 4;
-    state->dataLoopNodes->Node(8).Temp = 23.822;        // 24C db
-    state->dataLoopNodes->Node(8).HumRat = 0.0145946;   // 17C wb
-    state->dataLoopNodes->Node(8).Enthalpy = 61084.266; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(8).Temp = 23.822;      // 24C db
+    state->dataLoopNodes->Node(8).HumRat = 0.0145946; // 17C wb
+    state->dataLoopNodes->Node(8).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(8).Temp, state->dataLoopNodes->Node(8).HumRat);
+    state->dataLoopNodes->Node(8).Press = state->dataEnvrn->OutBaroPress;
     Real64 SenOutput;
     Real64 LatOutput;
 
@@ -14696,8 +14699,6 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -50.0;
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -0.007806893;
     state->dataEnvrn->StdRhoAir = 1.2043;
-    // This unit test was built with values based on zero barometric pressure - should be updated
-    state->dataEnvrn->OutBaroPress = 0.000001;
     thisSys->simulate(*state,
                       compName,
                       FirstHVACIteration,
@@ -14714,16 +14715,16 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 1.0);
     EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
     EXPECT_NEAR(SenOutput, -227.705, 0.1);
-    EXPECT_NEAR(LatOutput, -737.9931, 0.1);
+    EXPECT_NEAR(LatOutput, -1531, 0.1);
 
     // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
     thisSys->m_ZoneSequenceHeatingNum = 0;
-    state->dataLoopNodes->Node(1).HumRat = 0.0114544;   // 17C wb
-    state->dataLoopNodes->Node(1).Enthalpy = 53273.99;  // www.sugartech.com/psychro/index.php
-    state->dataLoopNodes->Node(8).Temp = 24.18496;      // 24C db
-    state->dataLoopNodes->Node(8).HumRat = 0.0121542;   // 17C wb
-    state->dataLoopNodes->Node(8).Enthalpy = 55245.434; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(1).HumRat = 0.0114544; // 17C wb
+    state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
+    state->dataLoopNodes->Node(8).Temp = 24.18496;    // 24C db
+    state->dataLoopNodes->Node(8).HumRat = 0.0121542; // 17C wb
+    state->dataLoopNodes->Node(8).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(8).Temp, state->dataLoopNodes->Node(8).HumRat);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = state->dataLoopNodes->Node(1).HumRat;
     state->dataHeatBalFanSys->MAT(1) = state->dataLoopNodes->Node(1).Temp;
 
@@ -14744,11 +14745,11 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
                       SenOutput,
                       LatOutput);
     EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.OperatingMode, 3);
-    EXPECT_NEAR(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.6607, 0.001);
+    EXPECT_NEAR(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.55356, 0.001);
     EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
-    EXPECT_NEAR(thisSys->CoilSHR, 0.44387, 0.001);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.4578, 0.001);
     EXPECT_NEAR(SenOutput, -397.162, 0.1);
-    EXPECT_NEAR(LatOutput, -523.848, 0.1);
+    EXPECT_NEAR(LatOutput, -495.2, 0.1);
 
     // OperatingMode 2
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -14771,9 +14772,9 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.OperatingMode, 1);
     EXPECT_EQ(state->dataCoilCooingDX->coilCoolingDXs[0].performance.ModeRatio, 0.0);
     EXPECT_NEAR(thisSys->LoadSHR, 0.98533, 0.001);
-    EXPECT_NEAR(thisSys->CoilSHR, 0.97600, 0.001);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.97702, 0.001);
     EXPECT_NEAR(SenOutput, -2000.0, 0.5);
-    EXPECT_NEAR(LatOutput, -327.04, 0.1);
+    EXPECT_NEAR(LatOutput, -346.1, 0.1);
 }
 
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
@@ -15959,11 +15960,13 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     thisSys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
     // Test direct solution
+    state->dataEnvrn->OutBaroPress = 101325;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
     state->dataLoopNodes->Node.redimension(7);
     state->dataLoopNodes->Node(1).Temp = 24.0;      // 24C db
     state->dataLoopNodes->Node(1).HumRat = 0.01522; // 17C wb
+    state->dataLoopNodes->Node(1).Press = state->dataEnvrn->OutBaroPress;
     state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
@@ -15976,8 +15979,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataHeatBalFanSys->TempControlType(1) = 4;
     state->dataLoopNodes->Node(7).FluidType = DataLoopNode::NodeFluidType::Air;
-    state->dataLoopNodes->Node(7).Temp = 24.0;                                       // 24C db
-    state->dataLoopNodes->Node(7).HumRat = 0.01522;                                  // 17C wb
+    state->dataLoopNodes->Node(7).Temp = 24.0;      // 24C db
+    state->dataLoopNodes->Node(7).HumRat = 0.01522; // 17C wb
+    state->dataLoopNodes->Node(7).Press = state->dataEnvrn->OutBaroPress;
     state->dataLoopNodes->Node(7).Enthalpy = state->dataLoopNodes->Node(1).Enthalpy; // www.sugartech.com/psychro/index.php
     thisSys->NodeNumOfControlledZone = 7;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -227.705;

@@ -449,8 +449,8 @@ namespace VariableSpeedCoils {
     );
 
     int GetVSCoilCapFTCurveIndex(EnergyPlusData &state,
-                                 int const &CoilIndex, // must match coil names for the coil type
-                                 bool &ErrorsFound     // set to true if problem
+                                 int CoilIndex,    // must match coil names for the coil type
+                                 bool &ErrorsFound // set to true if problem
     );
 
     Real64 GetVSCoilMinOATCompressor(EnergyPlusData &state,

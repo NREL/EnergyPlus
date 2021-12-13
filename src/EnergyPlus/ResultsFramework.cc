@@ -161,7 +161,7 @@ namespace ResultsFramework {
                        const OutputProcessor::ReportingFrequency reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       const OutputProcessor::Unit &units)
+                       const OutputProcessor::Unit units)
         : varName(VarName), m_timeStepType(timeStepType), rptID(ReportID), Units(units)
     {
         setReportFrequency(reportFrequency);
@@ -171,7 +171,7 @@ namespace ResultsFramework {
                        const OutputProcessor::ReportingFrequency reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       const OutputProcessor::Unit &units,
+                       const OutputProcessor::Unit units,
                        const std::string &customUnits)
         : varName(VarName), m_timeStepType(timeStepType), rptID(ReportID), Units(units), m_customUnits(customUnits)
     {
@@ -252,7 +252,7 @@ namespace ResultsFramework {
         return Units;
     }
 
-    void Variable::setUnits(const OutputProcessor::Unit &units)
+    void Variable::setUnits(const OutputProcessor::Unit units)
     {
         Units = units;
     }
@@ -298,7 +298,7 @@ namespace ResultsFramework {
                                    const OutputProcessor::ReportingFrequency reportFrequency,
                                    const OutputProcessor::TimeStepType timeStepType,
                                    const int ReportID,
-                                   const OutputProcessor::Unit &units)
+                                   const OutputProcessor::Unit units)
         : Variable(VarName, reportFrequency, timeStepType, ReportID, units)
     {
     }
@@ -307,7 +307,7 @@ namespace ResultsFramework {
                                    const OutputProcessor::ReportingFrequency reportFrequency,
                                    const OutputProcessor::TimeStepType timeStepType,
                                    const int ReportID,
-                                   const OutputProcessor::Unit &units,
+                                   const OutputProcessor::Unit units,
                                    const std::string &customUnits)
         : Variable(VarName, reportFrequency, timeStepType, ReportID, units, customUnits)
     {
@@ -317,7 +317,7 @@ namespace ResultsFramework {
     MeterVariable::MeterVariable(const std::string &VarName,
                                  const OutputProcessor::ReportingFrequency reportFrequency,
                                  const int ReportID,
-                                 const OutputProcessor::Unit &units,
+                                 const OutputProcessor::Unit units,
                                  const bool MeterOnly,
                                  const bool Accumulative)
         : Variable(VarName, reportFrequency, OutputProcessor::TimeStepType::TimeStepZone, ReportID, units)
