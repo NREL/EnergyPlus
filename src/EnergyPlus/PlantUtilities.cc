@@ -1705,7 +1705,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                                         FoundComponent = true;
                                         ++FoundCount;
                                         LoopNum = LoopCtr;
-                                        LoopSideNum = static_cast<DataPlant::LoopSideLocation>(LoopSideCtr);
+                                        LoopSideNum = LoopSideCtr;
                                         BranchNum = BranchCtr;
                                         CompNum = CompCtr;
                                     }
@@ -1714,7 +1714,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                                 FoundComponent = true;
                                 ++FoundCount;
                                 LoopNum = LoopCtr;
-                                LoopSideNum = static_cast<DataPlant::LoopSideLocation>(LoopSideCtr);
+                                LoopSideNum = LoopSideCtr;
                                 BranchNum = BranchCtr;
                                 CompNum = CompCtr;
                             }
@@ -1818,7 +1818,7 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                         FoundNode = true;
                         ++inFoundCount;
                         LoopNum = LoopCtr;
-                        LoopSideNum = static_cast<DataPlant::LoopSideLocation>(LoopSideCtr);
+                        LoopSideNum = LoopSideCtr;
                         BranchNum = BranchCtr;
                         if (present(CompNum)) {
                             CompNum = CompCtr;
@@ -1828,7 +1828,7 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                     if (NodeNum == this_comp.NodeNumOut) {
                         ++outFoundCount;
                         LoopNum = LoopCtr;
-                        LoopSideNum = static_cast<DataPlant::LoopSideLocation>(LoopSideCtr);
+                        LoopSideNum = LoopSideCtr;
                         BranchNum = BranchCtr;
                     }
                 }

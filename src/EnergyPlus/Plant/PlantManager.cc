@@ -869,7 +869,7 @@ void GetPlantInput(EnergyPlusData &state)
 
                     this_comp.CurOpSchemeType = OpScheme::Unassigned;
                     this_comp.TypeOf = this_comp_type;
-                    this_comp.location = EnergyPlus::PlantLocation(LoopNum, static_cast<DataPlant::LoopSideLocation>(LoopSideNum), BranchNum, CompNum);
+                    this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
 
                     this_comp.Type =
                         static_cast<PlantEquipmentType>(getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_comp_type)));
