@@ -673,7 +673,7 @@ namespace PlantPipingSystemsManager {
         bool IsActuallyPartOfAHorizontalTrench = false;
         // Location of this pipe circuit in the PlantLoop topology
         int LoopNum = 0;
-        DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid;
+        DataPlant::LoopSideLocation LoopSide = DataPlant::LoopSideLocation::Invalid;
         int BranchNum = 0;
         int CompNum = 0;
         ExtendedFluidProperties CurFluidPropertySet; // is_used

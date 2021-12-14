@@ -1953,7 +1953,7 @@ namespace HVACMultiSpeedHeatPump {
                                         MSHeatPump(MSHeatPumpNum).Name,
                                         DataPlant::PlantEquipmentType::MultiSpeedHeatPumpRecovery,
                                         MSHeatPump(MSHeatPumpNum).HRLoopNum,
-                                        MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
+                                        MSHeatPump(MSHeatPumpNum).HRLoopSide,
                                         MSHeatPump(MSHeatPumpNum).HRBranchNum,
                                         MSHeatPump(MSHeatPumpNum).HRCompNum,
                                         errFlag,
@@ -2239,7 +2239,7 @@ namespace HVACMultiSpeedHeatPump {
                                    MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum,
                                    MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum,
                                    MSHeatPump(MSHeatPumpNum).HRLoopNum,
-                                   MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
+                                   MSHeatPump(MSHeatPumpNum).HRLoopSide,
                                    MSHeatPump(MSHeatPumpNum).HRBranchNum,
                                    MSHeatPump(MSHeatPumpNum).HRCompNum);
             }
@@ -2728,7 +2728,7 @@ namespace HVACMultiSpeedHeatPump {
                                  MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum,
                                  MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum,
                                  MSHeatPump(MSHeatPumpNum).HRLoopNum,
-                                 MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
+                                 MSHeatPump(MSHeatPumpNum).HRLoopSide,
                                  MSHeatPump(MSHeatPumpNum).HRBranchNum,
                                  MSHeatPump(MSHeatPumpNum).HRCompNum);
         }

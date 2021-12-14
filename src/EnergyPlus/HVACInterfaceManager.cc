@@ -393,7 +393,7 @@ void rshift1(Array1D<Real64> &a)
 
 void UpdatePlantLoopInterface(EnergyPlusData &state,
                               int const LoopNum,                // The 'inlet/outlet node' loop number
-                              DataPlant::LoopSideLocation const ThisLoopSideNum,        // The 'outlet node' LoopSide number
+                              DataPlant::LoopSideLocation const ThisLoopSide,        // The 'outlet node' LoopSide number
                               int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                               int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                               bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
@@ -444,7 +444,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     convergence.PlantTempNotConverged = false;
 
     // set the LoopSide inlet node
-    ThisLoopSideInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSideNum).NodeNumIn;
+    ThisLoopSideInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).NodeNumIn;
 
     // save the inlet node temp for DeltaEnergy check
     OldOtherLoopSideInletMdot = state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate;
@@ -462,10 +462,10 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     auto &flow_supply_to_demand_tol(convergence.PlantFlowSupplyToDemandTolValue);
     if (CommonPipeType == DataPlant::CommonPipeType::Single || CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
         // update the temperature
-        UpdateCommonPipe(state, LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
+        UpdateCommonPipe(state, LoopNum, ThisLoopSide, CommonPipeType, MixedOutletTemp);
         state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
         TankOutletTemp = MixedOutletTemp;
-        if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
+        if (ThisLoopSide == DataPlant::LoopSideLocation::Demand) {
             rshift1(flow_demand_to_supply_tol);
             flow_demand_to_supply_tol(1) = std::abs(OldOtherLoopSideInletMdot - state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
             if (flow_demand_to_supply_tol(1) > DataConvergParams::PlantFlowRateToler) {
@@ -487,11 +487,11 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
             state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRateMaxAvail;
 
     } else { // no common pipe
-        UpdateHalfLoopInletTemp(state, LoopNum, ThisLoopSideNum, TankOutletTemp);
+        UpdateHalfLoopInletTemp(state, LoopNum, ThisLoopSide, TankOutletTemp);
         // update the temperature
         state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp = TankOutletTemp;
         // Set the flow tolerance array
-        if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
+        if (ThisLoopSide == DataPlant::LoopSideLocation::Demand) {
             rshift1(flow_demand_to_supply_tol);
             flow_demand_to_supply_tol(1) = std::abs(state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate -
                                                     state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
@@ -526,7 +526,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     }
 
     // temperature
-    if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
+    if (ThisLoopSide == DataPlant::LoopSideLocation::Demand) {
         auto &temp_demand_to_supply_tol(convergence.PlantTempDemandToSupplyTolValue);
         rshift1(temp_demand_to_supply_tol);
         temp_demand_to_supply_tol(1) = std::abs(OldTankOutletTemp - state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp);
@@ -543,7 +543,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     }
 
     // Set out of tolerance flags
-    if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
+    if (ThisLoopSide == DataPlant::LoopSideLocation::Demand) {
         if (convergence.PlantMassFlowNotConverged || convergence.PlantTempNotConverged) {
             OutOfToleranceFlag = true;
         }
@@ -596,7 +596,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation TankOutletLoopSide;    // inlet loopsidenumber
+    DataPlant::LoopSideLocation TankOutletLoopSide;    // inlet loopSideber
     int TankInletNode;         // inlet loop side outlet node
     int TankOutletNode;        // inlet loop side outlet node
     Real64 TankInletTemp;      // temporary variable
@@ -738,7 +738,7 @@ void UpdateCommonPipe(
     static constexpr std::string_view RoutineName("UpdateCommonPipe");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation TankOutletLoopSide;    // inlet loopsidenumber
+    DataPlant::LoopSideLocation TankOutletLoopSide;    // inlet loopSideber
     int TankInletNode;         // inlet loop side outlet node
     int TankOutletNode;        // inlet loop side outlet node
     Real64 TankInletTemp;      // temporary variable

@@ -122,7 +122,7 @@ namespace DataPlant {
         }
 
         // Do pressure system initialize if this is the demand side (therefore once per whole loop)
-        if (this->myLoopSideNum == DataPlant::LoopSideLocation::Demand) {
+        if (this->myLoopSide == DataPlant::LoopSideLocation::Demand) {
             PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall::Init);
         }
 
@@ -130,22 +130,22 @@ namespace DataPlant {
         this->TurnOnAllLoopSideBranches();
 
         // Do the actual simulation here every time
-        this->DoFlowAndLoadSolutionPass(state, this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
+        this->DoFlowAndLoadSolutionPass(state, this->myOtherLoopSide, ThisSideInletNode, FirstHVACIteration);
 
         // On constant speed branch pump loop sides we need to re-simulate
         if (this->hasConstSpeedBranchPumps) {
             // turn off any pumps connected to unloaded equipment and re-do the flow/load solution pass
             this->DisableAnyBranchPumpsConnectedToUnloadedEquipment();
-            this->DoFlowAndLoadSolutionPass(state, this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
+            this->DoFlowAndLoadSolutionPass(state, this->myOtherLoopSide, ThisSideInletNode, FirstHVACIteration);
         }
 
         // A couple things are specific to which LoopSide we are on  // TODO: This whole block needs to be moved up to the loop level
-        if (this->myLoopSideNum == DataPlant::LoopSideLocation::Demand) {
+        if (this->myLoopSide == DataPlant::LoopSideLocation::Demand) {
 
             // Pass the loop information via the HVAC interface manager
             HVACInterfaceManager::UpdatePlantLoopInterface(state,
                                                            this->myLoopNum,
-                                                           this->myLoopSideNum,
+                                                           this->myLoopSide,
                                                            thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut,
                                                            thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn,
                                                            ReSimOtherSideNeeded,
@@ -159,7 +159,7 @@ namespace DataPlant {
             // Pass the loop information via the HVAC interface manager (only the flow)
             HVACInterfaceManager::UpdatePlantLoopInterface(state,
                                                            this->myLoopNum,
-                                                           this->myLoopSideNum,
+                                                           this->myLoopSide,
                                                            thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut,
                                                            thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn,
                                                            ReSimOtherSideNeeded,
@@ -517,7 +517,7 @@ namespace DataPlant {
                 case DataPlant::PlantEquipmentType::PackagedTESCoolingCoil: {
                     this->SimAirLoopsNeeded = true;
                     // sometimes these coils are children in ZoneHVAC equipment
-                    // PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
+                    // PlantLoop(LoopNum)%LoopSide(LoopSide)%SimZoneEquipNeeded= .TRUE.
                     break;
                 }
 
@@ -703,8 +703,8 @@ namespace DataPlant {
         // If we are doing a common pipe simulation, and there is greater other-side flow than this side,
         //  then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
         //  as the flow going through the actual supply side
-        if (this->hasConstSpeedBranchPumps && this->myLoopSideNum == DataPlant::LoopSideLocation::Supply && thisPlantLoop.CommonPipeType != DataPlant::CommonPipeType::No) {
-            const DataPlant::LoopSideLocation OtherSide = LoopSideOther[static_cast<int>(this->myLoopSideNum)];
+        if (this->hasConstSpeedBranchPumps && this->myLoopSide == DataPlant::LoopSideLocation::Supply && thisPlantLoop.CommonPipeType != DataPlant::CommonPipeType::No) {
+            const DataPlant::LoopSideLocation OtherSide = LoopSideOther[static_cast<int>(this->myLoopSide)];
             const int otherSideOutletNodeNum = thisPlantLoop.LoopSide(OtherSide).NodeNumOut;
             Real64 commonPipeFlow = state.dataLoopNodes->Node(otherSideOutletNodeNum).MassFlowRate - ThisLoopSideFlow;
             Real64 otherSideExitingTemperature = state.dataLoopNodes->Node(otherSideOutletNodeNum).Temp;
@@ -1073,7 +1073,7 @@ namespace DataPlant {
             loop_side.flowRequestNeedIfOn = max(InletBranchRequestNeedIfOn, ParallelBranchRequestsNeedIfOn, OutletBranchRequestNeedIfOn);
         }
 
-        auto &this_loop_side(loop.LoopSide(this->myLoopSideNum));
+        auto &this_loop_side(loop.LoopSide(this->myLoopSide));
         auto &other_loop_side(loop.LoopSide(OtherSide));
 
         //~ Now that we have calculated each sides different status's requests, process to find final
@@ -1106,7 +1106,7 @@ namespace DataPlant {
                     //  2. determine which loop side has the stepped data
                     DataPlant::LoopSideLocation LoopSideIndex = DataPlant::LoopSideLocation::Invalid;
                     if (this_loop_side.hasConstSpeedBranchPumps && (this_loop_side.flowRequestFinal < other_loop_side.flowRequestFinal)) {
-                        LoopSideIndex = this->myLoopSideNum;
+                        LoopSideIndex = this->myLoopSide;
                     } else if (other_loop_side.hasConstSpeedBranchPumps && (other_loop_side.flowRequestFinal < this_loop_side.flowRequestFinal)) {
                         LoopSideIndex = OtherSide;
                     }
@@ -1740,7 +1740,7 @@ namespace DataPlant {
                 case DataPlant::OpScheme::CompSetPtBased:
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state,
                                                                         this->myLoopNum,
-                                                                        this->myLoopSideNum,
+                                                                        this->myLoopSide,
                                                                         BranchCounter,
                                                                         CompCounter,
                                                                         LoadToLoopSetPoint,
@@ -1751,14 +1751,14 @@ namespace DataPlant {
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);
                     break;
                 case DataPlant::OpScheme::EMS:
-                    if (this->myLoopSideNum == DataPlant::LoopSideLocation::Supply) {
+                    if (this->myLoopSide == DataPlant::LoopSideLocation::Supply) {
                         int const curCompOpSchemePtr = this_comp.CurCompLevelOpNum;
                         int const OpSchemePtr = this_comp.OpScheme(curCompOpSchemePtr).OpSchemePtr;
                         state.dataPlnt->PlantLoop(this->myLoopNum).OpScheme(OpSchemePtr).EMSIntVarLoopDemandRate = InitialDemandToLoopSetPoint;
                     }
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state,
                                                                         this->myLoopNum,
-                                                                        this->myLoopSideNum,
+                                                                        this->myLoopSide,
                                                                         BranchCounter,
                                                                         CompCounter,
                                                                         UpdatedDemandToLoopSetPoint,
@@ -1789,7 +1789,7 @@ namespace DataPlant {
 
             if (this->FlowLock == DataPlant::FlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(
-                    state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall::Calc, this->myLoopSideNum, BranchCounter);
+                    state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall::Calc, this->myLoopSide, BranchCounter);
             }
 
         } //~ BranchCounter
@@ -1829,7 +1829,7 @@ namespace DataPlant {
                     goto components2_end;       // don't do anymore components on this branch
                 case DataPlant::OpScheme::Pump: //~ pump
                     PumpLocation.loopNum = this->myLoopNum;
-                    PumpLocation.loopSideNum = this->myLoopSideNum;
+                    PumpLocation.loopSide = this->myLoopSide;
                     PumpLocation.branchNum = BranchCounter;
                     PumpLocation.compNum = CompCounter;
                     if (this->BranchPumpsExist) {
@@ -1843,7 +1843,7 @@ namespace DataPlant {
                     if (!LoadDistributionWasPerformed) { //~ Still need to distribute load among load range based components
                         PlantCondLoopOperation::ManagePlantLoadDistribution(state,
                                                                             this->myLoopNum,
-                                                                            this->myLoopSideNum,
+                                                                            this->myLoopSide,
                                                                             BranchCounter,
                                                                             CompCounter,
                                                                             LoadToLoopSetPoint,
@@ -1868,7 +1868,7 @@ namespace DataPlant {
             //~ If we are locked, go ahead and simulate the pressure components on this branch
             if (this->FlowLock == DataPlant::FlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(
-                    state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall::Calc, this->myLoopSideNum, BranchCounter);
+                    state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall::Calc, this->myLoopSide, BranchCounter);
             }
 
         } //~ BranchCounter
@@ -1895,7 +1895,7 @@ namespace DataPlant {
                     break;
                 case DataPlant::OpScheme::Pump: //~ pump
                     PumpLocation.loopNum = this->myLoopNum;
-                    PumpLocation.loopSideNum = this->myLoopSideNum;
+                    PumpLocation.loopSide = this->myLoopSide;
                     PumpLocation.branchNum = BranchCounter;
                     PumpLocation.compNum = CompCounter;
                     if (this->BranchPumpsExist) {
@@ -1921,7 +1921,7 @@ namespace DataPlant {
 
             if (this->FlowLock == DataPlant::FlowLock::Locked) {
                 PlantPressureSystem::SimPressureDropSystem(
-                    state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall::Calc, this->myLoopSideNum, BranchCounter);
+                    state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall::Calc, this->myLoopSide, BranchCounter);
             }
 
         } //~ BranchCounter
@@ -2035,7 +2035,7 @@ namespace DataPlant {
         //       RE-ENGINEERED  na
 
         auto &loop(state.dataPlnt->PlantLoop(SpecificPumpLocation.loopNum));
-        auto &loop_side(loop.LoopSide(SpecificPumpLocation.loopSideNum));
+        auto &loop_side(loop.LoopSide(SpecificPumpLocation.loopSide));
         auto &loop_side_branch(loop_side.Branch(SpecificPumpLocation.branchNum));
         auto &comp(loop_side_branch.Comp(SpecificPumpLocation.compNum));
         int const PumpIndex = comp.IndexInLoopSidePumps;
@@ -2077,20 +2077,20 @@ namespace DataPlant {
         int PumpIndexStart;
         int PumpIndexEnd;
         int PumpLoopNum;
-        DataPlant::LoopSideLocation PumpLoopSideNum;
+        DataPlant::LoopSideLocation PumpLoopSide;
 
         // If we have a specific loop/side/br/comp, then find the index and only do that one, otherwise do all pumps on the loop side
         if (present(SpecificPumpLocation)) {
             PumpLoopNum = SpecificPumpLocation().loopNum;
-            PumpLoopSideNum = SpecificPumpLocation().loopSideNum;
+            PumpLoopSide = SpecificPumpLocation().loopSide;
             int const PumpBranchNum = SpecificPumpLocation().branchNum;
             int const PumpCompNum = SpecificPumpLocation().compNum;
             PumpIndexStart =
-                state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum).Branch(PumpBranchNum).Comp(PumpCompNum).IndexInLoopSidePumps;
+                state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSide).Branch(PumpBranchNum).Comp(PumpCompNum).IndexInLoopSidePumps;
             PumpIndexEnd = PumpIndexStart;
         } else {
             PumpLoopNum = this->myLoopNum;
-            PumpLoopSideNum = this->myLoopSideNum;
+            PumpLoopSide = this->myLoopSide;
             PumpIndexStart = 1;
             PumpIndexEnd = this->TotalPumps;
         }
@@ -2104,7 +2104,7 @@ namespace DataPlant {
         }
 
         //~ Now loop through all the pumps and simulate them, keeping track of their status
-        auto &loop_side(state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum));
+        auto &loop_side(state.dataPlnt->PlantLoop(PumpLoopNum).LoopSide(PumpLoopSide));
         auto &loop_side_branch(loop_side.Branch);
         for (int PumpCounter = PumpIndexStart; PumpCounter <= PumpIndexEnd; ++PumpCounter) {
 

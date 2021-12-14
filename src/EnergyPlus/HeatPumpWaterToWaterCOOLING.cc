@@ -124,7 +124,7 @@ void GshpPeCoolingSpecs::simulate(
     } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             this->SourceLoopNum,
-                                                            this->SourceLoopSideNum,
+                                                            this->SourceLoopSide,
                                                             DataPlant::PlantEquipmentType::HPWaterEFCooling,
                                                             this->SourceSideInletNodeNum,
                                                             this->SourceSideOutletNodeNum,
@@ -158,7 +158,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::HPWaterPECooling,
                                                 this->SourceLoopNum,
-                                                this->SourceLoopSideNum,
+                                                this->SourceLoopSide,
                                                 this->SourceBranchNum,
                                                 this->SourceCompNum,
                                                 errFlag,
@@ -171,7 +171,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::HPWaterPECooling,
                                                 this->LoadLoopNum,
-                                                this->LoadLoopSideNum,
+                                                this->LoadLoopSide,
                                                 this->LoadBranchNum,
                                                 this->LoadCompNum,
                                                 errFlag,
@@ -185,7 +185,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
         }
 
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPPlantTypeOfNum, true);
+            state, this->LoadLoopNum, this->LoadLoopSide, this->SourceLoopNum, this->SourceLoopSide, this->WWHPPlantTypeOfNum, true);
         this->plantScanFlag = false;
     }
 }
@@ -537,7 +537,7 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
                                            this->LoadSideInletNodeNum,
                                            this->LoadSideOutletNodeNum,
                                            this->LoadLoopNum,
-                                           this->LoadLoopSideNum,
+                                           this->LoadLoopSide,
                                            this->LoadBranchNum,
                                            this->LoadCompNum);
 
@@ -554,7 +554,7 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
                                            this->SourceSideInletNodeNum,
                                            this->SourceSideOutletNodeNum,
                                            this->SourceLoopNum,
-                                           this->SourceLoopSideNum,
+                                           this->SourceLoopSide,
                                            this->SourceBranchNum,
                                            this->SourceCompNum);
 
@@ -657,7 +657,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                              this->LoadSideInletNodeNum,
                                              this->LoadSideOutletNodeNum,
                                              this->LoadLoopNum,
-                                             this->LoadLoopSideNum,
+                                             this->LoadLoopSide,
                                              this->LoadBranchNum,
                                              this->LoadCompNum);
         this->SourceSideWaterMassFlowRate = 0.0;
@@ -666,17 +666,17 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                              this->SourceSideInletNodeNum,
                                              this->SourceSideOutletNodeNum,
                                              this->SourceLoopNum,
-                                             this->SourceLoopSideNum,
+                                             this->SourceLoopSide,
                                              this->SourceBranchNum,
                                              this->SourceCompNum);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadLoopNum,
-                                                    this->LoadLoopSideNum,
+                                                    this->LoadLoopSide,
                                                     this->LoadBranchNum,
                                                     this->LoadCompNum,
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
-                                                    this->LoadLoopSideNum,
+                                                    this->LoadLoopSide,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
         // now initialize simulation variables for "heat pump off"
@@ -697,7 +697,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                              this->LoadSideInletNodeNum,
                                              this->LoadSideOutletNodeNum,
                                              this->LoadLoopNum,
-                                             this->LoadLoopSideNum,
+                                             this->LoadLoopSide,
                                              this->LoadBranchNum,
                                              this->LoadCompNum);
 
@@ -707,7 +707,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                              this->SourceSideInletNodeNum,
                                              this->SourceSideOutletNodeNum,
                                              this->SourceLoopNum,
-                                             this->SourceLoopSideNum,
+                                             this->SourceLoopSide,
                                              this->SourceBranchNum,
                                              this->SourceCompNum);
         // get inlet temps
@@ -722,7 +722,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                  this->LoadSideInletNodeNum,
                                                  this->LoadSideOutletNodeNum,
                                                  this->LoadLoopNum,
-                                                 this->LoadLoopSideNum,
+                                                 this->LoadLoopSide,
                                                  this->LoadBranchNum,
                                                  this->LoadCompNum);
             this->SourceSideWaterMassFlowRate = 0.0;
@@ -731,17 +731,17 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                  this->SourceSideInletNodeNum,
                                                  this->SourceSideOutletNodeNum,
                                                  this->SourceLoopNum,
-                                                 this->SourceLoopSideNum,
+                                                 this->SourceLoopSide,
                                                  this->SourceBranchNum,
                                                  this->SourceCompNum);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->LoadLoopNum,
-                                                        this->LoadLoopSideNum,
+                                                        this->LoadLoopSide,
                                                         this->LoadBranchNum,
                                                         this->LoadCompNum,
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
-                                                        this->LoadLoopSideNum,
+                                                        this->LoadLoopSide,
                                                         DataPlant::CriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             this->QLoad = 0.0;
@@ -755,12 +755,12 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
         }
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadLoopNum,
-                                                    this->LoadLoopSideNum,
+                                                    this->LoadLoopSide,
                                                     this->LoadBranchNum,
                                                     this->LoadCompNum,
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
-                                                    this->LoadLoopSideNum,
+                                                    this->LoadLoopSide,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
     }

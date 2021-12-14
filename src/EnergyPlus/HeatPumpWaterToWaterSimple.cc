@@ -140,7 +140,7 @@ void GshpSpecs::simulate(EnergyPlusData &state,
         } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->SourceLoopNum,
-                                                                this->SourceLoopSideNum,
+                                                                this->SourceLoopSide,
                                                                 DataPlant::PlantEquipmentType::HPWaterEFCooling,
                                                                 this->SourceSideInletNodeNum,
                                                                 this->SourceSideOutletNodeNum,
@@ -160,7 +160,7 @@ void GshpSpecs::simulate(EnergyPlusData &state,
         } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->SourceLoopNum,
-                                                                this->SourceLoopSideNum,
+                                                                this->SourceLoopSide,
                                                                 DataPlant::PlantEquipmentType::HPWaterEFHeating,
                                                                 this->SourceSideInletNodeNum,
                                                                 this->SourceSideOutletNodeNum,
@@ -739,7 +739,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
     auto &PrevSimTime = state.dataHPWaterToWaterSimple->PrevSimTime;
 
     int LoopNum;
-    DataPlant::LoopSideLocation LoopSideNum;
+    DataPlant::LoopSideLocation LoopSide;
     Real64 rho; // local fluid density
 
     this->MustRun = true; // Reset MustRun flag to TRUE
@@ -754,7 +754,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                 this->Name,
                                                 this->WWHPType,
                                                 this->SourceLoopNum,
-                                                this->SourceLoopSideNum,
+                                                this->SourceLoopSide,
                                                 this->SourceBranchNum,
                                                 this->SourceCompNum,
                                                 errFlag,
@@ -767,7 +767,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                                 this->Name,
                                                 this->WWHPType,
                                                 this->LoadLoopNum,
-                                                this->LoadLoopSideNum,
+                                                this->LoadLoopSide,
                                                 this->LoadBranchNum,
                                                 this->LoadCompNum,
                                                 errFlag,
@@ -779,7 +779,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
 
         if (!errFlag) {
             PlantUtilities::InterConnectTwoPlantLoopSides(
-                state, this->LoadLoopNum, this->LoadLoopSideNum, this->SourceLoopNum, this->SourceLoopSideNum, this->WWHPType, true);
+                state, this->LoadLoopNum, this->LoadLoopSide, this->SourceLoopNum, this->SourceLoopSide, this->WWHPType, true);
         }
 
         if (errFlag) {
@@ -840,7 +840,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                            this->LoadSideInletNodeNum,
                            this->LoadSideOutletNodeNum,
                            this->LoadLoopNum,
-                           this->LoadLoopSideNum,
+                           this->LoadLoopSide,
                            this->LoadBranchNum,
                            this->LoadCompNum);
 
@@ -850,7 +850,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                            this->SourceSideInletNodeNum,
                            this->SourceSideOutletNodeNum,
                            this->SourceLoopNum,
-                           this->SourceLoopSideNum,
+                           this->SourceLoopSide,
                            this->SourceBranchNum,
                            this->SourceCompNum);
 
@@ -872,7 +872,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                      (state.dataGlobal->TimeStep - 1) * state.dataGlobal->TimeStepZone + SysTimeElapsed;
 
     LoopNum = this->LoadLoopNum;
-    LoopSideNum = this->LoadLoopSideNum;
+    LoopSide = this->LoadLoopSide;
 
     if (MyLoad > 0.0 && GSHPTypeNum == DataPlant::PlantEquipmentType::HPWaterEFHeating) {
         this->MustRun = true;
@@ -896,7 +896,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                              this->LoadSideInletNodeNum,
                              this->LoadSideOutletNodeNum,
                              this->LoadLoopNum,
-                             this->LoadLoopSideNum,
+                             this->LoadLoopSide,
                              this->LoadBranchNum,
                              this->LoadCompNum);
         SetComponentFlowRate(state,
@@ -904,17 +904,17 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                              this->SourceSideInletNodeNum,
                              this->SourceSideOutletNodeNum,
                              this->SourceLoopNum,
-                             this->SourceLoopSideNum,
+                             this->SourceLoopSide,
                              this->SourceBranchNum,
                              this->SourceCompNum);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadLoopNum,
-                                                    this->LoadLoopSideNum,
+                                                    this->LoadLoopSide,
                                                     this->LoadBranchNum,
                                                     this->LoadCompNum,
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
-                                                    this->LoadLoopSideNum, // IS THIS RIGHT?
+                                                    this->LoadLoopSide, // IS THIS RIGHT?
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->reportSourceSideMassFlowRate);
         // Set flows if the heat pump is running
@@ -928,7 +928,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                              this->LoadSideInletNodeNum,
                              this->LoadSideOutletNodeNum,
                              this->LoadLoopNum,
-                             this->LoadLoopSideNum,
+                             this->LoadLoopSide,
                              this->LoadBranchNum,
                              this->LoadCompNum);
         SetComponentFlowRate(state,
@@ -936,7 +936,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                              this->SourceSideInletNodeNum,
                              this->SourceSideOutletNodeNum,
                              this->SourceLoopNum,
-                             this->SourceLoopSideNum,
+                             this->SourceLoopSide,
                              this->SourceBranchNum,
                              this->SourceCompNum);
         // if there's no flowin one, turn the entire "heat pump off"
@@ -951,7 +951,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
                                  this->LoadLoopNum,
-                                 this->LoadLoopSideNum,
+                                 this->LoadLoopSide,
                                  this->LoadBranchNum,
                                  this->LoadCompNum);
             SetComponentFlowRate(state,
@@ -959,29 +959,29 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourceLoopNum,
-                                 this->SourceLoopSideNum,
+                                 this->SourceLoopSide,
                                  this->SourceBranchNum,
                                  this->SourceCompNum);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->LoadLoopNum,
-                                                        this->LoadLoopSideNum,
+                                                        this->LoadLoopSide,
                                                         this->LoadBranchNum,
                                                         this->LoadCompNum,
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
-                                                        this->LoadLoopSideNum,
+                                                        this->LoadLoopSide,
                                                         DataPlant::CriteriaType::MassFlowRate,
                                                         this->reportSourceSideMassFlowRate);
             return;
         }
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadLoopNum,
-                                                    this->LoadLoopSideNum,
+                                                    this->LoadLoopSide,
                                                     this->LoadBranchNum,
                                                     this->LoadCompNum,
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
-                                                    this->LoadLoopSideNum,
+                                                    this->LoadLoopSide,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->reportSourceSideMassFlowRate);
     }

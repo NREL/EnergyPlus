@@ -647,7 +647,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                            this->DemandSideLoop.inletNodeNum,
                                            this->DemandSideLoop.outletNodeNum,
                                            this->DemandSideLoop.loopNum,
-                                           this->DemandSideLoop.loopSideNum,
+                                           this->DemandSideLoop.loopSide,
                                            this->DemandSideLoop.branchNum,
                                            this->DemandSideLoop.compNum);
 
@@ -663,7 +663,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                            this->SupplySideLoop.inletNodeNum,
                                            this->SupplySideLoop.outletNodeNum,
                                            this->SupplySideLoop.loopNum,
-                                           this->SupplySideLoop.loopSideNum,
+                                           this->SupplySideLoop.loopSide,
                                            this->SupplySideLoop.branchNum,
                                            this->SupplySideLoop.compNum);
         this->MyEnvrnFlag = false;
@@ -678,11 +678,11 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
     if (this->ControlMode == iCtrlType::CoolingSetPointOnOffWithComponentOverride) {
         // store current value for setpoint in central plant loop data structure
         int LoopNum2 = this->OtherCompSupplySideLoop.loopNum;
-        DataPlant::LoopSideLocation LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
+        DataPlant::LoopSideLocation LoopSide = this->OtherCompSupplySideLoop.loopSide;
         int BranchNum = this->OtherCompSupplySideLoop.branchNum;
         int LoopCompNum = this->OtherCompSupplySideLoop.compNum;
 
-        state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMinCntrlTemp =
+        state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSide).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMinCntrlTemp =
             state.dataLoopNodes->Node(this->SetPointNodeNum).TempSetPoint - this->TempControlTol; // issue #5626, include control tolerance
     }
 }
@@ -972,7 +972,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                  this->SupplySideLoop.inletNodeNum,
                                                  this->SupplySideLoop.outletNodeNum,
                                                  this->SupplySideLoop.loopNum,
-                                                 this->SupplySideLoop.loopSideNum,
+                                                 this->SupplySideLoop.loopSide,
                                                  this->SupplySideLoop.branchNum,
                                                  this->SupplySideLoop.compNum);
             if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -986,7 +986,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                  this->DemandSideLoop.inletNodeNum,
                                                  this->DemandSideLoop.outletNodeNum,
                                                  this->DemandSideLoop.loopNum,
-                                                 this->DemandSideLoop.loopSideNum,
+                                                 this->DemandSideLoop.loopSide,
                                                  this->DemandSideLoop.branchNum,
                                                  this->DemandSideLoop.compNum);
 
@@ -1004,7 +1004,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
-                                                             this->SupplySideLoop.loopSideNum,
+                                                             this->SupplySideLoop.loopSide,
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1024,7 +1024,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                                  this->DemandSideLoop.inletNodeNum,
                                                                  this->DemandSideLoop.outletNodeNum,
                                                                  this->DemandSideLoop.loopNum,
-                                                                 this->DemandSideLoop.loopSideNum,
+                                                                 this->DemandSideLoop.loopSide,
                                                                  this->DemandSideLoop.branchNum,
                                                                  this->SupplySideLoop.compNum);
                         }
@@ -1035,7 +1035,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
-                                                             this->SupplySideLoop.loopSideNum,
+                                                             this->SupplySideLoop.loopSide,
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a
@@ -1050,7 +1050,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
-                                                             this->DemandSideLoop.loopSideNum,
+                                                             this->DemandSideLoop.loopSide,
                                                              this->DemandSideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                     }
@@ -1064,7 +1064,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
-                                                             this->SupplySideLoop.loopSideNum,
+                                                             this->SupplySideLoop.loopSide,
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1083,7 +1083,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                                  this->DemandSideLoop.inletNodeNum,
                                                                  this->DemandSideLoop.outletNodeNum,
                                                                  this->DemandSideLoop.loopNum,
-                                                                 this->DemandSideLoop.loopSideNum,
+                                                                 this->DemandSideLoop.loopSide,
                                                                  this->DemandSideLoop.branchNum,
                                                                  this->DemandSideLoop.compNum);
                         }
@@ -1094,7 +1094,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
-                                                             this->SupplySideLoop.loopSideNum,
+                                                             this->SupplySideLoop.loopSide,
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a
@@ -1109,7 +1109,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
-                                                             this->DemandSideLoop.loopSideNum,
+                                                             this->DemandSideLoop.loopSide,
                                                              this->DemandSideLoop.branchNum,
                                                              this->DemandSideLoop.compNum);
                     }
@@ -1122,7 +1122,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 mdotDmdSide = 0.0;
@@ -1131,7 +1131,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1149,7 +1149,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
-                                                             this->SupplySideLoop.loopSideNum,
+                                                             this->SupplySideLoop.loopSide,
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1163,7 +1163,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
-                                                             this->DemandSideLoop.loopSideNum,
+                                                             this->DemandSideLoop.loopSide,
                                                              this->DemandSideLoop.branchNum,
                                                              this->DemandSideLoop.compNum);
                     } else { // not able to cool so turn off
@@ -1173,7 +1173,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
-                                                             this->SupplySideLoop.loopSideNum,
+                                                             this->SupplySideLoop.loopSide,
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a
@@ -1188,7 +1188,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
-                                                             this->DemandSideLoop.loopSideNum,
+                                                             this->DemandSideLoop.loopSide,
                                                              this->DemandSideLoop.branchNum,
                                                              this->DemandSideLoop.compNum);
                     }
@@ -1202,7 +1202,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
-                                                             this->SupplySideLoop.loopSideNum,
+                                                             this->SupplySideLoop.loopSide,
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1215,7 +1215,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
-                                                             this->DemandSideLoop.loopSideNum,
+                                                             this->DemandSideLoop.loopSide,
                                                              this->DemandSideLoop.branchNum,
                                                              this->DemandSideLoop.compNum);
                     } else { // not able to heat so turn off
@@ -1225,7 +1225,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->SupplySideLoop.inletNodeNum,
                                                              this->SupplySideLoop.outletNodeNum,
                                                              this->SupplySideLoop.loopNum,
-                                                             this->SupplySideLoop.loopSideNum,
+                                                             this->SupplySideLoop.loopSide,
                                                              this->SupplySideLoop.branchNum,
                                                              this->SupplySideLoop.compNum);
                         // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a
@@ -1240,7 +1240,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                              this->DemandSideLoop.inletNodeNum,
                                                              this->DemandSideLoop.outletNodeNum,
                                                              this->DemandSideLoop.loopNum,
-                                                             this->DemandSideLoop.loopSideNum,
+                                                             this->DemandSideLoop.loopSide,
                                                              this->DemandSideLoop.branchNum,
                                                              this->DemandSideLoop.compNum);
                     }
@@ -1253,7 +1253,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 mdotDmdSide = 0.0;
@@ -1262,7 +1262,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1281,7 +1281,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1295,7 +1295,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
-                                                         this->DemandSideLoop.loopSideNum,
+                                                         this->DemandSideLoop.loopSide,
                                                          this->DemandSideLoop.branchNum,
                                                          this->DemandSideLoop.compNum);
                 }
@@ -1306,7 +1306,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh
@@ -1321,7 +1321,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1340,7 +1340,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1353,7 +1353,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             } else { // not able or are wanting to heat so turn off
@@ -1363,7 +1363,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh
@@ -1378,7 +1378,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1397,7 +1397,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1410,7 +1410,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
-                                                         this->DemandSideLoop.loopSideNum,
+                                                         this->DemandSideLoop.loopSide,
                                                          this->DemandSideLoop.branchNum,
                                                          this->DemandSideLoop.compNum);
                 }
@@ -1421,7 +1421,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh
@@ -1436,7 +1436,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1455,7 +1455,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1468,7 +1468,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             } else { // not able or are wanting to cool so turn off
@@ -1478,7 +1478,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh
@@ -1493,7 +1493,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1515,7 +1515,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1528,7 +1528,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
-                                                         this->DemandSideLoop.loopSideNum,
+                                                         this->DemandSideLoop.loopSide,
                                                          this->DemandSideLoop.branchNum,
                                                          this->DemandSideLoop.compNum);
                 }
@@ -1540,7 +1540,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1553,7 +1553,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                          this->DemandSideLoop.inletNodeNum,
                                                          this->DemandSideLoop.outletNodeNum,
                                                          this->DemandSideLoop.loopNum,
-                                                         this->DemandSideLoop.loopSideNum,
+                                                         this->DemandSideLoop.loopSide,
                                                          this->DemandSideLoop.branchNum,
                                                          this->DemandSideLoop.compNum);
                 }
@@ -1564,7 +1564,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh
@@ -1579,7 +1579,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1600,7 +1600,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1613,7 +1613,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             } else if ((DeltaTHeating > this->TempControlTol) && (SetPointTempLo > this->SupplySideLoop.InletTemp)) {
@@ -1624,7 +1624,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1637,7 +1637,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             } else { // not able or don't want conditioning
@@ -1647,7 +1647,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh
@@ -1662,7 +1662,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1680,7 +1680,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1693,7 +1693,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             } else { // not wanting to cool so turn off
@@ -1703,7 +1703,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh
@@ -1718,7 +1718,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1751,7 +1751,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
             Real64 DeltaTCooling = SetPointTemp - ControlSignalValue;
             // obtain shut down state
             bool ChillerShutDown = state.dataPlnt->PlantLoop(this->OtherCompSupplySideLoop.loopNum)
-                                       .LoopSide(this->OtherCompSupplySideLoop.loopSideNum)
+                                       .LoopSide(this->OtherCompSupplySideLoop.loopSide)
                                        .Branch(this->OtherCompSupplySideLoop.branchNum)
                                        .Comp(this->OtherCompSupplySideLoop.compNum)
                                        .FreeCoolCntrlShutDown;
@@ -1763,7 +1763,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -1776,7 +1776,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
 
@@ -1787,7 +1787,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->SupplySideLoop.inletNodeNum,
                                                      this->SupplySideLoop.outletNodeNum,
                                                      this->SupplySideLoop.loopNum,
-                                                     this->SupplySideLoop.loopSideNum,
+                                                     this->SupplySideLoop.loopSide,
                                                      this->SupplySideLoop.branchNum,
                                                      this->SupplySideLoop.compNum);
                 // issue 4959, make demand side flow request on first hvac iteration so demand side loop can run as a trial to get a fresh
@@ -1802,7 +1802,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                                      this->DemandSideLoop.inletNodeNum,
                                                      this->DemandSideLoop.outletNodeNum,
                                                      this->DemandSideLoop.loopNum,
-                                                     this->DemandSideLoop.loopSideNum,
+                                                     this->DemandSideLoop.loopSide,
                                                      this->DemandSideLoop.branchNum,
                                                      this->DemandSideLoop.compNum);
             }
@@ -1819,7 +1819,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                              this->SupplySideLoop.inletNodeNum,
                                              this->SupplySideLoop.outletNodeNum,
                                              this->SupplySideLoop.loopNum,
-                                             this->SupplySideLoop.loopSideNum,
+                                             this->SupplySideLoop.loopSide,
                                              this->SupplySideLoop.branchNum,
                                              this->SupplySideLoop.compNum);
         mdotDmdSide = 0.0;
@@ -1828,7 +1828,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int co
                                              this->DemandSideLoop.inletNodeNum,
                                              this->DemandSideLoop.outletNodeNum,
                                              this->DemandSideLoop.loopNum,
-                                             this->DemandSideLoop.loopSideNum,
+                                             this->DemandSideLoop.loopSide,
                                              this->DemandSideLoop.branchNum,
                                              this->DemandSideLoop.compNum);
     }
@@ -2160,7 +2160,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
                                                  this->DemandSideLoop.inletNodeNum,
                                                  this->DemandSideLoop.outletNodeNum,
                                                  this->DemandSideLoop.loopNum,
-                                                 this->DemandSideLoop.loopSideNum,
+                                                 this->DemandSideLoop.loopSide,
                                                  this->DemandSideLoop.branchNum,
                                                  this->DemandSideLoop.compNum);
 
@@ -2172,7 +2172,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
                                                  this->DemandSideLoop.inletNodeNum,
                                                  this->DemandSideLoop.outletNodeNum,
                                                  this->DemandSideLoop.loopNum,
-                                                 this->DemandSideLoop.loopSideNum,
+                                                 this->DemandSideLoop.loopSide,
                                                  this->DemandSideLoop.branchNum,
                                                  this->DemandSideLoop.compNum);
 
@@ -2185,7 +2185,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
                                                  this->DemandSideLoop.inletNodeNum,
                                                  this->DemandSideLoop.outletNodeNum,
                                                  this->DemandSideLoop.loopNum,
-                                                 this->DemandSideLoop.loopSideNum,
+                                                 this->DemandSideLoop.loopSide,
                                                  this->DemandSideLoop.branchNum,
                                                  this->DemandSideLoop.compNum);
         }
@@ -2240,7 +2240,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
                                                  this->DemandSideLoop.inletNodeNum,
                                                  this->DemandSideLoop.outletNodeNum,
                                                  this->DemandSideLoop.loopNum,
-                                                 this->DemandSideLoop.loopSideNum,
+                                                 this->DemandSideLoop.loopSide,
                                                  this->DemandSideLoop.branchNum,
                                                  this->DemandSideLoop.compNum);
         } else if ((TargetSupplySideLoopLeavingTemp <= LeavingTempFullFlow) && (LeavingTempFullFlow < LeavingTempMinFlow)) {
@@ -2251,7 +2251,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
                                                  this->DemandSideLoop.inletNodeNum,
                                                  this->DemandSideLoop.outletNodeNum,
                                                  this->DemandSideLoop.loopNum,
-                                                 this->DemandSideLoop.loopSideNum,
+                                                 this->DemandSideLoop.loopSide,
                                                  this->DemandSideLoop.branchNum,
                                                  this->DemandSideLoop.compNum);
         } else if (LeavingTempMinFlow <= TargetSupplySideLoopLeavingTemp) {
@@ -2263,7 +2263,7 @@ void HeatExchangerStruct::findDemandSideLoopFlow(EnergyPlusData &state, Real64 c
                                                  this->DemandSideLoop.inletNodeNum,
                                                  this->DemandSideLoop.outletNodeNum,
                                                  this->DemandSideLoop.loopNum,
-                                                 this->DemandSideLoop.loopSideNum,
+                                                 this->DemandSideLoop.loopSide,
                                                  this->DemandSideLoop.branchNum,
                                                  this->DemandSideLoop.compNum);
         }
@@ -2321,7 +2321,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                 this->DemandSideLoop.loopNum,
-                                                this->DemandSideLoop.loopSideNum,
+                                                this->DemandSideLoop.loopSide,
                                                 this->DemandSideLoop.branchNum,
                                                 this->DemandSideLoop.compNum,
                                                 errFlag,
@@ -2331,7 +2331,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 this->DemandSideLoop.inletNodeNum,
                                                 _);
 
-        if (this->DemandSideLoop.loopSideNum != DataPlant::LoopSideLocation::Demand) { // throw error
+        if (this->DemandSideLoop.loopSide != DataPlant::LoopSideLocation::Demand) { // throw error
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
@@ -2345,7 +2345,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                 this->SupplySideLoop.loopNum,
-                                                this->SupplySideLoop.loopSideNum,
+                                                this->SupplySideLoop.loopSide,
                                                 this->SupplySideLoop.branchNum,
                                                 this->SupplySideLoop.compNum,
                                                 errFlag,
@@ -2355,7 +2355,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 this->SupplySideLoop.inletNodeNum,
                                                 _);
 
-        if (this->SupplySideLoop.loopSideNum != DataPlant::LoopSideLocation::Supply) { // throw error
+        if (this->SupplySideLoop.loopSide != DataPlant::LoopSideLocation::Supply) { // throw error
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
@@ -2378,9 +2378,9 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
             PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                           this->SupplySideLoop.loopNum,
-                                                          this->SupplySideLoop.loopSideNum,
+                                                          this->SupplySideLoop.loopSide,
                                                           this->DemandSideLoop.loopNum,
-                                                          this->DemandSideLoop.loopSideNum,
+                                                          this->DemandSideLoop.loopSide,
                                                           DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                           true);
         }
@@ -2392,7 +2392,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                      RoutineName,
                                                      this->OtherCompSupplySideLoop.inletNodeNum,
                                                      this->OtherCompSupplySideLoop.loopNum,
-                                                     this->OtherCompSupplySideLoop.loopSideNum,
+                                                     this->OtherCompSupplySideLoop.loopSide,
                                                      this->OtherCompSupplySideLoop.branchNum,
                                                      this->OtherCompSupplySideLoop.compNum);
 
@@ -2400,25 +2400,25 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                      RoutineName,
                                                      this->OtherCompDemandSideLoop.inletNodeNum,
                                                      this->OtherCompDemandSideLoop.loopNum,
-                                                     this->OtherCompDemandSideLoop.loopSideNum,
+                                                     this->OtherCompDemandSideLoop.loopSide,
                                                      this->OtherCompDemandSideLoop.branchNum,
                                                      this->OtherCompDemandSideLoop.compNum);
 
             // revise how loads served category for other controlled equipment
             int LoopNum2 = this->OtherCompSupplySideLoop.loopNum;
-            DataPlant::LoopSideLocation LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
+            DataPlant::LoopSideLocation LoopSide = this->OtherCompSupplySideLoop.loopSide;
             int BranchNum = this->OtherCompSupplySideLoop.branchNum;
             int LoopCompNum = this->OtherCompSupplySideLoop.compNum;
 
-            switch (state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed) {
+            switch (state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSide).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed) {
 
             case DataPlant::HowMet::ByNominalCap: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSide).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
                     DataPlant::HowMet::ByNominalCapFreeCoolCntrl;
                 break;
             }
             case DataPlant::HowMet::ByNominalCapLowOutLimit: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSide).Branch(BranchNum).Comp(LoopCompNum).HowLoadServed =
                     DataPlant::HowMet::ByNominalCapLowOutLimitFreeCoolCntrl;
                 break;
             }
@@ -2428,19 +2428,19 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
             switch (this->ControlSignalTemp) {
             case iCtrlTemp::WetBulbTemperature: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSide).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
                     DataPlant::FreeCoolControlMode::WetBulb;
                 break;
             }
             case iCtrlTemp::DryBulbTemperature: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSide).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
                     DataPlant::FreeCoolControlMode::DryBulb;
                 break;
             }
             case iCtrlTemp::LoopTemperature: {
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSide).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlMode =
                     DataPlant::FreeCoolControlMode::Loop;
-                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSideNum).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
+                state.dataPlnt->PlantLoop(LoopNum2).LoopSide(LoopSide).Branch(BranchNum).Comp(LoopCompNum).FreeCoolCntrlNodeNum =
                     this->OtherCompDemandSideLoop.inletNodeNum;
                 break;
             }
@@ -2454,7 +2454,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                         this->ComponentUserName,
                                                         this->ComponentType,
                                                         this->OtherCompSupplySideLoop.loopNum,
-                                                        this->OtherCompSupplySideLoop.loopSideNum,
+                                                        this->OtherCompSupplySideLoop.loopSide,
                                                         this->OtherCompSupplySideLoop.branchNum,
                                                         this->OtherCompSupplySideLoop.compNum,
                                                         errFlag,
@@ -2469,7 +2469,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                         this->ComponentUserName,
                                                         this->ComponentType,
                                                         this->OtherCompDemandSideLoop.loopNum,
-                                                        this->OtherCompDemandSideLoop.loopSideNum,
+                                                        this->OtherCompDemandSideLoop.loopSide,
                                                         this->OtherCompDemandSideLoop.branchNum,
                                                         this->OtherCompDemandSideLoop.compNum,
                                                         errFlag,

@@ -82,7 +82,7 @@ namespace Boilers {
         DataGlobalConstants::ResourceType FuelType; // resource type assignment
         DataPlant::PlantEquipmentType Type;         // plant loop type identifier
         int LoopNum;                                // plant loop connection
-        DataPlant::LoopSideLocation LoopSideNum;                            // plant loop side connection
+        DataPlant::LoopSideLocation LoopSide;                            // plant loop side connection
         int BranchNum;                              // plant loop branch connection
         int CompNum;                                // plant loop component connection
         bool Available;                             // TRUE if machine available in current time step
@@ -139,7 +139,7 @@ namespace Boilers {
 
         // Default Constructor
         BoilerSpecs()
-            : FuelType(DataGlobalConstants::ResourceType::None), Type(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid),
+            : FuelType(DataGlobalConstants::ResourceType::None), Type(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid),
               BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0),
               FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), VolFlowRate(0.0),
               VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0),

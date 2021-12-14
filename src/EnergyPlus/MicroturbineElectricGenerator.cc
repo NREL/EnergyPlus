@@ -1129,7 +1129,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                            this->HeatRecInletNodeNum,
                                            this->HeatRecOutletNodeNum,
                                            this->HRLoopNum,
-                                           this->HRLoopSideNum,
+                                           this->HRLoopSide,
                                            this->HRBranchNum,
                                            this->HRCompNum);
 
@@ -1172,7 +1172,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                              this->HeatRecInletNodeNum,
                                              this->HeatRecOutletNodeNum,
                                              this->HRLoopNum,
-                                             this->HRLoopSideNum,
+                                             this->HRLoopSide,
                                              this->HRBranchNum,
                                              this->HRCompNum);
     } else { // not FirstHVACIteration
@@ -1194,7 +1194,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
-                                                     this->HRLoopSideNum,
+                                                     this->HRLoopSide,
                                                      this->HRBranchNum,
                                                      this->HRCompNum);
             } else {
@@ -1203,7 +1203,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
-                                                     this->HRLoopSideNum,
+                                                     this->HRLoopSide,
                                                      this->HRBranchNum,
                                                      this->HRCompNum);
             }
@@ -1213,7 +1213,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                                  this->HeatRecInletNodeNum,
                                                  this->HeatRecOutletNodeNum,
                                                  this->HRLoopNum,
-                                                 this->HRLoopSideNum,
+                                                 this->HRLoopSide,
                                                  this->HRBranchNum,
                                                  this->HRCompNum);
         }
@@ -1977,7 +1977,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Generator_MicroTurbine,
                                                 this->HRLoopNum,
-                                                this->HRLoopSideNum,
+                                                this->HRLoopSide,
                                                 this->HRBranchNum,
                                                 this->HRCompNum,
                                                 errFlag,
@@ -2011,7 +2011,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
                                            this->HeatRecInletNodeNum,
                                            this->HeatRecOutletNodeNum,
                                            this->HRLoopNum,
-                                           this->HRLoopSideNum,
+                                           this->HRLoopSide,
                                            this->HRBranchNum,
                                            this->HRCompNum);
 

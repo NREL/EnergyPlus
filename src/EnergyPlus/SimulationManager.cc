@@ -2309,13 +2309,13 @@ namespace SimulationManager {
               "{}\n",
               "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
         for (int Count = 1; Count <= state.dataHVACGlobal->NumPlantLoops; ++Count) {
-            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
+            for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
                 //  Plant Supply Side Loop
                 // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
                 const auto LoopString = [&]() {
-                    if (LoopSideNum == LoopSideLocation::Demand) {
+                    if (LoopSide == LoopSideLocation::Demand) {
                         return "Demand";
-                    } else if (LoopSideNum == LoopSideLocation::Supply) {
+                    } else if (LoopSide == LoopSideLocation::Supply) {
                         return "Supply";
                     } else {
                         return "";
@@ -2326,43 +2326,43 @@ namespace SimulationManager {
                       " Plant Loop,{},{},{},{},{},{}\n",
                       state.dataPlnt->PlantLoop(Count).Name,
                       LoopString,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).NodeNameIn,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).NodeNameOut,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).BranchList,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).ConnectList);
                 //  Plant Supply Side Splitter
-                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
+                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.Exists) {
                     print(state.files.bnd,
                           "   Plant Loop Connector,Splitter,{},{},{},{}\n",
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.Name,
                           state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
-                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.TotalOutletNodes);
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.TotalOutletNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Splitter,{},",
                               Count1,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.Name);
 
-                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.BranchNumIn <= 0) {
                             print(state.files.bnd, "{},\n", errstring);
                         } else {
                             print(state.files.bnd,
                                   "{},",
                                   state.dataPlnt->PlantLoop(Count)
-                                      .LoopSide(LoopSideNum)
-                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
+                                      .LoopSide(LoopSide)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.BranchNumIn)
                                       .Name);
                         }
 
-                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.BranchNumOut(Count1) <= 0) {
                             print(state.files.bnd, "{},{},{}\n", errstring, state.dataPlnt->PlantLoop(Count).Name, LoopString);
                         } else {
                             print(state.files.bnd,
                                   "{},{},{}\n",
                                   state.dataPlnt->PlantLoop(Count)
-                                      .LoopSide(LoopSideNum)
-                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                      .LoopSide(LoopSide)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.BranchNumOut(Count1))
                                       .Name,
                                   state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
@@ -2371,46 +2371,46 @@ namespace SimulationManager {
                         print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
                               Count1,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.NodeNameIn,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.NodeNameOut(Count1),
                               state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
                 }
 
                 //  Plant Supply Side Mixer
-                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
+                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.Exists) {
                     print(state.files.bnd,
                           "   Plant Loop Connector,Mixer,{},{},{},{}\n",
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.Name,
                           state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes); //',Supply,'//  &
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.TotalInletNodes); //',Supply,'//  &
 
-                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.TotalInletNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Mixer,{},",
                               Count1,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
-                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.Name);
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.BranchNumIn(Count1) <= 0) {
                             print(state.files.bnd, "{},", errstring);
                         } else {
                             print(state.files.bnd,
                                   "{},",
                                   state.dataPlnt->PlantLoop(Count)
-                                      .LoopSide(LoopSideNum)
-                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
+                                      .LoopSide(LoopSide)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.BranchNumIn(Count1))
                                       .Name);
                         }
-                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.BranchNumOut <= 0) {
                             print(state.files.bnd, "{},{},Supply\n", errstring, state.dataPlnt->PlantLoop(Count).Name);
                         } else {
                             print(state.files.bnd,
                                   "{},{},{}\n",
                                   state.dataPlnt->PlantLoop(Count)
-                                      .LoopSide(LoopSideNum)
-                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
+                                      .LoopSide(LoopSide)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.BranchNumOut)
                                       .Name,
                                   state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
@@ -2418,9 +2418,9 @@ namespace SimulationManager {
                         print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
                               Count1,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.NodeNameIn(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.NodeNameOut,
                               state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
@@ -2465,13 +2465,13 @@ namespace SimulationManager {
               "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
 
         for (int Count = state.dataHVACGlobal->NumPlantLoops + 1; Count <= state.dataPlnt->TotNumLoops; ++Count) {
-            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
+            for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
                 //  Plant Supply Side Loop
                 // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
                 const auto LoopString = [&]() {
-                    if (LoopSideNum == LoopSideLocation::Demand) {
+                    if (LoopSide == LoopSideLocation::Demand) {
                         return "Demand";
-                    } else if (LoopSideNum == LoopSideLocation::Supply) {
+                    } else if (LoopSide == LoopSideLocation::Supply) {
                         return "Supply";
                     } else {
                         return "";
@@ -2482,43 +2482,43 @@ namespace SimulationManager {
                       " Plant Loop,{},{},{},{},{},{}\n",
                       state.dataPlnt->PlantLoop(Count).Name,
                       LoopString,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
-                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).NodeNameIn,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).NodeNameOut,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).BranchList,
+                      state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).ConnectList);
                 //  Plant Supply Side Splitter
-                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
+                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.Exists) {
                     print(state.files.bnd,
                           "   Plant Loop Connector,Splitter,{},{},{},{}\n",
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.Name,
                           state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
-                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.TotalOutletNodes);
+                    for (int Count1 = 1; Count1 <= state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.TotalOutletNodes; ++Count1) {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Splitter,{},",
                               Count1,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.Name);
 
-                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.BranchNumIn <= 0) {
                             print(state.files.bnd, "{},", errstring);
                         } else {
                             print(state.files.bnd,
                                   "{},",
                                   state.dataPlnt->PlantLoop(Count)
-                                      .LoopSide(LoopSideNum)
-                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
+                                      .LoopSide(LoopSide)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.BranchNumIn)
                                       .Name);
                         }
-                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.BranchNumOut(Count1) <= 0) {
                             print(state.files.bnd, "{},{},{}\n", errstring, state.dataPlnt->PlantLoop(Count).Name, LoopString);
                         } else {
 
                             print(state.files.bnd,
                                   "{},{},{}\n",
                                   state.dataPlnt->PlantLoop(Count)
-                                      .LoopSide(LoopSideNum)
-                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                      .LoopSide(LoopSide)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.BranchNumOut(Count1))
                                       .Name,
                                   state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
@@ -2527,20 +2527,20 @@ namespace SimulationManager {
                         print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
                               Count1,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.NodeNameIn,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Splitter.NodeNameOut(Count1),
                               state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }
                 }
 
                 //  Plant Supply Side Mixer
-                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
-                    const auto totalInletNodes = state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.Exists) {
+                    const auto totalInletNodes = state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.TotalInletNodes;
                     print(state.files.bnd,
                           "   Plant Loop Connector,Mixer,{},{},{},{}\n",
-                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                          state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.Name,
                           state.dataPlnt->PlantLoop(Count).Name,
                           LoopString,
                           totalInletNodes); //',Supply,'//  &
@@ -2549,26 +2549,26 @@ namespace SimulationManager {
                         print(state.files.bnd,
                               "     Plant Loop Connector Branches,{},Mixer,{},",
                               Count1,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.Name);
 
-                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.BranchNumIn(Count1) <= 0) {
                             print(state.files.bnd, "{},", errstring);
                         } else {
                             print(state.files.bnd,
                                   "{},",
                                   state.dataPlnt->PlantLoop(Count)
-                                      .LoopSide(LoopSideNum)
-                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
+                                      .LoopSide(LoopSide)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.BranchNumIn(Count1))
                                       .Name);
                         }
-                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
+                        if (state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.BranchNumOut <= 0) {
                             print(state.files.bnd, "{},{},{}\n", errstring, state.dataPlnt->PlantLoop(Count).Name, LoopString);
                         } else {
                             print(state.files.bnd,
                                   "{},{},{}\n",
                                   state.dataPlnt->PlantLoop(Count)
-                                      .LoopSide(LoopSideNum)
-                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
+                                      .LoopSide(LoopSide)
+                                      .Branch(state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.BranchNumOut)
                                       .Name,
                                   state.dataPlnt->PlantLoop(Count).Name,
                                   LoopString);
@@ -2576,9 +2576,9 @@ namespace SimulationManager {
                         print(state.files.bnd,
                               "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
                               Count1,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
-                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.Name,
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.NodeNameIn(Count1),
+                              state.dataPlnt->PlantLoop(Count).LoopSide(LoopSide).Mixer.NodeNameOut,
                               state.dataPlnt->PlantLoop(Count).Name,
                               LoopString);
                     }

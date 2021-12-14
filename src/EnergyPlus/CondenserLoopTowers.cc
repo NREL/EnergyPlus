@@ -2046,7 +2046,7 @@ namespace CondenserLoopTowers {
         // Locate the tower on the plant loops for later usage
         bool ErrorsFound = false;
         PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, this->TowerType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+            state, this->Name, this->TowerType, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
         if (ErrorsFound) {
             ShowFatalError(state, "initialize: Program terminated due to previous condition(s).");
         }
@@ -2072,7 +2072,7 @@ namespace CondenserLoopTowers {
                                            this->WaterInletNodeNum,
                                            this->WaterOutletNodeNum,
                                            this->LoopNum,
-                                           this->LoopSideNum,
+                                           this->LoopSide,
                                            this->BranchNum,
                                            this->CompNum);
     }
@@ -2128,14 +2128,14 @@ namespace CondenserLoopTowers {
         }
 
         this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
-            state, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
+            state, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
 
         PlantUtilities::SetComponentFlowRate(state,
                                              this->WaterMassFlowRate,
                                              this->WaterInletNodeNum,
                                              this->WaterOutletNodeNum,
                                              this->LoopNum,
-                                             this->LoopSideNum,
+                                             this->LoopSide,
                                              this->BranchNum,
                                              this->CompNum);
 
@@ -4887,13 +4887,13 @@ namespace CondenserLoopTowers {
                 if (this->SetpointIsOnOutlet) {
                     TempSetPoint = state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPoint;
                 } else {
-                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
+                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPoint;
                 }
             } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 if (this->SetpointIsOnOutlet) {
                     TempSetPoint = state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPointHi;
                 } else {
-                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
+                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPointHi;
                 }
             }
         }
@@ -5192,13 +5192,13 @@ namespace CondenserLoopTowers {
                 if (this->SetpointIsOnOutlet) {
                     TempSetPoint = state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPoint;
                 } else {
-                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
+                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPoint;
                 }
             } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                 if (this->SetpointIsOnOutlet) {
                     TempSetPoint = state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPointHi;
                 } else {
-                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
+                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPointHi;
                 }
             }
         }
@@ -5231,7 +5231,7 @@ namespace CondenserLoopTowers {
         }
 
         // Do not RETURN here if flow rate is less than SmallMassFlow. Check basin heater and then RETURN.
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) return; // TODO: WTF
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked) return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             CalcBasinHeaterPower(
@@ -5451,9 +5451,9 @@ namespace CondenserLoopTowers {
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
+                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
+                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPointHi;
             } else {
                 assert(false);
             }
@@ -5475,7 +5475,7 @@ namespace CondenserLoopTowers {
         Real64 Ta = TempSetPoint - this->AirWetBulb;
 
         // Do not RETURN here if flow rate is less than MassFlowTolerance. Check basin heater and then RETURN.
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) return; // TODO: WTF
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked) return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             CalcBasinHeaterPower(
@@ -6191,9 +6191,9 @@ namespace CondenserLoopTowers {
             {
                 auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
+                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPoint;
                 } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
+                    TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPointHi;
                 } else {
                     assert(false);
                 }
@@ -6833,7 +6833,7 @@ namespace CondenserLoopTowers {
         // set node information
         state.dataLoopNodes->Node(this->WaterOutletNodeNum).Temp = this->OutletWaterTemp;
 
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked ||
             state.dataGlobal->WarmupFlag)
             return;
 

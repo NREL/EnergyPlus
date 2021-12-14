@@ -218,7 +218,7 @@ namespace SteamBaseboardRadiator {
                                           _,
                                           _,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                           state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum);
                     } else {
                         ShowSevereError(state,
@@ -240,7 +240,7 @@ namespace SteamBaseboardRadiator {
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum);
                 CalcSteamBaseboard(state, BaseboardNum, PowerMet);
@@ -950,7 +950,7 @@ namespace SteamBaseboardRadiator {
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
                                         errFlag,
@@ -999,7 +999,7 @@ namespace SteamBaseboardRadiator {
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum);
             state.dataLoopNodes->Node(SteamInletNode).Enthalpy = StartEnthSteam;
@@ -1734,34 +1734,34 @@ namespace SteamBaseboardRadiator {
 
         PullCompInterconnectTrigger(state,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                     DataPlant::CriteriaType::HeatTransferRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(state,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                     DataPlant::CriteriaType::MassFlowRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate);
 
         PullCompInterconnectTrigger(state,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSide,
                                     DataPlant::CriteriaType::Temperature,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletTemp);
     }

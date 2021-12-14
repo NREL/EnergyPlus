@@ -70,7 +70,7 @@ namespace PlantUtilities {
                             int InletNode,   // component's inlet node index in node structure
                             int OutletNode,  // component's outlet node index in node structure
                             int LoopNum,     // plant loop index for PlantLoop structure
-                            DataPlant::LoopSideLocation LoopSideNum, // Loop side index for PlantLoop structure
+                            DataPlant::LoopSideLocation LoopSide, // Loop side index for PlantLoop structure
                             int BranchIndex, // branch index for PlantLoop
                             int CompIndex    // component index for PlantLoop
     );
@@ -80,7 +80,7 @@ namespace PlantUtilities {
                               int InletNode,    // component's inlet node index in node structure
                               int OutletNode,   // component's outlet node index in node structure
                               int LoopNum,      // plant loop index for PlantLoop structure
-                              DataPlant::LoopSideLocation LoopSideNum,  // Loop side index for PlantLoop structure
+                              DataPlant::LoopSideLocation LoopSide,  // Loop side index for PlantLoop structure
                               int BranchIndex,  // branch index for PlantLoop
                               int CompIndex     // component index for PlantLoop
     );
@@ -89,7 +89,7 @@ namespace PlantUtilities {
                                    Real64 &CompFlow,
                                    int ActuatedNode,
                                    int LoopNum,
-                                   DataPlant::LoopSideLocation LoopSideNum,
+                                   DataPlant::LoopSideLocation LoopSide,
                                    int BranchNum,
                                    bool ResetMode // flag to indicate if this is a real flow set, or a reset flow setting.
     );
@@ -97,7 +97,7 @@ namespace PlantUtilities {
     Real64
     RegulateCondenserCompFlowReqOp(EnergyPlusData &state,
                                           int LoopNum,
-                                          DataPlant::LoopSideLocation LoopSideNum,
+                                          DataPlant::LoopSideLocation LoopSide,
                                           int BranchNum,
                                           int CompNum,
                                           Real64 TentativeFlowRequest);
@@ -106,10 +106,10 @@ namespace PlantUtilities {
 
     void CheckPlantMixerSplitterConsistency(EnergyPlusData &state,
                                             const int LoopNum,
-                                            const DataPlant::LoopSideLocation LoopSideNum,
+                                            const DataPlant::LoopSideLocation LoopSide,
                                             const bool FirstHVACIteration);
 
-    void CheckForRunawayPlantTemps(EnergyPlusData &state, int LoopNum, const DataPlant::LoopSideLocation LoopSideNum);
+    void CheckForRunawayPlantTemps(EnergyPlusData &state, int LoopNum, const DataPlant::LoopSideLocation LoopSide);
 
     void SetAllFlowLocks(EnergyPlusData &state, DataPlant::FlowLock Value);
 
@@ -164,9 +164,9 @@ namespace PlantUtilities {
 
     void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
                                        int Loop1Num,
-                                       DataPlant::LoopSideLocation Loop1LoopSideNum,
+                                       DataPlant::LoopSideLocation Loop1LoopSide,
                                        int Loop2Num,
-                                       DataPlant::LoopSideLocation Loop2LoopSideNum,
+                                       DataPlant::LoopSideLocation Loop2LoopSide,
                                        DataPlant::PlantEquipmentType ComponentType,
                                        bool Loop1DemandsOnLoop2);
 
@@ -198,7 +198,7 @@ namespace PlantUtilities {
                                  std::string_view CompName,
                                  DataPlant::PlantEquipmentType CompType,
                                  int &LoopNum,
-                                 DataPlant::LoopSideLocation &LoopSideNum,
+                                 DataPlant::LoopSideLocation &LoopSide,
                                  int &BranchNum,
                                  int &CompNum,
                                  bool &errFlag,
@@ -212,7 +212,7 @@ namespace PlantUtilities {
                                   std::string_view const CallerName, // really used for error messages
                                   int NodeNum,                       // index in Node structure of node to be scanned
                                   int &LoopNum,                      // return value for plant loop
-                                  DataPlant::LoopSideLocation &LoopSideNum,                  // return value for plant loop side
+                                  DataPlant::LoopSideLocation &LoopSide,                  // return value for plant loop side
                                   int &BranchNum,
                                   Optional_int CompNum = _);
 
@@ -237,13 +237,13 @@ namespace PlantUtilities {
     {
         // Members
         int CallingCompLoopNum;        // for debug error handling
-        DataPlant::LoopSideLocation CallingCompLoopSideNum;    // for debug error handling
+        DataPlant::LoopSideLocation CallingCompLoopSide;    // for debug error handling
         int CallingCompBranchNum;      // for debug error handling
         int CallingCompCompNum;        // for debug error handling
         Real64 ThisCriteriaCheckValue; // the previous value, to check the current against
 
         // Default Constructor
-        CriteriaData() : CallingCompLoopNum(0), CallingCompLoopSideNum(DataPlant::LoopSideLocation::Invalid), CallingCompBranchNum(0), CallingCompCompNum(0), ThisCriteriaCheckValue(0.0)
+        CriteriaData() : CallingCompLoopNum(0), CallingCompLoopSide(DataPlant::LoopSideLocation::Invalid), CallingCompBranchNum(0), CallingCompCompNum(0), ThisCriteriaCheckValue(0.0)
         {
         }
     };

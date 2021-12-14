@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     HWBaseboard(1).AirMassFlowRateStd = 0.5;
     HWBaseboard(1).SchedPtr = -1;
     HWBaseboard(1).LoopNum = 1;
-    HWBaseboard(1).LoopSideNum = DataPlant::LoopSideLocation::Demand;
+    HWBaseboard(1).LoopSide = DataPlant::LoopSideLocation::Demand;
     HWBaseboard(1).BranchNum = 1;
     HWBaseboard(1).UA = 400.0;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";

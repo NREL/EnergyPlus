@@ -109,7 +109,7 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     thisEFC.WaterOutletNodeNum = 2;
     thisEFC.OutdoorAirInletNodeNum = 0;
     thisEFC.LoopNum = 1;
-    thisEFC.LoopSideNum = DataPlant::LoopSideLocation::Demand;
+    thisEFC.LoopSide = DataPlant::LoopSideLocation::Demand;
     thisEFC.BranchNum = 1;
     thisEFC.CompNum = 1;
     PlantLocation pl;

@@ -777,7 +777,7 @@ namespace CTElectricGenerator {
                                                HeatRecInletNode,
                                                HeatRecOutletNode,
                                                this->HRLoopNum,
-                                               this->HRLoopSideNum,
+                                               this->HRLoopSide,
                                                this->HRBranchNum,
                                                this->HRCompNum);
 
@@ -801,7 +801,7 @@ namespace CTElectricGenerator {
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
-                                                     this->HRLoopSideNum,
+                                                     this->HRLoopSide,
                                                      this->HRBranchNum,
                                                      this->HRCompNum);
 
@@ -811,7 +811,7 @@ namespace CTElectricGenerator {
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
-                                                     this->HRLoopSideNum,
+                                                     this->HRLoopSide,
                                                      this->HRBranchNum,
                                                      this->HRCompNum);
             }
@@ -830,7 +830,7 @@ namespace CTElectricGenerator {
                                                         this->Name,
                                                         DataPlant::PlantEquipmentType::Generator_CTurbine,
                                                         this->HRLoopNum,
-                                                        this->HRLoopSideNum,
+                                                        this->HRLoopSide,
                                                         this->HRBranchNum,
                                                         this->HRCompNum,
                                                         errFlag,
@@ -871,7 +871,7 @@ namespace CTElectricGenerator {
                                                HeatRecInletNode,
                                                HeatRecOutletNode,
                                                this->HRLoopNum,
-                                               this->HRLoopSideNum,
+                                               this->HRLoopSide,
                                                this->HRBranchNum,
                                                this->HRCompNum);
 

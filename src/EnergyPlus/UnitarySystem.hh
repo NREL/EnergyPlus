@@ -332,11 +332,11 @@ namespace UnitarySystems {
         bool m_InitHeatPump; // Heat pump initialization flag (for error reporting)
 
         int m_HRLoopNum;
-        DataPlant::LoopSideLocation m_HRLoopSideNum {DataPlant::LoopSideLocation::Invalid};
+        DataPlant::LoopSideLocation m_HRLoopSide{DataPlant::LoopSideLocation::Invalid};
         int m_HRBranchNum;
         int m_HRCompNum;
         int m_SuppCoilLoopNum;
-        DataPlant::LoopSideLocation m_SuppCoilLoopSide {DataPlant::LoopSideLocation::Invalid};
+        DataPlant::LoopSideLocation m_SuppCoilLoop{DataPlant::LoopSideLocation::Invalid};
         int m_SuppCoilBranchNum;
         int m_SuppCoilCompNum;
         int m_SuppCoilFluidOutletNodeNum;

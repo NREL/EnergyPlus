@@ -576,7 +576,7 @@ namespace FourPipeBeam {
                                         this->name,
                                         DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal,
                                         this->cWLocation.loopNum,
-                                        this->cWLocation.loopSideNum,
+                                        this->cWLocation.loopSide,
                                         this->cWLocation.branchNum,
                                         this->cWLocation.compNum,
                                         errFlag,
@@ -594,7 +594,7 @@ namespace FourPipeBeam {
                                         this->name,
                                         DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal,
                                         this->hWLocation.loopNum,
-                                        this->hWLocation.loopSideNum,
+                                        this->hWLocation.loopSide,
                                         this->hWLocation.branchNum,
                                         this->hWLocation.compNum,
                                         errFlag,
@@ -635,7 +635,7 @@ namespace FourPipeBeam {
                                    this->cWInNodeNum,
                                    this->cWOutNodeNum,
                                    this->cWLocation.loopNum,
-                                   this->cWLocation.loopSideNum,
+                                   this->cWLocation.loopSide,
                                    this->cWLocation.branchNum,
                                    this->cWLocation.compNum);
             }
@@ -646,7 +646,7 @@ namespace FourPipeBeam {
                                    this->hWInNodeNum,
                                    this->hWOutNodeNum,
                                    this->hWLocation.loopNum,
-                                   this->hWLocation.loopSideNum,
+                                   this->hWLocation.loopSide,
                                    this->hWLocation.branchNum,
                                    this->hWLocation.compNum);
             }
@@ -668,7 +668,7 @@ namespace FourPipeBeam {
                                    this->cWInNodeNum,
                                    this->cWOutNodeNum,
                                    this->cWLocation.loopNum,
-                                   this->cWLocation.loopSideNum,
+                                   this->cWLocation.loopSide,
                                    this->cWLocation.branchNum,
                                    this->cWLocation.compNum);
             }
@@ -679,7 +679,7 @@ namespace FourPipeBeam {
                                    this->hWInNodeNum,
                                    this->hWOutNodeNum,
                                    this->hWLocation.loopNum,
-                                   this->hWLocation.loopSideNum,
+                                   this->hWLocation.loopSide,
                                    this->hWLocation.branchNum,
                                    this->hWLocation.compNum);
             }
@@ -1008,7 +1008,7 @@ namespace FourPipeBeam {
                                                this->cWInNodeNum,
                                                this->cWOutNodeNum,
                                                this->cWLocation.loopNum,
-                                               this->cWLocation.loopSideNum,
+                                               this->cWLocation.loopSide,
                                                this->cWLocation.branchNum,
                                                this->cWLocation.compNum);
         }
@@ -1026,7 +1026,7 @@ namespace FourPipeBeam {
                                                this->hWInNodeNum,
                                                this->hWOutNodeNum,
                                                this->hWLocation.loopNum,
-                                               this->hWLocation.loopSideNum,
+                                               this->hWLocation.loopSide,
                                                this->hWLocation.branchNum,
                                                this->hWLocation.compNum);
         }
@@ -1086,7 +1086,7 @@ namespace FourPipeBeam {
                                                    this->cWInNodeNum,
                                                    this->cWOutNodeNum,
                                                    this->cWLocation.loopNum,
-                                                   this->cWLocation.loopSideNum,
+                                                   this->cWLocation.loopSide,
                                                    this->cWLocation.branchNum,
                                                    this->cWLocation.compNum);
             }
@@ -1107,7 +1107,7 @@ namespace FourPipeBeam {
                                                    this->hWInNodeNum,
                                                    this->hWOutNodeNum,
                                                    this->hWLocation.loopNum,
-                                                   this->hWLocation.loopSideNum,
+                                                   this->hWLocation.loopSide,
                                                    this->hWLocation.branchNum,
                                                    this->hWLocation.compNum);
             }
@@ -1148,7 +1148,7 @@ namespace FourPipeBeam {
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
-                                     this->hWLocation.loopSideNum,
+                                     this->hWLocation.loopSide,
                                      this->hWLocation.branchNum,
                                      this->hWLocation.compNum);
             }
@@ -1162,7 +1162,7 @@ namespace FourPipeBeam {
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
-                                     this->cWLocation.loopSideNum,
+                                     this->cWLocation.loopSide,
                                      this->cWLocation.branchNum,
                                      this->cWLocation.compNum);
             }
@@ -1180,7 +1180,7 @@ namespace FourPipeBeam {
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
-                                     this->hWLocation.loopSideNum,
+                                     this->hWLocation.loopSide,
                                      this->hWLocation.branchNum,
                                      this->hWLocation.compNum);
             }
@@ -1193,7 +1193,7 @@ namespace FourPipeBeam {
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
-                                     this->cWLocation.loopSideNum,
+                                     this->cWLocation.loopSide,
                                      this->cWLocation.branchNum,
                                      this->cWLocation.compNum);
             }
@@ -1224,7 +1224,7 @@ namespace FourPipeBeam {
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
-                                     this->hWLocation.loopSideNum,
+                                     this->hWLocation.loopSide,
                                      this->hWLocation.branchNum,
                                      this->hWLocation.compNum);
             }
@@ -1262,7 +1262,7 @@ namespace FourPipeBeam {
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
-                                     this->cWLocation.loopSideNum,
+                                     this->cWLocation.loopSide,
                                      this->cWLocation.branchNum,
                                      this->cWLocation.compNum);
             }
@@ -1300,7 +1300,7 @@ namespace FourPipeBeam {
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
-                                     this->hWLocation.loopSideNum,
+                                     this->hWLocation.loopSide,
                                      this->hWLocation.branchNum,
                                      this->hWLocation.compNum);
             }
@@ -1314,7 +1314,7 @@ namespace FourPipeBeam {
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
-                                     this->cWLocation.loopSideNum,
+                                     this->cWLocation.loopSide,
                                      this->cWLocation.branchNum,
                                      this->cWLocation.compNum);
             }
@@ -1364,7 +1364,7 @@ namespace FourPipeBeam {
                                  this->cWInNodeNum,
                                  this->cWOutNodeNum,
                                  this->cWLocation.loopNum,
-                                 this->cWLocation.loopSideNum,
+                                 this->cWLocation.loopSide,
                                  this->cWLocation.branchNum,
                                  this->cWLocation.compNum);
             fModCoolCWMdot =
@@ -1405,7 +1405,7 @@ namespace FourPipeBeam {
                                      this->cWInNodeNum,
                                      this->cWOutNodeNum,
                                      this->cWLocation.loopNum,
-                                     this->cWLocation.loopSideNum,
+                                     this->cWLocation.loopSide,
                                      this->cWLocation.branchNum,
                                      this->cWLocation.compNum);
             }
@@ -1419,7 +1419,7 @@ namespace FourPipeBeam {
                                  this->hWInNodeNum,
                                  this->hWOutNodeNum,
                                  this->hWLocation.loopNum,
-                                 this->hWLocation.loopSideNum,
+                                 this->hWLocation.loopSide,
                                  this->hWLocation.branchNum,
                                  this->hWLocation.compNum);
             fModHeatHWMdot =
@@ -1460,7 +1460,7 @@ namespace FourPipeBeam {
                                      this->hWInNodeNum,
                                      this->hWOutNodeNum,
                                      this->hWLocation.loopNum,
-                                     this->hWLocation.loopSideNum,
+                                     this->hWLocation.loopSide,
                                      this->hWLocation.branchNum,
                                      this->hWLocation.compNum);
             }

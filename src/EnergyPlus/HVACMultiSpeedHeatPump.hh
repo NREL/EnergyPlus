@@ -147,7 +147,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 MaxHeatRecOutletTemp;        // Maximum outlet water temperature for heat recovery
         Real64 DesignHeatRecMassFlowRate;   // Design water mass flow rate through heat recovery loop [kg/s]
         int HRLoopNum;                      // plant loop number for heat recovery
-        DataPlant::LoopSideLocation HRLoopSideNum;                  // Plant loop side for heat recovery
+        DataPlant::LoopSideLocation HRLoopSide;                  // Plant loop side for heat recovery
         int HRBranchNum;                    // plant loop branch for heat recovery
         int HRCompNum;                      // plant loop component for heat recovery
         Real64 AuxElecPower;                // Auxiliary Electric Power
@@ -242,7 +242,8 @@ namespace HVACMultiSpeedHeatPump {
               FanVolFlow(0.0), FanSchedPtr(0), OpMode(0), HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0), HeatCoilIndex(0), CoolCoilType(0),
               DXCoolCoilIndex(0), SuppHeatCoilType(0), SuppHeatCoilNum(0), DesignSuppHeatingCapacity(0.0), SuppMaxAirTemp(0.0), SuppMaxOATemp(0.0),
               AuxOnCyclePower(0.0), AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
-              HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRLoopNum(0), HRLoopSideNum(DataPlant::LoopSideLocation::Invalid), HRBranchNum(0),
+              HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRLoopNum(0),
+              HRLoopSide(DataPlant::LoopSideLocation::Invalid), HRBranchNum(0),
               HRCompNum(0), AuxElecPower(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0),
               NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(ModeOfOperation::Unassigned), HeatCoolMode(ModeOfOperation::Unassigned),
               AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0), CompPartLoadRatio(0.0), FanPartLoadRatio(0.0), TotCoolEnergyRate(0.0),

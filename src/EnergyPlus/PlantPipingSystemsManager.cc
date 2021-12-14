@@ -2118,7 +2118,7 @@ namespace PlantPipingSystemsManager {
                                                     thisCircuit->Name,
                                                     TypeToLookFor,
                                                     thisCircuit->LoopNum,
-                                                    thisCircuit->LoopSideNum,
+                                                    thisCircuit->LoopSide,
                                                     thisCircuit->BranchNum,
                                                     thisCircuit->CompNum,
                                                     errFlag,
@@ -2202,7 +2202,7 @@ namespace PlantPipingSystemsManager {
                                              InletNodeNum,
                                              OutletNodeNum,
                                              thisCircuit->LoopNum,
-                                             thisCircuit->LoopSideNum,
+                                             thisCircuit->LoopSide,
                                              thisCircuit->BranchNum,
                                              thisCircuit->CompNum);
     }

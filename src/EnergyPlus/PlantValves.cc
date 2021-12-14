@@ -116,7 +116,7 @@ namespace PlantValves {
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->LoopNum > 0) {
             PlantUtilities::SetComponentFlowRate(
-                state, mdot, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+                state, mdot, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
         }
     }
 
@@ -287,7 +287,7 @@ namespace PlantValves {
                                                         this->Name,
                                                         DataPlant::PlantEquipmentType::ValveTempering,
                                                         this->LoopNum,
-                                                        this->LoopSideNum,
+                                                        this->LoopSide,
                                                         this->BranchNum,
                                                         this->CompNum,
                                                         errFlag,
@@ -430,7 +430,7 @@ namespace PlantValves {
                                                    this->PltInletNodeNum,
                                                    this->PltOutletNodeNum,
                                                    this->LoopNum,
-                                                   this->LoopSideNum,
+                                                   this->LoopSide,
                                                    this->BranchNum,
                                                    this->CompNum);
             }
@@ -477,7 +477,7 @@ namespace PlantValves {
 
         if (state.dataGlobal->KickOffSimulation) return;
 
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked) {
             Tin = this->InletTemp;
             Tset = this->SetPointTemp;
             Ts2 = this->Stream2SourceTemp;
@@ -491,7 +491,7 @@ namespace PlantValves {
                     this->FlowDivFract = 1.0;
                 }
             }
-        } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock ==
+        } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock ==
                    DataPlant::FlowLock::Locked) { // don't recalc diversion, just reuse current flows
             if (this->MixedMassFlowRate > 0.0) {
                 this->FlowDivFract = state.dataLoopNodes->Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;

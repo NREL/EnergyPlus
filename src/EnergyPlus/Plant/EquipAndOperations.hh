@@ -87,7 +87,7 @@ struct EquipListCompData
     std::string TypeOf;                    // The name of each item in the list
     DataPlant::CtrlType CtrlType;          // CoolingOp, HeatingOp, DualOp
     int LoopNumPtr;                        // pointer to the comp location in the data structure
-    DataPlant::LoopSideLocation LoopSideNumPtr;                    // pointer to the comp location in the data structure
+    DataPlant::LoopSideLocation LoopSidePtr;                    // pointer to the comp location in the data structure
     int BranchNumPtr;                      // pointer to the comp location in the data structure
     int CompNumPtr;                        // pointer to the comp location in the data structure
     Real64 SetPointFlowRate;               // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
@@ -100,7 +100,7 @@ struct EquipListCompData
 
     // Default Constructor
     EquipListCompData()
-        : CtrlType(DataPlant::CtrlType::Unassigned), LoopNumPtr(0), LoopSideNumPtr(DataPlant::LoopSideLocation::Invalid), BranchNumPtr(0), CompNumPtr(0), SetPointFlowRate(0.0),
+        : CtrlType(DataPlant::CtrlType::Unassigned), LoopNumPtr(0), LoopSidePtr(DataPlant::LoopSideLocation::Invalid), BranchNumPtr(0), CompNumPtr(0), SetPointFlowRate(0.0),
           DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
     {
     }

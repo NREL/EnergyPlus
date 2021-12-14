@@ -209,7 +209,7 @@ void SimulateVRF(EnergyPlusData &state,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).Name,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFType,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopNum,
-                                                state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopSideNum,
+                                                state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceLoopSide,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceBranchNum,
                                                 state.dataHVACVarRefFlow->VRF(VRFCondenser).SourceCompNum,
                                                 errFlag,
@@ -330,7 +330,7 @@ void VRFCondenserEquipment::simulate(EnergyPlusData &state,
     if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             this->SourceLoopNum,
-                                                            this->SourceLoopSideNum,
+                                                            this->SourceLoopSide,
                                                             PlantEquipmentType::HeatPumpVRF,
                                                             this->CondenserNodeNum,
                                                             this->CondenserOutletNodeNum,
@@ -515,7 +515,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                                  state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
                                  state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
                                  state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum,
-                                 state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopSideNum,
+                                 state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopSide,
                                  state.dataHVACVarRefFlow->VRF(VRFCond).SourceBranchNum,
                                  state.dataHVACVarRefFlow->VRF(VRFCond).SourceCompNum);
             state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow = state.dataHVACVarRefFlow->CondenserWaterMassFlowRate;
@@ -1282,7 +1282,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                              state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
                              state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
                              state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopSideNum,
+                             state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopSide,
                              state.dataHVACVarRefFlow->VRF(VRFCond).SourceBranchNum,
                              state.dataHVACVarRefFlow->VRF(VRFCond).SourceCompNum);
 
@@ -6681,7 +6681,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
                                state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
                                state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum,
-                               state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopSideNum,
+                               state.dataHVACVarRefFlow->VRF(VRFCond).SourceLoopSide,
                                state.dataHVACVarRefFlow->VRF(VRFCond).SourceBranchNum,
                                state.dataHVACVarRefFlow->VRF(VRFCond).SourceCompNum);
         }
@@ -9247,7 +9247,7 @@ void VRFCondenserEquipment::SizeVRFCondenser(EnergyPlusData &state)
                                                    this->CondenserNodeNum,
                                                    this->CondenserOutletNodeNum,
                                                    this->SourceLoopNum,
-                                                   this->SourceLoopSideNum,
+                                                   this->SourceLoopSide,
                                                    this->SourceBranchNum,
                                                    this->SourceCompNum);
 

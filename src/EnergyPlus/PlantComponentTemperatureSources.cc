@@ -143,7 +143,7 @@ namespace PlantComponentTemperatureSources {
                                                this->InletNodeNum,
                                                this->OutletNodeNum,
                                                this->Location.loopNum,
-                                               this->Location.loopSideNum,
+                                               this->Location.loopSide,
                                                this->Location.branchNum,
                                                this->Location.compNum);
 
@@ -209,7 +209,7 @@ namespace PlantComponentTemperatureSources {
                                              this->InletNodeNum,
                                              this->OutletNodeNum,
                                              this->Location.loopNum,
-                                             this->Location.loopSideNum,
+                                             this->Location.loopSide,
                                              this->Location.branchNum,
                                              this->Location.compNum);
 
@@ -440,7 +440,7 @@ namespace PlantComponentTemperatureSources {
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::WaterSource,
                                                     this->Location.loopNum,
-                                                    this->Location.loopSideNum,
+                                                    this->Location.loopSide,
                                                     this->Location.branchNum,
                                                     this->Location.compNum,
                                                     errFlag,

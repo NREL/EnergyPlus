@@ -188,7 +188,7 @@ void SimPumps(EnergyPlusData &state,
     InitializePumps(state, PumpNum);
 
     // If all we need is to set outlet min/max avail, then just do it and get out.  Also, we only do min/max avail on flow query
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum).FlowLock == DataPlant::FlowLock::PumpQuery) {
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSide).FlowLock == DataPlant::FlowLock::PumpQuery) {
         SetupPumpMinMaxFlows(state, LoopNum, PumpNum);
         return;
     }
@@ -1461,7 +1461,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                 state.dataPumps->PumpEquip(PumpNum).Name,
                                 state.dataPumps->PumpEquip(PumpNum).TypeOf_Num,
                                 state.dataPumps->PumpEquip(PumpNum).LoopNum,
-                                state.dataPumps->PumpEquip(PumpNum).LoopSideNum,
+                                state.dataPumps->PumpEquip(PumpNum).LoopSide,
                                 state.dataPumps->PumpEquip(PumpNum).BranchNum,
                                 state.dataPumps->PumpEquip(PumpNum).CompNum,
                                 errFlag,
@@ -1471,7 +1471,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                 _,
                                 _);
         plloopnum = state.dataPumps->PumpEquip(PumpNum).LoopNum;
-        lsnum = state.dataPumps->PumpEquip(PumpNum).LoopSideNum;
+        lsnum = state.dataPumps->PumpEquip(PumpNum).LoopSide;
         brnum = state.dataPumps->PumpEquip(PumpNum).BranchNum;
         cpnum = state.dataPumps->PumpEquip(PumpNum).CompNum;
         if (plloopnum > 0 && lsnum != DataPlant::LoopSideLocation::Invalid && brnum > 0 && cpnum > 0) {
@@ -1505,7 +1505,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
             ShowFatalError(state, "InitializePumps: Program terminated due to previous condition(s).");
         }
         state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-            .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)
+            .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSide)
             .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
             .Comp(state.dataPumps->PumpEquip(PumpNum).CompNum)
             .CompNum = PumpNum;
@@ -1579,7 +1579,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
         if (state.dataPumps->PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
             // reset flow priority appropriately (default was for Intermittent)
             state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)
+                .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSide)
                 .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
                 .Comp(state.dataPumps->PumpEquip(PumpNum).CompNum)
                 .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
@@ -1618,7 +1618,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                InletNode,
                                OutletNode,
                                state.dataPumps->PumpEquip(PumpNum).LoopNum,
-                               state.dataPumps->PumpEquip(PumpNum).LoopSideNum,
+                               state.dataPumps->PumpEquip(PumpNum).LoopSide,
                                state.dataPumps->PumpEquip(PumpNum).BranchNum,
                                state.dataPumps->PumpEquip(PumpNum).CompNum);
             state.dataPumps->PumpEquip(PumpNum).MassFlowRateMax = mdotMax;
@@ -1640,7 +1640,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                InletNode,
                                OutletNode,
                                state.dataPumps->PumpEquip(PumpNum).LoopNum,
-                               state.dataPumps->PumpEquip(PumpNum).LoopSideNum,
+                               state.dataPumps->PumpEquip(PumpNum).LoopSide,
                                state.dataPumps->PumpEquip(PumpNum).BranchNum,
                                state.dataPumps->PumpEquip(PumpNum).CompNum);
             state.dataPumps->PumpEquip(PumpNum).MassFlowRateMax = mdotMax;
@@ -1943,7 +1943,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).pumpType),
                       BITF(PumpType::VarSpeed) | BITF(PumpType::Bank_VarSpeed) | BITF(PumpType::Cond))) {
         if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)
+                .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSide)
                 .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
                 .Comp(state.dataPumps->PumpEquip(PumpNum).CompNum)
                 .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
@@ -1960,7 +1960,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
                          InletNode,
                          OutletNode,
                          state.dataPumps->PumpEquip(PumpNum).LoopNum,
-                         state.dataPumps->PumpEquip(PumpNum).LoopSideNum,
+                         state.dataPumps->PumpEquip(PumpNum).LoopSide,
                          state.dataPumps->PumpEquip(PumpNum).BranchNum,
                          state.dataPumps->PumpEquip(PumpNum).CompNum);
 
@@ -2251,7 +2251,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
         if (PlantSizNum > 0) {
             if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                 if (!state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                         .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)
+                         .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSide)
                          .BranchPumpsExist) {
                     // size pump to full flow of plant loop
                     if (state.dataPumps->PumpEquip(PumpNum).pumpType == PumpType::Cond) {
@@ -2269,7 +2269,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
                     // Distribute sizes evenly across all branch pumps
                     DesVolFlowRatePerBranch = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate /
                                               state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum)
-                                                  .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)
+                                                  .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSide)
                                                   .TotalPumps;
                     if (state.dataPumps->PumpEquip(PumpNum).pumpType == PumpType::Cond) {
                         TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);

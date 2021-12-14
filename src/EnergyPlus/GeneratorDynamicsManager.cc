@@ -926,7 +926,7 @@ namespace GeneratorDynamicsManager {
                                  InletNode,
                                  OutletNode,
                                  state.dataCHPElectGen->MicroCHP(GeneratorNum).CWLoopNum,
-                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).CWLoopSideNum,
+                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).CWLoopSide,
                                  state.dataCHPElectGen->MicroCHP(GeneratorNum).CWBranchNum,
                                  state.dataCHPElectGen->MicroCHP(GeneratorNum).CWCompNum);
         }

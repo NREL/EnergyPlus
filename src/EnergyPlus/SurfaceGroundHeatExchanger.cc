@@ -545,10 +545,10 @@ namespace SurfaceGroundHeatExchanger {
         // If loop operation is controlled by an environmental variable (DBtemp, WBtemp, etc)
         // then shut branch down when equipment is not scheduled to run.
         DesignFlow =
-            RegulateCondenserCompFlowReqOp(state, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
+            RegulateCondenserCompFlowReqOp(state, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
 
         SetComponentFlowRate(
-            state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+            state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
 
         // get the current flow rate - module variable
         state.dataSurfaceGroundHeatExchangers->FlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
@@ -1445,7 +1445,7 @@ namespace SurfaceGroundHeatExchanger {
                                 this->Name,
                                 DataPlant::PlantEquipmentType::GrndHtExchgSurface,
                                 this->LoopNum,
-                                this->LoopSideNum,
+                                this->LoopSide,
                                 this->BranchNum,
                                 this->CompNum,
                                 errFlag,
@@ -1470,7 +1470,7 @@ namespace SurfaceGroundHeatExchanger {
                            this->InletNodeNum,
                            this->OutletNodeNum,
                            this->LoopNum,
-                           this->LoopSideNum,
+                           this->LoopSide,
                            this->BranchNum,
                            this->CompNum);
         RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);

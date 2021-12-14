@@ -2111,7 +2111,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
                                                     g->compPlantName,
                                                     g->compPlantType,
                                                     g->cogenLocation.loopNum,
-                                                    g->cogenLocation.loopSideNum,
+                                                    g->cogenLocation.loopSide,
                                                     g->cogenLocation.branchNum,
                                                     g->cogenLocation.compNum,
                                                     plantNotFound,
@@ -2130,7 +2130,7 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(EnergyPlusData &state)
     for (auto &g : elecGenCntrlObj) {
         if (g->plantInfoFound) {
             thermalLoad += state.dataPlnt->PlantLoop(g->cogenLocation.loopNum)
-                               .LoopSide(g->cogenLocation.loopSideNum)
+                               .LoopSide(g->cogenLocation.loopSide)
                                .Branch(g->cogenLocation.branchNum)
                                .Comp(g->cogenLocation.compNum)
                                .MyLoad;

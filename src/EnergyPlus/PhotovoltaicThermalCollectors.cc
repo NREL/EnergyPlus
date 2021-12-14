@@ -367,7 +367,7 @@ namespace PhotovoltaicThermalCollectors {
                                                    state.dataIPShortCut->cAlphaArgs(7),
                                                    "Water Nodes");
 
-                state.dataPhotovoltaicThermalCollector->PVT(Item).WLoopSideNum = DataPlant::LoopSideLocation::Invalid;
+                state.dataPhotovoltaicThermalCollector->PVT(Item).WLoopSide = DataPlant::LoopSideLocation::Invalid;
             }
 
             if (state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
@@ -621,7 +621,7 @@ namespace PhotovoltaicThermalCollectors {
                                                        InletNode,
                                                        OutletNode,
                                                        this->WLoopNum,
-                                                       this->WLoopSideNum,
+                                                       this->WLoopSide,
                                                        this->WLoopBranchNum,
                                                        this->WLoopCompNum);
 
@@ -648,7 +648,7 @@ namespace PhotovoltaicThermalCollectors {
                 }
 
                 PlantUtilities::SetComponentFlowRate(
-                    state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
+                    state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSide, this->WLoopBranchNum, this->WLoopCompNum);
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 this->MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             }
@@ -694,7 +694,7 @@ namespace PhotovoltaicThermalCollectors {
             if (this->WLoopNum > 0) {
                 PltSizNum = state.dataPlnt->PlantLoop(this->WLoopNum).PlantSizNum;
             }
-            if (this->WLoopSideNum == DataPlant::LoopSideLocation::Supply) {
+            if (this->WLoopSide == DataPlant::LoopSideLocation::Supply) {
                 if (PltSizNum > 0) {
                     if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         DesignVolFlowRateDes = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
@@ -718,7 +718,7 @@ namespace PhotovoltaicThermalCollectors {
                         }
                     }
                 }
-            } else if (this->WLoopSideNum == DataPlant::LoopSideLocation::Demand) {
+            } else if (this->WLoopSide == DataPlant::LoopSideLocation::Demand) {
                 DesignVolFlowRateDes = this->AreaCol * SimplePVTWaterSizeFactor;
             }
             if (this->DesignVolFlowRateWasAutoSized) {
@@ -1130,7 +1130,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         this->Name,
                                                         this->Type,
                                                         this->WLoopNum,
-                                                        this->WLoopSideNum,
+                                                        this->WLoopSide,
                                                         this->WLoopBranchNum,
                                                         this->WLoopCompNum,
                                                         errFlag,

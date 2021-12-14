@@ -132,14 +132,14 @@ void GasAbsorberSpecs::simulate(
     DataPlant::BrLoopType brIdentity(DataPlant::BrLoopType::NoMatch);
 
     int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                              .LoopSide(calledFromLocation.loopSideNum)
+                              .LoopSide(calledFromLocation.loopSide)
                               .Branch(calledFromLocation.branchNum)
                               .TotalComponents;
 
     for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                                   .LoopSide(calledFromLocation.loopSideNum)
+                                   .LoopSide(calledFromLocation.loopSide)
                                    .Branch(calledFromLocation.branchNum)
                                    .Comp(iComp)
                                    .NodeNumIn;
@@ -176,7 +176,7 @@ void GasAbsorberSpecs::simulate(
         if (this->CDLoopNum > 0) {
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->CDLoopNum,
-                                                                this->CDLoopSideNum,
+                                                                this->CDLoopSide,
                                                                 DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                                 this->CondReturnNodeNum,
                                                                 this->CondSupplyNodeNum,
@@ -200,14 +200,14 @@ void GasAbsorberSpecs::getDesignCapacities(
     bool matchfound(false);
 
     int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                              .LoopSide(calledFromLocation.loopSideNum)
+                              .LoopSide(calledFromLocation.loopSide)
                               .Branch(calledFromLocation.branchNum)
                               .TotalComponents;
 
     for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                                   .LoopSide(calledFromLocation.loopSideNum)
+                                   .LoopSide(calledFromLocation.loopSide)
                                    .Branch(calledFromLocation.branchNum)
                                    .Comp(iComp)
                                    .NodeNumIn;
@@ -255,7 +255,7 @@ void GasAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocatio
 
     // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
     int BranchInletNodeNum =
-        state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+        state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSide).Branch(calledFromLocation.branchNum).NodeNumIn;
 
     if (BranchInletNodeNum == this->ChillReturnNodeNum) {       // Operate as chiller
         this->size(state);                                      // only call from chilled water loop
@@ -844,7 +844,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                             this->CWLoopNum,
-                                            this->CWLoopSideNum,
+                                            this->CWLoopSide,
                                             this->CWBranchNum,
                                             this->CWCompNum,
                                             errFlag,
@@ -861,7 +861,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                             this->HWLoopNum,
-                                            this->HWLoopSideNum,
+                                            this->HWLoopSide,
                                             this->HWBranchNum,
                                             this->HWCompNum,
                                             errFlag,
@@ -879,7 +879,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                 this->CDLoopNum,
-                                                this->CDLoopSideNum,
+                                                this->CDLoopSide,
                                                 this->CDBranchNum,
                                                 this->CDCompNum,
                                                 errFlag,
@@ -893,22 +893,22 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         }
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWLoopNum,
-                                                      this->CWLoopSideNum,
+                                                      this->CWLoopSide,
                                                       this->CDLoopNum,
-                                                      this->CDLoopSideNum,
+                                                      this->CDLoopSide,
                                                       DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                       true);
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->HWLoopNum,
-                                                      this->HWLoopSideNum,
+                                                      this->HWLoopSide,
                                                       this->CDLoopNum,
-                                                      this->CDLoopSideNum,
+                                                      this->CDLoopSide,
                                                       DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                       true);
     }
 
     PlantUtilities::InterConnectTwoPlantLoopSides(
-        state, this->CWLoopNum, this->CWLoopSideNum, this->HWLoopNum, this->HWLoopSideNum, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
+        state, this->CWLoopNum, this->CWLoopSide, this->HWLoopNum, this->HWLoopSide, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
 
     // check if outlet node of chilled water side has a setpoint.
     if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -1019,7 +1019,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
                                                CondInletNode,
                                                CondOutletNode,
                                                this->CDLoopNum,
-                                               this->CDLoopSideNum,
+                                               this->CDLoopSide,
                                                this->CDBranchNum,
                                                this->CDCompNum);
         }
@@ -1041,7 +1041,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
                                            HeatInletNode,
                                            HeatOutletNode,
                                            this->HWLoopNum,
-                                           this->HWLoopSideNum,
+                                           this->HWLoopSide,
                                            this->HWBranchNum,
                                            this->HWCompNum);
 
@@ -1062,7 +1062,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
                                            this->ChillReturnNodeNum,
                                            this->ChillSupplyNodeNum,
                                            this->CWLoopNum,
-                                           this->CWLoopSideNum,
+                                           this->CWLoopSide,
                                            this->CWBranchNum,
                                            this->CWCompNum);
 
@@ -1093,7 +1093,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
         mdot = this->DesCondMassFlowRate;
 
         PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
+            state, mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDLoopNum, this->CDLoopSide, this->CDBranchNum, this->CDCompNum);
 
     } else {
         mdot = 0.0;
@@ -1103,7 +1103,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
                                                  this->CDLoopNum,
-                                                 this->CDLoopSideNum,
+                                                 this->CDLoopSide,
                                                  this->CDBranchNum,
                                                  this->CDCompNum);
         }
@@ -1548,7 +1548,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
     // condenser water temperature
     Real64 errorAvailCap; // error fraction on final estimate of AvailableCoolingCapacity
     int LoopNum;
-    DataPlant::LoopSideLocation LoopSideNum;
+    DataPlant::LoopSideLocation LoopSide;
     Real64 Cp_CW; // local fluid specific heat for chilled water
     Real64 Cp_CD; // local fluid specific heat for condenser water
 
@@ -1623,7 +1623,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
                                                  this->CDLoopNum,
-                                                 this->CDLoopSideNum,
+                                                 this->CDLoopSide,
                                                  this->CDBranchNum,
                                                  this->CDCompNum);
         }
@@ -1652,7 +1652,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
                                                  this->CDLoopNum,
-                                                 this->CDLoopSideNum,
+                                                 this->CDLoopSide,
                                                  this->CDBranchNum,
                                                  this->CDCompNum);
         } else {
@@ -1667,7 +1667,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                      this->CondReturnNodeNum,
                                                      this->CondSupplyNodeNum,
                                                      this->CDLoopNum,
-                                                     this->CDLoopSideNum,
+                                                     this->CDLoopSide,
                                                      this->CDBranchNum,
                                                      this->CDCompNum);
             }
@@ -1688,9 +1688,9 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
         lChillWaterMassflowratemax = this->DesEvapMassFlowRate;
 
         LoopNum = this->CWLoopNum;
-        LoopSideNum = this->CWLoopSideNum;
+        LoopSide = this->CWLoopSide;
         {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock);
+            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).FlowLock);
             if (SELECT_CASE_var == DataPlant::FlowLock::Unlocked) { // mass flow rates may be changed by loop components
                 this->PossibleSubcooling = false;
                 lCoolingLoad = std::abs(MyLoad);
@@ -1704,7 +1704,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                          this->ChillReturnNodeNum,
                                                          this->ChillSupplyNodeNum,
                                                          this->CWLoopNum,
-                                                         this->CWLoopSideNum,
+                                                         this->CWLoopSide,
                                                          this->CWBranchNum,
                                                          this->CWCompNum);
                     // Commenting this could cause diffs - lChillSupplyTemp = ChillSupplySetPointTemp;
@@ -1914,7 +1914,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
     Real64 HeatDeltaTemp(0.0); // hot water temperature difference
     Real64 HeatSupplySetPointTemp(0.0);
     int LoopNum;
-    DataPlant::LoopSideLocation LoopSideNum;
+    DataPlant::LoopSideLocation LoopSide;
     Real64 Cp_HW; // local fluid specific heat for hot water
 
     // set node values to data structure values for nodes
@@ -1933,7 +1933,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
     lHeatCapFCoolCurve = this->HeatCapFCoolCurve;
     lFuelHeatFHPLRCurve = this->FuelHeatFHPLRCurve;
     LoopNum = this->HWLoopNum;
-    LoopSideNum = this->HWLoopSideNum;
+    LoopSide = this->HWLoopSide;
 
     Cp_HW = FluidProperties::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, lHotWaterReturnTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
@@ -1980,7 +1980,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
         //    cooling load taken by the chiller, and
         //    supply temperature
         {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock);
+            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).FlowLock);
             if (SELECT_CASE_var == DataPlant::FlowLock::Unlocked) { // mass flow rates may be changed by loop components
                 lHeatingLoad = std::abs(MyLoad);
                 if (HeatDeltaTemp != 0) {
@@ -1991,7 +1991,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
                                                          this->HeatReturnNodeNum,
                                                          this->HeatSupplyNodeNum,
                                                          this->HWLoopNum,
-                                                         this->HWLoopSideNum,
+                                                         this->HWLoopSide,
                                                          this->HWBranchNum,
                                                          this->HWCompNum);
 

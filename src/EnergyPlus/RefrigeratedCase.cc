@@ -9809,7 +9809,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                     Condenser(RefCondLoop).Name,
                                                     DataPlant::PlantEquipmentType::RefrigSystemWaterCondenser,
                                                     Condenser(RefCondLoop).PlantLoopNum,
-                                                    Condenser(RefCondLoop).PlantLoopSideNum,
+                                                    Condenser(RefCondLoop).PlantLoopSide,
                                                     Condenser(RefCondLoop).PlantBranchNum,
                                                     Condenser(RefCondLoop).PlantCompNum,
                                                     errFlag,
@@ -9843,7 +9843,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                     RefrigRack(RefCompRackLoop).Name,
                                                     DataPlant::PlantEquipmentType::RefrigerationWaterCoolRack,
                                                     RefrigRack(RefCompRackLoop).PlantLoopNum,
-                                                    RefrigRack(RefCompRackLoop).PlantLoopSideNum,
+                                                    RefrigRack(RefCompRackLoop).PlantLoopSide,
                                                     RefrigRack(RefCompRackLoop).PlantBranchNum,
                                                     RefrigRack(RefCompRackLoop).PlantCompNum,
                                                     errFlag,
@@ -9899,7 +9899,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                    Condenser(RefCondLoop).InletNode,
                                                    Condenser(RefCondLoop).OutletNode,
                                                    Condenser(RefCondLoop).PlantLoopNum,
-                                                   Condenser(RefCondLoop).PlantLoopSideNum,
+                                                   Condenser(RefCondLoop).PlantLoopSide,
                                                    Condenser(RefCondLoop).PlantBranchNum,
                                                    Condenser(RefCondLoop).PlantCompNum);
             }
@@ -9924,7 +9924,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                    RefrigRack(RefCompRackLoop).InletNode,
                                                    RefrigRack(RefCompRackLoop).OutletNode,
                                                    RefrigRack(RefCompRackLoop).PlantLoopNum,
-                                                   RefrigRack(RefCompRackLoop).PlantLoopSideNum,
+                                                   RefrigRack(RefCompRackLoop).PlantLoopSide,
                                                    RefrigRack(RefCompRackLoop).PlantBranchNum,
                                                    RefrigRack(RefCompRackLoop).PlantCompNum);
             }
@@ -10780,7 +10780,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
     PlantInletNode = this->InletNode;
     PlantOutletNode = this->OutletNode;
     PlantLoopIndex = this->PlantLoopNum;
-    PlantLoopSideIndex = this->PlantLoopSideNum;
+    PlantLoopSideIndex = this->PlantLoopSide;
     PlantBranchIndex = this->PlantBranchNum;
     PlantCompIndex = this->PlantCompNum;
 
@@ -10945,7 +10945,7 @@ void RefrigRackData::simulate(EnergyPlusData &state,
     PlantInletNode = this->InletNode;
     PlantOutletNode = this->OutletNode;
     PlantLoopIndex = this->PlantLoopNum;
-    PlantLoopSideIndex = this->PlantLoopSideNum;
+    PlantLoopSideIndex = this->PlantLoopSide;
     PlantBranchIndex = this->PlantBranchNum;
     PlantCompIndex = this->PlantCompNum;
 
@@ -15678,7 +15678,7 @@ void ZeroHVACValues(EnergyPlusData &state)
                                                      RefrigRack(RackNum).InletNode,
                                                      RefrigRack(RackNum).OutletNode,
                                                      RefrigRack(RackNum).PlantLoopNum,
-                                                     RefrigRack(RackNum).PlantLoopSideNum,
+                                                     RefrigRack(RackNum).PlantLoopSide,
                                                      RefrigRack(RackNum).PlantBranchNum,
                                                      RefrigRack(RackNum).PlantCompNum);
             }
@@ -15702,7 +15702,7 @@ void ZeroHVACValues(EnergyPlusData &state)
                                                      Condenser(CondID).InletNode,
                                                      Condenser(CondID).OutletNode,
                                                      Condenser(CondID).PlantLoopNum,
-                                                     Condenser(CondID).PlantLoopSideNum,
+                                                     Condenser(CondID).PlantLoopSide,
                                                      Condenser(CondID).PlantBranchNum,
                                                      Condenser(CondID).PlantCompNum);
             }

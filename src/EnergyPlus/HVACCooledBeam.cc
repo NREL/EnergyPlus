@@ -540,7 +540,7 @@ namespace HVACCooledBeam {
                                     CoolBeam(CBNum).Name,
                                     DataPlant::PlantEquipmentType::CooledBeamAirTerminal,
                                     CoolBeam(CBNum).CWLoopNum,
-                                    CoolBeam(CBNum).CWLoopSideNum,
+                                    CoolBeam(CBNum).CWLoopSide,
                                     CoolBeam(CBNum).CWBranchNum,
                                     CoolBeam(CBNum).CWCompNum,
                                     errFlag,
@@ -587,7 +587,7 @@ namespace HVACCooledBeam {
                                InWaterNode,
                                OutWaterNode,
                                CoolBeam(CBNum).CWLoopNum,
-                               CoolBeam(CBNum).CWLoopSideNum,
+                               CoolBeam(CBNum).CWLoopSide,
                                CoolBeam(CBNum).CWBranchNum,
                                CoolBeam(CBNum).CWCompNum);
             CoolBeam(CBNum).MySizeFlag = false;
@@ -613,7 +613,7 @@ namespace HVACCooledBeam {
                                InWaterNode,
                                OutWaterNode,
                                CoolBeam(CBNum).CWLoopNum,
-                               CoolBeam(CBNum).CWLoopSideNum,
+                               CoolBeam(CBNum).CWLoopSide,
                                CoolBeam(CBNum).CWBranchNum,
                                CoolBeam(CBNum).CWCompNum);
 
@@ -982,7 +982,7 @@ namespace HVACCooledBeam {
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
                              CoolBeam(CBNum).CWLoopNum,
-                             CoolBeam(CBNum).CWLoopSideNum,
+                             CoolBeam(CBNum).CWLoopSide,
                              CoolBeam(CBNum).CWBranchNum,
                              CoolBeam(CBNum).CWCompNum);
         MinColdWaterFlow = 0.0;
@@ -991,7 +991,7 @@ namespace HVACCooledBeam {
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
                              CoolBeam(CBNum).CWLoopNum,
-                             CoolBeam(CBNum).CWLoopSideNum,
+                             CoolBeam(CBNum).CWLoopSide,
                              CoolBeam(CBNum).CWBranchNum,
                              CoolBeam(CBNum).CWCompNum);
 
@@ -1126,7 +1126,7 @@ namespace HVACCooledBeam {
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
                              CoolBeam(CBNum).CWLoopNum,
-                             CoolBeam(CBNum).CWLoopSideNum,
+                             CoolBeam(CBNum).CWLoopSide,
                              CoolBeam(CBNum).CWBranchNum,
                              CoolBeam(CBNum).CWCompNum);
 

@@ -429,10 +429,10 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
 
     // Hypothetical design flow rate
     Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(
-        state, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
+        state, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
 
     PlantUtilities::SetComponentFlowRate(
-        state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+        state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
 
     // get the current flow rate - module variable
     this->MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
@@ -892,7 +892,7 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::GrndHtExchgPond,
                                                 this->LoopNum,
-                                                this->LoopSideNum,
+                                                this->LoopSide,
                                                 this->BranchNum,
                                                 this->CompNum,
                                                 errFlag,
@@ -922,7 +922,7 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
                                            this->InletNodeNum,
                                            this->OutletNodeNum,
                                            this->LoopNum,
-                                           this->LoopSideNum,
+                                           this->LoopSide,
                                            this->BranchNum,
                                            this->CompNum);
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);

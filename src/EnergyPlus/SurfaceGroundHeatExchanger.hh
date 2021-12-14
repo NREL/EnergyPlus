@@ -94,7 +94,7 @@ namespace SurfaceGroundHeatExchanger {
         int ConvErrIndex3;                           // recurring error index
         // loop topology variables
         int LoopNum;
-        DataPlant::LoopSideLocation LoopSideNum;
+        DataPlant::LoopSideLocation LoopSide;
         int BranchNum;
         int CompNum;
 
@@ -156,7 +156,7 @@ namespace SurfaceGroundHeatExchanger {
             : DesignMassFlowRate(0.0), TubeDiameter(0.0), TubeSpacing(0.0), SurfaceLength(0.0), SurfaceWidth(0.0), TopThermAbs(0.0), TopSolarAbs(0.0),
               BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0),
               TopRoughness(DataSurfaces::SurfaceRoughness::Unassigned), BtmRoughness(DataSurfaces::SurfaceRoughness::Unassigned), FrozenErrIndex1(0),
-              FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
+              FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
               TsrcConstCoef(0.0), TsrcVarCoef(0.0), QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0),
               CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
               CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
