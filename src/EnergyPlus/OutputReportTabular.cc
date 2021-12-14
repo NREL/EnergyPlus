@@ -7786,6 +7786,14 @@ void WriteBEPSTable(EnergyPlusData &state)
 
     int constexpr colElectricity(1);
     int constexpr colGas(2);
+    int constexpr colGasoline(3);
+    int constexpr colDiesel(4);
+    int constexpr colCoal(5);
+    int constexpr colFuelOilNo1(6);
+    int constexpr colFuelOilNo2(7);
+    int constexpr colPropane(8);
+    int constexpr colOtherFuel1(9);
+    int constexpr colOtherFuel2(10);
     int constexpr colPurchCool(11);
     int constexpr colPurchHeat(12);
 
@@ -8900,20 +8908,18 @@ void WriteBEPSTable(EnergyPlusData &state)
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
                 }
             } break;
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10: {
+            case colGasoline:
+            case colDiesel:
+            case colCoal:
+            case colFuelOilNo1:
+            case colFuelOilNo2:
+            case colPropane:
+            case colOtherFuel1:
+            case colOtherFuel2: {
                 if (produceTabular) {
                     footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
                 }
-                // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
-                // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
             } break;
             case colPurchHeat: {
                 if (produceTabular) {
@@ -8921,7 +8927,6 @@ void WriteBEPSTable(EnergyPlusData &state)
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
                 }
             } break;
-
             }
             // heading for the entire sub-table
             if (ort->displayTabularBEPS) {
