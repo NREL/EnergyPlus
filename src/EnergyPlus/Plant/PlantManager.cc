@@ -2289,57 +2289,54 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
     if (state.dataPlantMgr->SupplyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys)
-                {
-                // check if setpoints being placed on node properly
-                if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                    if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
-                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+            // check if setpoints being placed on node properly
+            if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+                if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
+                        ShowContinueError(state,
+                                          "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
+                        ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
+                        state.dataHVACGlobal->SetPointErrorFlag = true;
+                    } else {
+                        CheckIfNodeSetPointManagedByEMS(state,
+                                                        state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum,
+                                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
+                                                        state.dataHVACGlobal->SetPointErrorFlag);
+                        if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
                             ShowContinueError(
                                 state, "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
                             ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
-                            state.dataHVACGlobal->SetPointErrorFlag = true;
-                        } else {
-                            CheckIfNodeSetPointManagedByEMS(state,
-                                                            state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                            EMSManager::SPControlType::iTemperatureMaxSetPoint,
-                                                            state.dataHVACGlobal->SetPointErrorFlag);
-                            if (state.dataHVACGlobal->SetPointErrorFlag) {
-                                ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
-                                ShowContinueError(
-                                    state, "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
-                                ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
-                                ShowContinueError(state, "Or add EMS Actuator for Temperature Maximum Setpoint");
+                            ShowContinueError(state, "Or add EMS Actuator for Temperature Maximum Setpoint");
 
-                            } // SetPointErrorFlag
-                        }     // Not EMS
-                    }         // Node TSPhi = Sensed
-                    if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo == SensedNodeFlagValue) {
-                        if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        } // SetPointErrorFlag
+                    }     // Not EMS
+                }         // Node TSPhi = Sensed
+                if (state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo == SensedNodeFlagValue) {
+                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                        ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
+                        ShowContinueError(state,
+                                          "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
+                        ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
+                        state.dataHVACGlobal->SetPointErrorFlag = true;
+                    } else {
+                        CheckIfNodeSetPointManagedByEMS(state,
+                                                        state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum,
+                                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                                        state.dataHVACGlobal->SetPointErrorFlag);
+                        if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
                             ShowContinueError(
                                 state, "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
                             ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
-                            state.dataHVACGlobal->SetPointErrorFlag = true;
-                        } else {
-                            CheckIfNodeSetPointManagedByEMS(state,
-                                                            state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                            EMSManager::SPControlType::iTemperatureMinSetPoint,
-                                                            state.dataHVACGlobal->SetPointErrorFlag);
-                            if (state.dataHVACGlobal->SetPointErrorFlag) {
-                                ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
-                                ShowContinueError(
-                                    state, "Node Referenced =" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
-                                ShowContinueError(state, "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
-                                ShowContinueError(state, "Or add EMS Actuator for Temperature Minimum Setpoint");
+                            ShowContinueError(state, "Or add EMS Actuator for Temperature Minimum Setpoint");
 
-                            } // SetPointErrorFlag
-                        }     // NOT EMS
-                    }         // Node TSPtLo = Sensed...
-                }             // LoopDemandScheme = DualSPDB
-            }                 // LOOPSIDE
-        }                     // PLANT LOOP
+                        } // SetPointErrorFlag
+                    }     // NOT EMS
+                }         // Node TSPtLo = Sensed...
+            }             // LoopDemandScheme = DualSPDB
+        }                 // PLANT LOOP
 
         // Any per-environment load distribution init should be OK here
         // Just clear away any trailing MyLoad for now...
