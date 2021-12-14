@@ -1892,10 +1892,10 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
                                                std::string const &coilName, // user-defined name of the coil
                                                std::string const &coilType, // idf input object class name of coil
                                                std::string const &fanName,
-                                               DataAirSystems::FanModelType const &fanEnumType,
-                                               int const &fanIndex)
+                                               DataAirSystems::FanModelType fanEnumType,
+                                               int fanIndex)
 {
-    if (fanName == "") {
+    if (fanName.empty()) {
         return;
     }
     int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);

@@ -281,7 +281,7 @@ namespace PlantPipingSystemsManager {
         CartesianPipeCellInformation() = default;
 
         CartesianPipeCellInformation(Real64 GridCellWidth,
-                                     RadialSizing const &PipeSizes,
+                                     EnergyPlus::PlantPipingSystemsManager::RadialSizing PipeSizes,
                                      int NumRadialNodes,
                                      Real64 CellDepth,
                                      Real64 InsulationThickness,
@@ -414,7 +414,7 @@ namespace PlantPipingSystemsManager {
         {
         }
 
-        bool inline contains(PointF const &p) const
+        bool inline contains(EnergyPlus::PlantPipingSystemsManager::PointF p) const
         {
             return ((this->X_min <= p.X) && (p.X < (this->X_min + this->Width)) && (this->Y_min <= p.Y) && (p.Y < (this->Y_min + this->Height)));
         }

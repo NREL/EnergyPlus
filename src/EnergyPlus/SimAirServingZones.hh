@@ -163,9 +163,9 @@ namespace SimAirServingZones {
                              int AirLoopNum,              // Primary air loop number
                              int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
                              HVACSystemData *CompPointer, // equipment actual pointer
-                             int const &airLoopNum,       // index to AirloopHVAC
-                             int const &branchNum,        // index to AirloopHVAC branch
-                             int const &compNum           // index to AirloopHVAC branch component
+                             int airLoopNum,              // index to AirloopHVAC
+                             int branchNum,               // index to AirloopHVAC branch
+                             int compNum                  // index to AirloopHVAC branch component
     );
 
     void UpdateBranchConnections(EnergyPlusData &state,

@@ -57,13 +57,13 @@ namespace EnergyPlus {
 void BaseSizerWithFanHeatInputs::initializeWithinEP(EnergyPlusData &state,
                                                     std::string_view const _compType,
                                                     std::string_view const _compName,
-                                                    bool const &_printWarningFlag,
-                                                    std::string_view _callingRoutine)
+                                                    bool _printWarningFlag,
+                                                    std::string_view const _callingRoutine)
 {
     BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
     this->dataDesAccountForFanHeat = state.dataSize->DataDesAccountForFanHeat;
     // water coils on main branch have no parent object to set DataFan* variables
-    if (int(this->primaryAirSystem.size() > 0) && this->curSysNum > 0 && this->curOASysNum == 0) {
+    if (!(this->primaryAirSystem.empty()) && this->curSysNum > 0 && this->curOASysNum == 0) {
         if (this->primaryAirSystem(this->curSysNum).supFanModelType == DataAirSystems::StructArrayLegacyFanModels) {
             this->dataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
             this->dataFanIndex = this->primaryAirSystem(this->curSysNum).SupFanNum;
@@ -100,8 +100,8 @@ Real64 BaseSizerWithFanHeatInputs::calcFanDesHeatGain(Real64 &airVolFlow)
 }
 
 void BaseSizerWithFanHeatInputs::getFanInputsForDesHeatGain(EnergyPlusData &state,
-                                                            int const &fanEnumType,
-                                                            int const &fanIndex,
+                                                            int fanEnumType,
+                                                            int fanIndex,
                                                             Real64 &deltaP,
                                                             Real64 &motEff,
                                                             Real64 &totEff,

@@ -107,7 +107,7 @@ namespace HVACVariableRefrigerantFlow {
     // VRF System Types (strings used in integer conversions)
     constexpr int VRF_HeatPump(1);
 
-    constexpr auto cVRFTypes(int const &i)
+    constexpr auto cVRFTypes(int i)
     {
         if (i == 1) {
             return "AirConditioner:VariableRefrigerantFlow";

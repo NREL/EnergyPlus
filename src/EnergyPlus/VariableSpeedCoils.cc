@@ -8037,8 +8037,8 @@ namespace VariableSpeedCoils {
     }
 
     int GetVSCoilCapFTCurveIndex(EnergyPlusData &state,
-                                 int const &CoilIndex, // must match coil names for the coil type
-                                 bool &ErrorsFound     // set to true if problem
+                                 int const CoilIndex, // must match coil names for the coil type
+                                 bool &ErrorsFound    // set to true if problem
     )
     {
 

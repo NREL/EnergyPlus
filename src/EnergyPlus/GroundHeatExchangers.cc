@@ -876,7 +876,7 @@ std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian 
 
 //******************************************************************************
 
-Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &currTime)
+Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const currTime)
 {
     Real64 pointToPointResponse = erfc(dists[0] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[0];
     Real64 pointToReflectedResponse = erfc(dists[1] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[1];
@@ -886,7 +886,7 @@ Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &cu
 
 //******************************************************************************
 
-Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const currTime)
 {
 
     // This code could be optimized in a number of ways.
@@ -919,7 +919,7 @@ Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSi
 
 //******************************************************************************
 
-Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const currTime)
 {
 
     // Similar optimizations as discussed above could happen here
@@ -3127,7 +3127,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime)
+void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const CurTime)
 {
 
     constexpr const char *RoutineName("initEnvironment");
@@ -3224,7 +3224,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
+void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
 {
 
     constexpr const char *RoutineName("initEnvironment");

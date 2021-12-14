@@ -1743,8 +1743,8 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->sourceTypeNames(6) = "FuelOilNo1";
         ort->sourceTypeNames(7) = "FuelOilNo2";
         ort->sourceTypeNames(8) = "Propane";
-        ort->sourceTypeNames(9) = "PurchasedElectric";
-        ort->sourceTypeNames(10) = "SoldElectric";
+        ort->sourceTypeNames(9) = "PurchasedElectricity";
+        ort->sourceTypeNames(10) = "SoldElectricity";
         ort->sourceTypeNames(11) = "OtherFuel1";
         ort->sourceTypeNames(12) = "OtherFuel2";
 
@@ -4038,8 +4038,8 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
     //          sourceTypeNames(6)='FuelOilNo1'
     //          sourceTypeNames(7)='FuelOilNo2'
     //          sourceTypeNames(8)='Propane'
-    //          sourceTypeNames(9)='PurchasedElectric'
-    //          sourceTypeNames(10)='SoldElectric'
+    //          sourceTypeNames(9)='PurchasedElectricity'
+    //          sourceTypeNames(10)='SoldElectricity'
     //          sourceTypeNames(11)='OtherFuel1'
     //          sourceTypeNames(12)='OtherFuel2'
 
@@ -5288,9 +5288,9 @@ void WriteTabularReports(EnergyPlusData &state)
     print<variable_fmt_syntax>(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
 }
 
-bool produceDualUnitsFlags(const int &iUnit_Sys,
-                           const UnitsStyle &unitsStyle_Tab,
-                           const UnitsStyle &unitsStyle_Sql,
+bool produceDualUnitsFlags(const int iUnit_Sys,
+                           const UnitsStyle unitsStyle_Tab,
+                           const UnitsStyle unitsStyle_Sql,
                            UnitsStyle &unitsStyle_Cur,
                            bool &produce_Tab,
                            bool &produce_Sql)
@@ -14596,9 +14596,9 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
 
 // populate the delay sequence arrays for the component load summary table output
 void GetDelaySequences(EnergyPlusData &state,
-                       int const &desDaySelected,
-                       bool const &isCooling,
-                       int const &zoneIndex,
+                       int const desDaySelected,
+                       bool const isCooling,
+                       int const zoneIndex,
                        Array1D<Real64> &peopleDelaySeq,
                        Array1D<Real64> &equipDelaySeq,
                        Array1D<Real64> &hvacLossDelaySeq,
@@ -14709,7 +14709,7 @@ void GetDelaySequences(EnergyPlusData &state,
 }
 
 // Used to construct the tabular output for a single cell in the component load summary reports based on moving average
-Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep)
+Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const numTimeSteps, int const maxTimeStep)
 {
     using General::MovingAvg;
     Array1D<Real64> AvgData; // sequence data after averaging
@@ -14723,9 +14723,9 @@ Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq,
 void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                     Array2D<Real64> &resultCells,
                                     Array2D_bool &resCellsUsd,
-                                    int const &desDaySelected,
-                                    int const &timeOfMax,
-                                    int const &zoneIndex,
+                                    int const desDaySelected,
+                                    int const timeOfMax,
+                                    int const zoneIndex,
                                     Array1D<Real64> const &peopleDelaySeq,
                                     Array1D<Real64> const &equipDelaySeq,
                                     Array1D<Real64> const &hvacLossDelaySeq,
@@ -14934,7 +14934,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
 // for the load summary report add values the peak conditions subtable
 void CollectPeakZoneConditions(
-    EnergyPlusData &state, CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
+    EnergyPlusData &state, CompLoadTablesType &compLoad, int const desDaySelected, int const timeOfMax, int const zoneIndex, bool const isCooling)
 {
     using DataSizing::SupplyAirTemperature;
     using Psychrometrics::PsyRhFnTdbWPb;
@@ -15169,7 +15169,7 @@ void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType
 }
 
 // adds the area column for the load component tables
-void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoad)
+void AddAreaColumnForZone(int const zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoad)
 {
     compLoad.cells(cArea, rPeople) = compAreas(zoneNum).floor;
     compLoad.cellUsed(cArea, rPeople) = true;
@@ -15233,7 +15233,7 @@ void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> co
 }
 
 // Used for the AirLoop and Facility level load component tables to sum the results from invidual zones
-void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 const &multiplier)
+void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 const multiplier)
 {
     // sum the main results
     for (int col = 1; col <= cPerArea; ++col) {
@@ -15444,7 +15444,7 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
 }
 
 // make a list of the zones for the airloop component loads report
-void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop)
+void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const curAirLoop)
 {
     int counter = 0;
     for (int zi = 1; zi <= state.dataGlobal->NumOfZones; ++zi) {
@@ -15455,13 +15455,13 @@ void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &comp
     }
 }
 
-// Jan 2021: Added additional parameters to accommondate dual-unit reporting
+// Jan 2021: Added additional parameters to accommodate dual-unit reporting
 // provide output from the load component summary tables
 void OutputCompLoadSummary(EnergyPlusData &state,
-                           OutputType const &kind,
+                           EnergyPlus::OutputReportTabular::OutputType const kind,
                            CompLoadTablesType const &compLoadCool,
                            CompLoadTablesType const &compLoadHeat,
-                           int const &zoneOrAirLoopIndex,
+                           int const zoneOrAirLoopIndex,
                            UnitsStyle unitsStyle_para,
                            bool produceTabular_para,
                            bool produceSQLite_para)

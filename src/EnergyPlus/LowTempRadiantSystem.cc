@@ -1795,7 +1795,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    FluidToSlabHeatTransferTypes HydronicSystemBaseData::getFluidToSlabHeatTransferInput(EnergyPlusData &state, std::string const userInput)
+    FluidToSlabHeatTransferTypes HydronicSystemBaseData::getFluidToSlabHeatTransferInput(EnergyPlusData &state, std::string const &userInput)
     {
         if (UtilityRoutines::SameString(userInput, "ConvectionOnly")) {
             return FluidToSlabHeatTransferTypes::ConvectionOnly;
@@ -1812,7 +1812,7 @@ namespace LowTempRadiantSystem {
     LowTempRadiantControlTypes RadiantSystemBaseData::processRadiantSystemControlInput(EnergyPlusData &state,
                                                                                        std::string const &controlInput,
                                                                                        std::string const &controlInputField,
-                                                                                       LowTempRadiantSystem::SystemType const &typeOfRadiantSystem)
+                                                                                       LowTempRadiantSystem::SystemType const typeOfRadiantSystem)
     {
         if (UtilityRoutines::SameString(controlInput, "MeanAirTemperature")) {
             return LowTempRadiantControlTypes::MATControl;
@@ -3759,7 +3759,7 @@ namespace LowTempRadiantSystem {
     void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystemComponents(
         EnergyPlusData &state,
         Real64 &LoadMet,
-        LowTempRadiantSystem::SystemType const &typeOfRadiantSystem) // Load met by the low temperature radiant system, in Watts
+        LowTempRadiantSystem::SystemType const typeOfRadiantSystem) // Load met by the low temperature radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -4817,7 +4817,7 @@ namespace LowTempRadiantSystem {
         int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
         bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
         Real64 &LoadMet,          // Load met by the low temperature radiant system, in Watts
-        LowTempRadiantSystem::SystemType const &typeOfRadiantSystem)
+        LowTempRadiantSystem::SystemType const typeOfRadiantSystem)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5817,7 +5817,7 @@ namespace LowTempRadiantSystem {
                                                          Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
                                                          Real64 const NumCircs,      // Number of fluid circuits in this surface
                                                          int const DesignObjPtr,     // Design Object Pointer
-                                                         LowTempRadiantSystem::SystemType const &typeOfRadiantSystem)
+                                                         LowTempRadiantSystem::SystemType const typeOfRadiantSystem)
     {
 
         // SUBROUTINE INFORMATION:

@@ -147,7 +147,7 @@ namespace OutputReportTabularAnnual {
 
         Real64 getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
-        void computeBinColumns(EnergyPlusData &state, OutputReportTabular::UnitsStyle const &unitsStyle_para);
+        void computeBinColumns(EnergyPlusData &state, OutputReportTabular::UnitsStyle unitsStyle_para);
 
         std::vector<std::string> setupAggString();
 

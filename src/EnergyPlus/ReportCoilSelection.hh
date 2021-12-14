@@ -404,8 +404,8 @@ public: // methods
                               std::string const &coilName, // user-defined name of the coil
                               std::string const &coilType, // idf input object class name of coil
                               std::string const &fanName,
-                              DataAirSystems::FanModelType const &fanEnumType,
-                              int const &fanIndex);
+                              DataAirSystems::FanModelType fanEnumType,
+                              int fanIndex);
 
     static std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);
 
