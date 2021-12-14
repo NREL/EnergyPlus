@@ -178,7 +178,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
         bool SeriesPressureComponentFound(false);
 
         // Need to go along plant loop and set up component pressure drop data structure!
-        for (auto LoopSideNum : DataPlant::LoopSideKeys) {
+        for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
             auto &loop_side(loop.LoopSide(LoopSideNum));
 
             // Loop through all branches on this loop side
@@ -592,7 +592,7 @@ void UpdatePressureDrop(EnergyPlusData &state, int const LoopNum)
     // Now do effective K value calculations
     EffectiveLoopKValue = 0.0;
 
-    for (auto LoopSideNum : DataPlant::LoopSideKeys) {
+    for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
 
         EffectiveLoopSideKValue = 0.0;
 

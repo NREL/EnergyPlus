@@ -648,8 +648,6 @@ void SimHVAC(EnergyPlusData &state)
     auto &MaxErrCount = state.dataHVACMgr->MaxErrCount;
     auto &ErrEnvironmentName = state.dataHVACMgr->ErrEnvironmentName;
     int LoopNum;
-    DataPlant::LoopSideLocation LoopSide;
-    DataPlant::LoopSideLocation ThisLoopSide;
 
     int AirSysNum;
     int StackDepth;
@@ -934,9 +932,10 @@ void SimHVAC(EnergyPlusData &state)
 
     // Test plant loop for errors
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-        for (auto LoopSide : DataPlant::LoopSideKeys) {
+        for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
             CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
-            CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
+            CheckForRunawayPlantTemps(state, LoopNum, LoopSide
+                                      );
         }
     }
 

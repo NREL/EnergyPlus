@@ -72,10 +72,6 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     state->dataHVACGlobal->TimeStepSys = 1;
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    for (int i = 1; i <= state->dataPlnt->TotNumLoops; ++i) {
-        auto &loop(state->dataPlnt->PlantLoop(i));
-
-    }
     // Set Up PlantLoop Variables
     state->dataPlnt->PlantLoop(1).Mass = 50;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";

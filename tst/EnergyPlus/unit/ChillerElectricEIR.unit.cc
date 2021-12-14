@@ -196,7 +196,6 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
@@ -302,8 +301,6 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);

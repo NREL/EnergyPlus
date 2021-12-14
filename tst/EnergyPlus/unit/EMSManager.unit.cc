@@ -244,7 +244,6 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).Name = "MyPlant";
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
@@ -407,8 +406,6 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).Name = "MyPlant";
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);

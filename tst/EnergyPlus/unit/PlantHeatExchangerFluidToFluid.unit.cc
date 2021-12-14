@@ -2316,8 +2316,6 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
@@ -2416,11 +2414,6 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     // setup two plant loops, need for SetComponenetFlowRate
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-
-    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-
-    }
     // loop 1 is like a chilled water loop, supply side of HX, two branches on supply side
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);

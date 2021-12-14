@@ -64,10 +64,6 @@ TEST_F(EnergyPlusFixture, DataPlant_AnyPlantLoopSidesNeedSim)
 {
     state->dataPlnt->TotNumLoops = 3;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-    }
-
     EXPECT_TRUE(PlantUtilities::AnyPlantLoopSidesNeedSim(*state)); // SimLoopSideNeeded is set to true in default ctor
     PlantUtilities::SetAllPlantSimFlagsToValue(*state, false);     // Set all SimLoopSideNeeded to false
     EXPECT_FALSE(PlantUtilities::AnyPlantLoopSidesNeedSim(*state));

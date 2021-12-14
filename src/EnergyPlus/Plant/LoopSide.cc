@@ -891,7 +891,7 @@ namespace DataPlant {
         auto &loop(state.dataPlnt->PlantLoop(this->myLoopNum));
 
         //~ First we need to set up the flow requests on each LoopSide
-        for (auto LoopSideCounter : DataPlant::LoopSideKeys) {
+        for (DataPlant::LoopSideLocation LoopSideCounter : DataPlant::LoopSideKeys) {
             // Clear things out for this LoopSide
             Real64 InletBranchRequestNeedAndTurnOn = 0.0;
             Real64 InletBranchRequestNeedIfOn = 0.0;

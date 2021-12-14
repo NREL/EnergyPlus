@@ -2106,7 +2106,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         // check the pointers to see if a single component is attached to more than one type of control scheme
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
-            for (auto LoopSideNum : DataPlant::LoopSideKeys){
+            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys){
                 auto const &this_loop_side(this_plant_loop.LoopSide(LoopSideNum));
                 for (int BranchNum = 1, BranchNum_end = this_loop_side.TotalBranches; BranchNum <= BranchNum_end; ++BranchNum) {
                     auto const &this_branch(this_loop_side.Branch(BranchNum));
@@ -2186,7 +2186,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     if (FirstHVACIteration) {
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
-            for (auto LoopSideNum : LoopSideKeys)
+            for (DataPlant::LoopSideLocation LoopSideNum : LoopSideKeys)
             {
                 auto &this_loop_side(this_plant_loop.LoopSide(LoopSideNum));
                 for (int BranchNum = 1, BranchNum_end = this_loop_side.TotalBranches; BranchNum <= BranchNum_end; ++BranchNum) {
@@ -3361,10 +3361,9 @@ void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum)
     // na
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int MachineOnBranch;
-    int LoopSideNum;
     int Num;
 
-    for (auto LoopSideNum : LoopSideKeys) {
+    for (DataPlant::LoopSideLocation LoopSideNum : LoopSideKeys) {
         for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++Num) {
             for (MachineOnBranch = 1; MachineOnBranch <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
                  ++MachineOnBranch) {
@@ -3449,7 +3448,6 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
     static constexpr std::string_view Units("[on/off]");
     // INTEGER                      :: NumAct
     int LoopNum;
-    DataPlant::LoopSideLocation LoopSideNum;
     int BranchNum;
     int CompNum;
 
@@ -3487,7 +3485,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                          state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).EMSCtrl,
                          state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).EMSValue);
 
-        for (auto LoopSideNum : LoopSideKeys) {
+        for (DataPlant::LoopSideLocation LoopSideNum : LoopSideKeys) {
             for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                 if (LoopSideNum == LoopSideLocation::Supply) {
                     ActuatorName = "Supply Side Branch";

@@ -231,7 +231,6 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -481,7 +480,6 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -730,7 +728,6 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -979,7 +976,6 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -1192,7 +1188,6 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -1402,7 +1397,6 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     state->dataWaterCoils->MySizeFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;

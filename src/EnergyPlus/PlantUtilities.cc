@@ -681,7 +681,6 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
     std::string hotcold;
     bool makefatalerror;
     std::string DemandSupply;
-    int LSN;
     int BrN;
     int CpN;
     Real64 LoopCapacity;
@@ -1667,7 +1666,6 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int LoopCtr;
-    int LoopSideCtr;
     int BranchCtr;
     int CompCtr;
     bool FoundComponent;
@@ -1792,7 +1790,6 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
     // Loop thru plant data structure and find matching node.
 
     int LoopCtr;
-    int LoopSideCtr;
     int BranchCtr;
     int CompCtr;
     bool FoundNode;
@@ -1866,7 +1863,6 @@ bool AnyPlantLoopSidesNeedSim(EnergyPlusData &state)
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int LoopCtr;
-    int LoopSideCtr;
 
     // Assume that there aren't any
     AnyPlantLoopSidesNeedSim = false;
@@ -1921,7 +1917,6 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string DemandSupply;
-    int LSN; // LoopSide counter
     int BrN; // Branch counter
     int CpN; // Component (on branch) counter
 

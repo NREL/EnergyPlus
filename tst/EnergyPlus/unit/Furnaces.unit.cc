@@ -293,8 +293,6 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
-        auto &loop(state->dataPlnt->PlantLoop(loopindex));
-
         auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);

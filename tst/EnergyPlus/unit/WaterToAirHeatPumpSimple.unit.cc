@@ -340,7 +340,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
@@ -772,7 +771,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);

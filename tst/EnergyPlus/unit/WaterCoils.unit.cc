@@ -179,7 +179,6 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -415,7 +414,6 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -571,7 +569,6 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -730,7 +727,6 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -846,7 +842,6 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -949,7 +944,6 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
@@ -1063,8 +1057,6 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
@@ -1247,8 +1239,6 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
@@ -1346,8 +1336,6 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
 
     // set up plant loop
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-
         auto &loopside(state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
@@ -1688,7 +1676,6 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = HotWaterMassFlowRate;
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;

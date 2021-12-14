@@ -2761,7 +2761,6 @@ void CheckPlantOnAbort(EnergyPlusData &state)
     int ParalBranchNum;    // used to search for active control branches in parallel with bypass branches
     int ParalBranchNum2;   // used to search for active control branches in parallel with bypass branches
     int BranchNum2;        // used to search for active control branches in parallel with bypass branches
-    LoopSideLocation SideNum;
     int numLoopSides;
     int BranchNum; // DO loop counter for branches
     int CompNum;   // do loop for multiple components on a branch

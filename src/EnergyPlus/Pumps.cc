@@ -2178,7 +2178,6 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     int PlantSizNum; // index of Plant Sizing array
     bool ErrorsFound;
     Real64 TotalEffic; // pump total efficiency
-    DataPlant::LoopSideLocation Side;          // half loop index
     int BranchNum;     // index of branch
     int CompNum;       // index of component on branch
     Real64 PumpSizFac; // pump sizing factor
