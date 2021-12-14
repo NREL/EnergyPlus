@@ -680,7 +680,6 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string hotcold;
     bool makefatalerror;
-    std::string DemandSupply;
     int BrN;
     int CpN;
     Real64 LoopCapacity;
@@ -728,14 +727,8 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
     if (makefatalerror) {
         ShowSevereError(state, "Plant temperatures are getting far too " + hotcold + ", check controls and relative loads and capacities");
         ShowContinueErrorTimeStamp(state, "");
-        if (LoopSide == DataPlant::LoopSideLocation::Demand) {
-            DemandSupply = "Demand";
-        } else if (LoopSide == DataPlant::LoopSideLocation::Supply) {
-            DemandSupply = "Supply";
-        } else {
-            DemandSupply = "Unknown";
-        }
-        ShowContinueError(state, "PlantLoop Name (" + DemandSupply + "Side)= " + state.dataPlnt->PlantLoop(LoopNum).Name);
+        ShowContinueError(state,
+                          format("PlantLoop Name ({} Side) = {}", DataPlant::DemandSupplyNames[static_cast<int>(LoopSide)], state.dataPlnt->PlantLoop(LoopNum).Name));
         ShowContinueError(state,
                           format("PlantLoop Setpoint Temperature={:.1R} {{C}}",
                                  state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint));
@@ -761,12 +754,12 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
         }
         ShowContinueError(state,
                           format("PlantLoop Outlet Node ({}Side) \"{}\" has temperature={:.1R} {{C}}",
-                                 DemandSupply,
+                                 DataPlant::DemandSupplyNames[static_cast<int>(LoopSide)],
                                  state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).NodeNumOut),
                                  state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).NodeNumOut).Temp));
         ShowContinueError(state,
                           format("PlantLoop Inlet Node ({}Side) \"{}\" has temperature={:.1R} {{C}}",
-                                 DemandSupply,
+                                 DataPlant::DemandSupplyNames[static_cast<int>(LoopSide)],
                                  state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).NodeNumIn),
                                  state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).NodeNumIn).Temp));
         ShowContinueError(state, format("PlantLoop Minimum Temperature={:.1R} {{C}}", state.dataPlnt->PlantLoop(LoopNum).MinTemp));
@@ -779,7 +772,7 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
             format("PlantLoop Flow Request (LoopSideLocation::Demand)={:.1R} {{kg/s}}", state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).FlowRequest));
         ShowContinueError(state,
                           format("PlantLoop Node ({}Side) \"{}\" has mass flow rate ={:.1R} {{kg/s}}",
-                                 DemandSupply,
+                                 DataPlant::DemandSupplyNames[static_cast<int>(LoopSide)],
                                  state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).NodeNumOut),
                                  state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).NodeNumOut).MassFlowRate));
         ShowContinueError(
@@ -1916,19 +1909,11 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
     // structure of the given loop.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    std::string DemandSupply;
     int BrN; // Branch counter
     int CpN; // Component (on branch) counter
 
     for (DataPlant::LoopSideLocation LSN : DataPlant::LoopSideKeys) {
-        if (LSN == DataPlant::LoopSideLocation::Demand) {
-            DemandSupply = "Demand";
-        } else if (LSN == DataPlant::LoopSideLocation::Supply) {
-            DemandSupply = "Supply";
-        } else {
-            DemandSupply = "Unknown";
-        }
-        ShowContinueError(state, DemandSupply + " Branches:");
+        ShowContinueError(state, format("{} Branches:", DataPlant::DemandSupplyNames[static_cast<int>(LSN)]));
         for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).TotalBranches; ++BrN) {
             ShowContinueError(state, "  " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Name);
             ShowContinueError(state, "    Components on Branch:");

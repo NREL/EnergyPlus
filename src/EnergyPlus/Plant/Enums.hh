@@ -72,6 +72,8 @@ enum class LoopSideLocation
 
 constexpr std::array<LoopSideLocation, static_cast<int>(LoopSideLocation::Num)> LoopSideOther = {LoopSideLocation::Supply, LoopSideLocation::Demand};
 
+constexpr std::array<std::string_view ,static_cast<int>(LoopSideLocation::Num)> DemandSupplyNames = {"Demand", "Supply"};
+
 // Parameters for scheme types
 // Used in TYPE(OperationData)%Type
 // As in PlantLoop(:)%OpScheme(:)%Type

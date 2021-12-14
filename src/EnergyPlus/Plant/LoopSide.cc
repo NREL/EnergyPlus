@@ -1300,7 +1300,6 @@ namespace DataPlant {
         // Using/Aliasing
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const LoopSideName(2, {"Demand", "Supply"});
         int constexpr LoopSideSingleBranch(1); // For readability
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
