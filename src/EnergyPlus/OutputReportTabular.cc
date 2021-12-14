@@ -7979,24 +7979,25 @@ void WriteBEPSTable(EnergyPlusData &state)
                 }
             }
             // unit conversion - all values are used as divisors
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    largeConversionFactor = 3600000.0;
-                    kConversionFactor = 1.0;
-                    waterConversionFactor = 1.0;
-                    areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
-                    kConversionFactor = 1.0;
-                    waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
-                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-                } else {
-                    largeConversionFactor = 1000000000.0;
-                    kConversionFactor = 1000.0;
-                    waterConversionFactor = 1.0;
-                    areaConversionFactor = 1.0;
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                largeConversionFactor = 3600000.0;
+                kConversionFactor = 1.0;
+                waterConversionFactor = 1.0;
+                areaConversionFactor = 1.0;
+            } break;
+            case iUnitsStyle::InchPound: {
+                largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+                kConversionFactor = 1.0;
+                waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
+                areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+            } break;
+            default: {
+                largeConversionFactor = 1000000000.0;
+                kConversionFactor = 1000.0;
+                waterConversionFactor = 1.0;
+                areaConversionFactor = 1.0;
+            } break;
             }
 
             // convert floor areas
@@ -8085,21 +8086,22 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(3, 4);
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Total Energy [kWh]";
-                    columnHead(2) = "Energy Per Total Building Area [kWh/m2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [kWh/m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Total Energy [kBtu]";
-                    columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
-                } else {
-                    columnHead(1) = "Total Energy [GJ]";
-                    columnHead(2) = "Energy Per Total Building Area [MJ/m2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [MJ/m2]";
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Total Energy [kWh]";
+                columnHead(2) = "Energy Per Total Building Area [kWh/m2]";
+                columnHead(3) = "Energy Per Conditioned Building Area [kWh/m2]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Total Energy [kBtu]";
+                columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
+                columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
+            } break;
+            default: {
+                columnHead(1) = "Total Energy [GJ]";
+                columnHead(2) = "Energy Per Total Building Area [MJ/m2]";
+                columnHead(3) = "Energy Per Conditioned Building Area [MJ/m2]";
+            } break;
             }
 
             rowHead(1) = "Total Site Energy";
@@ -8490,15 +8492,16 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(1, 3);
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Area [m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Area [ft2]";
-                } else {
-                    columnHead(1) = "Area [m2]";
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Area [m2]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Area [ft2]";
+            } break;
+            default: {
+                columnHead(1) = "Area [m2]";
+            } break;
             }
 
             rowHead(1) = "Total Building Area";
@@ -8585,51 +8588,52 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(15) = "";
             rowHead(16) = "Total End Uses";
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity [kWh]";
-                    columnHead(2) = "Natural Gas [kWh]";
-                    columnHead(3) = "Gasoline [kWh]";
-                    columnHead(4) = "Diesel [kWh]";
-                    columnHead(5) = "Coal [kWh]";
-                    columnHead(6) = "Fuel Oil No 1 [kWh]";
-                    columnHead(7) = "Fuel Oil No 2 [kWh]";
-                    columnHead(8) = "Propane [kWh]";
-                    columnHead(9) = "Other Fuel 1 [kWh]";
-                    columnHead(10) = "Other Fuel 2 [kWh]";
-                    columnHead(11) = "District Cooling [kWh]";
-                    columnHead(12) = "District Heating [kWh]";
-                    columnHead(13) = "Water [m3]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity [kBtu]";
-                    columnHead(2) = "Natural Gas [kBtu]";
-                    columnHead(3) = "Gasoline [kBtu]";
-                    columnHead(4) = "Diesel [kBtu]";
-                    columnHead(5) = "Coal [kBtu]";
-                    columnHead(6) = "Fuel Oil No 1 [kBtu]";
-                    columnHead(7) = "Fuel Oil No 2 [kBtu]";
-                    columnHead(8) = "Propane [kBtu]";
-                    columnHead(9) = "Other Fuel 1 [kBtu]";
-                    columnHead(10) = "Other Fuel 2 [kBtu]";
-                    columnHead(11) = "District Cooling [kBtu]";
-                    columnHead(12) = "District Heating [kBtu]";
-                    columnHead(13) = "Water [gal]";
-                } else {
-                    columnHead(1) = "Electricity [GJ]";
-                    columnHead(2) = "Natural Gas [GJ]";
-                    columnHead(3) = "Gasoline [GJ]";
-                    columnHead(4) = "Diesel [GJ]";
-                    columnHead(5) = "Coal [GJ]";
-                    columnHead(6) = "Fuel Oil No 1 [GJ]";
-                    columnHead(7) = "Fuel Oil No 2 [GJ]";
-                    columnHead(8) = "Propane [GJ]";
-                    columnHead(9) = "Other Fuel 1 [GJ]";
-                    columnHead(10) = "Other Fuel 2 [GJ]";
-                    columnHead(11) = "District Cooling [GJ]";
-                    columnHead(12) = "District Heating [GJ]";
-                    columnHead(13) = "Water [m3]";
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Electricity [kWh]";
+                columnHead(2) = "Natural Gas [kWh]";
+                columnHead(3) = "Gasoline [kWh]";
+                columnHead(4) = "Diesel [kWh]";
+                columnHead(5) = "Coal [kWh]";
+                columnHead(6) = "Fuel Oil No 1 [kWh]";
+                columnHead(7) = "Fuel Oil No 2 [kWh]";
+                columnHead(8) = "Propane [kWh]";
+                columnHead(9) = "Other Fuel 1 [kWh]";
+                columnHead(10) = "Other Fuel 2 [kWh]";
+                columnHead(11) = "District Cooling [kWh]";
+                columnHead(12) = "District Heating [kWh]";
+                columnHead(13) = "Water [m3]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Electricity [kBtu]";
+                columnHead(2) = "Natural Gas [kBtu]";
+                columnHead(3) = "Gasoline [kBtu]";
+                columnHead(4) = "Diesel [kBtu]";
+                columnHead(5) = "Coal [kBtu]";
+                columnHead(6) = "Fuel Oil No 1 [kBtu]";
+                columnHead(7) = "Fuel Oil No 2 [kBtu]";
+                columnHead(8) = "Propane [kBtu]";
+                columnHead(9) = "Other Fuel 1 [kBtu]";
+                columnHead(10) = "Other Fuel 2 [kBtu]";
+                columnHead(11) = "District Cooling [kBtu]";
+                columnHead(12) = "District Heating [kBtu]";
+                columnHead(13) = "Water [gal]";
+            } break;
+            default: {
+                columnHead(1) = "Electricity [GJ]";
+                columnHead(2) = "Natural Gas [GJ]";
+                columnHead(3) = "Gasoline [GJ]";
+                columnHead(4) = "Diesel [GJ]";
+                columnHead(5) = "Coal [GJ]";
+                columnHead(6) = "Fuel Oil No 1 [GJ]";
+                columnHead(7) = "Fuel Oil No 2 [GJ]";
+                columnHead(8) = "Propane [GJ]";
+                columnHead(9) = "Other Fuel 1 [GJ]";
+                columnHead(10) = "Other Fuel 2 [GJ]";
+                columnHead(11) = "District Cooling [GJ]";
+                columnHead(12) = "District Heating [GJ]";
+                columnHead(13) = "Water [m3]";
+            } break;
             }
 
             tableBody = "";
@@ -8883,32 +8887,41 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
 
             footnote = "";
-            {
-                auto const SELECT_CASE_var(resourcePrimaryHeating);
-                if (SELECT_CASE_var == colElectricity) {
-                    if (produceTabular) {
-                        footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
-                    }
-                } else if (SELECT_CASE_var == colGas) {
-                    if (produceTabular) {
-                        footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
-                    }
-                } else if (SELECT_CASE_var == 3 || SELECT_CASE_var == 4 || SELECT_CASE_var == 5 || SELECT_CASE_var == 6 || SELECT_CASE_var == 7 ||
-                           SELECT_CASE_var == 8 || SELECT_CASE_var == 9 || SELECT_CASE_var == 10) {
-                    if (produceTabular) {
-                        footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
-                    }
-                    // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
-                    // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
-                } else if (SELECT_CASE_var == colPurchHeat) {
-                    if (produceTabular) {
-                        footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
-                    }
+            switch (resourcePrimaryHeating) {
+            case colElectricity: {
+                if (produceTabular) {
+                    footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
                 }
+            } break;
+            case colGas: {
+                if (produceTabular) {
+                    footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
+                }
+            } break;
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10: {
+                if (produceTabular) {
+                    footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
+                }
+                // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
+                // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
+            } break;
+            case colPurchHeat: {
+                if (produceTabular) {
+                    footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
+                }
+            } break;
+
             }
             // heading for the entire sub-table
             if (ort->displayTabularBEPS) {
