@@ -230,9 +230,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
         }
 
         if (loop.HasPressureComponents) {
-            state.dataPlantPressureSys->FullParallelBranchSetFound(static_cast<int>(DataPlant::LoopSideLocation::Demand)) =
-                state.dataPlantPressureSys->FullParallelBranchSetFound(static_cast<int>(DataPlant::LoopSideLocation::Supply)) =
-                false;
+            state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(DataPlant::LoopSideLocation::Demand)] = state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(DataPlant::LoopSideLocation::Supply)] = false;
 
             // Set up loop level variables if applicable
 
@@ -262,7 +260,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
                     // no parallel branches, ok for this check
                 } else if (BranchPressureTally == isize(loop_side.Branch) - 2) {
                     // all parallel branches have pressure components
-                    state.dataPlantPressureSys->FullParallelBranchSetFound(static_cast<int>(LoopSideNum)) = true;
+                    state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(LoopSideNum)] = true;
                 } else {
                     // we aren't ok
                     ShowSevereError(state, "Pressure drop component configuration error detected on loop: " + loop.Name);
@@ -277,8 +275,8 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
             }
 
             // Check for full path pressure data
-            if (state.dataPlantPressureSys->FullParallelBranchSetFound(static_cast<int>(DataPlant::LoopSideLocation::Demand)) ||
-                state.dataPlantPressureSys->FullParallelBranchSetFound(static_cast<int>(DataPlant::LoopSideLocation::Supply)) ||
+            if (state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(DataPlant::LoopSideLocation::Demand)] ||
+                state.dataPlantPressureSys->FullParallelBranchSetFound[static_cast<int>(DataPlant::LoopSideLocation::Supply)] ||
                 SeriesPressureComponentFound) {
                 // we are fine, either way we will always have a path with at least one pressure component hit
             } else {

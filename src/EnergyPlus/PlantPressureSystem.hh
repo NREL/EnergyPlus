@@ -113,7 +113,7 @@ struct PlantPressureSysData : BaseGlobalStruct
 
     bool InitPressureDropOneTimeInit = true;
     Array1D_bool LoopInit;
-    Array1D_bool FullParallelBranchSetFound = Array1D<bool>(2);
+    std::array<bool, static_cast<int>(DataPlant::LoopSideLocation::Num)> FullParallelBranchSetFound{false, false};
     bool CommonPipeErrorEncountered = false;
     int ErrorCounter = 0; // For proper error handling
     int ZeroKWarningCounter = 0;
@@ -123,7 +123,7 @@ struct PlantPressureSysData : BaseGlobalStruct
     {
         this->InitPressureDropOneTimeInit = true;
         this->LoopInit.clear();
-        this->FullParallelBranchSetFound.clear();
+        this->FullParallelBranchSetFound = {false, false};
         this->CommonPipeErrorEncountered = false;
         this->ErrorCounter = 0;
         this->ZeroKWarningCounter = 0;
