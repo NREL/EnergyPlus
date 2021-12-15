@@ -1445,7 +1445,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     Real64 mdotMax; // local fluid mass flow rate maximum
     Real64 mdotMin; // local fluid mass flow rate minimum
     int plloopnum;
-    DataPlant::LoopSideLocation LoopSide;
+    DataPlant::LoopSideLocation lsnum;
     int brnum;
     int cpnum;
 
@@ -1471,25 +1471,25 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                                 _,
                                 _);
         plloopnum = state.dataPumps->PumpEquip(PumpNum).LoopNum;
-        LoopSide = state.dataPumps->PumpEquip(PumpNum).LoopSide;
+        lsnum = state.dataPumps->PumpEquip(PumpNum).LoopSide;
         brnum = state.dataPumps->PumpEquip(PumpNum).BranchNum;
         cpnum = state.dataPumps->PumpEquip(PumpNum).CompNum;
-        if (plloopnum > 0 && LoopSide != DataPlant::LoopSideLocation::Invalid && brnum > 0 && cpnum > 0) {
-            if (state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Comp(cpnum).NodeNumIn != InletNode ||
-                state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Comp(cpnum).NodeNumOut != OutletNode) {
+        if (plloopnum > 0 && lsnum != DataPlant::LoopSideLocation::Invalid && brnum > 0 && cpnum > 0) {
+            if (state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn != InletNode ||
+                state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut != OutletNode) {
                 ShowSevereError(state,
                                 "InitializePumps: " + cPumpTypes[state.dataPumps->PumpEquip(PumpNum).pumpType] + "=\"" +
                                     state.dataPumps->PumpEquip(PumpNum).Name + "\", non-matching nodes.");
                 ShowContinueError(state,
-                                  "...in Branch=\"" + state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Name +
+                                  "...in Branch=\"" + state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Name +
                                       "\", Component referenced with:");
                 ShowContinueError(state,
                                   "...Inlet Node=\"" + state.dataLoopNodes->NodeID(
-                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Comp(cpnum).NodeNumIn));
+                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
                 ShowContinueError(
                     state,
                     "...Outlet Node=\"" +
-                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Comp(cpnum).NodeNumOut));
+                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
                 ShowContinueError(state, "...Pump Inlet Node=\"" + state.dataLoopNodes->NodeID(InletNode));
                 ShowContinueError(state, "...Pump Outlet Node=\"" + state.dataLoopNodes->NodeID(OutletNode));
                 errFlag = true;
