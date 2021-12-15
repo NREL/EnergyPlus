@@ -865,7 +865,7 @@ namespace DataPlant {
         return this->EvaluateLoopSetPointLoad(state, 1, 1, ThisLoopSideFlow);
     }
 
-    Real64 HalfLoopData::SetupLoopFlowRequest(EnergyPlusData &state, const LoopSideLocation (OtherSide))
+    Real64 HalfLoopData::SetupLoopFlowRequest(EnergyPlusData &state, const LoopSideLocation OtherSide)
     {
 
         // FUNCTION INFORMATION:

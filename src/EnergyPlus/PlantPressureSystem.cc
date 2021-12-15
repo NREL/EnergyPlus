@@ -357,7 +357,7 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
 
 void BranchPressureDrop(EnergyPlusData &state,
                         int const LoopNum,     // Plant Loop Index
-                        const DataPlant::LoopSideLocation LoopSide, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
+                        const DataPlant::LoopSideLocation LoopSide, // LoopSide on Plant Loop LoopNum
                         int const BranchNum    // Branch Index on LoopSide LoopSideNum
 )
 {

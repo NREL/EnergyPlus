@@ -74,7 +74,7 @@ namespace PlantPressureSystem {
 
     void BranchPressureDrop(EnergyPlusData &state,
                             int LoopNum,     // Plant Loop Index
-                            DataPlant::LoopSideLocation LoopSide, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
+                            DataPlant::LoopSideLocation LoopSide, // LoopSide on Plant Loop LoopNum
                             int BranchNum    // Branch Index on LoopSide LoopSideNum
     );
 

@@ -3409,7 +3409,7 @@ void RevisePlantCallingOrder(EnergyPlusData &state)
                     if (state.dataPlantMgr->OtherLoopCallingIndex > HalfLoopNum) { // rearrange
                         state.dataPlantMgr->newCallingIndex = max(HalfLoopNum, 1);
 
-                        if (OtherLoopSide == LoopSideLocation::Supply) { // if this is a LoopSideLocation::Supply, don't push it before its own demand side
+                        if (OtherLoopSide == LoopSideLocation::Supply) { // if this is a supply side, don't push it before its own demand side
                             state.dataPlantMgr->OtherLoopDemandSideCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum, LoopSideLocation::Demand);
                             if (state.dataPlantMgr->OtherLoopDemandSideCallingIndex < HalfLoopNum) { // good to go
                                 state.dataPlantMgr->newCallingIndex = min(state.dataPlantMgr->OtherLoopDemandSideCallingIndex + 1,
