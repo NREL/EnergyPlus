@@ -934,7 +934,8 @@ void SimHVAC(EnergyPlusData &state)
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
         for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
             CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
-            CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
+            CheckForRunawayPlantTemps(state, LoopNum, LoopSide
+                                      );
         }
     }
 

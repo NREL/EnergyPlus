@@ -392,11 +392,11 @@ void rshift1(Array1D<Real64> &a)
 }
 
 void UpdatePlantLoopInterface(EnergyPlusData &state,
-                              int const LoopNum,                              // The 'inlet/outlet node' loop number
-                              DataPlant::LoopSideLocation const ThisLoopSide, // The 'outlet node' LoopSide number
-                              int const ThisLoopSideOutletNode,               // Node number for the inlet of the side that needs the outlet node data
-                              int const OtherLoopSideInletNode,               // Node number for the outlet of the side of the loop just simulated
-                              bool &OutOfToleranceFlag,                       // True when the other side of the loop need to be (re)simulated
+                              int const LoopNum,                // The 'inlet/outlet node' loop number
+                              DataPlant::LoopSideLocation const ThisLoopSide,        // The 'outlet node' LoopSide number
+                              int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
+                              int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
+                              bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
                               DataPlant::CommonPipeType const CommonPipeType)
 {
 
@@ -596,13 +596,13 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation TankOutletLoopSide; // inlet loopSideber
-    int TankInletNode;                              // inlet loop side outlet node
-    int TankOutletNode;                             // inlet loop side outlet node
-    Real64 TankInletTemp;                           // temporary variable
-    Real64 LastTankOutletTemp;                      // temporary variable
-    Real64 Cp;                                      // specific heat
-    Real64 TimeElapsed;                             // temporary value based on current clock time during simulation, fractional hours
+    DataPlant::LoopSideLocation TankOutletLoopSide;    // inlet loopSideber
+    int TankInletNode;         // inlet loop side outlet node
+    int TankOutletNode;        // inlet loop side outlet node
+    Real64 TankInletTemp;      // temporary variable
+    Real64 LastTankOutletTemp; // temporary variable
+    Real64 Cp;                 // specific heat
+    Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
 
     Real64 TimeStepSeconds;
     Real64 MassFlowRate;
@@ -695,11 +695,8 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     TankOutletTemp = TankAverageTemp;
 }
 
-void UpdateCommonPipe(EnergyPlusData &state,
-                      int const LoopNum,
-                      DataPlant::LoopSideLocation const TankInletLoopSide,
-                      DataPlant::CommonPipeType const CommonPipeType,
-                      Real64 &MixedOutletTemp)
+void UpdateCommonPipe(
+    EnergyPlusData &state, int const LoopNum, DataPlant::LoopSideLocation const TankInletLoopSide, DataPlant::CommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
@@ -741,13 +738,13 @@ void UpdateCommonPipe(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("UpdateCommonPipe");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation TankOutletLoopSide; // inlet loopSideber
-    int TankInletNode;                              // inlet loop side outlet node
-    int TankOutletNode;                             // inlet loop side outlet node
-    Real64 TankInletTemp;                           // temporary variable
-    Real64 LastTankOutletTemp;                      // temporary variable
-    Real64 Cp;                                      // specific heat
-    Real64 TimeElapsed;                             // temporary value based on current clock time during simulation, fractional hours
+    DataPlant::LoopSideLocation TankOutletLoopSide;    // inlet loopSideber
+    int TankInletNode;         // inlet loop side outlet node
+    int TankOutletNode;        // inlet loop side outlet node
+    Real64 TankInletTemp;      // temporary variable
+    Real64 LastTankOutletTemp; // temporary variable
+    Real64 Cp;                 // specific heat
+    Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
 
     Real64 FracTotLoopMass; // Fraction of total loop mass assigned to the half loop
     Real64 TimeStepSeconds;
@@ -842,8 +839,8 @@ void UpdateCommonPipe(EnergyPlusData &state,
 }
 
 void ManageSingleCommonPipe(EnergyPlusData &state,
-                            int const LoopNum,                          // plant loop number
-                            DataPlant::LoopSideLocation const LoopSide, // plant loop side number
+                            int const LoopNum,           // plant loop number
+                            DataPlant::LoopSideLocation const LoopSide,          // plant loop side number
                             Real64 const TankOutletTemp, // inlet temperature to the common pipe passed in from the capacitance calculation
                             Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
 )

@@ -189,10 +189,10 @@ namespace WaterCoils {
         int AirOutletNodeNum;
         int WaterInletNodeNum;
         int WaterOutletNodeNum;
-        int WaterLoopNum;                          // Plant loop index
-        DataPlant::LoopSideLocation WaterLoopSide; // Plant loop side index
-        int WaterLoopBranchNum;                    // Plant loop branch index
-        int WaterLoopCompNum;                      // Plant loop Comp index
+        int WaterLoopNum;       // Plant loop index
+        DataPlant::LoopSideLocation WaterLoopSide;      // Plant loop side index
+        int WaterLoopBranchNum; // Plant loop branch index
+        int WaterLoopCompNum;   // Plant loop Comp index
         // begin variables for Water System interactions
         int CondensateCollectMode;         // where does water come from
         std::string CondensateCollectName; // name of water source e.g. water storage tank
@@ -242,12 +242,11 @@ namespace WaterCoils {
               DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0), HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0),
               UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0), SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0),
               RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0), LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterLoopNum(0), WaterLoopSide(DataPlant::LoopSideLocation::Invalid),
-              WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0),
-              CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0),
-              FaultyCoilFoulingFactor(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0),
-              UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false),
-              heatRecoveryCoil(false)
+              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterLoopNum(0), WaterLoopSide(DataPlant::LoopSideLocation::Invalid), WaterLoopBranchNum(0),
+              WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
+              CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
+              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
+              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false), heatRecoveryCoil(false)
         {
         }
     };
@@ -516,10 +515,10 @@ namespace WaterCoils {
     void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
                                              DataPlant::PlantEquipmentType const CoilType,
                                              std::string const &CoilName,
-                                             int const EquipFlowCtrl,                    // Flow control mode for the equipment
-                                             int const LoopNum,                          // Plant loop index for where called from
-                                             const DataPlant::LoopSideLocation LoopSide, // Plant loop side index for where called from
-                                             int &CompIndex,                             // Chiller number pointer
+                                             int const EquipFlowCtrl, // Flow control mode for the equipment
+                                             int const LoopNum,       // Plant loop index for where called from
+                                             const DataPlant::LoopSideLocation LoopSide,      // Plant loop side index for where called from
+                                             int &CompIndex,          // Chiller number pointer
                                              bool const FirstHVACIteration,
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     );

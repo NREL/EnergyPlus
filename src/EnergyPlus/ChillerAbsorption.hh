@@ -140,15 +140,15 @@ namespace ChillerAbsorption {
         Real64 GeneratorDeltaTemp;                     // C - generator fluid temperature difference (water only)
         bool GeneratorDeltaTempWasAutoSized;           // true if generator delta T was autosize on input
         int CWLoopNum;                                 // chilled water plant loop index number
-        DataPlant::LoopSideLocation CWLoopSide;        // chilled water plant loop side index
+        DataPlant::LoopSideLocation CWLoopSide;                             // chilled water plant loop side index
         int CWBranchNum;                               // chilled water plant loop branch index
         int CWCompNum;                                 // chilled water plant loop component index
         int CDLoopNum;                                 // condenser water plant loop index number
-        DataPlant::LoopSideLocation CDLoopSide;        // condenser water plant loop side index
+        DataPlant::LoopSideLocation CDLoopSide;                             // condenser water plant loop side index
         int CDBranchNum;                               // condenser water plant loop branch index
         int CDCompNum;                                 // condenser water plant loop component index
         int GenLoopNum;                                // generator water plant loop index number
-        DataPlant::LoopSideLocation GenLoopSide;       // generator water plant loop side index
+        DataPlant::LoopSideLocation GenLoopSide;                            // generator water plant loop side index
         int GenBranchNum;                              // generator water plant loop branch index
         int GenCompNum;                                // generator water plant loop component index
         bool FaultyChillerSWTFlag;                     // True if the chiller has SWT sensor fault
@@ -188,12 +188,11 @@ namespace ChillerAbsorption {
               GeneratorSubcool(0.0), SteamFluidIndex(0), GeneratorDeltaTemp(-99999.0), GeneratorDeltaTempWasAutoSized(true), CWLoopNum(0),
               CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CDLoopNum(0),
               CDLoopSide(DataPlant::LoopSideLocation::Invalid), CDBranchNum(0), CDCompNum(0), GenLoopNum(0),
-              GenLoopSide(DataPlant::LoopSideLocation::Invalid), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false),
-              FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0),
-              SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0),
-              PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
-              CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true), GenInputOutputNodesUsed(false),
-              EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              GenLoopSide(DataPlant::LoopSideLocation::Invalid), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
+              PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0),
+              EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0),
+              GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0), MyOneTimeFlag(true),
+              MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
         {
         }
 

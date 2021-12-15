@@ -891,10 +891,20 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         if (errFlag) {
             ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
         }
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSide, this->CDLoopNum, this->CDLoopSide, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->HWLoopNum, this->HWLoopSide, this->CDLoopNum, this->CDLoopSide, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->CWLoopNum,
+                                                      this->CWLoopSide,
+                                                      this->CDLoopNum,
+                                                      this->CDLoopSide,
+                                                      DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->HWLoopNum,
+                                                      this->HWLoopSide,
+                                                      this->CDLoopNum,
+                                                      this->CDLoopSide,
+                                                      DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
+                                                      true);
     }
 
     PlantUtilities::InterConnectTwoPlantLoopSides(
@@ -1088,8 +1098,14 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
     } else {
         mdot = 0.0;
         if (this->CDLoopNum > 0 && this->isWaterCooled) {
-            PlantUtilities::SetComponentFlowRate(
-                state, mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDLoopNum, this->CDLoopSide, this->CDBranchNum, this->CDCompNum);
+            PlantUtilities::SetComponentFlowRate(state,
+                                                 mdot,
+                                                 this->CondReturnNodeNum,
+                                                 this->CondSupplyNodeNum,
+                                                 this->CDLoopNum,
+                                                 this->CDLoopSide,
+                                                 this->CDBranchNum,
+                                                 this->CDCompNum);
         }
     }
 }

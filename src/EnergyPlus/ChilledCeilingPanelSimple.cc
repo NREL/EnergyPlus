@@ -818,8 +818,19 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     if (state.dataChilledCeilingPanelSimple->SetLoopIndexFlag(CoolingPanelNum)) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(
-                state, ThisCP.EquipID, ThisCP.EquipType, ThisCP.LoopNum, ThisCP.LoopSide, ThisCP.BranchNum, ThisCP.CompNum, errFlag, _, _, _, _, _);
+            ScanPlantLoopsForObject(state,
+                                    ThisCP.EquipID,
+                                    ThisCP.EquipType,
+                                    ThisCP.LoopNum,
+                                    ThisCP.LoopSide,
+                                    ThisCP.BranchNum,
+                                    ThisCP.CompNum,
+                                    errFlag,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _);
             if (errFlag) {
                 ShowFatalError(state, "InitCoolingPanel: Program terminated for previous conditions.");
             }

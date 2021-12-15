@@ -1406,8 +1406,11 @@ namespace PlantChillers {
                                                      this->CWCompNum);
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-                if (state.dataPlnt->PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSide).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                if (state.dataPlnt->PlantLoop(this->CDLoopNum)
+                        .LoopSide(this->CDLoopSide)
+                        .Branch(this->CDBranchNum)
+                        .Comp(this->CDCompNum)
+                        .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -2142,14 +2145,20 @@ namespace PlantChillers {
 
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSide)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSide)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -3558,8 +3567,11 @@ namespace PlantChillers {
             }
 
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-                if (state.dataPlnt->PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSide).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                if (state.dataPlnt->PlantLoop(this->CDLoopNum)
+                        .LoopSide(this->CDLoopSide)
+                        .Branch(this->CDBranchNum)
+                        .Comp(this->CDCompNum)
+                        .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -4290,14 +4302,20 @@ namespace PlantChillers {
 
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSide)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSide)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                     (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue)) {
@@ -5651,8 +5669,11 @@ namespace PlantChillers {
                                                      this->CWCompNum);
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-                if (state.dataPlnt->PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSide).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                if (state.dataPlnt->PlantLoop(this->CDLoopNum)
+                        .LoopSide(this->CDLoopSide)
+                        .Branch(this->CDBranchNum)
+                        .Comp(this->CDCompNum)
+                        .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -6347,14 +6368,20 @@ namespace PlantChillers {
 
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSide)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSide)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -7375,8 +7402,11 @@ namespace PlantChillers {
                                                      this->CWCompNum);
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-                if (state.dataPlnt->PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSide).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                    DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                if (state.dataPlnt->PlantLoop(this->CDLoopNum)
+                        .LoopSide(this->CDLoopSide)
+                        .Branch(this->CDBranchNum)
+                        .Comp(this->CDCompNum)
+                        .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
                     this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -7846,14 +7876,20 @@ namespace PlantChillers {
             }
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSide)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSide)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&

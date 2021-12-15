@@ -1483,10 +1483,9 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
                 ShowContinueError(state,
                                   "...in Branch=\"" + state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Name +
                                       "\", Component referenced with:");
-                ShowContinueError(
-                    state,
-                    "...Inlet Node=\"" +
-                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Comp(cpnum).NodeNumIn));
+                ShowContinueError(state,
+                                  "...Inlet Node=\"" + state.dataLoopNodes->NodeID(
+                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Comp(cpnum).NodeNumIn));
                 ShowContinueError(
                     state,
                     "...Outlet Node=\"" +

@@ -53,10 +53,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -139,12 +139,11 @@ namespace IceThermalStorage {
 
         // Default Constructor
         SimpleIceStorageData()
-            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0),
-              LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0),
-              ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0),
-              ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true),
-              MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0), ITSmdot(0.0), ITSCoolingRate_rep(0.0),
-              ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
+            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
+              DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0),
+              XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0),
+              ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0),
+              ITSmdot(0.0), ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
 
@@ -237,14 +236,13 @@ namespace IceThermalStorage {
 
         // Default Constructor
         DetailedIceStorageData()
-            : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), PlantLoopNum(0),
-              PlantLoopSide(DataPlant::LoopSideLocation::Invalid), PlantBranchNum(0), PlantCompNum(0), DesignMassFlowRate(0.0), MapNum(0),
-              DischargeCurveNum(0), ChargeCurveNum(0), CurveFitTimeStep(1.0), DischargeParaElecLoad(0.0), ChargeParaElecLoad(0.0), TankLossCoeff(0.0),
-              FreezingTemp(0.0), CompLoad(0.0), IceFracChange(0.0), IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0),
-              DischargingEnergy(0.0), ChargingRate(0.0), ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0),
-              InletTemp(0.0), OutletTemp(0.0), TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0),
-              DischargeErrorCount(0), ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true),
-              MyPlantScanFlag(true), MyEnvrnFlag2(true)
+            : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), PlantLoopNum(0), PlantLoopSide(DataPlant::LoopSideLocation::Invalid), PlantBranchNum(0),
+              PlantCompNum(0), DesignMassFlowRate(0.0), MapNum(0), DischargeCurveNum(0), ChargeCurveNum(0), CurveFitTimeStep(1.0),
+              DischargeParaElecLoad(0.0), ChargeParaElecLoad(0.0), TankLossCoeff(0.0), FreezingTemp(0.0), CompLoad(0.0), IceFracChange(0.0),
+              IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0), ChargingEnergy(0.0),
+              MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0), TankOutletTemp(0.0),
+              ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0), ChargeIterErrors(0),
+              ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
 
