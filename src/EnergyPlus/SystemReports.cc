@@ -1054,8 +1054,8 @@ void InitEnergyReports(EnergyPlusData &state)
 
     // On every iteration, load the Plant Supply Side Data and load the Plant Demand Side Data
     for (LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
-        auto &vrp = state.dataPlnt->VentRepPlant[static_cast<int>(LoopSide)](PlantLoopNum);
         for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops; ++PlantLoopNum) {
+            auto &vrp = state.dataPlnt->VentRepPlant[static_cast<int>(LoopSide)](PlantLoopNum);
             for (BranchNum = 1; BranchNum <= vrp.TotalBranches; ++BranchNum) {
                 auto &vrpBranch = vrp.Branch(BranchNum);
                 for (CompNum = 1; CompNum <= vrpBranch.TotalComponents; ++CompNum) {
@@ -1071,8 +1071,8 @@ void InitEnergyReports(EnergyPlusData &state)
         }
 
         // On every iteration, load the Condenser Supply Side Data and load the Condenser Demand Side Data
-        auto &vrc = state.dataPlnt->VentRepCond[static_cast<int>(LoopSide)](PlantLoopNum);
         for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumCondLoops; ++PlantLoopNum) {
+            auto &vrc = state.dataPlnt->VentRepCond[static_cast<int>(LoopSide)](PlantLoopNum);
             for (BranchNum = 1; BranchNum <= vrc.TotalBranches; ++BranchNum) {
                 auto &vrcBranch = vrc.Branch(BranchNum);
                 for (CompNum = 1; CompNum <= vrcBranch.TotalComponents; ++CompNum) {
