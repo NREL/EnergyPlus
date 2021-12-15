@@ -9075,51 +9075,52 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(3) = "Other";
             rowHead(4) = "Total";
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity Intensity [kWh/m2]";
-                    columnHead(2) = "Natural Gas Intensity [kWh/m2]";
-                    columnHead(3) = "Gasoline Intensity [kWh/m2]";
-                    columnHead(4) = "Diesel Intensity [kWh/m2]";
-                    columnHead(5) = "Coal Intensity [kWh/m2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
-                    columnHead(8) = "Propane Intensity [kWh/m2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
-                    columnHead(11) = "District Cooling Intensity [kWh/m2]";
-                    columnHead(12) = "District Heating Intensity [kWh/m2]";
-                    columnHead(13) = "Water Intensity [m3/m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity Intensity [kBtu/ft2]";
-                    columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
-                    columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
-                    columnHead(4) = "Diesel Intensity [kBtu/ft2]";
-                    columnHead(5) = "Coal Intensity [kBtu/ft2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
-                    columnHead(8) = "Propane Intensity [kBtu/ft2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
-                    columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
-                    columnHead(12) = "District Heating Intensity [kBtu/ft2]";
-                    columnHead(13) = "Water Intensity [gal/ft2]";
-                } else {
-                    columnHead(1) = "Electricity Intensity [MJ/m2]";
-                    columnHead(2) = "Natural Gas Intensity [MJ/m2]";
-                    columnHead(3) = "Gasoline Intensity [MJ/m2]";
-                    columnHead(4) = "Diesel Intensity [MJ/m2]";
-                    columnHead(5) = "Coal Intensity [MJ/m2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
-                    columnHead(8) = "Propane Intensity [MJ/m2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
-                    columnHead(11) = "District Cooling Intensity [MJ/m2]";
-                    columnHead(12) = "District Heating Intensity [MJ/m2]";
-                    columnHead(13) = "Water Intensity [m3/m2]";
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Electricity Intensity [kWh/m2]";
+                columnHead(2) = "Natural Gas Intensity [kWh/m2]";
+                columnHead(3) = "Gasoline Intensity [kWh/m2]";
+                columnHead(4) = "Diesel Intensity [kWh/m2]";
+                columnHead(5) = "Coal Intensity [kWh/m2]";
+                columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
+                columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
+                columnHead(8) = "Propane Intensity [kWh/m2]";
+                columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
+                columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
+                columnHead(11) = "District Cooling Intensity [kWh/m2]";
+                columnHead(12) = "District Heating Intensity [kWh/m2]";
+                columnHead(13) = "Water Intensity [m3/m2]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Electricity Intensity [kBtu/ft2]";
+                columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
+                columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
+                columnHead(4) = "Diesel Intensity [kBtu/ft2]";
+                columnHead(5) = "Coal Intensity [kBtu/ft2]";
+                columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
+                columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
+                columnHead(8) = "Propane Intensity [kBtu/ft2]";
+                columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
+                columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
+                columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
+                columnHead(12) = "District Heating Intensity [kBtu/ft2]";
+                columnHead(13) = "Water Intensity [gal/ft2]";
+            } break;
+            default: {
+                columnHead(1) = "Electricity Intensity [MJ/m2]";
+                columnHead(2) = "Natural Gas Intensity [MJ/m2]";
+                columnHead(3) = "Gasoline Intensity [MJ/m2]";
+                columnHead(4) = "Diesel Intensity [MJ/m2]";
+                columnHead(5) = "Coal Intensity [MJ/m2]";
+                columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
+                columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
+                columnHead(8) = "Propane Intensity [MJ/m2]";
+                columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
+                columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
+                columnHead(11) = "District Cooling Intensity [MJ/m2]";
+                columnHead(12) = "District Heating Intensity [MJ/m2]";
+                columnHead(13) = "Water Intensity [m3/m2]";
+            } break;
             }
 
             if (produceTabular) {
@@ -9208,15 +9209,16 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(2, 14);
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity [kWh]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity [kBtu]";
-                } else {
-                    columnHead(1) = "Electricity [GJ]";
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Electricity [kWh]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Electricity [kBtu]";
+            } break;
+            default: {
+                columnHead(1) = "Electricity [GJ]";
+            } break;
             }
             columnHead(2) = "Percent Electricity [%]";
 
@@ -9308,15 +9310,16 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(2, 7);
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Heat [kWh]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Heat [kBtu]";
-                } else {
-                    columnHead(1) = "Heat [GJ]";
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Heat [kWh]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Heat [kBtu]";
+            } break;
+            default: {
+                columnHead(1) = "Heat [GJ]";
+            } break;
             }
 
             columnHead(2) = "Percent Heat [%]";
@@ -9416,16 +9419,18 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth.allocate(2);
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(2, 13);
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Water [m3]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Water [gal]";
-                } else {
-                    columnHead(1) = "Water [m3]";
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Water [m3]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Water [gal]";
+            } break;
+            default: {
+                columnHead(1) = "Water [m3]";
+            } break;
             }
+
             columnHead(2) = "Percent Water [%]";
             rowHead(1) = "Rainwater Collection";
             rowHead(2) = "Condensate Collection";
@@ -9662,51 +9667,52 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     for (int col = 1; col <= numCol; ++col) {
         columnWidth(col) = 10; // array assignment - same for all columns
     }
-    {
-        auto const SELECT_CASE_var(unitsStyle_cur);
-        if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-            columnHead(2) = "Electricity [kWh]";
-            columnHead(3) = "Natural Gas [kWh]";
-            columnHead(4) = "Gasoline [kWh]";
-            columnHead(5) = "Diesel [kWh]";
-            columnHead(6) = "Coal [kWh]";
-            columnHead(7) = "Fuel Oil No 1 [kWh]";
-            columnHead(8) = "Fuel Oil No 2 [kWh]";
-            columnHead(9) = "Propane [kWh]";
-            columnHead(10) = "Other Fuel 1 [kWh]";
-            columnHead(11) = "Other Fuel 2 [kWh]";
-            columnHead(12) = "District Cooling [kWh]";
-            columnHead(13) = "District Heating [kWh]";
-            columnHead(14) = "Water [m3]";
-        } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-            columnHead(2) = "Electricity [kBtu]";
-            columnHead(3) = "Natural Gas [kBtu]";
-            columnHead(4) = "Gasoline [kBtu]";
-            columnHead(5) = "Diesel [kBtu]";
-            columnHead(6) = "Coal [kBtu]";
-            columnHead(7) = "Fuel Oil No 1 [kBtu]";
-            columnHead(8) = "Fuel Oil No 2 [kBtu]";
-            columnHead(9) = "Propane [kBtu]";
-            columnHead(10) = "Other Fuel 1 [kBtu]";
-            columnHead(11) = "Other Fuel 2 [kBtu]";
-            columnHead(12) = "District Cooling [kBtu]";
-            columnHead(13) = "District Heating [kBtu]";
-            columnHead(14) = "Water [gal]";
-        } else {
-            columnHead(2) = "Electricity [GJ]";
-            columnHead(3) = "Natural Gas [GJ]";
-            columnHead(4) = "Gasoline [GJ]";
-            columnHead(5) = "Diesel [GJ]";
-            columnHead(6) = "Coal [GJ]";
-            columnHead(7) = "Fuel Oil No 1 [GJ]";
-            columnHead(8) = "Fuel Oil No 2 [GJ]";
-            columnHead(9) = "Propane [GJ]";
-            columnHead(10) = "Other Fuel 1 [GJ]";
-            columnHead(11) = "Other Fuel 2 [GJ]";
-            columnHead(12) = "District Cooling [GJ]";
-            columnHead(13) = "District Heating [GJ]";
-            columnHead(14) = "Water [m3]";
-        }
+    switch (unitsStyle_cur) {
+    case iUnitsStyle::JtoKWH: {
+        columnHead(2) = "Electricity [kWh]";
+        columnHead(3) = "Natural Gas [kWh]";
+        columnHead(4) = "Gasoline [kWh]";
+        columnHead(5) = "Diesel [kWh]";
+        columnHead(6) = "Coal [kWh]";
+        columnHead(7) = "Fuel Oil No 1 [kWh]";
+        columnHead(8) = "Fuel Oil No 2 [kWh]";
+        columnHead(9) = "Propane [kWh]";
+        columnHead(10) = "Other Fuel 1 [kWh]";
+        columnHead(11) = "Other Fuel 2 [kWh]";
+        columnHead(12) = "District Cooling [kWh]";
+        columnHead(13) = "District Heating [kWh]";
+        columnHead(14) = "Water [m3]";
+    } break;
+    case iUnitsStyle::InchPound: {
+        columnHead(2) = "Electricity [kBtu]";
+        columnHead(3) = "Natural Gas [kBtu]";
+        columnHead(4) = "Gasoline [kBtu]";
+        columnHead(5) = "Diesel [kBtu]";
+        columnHead(6) = "Coal [kBtu]";
+        columnHead(7) = "Fuel Oil No 1 [kBtu]";
+        columnHead(8) = "Fuel Oil No 2 [kBtu]";
+        columnHead(9) = "Propane [kBtu]";
+        columnHead(10) = "Other Fuel 1 [kBtu]";
+        columnHead(11) = "Other Fuel 2 [kBtu]";
+        columnHead(12) = "District Cooling [kBtu]";
+        columnHead(13) = "District Heating [kBtu]";
+        columnHead(14) = "Water [gal]";
+    } break;
+    default: {
+        columnHead(2) = "Electricity [GJ]";
+        columnHead(3) = "Natural Gas [GJ]";
+        columnHead(4) = "Gasoline [GJ]";
+        columnHead(5) = "Diesel [GJ]";
+        columnHead(6) = "Coal [GJ]";
+        columnHead(7) = "Fuel Oil No 1 [GJ]";
+        columnHead(8) = "Fuel Oil No 2 [GJ]";
+        columnHead(9) = "Propane [GJ]";
+        columnHead(10) = "Other Fuel 1 [GJ]";
+        columnHead(11) = "Other Fuel 2 [GJ]";
+        columnHead(12) = "District Cooling [GJ]";
+        columnHead(13) = "District Heating [GJ]";
+        columnHead(14) = "Water [m3]";
+    } break;
     }
 
     int numSubCatOrTypes = 0;
@@ -9962,18 +9968,19 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             // unit conversion - all values are used as divisors
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    largeConversionFactor = 3600000.0;
-                    areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
-                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-                } else {
-                    largeConversionFactor = 1000000.0; // to MJ
-                    areaConversionFactor = 1.0;
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                largeConversionFactor = 3600000.0;
+                areaConversionFactor = 1.0;
+            } break;
+            case iUnitsStyle::InchPound: {
+                largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+                areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+            } break;
+            default: {
+                largeConversionFactor = 1000000.0; // to MJ
+                areaConversionFactor = 1.0;
+            } break;
             }
 
             // convert units into MJ (divide by 1,000,000) if J otherwise kWh
@@ -10027,49 +10034,50 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             largeConversionFactor = 1.0;
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Source Electricity [kWh]";
-                    columnHead(2) = "Source Natural Gas [kWh]";
-                    columnHead(3) = "Source Gasoline [kWh]";
-                    columnHead(4) = "Source Diesel [kWh]";
-                    columnHead(5) = "Source Coal [kWh]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kWh]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kWh]";
-                    columnHead(8) = "Source Propane [kWh]";
-                    columnHead(9) = "Source Other Fuel 1 [kWh]";
-                    columnHead(10) = "Source Other Fuel 2 [kWh]";
-                    columnHead(11) = "Source District Cooling [kWh]";
-                    columnHead(12) = "Source District Heating [kWh]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Source Electricity [kBtu]";
-                    columnHead(2) = "Source Natural Gas [kBtu]";
-                    columnHead(3) = "Source Gasoline [kBtu]";
-                    columnHead(4) = "Source Diesel [kBtu]";
-                    columnHead(5) = "Source Coal [kBtu]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
-                    columnHead(8) = "Source Propane [kBtu]";
-                    columnHead(9) = "Source Other Fuel 1 [kBtu]";
-                    columnHead(10) = "Source Other Fuel 2 [kBtu]";
-                    columnHead(11) = "Source District Cooling [kBtu]";
-                    columnHead(12) = "Source District Heating [kBtu]";
-                } else {
-                    columnHead(1) = "Source Electricity [GJ]";
-                    columnHead(2) = "Source Natural Gas [GJ]";
-                    columnHead(3) = "Source Gasoline [GJ]";
-                    columnHead(4) = "Source Diesel [GJ]";
-                    columnHead(5) = "Source Coal [GJ]";
-                    columnHead(6) = "Source Fuel Oil No 1 [GJ]";
-                    columnHead(7) = "Source Fuel Oil No 2 [GJ]";
-                    columnHead(8) = "Source Propane [GJ]";
-                    columnHead(9) = "Source Other Fuel 1 [GJ]";
-                    columnHead(10) = "Source Other Fuel 2 [GJ]";
-                    columnHead(11) = "Source District Cooling [GJ]";
-                    columnHead(12) = "Source District Heating [GJ]";
-                    largeConversionFactor = 1000.0; // for converting MJ to GJ
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Source Electricity [kWh]";
+                columnHead(2) = "Source Natural Gas [kWh]";
+                columnHead(3) = "Source Gasoline [kWh]";
+                columnHead(4) = "Source Diesel [kWh]";
+                columnHead(5) = "Source Coal [kWh]";
+                columnHead(6) = "Source Fuel Oil No 1 [kWh]";
+                columnHead(7) = "Source Fuel Oil No 2 [kWh]";
+                columnHead(8) = "Source Propane [kWh]";
+                columnHead(9) = "Source Other Fuel 1 [kWh]";
+                columnHead(10) = "Source Other Fuel 2 [kWh]";
+                columnHead(11) = "Source District Cooling [kWh]";
+                columnHead(12) = "Source District Heating [kWh]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Source Electricity [kBtu]";
+                columnHead(2) = "Source Natural Gas [kBtu]";
+                columnHead(3) = "Source Gasoline [kBtu]";
+                columnHead(4) = "Source Diesel [kBtu]";
+                columnHead(5) = "Source Coal [kBtu]";
+                columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
+                columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
+                columnHead(8) = "Source Propane [kBtu]";
+                columnHead(9) = "Source Other Fuel 1 [kBtu]";
+                columnHead(10) = "Source Other Fuel 2 [kBtu]";
+                columnHead(11) = "Source District Cooling [kBtu]";
+                columnHead(12) = "Source District Heating [kBtu]";
+            } break;
+            default: {
+                columnHead(1) = "Source Electricity [GJ]";
+                columnHead(2) = "Source Natural Gas [GJ]";
+                columnHead(3) = "Source Gasoline [GJ]";
+                columnHead(4) = "Source Diesel [GJ]";
+                columnHead(5) = "Source Coal [GJ]";
+                columnHead(6) = "Source Fuel Oil No 1 [GJ]";
+                columnHead(7) = "Source Fuel Oil No 2 [GJ]";
+                columnHead(8) = "Source Propane [GJ]";
+                columnHead(9) = "Source Other Fuel 1 [GJ]";
+                columnHead(10) = "Source Other Fuel 2 [GJ]";
+                columnHead(11) = "Source District Cooling [GJ]";
+                columnHead(12) = "Source District Heating [GJ]";
+                largeConversionFactor = 1000.0; // for converting MJ to GJ
+            } break;
             }
 
             //---- End Uses by Source Energy Sub-Table
@@ -10110,48 +10118,49 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             // Normalized by Area tables
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Source Electricity [kWh/m2]";
-                    columnHead(2) = "Source Natural Gas [kWh/m2]";
-                    columnHead(3) = "Source Gasoline [kWh/m2]";
-                    columnHead(4) = "Source Diesel [kWh/m2]";
-                    columnHead(5) = "Source Coal [kWh/m2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
-                    columnHead(8) = "Source Propane [kWh/m2]";
-                    columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
-                    columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
-                    columnHead(11) = "Source District Cooling [kWh/m2]";
-                    columnHead(12) = "Source District Heating [kWh/m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Source Electricity [kBtu/ft2]";
-                    columnHead(2) = "Source Natural Gas [kBtu/ft2]";
-                    columnHead(3) = "Source Gasoline [kBtu/ft2]";
-                    columnHead(4) = "Source Diesel [kBtu/ft2]";
-                    columnHead(5) = "Source Coal [kBtu/ft2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
-                    columnHead(8) = "Source Propane [kBtu/ft2]";
-                    columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
-                    columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
-                    columnHead(11) = "Source District Cooling [kBtu/ft2]";
-                    columnHead(12) = "Source District Heating [kBtu/ft2]";
-                } else {
-                    columnHead(1) = "Source Electricity [MJ/m2]";
-                    columnHead(2) = "Source Natural Gas [MJ/m2]";
-                    columnHead(3) = "Source Gasoline [MJ/m2]";
-                    columnHead(4) = "Source Diesel [MJ/m2]";
-                    columnHead(5) = "Source Coal [MJ/m2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
-                    columnHead(8) = "Source Propane [MJ/m2]";
-                    columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
-                    columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
-                    columnHead(11) = "Source District Cooling [MJ/m2]";
-                    columnHead(12) = "Source District Heating [MJ/m2]";
-                }
+            switch (unitsStyle_cur) {
+            case iUnitsStyle::JtoKWH: {
+                columnHead(1) = "Source Electricity [kWh/m2]";
+                columnHead(2) = "Source Natural Gas [kWh/m2]";
+                columnHead(3) = "Source Gasoline [kWh/m2]";
+                columnHead(4) = "Source Diesel [kWh/m2]";
+                columnHead(5) = "Source Coal [kWh/m2]";
+                columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
+                columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
+                columnHead(8) = "Source Propane [kWh/m2]";
+                columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
+                columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
+                columnHead(11) = "Source District Cooling [kWh/m2]";
+                columnHead(12) = "Source District Heating [kWh/m2]";
+            } break;
+            case iUnitsStyle::InchPound: {
+                columnHead(1) = "Source Electricity [kBtu/ft2]";
+                columnHead(2) = "Source Natural Gas [kBtu/ft2]";
+                columnHead(3) = "Source Gasoline [kBtu/ft2]";
+                columnHead(4) = "Source Diesel [kBtu/ft2]";
+                columnHead(5) = "Source Coal [kBtu/ft2]";
+                columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
+                columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
+                columnHead(8) = "Source Propane [kBtu/ft2]";
+                columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
+                columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
+                columnHead(11) = "Source District Cooling [kBtu/ft2]";
+                columnHead(12) = "Source District Heating [kBtu/ft2]";
+            } break;
+            default: {
+                columnHead(1) = "Source Electricity [MJ/m2]";
+                columnHead(2) = "Source Natural Gas [MJ/m2]";
+                columnHead(3) = "Source Gasoline [MJ/m2]";
+                columnHead(4) = "Source Diesel [MJ/m2]";
+                columnHead(5) = "Source Coal [MJ/m2]";
+                columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
+                columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
+                columnHead(8) = "Source Propane [MJ/m2]";
+                columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
+                columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
+                columnHead(11) = "Source District Cooling [MJ/m2]";
+                columnHead(12) = "Source District Heating [MJ/m2]";
+            } break;
             }
 
             //---- Normalized by Conditioned Area Sub-Table
@@ -10501,10 +10510,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 columnHead(10) = "Other Fuel 2 [kBtuh]";
                 columnHead(11) = "District Cooling [kBtuh]";
                 {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
+                    if (distrHeatSelected == 4) {
                         columnHead(12) = "District Heating [kBtuh]";
-                    } else if (SELECT_CASE_var == 5) {
+                    } else if (distrHeatSelected == 5) {
                         columnHead(12) = "Steam [kBtuh]";
                     }
                 }
@@ -10522,10 +10530,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 columnHead(10) = "Other Fuel 2 [W]";
                 columnHead(11) = "District Cooling [W]";
                 {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
+                    if (distrHeatSelected == 4) {
                         columnHead(12) = "District Heating [W]";
-                    } else if (SELECT_CASE_var == 5) {
+                    } else if (distrHeatSelected == 5) {
                         columnHead(12) = "Steam [W]";
                     }
                 }
@@ -10611,10 +10618,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 columnHead(11) = "Other Fuel 2 [kBtuh]";
                 columnHead(12) = "District Cooling [kBtuh]";
                 {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
+                    if (distrHeatSelected == 4) {
                         columnHead(13) = "District Heating [kBtuh]";
-                    } else if (SELECT_CASE_var == 5) {
+                    } else if (distrHeatSelected == 5) {
                         columnHead(13) = "Steam [kBtuh]";
                     }
                 }
@@ -10633,10 +10639,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 columnHead(11) = "Other Fuel 2 [W]";
                 columnHead(12) = "District Cooling [W]";
                 {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
+                    if (distrHeatSelected == 4) {
                         columnHead(13) = "District Heating [W]";
-                    } else if (SELECT_CASE_var == 5) {
+                    } else if (distrHeatSelected == 5) {
                         columnHead(13) = "Steam [W]";
                     }
                 }
@@ -11358,108 +11363,114 @@ void WriteVeriSumTable(EnergyPlusData &state)
                     }
                     if ((state.dataSurface->Surface(iSurf).Tilt >= 60.0) && (state.dataSurface->Surface(iSurf).Tilt <= 120.0)) {
                         // vertical walls and windows
-                        {
-                            auto const SELECT_CASE_var(state.dataSurface->Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::Roof)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                                if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                    wallAreaN += curArea * mult;
-                                    if (isConditioned) wallAreaNcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaN += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaNcond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                    wallAreaE += curArea * mult;
-                                    if (isConditioned) wallAreaEcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaE += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaEcond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                    wallAreaS += curArea * mult;
-                                    if (isConditioned) wallAreaScond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaS += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaScond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                    wallAreaW += curArea * mult;
-                                    if (isConditioned) wallAreaWcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaW += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
-                                    }
+                        switch (state.dataSurface->Surface(iSurf).Class) {
+                        case SurfaceClass::Wall:
+                        case SurfaceClass::Floor:
+                        case SurfaceClass::Roof: {
+                            mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                            if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                                wallAreaN += curArea * mult;
+                                if (isConditioned) wallAreaNcond += curArea * mult;
+                                if (isAboveGround) {
+                                    aboveGroundWallAreaN += curArea * mult;
+                                    if (isConditioned) aboveGroundWallAreaNcond += curArea * mult;
                                 }
-                                if (DetailedWWR) {
-                                    if (produceTabular) {
-                                        print(state.files.debug,
-                                              "{},Wall,{:.1R},{:.1R}\n",
-                                              state.dataSurface->Surface(iSurf).Name,
-                                              curArea * mult,
-                                              state.dataSurface->Surface(iSurf).Tilt);
-                                    }
+                            } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                                wallAreaE += curArea * mult;
+                                if (isConditioned) wallAreaEcond += curArea * mult;
+                                if (isAboveGround) {
+                                    aboveGroundWallAreaE += curArea * mult;
+                                    if (isConditioned) aboveGroundWallAreaEcond += curArea * mult;
                                 }
-                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
-                                if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                    windowAreaN += curArea * mult;
-                                    if (isConditioned) windowAreaNcond += curArea * mult;
-                                } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                    windowAreaE += curArea * mult;
-                                    if (isConditioned) windowAreaEcond += curArea * mult;
-                                } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                    windowAreaS += curArea * mult;
-                                    if (isConditioned) windowAreaScond += curArea * mult;
-                                } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                    windowAreaW += curArea * mult;
-                                    if (isConditioned) windowAreaWcond += curArea * mult;
+                            } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                                wallAreaS += curArea * mult;
+                                if (isConditioned) wallAreaScond += curArea * mult;
+                                if (isAboveGround) {
+                                    aboveGroundWallAreaS += curArea * mult;
+                                    if (isConditioned) aboveGroundWallAreaScond += curArea * mult;
                                 }
-                                zoneOpeningArea(zonePt) +=
-                                    curArea *
-                                    state.dataSurface->Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
-                                zoneGlassArea(zonePt) += state.dataSurface->Surface(iSurf).GrossArea * state.dataSurface->Surface(iSurf).Multiplier;
-                                if (DetailedWWR) {
-                                    if (produceTabular) {
-                                        print(state.files.debug,
-                                              "{},Window,{:.1R},{:.1R}\n",
-                                              state.dataSurface->Surface(iSurf).Name,
-                                              curArea * mult,
-                                              state.dataSurface->Surface(iSurf).Tilt);
-                                    }
+                            } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                                wallAreaW += curArea * mult;
+                                if (isConditioned) wallAreaWcond += curArea * mult;
+                                if (isAboveGround) {
+                                    aboveGroundWallAreaW += curArea * mult;
+                                    if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
                                 }
                             }
+                            if (DetailedWWR) {
+                                if (produceTabular) {
+                                    print(state.files.debug,
+                                          "{},Wall,{:.1R},{:.1R}\n",
+                                          state.dataSurface->Surface(iSurf).Name,
+                                          curArea * mult,
+                                          state.dataSurface->Surface(iSurf).Tilt);
+                                }
+                            }
+                        } break;
+                        case SurfaceClass::Window:
+                        case SurfaceClass::TDD_Dome: {
+                            mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
+                            if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                                windowAreaN += curArea * mult;
+                                if (isConditioned) windowAreaNcond += curArea * mult;
+                            } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                                windowAreaE += curArea * mult;
+                                if (isConditioned) windowAreaEcond += curArea * mult;
+                            } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                                windowAreaS += curArea * mult;
+                                if (isConditioned) windowAreaScond += curArea * mult;
+                            } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                                windowAreaW += curArea * mult;
+                                if (isConditioned) windowAreaWcond += curArea * mult;
+                            }
+                            zoneOpeningArea(zonePt) +=
+                                curArea *
+                                state.dataSurface->Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
+                            zoneGlassArea(zonePt) += state.dataSurface->Surface(iSurf).GrossArea * state.dataSurface->Surface(iSurf).Multiplier;
+                            if (DetailedWWR) {
+                                if (produceTabular) {
+                                    print(state.files.debug,
+                                          "{},Window,{:.1R},{:.1R}\n",
+                                          state.dataSurface->Surface(iSurf).Name,
+                                          curArea * mult,
+                                          state.dataSurface->Surface(iSurf).Tilt);
+                                }
+                            }
+                        } break;
                         }
                     } else if (state.dataSurface->Surface(iSurf).Tilt < 60.0) { // roof and skylights
+                        switch (state.dataSurface->Surface(iSurf).Class) {
+                        case SurfaceClass::Wall:
+                        case SurfaceClass::Floor:
+                        case SurfaceClass::Roof:
+
                         {
-                            auto const SELECT_CASE_var(state.dataSurface->Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::Roof)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                                roofArea += curArea * mult;
-                                if (DetailedWWR) {
-                                    if (produceTabular) {
-                                        print(state.files.debug,
-                                              "{},Roof,{:.1R},{:.1R}\n",
-                                              state.dataSurface->Surface(iSurf).Name,
-                                              curArea * mult,
-                                              state.dataSurface->Surface(iSurf).Tilt);
-                                    }
-                                }
-                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
-                                skylightArea += curArea * mult;
-                                if (DetailedWWR) {
-                                    if (produceTabular) {
-                                        print(state.files.debug,
-                                              "{},Skylight,{:.1R},{:.1R}\n",
-                                              state.dataSurface->Surface(iSurf).Name,
-                                              curArea * mult,
-                                              state.dataSurface->Surface(iSurf).Tilt);
-                                    }
+                            mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                            roofArea += curArea * mult;
+                            if (DetailedWWR) {
+                                if (produceTabular) {
+                                    print(state.files.debug,
+                                          "{},Roof,{:.1R},{:.1R}\n",
+                                          state.dataSurface->Surface(iSurf).Name,
+                                          curArea * mult,
+                                          state.dataSurface->Surface(iSurf).Tilt);
                                 }
                             }
+                        } break;
+                        case SurfaceClass::Window:
+                        case SurfaceClass::TDD_Dome: {
+                            mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
+                            skylightArea += curArea * mult;
+                            if (DetailedWWR) {
+                                if (produceTabular) {
+                                    print(state.files.debug,
+                                          "{},Skylight,{:.1R},{:.1R}\n",
+                                          state.dataSurface->Surface(iSurf).Name,
+                                          curArea * mult,
+                                          state.dataSurface->Surface(iSurf).Tilt);
+                                }
+                            }
+                        } break;
                         }
                     } else { // floors
                              // ignored
@@ -14931,54 +14942,68 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             seqData = surfDelaySeq(_, kSurf);
             MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
             singleSurfDelay = AvgData(timeOfMax);
-            {
-                auto const SELECT_CASE_var(state.dataSurface->Surface(kSurf).Class);
-                if (SELECT_CASE_var == SurfaceClass::Wall) {
-                    {
-                        auto const SELECT_CASE_var1(curExtBoundCond);
-                        if (SELECT_CASE_var1 == ExternalEnvironment) {
-                            delayOpaque(LoadCompRow::ExtWall) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
-                                   (SELECT_CASE_var1 == KivaFoundation)) {
-                            delayOpaque(LoadCompRow::GrdWall) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
-                                   (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
-                            delayOpaque(LoadCompRow::OtherWall) += singleSurfDelay;
-                        } else { // interzone
-                            delayOpaque(LoadCompRow::IntZonWall) += singleSurfDelay;
-                        }
-                    }
-                } else if (SELECT_CASE_var == SurfaceClass::Floor) {
-                    {
-                        auto const SELECT_CASE_var1(curExtBoundCond);
-                        if (SELECT_CASE_var1 == ExternalEnvironment) {
-                            delayOpaque(LoadCompRow::ExtFlr) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
-                                   (SELECT_CASE_var1 == KivaFoundation)) {
-                            delayOpaque(LoadCompRow::GrdFlr) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
-                                   (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
-                            delayOpaque(LoadCompRow::OtherFlr) += singleSurfDelay;
-                        } else { // interzone
-                            delayOpaque(LoadCompRow::IntZonFlr) += singleSurfDelay;
-                        }
-                    }
-                } else if (SELECT_CASE_var == SurfaceClass::Roof) {
-                    {
-                        auto const SELECT_CASE_var1(curExtBoundCond);
-                        if (SELECT_CASE_var1 == ExternalEnvironment) {
-                            delayOpaque(LoadCompRow::Roof) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
-                                   (SELECT_CASE_var1 == KivaFoundation) || (SELECT_CASE_var1 == OtherSideCoefNoCalcExt) ||
-                                   (SELECT_CASE_var1 == OtherSideCoefCalcExt) || (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
-                            delayOpaque(LoadCompRow::OtherRoof) += singleSurfDelay;
-                        } else { // interzone
-                            delayOpaque(LoadCompRow::IntZonCeil) += singleSurfDelay;
-                        }
-                    }
-                } else if (SELECT_CASE_var == SurfaceClass::Door) {
-                    delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
+            switch (state.dataSurface->Surface(kSurf).Class) {
+            case SurfaceClass::Wall: {
+                switch (curExtBoundCond) {
+                case ExternalEnvironment: {
+                    delayOpaque(LoadCompRow::ExtWall) += singleSurfDelay;
+                } break;
+                case Ground:
+                case GroundFCfactorMethod:
+                case KivaFoundation: {
+                    delayOpaque(LoadCompRow::GrdWall) += singleSurfDelay;
+                } break;
+                case OtherSideCoefNoCalcExt:
+                case OtherSideCoefCalcExt:
+                case OtherSideCondModeledExt: {
+                    delayOpaque(LoadCompRow::OtherWall) += singleSurfDelay;
+                } break;
+                default: { // interzone
+                    delayOpaque(LoadCompRow::IntZonWall) += singleSurfDelay;
+                } break;
                 }
+            } break;
+            case SurfaceClass::Floor: {
+                switch (curExtBoundCond) {
+                case ExternalEnvironment: {
+                    delayOpaque(LoadCompRow::ExtFlr) += singleSurfDelay;
+                } break;
+                case Ground:
+                case GroundFCfactorMethod:
+                case KivaFoundation: {
+                    delayOpaque(LoadCompRow::GrdFlr) += singleSurfDelay;
+                } break;
+                case OtherSideCoefNoCalcExt:
+                case OtherSideCoefCalcExt:
+                case OtherSideCondModeledExt: {
+                    delayOpaque(LoadCompRow::OtherFlr) += singleSurfDelay;
+                } break;
+                default: { // interzone
+                    delayOpaque(LoadCompRow::IntZonFlr) += singleSurfDelay;
+                } break;
+                }
+            } break;
+            case SurfaceClass::Roof: {
+                switch (curExtBoundCond) {
+                case ExternalEnvironment: {
+                    delayOpaque(LoadCompRow::Roof) += singleSurfDelay;
+                } break;
+                case Ground:
+                case GroundFCfactorMethod:
+                case KivaFoundation:
+                case OtherSideCoefNoCalcExt:
+                case OtherSideCoefCalcExt:
+                case OtherSideCondModeledExt: {
+                    delayOpaque(LoadCompRow::OtherRoof) += singleSurfDelay;
+                } break;
+                default: { // interzone
+                    delayOpaque(LoadCompRow::IntZonCeil) += singleSurfDelay;
+                } break;
+                }
+            } break;
+            case SurfaceClass::Door: {
+                delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
+            } break;
             }
         }
         for (int k = LoadCompRow::Roof; k <= LoadCompRow::OtherFlr; ++k) {
