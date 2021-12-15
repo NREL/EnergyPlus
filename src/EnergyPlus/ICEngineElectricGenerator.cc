@@ -508,7 +508,7 @@ namespace ICEngineElectricGenerator {
 
         PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                         this->HRLoopNum,
-                                                        this->HRLoopSide,
+                                                        this->HRLoopSideNum,
                                                         DataPlant::PlantEquipmentType::Generator_ICEngine,
                                                         this->HeatRecInletNodeNum,
                                                         this->HeatRecOutletNodeNum,
@@ -831,7 +831,7 @@ namespace ICEngineElectricGenerator {
                                                HeatRecInletNode,
                                                HeatRecOutletNode,
                                                this->HRLoopNum,
-                                               this->HRLoopSide,
+                                               this->HRLoopSideNum,
                                                this->HRBranchNum,
                                                this->HRCompNum);
 
@@ -855,7 +855,7 @@ namespace ICEngineElectricGenerator {
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
-                                                     this->HRLoopSide,
+                                                     this->HRLoopSideNum,
                                                      this->HRBranchNum,
                                                      this->HRCompNum);
 
@@ -865,7 +865,7 @@ namespace ICEngineElectricGenerator {
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
-                                                     this->HRLoopSide,
+                                                     this->HRLoopSideNum,
                                                      this->HRBranchNum,
                                                      this->HRCompNum);
             }
@@ -896,7 +896,7 @@ namespace ICEngineElectricGenerator {
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::Generator_ICEngine,
                                                     this->HRLoopNum,
-                                                    this->HRLoopSide,
+                                                    this->HRLoopSideNum,
                                                     this->HRBranchNum,
                                                     this->HRCompNum,
                                                     errFlag,
@@ -930,7 +930,7 @@ namespace ICEngineElectricGenerator {
                                                this->HeatRecInletNodeNum,
                                                this->HeatRecOutletNodeNum,
                                                this->HRLoopNum,
-                                               this->HRLoopSide,
+                                               this->HRLoopSideNum,
                                                this->HRBranchNum,
                                                this->HRCompNum);
 

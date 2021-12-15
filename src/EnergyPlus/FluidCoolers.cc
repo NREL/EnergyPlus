@@ -762,7 +762,7 @@ void FluidCoolerspecs::oneTimeInit_new(EnergyPlusData &state)
     bool ErrorsFound = false;
     // Locate the tower on the plant loops for later usage
     PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->FluidCoolerType, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+        state, this->Name, this->FluidCoolerType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
     if (ErrorsFound) {
         ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
@@ -784,7 +784,7 @@ void FluidCoolerspecs::initEachEnvironment(EnergyPlusData &state)
                                        this->WaterInletNodeNum,
                                        this->WaterOutletNodeNum,
                                        this->LoopNum,
-                                       this->LoopSide,
+                                       this->LoopSideNum,
                                        this->BranchNum,
                                        this->CompNum);
 }
@@ -837,7 +837,7 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
 
     this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state,
                                                                              this->LoopNum,
-                                                                             this->LoopSide,
+                                                                             this->LoopSideNum,
                                                                              this->BranchNum,
                                                                              this->CompNum,
                                                                              this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier);
@@ -847,7 +847,7 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
                                          this->WaterInletNodeNum,
                                          this->WaterOutletNodeNum,
                                          this->LoopNum,
-                                         this->LoopSide,
+                                         this->LoopSideNum,
                                          this->BranchNum,
                                          this->CompNum);
 }
@@ -1634,9 +1634,9 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
     {
         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
         if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPoint;
+            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
         } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPointHi;
+            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
         }
     }
 
@@ -1740,15 +1740,15 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
     {
         auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
         if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPoint;
+            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
         } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPointHi;
+            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
         }
     }
 
     // MassFlowTol is a parameter to indicate a no flow condition
     if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance ||
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked)
+        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
         return;
 
     // set local variable for fluid cooler
@@ -1928,7 +1928,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     auto &waterOutletNode = this->WaterOutletNodeNum;
     state.dataLoopNodes->Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
-    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked ||
+    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
         state.dataGlobal->WarmupFlag)
         return;
 

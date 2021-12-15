@@ -121,7 +121,7 @@ namespace UserDefinedComponents {
 
         for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
             if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
-            if (calledFromLocation.loopSide != this->Loop(loop).LoopSide) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
             thisLoop = loop;
         }
 
@@ -138,7 +138,7 @@ namespace UserDefinedComponents {
                                                this->Loop(thisLoop).InletNodeNum,
                                                this->Loop(thisLoop).OutletNodeNum,
                                                this->Loop(thisLoop).LoopNum,
-                                               this->Loop(thisLoop).LoopSide,
+                                               this->Loop(thisLoop).LoopSideNum,
                                                this->Loop(thisLoop).BranchNum,
                                                this->Loop(thisLoop).CompNum);
 
@@ -150,7 +150,7 @@ namespace UserDefinedComponents {
                 state,
                 format("SimUserDefinedPlantComponent: did not find where called from loop number called from ={} , loop side called from ={}",
                        calledFromLocation.loopNum,
-                       calledFromLocation.loopSide));
+                       calledFromLocation.loopSideNum));
         }
     }
 
@@ -160,7 +160,7 @@ namespace UserDefinedComponents {
         int thisLoop = 0;
         for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
             if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
-            if (calledFromLocation.loopSide != this->Loop(loop).LoopSide) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
             thisLoop = loop;
         }
 
@@ -193,7 +193,7 @@ namespace UserDefinedComponents {
 
         for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
             if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
-            if (calledFromLocation.loopSide != this->Loop(loop).LoopSide) continue;
+            if (calledFromLocation.loopSideNum != this->Loop(loop).LoopSideNum) continue;
             thisLoop = loop;
         }
 
@@ -285,7 +285,7 @@ namespace UserDefinedComponents {
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.OutletNodeNum,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.LoopNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.LoopSide,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.LoopSideNum,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.BranchNum,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.CompNum);
 
@@ -396,7 +396,7 @@ namespace UserDefinedComponents {
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).LoopNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).LoopSide,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).CompNum);
 
@@ -516,7 +516,7 @@ namespace UserDefinedComponents {
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).LoopNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).LoopSide,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).LoopSideNum,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).BranchNum,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).CompNum);
 
@@ -2417,7 +2417,7 @@ namespace UserDefinedComponents {
                                                         this->Name,
                                                         DataPlant::PlantEquipmentType::CoilUserDefined,
                                                         this->Loop.LoopNum,
-                                                        this->Loop.LoopSide,
+                                                        this->Loop.LoopSideNum,
                                                         this->Loop.BranchNum,
                                                         this->Loop.CompNum,
                                                         errFlag);
@@ -2426,14 +2426,14 @@ namespace UserDefinedComponents {
                 }
                 // set user input for flow priority
                 state.dataPlnt->PlantLoop(this->Loop.LoopNum)
-                    .LoopSide(this->Loop.LoopSide)
+                    .LoopSide(this->Loop.LoopSideNum)
                     .Branch(this->Loop.BranchNum)
                     .Comp(this->Loop.CompNum)
                     .FlowPriority = this->Loop.FlowPriority;
 
                 // set user input for how loads served
                 state.dataPlnt->PlantLoop(this->Loop.LoopNum)
-                    .LoopSide(this->Loop.LoopSide)
+                    .LoopSide(this->Loop.LoopSideNum)
                     .Branch(this->Loop.BranchNum)
                     .Comp(this->Loop.CompNum)
                     .HowLoadServed = this->Loop.HowLoadServed;
@@ -2493,7 +2493,7 @@ namespace UserDefinedComponents {
                                                             this->Name,
                                                             DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined,
                                                             this->Loop(loop).LoopNum,
-                                                            this->Loop(loop).LoopSide,
+                                                            this->Loop(loop).LoopSideNum,
                                                             this->Loop(loop).BranchNum,
                                                             this->Loop(loop).CompNum,
                                                             errFlag,
@@ -2506,14 +2506,14 @@ namespace UserDefinedComponents {
                     }
                     // set user input for flow priority
                     state.dataPlnt->PlantLoop(this->Loop(loop).LoopNum)
-                        .LoopSide(this->Loop(loop).LoopSide)
+                        .LoopSide(this->Loop(loop).LoopSideNum)
                         .Branch(this->Loop(loop).BranchNum)
                         .Comp(this->Loop(loop).CompNum)
                         .FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
                     state.dataPlnt->PlantLoop(this->Loop(loop).LoopNum)
-                        .LoopSide(this->Loop(loop).LoopSide)
+                        .LoopSide(this->Loop(loop).LoopSideNum)
                         .Branch(this->Loop(loop).BranchNum)
                         .Comp(this->Loop(loop).CompNum)
                         .HowLoadServed = this->Loop(loop).HowLoadServed;
@@ -2584,7 +2584,7 @@ namespace UserDefinedComponents {
                                                             this->Name,
                                                             DataPlant::PlantEquipmentType::AirTerminalUserDefined,
                                                             this->Loop(loop).LoopNum,
-                                                            this->Loop(loop).LoopSide,
+                                                            this->Loop(loop).LoopSideNum,
                                                             this->Loop(loop).BranchNum,
                                                             this->Loop(loop).CompNum,
                                                             errFlag,
@@ -2597,14 +2597,14 @@ namespace UserDefinedComponents {
                     }
                     // set user input for flow priority
                     state.dataPlnt->PlantLoop(this->Loop(loop).LoopNum)
-                        .LoopSide(this->Loop(loop).LoopSide)
+                        .LoopSide(this->Loop(loop).LoopSideNum)
                         .Branch(this->Loop(loop).BranchNum)
                         .Comp(this->Loop(loop).CompNum)
                         .FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
                     state.dataPlnt->PlantLoop(this->Loop(loop).LoopNum)
-                        .LoopSide(this->Loop(loop).LoopSide)
+                        .LoopSide(this->Loop(loop).LoopSideNum)
                         .Branch(this->Loop(loop).BranchNum)
                         .Comp(this->Loop(loop).CompNum)
                         .HowLoadServed = this->Loop(loop).HowLoadServed;
@@ -2683,7 +2683,7 @@ namespace UserDefinedComponents {
                                              this->Loop(LoopNum).InletNodeNum,
                                              this->Loop(LoopNum).OutletNodeNum,
                                              this->Loop(LoopNum).LoopNum,
-                                             this->Loop(LoopNum).LoopSide,
+                                             this->Loop(LoopNum).LoopSideNum,
                                              this->Loop(LoopNum).BranchNum,
                                              this->Loop(LoopNum).CompNum);
 
@@ -2706,7 +2706,7 @@ namespace UserDefinedComponents {
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapLowOutLimit) {
             state.dataPlnt->PlantLoop(this->Loop(LoopNum).LoopNum)
-                .LoopSide(this->Loop(LoopNum).LoopSide)
+                .LoopSide(this->Loop(LoopNum).LoopSideNum)
                 .Branch(this->Loop(LoopNum).BranchNum)
                 .Comp(this->Loop(LoopNum).CompNum)
                 .MinOutletTemp = this->Loop(LoopNum).LowOutTempLimit;
@@ -2714,7 +2714,7 @@ namespace UserDefinedComponents {
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapHiOutLimit) {
             state.dataPlnt->PlantLoop(this->Loop(LoopNum).LoopNum)
-                .LoopSide(this->Loop(LoopNum).LoopSide)
+                .LoopSide(this->Loop(LoopNum).LoopSideNum)
                 .Branch(this->Loop(LoopNum).BranchNum)
                 .Comp(this->Loop(LoopNum).CompNum)
                 .MaxOutletTemp = this->Loop(LoopNum).HiOutTempLimit;
@@ -2731,7 +2731,7 @@ namespace UserDefinedComponents {
                                                         this->Name,
                                                         DataPlant::PlantEquipmentType::PlantComponentUserDefined,
                                                         this->Loop(ConnectionNum).LoopNum,
-                                                        this->Loop(ConnectionNum).LoopSide,
+                                                        this->Loop(ConnectionNum).LoopSideNum,
                                                         this->Loop(ConnectionNum).BranchNum,
                                                         this->Loop(ConnectionNum).CompNum,
                                                         errFlag,
@@ -2745,14 +2745,14 @@ namespace UserDefinedComponents {
 
                 // set user input for flow priority
                 state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
-                    .LoopSide(this->Loop(ConnectionNum).LoopSide)
+                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
                     .Branch(this->Loop(ConnectionNum).BranchNum)
                     .Comp(this->Loop(ConnectionNum).CompNum)
                     .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
 
                 // set user input for how loads served
                 state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).LoopNum)
-                    .LoopSide(this->Loop(ConnectionNum).LoopSide)
+                    .LoopSide(this->Loop(ConnectionNum).LoopSideNum)
                     .Branch(this->Loop(ConnectionNum).BranchNum)
                     .Comp(this->Loop(ConnectionNum).CompNum)
                     .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;
@@ -2796,7 +2796,7 @@ namespace UserDefinedComponents {
                                                  this->Loop.InletNodeNum,
                                                  this->Loop.OutletNodeNum,
                                                  this->Loop.LoopNum,
-                                                 this->Loop.LoopSide,
+                                                 this->Loop.LoopSideNum,
                                                  this->Loop.BranchNum,
                                                  this->Loop.CompNum);
             PlantUtilities::SafeCopyPlantNode(state, this->Loop.InletNodeNum, this->Loop.OutletNodeNum);
@@ -2851,7 +2851,7 @@ namespace UserDefinedComponents {
                                                      this->Loop(loop).InletNodeNum,
                                                      this->Loop(loop).OutletNodeNum,
                                                      this->Loop(loop).LoopNum,
-                                                     this->Loop(loop).LoopSide,
+                                                     this->Loop(loop).LoopSideNum,
                                                      this->Loop(loop).BranchNum,
                                                      this->Loop(loop).CompNum);
                 PlantUtilities::SafeCopyPlantNode(state, this->Loop(loop).InletNodeNum, this->Loop(loop).OutletNodeNum);
@@ -2903,7 +2903,7 @@ namespace UserDefinedComponents {
                                                      this->Loop(loop).InletNodeNum,
                                                      this->Loop(loop).OutletNodeNum,
                                                      this->Loop(loop).LoopNum,
-                                                     this->Loop(loop).LoopSide,
+                                                     this->Loop(loop).LoopSideNum,
                                                      this->Loop(loop).BranchNum,
                                                      this->Loop(loop).CompNum);
                 PlantUtilities::SafeCopyPlantNode(state, this->Loop(loop).InletNodeNum, this->Loop(loop).OutletNodeNum);

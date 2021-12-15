@@ -161,10 +161,8 @@ namespace UnitarySystems {
           m_MultiOrVarSpeedHeatCoil(false), m_MultiOrVarSpeedCoolCoil(false), m_PartLoadFrac(0.0), m_CoolingPartLoadFrac(0.0),
           m_HeatingPartLoadFrac(0.0), m_SuppHeatPartLoadFrac(0.0), m_HeatCompPartLoadRatio(0.0), m_CoolCompPartLoadRatio(0.0), m_SpeedRatio(0.0),
           m_CycRatio(0.0), m_MyEnvrnFlag(true), m_MyEnvrnFlag2(true), m_MyPlantScanFlag(true), m_MySuppCoilPlantScanFlag(true),
-          m_MySetPointCheckFlag(true), m_MySizingCheckFlag(true), m_InitHeatPump(false), m_HRLoopNum(0),
-          m_HRLoopSide(DataPlant::LoopSideLocation::Invalid), m_HRBranchNum(0),
-          m_HRCompNum(0), m_SuppCoilLoopNum(0),
-          m_SuppCoilLoop(DataPlant::LoopSideLocation::Invalid), m_SuppCoilBranchNum(0), m_SuppCoilCompNum(0), m_SuppCoilFluidOutletNodeNum(0),
+          m_MySetPointCheckFlag(true), m_MySizingCheckFlag(true), m_InitHeatPump(false), m_HRLoopNum(0), m_HRLoopSideNum(DataPlant::LoopSideLocation::Invalid), m_HRBranchNum(0),
+          m_HRCompNum(0), m_SuppCoilLoopNum(0), m_SuppCoilLoopSide(DataPlant::LoopSideLocation::Invalid), m_SuppCoilBranchNum(0), m_SuppCoilCompNum(0), m_SuppCoilFluidOutletNodeNum(0),
           m_WSHPRuntimeFrac(0.0), m_CompPartLoadRatio(0.0), m_CoolingCoilSensDemand(0.0), m_CoolingCoilLatentDemand(0.0),
           m_HeatingCoilSensDemand(0.0), m_SenLoadLoss(0.0), m_LatLoadLoss(0.0), m_DesignHeatRecMassFlowRate(0.0), m_HeatRecoveryMassFlowRate(0.0),
           m_HeatRecoveryRate(0.0), m_HeatRecoveryEnergy(0.0), m_HeatRecoveryInletTemp(0.0), m_HeatRecoveryOutletTemp(0.0), m_IterationCounter(0),
@@ -681,7 +679,7 @@ namespace UnitarySystems {
                                                         this->Name,
                                                         DataPlant::PlantEquipmentType::UnitarySysRecovery,
                                                         this->m_HRLoopNum,
-                                                        this->m_HRLoopSide,
+                                                        this->m_HRLoopSideNum,
                                                         this->m_HRBranchNum,
                                                         this->m_HRCompNum,
                                                         state.dataUnitarySystems->initUnitarySystemsErrFlag,
@@ -842,7 +840,7 @@ namespace UnitarySystems {
                                                         this->m_SuppHeatCoilName,
                                                         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
                                                         this->m_SuppCoilLoopNum,
-                                                        this->m_SuppCoilLoop,
+                                                        this->m_SuppCoilLoopSide,
                                                         this->m_SuppCoilBranchNum,
                                                         this->m_SuppCoilCompNum,
                                                         state.dataUnitarySystems->initUnitarySystemsErrFlag,
@@ -876,7 +874,7 @@ namespace UnitarySystems {
                 }
                 // fill outlet node for coil
                 this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum)
-                                                         .LoopSide(this->m_SuppCoilLoop)
+                                                         .LoopSide(this->m_SuppCoilLoopSide)
                                                          .Branch(this->m_SuppCoilBranchNum)
                                                          .Comp(this->m_SuppCoilCompNum)
                                                          .NodeNumOut;
@@ -887,7 +885,7 @@ namespace UnitarySystems {
                                                         this->m_SuppHeatCoilName,
                                                         DataPlant::PlantEquipmentType::CoilSteamAirHeating,
                                                         this->m_SuppCoilLoopNum,
-                                                        this->m_SuppCoilLoop,
+                                                        this->m_SuppCoilLoopSide,
                                                         this->m_SuppCoilBranchNum,
                                                         this->m_SuppCoilCompNum,
                                                         state.dataUnitarySystems->initUnitarySystemsErrFlag,
@@ -910,7 +908,7 @@ namespace UnitarySystems {
 
                 // fill outlet node for coil
                 this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilLoopNum)
-                                                         .LoopSide(this->m_SuppCoilLoop)
+                                                         .LoopSide(this->m_SuppCoilLoopSide)
                                                          .Branch(this->m_SuppCoilBranchNum)
                                                          .Comp(this->m_SuppCoilCompNum)
                                                          .NodeNumOut;
@@ -954,7 +952,7 @@ namespace UnitarySystems {
                                                    this->m_HeatRecoveryInletNodeNum,
                                                    this->m_HeatRecoveryOutletNodeNum,
                                                    this->m_HRLoopNum,
-                                                   this->m_HRLoopSide,
+                                                   this->m_HRLoopSideNum,
                                                    this->m_HRBranchNum,
                                                    this->m_HRCompNum);
             }
@@ -1080,7 +1078,7 @@ namespace UnitarySystems {
                                                        this->m_SuppCoilFluidInletNode,
                                                        this->m_SuppCoilFluidOutletNodeNum,
                                                        this->m_SuppCoilLoopNum,
-                                                       this->m_SuppCoilLoop,
+                                                       this->m_SuppCoilLoopSide,
                                                        this->m_SuppCoilBranchNum,
                                                        this->m_SuppCoilCompNum);
                 }
@@ -1240,7 +1238,7 @@ namespace UnitarySystems {
                                                      this->m_SuppCoilFluidInletNode,
                                                      this->m_SuppCoilFluidOutletNodeNum,
                                                      this->m_SuppCoilLoopNum,
-                                                     this->m_SuppCoilLoop,
+                                                     this->m_SuppCoilLoopSide,
                                                      this->m_SuppCoilBranchNum,
                                                      this->m_SuppCoilCompNum);
                 //     simulate water coil to find operating capacity
@@ -1267,7 +1265,7 @@ namespace UnitarySystems {
                                                      this->m_SuppCoilFluidInletNode,
                                                      this->m_SuppCoilFluidOutletNodeNum,
                                                      this->m_SuppCoilLoopNum,
-                                                     this->m_SuppCoilLoop,
+                                                     this->m_SuppCoilLoopSide,
                                                      this->m_SuppCoilBranchNum,
                                                      this->m_SuppCoilCompNum);
                 //     simulate steam coil to find operating capacity
@@ -1408,7 +1406,7 @@ namespace UnitarySystems {
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                  this->m_SuppCoilLoopNum,
-                                                 this->m_SuppCoilLoop,
+                                                 this->m_SuppCoilLoopSide,
                                                  this->m_SuppCoilBranchNum,
                                                  this->m_SuppCoilCompNum);
         }
@@ -7758,7 +7756,7 @@ namespace UnitarySystems {
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                  this->m_SuppCoilLoopNum,
-                                                 this->m_SuppCoilLoop,
+                                                 this->m_SuppCoilLoopSide,
                                                  this->m_SuppCoilBranchNum,
                                                  this->m_SuppCoilCompNum);
         }
@@ -7769,7 +7767,7 @@ namespace UnitarySystems {
                                                  this->m_HeatRecoveryInletNodeNum,
                                                  this->m_HeatRecoveryOutletNodeNum,
                                                  this->m_HRLoopNum,
-                                                 this->m_HRLoopSide,
+                                                 this->m_HRLoopSideNum,
                                                  this->m_HRBranchNum,
                                                  this->m_HRCompNum);
         }
@@ -9972,7 +9970,7 @@ namespace UnitarySystems {
                                                        this->m_SuppCoilFluidInletNode,
                                                        this->m_SuppCoilFluidOutletNodeNum,
                                                        this->m_SuppCoilLoopNum,
-                                                       this->m_SuppCoilLoop,
+                                                       this->m_SuppCoilLoopSide,
                                                        this->m_SuppCoilBranchNum,
                                                        this->m_SuppCoilCompNum);
                 }
@@ -14330,7 +14328,7 @@ namespace UnitarySystems {
                                                                  this->m_SuppCoilFluidInletNode,
                                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                                  this->m_SuppCoilLoopNum,
-                                                                 this->m_SuppCoilLoop,
+                                                                 this->m_SuppCoilLoopSide,
                                                                  this->m_SuppCoilBranchNum,
                                                                  this->m_SuppCoilCompNum);
 
@@ -14345,7 +14343,7 @@ namespace UnitarySystems {
                                                                  this->m_SuppCoilFluidInletNode,
                                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                                  this->m_SuppCoilLoopNum,
-                                                                 this->m_SuppCoilLoop,
+                                                                 this->m_SuppCoilLoopSide,
                                                                  this->m_SuppCoilBranchNum,
                                                                  this->m_SuppCoilCompNum);
 
@@ -14526,7 +14524,7 @@ namespace UnitarySystems {
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
                                                  this->m_SuppCoilLoopNum,
-                                                 this->m_SuppCoilLoop,
+                                                 this->m_SuppCoilLoopSide,
                                                  this->m_SuppCoilBranchNum,
                                                  this->m_SuppCoilCompNum);
         }

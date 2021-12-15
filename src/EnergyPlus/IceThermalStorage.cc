@@ -166,7 +166,7 @@ namespace IceThermalStorage {
 
         // this was happening in PlantLoopEquip before
         auto &thisComp(state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                           .LoopSide(calledFromLocation.loopSide)
+                           .LoopSide(calledFromLocation.loopSideNum)
                            .Branch(calledFromLocation.branchNum)
                            .Comp(calledFromLocation.compNum));
 
@@ -375,7 +375,7 @@ namespace IceThermalStorage {
                                                  this->PlantInNodeNum,
                                                  this->PlantOutNodeNum,
                                                  this->PlantLoopNum,
-                                                 this->PlantLoopSide,
+                                                 this->PlantLoopSideNum,
                                                  this->PlantBranchNum,
                                                  this->PlantCompNum);
 
@@ -401,7 +401,7 @@ namespace IceThermalStorage {
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
-                                                     this->PlantLoopSide,
+                                                     this->PlantLoopSideNum,
                                                      this->PlantBranchNum,
                                                      this->PlantCompNum);
 
@@ -417,7 +417,7 @@ namespace IceThermalStorage {
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
-                                                     this->PlantLoopSide,
+                                                     this->PlantLoopSideNum,
                                                      this->PlantBranchNum,
                                                      this->PlantCompNum);
 
@@ -556,7 +556,7 @@ namespace IceThermalStorage {
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
-                                                     this->PlantLoopSide,
+                                                     this->PlantLoopSideNum,
                                                      this->PlantBranchNum,
                                                      this->PlantCompNum);
 
@@ -573,7 +573,7 @@ namespace IceThermalStorage {
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
                                                      this->PlantLoopNum,
-                                                     this->PlantLoopSide,
+                                                     this->PlantLoopSideNum,
                                                      this->PlantBranchNum,
                                                      this->PlantCompNum);
 
@@ -1334,7 +1334,7 @@ namespace IceThermalStorage {
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::TS_IceDetailed,
                                                     this->PlantLoopNum,
-                                                    this->PlantLoopSide,
+                                                    this->PlantLoopSideNum,
                                                     this->PlantBranchNum,
                                                     this->PlantCompNum,
                                                     errFlag);
@@ -1367,12 +1367,12 @@ namespace IceThermalStorage {
                                                this->PlantInNodeNum,
                                                this->PlantOutNodeNum,
                                                this->PlantLoopNum,
-                                               this->PlantLoopSide,
+                                               this->PlantLoopSideNum,
                                                this->PlantBranchNum,
                                                this->PlantCompNum);
 
             if ((state.dataPlnt->PlantLoop(this->PlantLoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
-                (this->PlantLoopSide == DataPlant::LoopSideLocation::Supply)) {
+                (this->PlantLoopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
                 for (CompNum = 1;
                      CompNum <=
@@ -1417,7 +1417,7 @@ namespace IceThermalStorage {
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::TS_IceSimple,
                                                     this->LoopNum,
-                                                    this->LoopSide,
+                                                    this->LoopSideNum,
                                                     this->BranchNum,
                                                     this->CompNum,
                                                     errFlag,
@@ -1443,11 +1443,11 @@ namespace IceThermalStorage {
                                                this->PltInletNodeNum,
                                                this->PltOutletNodeNum,
                                                this->LoopNum,
-                                               this->LoopSide,
+                                               this->LoopSideNum,
                                                this->BranchNum,
                                                this->CompNum);
             if ((state.dataPlnt->PlantLoop(this->LoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
-                (this->LoopSide == DataPlant::LoopSideLocation::Supply)) {
+                (this->LoopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
                 for (int compNum = 1;
                      compNum <= state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(this->BranchNum).TotalComponents;
@@ -1533,7 +1533,7 @@ namespace IceThermalStorage {
                                              this->PltInletNodeNum,
                                              this->PltOutletNodeNum,
                                              this->LoopNum,
-                                             this->LoopSide,
+                                             this->LoopSideNum,
                                              this->BranchNum,
                                              this->CompNum);
 
@@ -1568,7 +1568,7 @@ namespace IceThermalStorage {
                                              this->PltInletNodeNum,
                                              this->PltOutletNodeNum,
                                              this->LoopNum,
-                                             this->LoopSide,
+                                             this->LoopSideNum,
                                              this->BranchNum,
                                              this->CompNum);
 
@@ -1776,7 +1776,7 @@ namespace IceThermalStorage {
                                              this->PltInletNodeNum,
                                              this->PltOutletNodeNum,
                                              this->LoopNum,
-                                             this->LoopSide,
+                                             this->LoopSideNum,
                                              this->BranchNum,
                                              this->CompNum);
 

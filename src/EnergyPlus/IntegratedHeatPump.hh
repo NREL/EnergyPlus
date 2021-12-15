@@ -143,7 +143,7 @@ namespace IntegratedHeatPump {
         std::string WHtankName;
         int WHtankID;
         int LoopNum;
-        int LoopSide;
+        int LoopSideNum;
         bool IsWHCallAvail;
         // whether water heating call available
         bool CheckWHCall;
@@ -213,7 +213,7 @@ namespace IntegratedHeatPump {
               SHDWHWHCoilIndex(0), AirCoolInletNodeNum(0), AirHeatInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               WaterTankoutNod(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1), TindoorOverCoolAllow(0.0),
               TambientOverCoolAllow(0.0), TindoorWHHighPriority(0.0), TambientWHHighPriority(0.0), WaterVolSCDWH(0.0), TimeLimitSHDWH(0.0),
-              WHtankType(DataPlant::PlantEquipmentType::Invalid), WHtankID(0), LoopNum(0), LoopSide(0), IsWHCallAvail(false), CheckWHCall(false),
+              WHtankType(DataPlant::PlantEquipmentType::Invalid), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false),
               CurMode(IHPOperationMode::IdleMode), ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0),
               HeatVolFlowScale(0), MaxHeatAirMassFlow(0), MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false),
               IDFanID(0), IDFanPlace(0), ODAirInletNodeNum(0),                                                        // oudoor coil inlet Nod

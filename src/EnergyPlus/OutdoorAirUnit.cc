@@ -1230,7 +1230,7 @@ namespace OutdoorAirUnit {
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentName,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilType,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSide,
+                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum,
                                             errFlag,
@@ -1325,7 +1325,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSide,
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
                     }
@@ -1349,7 +1349,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSide,
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
                     }
@@ -1370,7 +1370,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSide,
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
                     }
@@ -1393,7 +1393,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSide,
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum);
                     }
@@ -2313,7 +2313,7 @@ namespace OutdoorAirUnit {
                                       2,
                                       SimCompNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSide,
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSideNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;
@@ -2378,7 +2378,7 @@ namespace OutdoorAirUnit {
                                       1,
                                       SimCompNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSide,
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSideNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;
@@ -2427,7 +2427,7 @@ namespace OutdoorAirUnit {
                                       1,
                                       SimCompNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSide,
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSideNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;
@@ -2472,7 +2472,7 @@ namespace OutdoorAirUnit {
                                       1,
                                       SimCompNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSide,
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).LoopSideNum,
                                       OutAirUnit(OAUnitNum).OAEquip(EquipNum).BranchNum);
                 }
             } break;

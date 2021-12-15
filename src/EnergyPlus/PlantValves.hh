@@ -83,7 +83,7 @@ namespace PlantValves {
         Real64 MixedMassFlowRate = 0.0; // Flow rate downstream of mixer [kg/s]
         // loop topology variables
         int LoopNum = 0;
-        DataPlant::LoopSideLocation LoopSide = DataPlant::LoopSideLocation::Invalid;
+        DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid;
         int BranchNum = 0;
         int CompNum = 0;
         bool compDelayedInitFlag = true;

@@ -163,7 +163,7 @@ void WrapperSpecs::simulate(
     } else if (calledFromLocation.loopNum == this->GLHELoopNum) {
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
-                                                            this->GLHELoopSide,
+                                                            this->GLHELoopSideNum,
                                                             DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                             this->GLHEInletNodeNum,
                                                             this->GLHEOutletNodeNum,
@@ -1546,7 +1546,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->CWLoopNum,
-                                                this->CWLoopSide,
+                                                this->CWLoopSideNum,
                                                 this->CWBranchNum,
                                                 this->CWCompNum,
                                                 errFlag,
@@ -1560,7 +1560,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->HWLoopNum,
-                                                this->HWLoopSide,
+                                                this->HWLoopSideNum,
                                                 this->HWBranchNum,
                                                 this->HWCompNum,
                                                 errFlag,
@@ -1574,7 +1574,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                 this->GLHELoopNum,
-                                                this->GLHELoopSide,
+                                                this->GLHELoopSideNum,
                                                 this->GLHEBranchNum,
                                                 this->GLHECompNum,
                                                 errFlag,
@@ -1586,25 +1586,25 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
 
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWLoopNum,
-                                                      this->CWLoopSide,
+                                                      this->CWLoopSideNum,
                                                       this->GLHELoopNum,
-                                                      this->GLHELoopSide,
+                                                      this->GLHELoopSideNum,
                                                       DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                       true);
 
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->HWLoopNum,
-                                                      this->HWLoopSide,
+                                                      this->HWLoopSideNum,
                                                       this->GLHELoopNum,
-                                                      this->GLHELoopSide,
+                                                      this->GLHELoopSideNum,
                                                       DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                       true);
 
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWLoopNum,
-                                                      this->CWLoopSide,
+                                                      this->CWLoopSideNum,
                                                       this->HWLoopNum,
-                                                      this->HWLoopSide,
+                                                      this->HWLoopSideNum,
                                                       DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                       true);
 
@@ -1612,13 +1612,13 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
             // Reset flow priority
             if (LoopNum == this->CWLoopNum) {
                 state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSide)
+                    .LoopSide(this->CWLoopSideNum)
                     .Branch(this->CWBranchNum)
                     .Comp(this->CWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             } else if (LoopNum == this->HWLoopNum) {
                 state.dataPlnt->PlantLoop(this->HWLoopNum)
-                    .LoopSide(this->HWLoopSide)
+                    .LoopSide(this->HWLoopSideNum)
                     .Branch(this->HWBranchNum)
                     .Comp(this->HWCompNum)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
@@ -1722,7 +1722,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                this->CHWInletNodeNum,
                                                this->CHWOutletNodeNum,
                                                this->CWLoopNum,
-                                               this->CWLoopSide,
+                                               this->CWLoopSideNum,
                                                this->CWBranchNum,
                                                this->CWCompNum);
             PlantUtilities::InitComponentNodes(state,
@@ -1731,7 +1731,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                this->HWInletNodeNum,
                                                this->HWOutletNodeNum,
                                                this->HWLoopNum,
-                                               this->HWLoopSide,
+                                               this->HWLoopSideNum,
                                                this->HWBranchNum,
                                                this->HWCompNum);
             PlantUtilities::InitComponentNodes(state,
@@ -1740,7 +1740,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                this->GLHEInletNodeNum,
                                                this->GLHEOutletNodeNum,
                                                this->GLHELoopNum,
-                                               this->GLHELoopSide,
+                                               this->GLHELoopSideNum,
                                                this->GLHEBranchNum,
                                                this->GLHECompNum);
 
@@ -1838,17 +1838,17 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
     }
 
     PlantUtilities::SetComponentFlowRate(
-        state, mdotCHW, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
+        state, mdotCHW, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
 
     PlantUtilities::SetComponentFlowRate(
-        state, mdotHW, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
+        state, mdotHW, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWLoopNum, this->HWLoopSideNum, this->HWBranchNum, this->HWCompNum);
 
     PlantUtilities::SetComponentFlowRate(state,
                                          mdotGLHE,
                                          this->GLHEInletNodeNum,
                                          this->GLHEOutletNodeNum,
                                          this->GLHELoopNum,
-                                         this->GLHELoopSide,
+                                         this->GLHELoopSideNum,
                                          this->GLHEBranchNum,
                                          this->GLHECompNum);
 }
@@ -2860,12 +2860,12 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
         CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMaxAvail;
         HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
         GLHEInletMassFlowRate = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMaxAvail;
-        DataPlant::LoopSideLocation LoopSide = this->CWLoopSide;
+        DataPlant::LoopSideLocation LoopSideNum = this->CWLoopSideNum;
         this->WrapperCoolingLoad = 0.0;
         CurCoolingLoad = std::abs(MyLoad);
         this->WrapperCoolingLoad = CurCoolingLoad;
         // Set actual mass flow rate at the nodes when it's locked
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).FlowLock == DataPlant::FlowLock::Locked) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
             CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
         }
         if (CHWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;
@@ -2874,12 +2874,12 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
         CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
         HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRateMaxAvail;
         GLHEInletMassFlowRate = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMaxAvail;
-        DataPlant::LoopSideLocation LoopSide = this->HWLoopSide;
+        DataPlant::LoopSideLocation LoopSideNum = this->HWLoopSideNum;
         this->WrapperHeatingLoad = 0.0;
         CurHeatingLoad = MyLoad;
         this->WrapperHeatingLoad = CurHeatingLoad;
         // Set actual mass flow rate at the nodes when it's locked
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).FlowLock == DataPlant::FlowLock::Locked) {
+        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
             HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
         }
         if (HWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;
@@ -3036,7 +3036,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                  this->CHWInletNodeNum,
                                                  this->CHWOutletNodeNum,
                                                  this->CWLoopNum,
-                                                 this->CWLoopSide,
+                                                 this->CWLoopSideNum,
                                                  this->CWBranchNum,
                                                  this->CWCompNum);
 
@@ -3045,7 +3045,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                  this->HWInletNodeNum,
                                                  this->HWOutletNodeNum,
                                                  this->HWLoopNum,
-                                                 this->HWLoopSide,
+                                                 this->HWLoopSideNum,
                                                  this->HWBranchNum,
                                                  this->HWCompNum);
 
@@ -3054,7 +3054,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                  this->GLHEInletNodeNum,
                                                  this->GLHEOutletNodeNum,
                                                  this->GLHELoopNum,
-                                                 this->GLHELoopSide,
+                                                 this->GLHELoopSideNum,
                                                  this->GLHEBranchNum,
                                                  this->GLHECompNum);
 
@@ -3369,7 +3369,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                      this->CHWInletNodeNum,
                                                      this->CHWOutletNodeNum,
                                                      this->CWLoopNum,
-                                                     this->CWLoopSide,
+                                                     this->CWLoopSideNum,
                                                      this->CWBranchNum,
                                                      this->CWCompNum);
 
@@ -3378,7 +3378,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                      this->HWInletNodeNum,
                                                      this->HWOutletNodeNum,
                                                      this->HWLoopNum,
-                                                     this->HWLoopSide,
+                                                     this->HWLoopSideNum,
                                                      this->HWBranchNum,
                                                      this->HWCompNum);
 
@@ -3387,7 +3387,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                      this->GLHEInletNodeNum,
                                                      this->GLHEOutletNodeNum,
                                                      this->GLHELoopNum,
-                                                     this->GLHELoopSide,
+                                                     this->GLHELoopSideNum,
                                                      this->GLHEBranchNum,
                                                      this->GLHECompNum);
 
@@ -3484,7 +3484,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                          this->CHWInletNodeNum,
                                                          this->CHWOutletNodeNum,
                                                          this->CWLoopNum,
-                                                         this->CWLoopSide,
+                                                         this->CWLoopSideNum,
                                                          this->CWBranchNum,
                                                          this->CWCompNum);
 
@@ -3493,7 +3493,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                          this->HWInletNodeNum,
                                                          this->HWOutletNodeNum,
                                                          this->HWLoopNum,
-                                                         this->HWLoopSide,
+                                                         this->HWLoopSideNum,
                                                          this->HWBranchNum,
                                                          this->HWCompNum);
 
@@ -3502,7 +3502,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                          this->GLHEInletNodeNum,
                                                          this->GLHEOutletNodeNum,
                                                          this->GLHELoopNum,
-                                                         this->GLHELoopSide,
+                                                         this->GLHELoopSideNum,
                                                          this->GLHEBranchNum,
                                                          this->GLHECompNum);
                 }

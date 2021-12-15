@@ -822,7 +822,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
                                     ThisCP.EquipID,
                                     ThisCP.EquipType,
                                     ThisCP.LoopNum,
-                                    ThisCP.LoopSide,
+                                    ThisCP.LoopSideNum,
                                     ThisCP.BranchNum,
                                     ThisCP.CompNum,
                                     errFlag,
@@ -859,7 +859,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
                                    ThisCP.WaterInletNode,
                                    ThisCP.WaterOutletNode,
                                    ThisCP.LoopNum,
-                                   ThisCP.LoopSide,
+                                   ThisCP.LoopSideNum,
                                    ThisCP.BranchNum,
                                    ThisCP.CompNum);
             }
@@ -884,7 +884,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
                            ThisCP.WaterInletNode,
                            ThisCP.WaterOutletNode,
                            ThisCP.LoopNum,
-                           ThisCP.LoopSide,
+                           ThisCP.LoopSideNum,
                            ThisCP.BranchNum,
                            ThisCP.CompNum);
 
@@ -1459,7 +1459,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
 
     if (CoolingPanelOn) {
         SetComponentFlowRate(
-            state, waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
+            state, waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
         if (waterMassFlowRate <= 0.0) CoolingPanelOn = false;
     }
 

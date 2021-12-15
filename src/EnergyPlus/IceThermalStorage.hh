@@ -104,7 +104,7 @@ namespace IceThermalStorage {
         int PltOutletNodeNum;     // Node number on the outlet side of the plant
         // loop topology variables
         int LoopNum;
-        DataPlant::LoopSideLocation LoopSide;
+        DataPlant::LoopSideLocation LoopSideNum;
         int BranchNum;
         int CompNum;
         Real64 DesignMassFlowRate;
@@ -139,7 +139,7 @@ namespace IceThermalStorage {
 
         // Default Constructor
         SimpleIceStorageData()
-            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
+            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
               DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0),
               XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0),
               ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0),
@@ -187,7 +187,7 @@ namespace IceThermalStorage {
         int PlantInNodeNum;  // Plant inlet node number for ice storage unit
         int PlantOutNodeNum; // Plant outlet node number for ice storage unit
         int PlantLoopNum;
-        DataPlant::LoopSideLocation PlantLoopSide;
+        DataPlant::LoopSideLocation PlantLoopSideNum;
         int PlantBranchNum;
         int PlantCompNum;
         Real64 DesignMassFlowRate;
@@ -236,7 +236,7 @@ namespace IceThermalStorage {
 
         // Default Constructor
         DetailedIceStorageData()
-            : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), PlantLoopNum(0), PlantLoopSide(DataPlant::LoopSideLocation::Invalid), PlantBranchNum(0),
+            : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), PlantLoopNum(0), PlantLoopSideNum(DataPlant::LoopSideLocation::Invalid), PlantBranchNum(0),
               PlantCompNum(0), DesignMassFlowRate(0.0), MapNum(0), DischargeCurveNum(0), ChargeCurveNum(0), CurveFitTimeStep(1.0),
               DischargeParaElecLoad(0.0), ChargeParaElecLoad(0.0), TankLossCoeff(0.0), FreezingTemp(0.0), CompLoad(0.0), IceFracChange(0.0),
               IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0), ChargingEnergy(0.0),

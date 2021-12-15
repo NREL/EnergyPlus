@@ -113,7 +113,7 @@ namespace CTElectricGenerator {
         Real64 HeatRecOutletTemp;         // Outlet Temperature of the heat recovery fluid
         Real64 HeatRecMdot;               // reporting: Heat Recovery Loop Mass flow rate
         int HRLoopNum;                    // cooling water plant loop index number, for heat recovery
-        DataPlant::LoopSideLocation HRLoopSide;                // cooling water plant loop side index, for heat recovery
+        DataPlant::LoopSideLocation HRLoopSideNum;                // cooling water plant loop side index, for heat recovery
         int HRBranchNum;                  // cooling water plant loop branch index, for heat recovery
         int HRCompNum;                    // cooling water plant loop component index, for heat recovery
         Real64 FuelMdot;                  // reporting: Fuel Amount used (kg/s)
@@ -137,7 +137,7 @@ namespace CTElectricGenerator {
               ExhaustEnergyRec(0.0), TotalHeatEnergyRec(0.0), QLubeOilRecoveredCurve(0), UA(0.0), UACoef(2, 0.0), MaxExhaustperCTPower(0.0),
               DesignHeatRecVolFlowRate(0.0), DesignHeatRecMassFlowRate(0.0), DesignMinExitGasTemp(0.0), DesignAirInletTemp(0.0),
               ExhaustStackTemp(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecInletTemp(0.0),
-              HeatRecOutletTemp(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSide(DataPlant::LoopSideLocation::Invalid), HRBranchNum(0), HRCompNum(0), FuelMdot(0.0),
+              HeatRecOutletTemp(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(DataPlant::LoopSideLocation::Invalid), HRBranchNum(0), HRCompNum(0), FuelMdot(0.0),
               FuelHeatingValue(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), OAInletNode(0), MyEnvrnFlag(true),
               MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true), MyFlag(true)
         {

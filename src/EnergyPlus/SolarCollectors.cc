@@ -947,7 +947,7 @@ namespace SolarCollectors {
                                                this->InletNode,
                                                this->OutletNode,
                                                this->WLoopNum,
-                                               this->WLoopSide,
+                                               this->WLoopSideNum,
                                                this->WLoopBranchNum,
                                                this->WLoopCompNum);
 
@@ -1028,7 +1028,7 @@ namespace SolarCollectors {
                                              this->InletNode,
                                              this->OutletNode,
                                              this->WLoopNum,
-                                             this->WLoopSide,
+                                             this->WLoopSideNum,
                                              this->WLoopBranchNum,
                                              this->WLoopCompNum);
 
@@ -2205,7 +2205,7 @@ namespace SolarCollectors {
                                                         this->Name,
                                                         this->Type,
                                                         this->WLoopNum,
-                                                        this->WLoopSide,
+                                                        this->WLoopSideNum,
                                                         this->WLoopBranchNum,
                                                         this->WLoopCompNum,
                                                         errFlag,

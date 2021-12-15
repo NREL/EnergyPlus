@@ -113,7 +113,7 @@ namespace BoilerSteam {
         EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         this->initialize(state);
-        auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).Branch(this->BranchNum).Comp(this->CompNum));
+        auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->calculate(state, CurLoad, RunFlag, sim_component.FlowCtrl);
         this->update(state, CurLoad, RunFlag, FirstHVACIteration);
     }
@@ -317,7 +317,7 @@ namespace BoilerSteam {
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Boiler_Steam,
                                                 this->LoopNum,
-                                                this->LoopSide,
+                                                this->LoopSideNum,
                                                 this->BranchNum,
                                                 this->CompNum,
                                                 errFlag,
@@ -355,7 +355,7 @@ namespace BoilerSteam {
                                            this->BoilerInletNodeNum,
                                            this->BoilerOutletNodeNum,
                                            this->LoopNum,
-                                           this->LoopSide,
+                                           this->LoopSideNum,
                                            this->BranchNum,
                                            this->CompNum);
 
@@ -685,7 +685,7 @@ namespace BoilerSteam {
         CpWater = FluidProperties::GetSatSpecificHeatRefrig(
             state, fluidNameSteam, state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp, 0.0, this->FluidIndex, RoutineName);
 
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock ==
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock ==
             DataPlant::FlowLock::Unlocked) { // TODO: Components shouldn't check FlowLock
             // Calculate the flow for the boiler
 
@@ -713,7 +713,7 @@ namespace BoilerSteam {
                                                  this->BoilerInletNodeNum,
                                                  this->BoilerOutletNodeNum,
                                                  this->LoopNum,
-                                                 this->LoopSide,
+                                                 this->LoopSideNum,
                                                  this->BranchNum,
                                                  this->CompNum);
 
@@ -795,7 +795,7 @@ namespace BoilerSteam {
                                                      this->BoilerInletNodeNum,
                                                      this->BoilerOutletNodeNum,
                                                      this->LoopNum,
-                                                     this->LoopSide,
+                                                     this->LoopSideNum,
                                                      this->BranchNum,
                                                      this->CompNum);
             }
@@ -818,7 +818,7 @@ namespace BoilerSteam {
                                                          this->BoilerInletNodeNum,
                                                          this->BoilerOutletNodeNum,
                                                          this->LoopNum,
-                                                         this->LoopSide,
+                                                         this->LoopSideNum,
                                                          this->BranchNum,
                                                          this->CompNum);
                 } else {

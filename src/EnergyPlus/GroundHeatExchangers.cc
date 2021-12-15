@@ -3114,10 +3114,10 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     this->tempGround /= 5;
 
     this->massFlowRate =
-        RegulateCondenserCompFlowReqOp(state, this->loopNum, this->loopSide, this->branchNum, this->compNum, this->designMassFlow);
+        RegulateCondenserCompFlowReqOp(state, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, this->designMassFlow);
 
     SetComponentFlowRate(
-        state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSide, this->branchNum, this->compNum);
+        state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -3136,7 +3136,7 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
         state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
     this->designMassFlow = this->designFlow * fluidDensity;
     PlantUtilities::InitComponentNodes(
-        state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSide, this->branchNum, this->compNum);
+        state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
     this->lastQnSubHr = 0.0;
     state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->tempGround;
@@ -3166,7 +3166,7 @@ void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
                             this->name,
                             DataPlant::PlantEquipmentType::GrndHtExchgSystem,
                             this->loopNum,
-                            this->loopSide,
+                            this->loopSideNum,
                             this->branchNum,
                             this->compNum,
                             errFlag,
@@ -3211,10 +3211,10 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     this->tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
     this->massFlowRate =
-        RegulateCondenserCompFlowReqOp(state, this->loopNum, this->loopSide, this->branchNum, this->compNum, this->designMassFlow);
+        RegulateCondenserCompFlowReqOp(state, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, this->designMassFlow);
 
     SetComponentFlowRate(
-        state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSide, this->branchNum, this->compNum);
+        state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -3233,7 +3233,7 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
         state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
     this->designMassFlow = this->designFlow * fluidDensity;
     PlantUtilities::InitComponentNodes(
-        state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSide, this->branchNum, this->compNum);
+        state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
     this->lastQnSubHr = 0.0;
     state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
@@ -3262,7 +3262,7 @@ void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
                             this->name,
                             DataPlant::PlantEquipmentType::GrndHtExchgSlinky,
                             this->loopNum,
-                            this->loopSide,
+                            this->loopSideNum,
                             this->branchNum,
                             this->compNum,
                             errFlag,

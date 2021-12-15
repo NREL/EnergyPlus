@@ -133,7 +133,7 @@ void BLASTAbsorberSpecs::simulate(
 {
 
     this->EquipFlowCtrl = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
-                              .LoopSide(calledFromLocation.loopSide)
+                              .LoopSide(calledFromLocation.loopSideNum)
                               .Branch(calledFromLocation.branchNum)
                               .Comp(calledFromLocation.compNum)
                               .FlowCtrl;
@@ -150,7 +150,7 @@ void BLASTAbsorberSpecs::simulate(
         // Called from non-dominant condenser water connection loop side
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
-                                                            calledFromLocation.loopSide,
+                                                            calledFromLocation.loopSideNum,
                                                             DataPlant::PlantEquipmentType::Chiller_Absorption,
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
@@ -164,7 +164,7 @@ void BLASTAbsorberSpecs::simulate(
         // Called from non-dominant generator hot water or steam connection loop side
         PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(state,
                                                                     calledFromLocation.loopNum,
-                                                                    calledFromLocation.loopSide,
+                                                                    calledFromLocation.loopSideNum,
                                                                     DataPlant::PlantEquipmentType::Chiller_Absorption,
                                                                     this->GeneratorInletNodeNum,
                                                                     this->GeneratorOutletNodeNum,
@@ -697,7 +697,7 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_Absorption,
                                             this->CWLoopNum,
-                                            this->CWLoopSide,
+                                            this->CWLoopSideNum,
                                             this->CWBranchNum,
                                             this->CWCompNum,
                                             errFlag,
@@ -711,7 +711,7 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Chiller_Absorption,
                                                 this->CDLoopNum,
-                                                this->CDLoopSide,
+                                                this->CDLoopSideNum,
                                                 this->CDBranchNum,
                                                 this->CDCompNum,
                                                 errFlag,
@@ -722,9 +722,9 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _);
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWLoopNum,
-                                                      this->CWLoopSide,
+                                                      this->CWLoopSideNum,
                                                       this->CDLoopNum,
-                                                      this->CDLoopSide,
+                                                      this->CDLoopSideNum,
                                                       DataPlant::PlantEquipmentType::Chiller_Absorption,
                                                       true);
     }
@@ -733,7 +733,7 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Chiller_Absorption,
                                                 this->GenLoopNum,
-                                                this->GenLoopSide,
+                                                this->GenLoopSideNum,
                                                 this->GenBranchNum,
                                                 this->GenCompNum,
                                                 errFlag,
@@ -743,16 +743,16 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->GeneratorInletNodeNum,
                                                 _);
         PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSide, this->GenLoopNum, this->GenLoopSide, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
+            state, this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenLoopSideNum, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
     }
 
     // Fill in connection data
     if ((this->CondInletNodeNum > 0) && (this->GeneratorInletNodeNum > 0)) {
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CDLoopNum,
-                                                      this->CDLoopSide,
+                                                      this->CDLoopSideNum,
                                                       this->GenLoopNum,
-                                                      this->GenLoopSide,
+                                                      this->GenLoopSideNum,
                                                       DataPlant::PlantEquipmentType::Chiller_Absorption,
                                                       false);
     }
@@ -761,12 +761,12 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     }
 
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
         if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -826,7 +826,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
                                        this->EvapInletNodeNum,
                                        this->EvapOutletNodeNum,
                                        this->CWLoopNum,
-                                       this->CWLoopSide,
+                                       this->CWLoopSideNum,
                                        this->CWBranchNum,
                                        this->CWCompNum);
 
@@ -844,7 +844,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
                                        this->CondInletNodeNum,
                                        this->CondOutletNodeNum,
                                        this->CDLoopNum,
-                                       this->CDLoopSide,
+                                       this->CDLoopSideNum,
                                        this->CDBranchNum,
                                        this->CDCompNum);
     state.dataLoopNodes->Node(this->CondInletNodeNum).Temp = this->TempDesCondIn;
@@ -893,7 +893,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
                                            this->GeneratorInletNodeNum,
                                            this->GeneratorOutletNodeNum,
                                            this->GenLoopNum,
-                                           this->GenLoopSide,
+                                           this->GenLoopSideNum,
                                            this->GenBranchNum,
                                            this->GenCompNum);
     }
@@ -952,10 +952,10 @@ void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
     }
 
     PlantUtilities::SetComponentFlowRate(
-        state, mdotEvap, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
+        state, mdotEvap, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
 
     PlantUtilities::SetComponentFlowRate(
-        state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSide, this->CDBranchNum, this->CDCompNum);
+        state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
 
     if (this->GeneratorInletNodeNum > 0) {
 
@@ -964,7 +964,7 @@ void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
                                              this->GeneratorInletNodeNum,
                                              this->GeneratorOutletNodeNum,
                                              this->GenLoopNum,
-                                             this->GenLoopSide,
+                                             this->GenLoopSideNum,
                                              this->GenBranchNum,
                                              this->GenCompNum);
     }
@@ -1545,7 +1545,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
 
     // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
     // condenser side outlet temperature.
-    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).FlowLock == DataPlant::FlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
         this->PossibleSubcooling = false;
         this->QEvaporator = std::abs(MyLoad);
         // limit by max capacity
@@ -1587,7 +1587,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
                                                      this->CWLoopNum,
-                                                     this->CWLoopSide,
+                                                     this->CWLoopSideNum,
                                                      this->CWBranchNum,
                                                      this->CWCompNum);
                 {
@@ -1645,7 +1645,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                 if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSide)
+                             .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -1657,7 +1657,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                 } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSide)
+                             .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -1790,7 +1790,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                              state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                              state.dataPlnt->PlantLoop(GenLoopNum).FluidIndex,
                                                              RoutineName);
-            if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSide).FlowLock == DataPlant::FlowLock::Unlocked) {
+            if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
                 if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
                     GenMassFlowRate = this->GenMassFlowRateMax;
                 } else { // LeavingSetpointModulated
@@ -1807,7 +1807,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                  this->GeneratorInletNodeNum,
                                                  this->GeneratorOutletNodeNum,
                                                  this->GenLoopNum,
-                                                 this->GenLoopSide,
+                                                 this->GenLoopSideNum,
                                                  this->GenBranchNum,
                                                  this->GenCompNum);
 
@@ -1851,7 +1851,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                  this->GeneratorInletNodeNum,
                                                  this->GeneratorOutletNodeNum,
                                                  this->GenLoopNum,
-                                                 this->GenLoopSide,
+                                                 this->GenLoopSideNum,
                                                  this->GenBranchNum,
                                                  this->GenCompNum);
 

@@ -3352,7 +3352,7 @@ namespace FuelCellElectricGenerator {
         if (this->Type == DataPlant::PlantEquipmentType::Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->CWLoopNum,
-                                                            this->CWLoopSide,
+                                                            this->CWLoopSideNum,
                                                             DataPlant::PlantEquipmentType::Generator_FCStackCooler,
                                                             this->StackCooler.WaterInNode,
                                                             this->StackCooler.WaterOutNode,
@@ -3364,7 +3364,7 @@ namespace FuelCellElectricGenerator {
         } else if (this->Type == DataPlant::PlantEquipmentType::Generator_FCExhaust) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->CWLoopNum,
-                                                            this->CWLoopSide,
+                                                            this->CWLoopSideNum,
                                                             DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                             this->ExhaustHX.WaterInNode,
                                                             this->ExhaustHX.WaterOutNode,
@@ -3467,7 +3467,7 @@ namespace FuelCellElectricGenerator {
                                                this->ExhaustHX.WaterInNode,
                                                this->ExhaustHX.WaterOutNode,
                                                this->CWLoopNum,
-                                               this->CWLoopSide,
+                                               this->CWLoopSideNum,
                                                this->CWBranchNum,
                                                this->CWCompNum);
 
@@ -3502,7 +3502,7 @@ namespace FuelCellElectricGenerator {
                                                  this->ExhaustHX.WaterInNode,
                                                  this->ExhaustHX.WaterOutNode,
                                                  this->CWLoopNum,
-                                                 this->CWLoopSide,
+                                                 this->CWLoopSideNum,
                                                  this->CWBranchNum,
                                                  this->CWCompNum);
 
@@ -3516,7 +3516,7 @@ namespace FuelCellElectricGenerator {
                                                  this->ExhaustHX.WaterInNode,
                                                  this->ExhaustHX.WaterOutNode,
                                                  this->CWLoopNum,
-                                                 this->CWLoopSide,
+                                                 this->CWLoopSideNum,
                                                  this->CWBranchNum,
                                                  this->CWCompNum);
 
@@ -3735,7 +3735,7 @@ namespace FuelCellElectricGenerator {
                                                     this->NameExhaustHX,
                                                     DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                     this->CWLoopNum,
-                                                    this->CWLoopSide,
+                                                    this->CWLoopSideNum,
                                                     this->CWBranchNum,
                                                     this->CWCompNum,
                                                     errFlag,

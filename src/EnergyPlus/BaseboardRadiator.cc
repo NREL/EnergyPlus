@@ -183,7 +183,7 @@ namespace BaseboardRadiator {
                                       DummyMdot,
                                       baseboard->Baseboard(BaseboardNum).WaterInletNode,
                                       baseboard->Baseboard(BaseboardNum).LoopNum,
-                                      baseboard->Baseboard(BaseboardNum).LoopSide,
+                                      baseboard->Baseboard(BaseboardNum).LoopSideNum,
                                       baseboard->Baseboard(BaseboardNum).BranchNum,
                                       false);
 
@@ -194,7 +194,7 @@ namespace BaseboardRadiator {
                                       DummyMdot,
                                       baseboard->Baseboard(BaseboardNum).WaterInletNode,
                                       baseboard->Baseboard(BaseboardNum).LoopNum,
-                                      baseboard->Baseboard(BaseboardNum).LoopSide,
+                                      baseboard->Baseboard(BaseboardNum).LoopSideNum,
                                       baseboard->Baseboard(BaseboardNum).BranchNum,
                                       true);
 
@@ -226,7 +226,7 @@ namespace BaseboardRadiator {
                               _,
                               _,
                               baseboard->Baseboard(BaseboardNum).LoopNum,
-                              baseboard->Baseboard(BaseboardNum).LoopSide,
+                              baseboard->Baseboard(BaseboardNum).LoopSideNum,
                               baseboard->Baseboard(BaseboardNum).BranchNum);
 
             PowerMet = baseboard->Baseboard(BaseboardNum).Power;
@@ -590,7 +590,7 @@ namespace BaseboardRadiator {
                                     baseboard->Baseboard(BaseboardNum).EquipID,
                                     baseboard->Baseboard(BaseboardNum).EquipType,
                                     baseboard->Baseboard(BaseboardNum).LoopNum,
-                                    baseboard->Baseboard(BaseboardNum).LoopSide,
+                                    baseboard->Baseboard(BaseboardNum).LoopSideNum,
                                     baseboard->Baseboard(BaseboardNum).BranchNum,
                                     baseboard->Baseboard(BaseboardNum).CompNum,
                                     errFlag,
@@ -639,7 +639,7 @@ namespace BaseboardRadiator {
                                baseboard->Baseboard(BaseboardNum).WaterInletNode,
                                baseboard->Baseboard(BaseboardNum).WaterOutletNode,
                                baseboard->Baseboard(BaseboardNum).LoopNum,
-                               baseboard->Baseboard(BaseboardNum).LoopSide,
+                               baseboard->Baseboard(BaseboardNum).LoopSideNum,
                                baseboard->Baseboard(BaseboardNum).BranchNum,
                                baseboard->Baseboard(BaseboardNum).CompNum);
             state.dataLoopNodes->Node(WaterInletNode).Temp = DataGlobalConstants::HWInitConvTemp;
@@ -1187,7 +1187,7 @@ namespace BaseboardRadiator {
                                       WaterMassFlowRate,
                                       baseboard->Baseboard(BaseboardNum).WaterInletNode,
                                       baseboard->Baseboard(BaseboardNum).LoopNum,
-                                      baseboard->Baseboard(BaseboardNum).LoopSide,
+                                      baseboard->Baseboard(BaseboardNum).LoopSideNum,
                                       baseboard->Baseboard(BaseboardNum).BranchNum,
                                       false);
             AirMassFlowRate = 0.0;

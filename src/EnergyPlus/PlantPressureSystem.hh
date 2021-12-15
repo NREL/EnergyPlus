@@ -66,7 +66,7 @@ namespace PlantPressureSystem {
                                int LoopNum,                        // Plant Loop to update pressure information
                                bool FirstHVACIteration,            // System flag
                                DataPlant::PressureCall CallType,   // Enumerated call type
-                               DataPlant::LoopSideLocation LoopSide = DataPlant::LoopSideLocation::Invalid, // Loop side num for specific branch simulation
+                               DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid, // Loop side num for specific branch simulation
                                Optional_int_const BranchNum = _    // Branch num for specific branch simulation
     );
 
@@ -74,7 +74,7 @@ namespace PlantPressureSystem {
 
     void BranchPressureDrop(EnergyPlusData &state,
                             int LoopNum,     // Plant Loop Index
-                            DataPlant::LoopSideLocation LoopSide, // LoopSide on Plant Loop LoopNum
+                            DataPlant::LoopSideLocation LoopSideNum, // LoopSide on Plant Loop LoopNum
                             int BranchNum    // Branch Index on LoopSide LoopSideNum
     );
 
@@ -82,17 +82,17 @@ namespace PlantPressureSystem {
 
     void DistributePressureOnBranch(EnergyPlusData &state,
                                     const int LoopNum,
-                                    const DataPlant::LoopSideLocation LoopSide,
+                                    const DataPlant::LoopSideLocation LoopSideNum,
                                     const int BranchNum, Real64 &BranchPressureDrop, bool &PumpFound);
 
     void PassPressureAcrossMixer(EnergyPlusData &state,
                                  const int LoopNum,
-                                 const DataPlant::LoopSideLocation LoopSide, Real64 &MixerPressure,
+                                 const DataPlant::LoopSideLocation LoopSideNum, Real64 &MixerPressure,
                                  const int NumBranchesOnLoopSide);
 
     void PassPressureAcrossSplitter(EnergyPlusData &state,
                                     const int LoopNum,
-                                    const DataPlant::LoopSideLocation LoopSide, Real64 &SplitterInletPressure);
+                                    const DataPlant::LoopSideLocation LoopSideNum, Real64 &SplitterInletPressure);
 
     void PassPressureAcrossInterface(EnergyPlusData &state, int LoopNum);
 

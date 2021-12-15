@@ -140,7 +140,7 @@ void IndirectAbsorberSpecs::simulate(
         // Called from non-dominant condenser water connection loop side
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
-                                                            calledFromLocation.loopSide,
+                                                            calledFromLocation.loopSideNum,
                                                             DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
@@ -154,7 +154,7 @@ void IndirectAbsorberSpecs::simulate(
         // Called from non-dominant generator hot water or steam connection loop side
         PlantUtilities::UpdateAbsorberChillerComponentGeneratorSide(state,
                                                                     calledFromLocation.loopNum,
-                                                                    calledFromLocation.loopSide,
+                                                                    calledFromLocation.loopSideNum,
                                                                     DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                                     this->GeneratorInletNodeNum,
                                                                     this->GeneratorOutletNodeNum,
@@ -805,7 +805,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                             this->CWLoopNum,
-                                            this->CWLoopSide,
+                                            this->CWLoopSideNum,
                                             this->CWBranchNum,
                                             this->CWCompNum,
                                             errFlag,
@@ -819,7 +819,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                             this->CDLoopNum,
-                                            this->CDLoopSide,
+                                            this->CDLoopSideNum,
                                             this->CDBranchNum,
                                             this->CDCompNum,
                                             errFlag,
@@ -830,9 +830,9 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             _);
     PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                   this->CWLoopNum,
-                                                  this->CWLoopSide,
+                                                  this->CWLoopSideNum,
                                                   this->CDLoopNum,
-                                                  this->CDLoopSide,
+                                                  this->CDLoopSideNum,
                                                   DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                   true);
 
@@ -841,7 +841,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                 this->GenLoopNum,
-                                                this->GenLoopSide,
+                                                this->GenLoopSideNum,
                                                 this->GenBranchNum,
                                                 this->GenCompNum,
                                                 errFlag,
@@ -852,9 +852,9 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _);
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWLoopNum,
-                                                      this->CWLoopSide,
+                                                      this->CWLoopSideNum,
                                                       this->GenLoopNum,
-                                                      this->GenLoopSide,
+                                                      this->GenLoopSideNum,
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       true);
     }
@@ -862,9 +862,9 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     if ((this->CondInletNodeNum > 0) && (this->GeneratorInletNodeNum > 0)) {
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CDLoopNum,
-                                                      this->CDLoopSide,
+                                                      this->CDLoopSideNum,
                                                       this->GenLoopNum,
-                                                      this->GenLoopSide,
+                                                      this->GenLoopSideNum,
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       false);
     }
@@ -874,13 +874,13 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 
     if (this->FlowMode == DataPlant::FlowMode::Constant) {
         // reset flow priority
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
         // reset flow priority
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
         if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -946,7 +946,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
     }
 
     this->EquipFlowCtrl =
-        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowCtrl;
+        state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowCtrl;
 
     // Initialize Supply Side Variables
     if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -965,7 +965,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
                                            this->EvapInletNodeNum,
                                            this->EvapOutletNodeNum,
                                            this->CWLoopNum,
-                                           this->CWLoopSide,
+                                           this->CWLoopSideNum,
                                            this->CWBranchNum,
                                            this->CWCompNum);
 
@@ -983,7 +983,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
                                            this->CondInletNodeNum,
                                            this->CondOutletNodeNum,
                                            this->CDLoopNum,
-                                           this->CDLoopSide,
+                                           this->CDLoopSideNum,
                                            this->CDBranchNum,
                                            this->CDCompNum);
 
@@ -1016,7 +1016,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
                                                this->GeneratorInletNodeNum,
                                                this->GeneratorOutletNodeNum,
                                                this->GenLoopNum,
-                                               this->GenLoopSide,
+                                               this->GenLoopSideNum,
                                                this->GenBranchNum,
                                                this->GenCompNum);
         }
@@ -1046,10 +1046,10 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
     }
 
     PlantUtilities::SetComponentFlowRate(
-        state, mdotEvap, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
+        state, mdotEvap, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
 
     PlantUtilities::SetComponentFlowRate(
-        state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSide, this->CDBranchNum, this->CDCompNum);
+        state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSideNum, this->CDBranchNum, this->CDCompNum);
 
     if (this->GeneratorInletNodeNum > 0) {
 
@@ -1058,7 +1058,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
                                              this->GeneratorInletNodeNum,
                                              this->GeneratorOutletNodeNum,
                                              this->GenLoopNum,
-                                             this->GenLoopSide,
+                                             this->GenLoopSideNum,
                                              this->GenBranchNum,
                                              this->GenCompNum);
     }
@@ -1801,7 +1801,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
 
     // If FlowLock is True, the new resolved mdot is used to update Power, QEvap, Qcond, and
     // condenser side outlet temperature.
-    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).FlowLock == DataPlant::FlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
         this->PossibleSubcooling = false;
         this->QEvaporator = std::abs(MyLoad);
 
@@ -1841,7 +1841,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
                                                      this->CWLoopNum,
-                                                     this->CWLoopSide,
+                                                     this->CWLoopSideNum,
                                                      this->CWBranchNum,
                                                      this->CWCompNum);
                 {
@@ -1896,7 +1896,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                 if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSide)
+                             .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -1908,7 +1908,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                 } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
-                             .LoopSide(this->CWLoopSide)
+                             .LoopSide(this->CWLoopSideNum)
                              .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
@@ -2070,7 +2070,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                                                  this->GeneratorInletNodeNum,
                                                  this->GeneratorOutletNodeNum,
                                                  this->GenLoopNum,
-                                                 this->GenLoopSide,
+                                                 this->GenLoopSideNum,
                                                  this->GenBranchNum,
                                                  this->GenCompNum);
 
@@ -2118,7 +2118,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                                                  this->GeneratorInletNodeNum,
                                                  this->GeneratorOutletNodeNum,
                                                  this->GenLoopNum,
-                                                 this->GenLoopSide,
+                                                 this->GenLoopSideNum,
                                                  this->GenBranchNum,
                                                  this->GenCompNum);
 

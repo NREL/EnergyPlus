@@ -106,7 +106,7 @@ using FluidProperties::GetSpecificHeatGlycol;
 
 void ManagePlantLoadDistribution(EnergyPlusData &state,
                                  int const LoopNum,     // PlantLoop data structure loop counter
-                                 const LoopSideLocation LoopSide, // PlantLoop data structure LoopSide counter
+                                 const LoopSideLocation LoopSideNum, // PlantLoop data structure LoopSide counter
                                  int const BranchNum,   // PlantLoop data structure branch counter
                                  int const CompNum,     // PlantLoop data structure component counter
                                  Real64 &LoopDemand,
@@ -168,11 +168,11 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
         return;
 
     // set up references
-    auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide));
+    auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
     auto &this_component(loop_side.Branch(BranchNum).Comp(CompNum));
 
     // Implement EMS control commands
-    ActivateEMSControls(state, LoopNum, LoopSide, BranchNum, CompNum, LoopShutDownFlag);
+    ActivateEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, LoopShutDownFlag);
 
     // Schedules are checked and CurOpScheme updated on FirstHVACIteration in InitLoadDistribution
     // Here we just load CurOpScheme to a local variable
@@ -260,13 +260,13 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     }
     case OpScheme::CompSetPtBased: {
         // check for EMS Control
-        TurnOnPlantLoopPipes(state, LoopNum, LoopSide);
-        FindCompSPLoad(state, LoopNum, LoopSide, BranchNum, CompNum, CurCompLevelOpNum);
+        TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
+        FindCompSPLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
         break;
     }
     case OpScheme::EMS: {
-        TurnOnPlantLoopPipes(state, LoopNum, LoopSide);
-        DistributeUserDefinedPlantLoad(state, LoopNum, LoopSide, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
+        TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
+        DistributeUserDefinedPlantLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
         break;
     }
     default: { // it's a range based control type with multiple equipment lists
@@ -307,8 +307,8 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
                 }
             }
             if (this_op_scheme.EquipList(ListPtr).NumComps > 0) {
-                TurnOnPlantLoopPipes(state, LoopNum, LoopSide);
-                DistributePlantLoad(state, LoopNum, LoopSide, CurSchemePtr, ListPtr, LoopDemand, RemLoopDemand);
+                TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
+                DistributePlantLoad(state, LoopNum, LoopSideNum, CurSchemePtr, ListPtr, LoopDemand, RemLoopDemand);
                 LoadDistributionWasPerformed = true;
             }
         }
@@ -1925,7 +1925,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     int BranchPtr;
     int CompPtr;
     int DummyLoopNum;
-    DataPlant::LoopSideLocation LoopSide;
+    DataPlant::LoopSideLocation LoopSideNum;
     int BranchNum;
     int CompNum;
     int Index;
@@ -1984,7 +1984,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                                                                 this_equip.Name,
                                                                 Type,
                                                                 DummyLoopNum,
-                                                                LoopSide,
+                                                                LoopSideNum,
                                                                 BranchNum,
                                                                 CompNum,
                                                                 errFlag1,
@@ -2003,7 +2003,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         }
 
                         this_equip.LoopNumPtr = DummyLoopNum;
-                        this_equip.LoopSidePtr = LoopSide;
+                        this_equip.LoopSideNumPtr = LoopSideNum;
                         this_equip.BranchNumPtr = BranchNum;
                         this_equip.CompNumPtr = CompNum;
 
@@ -2050,10 +2050,10 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         auto &this_equip(this_equip_list.Comp(EquipNum));
                         // dereference indices (stored in previous loop)
                         DummyLoopNum = this_equip.LoopNumPtr;
-                        LoopSide = this_equip.LoopSidePtr;
+                        LoopSideNum = this_equip.LoopSideNumPtr;
                         BranchNum = this_equip.BranchNumPtr;
                         CompNum = this_equip.CompNumPtr;
-                        auto &dummy_loop_equip(state.dataPlnt->PlantLoop(DummyLoopNum).LoopSide(LoopSide).Branch(BranchNum).Comp(CompNum));
+                        auto &dummy_loop_equip(state.dataPlnt->PlantLoop(DummyLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
                         if (dummy_loop_equip.NumOpSchemes == 0) {
                             // first op scheme for this component, allocate OpScheme and its EquipList to size 1
@@ -2106,8 +2106,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         // check the pointers to see if a single component is attached to more than one type of control scheme
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
-            for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys){
-                auto const &this_loop_side(this_plant_loop.LoopSide(LoopSide));
+            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys){
+                auto const &this_loop_side(this_plant_loop.LoopSide(LoopSideNum));
                 for (int BranchNum = 1, BranchNum_end = this_loop_side.TotalBranches; BranchNum <= BranchNum_end; ++BranchNum) {
                     auto const &this_branch(this_loop_side.Branch(BranchNum));
                     for (int CompNum = 1, CompNum_end = this_branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
@@ -2186,9 +2186,9 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     if (FirstHVACIteration) {
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
-            for (DataPlant::LoopSideLocation LoopSide : LoopSideKeys)
+            for (DataPlant::LoopSideLocation LoopSideNum : LoopSideKeys)
             {
-                auto &this_loop_side(this_plant_loop.LoopSide(LoopSide));
+                auto &this_loop_side(this_plant_loop.LoopSide(LoopSideNum));
                 for (int BranchNum = 1, BranchNum_end = this_loop_side.TotalBranches; BranchNum <= BranchNum_end; ++BranchNum) {
                     auto &this_branch(this_loop_side.Branch(BranchNum));
                     for (int CompNum = 1, CompNum_end = this_branch.TotalComponents; CompNum <= CompNum_end; ++CompNum) {
@@ -2229,7 +2229,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
 
                             // then look up the component topological position from this structure
                             LoopPtr = this_list_component.LoopNumPtr;
-                            LoopSidePtr = this_list_component.LoopSidePtr;
+                            LoopSidePtr = this_list_component.LoopSideNumPtr;
                             BranchPtr = this_list_component.BranchNumPtr;
                             CompPtr = this_list_component.CompNumPtr;
 
@@ -2276,7 +2276,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
 
 void DistributePlantLoad(EnergyPlusData &state,
                          int const LoopNum,
-                         const LoopSideLocation LoopSide,
+                         const LoopSideLocation LoopSideNum,
                          int const CurSchemePtr, // use as index in PlantLoop()OpScheme() data structure
                          int const ListPtr,      // use as index in PlantLoop()OpScheme() data structure
                          Real64 const LoopDemand,
@@ -2332,7 +2332,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
     // start with some references
     auto &this_loop(state.dataPlnt->PlantLoop(LoopNum));
-    auto &this_loopside(this_loop.LoopSide(LoopSide));
+    auto &this_loopside(this_loop.LoopSide(LoopSideNum));
     auto &this_equiplist(this_loop.OpScheme(CurSchemePtr).EquipList(ListPtr));
 
     struct LoadPLRPoint
@@ -2386,9 +2386,9 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
                 ChangeInLoad = max(0.0, ChangeInLoad);
                 this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
@@ -2467,9 +2467,9 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
                 ChangeInLoad = max(0.0, ChangeInLoad);
                 this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
@@ -2517,9 +2517,9 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
                 ChangeInLoad = max(0.0, ChangeInLoad);
                 this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
                 RemLoopDemand -= sign(ChangeInLoad, RemLoopDemand);
@@ -2636,9 +2636,9 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
                 ChangeInLoad = max(0.0, ChangeInLoad);
 
@@ -2718,9 +2718,9 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSide, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
                 ChangeInLoad = max(0.0, ChangeInLoad);
 
@@ -2804,7 +2804,7 @@ void AdjustChangeInLoadForLastStageUpperRangeLimit(EnergyPlusData &state,
 
 void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
                                    int const LoopNum,     // component topology
-                                   const LoopSideLocation LoopSide, // component topology
+                                   const LoopSideLocation LoopSideNum, // component topology
                                    int const BranchNum,   // component topology
                                    int const CompNum,     // component topology
                                    Real64 &ChangeInLoad   // positive magnitude of load change
@@ -2838,7 +2838,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
     Real64 QdotTmp(0.0);
     int ControlNodeNum(0);
 
-    auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Comp(CompNum));
+    auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
     // start of bad band-aid, need a general and comprehensive approach for determining current capacity of all kinds of equipment
     // Need to truncate the load down in case outlet temperature will hit a lower/upper limit
@@ -2976,7 +2976,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
 
 void FindCompSPLoad(EnergyPlusData &state,
                     int const LoopNum,
-                    const LoopSideLocation LoopSide,
+                    const LoopSideLocation LoopSideNum,
                     int const BranchNum,
                     int const CompNum,
                     int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
@@ -3023,7 +3023,7 @@ void FindCompSPLoad(EnergyPlusData &state,
     Real64 CurrentDemandForCoolingOp;
     Real64 CurrentDemandForHeatingOp;
 
-    auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Comp(CompNum));
+    auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
     // find the pointer to the 'PlantLoop()%OpScheme()'...data structure
     NumEquipLists = this_component.OpScheme(OpNum).NumEquipLists;
@@ -3125,21 +3125,21 @@ void FindCompSPLoad(EnergyPlusData &state,
         if (std::abs(this_component.MyLoad) > CompMaxLoad) {
             this_component.MyLoad = sign(CompMaxLoad, this_component.MyLoad);
         }
-        //   PlantLoop(LoopNum)%LoopSide(LoopSide)%Branch(BranchNum)%Comp(CompNum)%MyLoad = &
-        //   MIN(PlantLoop(LoopNum)%LoopSide(LoopSide)%Branch(BranchNum)%Comp(CompNum)%MyLoad,CompMaxLoad)
+        //   PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad = &
+        //   MIN(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad,CompMaxLoad)
 
         if (std::abs(this_component.MyLoad) < CompMinLoad) {
             this_component.MyLoad = sign(CompMinLoad, this_component.MyLoad);
         }
-        //   PlantLoop(LoopNum)%LoopSide(LoopSide)%Branch(BranchNum)%Comp(CompNum)%MyLoad = &
-        //   MAX(PlantLoop(LoopNum)%LoopSide(LoopSide)%Branch(BranchNum)%Comp(CompNum)%MyLoad,CompMinLoad)
+        //   PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad = &
+        //   MAX(PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%MyLoad,CompMinLoad)
 
     } // valid setpoint (TempSetPt /= SensedNodeFlagValue)
 }
 
 void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
                                     int const LoopNum,
-                                    const LoopSideLocation LoopSide,
+                                    const LoopSideLocation LoopSideNum,
                                     int const BranchNum,
                                     int const CompNum,
                                     int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
@@ -3181,9 +3181,9 @@ void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CompPtr;
 
-    auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Comp(CompNum));
+    auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
-    // ListPtr = PlantLoop(LoopNum)%LoopSide(LoopSide)%Branch(BranchNum)%Comp(CompNum)%OpScheme(CurCompLevelOpNum)%EquipList(1)%ListPtr
+    // ListPtr = PlantLoop(LoopNum)%LoopSide(LoopSideNum)%Branch(BranchNum)%Comp(CompNum)%OpScheme(CurCompLevelOpNum)%EquipList(1)%ListPtr
     CompPtr = this_component.OpScheme(CurCompLevelOpNum).EquipList(1).CompPtr;
 
     // fill internal variable
@@ -3285,7 +3285,7 @@ Real64 FindRangeVariable(EnergyPlusData &state,
 // Begin Plant Loop ON/OFF Utility Subroutines
 //******************************************************************************
 
-void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, const LoopSideLocation LoopSide)
+void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, const LoopSideLocation LoopSideNum)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Dan Fisher
@@ -3316,15 +3316,15 @@ void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, const LoopSi
     int MachineOnLoopNum;
     int Num;
 
-    for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalBranches; ++Num) {
-        for (MachineOnLoopNum = 1; MachineOnLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).TotalComponents;
+    for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++Num) {
+        for (MachineOnLoopNum = 1; MachineOnLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
              ++MachineOnLoopNum) {
-            switch (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).Comp(MachineOnLoopNum).Type) {
+            switch (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).Type) {
             case DataPlant::PlantEquipmentType::Pipe:
             case DataPlant::PlantEquipmentType::PipeInterior:
             case DataPlant::PlantEquipmentType::PipeExterior:
             case DataPlant::PlantEquipmentType::PipeUnderground: {
-                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).Comp(MachineOnLoopNum).ON = true;
+                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnLoopNum).ON = true;
                 break;
             }
             default:
@@ -3363,22 +3363,22 @@ void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum)
     int MachineOnBranch;
     int Num;
 
-    for (DataPlant::LoopSideLocation LoopSide : LoopSideKeys) {
-        for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalBranches; ++Num) {
-            for (MachineOnBranch = 1; MachineOnBranch <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).TotalComponents;
+    for (DataPlant::LoopSideLocation LoopSideNum : LoopSideKeys) {
+        for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++Num) {
+            for (MachineOnBranch = 1; MachineOnBranch <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
                  ++MachineOnBranch) {
                 // Sankar Non Integrated Economizer
                 if (!DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(
-                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).Comp(MachineOnBranch).Type)]) {
-                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).Comp(MachineOnBranch).ON = false;
-                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).Type)]) {
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
                 }
             }
         }
     }
 }
 
-void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, const LoopSideLocation LoopSide)
+void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, const LoopSideLocation LoopSideNum)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         D.E. Fisher
@@ -3407,14 +3407,14 @@ void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, const Lo
     int MachineOnBranch;
     int Num;
 
-    for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalBranches; ++Num) {
-        for (MachineOnBranch = 1; MachineOnBranch <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).TotalComponents;
+    for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++Num) {
+        for (MachineOnBranch = 1; MachineOnBranch <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
              ++MachineOnBranch) {
             // Sankar Non Integrated Economizer
             if (!DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(
-                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).Comp(MachineOnBranch).Type)]) {
-                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).Comp(MachineOnBranch).ON = false;
-                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).Type)]) {
+                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
+                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
             }
         }
     }
@@ -3485,44 +3485,44 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
                          state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).EMSCtrl,
                          state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).EMSValue);
 
-        for (DataPlant::LoopSideLocation LoopSide : LoopSideKeys) {
-            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalBranches; ++BranchNum) {
-                if (LoopSide == LoopSideLocation::Supply) {
+        for (DataPlant::LoopSideLocation LoopSideNum : LoopSideKeys) {
+            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                if (LoopSideNum == LoopSideLocation::Supply) {
                     ActuatorName = "Supply Side Branch";
-                    UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Name;
+                    UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                     ActuatorType = "On/Off Supervisory";
                     SetupEMSActuator(state,
                                      ActuatorName,
                                      UniqueIDName,
                                      ActuatorType,
                                      Units,
-                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).EMSCtrlOverrideOn,
-                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).EMSCtrlOverrideValue);
-                } else if (LoopSide == LoopSideLocation::Demand) {
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideOn,
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideValue);
+                } else if (LoopSideNum == LoopSideLocation::Demand) {
                     ActuatorName = "Demand Side Branch";
-                    UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Name;
+                    UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name;
                     ActuatorType = "On/Off Supervisory";
                     SetupEMSActuator(state,
                                      ActuatorName,
                                      UniqueIDName,
                                      ActuatorType,
                                      Units,
-                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).EMSCtrlOverrideOn,
-                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).EMSCtrlOverrideValue);
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideOn,
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).EMSCtrlOverrideValue);
                 }
-                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).TotalComponents; ++CompNum) {
+                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     ActuatorName = format("Plant Component {}",
                                           PlantEquipTypeNames[static_cast<int>(
-                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Comp(CompNum).Type)]);
-                    UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Comp(CompNum).Name;
+                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Type)]);
+                    UniqueIDName = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).Name;
                     ActuatorType = "On/Off Supervisory";
                     SetupEMSActuator(state,
                                      ActuatorName,
                                      UniqueIDName,
                                      ActuatorType,
                                      "[fraction]",
-                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideOn,
-                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideValue);
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideOn,
+                                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).EMSLoadOverrideValue);
                 }
             }
         }
@@ -3530,7 +3530,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
 }
 
 void ActivateEMSControls(
-    EnergyPlusData &state, int const LoopNum, const LoopSideLocation LoopSide, int const BranchNum, int const CompNum, bool &LoopShutDownFlag)
+    EnergyPlusData &state, int const LoopNum, const LoopSideLocation LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3579,7 +3579,7 @@ void ActivateEMSControls(
 
     // set up some nice references to avoid lookups
     auto &this_loop(state.dataPlnt->PlantLoop(LoopNum));
-    auto &this_loopside(this_loop.LoopSide(LoopSide));
+    auto &this_loopside(this_loop.LoopSide(LoopSideNum));
     auto &this_comp(this_loopside.Branch(BranchNum).Comp(CompNum));
 
     // Loop Control
@@ -3598,7 +3598,7 @@ void ActivateEMSControls(
     // Half-loop control
     if (this_loopside.EMSCtrl) {
         if (this_loopside.EMSValue <= 0.0) {
-            TurnOffLoopSideEquipment(state, LoopNum, LoopSide);
+            TurnOffLoopSideEquipment(state, LoopNum, LoopSideNum);
             return;
         } else {
             // do nothing:  can't turn all LoopSide equip. ON with loop switch
@@ -3653,7 +3653,7 @@ void ActivateEMSControls(
 
 void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
                                      int const LoopNum,
-                                     const LoopSideLocation LoopSide,
+                                     const LoopSideLocation LoopSideNum,
                                      int const BranchNum,
                                      int const CompNum,
                                      Real64 &ChangeInLoad // positive magnitude of load change
@@ -3696,7 +3696,7 @@ void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // set up some nice references to avoid lookups
-    auto &this_loopside(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide));
+    auto &this_loopside(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
     auto &this_branch(this_loopside.Branch(BranchNum));
     auto &this_comp(this_branch.Comp(CompNum));
 

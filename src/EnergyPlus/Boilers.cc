@@ -118,7 +118,7 @@ void BoilerSpecs::simulate(EnergyPlusData &state,
                            Real64 &CurLoad,
                            bool const RunFlag)
 {
-    auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).Branch(this->BranchNum).Comp(this->CompNum));
+    auto &sim_component(state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
     this->InitBoiler(state);
     this->CalcBoilerModel(state, CurLoad, RunFlag, sim_component.FlowCtrl);
     this->UpdateBoilerRecords(state, CurLoad, RunFlag);
@@ -476,7 +476,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Boiler_Simple,
                                             this->LoopNum,
-                                            this->LoopSide,
+                                            this->LoopSideNum,
                                             this->BranchNum,
                                             this->CompNum,
                                             errFlag,
@@ -491,7 +491,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
 
     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->FlowMode == DataPlant::FlowMode::Constant)) {
         // reset flow priority
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
+        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 }
@@ -512,7 +512,7 @@ void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
                                        this->BoilerInletNodeNum,
                                        this->BoilerOutletNodeNum,
                                        this->LoopNum,
-                                       this->LoopSide,
+                                       this->LoopSideNum,
                                        this->BranchNum,
                                        this->CompNum);
 
@@ -833,13 +833,13 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // Initialize the delta temperature to zero
     Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference, set in all necessary code paths so no initialization required
 
-    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
         // Either set the flow to the Constant value or calculate the flow for the variable volume
         if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
             // Then find the flow rate and outlet temp
             this->BoilerMassFlowRate = BoilerMassFlowRateMax;
             PlantUtilities::SetComponentFlowRate(
-                state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
+                state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
             if ((this->BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
                 BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
@@ -867,7 +867,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
                 this->BoilerMassFlowRate = 0.0;
             }
             PlantUtilities::SetComponentFlowRate(
-                state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);
+                state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         } // End of Constant/Variable Flow If Block
 

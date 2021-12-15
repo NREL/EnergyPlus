@@ -133,7 +133,7 @@ namespace SolarCollectors {
         TankTypeEnum ICSType_Num;           // ICS collector type number
         DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
         int WLoopNum;                       // Water plant loop index number
-        DataPlant::LoopSideLocation WLoopSide;                   // Water plant loop side index
+        DataPlant::LoopSideLocation WLoopSideNum;                   // Water plant loop side index
         int WLoopBranchNum;                 // Water plant loop branch index
         int WLoopCompNum;                   // Water plant loop component index
         bool Init;                          // Flag for initialization:  TRUE means do the init
@@ -210,7 +210,7 @@ namespace SolarCollectors {
         // Default Constructor
         CollectorData()
             : VentCavIndex(0), ICSType_Num(TankTypeEnum::ICSRectangularTank), Type(DataPlant::PlantEquipmentType::Invalid), WLoopNum(0),
-              WLoopSide(DataPlant::LoopSideLocation::Invalid), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true), Parameters(0), Surface(0), InletNode(0),
+              WLoopSideNum(DataPlant::LoopSideLocation::Invalid), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true), Parameters(0), Surface(0), InletNode(0),
               InletTemp(0.0), OutletNode(0), OutletTemp(0.0), MassFlowRate(0.0), MassFlowRateMax(0.0), VolFlowRateMax(0.0), ErrIndex(0),
               IterErrIndex(0), IncidentAngleModifier(0.0), Efficiency(0.0), Power(0.0), HeatGain(0.0), HeatLoss(0.0), Energy(0.0), HeatRate(0.0),
               HeatEnergy(0.0), StoredHeatRate(0.0), StoredHeatEnergy(0.0), HeatGainRate(0.0), HeatGainEnergy(0.0), HeatLossRate(0.0),

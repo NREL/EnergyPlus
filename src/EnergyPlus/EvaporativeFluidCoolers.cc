@@ -1223,7 +1223,7 @@ namespace EvaporativeFluidCoolers {
                                                this->WaterInletNodeNum,
                                                this->WaterOutletNodeNum,
                                                this->LoopNum,
-                                               this->LoopSide,
+                                               this->LoopSideNum,
                                                this->BranchNum,
                                                this->CompNum);
             this->MyEnvrnFlag = false;
@@ -1252,7 +1252,7 @@ namespace EvaporativeFluidCoolers {
         this->WaterMassFlowRate =
             PlantUtilities::RegulateCondenserCompFlowReqOp(state,
                                                            this->LoopNum,
-                                                           this->LoopSide,
+                                                           this->LoopSideNum,
                                                            this->BranchNum,
                                                            this->CompNum,
                                                            this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier);
@@ -1262,7 +1262,7 @@ namespace EvaporativeFluidCoolers {
                                              this->WaterInletNodeNum,
                                              this->WaterOutletNodeNum,
                                              this->LoopNum,
-                                             this->LoopSide,
+                                             this->LoopSideNum,
                                              this->BranchNum,
                                              this->CompNum);
     }
@@ -2106,9 +2106,9 @@ namespace EvaporativeFluidCoolers {
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPoint;
+                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPointHi;
+                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
             }
         }
 
@@ -2118,7 +2118,7 @@ namespace EvaporativeFluidCoolers {
 
         //   MassFlowTol is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance ||
-            state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked)
+            state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
             return;
 
         if (inletWaterTemp > TempSetPoint) {
@@ -2288,15 +2288,15 @@ namespace EvaporativeFluidCoolers {
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPoint;
+                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).TempSetPointHi;
+                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
             }
         }
 
         //   MassFlowTol is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance ||
-            state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked)
+            state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
             return;
 
         if (this->InletWaterTemp > TempSetPoint) {
@@ -2625,7 +2625,7 @@ namespace EvaporativeFluidCoolers {
 
         state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->OutletWaterTemp;
 
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(LoopSide).FlowLock == DataPlant::FlowLock::Unlocked || state.dataGlobal->WarmupFlag)
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked || state.dataGlobal->WarmupFlag)
             return;
 
         // Check flow rate through evaporative fluid cooler and compare to design flow rate,
@@ -2756,7 +2756,7 @@ namespace EvaporativeFluidCoolers {
         if (this->OneTimeFlagForEachEvapFluidCooler) {
             // Locate the tower on the plant loops for later usage
             PlantUtilities::ScanPlantLoopsForObject(
-                state, this->Name, this->Type, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+                state, this->Name, this->Type, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
             if (ErrorsFound) {
                 ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");

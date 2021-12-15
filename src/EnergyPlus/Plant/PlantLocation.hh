@@ -56,18 +56,18 @@ struct PlantLocation
 {
     // Members
     int loopNum;
-    DataPlant::LoopSideLocation loopSide;
+    DataPlant::LoopSideLocation loopSideNum;
     int branchNum;
     int compNum;
 
     // Default Constructor
-    PlantLocation() : loopNum(0), loopSide(DataPlant::LoopSideLocation::Invalid), branchNum(0), compNum(0)
+    PlantLocation() : loopNum(0), loopSideNum(DataPlant::LoopSideLocation::Invalid), branchNum(0), compNum(0)
     {
     }
 
     // Member Constructor
-    PlantLocation(int const loopNum, const DataPlant::LoopSideLocation loopSide, int const branchNum, int const compNum)
-        : loopNum(loopNum), loopSide(loopSide), branchNum(branchNum), compNum(compNum)
+    PlantLocation(int const loopNum, const DataPlant::LoopSideLocation loopSideNum, int const branchNum, int const compNum)
+        : loopNum(loopNum), loopSideNum(loopSideNum), branchNum(branchNum), compNum(compNum)
     {
     }
 };

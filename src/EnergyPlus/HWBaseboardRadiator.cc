@@ -232,7 +232,7 @@ namespace HWBaseboardRadiator {
                                       _,
                                       _,
                                       HWBaseboard(BaseboardNum).LoopNum,
-                                      HWBaseboard(BaseboardNum).LoopSide,
+                                      HWBaseboard(BaseboardNum).LoopSideNum,
                                       HWBaseboard(BaseboardNum).BranchNum);
                 } else {
                     ShowSevereError(state, "SimBaseboard: Errors in Baseboard=" + HWBaseboard(BaseboardNum).EquipID);
@@ -947,7 +947,7 @@ namespace HWBaseboardRadiator {
                                         HWBaseboard(BaseboardNum).EquipID,
                                         HWBaseboard(BaseboardNum).EquipType,
                                         HWBaseboard(BaseboardNum).LoopNum,
-                                        HWBaseboard(BaseboardNum).LoopSide,
+                                        HWBaseboard(BaseboardNum).LoopSideNum,
                                         HWBaseboard(BaseboardNum).BranchNum,
                                         HWBaseboard(BaseboardNum).CompNum,
                                         errFlag,
@@ -989,7 +989,7 @@ namespace HWBaseboardRadiator {
                                HWBaseboard(BaseboardNum).WaterInletNode,
                                HWBaseboard(BaseboardNum).WaterOutletNode,
                                HWBaseboard(BaseboardNum).LoopNum,
-                               HWBaseboard(BaseboardNum).LoopSide,
+                               HWBaseboard(BaseboardNum).LoopSideNum,
                                HWBaseboard(BaseboardNum).BranchNum,
                                HWBaseboard(BaseboardNum).CompNum);
 
@@ -1546,7 +1546,7 @@ namespace HWBaseboardRadiator {
                                       WaterMassFlowRate,
                                       HWBaseboard(BaseboardNum).WaterInletNode,
                                       HWBaseboard(BaseboardNum).LoopNum,
-                                      HWBaseboard(BaseboardNum).LoopSide,
+                                      HWBaseboard(BaseboardNum).LoopSideNum,
                                       HWBaseboard(BaseboardNum).BranchNum,
                                       false);
         }
@@ -1938,34 +1938,34 @@ namespace HWBaseboardRadiator {
 
         PullCompInterconnectTrigger(state,
                                     HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSide,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
                                     HWBaseboard(BaseboardNum).BranchNum,
                                     HWBaseboard(BaseboardNum).CompNum,
                                     HWBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSide,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
                                     DataPlant::CriteriaType::HeatTransferRate,
                                     HWBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(state,
                                     HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSide,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
                                     HWBaseboard(BaseboardNum).BranchNum,
                                     HWBaseboard(BaseboardNum).CompNum,
                                     HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSide,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
                                     DataPlant::CriteriaType::MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
         PullCompInterconnectTrigger(state,
                                     HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSide,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
                                     HWBaseboard(BaseboardNum).BranchNum,
                                     HWBaseboard(BaseboardNum).CompNum,
                                     HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
-                                    HWBaseboard(BaseboardNum).LoopSide,
+                                    HWBaseboard(BaseboardNum).LoopSideNum,
                                     DataPlant::CriteriaType::Temperature,
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }

@@ -10363,7 +10363,7 @@ namespace Furnaces {
         int CoilControlNode(0);                                      // control node for hot water and steam heating coils
         int CoilOutletNode(0);                                       // air outlet node of the heatiing coils
         int LoopNum(0);                                              // plant loop number
-        DataPlant::LoopSideLocation LoopSide(DataPlant::LoopSideLocation::Invalid);                                          // plant loop side number
+        DataPlant::LoopSideLocation LoopSideNum(DataPlant::LoopSideLocation::Invalid);                                          // plant loop side number
         int BranchNum(0);                                            // plant branch number
         int CompNum(0);                                              // Numeric Equivalent for Supplemental Heat Coil Type
 
@@ -10376,7 +10376,7 @@ namespace Furnaces {
             CoilOutletNode = state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode;
             CoilTypeNum = state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num;
             LoopNum = state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp;
-            LoopSide = state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp;
+            LoopSideNum = state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp;
             BranchNum = state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp;
             CompNum = state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp;
             MaxHotWaterFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow;
@@ -10387,7 +10387,7 @@ namespace Furnaces {
             CoilOutletNode = state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode;
             CoilTypeNum = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num;
             LoopNum = state.dataFurnaces->Furnace(FurnaceNum).LoopNum;
-            LoopSide = state.dataFurnaces->Furnace(FurnaceNum).LoopSide;
+            LoopSideNum = state.dataFurnaces->Furnace(FurnaceNum).LoopSide;
             BranchNum = state.dataFurnaces->Furnace(FurnaceNum).BranchNum;
             CompNum = state.dataFurnaces->Furnace(FurnaceNum).CompNum;
             MaxHotWaterFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow;
@@ -10401,7 +10401,7 @@ namespace Furnaces {
                     state, HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode);
             } else if (SELECT_CASE_var == Coil_HeatingWater) {
                 if (QCoilLoad > SmallLoad) {
-                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                     SimulateWaterCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
 
                     if (QActual > (QCoilLoad + SmallLoad)) {
@@ -10463,18 +10463,18 @@ namespace Furnaces {
                     }
                 } else {
                     mdot = 0.0;
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                 }
                 // simulate the hot water heating coil
                 SimulateWaterCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
             } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                 if (QCoilLoad > SmallLoad) {
-                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                     // simulate the steam heating coil
                     SimulateSteamCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
                 } else {
                     mdot = 0.0;
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                     // simulate the steam heating coil
                     SimulateSteamCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
                 }

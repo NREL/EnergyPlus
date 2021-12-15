@@ -469,11 +469,11 @@ TEST_F(EnergyPlusFixture, Initialization)
 
     // validate that location work got done correctly
     EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Supply, thisCoolingPLHP->loadSideLocation.loopSide));
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Supply, thisCoolingPLHP->loadSideLocation.loopSideNum));
     EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.branchNum);
     EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.compNum);
     EXPECT_EQ(2, thisCoolingPLHP->sourceSideLocation.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, thisCoolingPLHP->sourceSideLocation.loopSide));
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, thisCoolingPLHP->sourceSideLocation.loopSideNum));
     EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.branchNum);
     EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.compNum);
 
@@ -1184,7 +1184,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
 
     // do a little setup here
     thisCoolingPLHP->loadSideLocation.loopNum = 1;
-    thisCoolingPLHP->loadSideLocation.loopSide = DataPlant::LoopSideLocation::Supply;
+    thisCoolingPLHP->loadSideLocation.loopSideNum = DataPlant::LoopSideLocation::Supply;
     thisCoolingPLHP->loadSideLocation.branchNum = 1;
     thisCoolingPLHP->loadSideLocation.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
@@ -2676,7 +2676,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
 
     // do a little setup here
     thisCoolingPLHP->loadSideLocation.loopNum = 1;
-    thisCoolingPLHP->loadSideLocation.loopSide = DataPlant::LoopSideLocation::Supply;
+    thisCoolingPLHP->loadSideLocation.loopSideNum = DataPlant::LoopSideLocation::Supply;
     thisCoolingPLHP->loadSideLocation.branchNum = 1;
     thisCoolingPLHP->loadSideLocation.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;

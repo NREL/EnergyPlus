@@ -690,7 +690,7 @@ void MicroCHPDataStruct::simulate(EnergyPlusData &state,
 
     PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                     this->CWLoopNum,
-                                                    this->CWLoopSide,
+                                                    this->CWLoopSideNum,
                                                     DataPlant::PlantEquipmentType::Generator_MicroCHP,
                                                     this->PlantInletNodeID,
                                                     this->PlantOutletNodeID,
@@ -714,7 +714,7 @@ void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus
         this->PlantMassFlowRateMax =
             2.0 * CurveManager::CurveValue(
                       state, this->A42Model.WaterFlowCurveID, this->A42Model.MaxElecPower, state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
-    } else if (this->CWLoopSide == DataPlant::LoopSideLocation::Supply) {
+    } else if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Supply) {
         if (state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate > 0.0) {
             this->PlantMassFlowRateMax = state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate;
         } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum > 0) {
@@ -723,7 +723,7 @@ void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus
             this->PlantMassFlowRateMax = 2.0;
         }
 
-    } else if (this->CWLoopSide == DataPlant::LoopSideLocation::Demand) {
+    } else if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Demand) {
         this->PlantMassFlowRateMax = 2.0; // would like to use plant loop max but not ready yet
     }
 
@@ -806,7 +806,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
                                            this->PlantInletNodeID,
                                            this->PlantOutletNodeID,
                                            this->CWLoopNum,
-                                           this->CWLoopSide,
+                                           this->CWLoopSideNum,
                                            this->CWBranchNum,
                                            this->CWCompNum);
     }
@@ -832,7 +832,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
 
         Real64 mdot = this->PlantMassFlowRateMax;
         PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
+            state, mdot, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWLoopNum, this->CWLoopSideNum, this->CWBranchNum, this->CWCompNum);
         this->PlantMassFlowRate = mdot;
     }
 }
@@ -932,7 +932,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                  this->PlantInletNodeID,
                                                  this->PlantOutletNodeID,
                                                  this->CWLoopNum,
-                                                 this->CWLoopSide,
+                                                 this->CWLoopSideNum,
                                                  this->CWBranchNum,
                                                  this->CWCompNum);
             this->PlantMassFlowRate = MdotCW;
@@ -957,7 +957,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                  this->PlantInletNodeID,
                                                  this->PlantOutletNodeID,
                                                  this->CWLoopNum,
-                                                 this->CWLoopSide,
+                                                 this->CWLoopSideNum,
                                                  this->CWBranchNum,
                                                  this->CWCompNum);
             this->PlantMassFlowRate = MdotCW;
@@ -1530,7 +1530,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::Generator_MicroCHP,
                                                     this->CWLoopNum,
-                                                    this->CWLoopSide,
+                                                    this->CWLoopSideNum,
                                                     this->CWBranchNum,
                                                     this->CWCompNum,
                                                     errFlag,
@@ -1546,9 +1546,9 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
 
             if (!this->A42Model.InternalFlowControl) {
                 // IF this is on the supply side and not internal flow control then reset flow priority to lower
-                if (this->CWLoopSide == DataPlant::LoopSideLocation::Supply) {
+                if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Supply) {
                     state.dataPlnt->PlantLoop(this->CWLoopNum)
-                        .LoopSide(this->CWLoopSide)
+                        .LoopSide(this->CWLoopSideNum)
                         .Branch(this->CWBranchNum)
                         .Comp(this->CWCompNum)
                         .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
