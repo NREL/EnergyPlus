@@ -313,10 +313,8 @@ struct DataPlantData : BaseGlobalStruct
     int PlantManageHalfLoopCalls = 0; // tracks number of half loop calls
     Array1D<DataPlant::PlantLoopData> PlantLoop;
     Array1D<DataPlant::PlantAvailMgrData> PlantAvailMgr;
-    Array1D<DataPlant::ReportLoopData> VentRepPlantSupplySide;
-    Array1D<DataPlant::ReportLoopData> VentRepPlantDemandSide;
-    Array1D<DataPlant::ReportLoopData> VentRepCondSupplySide;
-    Array1D<DataPlant::ReportLoopData> VentRepCondDemandSide;
+    std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepPlant;
+    std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepCond;
     Array1D<DataPlant::PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
 
     void clear_state() override
@@ -333,10 +331,8 @@ struct DataPlantData : BaseGlobalStruct
         this->PlantManageHalfLoopCalls = 0;
         this->PlantLoop.deallocate();
         this->PlantAvailMgr.deallocate();
-        this->VentRepPlantSupplySide.deallocate();
-        this->VentRepPlantDemandSide.deallocate();
-        this->VentRepCondSupplySide.deallocate();
-        this->VentRepCondDemandSide.deallocate();
+        std::for_each(this->VentRepPlant.begin(), this->VentRepPlant.end(), [](Array1D<DataPlant::ReportLoopData> &Array1DObject) { Array1DObject.deallocate();});
+        std::for_each(this->VentRepCond.begin(), this->VentRepCond.end(), [](Array1D<DataPlant::ReportLoopData> &Array1DObject) { Array1DObject.deallocate();});
         this->PlantCallingOrderInfo.deallocate();
     }
 };
