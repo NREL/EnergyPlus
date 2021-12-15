@@ -1912,15 +1912,15 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
     int BrN; // Branch counter
     int CpN; // Component (on branch) counter
 
-    for (DataPlant::LoopSideLocation LSN : DataPlant::LoopSideKeys) {
-        ShowContinueError(state, format("{} Branches:", DataPlant::DemandSupplyNames[static_cast<int>(LSN)]));
-        for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).TotalBranches; ++BrN) {
-            ShowContinueError(state, "  " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Name);
+    for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
+        ShowContinueError(state, format("{} Branches:", DataPlant::DemandSupplyNames[static_cast<int>(LoopSide)]));
+        for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalBranches; ++BrN) {
+            ShowContinueError(state, "  " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BrN).Name);
             ShowContinueError(state, "    Components on Branch:");
-            for (CpN = 1; CpN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).TotalComponents; ++CpN) {
+            for (CpN = 1; CpN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BrN).TotalComponents; ++CpN) {
                 ShowContinueError(state,
-                                  "      " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).TypeOf + ':' +
-                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).Name);
+                                  "      " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BrN).Comp(CpN).TypeOf + ':' +
+                                      state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Branch(BrN).Comp(CpN).Name);
             }
         }
     }
