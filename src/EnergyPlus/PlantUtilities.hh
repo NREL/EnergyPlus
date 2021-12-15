@@ -116,15 +116,15 @@ namespace PlantUtilities {
     void ResetAllPlantInterConnectFlags(EnergyPlusData &state);
 
     void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                     int LoopNum,                          // component's loop index
-                                     DataPlant::LoopSideLocation LoopSide,                         // component's loop side number
-                                     int BranchNum,                        // Component's branch number
-                                     int CompNum,                          // Component's comp number
+                                     const int LoopNum,                          // component's loop index
+                                     const DataPlant::LoopSideLocation LoopSide,                         // component's loop side number
+                                     const int BranchNum,                        // Component's branch number
+                                     const int CompNum,                          // Component's comp number
                                      int &UniqueCriteriaCheckIndex,        // An integer given to this particular check
-                                     int ConnectedLoopNum,                 // Component's interconnected loop number
-                                     DataPlant::LoopSideLocation ConnectedLoopSide,                // Component's interconnected loop side number
-                                     DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
-                                     Real64 CriteriaValue                  // The value of the criteria check to evaluate
+                                     const int ConnectedLoopNum,                 // Component's interconnected loop number
+                                     const DataPlant::LoopSideLocation ConnectedLoopSide,                // Component's interconnected loop side number
+                                     const DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
+                                     const Real64 CriteriaValue                  // The value of the criteria check to evaluate
     );
 
     void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
