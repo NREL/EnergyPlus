@@ -349,15 +349,15 @@ namespace PlantCentralGSHP {
         bool HeatSetPointSetToLoop;                // True if the setpoint is missing at the outlet node
         int ChillerHeaterNums;                     // Total number of chiller heater units
         int CWLoopNum;                             // Chilled water plant loop index number
-        DataPlant::LoopSideLocation CWLoopSide;                         // Chilled water plant loop side index
+        DataPlant::LoopSideLocation CWLoopSide;    // Chilled water plant loop side index
         int CWBranchNum;                           // Chilled water plant loop branch index
         int CWCompNum;                             // Chilled water plant loop component index
         int HWLoopNum;                             // Hot water plant loop index number
-        DataPlant::LoopSideLocation HWLoopSide;                         // Hot water plant loop side index
+        DataPlant::LoopSideLocation HWLoopSide;    // Hot water plant loop side index
         int HWBranchNum;                           // Hot water plant loop branch index
         int HWCompNum;                             // Hot water plant loop component index
         int GLHELoopNum;                           // Geo-field water plant loop index number
-        DataPlant::LoopSideLocation GLHELoopSide;                       // Geo-field water plant loop side index
+        DataPlant::LoopSideLocation GLHELoopSide;  // Geo-field water plant loop side index
         int GLHEBranchNum;                         // Geo-field water plant loop branch index
         int GLHECompNum;                           // Geo-field water plant loop component index
         int CHWMassFlowIndex;                      // Chilled water flow index
@@ -380,11 +380,12 @@ namespace PlantCentralGSHP {
               HWInletNodeNum(0), HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0),
               HWMassFlowRate(0.0), GLHEMassFlowRate(0.0), CHWMassFlowRateMax(0.0), HWMassFlowRateMax(0.0), GLHEMassFlowRateMax(0.0),
               WrapperCoolingLoad(0.0), WrapperHeatingLoad(0.0), AncillaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false),
-              CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0),
-              CWCompNum(0), HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSide(DataPlant::LoopSideLocation::Invalid), GLHEBranchNum(0),
-              GLHECompNum(0), CHWMassFlowIndex(0), HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0),
-              HWVolFlowRate(0.0), GLHEVolFlowRate(0.0), MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false),
-              SimulHtgDominant(false), setupOutputVarsFlag(true), mySizesReported(false)
+              CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0),
+              CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), HWLoopNum(0),
+              HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), GLHELoopNum(0),
+              GLHELoopSide(DataPlant::LoopSideLocation::Invalid), GLHEBranchNum(0), GLHECompNum(0), CHWMassFlowIndex(0), HWMassFlowIndex(0),
+              GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0), HWVolFlowRate(0.0), GLHEVolFlowRate(0.0), MyWrapperFlag(true),
+              MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false), setupOutputVarsFlag(true), mySizesReported(false)
         {
         }
 

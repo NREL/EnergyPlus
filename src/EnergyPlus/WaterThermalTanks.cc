@@ -4667,7 +4667,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             ErrorsFound = true;
                         }
                         // if both volume and demand side flow connections are autosized, must be a good NominalVolForSizingDemandSideFlow
-                        if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).UseSide.loopSide == DataPlant::LoopSideLocation::Demand) &&
+                        if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).UseSide.loopSide ==
+                             DataPlant::LoopSideLocation::Demand) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).UseDesignVolFlowRateWasAutoSized)) {
                             if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NominalVolForSizingDemandSideFlow <= 0.0) {
                                 ShowWarningError(state,
@@ -4676,7 +4677,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                 ErrorsFound = true;
                             }
                         }
-                        if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).SrcSide.loopSide == DataPlant::LoopSideLocation::Demand) &&
+                        if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).SrcSide.loopSide ==
+                             DataPlant::LoopSideLocation::Demand) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).SourceDesignVolFlowRateWasAutoSized)) {
                             if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NominalVolForSizingDemandSideFlow <= 0.0) {
                                 ShowWarningError(state,

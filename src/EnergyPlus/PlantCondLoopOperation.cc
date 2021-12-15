@@ -105,10 +105,10 @@ using DataHVACGlobals::SmallLoad;
 using FluidProperties::GetSpecificHeatGlycol;
 
 void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                 int const LoopNum,     // PlantLoop data structure loop counter
+                                 int const LoopNum,               // PlantLoop data structure loop counter
                                  const LoopSideLocation LoopSide, // PlantLoop data structure LoopSide counter
-                                 int const BranchNum,   // PlantLoop data structure branch counter
-                                 int const CompNum,     // PlantLoop data structure component counter
+                                 int const BranchNum,             // PlantLoop data structure branch counter
+                                 int const CompNum,               // PlantLoop data structure component counter
                                  Real64 &LoopDemand,
                                  Real64 &RemLoopDemand,
                                  bool const FirstHVACIteration,
@@ -1980,19 +1980,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         Type = static_cast<DataPlant::PlantEquipmentType>(
                             getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
                         errFlag1 = false;
-                        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                                this_equip.Name,
-                                                                Type,
-                                                                DummyLoopNum,
-                                                                LoopSide,
-                                                                BranchNum,
-                                                                CompNum,
-                                                                errFlag1,
-                                                                _,
-                                                                _,
-                                                                NumSearchResults,
-                                                                _,
-                                                                LoopNum);
+                        PlantUtilities::ScanPlantLoopsForObject(
+                            state, this_equip.Name, Type, DummyLoopNum, LoopSide, BranchNum, CompNum, errFlag1, _, _, NumSearchResults, _, LoopNum);
 
                         if (errFlag1) {
                             ShowSevereError(state, "InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");
@@ -2106,7 +2095,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         // check the pointers to see if a single component is attached to more than one type of control scheme
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
-            for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys){
+            for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
                 auto const &this_loop_side(this_plant_loop.LoopSide(LoopSide));
                 for (int BranchNum = 1, BranchNum_end = this_loop_side.TotalBranches; BranchNum <= BranchNum_end; ++BranchNum) {
                     auto const &this_branch(this_loop_side.Branch(BranchNum));
@@ -2186,8 +2175,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     if (FirstHVACIteration) {
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
-            for (DataPlant::LoopSideLocation LoopSide : LoopSideKeys)
-            {
+            for (DataPlant::LoopSideLocation LoopSide : LoopSideKeys) {
                 auto &this_loop_side(this_plant_loop.LoopSide(LoopSide));
                 for (int BranchNum = 1, BranchNum_end = this_loop_side.TotalBranches; BranchNum <= BranchNum_end; ++BranchNum) {
                     auto &this_branch(this_loop_side.Branch(BranchNum));
@@ -2803,11 +2791,11 @@ void AdjustChangeInLoadForLastStageUpperRangeLimit(EnergyPlusData &state,
 }
 
 void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
-                                   int const LoopNum,     // component topology
+                                   int const LoopNum,               // component topology
                                    const LoopSideLocation LoopSide, // component topology
-                                   int const BranchNum,   // component topology
-                                   int const CompNum,     // component topology
-                                   Real64 &ChangeInLoad   // positive magnitude of load change
+                                   int const BranchNum,             // component topology
+                                   int const CompNum,               // component topology
+                                   Real64 &ChangeInLoad             // positive magnitude of load change
 )
 {
 

@@ -703,7 +703,8 @@ namespace DataPlant {
         // If we are doing a common pipe simulation, and there is greater other-side flow than this side,
         //  then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
         //  as the flow going through the actual supply side
-        if (this->hasConstSpeedBranchPumps && this->myLoopSide == DataPlant::LoopSideLocation::Supply && thisPlantLoop.CommonPipeType != DataPlant::CommonPipeType::No) {
+        if (this->hasConstSpeedBranchPumps && this->myLoopSide == DataPlant::LoopSideLocation::Supply &&
+            thisPlantLoop.CommonPipeType != DataPlant::CommonPipeType::No) {
             const DataPlant::LoopSideLocation OtherSide = LoopSideOther[static_cast<int>(this->myLoopSide)];
             const int otherSideOutletNodeNum = thisPlantLoop.LoopSide(OtherSide).NodeNumOut;
             Real64 commonPipeFlow = state.dataLoopNodes->Node(otherSideOutletNodeNum).MassFlowRate - ThisLoopSideFlow;

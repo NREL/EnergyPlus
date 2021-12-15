@@ -895,13 +895,8 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
                                                       true);
     }
 
-    PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                  this->CWLoopNum,
-                                                  this->CWLoopSide,
-                                                  this->HWLoopNum,
-                                                  this->HWLoopSide,
-                                                  DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
-                                                  true);
+    PlantUtilities::InterConnectTwoPlantLoopSides(
+        state, this->CWLoopNum, this->CWLoopSide, this->HWLoopNum, this->HWLoopSide, DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption, true);
 
     // check if outlet node of chilled water side has a setpoint.
     if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -1102,14 +1097,8 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     } else {
         mdot = 0.0;
         if (this->CDLoopNum > 0) {
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 mdot,
-                                                 this->CondReturnNodeNum,
-                                                 this->CondSupplyNodeNum,
-                                                 this->CDLoopNum,
-                                                 this->CDLoopSide,
-                                                 this->CDBranchNum,
-                                                 this->CDCompNum);
+            PlantUtilities::SetComponentFlowRate(
+                state, mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDLoopNum, this->CDLoopSide, this->CDBranchNum, this->CDCompNum);
         }
     }
 }

@@ -1142,14 +1142,8 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
         state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
 
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-        PlantUtilities::SetComponentFlowRate(state,
-                                             mdotCond,
-                                             this->CondInletNodeNum,
-                                             this->CondOutletNodeNum,
-                                             this->CDLoopNum,
-                                             this->CDLoopSide,
-                                             this->CDBranchNum,
-                                             this->CDCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSide, this->CDBranchNum, this->CDCompNum);
     }
     // Initialize heat recovery flow rates at node
     if (this->HeatRecActive) {
@@ -2865,8 +2859,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
     }
 
     if (this->ChillerEIRFPLR < 0.0) {
-        if (this->ChillerEIRFPLRError < 1 &&
-            state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSide).FlowLock != DataPlant::FlowLock::Unlocked &&
+        if (this->ChillerEIRFPLRError < 1 && state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSide).FlowLock != DataPlant::FlowLock::Unlocked &&
             !state.dataGlobal->WarmupFlag) {
             ++this->ChillerEIRFPLRError;
             ShowWarningError(state, "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name + "\":");

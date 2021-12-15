@@ -1023,14 +1023,8 @@ namespace SolarCollectors {
         this->MassFlowRate = this->MassFlowRateMax;
 
         // Request the mass flow rate from the plant component flow utility routine
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->MassFlowRate,
-                                             this->InletNode,
-                                             this->OutletNode,
-                                             this->WLoopNum,
-                                             this->WLoopSide,
-                                             this->WLoopBranchNum,
-                                             this->WLoopCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->MassFlowRate, this->InletNode, this->OutletNode, this->WLoopNum, this->WLoopSide, this->WLoopBranchNum, this->WLoopCompNum);
 
         if (this->InitICS) {
 
@@ -2201,19 +2195,8 @@ namespace SolarCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->Type,
-                                                        this->WLoopNum,
-                                                        this->WLoopSide,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->Type, this->WLoopNum, this->WLoopSide, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
                 }

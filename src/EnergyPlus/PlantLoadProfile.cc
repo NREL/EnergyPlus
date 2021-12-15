@@ -246,8 +246,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     if (this->EMSOverrideMassFlow) this->MassFlowRate = this->EMSMassFlowValue;
 
     // Request the mass flow rate from the plant component flow utility routine
-    SetComponentFlowRate(
-        state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSide, this->WLoopBranchNum, this->WLoopCompNum);
+    SetComponentFlowRate(state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSide, this->WLoopBranchNum, this->WLoopCompNum);
 
     this->VolFlowRate = this->MassFlowRate / FluidDensityInit;
 

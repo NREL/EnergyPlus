@@ -720,13 +720,8 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->CondInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWLoopNum,
-                                                      this->CWLoopSide,
-                                                      this->CDLoopNum,
-                                                      this->CDLoopSide,
-                                                      DataPlant::PlantEquipmentType::Chiller_Absorption,
-                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWLoopNum, this->CWLoopSide, this->CDLoopNum, this->CDLoopSide, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
     }
     if (this->GeneratorInletNodeNum > 0) {
         PlantUtilities::ScanPlantLoopsForObject(state,
@@ -748,13 +743,8 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 
     // Fill in connection data
     if ((this->CondInletNodeNum > 0) && (this->GeneratorInletNodeNum > 0)) {
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CDLoopNum,
-                                                      this->CDLoopSide,
-                                                      this->GenLoopNum,
-                                                      this->GenLoopSide,
-                                                      DataPlant::PlantEquipmentType::Chiller_Absorption,
-                                                      false);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CDLoopNum, this->CDLoopSide, this->GenLoopNum, this->GenLoopSide, DataPlant::PlantEquipmentType::Chiller_Absorption, false);
     }
     if (errFlag) {
         ShowFatalError(state, "InitBLASTAbsorberModel: Program terminated due to previous condition(s).");

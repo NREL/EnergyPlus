@@ -1126,19 +1126,8 @@ namespace PhotovoltaicThermalCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->Type,
-                                                        this->WLoopNum,
-                                                        this->WLoopSide,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->Type, this->WLoopNum, this->WLoopSide, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
                 }

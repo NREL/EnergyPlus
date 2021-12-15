@@ -158,7 +158,8 @@ namespace DataPlant {
               flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0), hasConstSpeedBranchPumps(false),
               InitialDemandToLoopSetPoint(0.0), CurrentAlterationsToDemand(0.0), UpdatedDemandToLoopSetPoint(0.0),
               LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), refrigIndex(0), LoopSetPtDemandAtInlet(0.0),
-              ThisSideLoadAlterations(0.0), myLoopNum(0), myLoopSide(DataPlant::LoopSideLocation::Invalid), myOtherLoopSide(DataPlant::LoopSideLocation::Invalid)
+              ThisSideLoadAlterations(0.0), myLoopNum(0), myLoopSide(DataPlant::LoopSideLocation::Invalid),
+              myOtherLoopSide(DataPlant::LoopSideLocation::Invalid)
         {
         }
 

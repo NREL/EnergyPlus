@@ -10357,15 +10357,15 @@ namespace Furnaces {
         Real64 HotWaterMdot;    // actual hot water mass flow rate
         std::array<Real64, 4> Par;
         int SolFlag;
-        auto &HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
-        int CoilTypeNum(0);                                          // heating coil type number
-        int HeatingCoilIndex(0);                                     // heating coil index
-        int CoilControlNode(0);                                      // control node for hot water and steam heating coils
-        int CoilOutletNode(0);                                       // air outlet node of the heatiing coils
-        int LoopNum(0);                                              // plant loop number
-        DataPlant::LoopSideLocation LoopSide(DataPlant::LoopSideLocation::Invalid);                                          // plant loop side number
-        int BranchNum(0);                                            // plant branch number
-        int CompNum(0);                                              // Numeric Equivalent for Supplemental Heat Coil Type
+        auto &HeatingCoilName = state.dataFurnaces->HeatingCoilName;                // name of heating coil
+        int CoilTypeNum(0);                                                         // heating coil type number
+        int HeatingCoilIndex(0);                                                    // heating coil index
+        int CoilControlNode(0);                                                     // control node for hot water and steam heating coils
+        int CoilOutletNode(0);                                                      // air outlet node of the heatiing coils
+        int LoopNum(0);                                                             // plant loop number
+        DataPlant::LoopSideLocation LoopSide(DataPlant::LoopSideLocation::Invalid); // plant loop side number
+        int BranchNum(0);                                                           // plant branch number
+        int CompNum(0);                                                             // Numeric Equivalent for Supplemental Heat Coil Type
 
         QActual = 0.0;
 

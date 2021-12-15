@@ -544,8 +544,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // If loop operation is controlled by an environmental variable (DBtemp, WBtemp, etc)
         // then shut branch down when equipment is not scheduled to run.
-        DesignFlow =
-            RegulateCondenserCompFlowReqOp(state, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
+        DesignFlow = RegulateCondenserCompFlowReqOp(state, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
 
         SetComponentFlowRate(
             state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum);

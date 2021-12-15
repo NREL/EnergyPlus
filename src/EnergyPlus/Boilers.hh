@@ -82,7 +82,7 @@ namespace Boilers {
         DataGlobalConstants::ResourceType FuelType; // resource type assignment
         DataPlant::PlantEquipmentType Type;         // plant loop type identifier
         int LoopNum;                                // plant loop connection
-        DataPlant::LoopSideLocation LoopSide;                            // plant loop side connection
+        DataPlant::LoopSideLocation LoopSide;       // plant loop side connection
         int BranchNum;                              // plant loop branch connection
         int CompNum;                                // plant loop component connection
         bool Available;                             // TRUE if machine available in current time step
@@ -139,16 +139,17 @@ namespace Boilers {
 
         // Default Constructor
         BoilerSpecs()
-            : FuelType(DataGlobalConstants::ResourceType::None), Type(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid),
-              BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), VolFlowRate(0.0),
-              VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0),
-              MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0), CurveTempMode(TempMode::NOTSET),
-              EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0),
-              CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
-              FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0),
-              BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0), BoilerEff(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
-              BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
+            : FuelType(DataGlobalConstants::ResourceType::None), Type(DataPlant::PlantEquipmentType::Invalid), LoopNum(0),
+              LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
+              NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::Unassigned),
+              ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0),
+              MassFlowRate(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
+              OptPartLoadRat(0.0), OperPartLoadRat(0.0), CurveTempMode(TempMode::NOTSET), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0),
+              ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0),
+              IsThisSized(false), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true),
+              MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0),
+              BoilerEff(0.0), BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0),
+              BoilerFuelTypeForOutputVariable("")
         {
         }
 

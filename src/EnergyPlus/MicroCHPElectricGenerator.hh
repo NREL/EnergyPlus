@@ -176,13 +176,13 @@ namespace MicroCHPElectricGenerator {
         int AirInletNodeID;
         std::string AirOutletNodeName;
         int AirOutletNodeID;
-        int FuelSupplyID;        // index for fuel supply data structure
-        int DynamicsControlID;   // index in GeneratorDynamics data where control issues are handled
-        int AvailabilitySchedID; // index for availability schedule
-        int CWLoopNum;           // cooling water plant loop index number
-        DataPlant::LoopSideLocation CWLoopSide;       // cooling water plant loop side index
-        int CWBranchNum;         // cooling water plant loop branch index
-        int CWCompNum;           // cooling water plant loop component index
+        int FuelSupplyID;                       // index for fuel supply data structure
+        int DynamicsControlID;                  // index in GeneratorDynamics data where control issues are handled
+        int AvailabilitySchedID;                // index for availability schedule
+        int CWLoopNum;                          // cooling water plant loop index number
+        DataPlant::LoopSideLocation CWLoopSide; // cooling water plant loop side index
+        int CWBranchNum;                        // cooling water plant loop branch index
+        int CWCompNum;                          // cooling water plant loop component index
         bool CheckEquipName;
         bool MySizeFlag;
         bool MyEnvrnFlag;
@@ -193,8 +193,8 @@ namespace MicroCHPElectricGenerator {
         MicroCHPDataStruct()
             : NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0), PlantMassFlowRateMax(0.0),
               PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0), DynamicsControlID(0),
-              AvailabilitySchedID(0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CheckEquipName(true), MySizeFlag(true),
-              MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
+              AvailabilitySchedID(0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0),
+              CheckEquipName(true), MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
         {
         }
 

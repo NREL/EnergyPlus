@@ -1143,13 +1143,8 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->CondInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWLoopNum,
-                                                      this->CWLoopSide,
-                                                      this->CDLoopNum,
-                                                      this->CDLoopSide,
-                                                      DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
-                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWLoopNum, this->CWLoopSide, this->CDLoopNum, this->CDLoopSide, DataPlant::PlantEquipmentType::Chiller_ElectricEIR, true);
     }
     if (this->HeatRecActive) {
         PlantUtilities::ScanPlantLoopsForObject(state,
@@ -1165,24 +1160,14 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->HeatRecInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWLoopNum,
-                                                      this->CWLoopSide,
-                                                      this->HRLoopNum,
-                                                      this->HRLoopSide,
-                                                      DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
-                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWLoopNum, this->CWLoopSide, this->HRLoopNum, this->HRLoopSide, DataPlant::PlantEquipmentType::Chiller_ElectricEIR, true);
     }
 
     if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
         this->HeatRecActive) {
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CDLoopNum,
-                                                      this->CDLoopSide,
-                                                      this->HRLoopNum,
-                                                      this->HRLoopSide,
-                                                      DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
-                                                      false);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CDLoopNum, this->CDLoopSide, this->HRLoopNum, this->HRLoopSide, DataPlant::PlantEquipmentType::Chiller_ElectricEIR, false);
     }
 
     if (errFlag) {
@@ -1414,14 +1399,8 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
         state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWLoopNum, this->CWLoopSide, this->CWBranchNum, this->CWCompNum);
 
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-        PlantUtilities::SetComponentFlowRate(state,
-                                             mdotCond,
-                                             this->CondInletNodeNum,
-                                             this->CondOutletNodeNum,
-                                             this->CDLoopNum,
-                                             this->CDLoopSide,
-                                             this->CDBranchNum,
-                                             this->CDCompNum);
+        PlantUtilities::SetComponentFlowRate(
+            state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDLoopNum, this->CDLoopSide, this->CDBranchNum, this->CDCompNum);
     }
     // Initialize heat recovery flow rates at node
     if (this->HeatRecActive) {

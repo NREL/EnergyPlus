@@ -2252,9 +2252,10 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                           .Branch(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantBranchNum)
                                           .Name +
                                       "\", Component referenced with:");
-                ShowContinueError(state,
-                                  "...Inlet Node=\"" + state.dataLoopNodes->NodeID(
-                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Comp(cpnum).NodeNumIn));
+                ShowContinueError(
+                    state,
+                    "...Inlet Node=\"" +
+                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(LoopSide).Branch(brnum).Comp(cpnum).NodeNumIn));
                 ShowContinueError(
                     state,
                     "...Outlet Node=\"" +

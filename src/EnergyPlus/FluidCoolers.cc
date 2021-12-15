@@ -835,12 +835,8 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
         this->AirWetBulb = state.dataEnvrn->OutWetBulbTemp;
     }
 
-    this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state,
-                                                                             this->LoopNum,
-                                                                             this->LoopSide,
-                                                                             this->BranchNum,
-                                                                             this->CompNum,
-                                                                             this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier);
+    this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
+        state, this->LoopNum, this->LoopSide, this->BranchNum, this->CompNum, this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier);
 
     PlantUtilities::SetComponentFlowRate(state,
                                          this->WaterMassFlowRate,
@@ -1928,8 +1924,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     auto &waterOutletNode = this->WaterOutletNodeNum;
     state.dataLoopNodes->Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
-    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked ||
-        state.dataGlobal->WarmupFlag)
+    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSide).FlowLock == DataPlant::FlowLock::Unlocked || state.dataGlobal->WarmupFlag)
         return;
 
     // Check flow rate through fluid cooler and compare to design flow rate, show warning if greater than Design * Mulitplier

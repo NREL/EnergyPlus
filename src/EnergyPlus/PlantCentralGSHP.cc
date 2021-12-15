@@ -1611,17 +1611,11 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
         if (this->VariableFlowCH) {
             // Reset flow priority
             if (LoopNum == this->CWLoopNum) {
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSide)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSide).Branch(this->CWBranchNum).Comp(this->CWCompNum).FlowPriority =
+                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             } else if (LoopNum == this->HWLoopNum) {
-                state.dataPlnt->PlantLoop(this->HWLoopNum)
-                    .LoopSide(this->HWLoopSide)
-                    .Branch(this->HWBranchNum)
-                    .Comp(this->HWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                state.dataPlnt->PlantLoop(this->HWLoopNum).LoopSide(this->HWLoopSide).Branch(this->HWBranchNum).Comp(this->HWCompNum).FlowPriority =
+                    DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             // check if setpoint on outlet node - chilled water loop
