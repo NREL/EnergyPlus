@@ -786,14 +786,14 @@ void CheckForRunawayPlantTemps(EnergyPlusData &state, int const LoopNum, const D
 
         LoopCapacity = 0.0;
         DispatchedCapacity = 0.0;
-        for (DataPlant::LoopSideLocation thisLoopSide : DataPlant::LoopSideKeys){
-            for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(thisLoopSide).TotalBranches; ++BrN) {
-                for (CpN = 1; CpN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(thisLoopSide).Branch(BrN).TotalComponents; ++CpN) {
-                    LoopCapacity += state.dataPlnt->PlantLoop(LoopNum).LoopSide(thisLoopSide).Branch(BrN).Comp(CpN).MaxLoad;
-                    DispatchedCapacity += std::abs(state.dataPlnt->PlantLoop(LoopNum).LoopSide(thisLoopSide).Branch(BrN).Comp(CpN).MyLoad);
+        for (DataPlant::LoopSideLocation LSN : DataPlant::LoopSideKeys){
+            for (BrN = 1; BrN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).TotalBranches; ++BrN) {
+                for (CpN = 1; CpN <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).TotalComponents; ++CpN) {
+                    LoopCapacity += state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).MaxLoad;
+                    DispatchedCapacity += std::abs(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LSN).Branch(BrN).Comp(CpN).MyLoad);
                 }
             }
-            if (thisLoopSide == DataPlant::LoopSideLocation::Demand) {
+            if (LSN == DataPlant::LoopSideLocation::Demand) {
                 LoopDemandSideCapacity = LoopCapacity;
                 LoopDemandSideDispatchedCapacity = DispatchedCapacity;
             } else {
