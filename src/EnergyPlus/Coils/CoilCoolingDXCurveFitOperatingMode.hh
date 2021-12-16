@@ -135,9 +135,12 @@ struct CoilCoolingDXCurveFitOperatingMode
 
     enum class CondenserType
     {
+        Invalid = -1,
         AIRCOOLED,
-        EVAPCOOLED
+        EVAPCOOLED,
+        Num
     };
+
     CondenserType condenserType = CondenserType::AIRCOOLED;
 
     Real64 condInletTemp = 0.0; // condenser inlet node temp or outdoor temp if no condenser node {C}

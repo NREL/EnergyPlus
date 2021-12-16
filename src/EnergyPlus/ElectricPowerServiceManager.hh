@@ -71,7 +71,7 @@ namespace EnergyPlus {
 
 enum class GeneratorType
 {
-    Unassigned = -1,
+    Invalid = -1,
     ICEngine,
     CombTurbine,
     PV,
@@ -101,11 +101,12 @@ static constexpr std::array<std::string_view, static_cast<int>(GeneratorType::Nu
                                                                                                          "GENERATOR:WINDTURBINE",
                                                                                                          "GENERATOR:PVWATTS"};
 
-enum class ThermalLossDestination : int
+enum class ThermalLossDestination
 {
-    heatLossNotDetermined = 0,
-    zoneGains,    // device thermal losses are added to a zone as internal gains
-    lostToOutside // device thermal losses have no destination
+    Invalid = -1,
+    ZoneGains,     // device thermal losses are added to a zone as internal gains
+    LostToOutside, // device thermal losses have no destination
+    Num
 };
 
 void initializeElectricPowerServiceZoneGains(EnergyPlusData &state);
@@ -116,13 +117,14 @@ class DCtoACInverter
 {
 
 public: // Methods
-    enum class InverterModelType : int
+    enum class InverterModelType
     {
-        notYetSet,
-        cECLookUpTableModel,
-        curveFuncOfPower,
-        simpleConstantEff,
-        pvWatts,
+        Invalid = -1,
+        CECLookUpTableModel,
+        CurveFuncOfPower,
+        SimpleConstantEff,
+        PVWatts,
+        Num
     };
 
     // Constructor
@@ -223,11 +225,12 @@ private: // methods
     void calcEfficiency(EnergyPlusData &state);
 
 private: // data
-    enum class ConverterModelType : int
+    enum class ConverterModelType
     {
-        notYetSet,
-        curveFuncOfPower,
-        simpleConstantEff
+        Invalid = -1,
+        CurveFuncOfPower,
+        SimpleConstantEff,
+        Num
     };
 
     std::string name_; // user identifier
@@ -352,19 +355,21 @@ private:                            // methods
     );
 
 private: // data
-    enum class StorageModelType : int
+    enum class StorageModelType
     {
-        storageTypeNotSet = 0,
-        simpleBucketStorage,
-        kiBaMBattery,
-        liIonNmcBattery,
+        Invalid = -1,
+        SimpleBucketStorage,
+        KIBaMBattery,
+        LiIonNmcBattery,
+        Num
     };
 
-    enum class BatteryDegradationModelType : int
+    enum class BatteryDegradationModelType
     {
-        degredationNotSet = 0,
-        lifeCalculationYes,
-        lifeCalculationNo
+        Invalid = -1,
+        LifeCalculationYes,
+        LifeCalculationNo,
+        Num
     };
 
     std::string name_;               // name of this electrical storage module
@@ -479,18 +484,21 @@ public: // methods
     std::string const &name() const;
 
 private: // data
-    enum class TransformerUse : int
+    enum class TransformerUse
     {
-        usenotYetSet = 0,
-        powerInFromGrid,              // condition power from grid going into building buss
-        powerOutFromBldgToGrid,       // condition power from building buss going out to grid
-        powerBetweenLoadCenterAndBldg // condition power from a load center going into building buss, or from building buss into load center for draws
+        Invalid = -1,
+        PowerInFromGrid,               // condition power from grid going into building buss
+        PowerOutFromBldgToGrid,        // condition power from building buss going out to grid
+        PowerBetweenLoadCenterAndBldg, // condition power from a load center going into building buss, or from building buss into load center for
+                                       // draws
+        Num
     };
-    enum class TransformerPerformanceInput : int
+    enum class TransformerPerformanceInput
     {
-        perfInputMethodNotSet = 0,
-        lossesMethod,
-        efficiencyMethod
+        Invalid = -1,
+        LossesMethod,
+        EfficiencyMethod,
+        Num
     };
 
     std::string name_; // user identifier
@@ -628,14 +636,15 @@ private: // Methods
     Real64 calcLoadCenterThermalLoad(EnergyPlusData &state); // returns heat rate called for from cogenerator(watts)
 
 public: // data public for unit test
-    enum class ElectricBussType : int
+    enum class ElectricBussType
     {
-        notYetSet = 0,
-        aCBuss,
-        dCBussInverter,
-        aCBussStorage,
-        dCBussInverterDCStorage,
-        dCBussInverterACStorage
+        Invalid = -1,
+        ACBuss,
+        DCBussInverter,
+        ACBussStorage,
+        DCBussInverterDCStorage,
+        DCBussInverterACStorage,
+        Num
     };
 
     std::unique_ptr<ElectricStorage> storageObj;
@@ -667,23 +676,25 @@ public: // data public for unit test
 private: // data
     enum class GeneratorOpScheme : int
     {
-        notYetSet = 0,
-        baseLoad,
-        demandLimit,
-        trackElectrical,
-        trackSchedule,
-        trackMeter,
-        thermalFollow,
-        thermalFollowLimitElectrical
+        Invalid = -1,
+        BaseLoad,
+        DemandLimit,
+        TrackElectrical,
+        TrackSchedule,
+        TrackMeter,
+        ThermalFollow,
+        ThermalFollowLimitElectrical,
+        Num
     };
 
     enum class StorageOpScheme : int
     {
-        notYetSet = 0,
-        facilityDemandStoreExcessOnSite, // legacy control behavior
-        meterDemandStoreExcessOnSite,
-        chargeDischargeSchedules,
-        facilityDemandLeveling
+        Invalid = -1,
+        FacilityDemandStoreExcessOnSite, // legacy control behavior
+        MeterDemandStoreExcessOnSite,
+        ChargeDischargeSchedules,
+        FacilityDemandLeveling,
+        Num
     };
 
     std::string name_;                     // user identifier

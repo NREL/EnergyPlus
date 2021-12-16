@@ -254,7 +254,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(4),
@@ -263,7 +263,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                NodeInputManager::compFluidStream::Primary,
+                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -302,7 +302,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -318,7 +318,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -328,7 +328,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
@@ -337,7 +337,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -361,18 +361,18 @@ namespace PlantChillers {
                                                                                    ErrorsFound,
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeFluidType::blank,
+                                                                                   DataLoopNode::NodeFluidType::Blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::blank,
+                                                                                    DataLoopNode::NodeFluidType::Blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -461,7 +461,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      NodeInputManager::compFluidStream::Tertiary,
+                                                                                      NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
@@ -475,7 +475,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       NodeInputManager::compFluidStream::Tertiary,
+                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
@@ -542,7 +542,7 @@ namespace PlantChillers {
                                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
                                                                                                  DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
                     } else {
                         thisChiller.HeatRecSetPointNodeNum = 0;
@@ -960,7 +960,7 @@ namespace PlantChillers {
                             // need call to EMS to check node
                             bool FatalError = false; // but not really fatal yet, but should be.
                             EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                                state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                             state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                             if (FatalError) {
                                 if (!this->HRSPErrDone) {
@@ -1330,7 +1330,7 @@ namespace PlantChillers {
     void ElectricChillerSpecs::calculate(EnergyPlusData &state,
                                          Real64 &MyLoad,
                                          bool const RunFlag,
-                                         DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
+                                         DataBranchAirLoopPlant::ControlType const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -1391,7 +1391,7 @@ namespace PlantChillers {
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
             // call for zero flow before leaving
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
                 state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -1410,7 +1410,7 @@ namespace PlantChillers {
                         .LoopSide(this->CDLoopSideNum)
                         .Branch(this->CDBranchNum)
                         .Comp(this->CDCompNum)
-                        .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                        .FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
                     this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -2176,7 +2176,7 @@ namespace PlantChillers {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -2353,7 +2353,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(4),
@@ -2362,7 +2362,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                NodeInputManager::compFluidStream::Primary,
+                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -2400,7 +2400,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -2417,7 +2417,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -2427,7 +2427,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
@@ -2436,7 +2436,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -2460,18 +2460,18 @@ namespace PlantChillers {
                                                                                    ErrorsFound,
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeFluidType::blank,
+                                                                                   DataLoopNode::NodeFluidType::Blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::blank,
+                                                                                    DataLoopNode::NodeFluidType::Blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -2595,7 +2595,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      NodeInputManager::compFluidStream::Tertiary,
+                                                                                      NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(13) + '=' + state.dataIPShortCut->cAlphaArgs(13));
@@ -2609,7 +2609,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       NodeInputManager::compFluidStream::Tertiary,
+                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(14) + '=' + state.dataIPShortCut->cAlphaArgs(14));
@@ -3469,7 +3469,7 @@ namespace PlantChillers {
     void EngineDrivenChillerSpecs::calculate(EnergyPlusData &state,
                                              Real64 &MyLoad,
                                              bool const RunFlag,
-                                             DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
+                                             DataBranchAirLoopPlant::ControlType const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -3550,7 +3550,7 @@ namespace PlantChillers {
 
         // If Chiller load is 0 or chiller is not running then leave the subroutine.
         if (MyLoad >= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
                 state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -3571,7 +3571,7 @@ namespace PlantChillers {
                         .LoopSide(this->CDLoopSideNum)
                         .Branch(this->CDBranchNum)
                         .Comp(this->CDCompNum)
-                        .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                        .FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
                     this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -4332,7 +4332,7 @@ namespace PlantChillers {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -4508,7 +4508,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(4),
@@ -4517,7 +4517,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                NodeInputManager::compFluidStream::Primary,
+                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -4555,7 +4555,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -4571,7 +4571,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else { // WaterCooled CondenserType
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -4579,18 +4579,18 @@ namespace PlantChillers {
                                                                                    ErrorsFound,
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeFluidType::blank,
+                                                                                   DataLoopNode::NodeFluidType::Blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(6),
                                                                                     ErrorsFound,
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::blank,
+                                                                                    DataLoopNode::NodeFluidType::Blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -4693,7 +4693,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      NodeInputManager::compFluidStream::Tertiary,
+                                                                                      NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
@@ -4707,7 +4707,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       NodeInputManager::compFluidStream::Tertiary,
+                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
@@ -5576,8 +5576,7 @@ namespace PlantChillers {
         }
     }
 
-    void
-    GTChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
+    void GTChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag, DataBranchAirLoopPlant::ControlType const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher / Brandon Anderson
@@ -5653,7 +5652,7 @@ namespace PlantChillers {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
         // flow resolver will not shut down the branch
         if (MyLoad >= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
                 state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -5673,7 +5672,7 @@ namespace PlantChillers {
                         .LoopSide(this->CDLoopSideNum)
                         .Branch(this->CDBranchNum)
                         .Comp(this->CDCompNum)
-                        .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                        .FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
                     this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -6399,7 +6398,7 @@ namespace PlantChillers {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {
@@ -6582,7 +6581,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(3),
@@ -6591,7 +6590,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                NodeInputManager::compFluidStream::Primary,
+                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -6629,7 +6628,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
                 OutAirNodeManager::CheckAndAddAirNodeNumber(state, thisChiller.CondInletNodeNum, Okay);
@@ -6646,7 +6645,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -6656,7 +6655,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(5),
@@ -6665,7 +6664,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager ::compFluidStream::Secondary,
+                                                                                    NodeInputManager ::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -6689,18 +6688,18 @@ namespace PlantChillers {
                                                                                    ErrorsFound,
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeFluidType::blank,
+                                                                                   DataLoopNode::NodeFluidType::Blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   NodeInputManager::compFluidStream::Secondary,
+                                                                                   NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(5),
                                                                                     ErrorsFound,
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::blank,
+                                                                                    DataLoopNode::NodeFluidType::Blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Secondary,
+                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -7300,7 +7299,7 @@ namespace PlantChillers {
     void ConstCOPChillerSpecs::calculate(EnergyPlusData &state,
                                          Real64 &MyLoad,
                                          bool const RunFlag,
-                                         DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl)
+                                         DataBranchAirLoopPlant::ControlType const EquipFlowCtrl)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -7387,7 +7386,7 @@ namespace PlantChillers {
             // If Chiller load is 0 or greater or chiller is not running then leave the subroutine.Before leaving
             // if the component control is SERIESACTIVE we set the component flow to inlet flow so that
             // flow resolver will not shut down the branch
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
                 state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
                 this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
             } else {
@@ -7406,7 +7405,7 @@ namespace PlantChillers {
                         .LoopSide(this->CDLoopSideNum)
                         .Branch(this->CDBranchNum)
                         .Comp(this->CDCompNum)
-                        .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                        .FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
                     this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
                 } else {
                     this->CondMassFlowRate = 0.0;
@@ -7907,7 +7906,7 @@ namespace PlantChillers {
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                            state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                         state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->ModulatedFlowErrDone) {

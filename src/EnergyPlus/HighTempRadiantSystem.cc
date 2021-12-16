@@ -248,7 +248,7 @@ namespace HighTempRadiantSystem {
         int constexpr iHeatDesignCapacityNumericNum(1); // get input index to High Temperature Radiant system heating capacity
         int constexpr iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to High Temperature Radiant system heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

@@ -1090,17 +1090,17 @@ namespace RoomAirModelManager {
 
             // Third Alpha is a string: JET or RECIRCULATION
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Jet")) {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Jet;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Jet;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Recirculation")) {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Recirculation;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Recirculation;
             } else {
-                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::VComfort_Invalid;
+                state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Invalid;
             }
 
             for (Loop2 = 1; Loop2 <= state.dataHeatBal->TotPeople; ++Loop2) {
                 if (state.dataHeatBal->People(Loop2).ZonePtr != state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr) continue;
                 if (state.dataHeatBal->People(Loop2).Fanger) {
-                    if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::VComfort_Invalid) {
+                    if (state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort == Comfort::Invalid) {
                         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                             ShowSevereError(state,
                                             "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));

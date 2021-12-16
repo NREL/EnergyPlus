@@ -78,14 +78,14 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlantCentralGSHP->Wrapper(1).ChillerHeaterNums = 2;
     state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater.allocate(2);
     // First test in SizeWrapper, so need to set that
-    state->dataPlantCentralGSHP->Wrapper(1).ControlMode = PlantCentralGSHP::iCondType::SmartMixing;
+    state->dataPlantCentralGSHP->Wrapper(1).ControlMode = PlantCentralGSHP::CondenserType::SmartMixing;
 
     int NumChillerHeaters = 1;
     state->dataPlantCentralGSHP->numChillerHeaters = NumChillerHeaters;
     state->dataPlantCentralGSHP->ChillerHeater.allocate(NumChillerHeaters);
     state->dataPlantCentralGSHP->ChillerHeater(1).ConstantFlow = false;
     state->dataPlantCentralGSHP->ChillerHeater(1).VariableFlow = true;
-    state->dataPlantCentralGSHP->ChillerHeater(1).CondenserType = PlantCentralGSHP::iCondType::WaterCooled;
+    state->dataPlantCentralGSHP->ChillerHeater(1).condenserType = PlantCentralGSHP::CondenserType::WaterCooled;
 
     state->dataPlantCentralGSHP->ChillerHeater(1).SizFac = 1.2;
 

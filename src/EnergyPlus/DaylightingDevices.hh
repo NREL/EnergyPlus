@@ -80,9 +80,9 @@ namespace DaylightingDevices {
     );
 
     Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,                                   // TDD pipe object number
-                    Real64 const COSI,                                   // Cosine of the incident angle
-                    DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
+                    int const PipeNum,                                  // TDD pipe object number
+                    Real64 const COSI,                                  // Cosine of the incident angle
+                    DataDaylightingDevices::RadType const RadiationType // Radiation type flag
     );
 
     Real64 InterpolatePipeTransBeam(EnergyPlusData &state,

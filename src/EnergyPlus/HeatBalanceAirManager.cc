@@ -577,7 +577,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = static_cast<AirBalance>(
                 getEnumerationValue(DataHeatBalance::AirBalanceTypeNamesUC,
                                     UtilityRoutines::MakeUPPERCase(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
-            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Unassigned) {
+            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Invalid) {
                 state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
                                  std::string{RoutineName} + cAlphaFieldNames(3) + " = " + cAlphaArgs(3) + " not valid choice for " +

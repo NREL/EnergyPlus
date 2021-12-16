@@ -280,12 +280,14 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         case DataHeatBalance::MaterialGroup::GapEquivalentLayer:
             state.dataConstruction->Construct(ConstrNum).TypeIsWindow = true;
             break;
-        case DataHeatBalance::MaterialGroup::Unassigned:
+        case DataHeatBalance::MaterialGroup::Invalid:
         case DataHeatBalance::MaterialGroup::Air:
         case DataHeatBalance::MaterialGroup::RegularMaterial:
         case DataHeatBalance::MaterialGroup::EcoRoof:
         case DataHeatBalance::MaterialGroup::IRTMaterial:
             break; // Purposely not doing anything
+        default:
+            assert(false);
         }
     }
 

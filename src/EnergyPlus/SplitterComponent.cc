@@ -229,7 +229,7 @@ namespace SplitterComponent {
                                                                                                  AlphArray(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  ObjectIsNotParent);
             state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes = NumAlphas - 2;
 
@@ -264,7 +264,7 @@ namespace SplitterComponent {
                                       AlphArray(1),
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::NodeConnectionType::Outlet,
-                                      NodeInputManager::compFluidStream::Primary,
+                                      NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {
                     ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));

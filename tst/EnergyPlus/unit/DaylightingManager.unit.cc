@@ -151,8 +151,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(
-        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
     EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
@@ -259,8 +258,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(
-        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
     EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
@@ -424,13 +422,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_doesDayLightingUseDElight_Test)
     EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
     state->dataDaylightingData->daylightControl.allocate(3);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-    state->dataDaylightingData->daylightControl(3).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(3).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
 
     EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
-    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::iDaylightingMethod::DElightDaylighting;
+    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::DaylightingMethod::DElight;
 
     EXPECT_TRUE(doesDayLightingUseDElight(*state));
 }
@@ -1627,8 +1625,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(
-        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
     EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);

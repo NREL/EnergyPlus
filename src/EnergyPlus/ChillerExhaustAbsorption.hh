@@ -201,7 +201,7 @@ namespace ChillerExhaustAbsorption {
               isWaterCooled(false), CHWLowLimitTemp(0.0), ExhaustAirInletNodeNum(0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0),
               DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0),
               CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0),
-              HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), CompType_Num(GeneratorType::Unassigned), ExhTempLTAbsLeavingTempIndex(0),
+              HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), CompType_Num(GeneratorType::Invalid), ExhTempLTAbsLeavingTempIndex(0),
               ExhTempLTAbsLeavingHeatingTempIndex(0), envrnInit(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0),
               HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0), ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0),
               CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0), ElectricPower(0.0), ElectricEnergy(0.0),

@@ -97,31 +97,31 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
         this->curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
         int SupFanNum = this->primaryAirSystem(this->curSysNum).SupFanNum;
         // int RetFanNum = this->primaryAirSystem(this->curSysNum).RetFanNum;
-        switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
-        case DataAirSystems::structArrayLegacyFanModels: {
+        switch (this->primaryAirSystem(this->curSysNum).supFanModelType) {
+        case DataAirSystems::StructArrayLegacyFanModels: {
             if (SupFanNum > 0) {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          this->compName,
                                                                                          this->compType,
                                                                                          state.dataFans->Fan(SupFanNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          this->primaryAirSystem(this->curSysNum).SupFanNum);
             }
             break;
         }
-        case DataAirSystems::objectVectorOOFanSystemModel: {
+        case DataAirSystems::ObjectVectorOOFanSystemModel: {
             if (this->primaryAirSystem(this->curSysNum).supFanVecIndex >= 0) {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                     state,
                     this->compName,
                     this->compType,
                     state.dataHVACFan->fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
-                    DataAirSystems::objectVectorOOFanSystemModel,
+                    DataAirSystems::ObjectVectorOOFanSystemModel,
                     this->primaryAirSystem(this->curSysNum).supFanVecIndex);
             }
             break;
         }
-        case DataAirSystems::fanModelTypeNotYetSet: {
+        case DataAirSystems::Invalid: {
             // do nothing
             break;
         }

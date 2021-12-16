@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -81,7 +80,6 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -104,7 +102,7 @@ namespace OutdoorAirUnit {
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
-    // Simulate zone outdooor air unit.
+    // Simulate zone outdoor air unit.
 
     // METHODOLOGY EMPLOYED:
     // Systems are modeled as a collection of components:
@@ -521,9 +519,9 @@ namespace OutdoorAirUnit {
                 {
                     auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(9));
                     if (SELECT_CASE_var == "NEUTRALCONTROL") {
-                        OutAirUnit(OAUnitNum).ControlType = Control::Neutral;
+                        OutAirUnit(OAUnitNum).controlType = OAUnitCtrlType::Neutral;
                     } else if (SELECT_CASE_var == "TEMPERATURECONTROL") {
-                        OutAirUnit(OAUnitNum).ControlType = Control::Temperature;
+                        OutAirUnit(OAUnitNum).controlType = OAUnitCtrlType::Temperature;
                     }
                 }
             } else {
@@ -531,7 +529,7 @@ namespace OutdoorAirUnit {
                                 std::string{CurrentModuleObject} + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(9) +
                                     "=\"" + state.dataIPShortCut->cAlphaArgs(9) + "\".");
                 ShowContinueError(state, "Control reset to Unconditioned Control.");
-                OutAirUnit(OAUnitNum).ControlType = Control::Neutral;
+                OutAirUnit(OAUnitNum).controlType = OAUnitCtrlType::Neutral;
             }
 
             // A10:High Control Temp :
@@ -567,7 +565,7 @@ namespace OutdoorAirUnit {
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                     ObjectIsParent);
             if (!lAlphaBlanks(14)) {
                 OutAirUnit(OAUnitNum).AirInletNode = GetOnlySingleNode(state,
@@ -577,7 +575,7 @@ namespace OutdoorAirUnit {
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Air,
                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                        ObjectIsParent);
             } else {
                 if (OutAirUnit(OAUnitNum).ExtFan) {
@@ -595,7 +593,7 @@ namespace OutdoorAirUnit {
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Internal,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
 
             //  Set connection type to 'OutdoorAir', because this is hardwired to OA conditions
@@ -606,7 +604,7 @@ namespace OutdoorAirUnit {
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
 
             if (!lAlphaBlanks(12)) {
@@ -1536,15 +1534,15 @@ namespace OutdoorAirUnit {
         auto &DataFanEnumType(state.dataSize->DataFanEnumType);
 
         if (OutAirUnit(OAUnitNum).SFanType == DataHVACGlobals::FanType_SystemModelObject) {
-            DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = OutAirUnit(OAUnitNum).SFan_Index;
         if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {
-            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+            state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
         } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
-            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+            state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
         }
 
         if (OutAirUnit(OAUnitNum).OutAirVolFlow == AutoSize) {
@@ -1820,7 +1818,7 @@ namespace OutdoorAirUnit {
         OutletNode = OutAirUnit(OAUnitNum).AirOutletNode;
         OutsideAirNode = OutAirUnit(OAUnitNum).OutsideAirNode;
         OperatingMode = OutAirUnit(OAUnitNum).OperatingMode;
-        Control UnitControlType = OutAirUnit(OAUnitNum).ControlType;
+        OAUnitCtrlType UnitControlType = OutAirUnit(OAUnitNum).controlType;
         AirOutletTemp = 0.0;
         OutAirUnit(OAUnitNum).CompOutSetTemp = 0.0;
         OutAirUnit(OAUnitNum).FanEffect = false;
@@ -1961,7 +1959,7 @@ namespace OutdoorAirUnit {
             // Control type check
             {
                 auto const SELECT_CASE_var(UnitControlType);
-                if (SELECT_CASE_var == Control::Neutral) {
+                if (SELECT_CASE_var == OAUnitCtrlType::Neutral) {
                     SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     // Neutral Control Condition
                     if (DesOATemp == SetPointTemp) {
@@ -1983,7 +1981,7 @@ namespace OutdoorAirUnit {
                         }
                     }
                     // SetPoint Temperature Condition
-                } else if (SELECT_CASE_var == Control::Temperature) {
+                } else if (SELECT_CASE_var == OAUnitCtrlType::Temperature) {
                     SetPointTemp = DesOATemp;
                     HiCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr);
                     LoCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr);
@@ -2489,7 +2487,7 @@ namespace OutdoorAirUnit {
                         UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(
                             state, OutAirUnit(OAUnitNum).OAEquip(SimCompNum).ComponentName, OAUnitNum);
                     }
-                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) ||
+                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) ||
                         (OpMode == Operation::HeatingMode)) {
                         Dxsystemouttemp = 100.0; // There is no cooling demand for the DX system.
                     } else {
@@ -2515,7 +2513,7 @@ namespace OutdoorAirUnit {
             } break;
             case CompType::DXHeatPumpSystem: {
                 if (Sim) {
-                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) ||
+                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) ||
                         (OpMode == Operation::CoolingMode)) {
                         Dxsystemouttemp = -20.0; // There is no heating demand for the DX system.
                     } else {
@@ -2528,10 +2526,10 @@ namespace OutdoorAirUnit {
             case CompType::UnitarySystemModel: { // 'CompType:UnitarySystem'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
-                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) &&
+                    if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) &&
                         (OpMode == Operation::HeatingMode)) {
                         Dxsystemouttemp = 100.0; // There is no cooling demand.
-                    } else if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Control::Temperature)) &&
+                    } else if (((OpMode == Operation::NeutralMode) && (OutAirUnit(OAUnitNum).controlType == OAUnitCtrlType::Temperature)) &&
                                (OpMode == Operation::CoolingMode)) {
                         Dxsystemouttemp = -20.0; // There is no heating demand.
                     } else {

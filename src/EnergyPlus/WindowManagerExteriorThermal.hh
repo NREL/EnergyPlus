@@ -83,10 +83,12 @@ namespace WindowManager {
 
     enum class ShadePosition
     {
+        Invalid = -1,
         NoShade,
         Interior,
         Exterior,
-        Between
+        Between,
+        Num
     };
 
     // Routine that calculates heat transfer balance by using Windows-CalcEngine routines

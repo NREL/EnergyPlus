@@ -63,6 +63,7 @@ enum class AutoSizingType
 {
     // align with DataHVACGlobals so scalable sizing strings can be applied
     // this will not be necessary when scalable sizing is moved to BaseSizerWithScalableInputs
+    Invalid = -1,
     ASHRAEMinSATCoolingSizing = 30,
     ASHRAEMaxSATHeatingSizing = 31,
     AutoCalculateSizing = 25,
@@ -98,14 +99,16 @@ enum class AutoSizingType
     WaterHeatingCoilUASizing = 20,
     ZoneCoolingLoadSizing = 26,
     ZoneHeatingLoadSizing = 27,
-    Unknown = 0
+    Num
 };
 
 enum class AutoSizingResultType
 {
+    Invalid = -1,
     NoError,    // no errors found
     ErrorType1, // sizing error
-    ErrorType2  // uninitialized sizing type
+    ErrorType2, // uninitialized sizing type
+    Num
 };
 
 struct BaseSizer
@@ -120,7 +123,7 @@ struct BaseSizer
     bool isFanReportObject = false;  // provides access to fan reporting
     bool initialized = false;        // indicates initializeWithinEP was called
     AutoSizingResultType errorType = AutoSizingResultType::NoError;
-    AutoSizingType sizingType = AutoSizingType::Unknown;
+    AutoSizingType sizingType = AutoSizingType::Invalid;
     std::string sizingString;
     std::string sizingStringScalable;
     bool overrideSizeString = true;
@@ -195,7 +198,7 @@ struct BaseSizer
     Real64 dataAirFlowUsedForSizing = 0.0;
     Real64 dataDesInletAirTemp = 0.0;
     bool dataDesAccountForFanHeat = false;
-    DataSizing::zoneFanPlacement dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+    DataSizing::ZoneFanPlacement dataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
 
     // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
     // HeatingWaterDesAirInletTempSizer
