@@ -678,8 +678,7 @@ namespace HVACFan {
         }
 
         if (m_heatLossesDestination == ThermalLossDestination::zoneGains) {
-            SetupZoneInternalGain(
-                state, m_zoneNum, name, DataHeatBalance::IntGainType::FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
+            SetupZoneInternalGain(state, m_zoneNum, name, DataHeatBalance::IntGainType::FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
         }
 
         alphaArgs.deallocate();

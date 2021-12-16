@@ -168,7 +168,8 @@ void PipeHTData::PushInnerTimeStepArrays()
                 for (int WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                     // This will store the old 'current' values as the new 'previous values'  This allows
                     // us to use the previous time array as history terms in the equations
-                    this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous) = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current);
+                    this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous) =
+                        this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current);
                 }
             }
         }
@@ -1095,7 +1096,8 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
             for (DepthIndex = 1; DepthIndex <= this->NumDepthNodes; ++DepthIndex) {
                 for (WidthIndex = 2; WidthIndex <= this->PipeNodeWidth; ++WidthIndex) {
                     // This will essentially erase the past iterations and revert back to the correct values
-                    this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current);
+                    this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Tentative) =
+                        this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Current);
                 }
             }
         }

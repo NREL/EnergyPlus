@@ -58,7 +58,7 @@ namespace EnergyPlus {
 
 void SetupZoneInternalGain(EnergyPlusData &state,
                            int const ZoneNum,
-                           std::string_view const &cComponentName,   // user unique name for device
+                           std::string_view const &cComponentName, // user unique name for device
                            DataHeatBalance::IntGainType const IntGainCompType,
                            Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
                            Real64 *ReturnAirConvectionGainRate,
@@ -93,8 +93,8 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 }
 void SetupSpaceInternalGain(EnergyPlusData &state,
                             int const spaceNum,
-                            Real64 spaceGainFraction,                 // Fraction of gain value assigned to this space
-                            std::string_view const &cComponentName,   // user unique name for device
+                            Real64 spaceGainFraction,               // Fraction of gain value assigned to this space
+                            std::string_view const &cComponentName, // user unique name for device
                             DataHeatBalance::IntGainType const IntGainCompType,
                             Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
                             Real64 *ReturnAirConvectionGainRate,

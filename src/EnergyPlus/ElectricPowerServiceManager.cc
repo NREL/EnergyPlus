@@ -2683,13 +2683,8 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
         if (zoneNum_ > 0) {
             switch (modelType_) {
             case InverterModelType::simpleConstantEff: {
-                SetupZoneInternalGain(state,
-                                      zoneNum_,
-                                      name_,
-                                      DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
-                                      &qdotConvZone_,
-                                      nullptr,
-                                      &qdotRadZone_);
+                SetupZoneInternalGain(
+                    state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple, &qdotConvZone_, nullptr, &qdotRadZone_);
                 break;
             }
             case InverterModelType::curveFuncOfPower: {
@@ -3137,13 +3132,8 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             "ACtoDCConverter Ancillary",
                             "Plant"); // called cogeneration for end use table
         if (zoneNum_ > 0) {
-            SetupZoneInternalGain(state,
-                                  zoneNum_,
-                                  name_,
-                                  DataHeatBalance::IntGainType::ElectricLoadCenterConverter,
-                                  &qdotConvZone_,
-                                  nullptr,
-                                  &qdotRadZone_);
+            SetupZoneInternalGain(
+                state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterConverter, &qdotConvZone_, nullptr, &qdotRadZone_);
         }
     } else {
         ShowSevereError(state, std::string{routineName} + " did not find power converter name = " + objectName);
@@ -3719,23 +3709,13 @@ ElectricStorage::ElectricStorage( // main constructor
         if (zoneNum_ > 0) {
             switch (storageModelMode_) {
             case StorageModelType::simpleBucketStorage: {
-                SetupZoneInternalGain(state,
-                                      zoneNum_,
-                                      name_,
-                                      DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
-                                      &qdotConvZone_,
-                                      nullptr,
-                                      &qdotRadZone_);
+                SetupZoneInternalGain(
+                    state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple, &qdotConvZone_, nullptr, &qdotRadZone_);
                 break;
             }
             case StorageModelType::kiBaMBattery: {
-                SetupZoneInternalGain(state,
-                                      zoneNum_,
-                                      name_,
-                                      DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
-                                      &qdotConvZone_,
-                                      nullptr,
-                                      &qdotRadZone_);
+                SetupZoneInternalGain(
+                    state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery, &qdotConvZone_, nullptr, &qdotRadZone_);
                 break;
             }
             case StorageModelType::liIonNmcBattery: {
@@ -4904,13 +4884,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         }
 
         if (zoneNum_ > 0) {
-            SetupZoneInternalGain(state,
-                                  zoneNum_,
-                                  name_,
-                                  DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
-                                  &qdotConvZone_,
-                                  nullptr,
-                                  &qdotRadZone_);
+            SetupZoneInternalGain(
+                state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterTransformer, &qdotConvZone_, nullptr, &qdotRadZone_);
         }
 
     } else {
