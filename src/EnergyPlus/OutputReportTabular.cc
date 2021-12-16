@@ -900,6 +900,8 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                         ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
                         ort->MonthlyColumns(mColumn).timeStamp = 0;
                     } break;
+                    default:
+                        break;
                     }
                 } else { // if no key corresponds to this instance of the report
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
@@ -3765,6 +3767,8 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                     // CASE (iAggType::MaximumDuringHoursShown)
                     // CASE (iAggType::MinimumDuringHoursShown)
                 } break;
+                default:
+                    break;
                 }
                 // if the new value has been set then set the monthly values to the
                 // new columns. This skips the aggregation types that don't even get
@@ -3802,6 +3806,8 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                             }
                             ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
                         } break;
+                        default:
+                            break;
                         }
                     }
                 }
@@ -3823,7 +3829,6 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                         case iAggType::HoursNonNegative:
                             // end scanning since these might reset
                             break; // do
-
                         case iAggType::SumOrAverageHoursShown: {
                             // this case is when the value should be set
                             if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
@@ -3860,6 +3865,8 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                                 ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
                             }
                         } break;
+                        default:
+                            break;
                         }
                         activeHoursShown = false; // fixed CR8317
                     }
@@ -6069,6 +6076,8 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                     }
                 }
             } break;
+            default:
+                break;
             }
             lineIn = "";
             lineTypeinterim = StatLineType::Initialized;
@@ -7199,6 +7208,8 @@ void WriteMonthlyTables(EnergyPlusData &state)
                     case iAggType::MinimumDuringHoursShown: {
                         columnUsedCount += 2;
                     } break;
+                    default:
+                        break;
                     }
                 } // jColumn
                 columnHead.allocate(columnUsedCount);
@@ -7447,6 +7458,8 @@ void WriteMonthlyTables(EnergyPlusData &state)
                             tableBody(columnRecount - 1, 15) = "-";
                         }
                     } break;
+                    default:
+                        break;
                     }
                 } // KColumn
                 if (produceTabular) {
@@ -11437,14 +11450,14 @@ void WriteVeriSumTable(EnergyPlusData &state)
                                 }
                             }
                         } break;
+                        default:
+                            break;
                         }
                     } else if (state.dataSurface->Surface(iSurf).Tilt < 60.0) { // roof and skylights
                         switch (state.dataSurface->Surface(iSurf).Class) {
                         case SurfaceClass::Wall:
                         case SurfaceClass::Floor:
-                        case SurfaceClass::Roof:
-
-                        {
+                        case SurfaceClass::Roof: {
                             mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                             roofArea += curArea * mult;
                             if (DetailedWWR) {
@@ -11471,6 +11484,8 @@ void WriteVeriSumTable(EnergyPlusData &state)
                                 }
                             }
                         } break;
+                        default:
+                            break;
                         }
                     } else { // floors
                              // ignored
@@ -15004,6 +15019,8 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             case SurfaceClass::Door: {
                 delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
             } break;
+            default:
+                break;
             }
         }
         for (int k = LoadCompRow::Roof; k <= LoadCompRow::OtherFlr; ++k) {
