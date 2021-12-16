@@ -64,9 +64,11 @@ namespace CommandLineInterface {
 
     enum class ReturnCodes
     {
+        Invalid = -1,
         Success,
         Failure,
         SuccessButHelper,
+        Num
     };
 
     // Process command line arguments

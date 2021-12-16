@@ -313,7 +313,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::ZoneNode,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent); // all zone air state variables are
         if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\", invalid");
@@ -425,7 +425,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             thisZoneEquipList.SequentialCoolingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
             thisZoneEquipList.SequentialHeatingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
             thisZoneEquipList.EquipType = "";
-            thisZoneEquipList.EquipTypeEnum = DataZoneEquipment::ZoneEquip::Unassigned;
+            thisZoneEquipList.EquipTypeEnum = DataZoneEquipment::ZoneEquip::Invalid;
             thisZoneEquipList.EquipName = "";
             thisZoneEquipList.EquipIndex = 0;
             thisZoneEquipList.CoolingPriority = 0;
@@ -678,7 +678,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneInlet,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -730,7 +730,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneExhaust,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -770,7 +770,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneReturn,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -789,8 +789,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).FixedReturnFlow = false;      // initialize to false here
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodePlenumNum = 0;      // initialize to zero here
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNodeExhaustNodeNum = 0; // initialize to zero here
-            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).SharedExhaustNode =
-                iLightReturnExhaustConfig::NoExhast; // initialize to zero here
+            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).SharedExhaustNode = LightReturnExhaustConfig::NoExhast; // initialize to zero here
 
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);
@@ -824,7 +823,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::Sensor,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -928,12 +927,12 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsParent);
 
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
-        state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Unassigned;
+        state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Invalid;
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
@@ -998,12 +997,12 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent);
 
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
-        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Unassigned;
+        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Invalid;
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
 
@@ -1418,14 +1417,14 @@ void CheckSharedExhaust(EnergyPlusData &state)
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes < 2) continue;
         for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount) {
-            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) == iLightReturnExhaustConfig::Shared) continue;
+            if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) == LightReturnExhaustConfig::Shared) continue;
             ExhastNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNum(nodeCount);
             if (ExhastNodeNum > 0) {
-                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) = iLightReturnExhaustConfig::Single;
+                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) = LightReturnExhaustConfig::Single;
                 for (int nodeCount1 = nodeCount + 1; nodeCount1 <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++nodeCount1) {
                     if (ExhastNodeNum == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeExhaustNodeNum(nodeCount1)) {
-                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) = iLightReturnExhaustConfig::Multi;
-                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount1) = iLightReturnExhaustConfig::Shared;
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount) = LightReturnExhaustConfig::Multi;
+                        state.dataZoneEquip->ZoneEquipConfig(ZoneNum).SharedExhaustNode(nodeCount1) = LightReturnExhaustConfig::Shared;
                     }
                 }
             }

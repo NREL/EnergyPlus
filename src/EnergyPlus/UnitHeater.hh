@@ -66,7 +66,7 @@ namespace UnitHeater {
 
     enum class HCoilType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Electric,
         Gas,
         WaterHeatingCoil,

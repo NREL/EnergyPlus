@@ -259,7 +259,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (!state.dataSurface->Surface(SurfNum).HeatTransSurf || state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window)
             continue; // Heat transfer surface only and not a window
-        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD) continue;
+        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD) continue;
         ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
         if (state.dataMaterial->Material(MatNum).EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {

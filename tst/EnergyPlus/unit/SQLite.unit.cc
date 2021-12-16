@@ -469,8 +469,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_privateMethods)
     EXPECT_EQ("Unknown!!!", timestepTypeName(3));
     EXPECT_EQ("Unknown!!!", timestepTypeName(-1));
     // Let's ensure we never get an unexpected change of mapping between enum and the corresponding int value
-    EXPECT_EQ(1, static_cast<int>(OutputProcessor::TimeStepType::TimeStepZone));
-    EXPECT_EQ(2, static_cast<int>(OutputProcessor::TimeStepType::TimeStepSystem));
+    EXPECT_EQ(1, static_cast<int>(OutputProcessor::TimeStepType::Zone));
+    EXPECT_EQ(2, static_cast<int>(OutputProcessor::TimeStepType::System));
 
     // test reportingFreqName
     EXPECT_EQ("HVAC System Timestep", reportingFreqName(-1));

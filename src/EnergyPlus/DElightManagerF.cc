@@ -238,7 +238,7 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-            if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
+            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
                 if (znDayl.TotalDaylRefPoints == 0) {
@@ -274,7 +274,7 @@ namespace DElightManagerF {
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-            if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
+            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
                 int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 

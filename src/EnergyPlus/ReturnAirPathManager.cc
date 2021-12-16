@@ -158,13 +158,13 @@ namespace ReturnAirPathManager {
                                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                               ObjectIsParent);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType = "";
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
-                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Unassigned;
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Invalid;
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName = "";
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
@@ -188,7 +188,7 @@ namespace ReturnAirPathManager {
                             ErrorsFound = true;
                         }
                         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = static_cast<DataZoneEquipment::AirLoopHVACZone>(
-                            getEnumerationValue(DataZoneEquipment::AirLoopHVACTypeNames, state.dataIPShortCut->cAlphaArgs(Counter)));
+                            getEnumerationValue(DataZoneEquipment::AirLoopHVACTypeNamesCC, state.dataIPShortCut->cAlphaArgs(Counter)));
 
                     } else {
                         ShowSevereError(state, "Unhandled component type in AirLoopHVAC:ReturnPath of " + state.dataIPShortCut->cAlphaArgs(Counter));

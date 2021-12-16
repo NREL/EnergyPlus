@@ -96,11 +96,13 @@ namespace OutputProcessor {
     };
     static constexpr std::array<std::string_view, (int)SOVStoreType::Num> sovStoreTypeStrings = {"State", "NonState", "Summed", "Average"};
 
-    enum class iReportVDD
+    enum class ReportVDD
     {
+        Invalid = -1,
         No,  // Don't report the variable dictionaries in any form
         Yes, // Report the variable dictionaries in "report format"
         IDF, // Report the variable dictionaries in "IDF format"
+        Num
     };
 
     constexpr Real64 MinSetValue(99999999999999.0);
@@ -110,21 +112,23 @@ namespace OutputProcessor {
 
     enum class VariableType
     {
-        Unassigned = -1,
+        Invalid = -1,
         NotFound, // ref: GetVariableKeyCountandType, 0 = not found
         Integer,  // ref: GetVariableKeyCountandType, 1 = integer
         Real,     // ref: GetVariableKeyCountandType, 2 = real
         Meter,    // ref: GetVariableKeyCountandType, 3 = meter
-        Schedule  // ref: GetVariableKeyCountandType, 4 = schedule
+        Schedule, // ref: GetVariableKeyCountandType, 4 = schedule
+        Num
     };
 
     enum class MtrType
     {
-        Unassigned = -1,
-        Normal,    // Type value for normal meters
-        Custom,    // Type value for custom meters
-        CustomDec, // Type value for custom meters that decrement another meter
-        CustomDiff // Type value for custom meters that difference another meter
+        Invalid = -1,
+        Normal,     // Type value for normal meters
+        Custom,     // Type value for custom meters
+        CustomDec,  // Type value for custom meters that decrement another meter
+        CustomDiff, // Type value for custom meters that difference another meter
+        Num
     };
 
     constexpr int N_WriteTimeStampFormatData(100);
@@ -184,7 +188,7 @@ namespace OutputProcessor {
     //  For IP Units (tabular reports) certain resources will be put in sub-tables
     enum class RT_IPUnits
     {
-        Unassigned = -1,
+        Invalid = -1,
         OtherJ,
         Electricity,
         Gas,
@@ -192,11 +196,13 @@ namespace OutputProcessor {
         Water,
         OtherKG,
         OtherM3,
-        OtherL
+        OtherL,
+        Num
     };
 
     enum class Unit
     {
+        Invalid = -1,
         kg_s,
         C,
         kgWater_kgDryAir,
@@ -247,7 +253,8 @@ namespace OutputProcessor {
         K_W,
         kgWater_s,
         unknown,
-        customEMS
+        customEMS,
+        Num
     };
 
     enum class ReportingFrequency
@@ -258,19 +265,24 @@ namespace OutputProcessor {
         Daily,         // Write out at 'EndDayFlag'
         Monthly,       // Write out at end of month (must be determined)
         Simulation,    // Write out once per environment 'EndEnvrnFlag'
-        Yearly         // Write out at 'EndYearFlag'
+        Yearly,        // Write out at 'EndYearFlag'
+        Num
     };
 
     enum class StoreType
     {
+        Invalid = -1,
         Averaged = 1, // Type value for "averaged" variables
-        Summed        // Type value for "summed" variables
+        Summed,       // Type value for "summed" variables
+        Num
     };
 
     enum class TimeStepType
     {
-        TimeStepZone = 1,   // Type value for "zone" timestep variables
-        TimeStepSystem = 2, // Type value for "system" timestep variables
+        Invalid = -1,
+        Zone = 1,   // Type value for "zone" timestep variables
+        System = 2, // Type value for "system" timestep variables
+        Num
     };
 
     struct TimeSteps
@@ -361,7 +373,7 @@ namespace OutputProcessor {
 
         // Default Constructor
         VariableTypeForDDOutput()
-            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), variableType(VariableType::NotFound), Next(0),
+            : timeStepType(TimeStepType::Zone), storeType(StoreType::Averaged), variableType(VariableType::NotFound), Next(0),
               ReportedOnDDFile(false), units(OutputProcessor::Unit::None)
         {
         }
@@ -383,7 +395,7 @@ namespace OutputProcessor {
         RealVariables VarPtr;          // Pointer used to real Variables structure
 
         // Default Constructor
-        RealVariableType() : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
+        RealVariableType() : timeStepType(TimeStepType::Zone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
         {
         }
     };
@@ -403,8 +415,7 @@ namespace OutputProcessor {
         IntegerVariables VarPtr;     // Pointer used to integer Variables structure
 
         // Default Constructor
-        IntegerVariableType()
-            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
+        IntegerVariableType() : timeStepType(TimeStepType::Zone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
         {
         }
     };
@@ -539,17 +550,17 @@ namespace OutputProcessor {
 
         // Default Constructor
         MeterType()
-            : Units(OutputProcessor::Unit::None), RT_forIPUnits(OutputProcessor::RT_IPUnits::Unassigned), TypeOfMeter(MtrType::Normal),
-              SourceMeter(0), TSValue(0.0), CurTSValue(0.0), RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false),
-              HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0),
-              DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0),
-              MNRptNum(0), YRValue(0.0), RptYR(false), RptYRFO(false), YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0),
-              YRRptNum(0), SMValue(0.0), RptSM(false), RptSMFO(false), SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0),
-              SMRptNum(0), LastSMValue(0.0), LastSMMaxVal(-99999.0), LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0),
-              FinYrSMValue(0.0), FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0), FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false),
-              RptAccTSFO(false), RptAccHR(false), RptAccHRFO(false), RptAccDY(false), RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false),
-              RptAccYR(false), RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false), TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0),
-              YRAccRptNum(0), SMAccRptNum(0), InstMeterCacheStart(0), InstMeterCacheEnd(0)
+            : Units(OutputProcessor::Unit::None), RT_forIPUnits(OutputProcessor::RT_IPUnits::Invalid), TypeOfMeter(MtrType::Normal), SourceMeter(0),
+              TSValue(0.0), CurTSValue(0.0), RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false), HRRptNum(0),
+              DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0), DYRptNum(0),
+              MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0), MNRptNum(0),
+              YRValue(0.0), RptYR(false), RptYRFO(false), YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0), YRRptNum(0),
+              SMValue(0.0), RptSM(false), RptSMFO(false), SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0), SMRptNum(0),
+              LastSMValue(0.0), LastSMMaxVal(-99999.0), LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0), FinYrSMValue(0.0),
+              FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0), FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false), RptAccTSFO(false),
+              RptAccHR(false), RptAccHRFO(false), RptAccDY(false), RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false), RptAccYR(false),
+              RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false), TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0), YRAccRptNum(0),
+              SMAccRptNum(0), InstMeterCacheStart(0), InstMeterCacheEnd(0)
         {
         }
     };
@@ -1028,7 +1039,7 @@ struct OutputProcessorData : BaseGlobalStruct
     int NumOfIVariable = 0;
     int MaxIVariable = 0;
     bool OutputInitialized = false;
-    OutputProcessor::iReportVDD ProduceReportVDD = OutputProcessor::iReportVDD::No;
+    OutputProcessor::ReportVDD ProduceReportVDD = OutputProcessor::ReportVDD::No;
     int NumHoursInMonth = 0;
     int NumHoursInSim = 0;
     Array1D_int ReportList;
@@ -1125,7 +1136,7 @@ struct OutputProcessorData : BaseGlobalStruct
         this->NumOfIVariable = 0;
         this->MaxIVariable = 0;
         this->OutputInitialized = false;
-        this->ProduceReportVDD = OutputProcessor::iReportVDD::No;
+        this->ProduceReportVDD = OutputProcessor::ReportVDD::No;
         this->NumHoursInMonth = 0;
         this->NumHoursInSim = 0;
         this->ReportList.deallocate();

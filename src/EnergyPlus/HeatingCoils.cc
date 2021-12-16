@@ -410,7 +410,7 @@ namespace HeatingCoils {
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
@@ -421,7 +421,7 @@ namespace HeatingCoils {
                                                                       Alphas(1),
                                                                       DataLoopNode::NodeFluidType::Air,
                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                       ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -435,7 +435,7 @@ namespace HeatingCoils {
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -546,7 +546,7 @@ namespace HeatingCoils {
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
@@ -557,7 +557,7 @@ namespace HeatingCoils {
                                                                       Alphas(1),
                                                                       DataLoopNode::NodeFluidType::Air,
                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                       ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -571,7 +571,7 @@ namespace HeatingCoils {
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -690,7 +690,7 @@ namespace HeatingCoils {
                                                      Alphas(1),
                                                      DataLoopNode::NodeFluidType::Air,
                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                     NodeInputManager::compFluidStream::Primary,
+                                                     NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
@@ -701,7 +701,7 @@ namespace HeatingCoils {
                                                       Alphas(1),
                                                       DataLoopNode::NodeFluidType::Air,
                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                      NodeInputManager::compFluidStream::Primary,
+                                                      NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -715,7 +715,7 @@ namespace HeatingCoils {
                                                          Alphas(1),
                                                          DataLoopNode::NodeFluidType::Air,
                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                         NodeInputManager::compFluidStream::Primary,
+                                                         NodeInputManager::CompFluidStream::Primary,
                                                          ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -885,7 +885,7 @@ namespace HeatingCoils {
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
@@ -896,7 +896,7 @@ namespace HeatingCoils {
                                                                       Alphas(1),
                                                                       DataLoopNode::NodeFluidType::Air,
                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                       ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -910,7 +910,7 @@ namespace HeatingCoils {
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -1077,7 +1077,7 @@ namespace HeatingCoils {
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
             errFlag = false;
@@ -1088,7 +1088,7 @@ namespace HeatingCoils {
                                                                       Alphas(1),
                                                                       DataLoopNode::NodeFluidType::Air,
                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                       ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -1296,7 +1296,7 @@ namespace HeatingCoils {
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
@@ -1477,7 +1477,7 @@ namespace HeatingCoils {
                             state.dataHeatingCoils->HeatingCoilFatalError = true;
                         } else {
                             CheckIfNodeSetPointManagedByEMS(
-                                state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHeatingCoils->HeatingCoilFatalError);
+                                state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHeatingCoils->HeatingCoilFatalError);
                             if (state.dataHeatingCoils->HeatingCoilFatalError) {
                                 ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                                 ShowContinueError(state, "... Missing temperature setpoint for heating coil.");

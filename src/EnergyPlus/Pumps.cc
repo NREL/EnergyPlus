@@ -314,7 +314,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -324,7 +324,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -497,9 +497,9 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(14)) {
             if (state.dataIPShortCut->cAlphaArgs(14) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(14) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -565,7 +565,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -575,7 +575,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -678,9 +678,9 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
             if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -738,7 +738,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Steam,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -748,7 +748,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Steam,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -819,9 +819,9 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
             if (state.dataIPShortCut->cAlphaArgs(6) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(6) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -879,7 +879,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -889,7 +889,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -977,9 +977,9 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
             if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -1039,7 +1039,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -1049,7 +1049,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -1130,9 +1130,9 @@ void GetPumpInput(EnergyPlusData &state)
         }
         if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
             if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOW") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlow;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlow;
             } else if (state.dataIPShortCut->cAlphaArgs(8) == "POWERPERFLOWPERPRESSURE") {
-                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::sizePowerPerFlowPerPressure;
+                state.dataPumps->PumpEquip(PumpNum).powerSizingMethod = PowerSizingMethod::SizePowerPerFlowPerPressure;
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
@@ -1941,7 +1941,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
                 .LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum)
                 .Branch(state.dataPumps->PumpEquip(PumpNum).BranchNum)
                 .Comp(state.dataPumps->PumpEquip(PumpNum).CompNum)
-                .FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                .FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
             state.dataPumps->PumpMassFlowRate = 0.0;
         }
     }
@@ -2172,11 +2172,11 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int PlantSizNum; // index of Plant Sizing array
     bool ErrorsFound;
-    Real64 TotalEffic; // pump total efficiency
-    int Side;          // half loop index
-    int BranchNum;     // index of branch
-    int CompNum;       // index of component on branch
-    Real64 PumpSizFac; // pump sizing factor
+    Real64 TotalEffic = 0.0; // pump total efficiency
+    int Side;                // half loop index
+    int BranchNum;           // index of branch
+    int CompNum;             // index of component on branch
+    Real64 PumpSizFac;       // pump sizing factor
     Real64 SteamDensity;
     Real64 TempWaterDensity;
     int DummyWaterIndex(1);
@@ -2317,16 +2317,18 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
         if (state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate >= SmallWaterVolFlow) {
             switch (state.dataPumps->PumpEquip(PumpNum).powerSizingMethod) {
 
-            case PowerSizingMethod::sizePowerPerFlow: {
+            case PowerSizingMethod::SizePowerPerFlow: {
                 TotalEffic = state.dataPumps->PumpEquip(PumpNum).NomPumpHead / state.dataPumps->PumpEquip(PumpNum).powerPerFlowScalingFactor;
                 break;
             }
 
-            case PowerSizingMethod::sizePowerPerFlowPerPressure: {
+            case PowerSizingMethod::SizePowerPerFlowPerPressure: {
                 TotalEffic =
                     (1 / state.dataPumps->PumpEquip(PumpNum).powerPerFlowPerPressureScalingFactor) * state.dataPumps->PumpEquip(PumpNum).MotorEffic;
                 break;
             }
+            default:
+                assert(false);
             }
 
             state.dataPumps->PumpEquip(PumpNum).NomPowerUse =

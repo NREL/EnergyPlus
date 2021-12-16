@@ -181,7 +181,7 @@ namespace HeatBalFiniteDiffManager {
                 {
                     state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = static_cast<CondFDScheme>(
                         getEnumerationValue(CondFDSchemeTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
-                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::Unassigned) {
+                    if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::Invalid) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                             " entered=" + state.dataIPShortCut->cAlphaArgs(1) +
@@ -434,7 +434,7 @@ namespace HeatBalFiniteDiffManager {
         // now do begin environment inits.
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
             for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+                if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
                 if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
                 ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
@@ -485,7 +485,7 @@ namespace HeatBalFiniteDiffManager {
         // now do every timestep inits
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
             if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
@@ -798,7 +798,7 @@ namespace HeatBalFiniteDiffManager {
         for (Surf = 1; Surf <= state.dataSurface->TotSurfaces; ++Surf) {
             if (!state.dataSurface->Surface(Surf).HeatTransSurf) continue;
             if (state.dataSurface->Surface(Surf).Class == DataSurfaces::SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(Surf).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+            if (state.dataSurface->Surface(Surf).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
             ConstrNum = state.dataSurface->Surface(Surf).Construction;
             TotNodes = ConstructFD(ConstrNum).TotNodes;
 
@@ -874,7 +874,7 @@ namespace HeatBalFiniteDiffManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
             if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CondFD) continue;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CondFD) continue;
 
             SetupOutputVariable(state,
                                 "CondFD Inner Solver Loop Iteration Count",
@@ -1515,7 +1515,7 @@ namespace HeatBalFiniteDiffManager {
             Real64 const Toa(state.dataMstBal->TempOutsideAirFD(Surf));
             Real64 const Tgnd(state.dataMstBal->TempOutsideAirFD(Surf));
 
-            if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+            if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
 
                 int const ConstrNum(surface.Construction);
                 int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
@@ -1813,7 +1813,7 @@ namespace HeatBalFiniteDiffManager {
 
         auto const &surface(state.dataSurface->Surface(Surf));
 
-        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) { // HT Algo issue
+        if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) { // HT Algo issue
 
             int const ConstrNum(surface.Construction);
             auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -2190,7 +2190,7 @@ namespace HeatBalFiniteDiffManager {
         //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
         auto TDT_i(TDT(i));
         Real64 const QFac(NetLWRadToSurfFD + QRadSWInFD + QRadThermInFD + SurfQdotRadHVACInPerAreaFD);
-        if (surface.HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+        if (surface.HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
             auto const &mat(state.dataMaterial->Material(MatLay));
             auto const &matFD(state.dataHeatBalFiniteDiffMgr->MaterialFD(MatLay));
@@ -2201,7 +2201,7 @@ namespace HeatBalFiniteDiffManager {
 
             if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer
                 // Use algebraic equation for TDT based on R
-                Real64 const IterDampConst(
+                Real64 constexpr IterDampConst(
                     5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls
                 Real64 const Rlayer(mat.Resistance);
                 if ((i == 1) && (surface.ExtBoundCond > 0)) { // this is for an adiabatic partition

@@ -80,8 +80,8 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     // Test 1: CurveVarsFracChargedLMTD Curve is QuadraticLinear
     TestNum = 1;
     IceStorageCurveType = IceThermalStorage::CurveVars::FracChargedLMTD;
-    state->dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::QuadraticLinear;
-    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(TestNum).curveType = CurveType::QuadraticLinear;
+    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(TestNum).Var1Max = 1.0;
     state->dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
     state->dataCurveManager->PerfCurve(TestNum).Var2Max = 10.0;
@@ -99,8 +99,8 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     // Test 2: CurveVarsFracDischargedLMTD Curve is BiQuadratic
     TestNum = 2;
     IceStorageCurveType = IceThermalStorage::CurveVars::FracDischargedLMTD;
-    state->dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::BiQuadratic;
-    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(TestNum).curveType = CurveType::BiQuadratic;
+    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(TestNum).Var1Max = 1.0;
     state->dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
     state->dataCurveManager->PerfCurve(TestNum).Var2Max = 10.0;
@@ -118,8 +118,8 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     // Test 3: CurveVarsLMTDMassFlow Curve is CubicLinear
     TestNum = 3;
     IceStorageCurveType = IceThermalStorage::CurveVars::LMTDMassFlow;
-    state->dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::CubicLinear;
-    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(TestNum).curveType = CurveType::CubicLinear;
+    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(TestNum).Var1Max = 10.0;
     state->dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
     state->dataCurveManager->PerfCurve(TestNum).Var2Max = 1.0;
@@ -137,8 +137,8 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     // Test 4: CurveVarsFracLMTDFracCharged Curve is CubicLinear
     TestNum = 4;
     IceStorageCurveType = IceThermalStorage::CurveVars::LMTDFracCharged;
-    state->dataCurveManager->PerfCurve(TestNum).CurveType = CurveTypeEnum::CubicLinear;
-    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(TestNum).curveType = CurveType::CubicLinear;
+    state->dataCurveManager->PerfCurve(TestNum).InterpolationType = CurveManager::InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(TestNum).Var1Max = 10.0;
     state->dataCurveManager->PerfCurve(TestNum).Var1Min = 0.0;
     state->dataCurveManager->PerfCurve(TestNum).Var2Max = 1.0;

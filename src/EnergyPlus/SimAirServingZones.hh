@@ -77,7 +77,7 @@ namespace SimAirServingZones {
     // component types addressed by this module
     enum class CompType
     {
-        Unassigned = -1,
+        Invalid = -1,
         OAMixer_Num,
         Fan_Simple_CV,
         Fan_Simple_VAV,
@@ -110,7 +110,8 @@ namespace SimAirServingZones {
         ZoneVRFasAirLoopEquip,
         PVT_AirBased,
         VRFTerminalUnit,
-        CoilSystemWater
+        CoilSystemWater,
+        Num
     };
 
     void ManageAirLoops(EnergyPlusData &state,

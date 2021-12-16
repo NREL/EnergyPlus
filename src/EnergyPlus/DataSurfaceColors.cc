@@ -79,7 +79,7 @@ bool MatchAndSetColorTextString(EnergyPlusData &state,
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataSurfaceColors::ColorNo::NUM)> colorkeys = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataSurfaceColors::ColorNo::Num)> colorkeys = {
         "TEXT",
         "WALLS",
         "WINDOWS",

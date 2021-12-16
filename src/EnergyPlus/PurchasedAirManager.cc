@@ -283,7 +283,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Air,
                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            ObjectIsNotParent);
             UniqueNodeError = false;
             CheckUniqueNodes(state,
@@ -304,7 +304,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsNotParent);
                 } else {
                     PurchAir(PurchAirNum).ZoneExhaustAirNodeNum = GetOnlySingleNode(state,
@@ -314,7 +314,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsNotParent);
                 }
                 UniqueNodeError = false;
@@ -335,7 +335,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsNotParent);
             }
             PurchAir(PurchAirNum).MaxHeatSuppAirTemp = state.dataIPShortCut->rNumericArgs(1);
@@ -520,7 +520,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
                 // Check if OA node is initialized in OutdoorAir:Node or OutdoorAir:Nodelist
                 CheckAndAddAirNodeNumber(state, PurchAir(PurchAirNum).OutdoorAirNodeNum, IsOANodeListed);
@@ -543,14 +543,14 @@ void GetPurchasedAir(EnergyPlusData &state)
 
                 // get Demand controlled ventilation type
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "None")) {
-                    PurchAir(PurchAirNum).DCVType = DCV::NoDCV;
+                    PurchAir(PurchAirNum).DCVType = DCV::None;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "OccupancySchedule")) {
                     PurchAir(PurchAirNum).DCVType = DCV::OccupancySchedule;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "CO2Setpoint")) {
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         PurchAir(PurchAirNum).DCVType = DCV::CO2SetPoint;
                     } else {
-                        PurchAir(PurchAirNum).DCVType = DCV::NoDCV;
+                        PurchAir(PurchAirNum).DCVType = DCV::None;
                         ShowWarningError(
                             state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + " invalid data");
                         ShowContinueError(state,
@@ -586,7 +586,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                 }
                 // get Outdoor air heat recovery type and effectiveness
                 if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "None")) {
-                    PurchAir(PurchAirNum).HtRecType = HeatRecovery::NoHeatRecovery;
+                    PurchAir(PurchAirNum).HtRecType = HeatRecovery::None;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Sensible")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::Sensible;
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Enthalpy")) {
@@ -600,9 +600,9 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             } else { // No outdoorair
-                PurchAir(PurchAirNum).DCVType = DCV::NoDCV;
+                PurchAir(PurchAirNum).DCVType = DCV::None;
                 PurchAir(PurchAirNum).EconomizerType = Econ::NoEconomizer;
-                PurchAir(PurchAirNum).HtRecType = HeatRecovery::NoHeatRecovery;
+                PurchAir(PurchAirNum).HtRecType = HeatRecovery::None;
             }
 
             PurchAir(PurchAirNum).HtRecSenEff = state.dataIPShortCut->rNumericArgs(10);

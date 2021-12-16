@@ -381,8 +381,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataFans->Fan(1).MotInAirFrac = 0.5;
     state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-    state->dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
+    state->dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
     // Test 14 - Airloop Equipment, with OA and precooling of OA stream, add fan heat
     // start with an autosized value
@@ -404,7 +404,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     // Test 15 - Airloop Equipment, with OA and precooling of OA stream, add fan heat, add scalable capacity sizing
     state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
     state->dataSize->FinalSysSizing(1).FractionOfAutosizedCoolingCapacity = 0.5;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing

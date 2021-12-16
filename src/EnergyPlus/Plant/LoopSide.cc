@@ -255,7 +255,7 @@ namespace DataPlant {
                     // For now this is just a placeholder, because these components shouldn't cause a problem anywhere...
                     break;
                 }
-                case DataPlant::OpScheme::Unassigned: { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
+                case DataPlant::OpScheme::Invalid: { //~ Uninitialized, this should be a sufficient place to catch for this on branch 1
                     // throw fatal
                     ShowSevereError(state,
                                     "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
@@ -323,8 +323,8 @@ namespace DataPlant {
                             //  and they won't affect the load distribution
                             break;
                         }
-                        case DataPlant::OpScheme::Unassigned: { //~ Uninitialized, this should be sufficient place to
-                                                                // catch for this on other branches
+                        case DataPlant::OpScheme::Invalid: { //~ Uninitialized, this should be sufficient place to
+                                                             // catch for this on other branches
                             // throw fatal error
                             ShowSevereError(
                                 state, "ValidateFlowControlPaths: Uninitialized operation scheme type for component Name: " + this_component.Name);
@@ -939,7 +939,7 @@ namespace DataPlant {
 
                     if (!DataPlant::PlantEquipmentTypeIsPump[static_cast<int>(component.Type)]) {
 
-                        if (FlowPriorityStatus == DataPlant::LoopFlowStatus::Unknown) {
+                        if (FlowPriorityStatus == DataPlant::LoopFlowStatus::Invalid) {
                             // do nothing
                         } else if (FlowPriorityStatus == DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn) {
                             ThisBranchFlowRequestNeedAndTurnOn = max(ThisBranchFlowRequestNeedAndTurnOn, node_with_request.MassFlowRateRequest);
@@ -1396,9 +1396,9 @@ namespace DataPlant {
                 BranchMinAvail = state.dataLoopNodes->Node(LastNodeOnBranch).MassFlowRateMinAvail;
                 BranchMaxAvail = state.dataLoopNodes->Node(LastNodeOnBranch).MassFlowRateMaxAvail;
                 //            !sum the branch flow requests to a total parallel branch flow request
-                bool activeBranch = this_splitter_outlet_branch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active;
+                bool activeBranch = this_splitter_outlet_branch.controlType == DataBranchAirLoopPlant::ControlType::Active;
                 bool isSeriesActiveAndRequesting =
-                    (this_splitter_outlet_branch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) && (BranchFlowReq > 0.0);
+                    (this_splitter_outlet_branch.controlType == DataBranchAirLoopPlant::ControlType::SeriesActive) && (BranchFlowReq > 0.0);
                 if (activeBranch || isSeriesActiveAndRequesting) { // revised logic for series active
                     TotParallelBranchFlowReq += BranchFlowReq;
                     ++NumActiveBranches;
@@ -1443,8 +1443,8 @@ namespace DataPlant {
             for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                 SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                 FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                if (this->Branch(SplitterBranchOut).ControlType != DataBranchAirLoopPlant::ControlTypeEnum::Active &&
-                    this->Branch(SplitterBranchOut).ControlType != DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                if (this->Branch(SplitterBranchOut).controlType != DataBranchAirLoopPlant::ControlType::Active &&
+                    this->Branch(SplitterBranchOut).controlType != DataBranchAirLoopPlant::ControlType::SeriesActive) {
                     state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRate = 0.0;
                     this->PushBranchFlowCharacteristics(
                         state, SplitterBranchOut, state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
@@ -1473,8 +1473,8 @@ namespace DataPlant {
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                     SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                    if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active ||
-                        this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                    if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Active ||
+                        this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::SeriesActive) {
                         // branch flow is min of requested flow and remaining flow
                         state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRate =
                             min(state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRate, FlowRemaining);
@@ -1494,7 +1494,7 @@ namespace DataPlant {
                 for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                     SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                    if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Passive) {
+                    if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Passive) {
                         // Calculate the total max available
                         totalMax += state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRateMaxAvail;
                     }
@@ -1504,7 +1504,7 @@ namespace DataPlant {
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                         SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                        if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Passive) {
+                        if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Passive) {
                             FracFlow = FlowRemaining / totalMax;
                             if (FracFlow <= 1.0) { // the passive branches will take all the flow
                                 PassiveFlowRate = FracFlow * state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRateMaxAvail;
@@ -1531,7 +1531,7 @@ namespace DataPlant {
                 for (OutletNum = 1; OutletNum <= this->Splitter.TotalOutletNodes; ++OutletNum) {
                     SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                    if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
+                    if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Bypass) {
                         state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRate =
                             min(FlowRemaining, state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRateMaxAvail);
                         this->PushBranchFlowCharacteristics(
@@ -1549,9 +1549,9 @@ namespace DataPlant {
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                         SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                        bool branchIsActive = this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active;
+                        bool branchIsActive = this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Active;
                         bool branchIsSeriesActiveAndRequesting =
-                            this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive &&
+                            this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::SeriesActive &&
                             this->Branch(SplitterBranchOut).RequestedMassFlow > 0.0;
                         if (branchIsActive || branchIsSeriesActiveAndRequesting) { // only series active branches that want to be "on"
                             // check Remaining flow (should be correct!)
@@ -1575,8 +1575,8 @@ namespace DataPlant {
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                         SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                        if (this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active ||
-                            this->Branch(SplitterBranchOut).ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                        if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Active ||
+                            this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::SeriesActive) {
                             StartingFlowRate = state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRate;
                             ActiveFlowRate =
                                 min(FlowRemaining, (state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRateMaxAvail - StartingFlowRate));
@@ -1623,8 +1623,8 @@ namespace DataPlant {
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                     auto &this_splitter_outlet_branch(this->Branch(SplitterBranchOut));
 
-                    if ((this_splitter_outlet_branch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::Active) ||
-                        (this_splitter_outlet_branch.ControlType == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)) {
+                    if ((this_splitter_outlet_branch.controlType == DataBranchAirLoopPlant::ControlType::Active) ||
+                        (this_splitter_outlet_branch.controlType == DataBranchAirLoopPlant::ControlType::SeriesActive)) {
 
                         // since we are calculating this fraction based on the total parallel request calculated above, we must mimic the logic to
                         // make sure the math works every time that means we must make the variable speed pump correction here as well.
