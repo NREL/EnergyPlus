@@ -7378,7 +7378,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         if (maxVal != storedMinVal) {
                             tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
                         }
-                    }
+                    } break;
                     case iAggType::Maximum:
                     case iAggType::Minimum:
                     case iAggType::MaximumDuringHoursShown:
