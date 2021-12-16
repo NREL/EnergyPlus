@@ -331,8 +331,10 @@ struct DataPlantData : BaseGlobalStruct
         this->PlantManageHalfLoopCalls = 0;
         this->PlantLoop.deallocate();
         this->PlantAvailMgr.deallocate();
-        std::for_each(this->VentRepPlant.begin(), this->VentRepPlant.end(), [](Array1D<DataPlant::ReportLoopData> &Array1DObject) { Array1DObject.deallocate();});
-        std::for_each(this->VentRepCond.begin(), this->VentRepCond.end(), [](Array1D<DataPlant::ReportLoopData> &Array1DObject) { Array1DObject.deallocate();});
+        this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
+        this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Supply)].deallocate();
+        this->VentRepCond[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
+        this->VentRepCond[static_cast<int>(DataPlant::LoopSideLocation::Supply)].deallocate();
         this->PlantCallingOrderInfo.deallocate();
     }
 };
