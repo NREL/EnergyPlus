@@ -5531,9 +5531,9 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                     if (ort->unitsStyle == UnitsStyle::InchPound) {
                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                         PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
                     } else {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, curNameWithSIUnits, lineIn.substr(12, lnPtr));
                     }
