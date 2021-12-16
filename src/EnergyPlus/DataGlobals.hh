@@ -93,7 +93,7 @@ struct DataGlobal : BaseGlobalStruct
     bool stopSimulation = false;
     std::function<void(void *)> externalHVACManager;
     bool externalHVACManagerInitialized = false;
-    DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+    DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Invalid;
     bool sizingAnalysisEioHeaderDoneOnce = false;
     bool EndDayFlag = false;                          // True at the end of each day (last time step of last hour of day)
     bool EndHourFlag = false;                         // True at the end of each hour (last time step of hour)
@@ -202,7 +202,7 @@ struct DataGlobal : BaseGlobalStruct
         this->externalHVACManager = nullptr;
         this->externalHVACManagerInitialized = false;
         this->sizingAnalysisEioHeaderDoneOnce = false;
-        this->KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+        this->KindOfSim = DataGlobalConstants::KindOfSim::Invalid;
         this->EndDayFlag = false;
         this->EndHourFlag = false;
         this->PreviousHour = 0;

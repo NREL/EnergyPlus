@@ -76,7 +76,7 @@ namespace MundtSimMgr {
         Array1D_bool SurfMask;                   // Limit of 60 surfaces at current sizing
 
         // Default Constructor
-        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Unassigned), Height(0.0), Temp(0.0)
+        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Invalid), Height(0.0), Temp(0.0)
         {
         }
     };

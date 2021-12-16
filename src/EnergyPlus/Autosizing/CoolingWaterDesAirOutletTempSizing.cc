@@ -86,7 +86,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).CoolDesTemp;
             }
             Real64 fanDeltaT = 0.0;
-            if (this->dataFanPlacement == DataSizing::zoneFanPlacement::zoneDrawThru) {
+            if (this->dataFanPlacement == DataSizing::ZoneFanPlacement::DrawThru) {
                 // calculate fan heat to get fan air-side delta T
                 Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                 if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
@@ -130,7 +130,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
             } else if (this->dataDesOutletAirTemp > 0.0) {
                 this->autoSizedValue = this->dataDesOutletAirTemp;
                 Real64 fanDeltaT = 0.0;
-                if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::DrawThru) {
                     // calculate fan heat to get fan air-side delta T
                     Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
@@ -144,7 +144,7 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(EnergyPlusData &state, Real64 _or
             } else {
                 this->autoSizedValue = this->finalSysSizing(this->curSysNum).CoolSupTemp;
                 Real64 fanDeltaT = 0.0;
-                if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::DrawThru) {
                     // calculate fan heat to get fan air-side delta T
                     Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {

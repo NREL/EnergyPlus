@@ -675,7 +675,7 @@ namespace HeatBalanceHAMTManager {
         state.dataHeatBalHAMTMgr->TotCellsMax = 0;
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
             conid = state.dataSurface->Surface(sid).Construction;
             if (conid == 0) continue;
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
@@ -792,7 +792,7 @@ namespace HeatBalanceHAMTManager {
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
             // Boundary Cells
             runor = -0.02;
             // Air Convection Cell
@@ -938,7 +938,7 @@ namespace HeatBalanceHAMTManager {
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
             cells(state.dataHeatBalHAMTMgr->Extcell(sid)).origin(1) += cells(state.dataHeatBalHAMTMgr->Extcell(sid)).length(1) / 2.0;
             cells(state.dataHeatBalHAMTMgr->Intcell(sid)).origin(1) -= cells(state.dataHeatBalHAMTMgr->Intcell(sid)).length(1) / 2.0;
             cells(state.dataHeatBalHAMTMgr->Extcell(sid)).volume = 0.0;

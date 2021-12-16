@@ -87,7 +87,7 @@ namespace EnergyPlus::HVACInterfaceManager {
 
 void UpdateHVACInterface(EnergyPlusData &state,
                          int const AirLoopNum, // airloop number for which air loop this is
-                         DataConvergParams::iCalledFrom const CalledFrom,
+                         DataConvergParams::CalledFrom const CalledFrom,
                          int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
                          int const InletNode,     // Node number for the inlet of the side that needs the outlet node data
                          bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
@@ -109,7 +109,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
     auto &TmpRealARR = state.dataHVACInterfaceMgr->TmpRealARR;
     Real64 DeltaEnergy;
 
-    if ((CalledFrom == DataConvergParams::iCalledFrom::AirSystemDemandSide) && (OutletNode == 0)) {
+    if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNode == 0)) {
         // Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(1) = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(1) = false;
@@ -148,7 +148,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         DataConvergParams::HVACCpApprox * ((state.dataLoopNodes->Node(OutletNode).MassFlowRate * state.dataLoopNodes->Node(OutletNode).Temp) -
                                            (state.dataLoopNodes->Node(InletNode).MassFlowRate * state.dataLoopNodes->Node(InletNode).Temp));
 
-    if ((CalledFrom == DataConvergParams::iCalledFrom::AirSystemDemandSide) && (OutletNode > 0)) {
+    if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNode > 0)) {
 
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(1) = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(1) = false;
@@ -216,7 +216,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-    } else if (CalledFrom == DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1) {
+    } else if (CalledFrom == DataConvergParams::CalledFrom::AirSystemSupplySideDeck1) {
 
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(2) = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(2) = false;
@@ -288,7 +288,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-    } else if (CalledFrom == DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2) {
+    } else if (CalledFrom == DataConvergParams::CalledFrom::AirSystemSupplySideDeck2) {
 
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(3) = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(3) = false;

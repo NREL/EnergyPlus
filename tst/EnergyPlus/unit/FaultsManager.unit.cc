@@ -100,9 +100,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs: fan curve
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
@@ -351,9 +351,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
 
     // Inputs: fan curve
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Cubic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;

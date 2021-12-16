@@ -488,7 +488,7 @@ void GetAirPathData(EnergyPlusData &state)
                                                                                  Alphas(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
         if (!lAlphaBlanks(7)) {
             AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
@@ -498,7 +498,7 @@ void GetAirPathData(EnergyPlusData &state)
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsParent);
         } else {
             // If no return path, set this to zero to trigger special handling when calling UpdateHVACInterface
@@ -607,7 +607,7 @@ void GetAirPathData(EnergyPlusData &state)
                     CurrentModuleObject,
                     PrimaryAirSystems(AirSysNum).Name,
                     DataLoopNode::NodeConnectionType::Inlet,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
                     _,
                     cAlphaFields(8));
@@ -648,7 +648,7 @@ void GetAirPathData(EnergyPlusData &state)
                     CurrentModuleObject,
                     PrimaryAirSystems(AirSysNum).Name,
                     DataLoopNode::NodeConnectionType::Outlet,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
                     _,
                     cAlphaFields(9));
@@ -1592,7 +1592,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         ++SupAirPathNodeNum;
                         state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
                             state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Unassigned;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 } else if (PlenumNum > 0) {
                     ++SupAirPathNodeNum;
@@ -1606,14 +1606,14 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         ++SupAirPathNodeNum;
                         state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
                             state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Unassigned;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 }
             }
 
             // find the nodes that connect a splitter and a plenum
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Unassigned) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
                     for (SupNodeIndex2 = SupNodeIndex + 1; SupNodeIndex2 <= NumAllSupAirPathNodes; ++SupNodeIndex2) {
                         if ((state.dataSimAirServingZones->SupNode(SupNodeIndex) == state.dataSimAirServingZones->SupNode(SupNodeIndex2)) &&
                             (state.dataSimAirServingZones->SupNodeType(SupNodeIndex2) == DataZoneEquipment::AirNodeType::CompInlet)) {
@@ -1626,7 +1626,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
             //  the rest of the nodes are outlet nodes and count the duplicated intermediate nodes
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Unassigned) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
                     ++NumSupAirPathOutNodes;
                     state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Outlet;
                 } else if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate) {
@@ -2014,8 +2014,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             RetFanIndex = 0;
             FoundOASys = false;
             PrimaryAirSystems(AirLoopNum).FanDesCoolLoad = 0.0;
-            fanModelTypeEnum supFanModelType = fanModelTypeNotYetSet;
-            fanModelTypeEnum retFanModelType = fanModelTypeNotYetSet;
+            FanModelType supFanModelType = FanModelType::Invalid;
+            FanModelType retFanModelType = FanModelType::Invalid;
 
             bool FoundCentralCoolCoil = false;
             for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
@@ -2040,7 +2040,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                                 SupFanIndex,
                                                 ErrorsFound,
                                                 ObjexxFCL::Optional_string_const());
-                                    supFanModelType = structArrayLegacyFanModels;
+                                    supFanModelType = StructArrayLegacyFanModels;
                                     goto EndOfAirLoop;
                                 }
                             } else {
@@ -2049,7 +2049,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                             RetFanIndex,
                                             ErrorsFound,
                                             ObjexxFCL::Optional_string_const());
-                                retFanModelType = structArrayLegacyFanModels;
+                                retFanModelType = StructArrayLegacyFanModels;
                             }
                         } else {
                             GetFanIndex(state,
@@ -2057,7 +2057,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                         SupFanIndex,
                                         ErrorsFound,
                                         ObjexxFCL::Optional_string_const());
-                            supFanModelType = structArrayLegacyFanModels;
+                            supFanModelType = StructArrayLegacyFanModels;
                             goto EndOfAirLoop;
                         }
                     }
@@ -2067,17 +2067,17 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (PrimaryAirSystems(AirLoopNum).Branch(BranchNum).DuctType != 3) {
                                     SupFanIndex =
                                         HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                                    supFanModelType = objectVectorOOFanSystemModel;
+                                    supFanModelType = ObjectVectorOOFanSystemModel;
                                     goto EndOfAirLoop;
                                 }
                             } else {
                                 RetFanIndex =
                                     HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                                retFanModelType = objectVectorOOFanSystemModel;
+                                retFanModelType = ObjectVectorOOFanSystemModel;
                             }
                         } else {
                             SupFanIndex = HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                            supFanModelType = objectVectorOOFanSystemModel;
+                            supFanModelType = ObjectVectorOOFanSystemModel;
                             goto EndOfAirLoop;
                         }
                     }
@@ -2087,24 +2087,24 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             } // end of Branch loop
         EndOfAirLoop:;
 
-            if (supFanModelType == structArrayLegacyFanModels) {
+            if (supFanModelType == StructArrayLegacyFanModels) {
                 PrimaryAirSystems(AirLoopNum).SupFanNum = SupFanIndex;
-                PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum = structArrayLegacyFanModels;
-            } else if (supFanModelType == objectVectorOOFanSystemModel) {
+                PrimaryAirSystems(AirLoopNum).supFanModelType = StructArrayLegacyFanModels;
+            } else if (supFanModelType == ObjectVectorOOFanSystemModel) {
                 PrimaryAirSystems(AirLoopNum).supFanVecIndex = SupFanIndex;
-                PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum = objectVectorOOFanSystemModel;
+                PrimaryAirSystems(AirLoopNum).supFanModelType = ObjectVectorOOFanSystemModel;
             }
             if (FoundCentralCoolCoil) { // parent systems with fan will need to set the fan placement
-                PrimaryAirSystems(AirLoopNum).supFanLocation = fanPlacement::DrawThru;
+                PrimaryAirSystems(AirLoopNum).supFanLocation = FanPlacement::DrawThru;
             } else {
-                PrimaryAirSystems(AirLoopNum).supFanLocation = fanPlacement::BlowThru;
+                PrimaryAirSystems(AirLoopNum).supFanLocation = FanPlacement::BlowThru;
             }
 
-            if (retFanModelType == structArrayLegacyFanModels) {
-                PrimaryAirSystems(AirLoopNum).retFanModelTypeEnum = structArrayLegacyFanModels;
+            if (retFanModelType == StructArrayLegacyFanModels) {
+                PrimaryAirSystems(AirLoopNum).retFanModelType = StructArrayLegacyFanModels;
                 PrimaryAirSystems(AirLoopNum).RetFanNum = RetFanIndex;
-            } else if (retFanModelType == objectVectorOOFanSystemModel) {
-                PrimaryAirSystems(AirLoopNum).retFanModelTypeEnum = objectVectorOOFanSystemModel;
+            } else if (retFanModelType == ObjectVectorOOFanSystemModel) {
+                PrimaryAirSystems(AirLoopNum).retFanModelType = ObjectVectorOOFanSystemModel;
                 PrimaryAirSystems(AirLoopNum).retFanVecIndex = RetFanIndex;
             }
         }
@@ -2525,7 +2525,7 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
     int AirLoopPass;
     // Flag set by ResolveSysFlow; if TRUE, mass balance failed and there must be a second pass
     bool SysReSim;
-    DataConvergParams::iCalledFrom CalledFrom;
+    DataConvergParams::CalledFrom CalledFrom;
 
     auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -2626,8 +2626,8 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
         // the zone equipment side, looping through all supply air paths for this
         // air loop.
         for (AirSysOutNum = 1; AirSysOutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
-            if (AirSysOutNum == 1) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1;
-            if (AirSysOutNum == 2) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2;
+            if (AirSysOutNum == 1) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck1;
+            if (AirSysOutNum == 2) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck2;
             UpdateHVACInterface(state,
                                 AirLoopNum,
                                 CalledFrom,
@@ -2701,8 +2701,8 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                 // the zone equipment side, looping through all supply air paths for this
                 // air loop.
                 for (AirSysOutNum = 1; AirSysOutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
-                    if (AirSysOutNum == 1) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1;
-                    if (AirSysOutNum == 2) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2;
+                    if (AirSysOutNum == 1) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck1;
+                    if (AirSysOutNum == 2) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck2;
                     UpdateHVACInterface(state,
                                         AirLoopNum,
                                         CalledFrom,

@@ -93,7 +93,7 @@ namespace FileSystem {
 
     enum class FileTypes
     {
-        Unknown = -1,
+        Invalid = -1,
         // JSON types should go first,
         EpJSON,
         JSON,
@@ -122,11 +122,11 @@ namespace FileSystem {
 
     inline constexpr bool is_all_json_type(FileTypes t)
     {
-        return t > FileTypes::Unknown && t <= FileTypes::last_binary_json_type;
+        return t > FileTypes::Invalid && t <= FileTypes::last_binary_json_type;
     }
     inline constexpr bool is_json_type(FileTypes t)
     {
-        return t > FileTypes::Unknown && t <= FileTypes::last_json_type;
+        return t > FileTypes::Invalid && t <= FileTypes::last_json_type;
     }
     inline constexpr bool is_binary_json_type(FileTypes t)
     {
@@ -260,25 +260,25 @@ namespace FileSystem {
 
     template <FileTypes fileType> void writeFile(fmt::ostream &os, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(fileType > FileTypes::Invalid, "Must be a valid file type");
         os.print("{}", data);
     }
 
     template <FileTypes fileType> void writeFile(std::ostream &os, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(fileType > FileTypes::Invalid, "Must be a valid file type");
         fmt::print(os, "{}", data);
     }
 
     template <FileTypes fileType> void writeFile(FILE *f, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(fileType > FileTypes::Invalid, "Must be a valid file type");
         fmt::print(f, "{}", data);
     }
 
     template <class T, FileTypes fileType, typename = std::enable_if_t<enable_unique_ptr_v<T>>> void writeFile(T &os, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(fileType > FileTypes::Invalid, "Must be a valid file type");
         if (os) {
             writeFile<fileType>(*os, data);
         }

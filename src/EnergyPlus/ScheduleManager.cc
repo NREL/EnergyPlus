@@ -2384,6 +2384,8 @@ namespace ScheduleManager {
                     case ScheduleInterpolation::No:
                         NoAverageLinear = "No";
                         break;
+                    default:
+                        assert(false);
                     }
                     for (Hr = 1; Hr <= 24; ++Hr) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {

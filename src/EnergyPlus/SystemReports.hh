@@ -64,12 +64,14 @@ struct EnergyPlusData;
 
 namespace SystemReports {
 
-    enum class iEndUseType
+    enum class EndUseType
     {
+        Invalid = -1,
         NoHeatNoCool,
         CoolingOnly,
         HeatingOnly,
         HeatAndCool,
+        Num
     };
 
     struct Energy

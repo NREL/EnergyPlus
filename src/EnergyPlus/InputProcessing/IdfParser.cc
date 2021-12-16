@@ -538,7 +538,7 @@ json IdfParser::parse_value(std::string_view idf, size_t &index, bool &success, 
     auto const &field_type = field_loc.find("type");
     if (field_type != field_loc.end()) {
         if (field_type.value() == "number" || field_type.value() == "integer") {
-            token = Token::NUMBER;
+            token = Token::Num;
         } else {
             token = Token::STRING;
         }
@@ -576,7 +576,7 @@ json IdfParser::parse_value(std::string_view idf, size_t &index, bool &success, 
         }
         return parsed_string;
     }
-    case Token::NUMBER: {
+    case Token::Num: {
         return parse_number(idf, index);
     }
     case Token::NONE:
@@ -693,7 +693,7 @@ IdfParser::Token IdfParser::next_token(std::string_view idf, size_t &index)
     default:
         static constexpr std::string_view numeric(".-+0123456789");
         if (numeric.find_first_of(c) != std::string::npos) {
-            return Token::NUMBER;
+            return Token::Num;
         }
         return Token::STRING;
     }

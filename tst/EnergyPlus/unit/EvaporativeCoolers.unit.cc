@@ -437,9 +437,9 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
 
     state->dataCurveManager->NumCurves = 1;
     state->dataCurveManager->PerfCurve.allocate(1);
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -735,9 +735,9 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     int constexpr CurveNum = 1;
     state->dataCurveManager->NumCurves = 1;
     state->dataCurveManager->PerfCurve.allocate(1);
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Linear";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.0;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.0;
     state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;

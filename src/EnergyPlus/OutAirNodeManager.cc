@@ -227,7 +227,7 @@ namespace OutAirNodeManager {
                                 CurrentModuleObject,
                                 CurrentModuleObject,
                                 DataLoopNode::NodeConnectionType::OutsideAir,
-                                static_cast<NodeInputManager::compFluidStream>(NextFluidStreamNum),
+                                static_cast<NodeInputManager::CompFluidStream>(NextFluidStreamNum),
                                 ObjectIsNotParent,
                                 IncrementFluidStreamYes,
                                 cAlphaFields(AlphaNum));
@@ -284,7 +284,7 @@ namespace OutAirNodeManager {
                             CurrentModuleObject,
                             CurrentModuleObject,
                             DataLoopNode::NodeConnectionType::OutsideAir,
-                            static_cast<NodeInputManager::compFluidStream>(NextFluidStreamNum),
+                            static_cast<NodeInputManager::CompFluidStream>(NextFluidStreamNum),
                             ObjectIsNotParent,
                             IncrementFluidStreamYes,
                             cAlphaFields(1));
@@ -533,7 +533,7 @@ namespace OutAirNodeManager {
                             "OutdoorAir:Node",
                             "OutdoorAir:Node",
                             DataLoopNode::NodeConnectionType::OutsideAir,
-                            static_cast<NodeInputManager::compFluidStream>(state.dataOutAirNodeMgr->NumOutsideAirNodes),
+                            static_cast<NodeInputManager::CompFluidStream>(state.dataOutAirNodeMgr->NumOutsideAirNodes),
                             ObjectIsNotParent,
                             IncrementFluidStreamYes);
                 SetOANodeValues(state, NodeNumber, false);

@@ -344,7 +344,7 @@ namespace Photovoltaics {
                 }
             }
 
-            state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Unassigned;
+            state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Invalid;
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVSimplePerfObjectName)) {
                 state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Simple;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName)) {
@@ -366,7 +366,7 @@ namespace Photovoltaics {
             }
             state.dataPhotovoltaic->PVarray(PVnum).PerfObjName = state.dataIPShortCut->cAlphaArgs(4); // check later once perf objects are loaded
 
-            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Unassigned;
+            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Invalid;
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Decoupled")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Decoupled;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "DecoupledUllebergDynamic")) {

@@ -200,7 +200,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
             state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
             state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
         } else { // bound the flow by Min/Max available and hardware limits
-            if (comp.FlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+            if (comp.FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
                 // determine highest flow request for all the components on the branch
                 Real64 SeriesBranchHighFlowRequest = 0.0;
                 Real64 SeriesBranchHardwareMaxLim = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
