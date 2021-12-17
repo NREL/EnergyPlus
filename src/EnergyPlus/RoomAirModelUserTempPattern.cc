@@ -245,19 +245,19 @@ void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number
         {
             auto const SELECT_CASE_var(state.dataRoomAirMod->RoomAirPattern(CurPatrnID).PatternMode);
 
-            if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::ConstGradTempPattern) {
+            if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::ConstGradTemp) {
 
                 FigureConstGradPattern(state, CurPatrnID, ZoneNum);
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::TwoGradInterpPattern) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::TwoGradInterp) {
 
                 FigureTwoGradInterpPattern(state, CurPatrnID, ZoneNum);
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::NonDimenHeightPattern) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::NonDimenHeight) {
 
                 FigureHeightPattern(state, CurPatrnID, ZoneNum);
 
-            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::SurfMapTempPattern) {
+            } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternType::SurfMapTemp) {
 
                 FigureSurfMapPattern(state, CurPatrnID, ZoneNum);
 
@@ -433,7 +433,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
     {
         auto const SELECT_CASE_var(state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.InterpolationMode);
 
-        if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulbMode) {
+        if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulb) {
 
             Grad = OutdoorDryBulbGrad(state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp,
                                       state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale,
@@ -441,7 +441,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
                                       state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale,
                                       state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
 
-        } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::ZoneAirTempMode) {
+        } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::ZoneAirTemp) {
 
             if (Tmean >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
                 Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
@@ -489,7 +489,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
                 }
             }
 
-        } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) {
+        } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleCooling) {
 
             CoolLoad = state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
             if (CoolLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
@@ -513,7 +513,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
                 }
             }
 
-        } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode) {
+        } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleHeating) {
 
             HeatLoad = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum);
             if (HeatLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {

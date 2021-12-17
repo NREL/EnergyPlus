@@ -321,23 +321,23 @@ namespace GeneratorDynamicsManager {
         {
             auto const SELECT_CASE_var(state.dataGenerator->GeneratorDynamics(DynaCntrlNum).LastOpMode);
 
-            if ((SELECT_CASE_var == DataGenerators::OperatingMode::OpModeOff) || (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeStandby)) {
+            if ((SELECT_CASE_var == DataGenerators::OperatingMode::Off) || (SELECT_CASE_var == DataGenerators::OperatingMode::Standby)) {
                 // possible future states {Off, Standby, WarmUp,Normal }
                 if (SchedVal == 0.0) {
-                    newOpMode = DataGenerators::OperatingMode::OpModeOff;
+                    newOpMode = DataGenerators::OperatingMode::Off;
 
                 } else if (((SchedVal != 0.0) && (!RunFlag)) || (TrialMdotcw < LimitMinMdotcw)) {
-                    newOpMode = DataGenerators::OperatingMode::OpModeStandby;
+                    newOpMode = DataGenerators::OperatingMode::Standby;
                 } else if ((SchedVal != 0.0) && (RunFlag)) {
 
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).WarmUpByTimeDelay) {
 
                         if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay == 0.0) {
-                            newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                            newOpMode = DataGenerators::OperatingMode::Normal;
 
                             // is startUp time delay longer than timestep?
                         } else if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay >= TimeStepSys) {
-                            newOpMode = DataGenerators::OperatingMode::OpModeWarmUp;
+                            newOpMode = DataGenerators::OperatingMode::WarmUp;
                             // generator just started so set start time
                             state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
                                 double(state.dataGlobal->DayOfSim) +
@@ -346,7 +346,7 @@ namespace GeneratorDynamicsManager {
                                     DataGlobalConstants::HoursInDay;
 
                         } else { // warm up period is less than a single system time step
-                            newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                            newOpMode = DataGenerators::OperatingMode::Normal;
                             PLRStartUp = true;
                             PLRforSubtimestepStartUp =
                                 (TimeStepSys - state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay) / TimeStepSys;
@@ -355,7 +355,7 @@ namespace GeneratorDynamicsManager {
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).WarmUpByEngineTemp) {
                         if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng >=
                             state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
-                            newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                            newOpMode = DataGenerators::OperatingMode::Normal;
                             // assume linear interpolation for PLR
                             PLRStartUp = true;
                             if ((state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng -
@@ -369,21 +369,21 @@ namespace GeneratorDynamicsManager {
                                 PLRforSubtimestepStartUp = 1.0;
                             }
                         } else {
-                            newOpMode = DataGenerators::OperatingMode::OpModeWarmUp;
+                            newOpMode = DataGenerators::OperatingMode::WarmUp;
                         }
                     }
                 }
 
-            } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeWarmUp) {
+            } else if (SELECT_CASE_var == DataGenerators::OperatingMode::WarmUp) {
                 // possible Future states {OFF, WarmUp, Normal, CoolDown }
                 // check availability manager
                 if (SchedVal == 0.0) {
                     // to off unless cool down time period is needed
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay == 0.0) {
-                        newOpMode = DataGenerators::OperatingMode::OpModeOff;
+                        newOpMode = DataGenerators::OperatingMode::Off;
                     } else {
                         if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay > TimeStepSys) {
-                            newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
+                            newOpMode = DataGenerators::OperatingMode::CoolDown;
                             // need to reset time of last shut down here
                             state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
                                 double(state.dataGlobal->DayOfSim) +
@@ -391,16 +391,16 @@ namespace GeneratorDynamicsManager {
                                  (SysTimeElapsed + (state.dataGlobal->CurrentTime - int(state.dataGlobal->CurrentTime)))) /
                                     DataGlobalConstants::HoursInDay;
                         } else {
-                            newOpMode = DataGenerators::OperatingMode::OpModeOff;
+                            newOpMode = DataGenerators::OperatingMode::Off;
                         }
                     }
                 } else if (((SchedVal != 0.0) && (!RunFlag)) || (TrialMdotcw < LimitMinMdotcw)) {
                     // to standby unless cool down time period is needed
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay == 0.0) {
-                        newOpMode = DataGenerators::OperatingMode::OpModeStandby;
+                        newOpMode = DataGenerators::OperatingMode::Standby;
                     } else {
                         if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay > TimeStepSys) {
-                            newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
+                            newOpMode = DataGenerators::OperatingMode::CoolDown;
                             // need to reset time of last shut down here
                             state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
                                 double(state.dataGlobal->DayOfSim) +
@@ -409,7 +409,7 @@ namespace GeneratorDynamicsManager {
                                     DataGlobalConstants::HoursInDay;
 
                         } else {
-                            newOpMode = DataGenerators::OperatingMode::OpModeStandby;
+                            newOpMode = DataGenerators::OperatingMode::Standby;
                             // assuming no PLR situation unless engine made to normal operation.
                         }
                     }
@@ -426,13 +426,13 @@ namespace GeneratorDynamicsManager {
                         EndingFractionalDay = state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp +
                                               state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay / DataGlobalConstants::HoursInDay;
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) || (CurrentFractionalDay > EndingFractionalDay)) {
-                            newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                            newOpMode = DataGenerators::OperatingMode::Normal;
                             PLRStartUp = true;
                             LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
                             PLRforSubtimestepStartUp =
                                 ((CurrentFractionalDay - EndingFractionalDay) / (CurrentFractionalDay - LastSystemTimeStepFractionalDay));
                         } else {
-                            newOpMode = DataGenerators::OperatingMode::OpModeWarmUp;
+                            newOpMode = DataGenerators::OperatingMode::WarmUp;
                         }
 
                     } else if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).WarmUpByEngineTemp) {
@@ -440,7 +440,7 @@ namespace GeneratorDynamicsManager {
                             // only change to normal if this is result from completed timestep, not just an interation
                             if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.TengLast >=
                                 state.dataGenerator->GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
-                                newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                                newOpMode = DataGenerators::OperatingMode::Normal;
                                 // assume linear interpolation for PLR
                                 PLRStartUp = true;
                                 if ((state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.Teng -
@@ -454,7 +454,7 @@ namespace GeneratorDynamicsManager {
                                     PLRforSubtimestepStartUp = 1.0;
                                 }
                             } else {
-                                newOpMode = DataGenerators::OperatingMode::OpModeWarmUp;
+                                newOpMode = DataGenerators::OperatingMode::WarmUp;
                             }
                         }
                     } else {
@@ -463,18 +463,18 @@ namespace GeneratorDynamicsManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeNormal) {
+            } else if (SELECT_CASE_var == DataGenerators::OperatingMode::Normal) {
                 // possible Future states {CoolDown, standby, off}
                 if (((SchedVal == 0.0) || (!RunFlag)) || (TrialMdotcw < LimitMinMdotcw)) {
                     // is cool down time delay longer than timestep?
                     if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay == 0.0) {
                         if (SchedVal != 0.0) {
-                            newOpMode = DataGenerators::OperatingMode::OpModeStandby;
+                            newOpMode = DataGenerators::OperatingMode::Standby;
                         } else {
-                            newOpMode = DataGenerators::OperatingMode::OpModeOff;
+                            newOpMode = DataGenerators::OperatingMode::Off;
                         }
                     } else if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay >= TimeStepSys) {
-                        newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
+                        newOpMode = DataGenerators::OperatingMode::CoolDown;
                         // also, generator just shut down so record shut down time
                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown =
                             double(state.dataGlobal->DayOfSim) +
@@ -483,9 +483,9 @@ namespace GeneratorDynamicsManager {
                                 DataGlobalConstants::HoursInDay;
                     } else { // cool down period is less than a single system time step
                         if (SchedVal != 0.0) {
-                            newOpMode = DataGenerators::OperatingMode::OpModeStandby;
+                            newOpMode = DataGenerators::OperatingMode::Standby;
                         } else {
-                            newOpMode = DataGenerators::OperatingMode::OpModeOff;
+                            newOpMode = DataGenerators::OperatingMode::Off;
                         }
                         PLRShutDown = true;
                         PLRforSubtimestepShutDown = (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay) / TimeStepSys;
@@ -499,10 +499,10 @@ namespace GeneratorDynamicsManager {
                     }
                 } else if ((SchedVal != 0.0) && (RunFlag)) {
 
-                    newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                    newOpMode = DataGenerators::OperatingMode::Normal;
                 }
 
-            } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeCoolDown) {
+            } else if (SELECT_CASE_var == DataGenerators::OperatingMode::CoolDown) {
                 // possible Future States {Standby, OFF, WarmUp, Normal}
 
                 if (SchedVal == 0.0) { // no longer available.
@@ -518,16 +518,16 @@ namespace GeneratorDynamicsManager {
                                               (TimeStepSys / DataGlobalConstants::HoursInDay);
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                             (CurrentFractionalDay > EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
-                            newOpMode = DataGenerators::OperatingMode::OpModeOff;
+                            newOpMode = DataGenerators::OperatingMode::Off;
                             PLRShutDown = true;
                             LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
                             PLRforSubtimestepShutDown =
                                 (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
                         } else { // CurrentFractionalDay > EndingFractionalDay
-                            newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
+                            newOpMode = DataGenerators::OperatingMode::CoolDown;
                         }
                     } else {
-                        newOpMode = DataGenerators::OperatingMode::OpModeOff;
+                        newOpMode = DataGenerators::OperatingMode::Off;
                     }
                 } else if (((SchedVal != 0.0) && (!RunFlag)) || (TrialMdotcw < LimitMinMdotcw)) {
                     // probably goes to standby but could be stuck in cool down for awhile
@@ -542,16 +542,16 @@ namespace GeneratorDynamicsManager {
                                               (TimeStepSys / DataGlobalConstants::HoursInDay);
                         if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                             (CurrentFractionalDay > EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
-                            newOpMode = DataGenerators::OperatingMode::OpModeStandby;
+                            newOpMode = DataGenerators::OperatingMode::Standby;
                             PLRShutDown = true;
                             LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
                             PLRforSubtimestepShutDown =
                                 (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
                         } else { // CurrentFractionalDay < EndingFractionalDay
-                            newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
+                            newOpMode = DataGenerators::OperatingMode::CoolDown;
                         }
                     } else {
-                        newOpMode = DataGenerators::OperatingMode::OpModeStandby;
+                        newOpMode = DataGenerators::OperatingMode::Standby;
                     }
                 } else if ((SchedVal != 0.0) && (RunFlag)) {
                     // was in cool down mode but is now being asked to restart
@@ -571,7 +571,7 @@ namespace GeneratorDynamicsManager {
                             if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                                 (CurrentFractionalDay < EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
 
-                                newOpMode = DataGenerators::OperatingMode::OpModeCoolDown;
+                                newOpMode = DataGenerators::OperatingMode::CoolDown;
                             } else { // CurrentFractionalDay > EndingFractionalDay
                                 // could go to warm up or normal now
                                 PLRShutDown = true;
@@ -579,7 +579,7 @@ namespace GeneratorDynamicsManager {
                                 PLRforSubtimestepShutDown =
                                     (EndingFractionalDay - LastSystemTimeStepFractionalDay) * DataGlobalConstants::HoursInDay / TimeStepSys;
                                 if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay == 0.0) {
-                                    newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                                    newOpMode = DataGenerators::OperatingMode::Normal;
                                     // possible PLR on start up.
                                     PLRStartUp = true;
                                     PLRforSubtimestepStartUp =
@@ -589,13 +589,13 @@ namespace GeneratorDynamicsManager {
                                     // is remaining time enough?
                                     if ((CurrentFractionalDay - EndingFractionalDay) >
                                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay) {
-                                        newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                                        newOpMode = DataGenerators::OperatingMode::Normal;
                                         // possible PLR on start up.
                                         PLRStartUp = true;
                                         PLRforSubtimestepStartUp =
                                             ((CurrentFractionalDay - EndingFractionalDay) / (CurrentFractionalDay - LastSystemTimeStepFractionalDay));
                                     } else {
-                                        newOpMode = DataGenerators::OperatingMode::OpModeWarmUp;
+                                        newOpMode = DataGenerators::OperatingMode::WarmUp;
                                         // generator just started so set start time
                                         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
                                             double(state.dataGlobal->DayOfSim) +
@@ -607,13 +607,13 @@ namespace GeneratorDynamicsManager {
                             }
                         } else {
 
-                            newOpMode = DataGenerators::OperatingMode::OpModeStandby;
+                            newOpMode = DataGenerators::OperatingMode::Standby;
                         }
                     } else { // not mandetory cool donw
                         // likely to go into warm up but if no warm up then back to normal
                         if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).WarmUpByTimeDelay) {
                             if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay == 0.0) {
-                                newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                                newOpMode = DataGenerators::OperatingMode::Normal;
 
                             } else if (state.dataGenerator->GeneratorDynamics(DynaCntrlNum).StartUpTimeDelay > 0.0) {
                                 CurrentFractionalDay = double(state.dataGlobal->DayOfSim) +
@@ -625,14 +625,14 @@ namespace GeneratorDynamicsManager {
                                     state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CoolDownDelay / DataGlobalConstants::HoursInDay;
                                 if ((std::abs(CurrentFractionalDay - EndingFractionalDay) < 0.000001) ||
                                     (CurrentFractionalDay > EndingFractionalDay)) { // CurrentFractionalDay == EndingFractionalDay
-                                    newOpMode = DataGenerators::OperatingMode::OpModeNormal;
+                                    newOpMode = DataGenerators::OperatingMode::Normal;
                                     // possible PLR on start up.
                                     PLRStartUp = true;
                                     LastSystemTimeStepFractionalDay = CurrentFractionalDay - (TimeStepSys / DataGlobalConstants::HoursInDay);
                                     PLRforSubtimestepStartUp =
                                         ((CurrentFractionalDay - EndingFractionalDay) / (CurrentFractionalDay - LastSystemTimeStepFractionalDay));
                                 } else {
-                                    newOpMode = DataGenerators::OperatingMode::OpModeWarmUp;
+                                    newOpMode = DataGenerators::OperatingMode::WarmUp;
                                     // set start up time
                                     // generator just started so set start time
                                     state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp =
@@ -654,7 +654,7 @@ namespace GeneratorDynamicsManager {
         if (PLRforSubtimestepShutDown < 0.0) PLRforSubtimestepShutDown = 0.0;
         if (PLRforSubtimestepShutDown > 1.0) PLRforSubtimestepShutDown = 1.0;
 
-        if (newOpMode == DataGenerators::OperatingMode::OpModeWarmUp) {
+        if (newOpMode == DataGenerators::OperatingMode::WarmUp) {
             {
                 auto const SELECT_CASE_var(GeneratorType);
 
@@ -671,7 +671,7 @@ namespace GeneratorDynamicsManager {
             }
         }
 
-        if (newOpMode == DataGenerators::OperatingMode::OpModeNormal) {
+        if (newOpMode == DataGenerators::OperatingMode::Normal) {
             // correct if switched to normal at sub timestep
             Pel *= PLRforSubtimestepStartUp;
             // unit may have constraints from transient limits or operating ranges.
@@ -690,15 +690,15 @@ namespace GeneratorDynamicsManager {
             }
         }
 
-        if (newOpMode == DataGenerators::OperatingMode::OpModeCoolDown) {
+        if (newOpMode == DataGenerators::OperatingMode::CoolDown) {
             Pel = 0.0; // assumes no power generated during shut down
         }
 
-        if (newOpMode == DataGenerators::OperatingMode::OpModeOff) {
+        if (newOpMode == DataGenerators::OperatingMode::Off) {
             Pel = 0.0; // assumes no power generated during OFF mode
         }
 
-        if (newOpMode == DataGenerators::OperatingMode::OpModeStandby) {
+        if (newOpMode == DataGenerators::OperatingMode::Standby) {
             Pel = 0.0; // assumes no power generated during standby mode
         }
 
@@ -724,7 +724,7 @@ namespace GeneratorDynamicsManager {
                 {
                     auto const SELECT_CASE_var1(newOpMode);
 
-                    if (SELECT_CASE_var1 == DataGenerators::OperatingMode::OpModeOff) {
+                    if (SELECT_CASE_var1 == DataGenerators::OperatingMode::Off) {
                         if (PLRforSubtimestepShutDown == 0.0) {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
@@ -735,7 +735,7 @@ namespace GeneratorDynamicsManager {
                         } else {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         }
-                    } else if (SELECT_CASE_var1 == DataGenerators::OperatingMode::OpModeStandby) {
+                    } else if (SELECT_CASE_var1 == DataGenerators::OperatingMode::Standby) {
                         if (PLRforSubtimestepShutDown == 0.0) {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
@@ -746,7 +746,7 @@ namespace GeneratorDynamicsManager {
                         } else {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         }
-                    } else if (SELECT_CASE_var1 == DataGenerators::OperatingMode::OpModeWarmUp) {
+                    } else if (SELECT_CASE_var1 == DataGenerators::OperatingMode::WarmUp) {
                         if (PLRforSubtimestepShutDown == 0.0) {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
@@ -758,7 +758,7 @@ namespace GeneratorDynamicsManager {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                         }
 
-                    } else if (SELECT_CASE_var1 == DataGenerators::OperatingMode::OpModeNormal) {
+                    } else if (SELECT_CASE_var1 == DataGenerators::OperatingMode::Normal) {
                         if (PLRforSubtimestepStartUp == 0.0) {
                             state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
 
@@ -781,7 +781,7 @@ namespace GeneratorDynamicsManager {
                             }
                         }
 
-                    } else if (SELECT_CASE_var1 == DataGenerators::OperatingMode::OpModeCoolDown) {
+                    } else if (SELECT_CASE_var1 == DataGenerators::OperatingMode::CoolDown) {
 
                         state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * DataGlobalConstants::SecInHour;
                     }

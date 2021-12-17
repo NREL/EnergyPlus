@@ -787,8 +787,8 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
         this->A42Model.QdotSkin = 0.0;
         this->A42Model.QdotConvZone = 0.0;
         this->A42Model.QdotRadZone = 0.0;
-        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).LastOpMode = DataGenerators::OperatingMode::OpModeOff;
-        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CurrentOpMode = DataGenerators::OperatingMode::OpModeOff;
+        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).LastOpMode = DataGenerators::OperatingMode::Off;
+        state.dataGenerator->GeneratorDynamics(DynaCntrlNum).CurrentOpMode = DataGenerators::OperatingMode::Off;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastShutDown = 0.0;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).FractionalDayofLastStartUp = 0.0;
         state.dataGenerator->GeneratorDynamics(DynaCntrlNum).HasBeenOn = false;
@@ -911,7 +911,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     {
         auto const SELECT_CASE_var(CurrentOpMode);
 
-        if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeOff) { // same as standby in model spec but no Pnet standby electicity losses.
+        if (SELECT_CASE_var == DataGenerators::OperatingMode::Off) { // same as standby in model spec but no Pnet standby electicity losses.
 
             Qgenss = 0.0;
             MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
@@ -937,7 +937,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                  this->CWCompNum);
             this->PlantMassFlowRate = MdotCW;
 
-        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeStandby) {
+        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::Standby) {
             Qgenss = 0.0;
             MdotCW = state.dataLoopNodes->Node(this->PlantInletNodeID).MassFlowRate; // kg/s
             TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C
@@ -962,7 +962,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                  this->CWCompNum);
             this->PlantMassFlowRate = MdotCW;
 
-        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeWarmUp) {
+        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::WarmUp) {
 
             if (this->A42Model.WarmUpByTimeDelay) {
                 // Internal combustion engine.  This is just like normal  operation but no net power yet.
@@ -1076,7 +1076,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             }
             NdotFuel = MdotFuel / state.dataGenerator->FuelSupply(this->FuelSupplyID).KmolPerSecToKgPerSec;
 
-        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeNormal) {
+        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::Normal) {
             if (PLRforSubtimestepStartUp < 1.0) {
                 if (RunFlagElectCenter) Pnetss = MyElectricLoad; // W
                 if (RunFlagPlant) Pnetss = AllowedLoad;
@@ -1147,7 +1147,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                 Pnetss = AllowedLoad;
             }
 
-        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeCoolDown) {
+        } else if (SELECT_CASE_var == DataGenerators::OperatingMode::CoolDown) {
 
             Pnetss = 0.0;
             Pstandby = 0.0;
@@ -1170,7 +1170,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     for (int i = 1; i <= 20; ++i) { // sequential search with exit criteria
         // calculate new value for engine temperature
         // for Stirling in warmup, need to include dependency of Qgness on Teng
-        if ((this->A42Model.WarmUpByEngineTemp) && (CurrentOpMode == DataGenerators::OperatingMode::OpModeWarmUp)) {
+        if ((this->A42Model.WarmUpByEngineTemp) && (CurrentOpMode == DataGenerators::OperatingMode::WarmUp)) {
 
             Real64 Pmax = this->A42Model.MaxElecPower;
             TcwIn = state.dataLoopNodes->Node(this->PlantInletNodeID).Temp;          // C

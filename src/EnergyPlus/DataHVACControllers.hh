@@ -66,7 +66,7 @@ namespace DataHVACControllers {
     {
         Invalid = -1,
         NoAction,
-        ReverseAction,
+        Reverse,
         NormalAction,
         Num
     };
