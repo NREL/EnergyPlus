@@ -431,13 +431,13 @@ void ManageHVAC(EnergyPlusData &state)
             }
             if (state.dataGlobal->DoOutputReporting) {
                 ReportMaxVentilationLoads(state);
-                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                     state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                     if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                         state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
-                UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateTabularReports(state, OutputProcessor::TimeStepType::System);
             }
             if (state.dataGlobal->ZoneSizingCalc) {
                 UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::DuringDay);
@@ -479,7 +479,7 @@ void ManageHVAC(EnergyPlusData &state)
                 state.dataHVACMgr->PrintedWarmup = true;
             }
             CalcMoreNodeInfo(state);
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
@@ -518,7 +518,7 @@ void ManageHVAC(EnergyPlusData &state)
                 }
                 state.dataHVACMgr->PrintedWarmup = true;
             }
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::System);
         }
         ManageEMS(
             state, EMSManager::EMSCallFrom::EndSystemTimestepAfterHVACReporting, anyEMSRan, ObjexxFCL::Optional_int_const()); // EMS calling point

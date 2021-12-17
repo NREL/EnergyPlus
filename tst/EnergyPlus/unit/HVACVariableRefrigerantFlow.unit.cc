@@ -193,12 +193,12 @@ protected:
         state->dataSize->SysSizInput(1).AirLoopNum = 1;
         state->dataCurveManager->NumCurves = 10;
         state->dataCurveManager->PerfCurve.allocate(10);
-        state->dataCurveManager->PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(1).CurveType = CurveTypeEnum::Linear;
+        state->dataCurveManager->PerfCurve(1).InterpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(1).curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
         state->dataCurveManager->PerfCurve(1).CurveMax = 1.0;
-        state->dataCurveManager->PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(2).CurveType = CurveTypeEnum::Linear;
+        state->dataCurveManager->PerfCurve(2).InterpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(2).curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
         state->dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
@@ -359,7 +359,7 @@ protected:
         int condNodeNum = 1;
 
         VRFCond.VRFSystemTypeNum = 1;
-        VRFCond.VRFAlgorithmTypeNum = iAlgorithmType::SysCurve;
+        VRFCond.VRFAlgorithmTypeNum = AlgorithmType::SysCurve;
         VRFCond.SchedPtr = 1;
         VRFCond.CoolingCapacity = 10000.0;
         VRFCond.CoolingCOP = 3.0;
@@ -370,7 +370,7 @@ protected:
         VRFCond.ZoneTUListPtr = 1;
         VRFCond.MaxOATCooling = 40.0;
         VRFCond.MaxOATHeating = 30.0;
-        VRFCond.ThermostatPriority = iThermostatCtrlType::LoadPriority;
+        VRFCond.ThermostatPriority = ThermostatCtrlType::LoadPriority;
         state->dataHVACVarRefFlow->MaxCoolingCapacity.allocate(1);
         state->dataHVACVarRefFlow->MaxCoolingCapacity(1) = 1.0E20;
         state->dataHVACVarRefFlow->MaxHeatingCapacity.allocate(1);
@@ -2501,7 +2501,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
-        *state, Q_req, iHXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+        *state, Q_req, HXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(1295, CompSpdActual, 5);
@@ -2520,7 +2520,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
-        *state, Q_req, iHXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+        *state, Q_req, HXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(950, CompSpdActual, 5);
@@ -2643,7 +2643,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     Tdischarge = 36;
 
     // Run
-    Q_h_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, iHXOpMode::CondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat);
+    Q_h_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, HXOpMode::CondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(27551, Q_h_OU, 10);
@@ -2660,7 +2660,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     Tsuction = -3;
 
     // Run
-    Q_c_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, iHXOpMode::EvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat);
+    Q_c_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, HXOpMode::EvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(24456, Q_c_OU, 10);
@@ -2680,7 +2680,7 @@ SC = 1;
 Tdischarge = 36;
 
 // Run
-m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
+m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, HXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
 
 // Test
 EXPECT_NEAR(3.6, m_air, 0.01);
@@ -2697,7 +2697,7 @@ EXPECT_NEAR(3.6, m_air, 0.01);
     Tsuction = -3;
 
     // Run
-    m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
+    m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, HXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(3.6, m_air, 0.01);
@@ -2719,7 +2719,7 @@ SC = 1;
 
 // Run
 state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
-    *state, iHXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
+    *state, HXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
 
 // Test
 EXPECT_NEAR(36, Tdischarge, 0.05);
@@ -2738,7 +2738,7 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
-        *state, iHXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
+        *state, HXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
 
     // Test
     EXPECT_NEAR(-3, Tsuction, 0.05);
@@ -2762,7 +2762,7 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
 
         // Run
         SC = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
-            *state, iHXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+            *state, HXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
         // Test
         EXPECT_NEAR(1, SC, 0.01);
@@ -2780,7 +2780,7 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
 
         // Run
         SH = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
-            *state, iHXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+            *state, HXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
         // Test
         EXPECT_NEAR(1, SH, 0.01);
@@ -2861,9 +2861,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Par(3) = CurveNum;
 
     // Inputs: parameters
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
@@ -4083,7 +4083,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     state->dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr = 0;
     state->dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex = 0;
-    state->dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority = iThermostatCtrlType::ThermostatOffsetPriority;
+    state->dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority = ThermostatCtrlType::ThermostatOffsetPriority;
 
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -8310,7 +8310,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->NumWaterCoils = 1;
     state->dataWaterCoils->WaterCoil.allocate(state->dataWaterCoils->NumWaterCoils);
     state->dataWaterCoils->WaterCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = WaterCoils::iCoilModel::HeatingSimple;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = WaterCoils::CoilModel::HeatingSimple;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;

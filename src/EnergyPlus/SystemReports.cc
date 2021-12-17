@@ -2426,10 +2426,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     Array1D_string SubCompNames;
     Array1D_string InletNodeNames;
     Array1D_int InletNodeNumbers;
-    Array1D<NodeInputManager::compFluidStream> InletFluidStreams;
+    Array1D<NodeInputManager::CompFluidStream> InletFluidStreams;
     Array1D_string OutletNodeNames;
     Array1D_int OutletNodeNumbers;
-    Array1D<NodeInputManager::compFluidStream> OutletFluidStreams;
+    Array1D<NodeInputManager::CompFluidStream> OutletFluidStreams;
     int NumChildren;
     int NumGrandChildren;
     bool IsParent;
@@ -2627,16 +2627,16 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 thisVar.EndUse = EndUses(VarNum);
                                 if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                        thisComp.MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::HeatingOnly;
+                                        thisComp.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
                                     }
                                     ModeFlagOn = false;
                                 } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                        thisComp.MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::CoolingOnly;
+                                        thisComp.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
                                     }
                                     ModeFlagOn = false;
                                 } else if (ModeFlagOn) {
-                                    thisVar.EndUse_CompMode = iEndUseType::NoHeatNoCool;
+                                    thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
                                 }
                                 thisVar.Group = Groups(VarNum);
                             }
@@ -2695,16 +2695,16 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     thisVar.EndUse = EndUses(VarNum);
                                     if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                            thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::HeatingOnly;
+                                            thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
                                         }
                                         ModeFlagOn = false;
                                     } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                            thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::CoolingOnly;
+                                            thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
                                         }
                                         ModeFlagOn = false;
                                     } else if (ModeFlagOn) {
-                                        thisVar.EndUse_CompMode = iEndUseType::NoHeatNoCool;
+                                        thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
                                     }
                                     thisVar.Group = Groups(VarNum);
                                 }
@@ -2768,17 +2768,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                         if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                                 thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum1).EndUse_CompMode =
-                                                    iEndUseType::HeatingOnly;
+                                                    EndUseType::HeatingOnly;
                                             }
                                             ModeFlagOn = false;
                                         } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                                 thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum1).EndUse_CompMode =
-                                                    iEndUseType::CoolingOnly;
+                                                    EndUseType::CoolingOnly;
                                             }
                                             ModeFlagOn = false;
                                         } else if (ModeFlagOn) {
-                                            thisVar.EndUse_CompMode = iEndUseType::NoHeatNoCool;
+                                            thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
                                         }
                                         thisVar.Group = Groups(VarNum);
                                     }
@@ -2880,16 +2880,16 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             thisVar.EndUse = EndUses(VarNum);
                             if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisEquipData.MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::HeatingOnly;
+                                    thisEquipData.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
                                 }
                                 ModeFlagOn = false;
                             } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                    thisEquipData.MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::CoolingOnly;
+                                    thisEquipData.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
                                 }
                                 ModeFlagOn = false;
                             } else if (ModeFlagOn) {
-                                thisVar.EndUse_CompMode = iEndUseType::NoHeatNoCool;
+                                thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
                             }
                             thisVar.Group = Groups(VarNum);
                         }
@@ -3042,16 +3042,16 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 thisVar.EndUse = EndUses(VarNum);
                                 if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                        thisSubEquipData.MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::HeatingOnly;
+                                        thisSubEquipData.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
                                     }
                                     ModeFlagOn = false;
                                 } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                        thisSubEquipData.MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::CoolingOnly;
+                                        thisSubEquipData.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
                                     }
                                     ModeFlagOn = false;
                                 } else if (ModeFlagOn) {
-                                    thisVar.EndUse_CompMode = iEndUseType::NoHeatNoCool;
+                                    thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
                                 }
                                 thisVar.Group = Groups(VarNum);
                             }
@@ -3113,17 +3113,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                             thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).EndUse_CompMode =
-                                                iEndUseType::HeatingOnly;
+                                                EndUseType::HeatingOnly;
                                         }
                                         ModeFlagOn = false;
                                     } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                             thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).EndUse_CompMode =
-                                                iEndUseType::CoolingOnly;
+                                                EndUseType::CoolingOnly;
                                         }
                                         ModeFlagOn = false;
                                     } else if (ModeFlagOn) {
-                                        thisVar.EndUse_CompMode = iEndUseType::NoHeatNoCool;
+                                        thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
                                     }
                                     thisVar.Group = Groups(VarNum);
                                 }
@@ -3343,16 +3343,16 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     thisVar.EndUse = EndUses(VarNum);
                                     if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                            thisComp.MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::HeatingOnly;
+                                            thisComp.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
                                         }
                                         ModeFlagOn = false;
                                     } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                            thisComp.MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::CoolingOnly;
+                                            thisComp.MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
                                         }
                                         ModeFlagOn = false;
                                     } else if (ModeFlagOn) {
-                                        thisVar.EndUse_CompMode = iEndUseType::NoHeatNoCool;
+                                        thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
                                     }
                                     thisVar.Group = Groups(VarNum);
                                 }
@@ -3412,16 +3412,16 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                         thisVar.EndUse = EndUses(VarNum);
                                         if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                                thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::HeatingOnly;
+                                                thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::HeatingOnly;
                                             }
                                             ModeFlagOn = false;
                                         } else if (thisVar.EndUse == "COOLINGCOILS" && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
-                                                thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = iEndUseType::CoolingOnly;
+                                                thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).EndUse_CompMode = EndUseType::CoolingOnly;
                                             }
                                             ModeFlagOn = false;
                                         } else if (ModeFlagOn) {
-                                            thisVar.EndUse_CompMode = iEndUseType::NoHeatNoCool;
+                                            thisVar.EndUse_CompMode = EndUseType::NoHeatNoCool;
                                         }
                                         thisVar.Group = Groups(VarNum);
                                     }
@@ -3481,7 +3481,7 @@ void ReportSystemEnergyUse(EnergyPlusData &state)
     int CompNum;
     int SubCompNum;
     int SubSubCompNum;
-    iEndUseType CompMode;
+    EndUseType CompMode;
     int InletNodeNum;
     int OutletNodeNum;
     int ADUNum;

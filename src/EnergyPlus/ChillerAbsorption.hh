@@ -174,24 +174,24 @@ namespace ChillerAbsorption {
         bool MyEnvrnFlag;
         bool GenInputOutputNodesUsed;
         ReportVars Report;
-        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlType EquipFlowCtrl;
 
         // Default Constructor
         BLASTAbsorberSpecs()
             : Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomPumpPower(0.0), NomPumpPowerWasAutoSized(false),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0),
               CondMassFlowRateMax(0.0), GenMassFlowRateMax(0.0), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
               OptPartLoadRat(0.0), TempDesCondIn(0.0), SteamLoadCoef(3, 0.0), PumpPowerCoef(3, 0.0), TempLowLimitEvapOut(0.0), ErrCount2(0),
-              GenHeatSourceType(DataLoopNode::NodeFluidType::blank), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false),
+              GenHeatSourceType(DataLoopNode::NodeFluidType::Blank), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false),
               GeneratorSubcool(0.0), SteamFluidIndex(0), GeneratorDeltaTemp(-99999.0), GeneratorDeltaTempWasAutoSized(true), CWLoopNum(0),
               CWLoopSideNum(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(DataPlant::LoopSideLocation::Invalid), CDBranchNum(0), CDCompNum(0), GenLoopNum(0),
               GenLoopSideNum(DataPlant::LoopSideLocation::Invalid), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
               PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0),
               EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0),
               GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0), MyOneTimeFlag(true),
-              MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid)
         {
         }
 

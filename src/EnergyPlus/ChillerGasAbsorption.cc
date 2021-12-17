@@ -357,7 +357,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           NodeInputManager::compFluidStream::Primary,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.ChillSupplyNodeNum = GetOnlySingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(3),
@@ -366,7 +366,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                           NodeInputManager::compFluidStream::Primary,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -382,7 +382,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                          NodeInputManager::compFluidStream::Tertiary,
+                                                          NodeInputManager::CompFluidStream::Tertiary,
                                                           DataLoopNode::ObjectIsNotParent);
         thisChiller.HeatSupplyNodeNum = GetOnlySingleNode(state,
                                                           state.dataIPShortCut->cAlphaArgs(7),
@@ -391,7 +391,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                          NodeInputManager::compFluidStream::Tertiary,
+                                                          NodeInputManager::CompFluidStream::Tertiary,
                                                           DataLoopNode::ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -479,7 +479,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                              NodeInputManager::compFluidStream::Secondary,
+                                                              NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             thisChiller.CondSupplyNodeNum = GetOnlySingleNode(state,
                                                               state.dataIPShortCut->cAlphaArgs(5),
@@ -488,7 +488,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Secondary,
+                                                              NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             TestCompSet(state,
                         cCurrentModuleObject,
@@ -504,7 +504,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                              NodeInputManager::compFluidStream::Secondary,
+                                                              NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             // Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )
             // Connection not required for air or evap cooled condenser so no call to TestCompSet here
@@ -923,7 +923,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         } else {
             // need call to EMS to check node
             errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::TemperatureSetPoint, errFlag);
             state.dataLoopNodes->NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
             if (errFlag) {
                 if (!this->ChillSetPointErrDone) {
@@ -955,7 +955,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         } else {
             // need call to EMS to check node
             errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::TemperatureSetPoint, errFlag);
             state.dataLoopNodes->NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
             if (errFlag) {
                 if (!this->HeatSetPointErrDone) {

@@ -455,9 +455,11 @@ struct EnergyPlusData;
 
 enum class FormatSyntax
 {
+    Invalid = -1,
     Fortran,
     FMT,
-    Printf
+    Printf,
+    Num
 };
 
 inline constexpr bool is_fortran_syntax(const std::string_view format_str)

@@ -73,7 +73,7 @@ namespace BranchNodeConnections {
                                 std::string_view const ObjectType,             // Type of object this Node is connected to (e.g. Chiller:Electric)
                                 std::string_view const ObjectName,             // Name of object this Node is connected to (e.g. MyChiller)
                                 std::string_view const ConnectionType,         // Connection Type for this Node (must be valid)
-                                NodeInputManager::compFluidStream FluidStream, // Count on Fluid Streams
+                                NodeInputManager::CompFluidStream FluidStream, // Count on Fluid Streams
                                 bool IsParent,                                 // True when node is a parent node
                                 bool &errFlag,                                 // Will be True if errors already detected or if errors found here
                                 Optional_string_const InputFieldName = _       // Input Field Name
@@ -85,7 +85,7 @@ namespace BranchNodeConnections {
                                     std::string const &ObjectType,                 // Type of object this Node is connected to (e.g. Chiller:Electric)
                                     std::string const &ObjectName,                 // Name of object this Node is connected to (e.g. MyChiller)
                                     std::string const &ConnectionType,             // Connection Type for this Node (must be valid)
-                                    NodeInputManager::compFluidStream FluidStream, // Count on Fluid Streams
+                                    NodeInputManager::CompFluidStream FluidStream, // Count on Fluid Streams
                                     bool IsParent,                                 // True when node is a parent node
                                     bool &errFlag                                  // Will be True if errors already detected or if errors found here
     );
@@ -120,11 +120,11 @@ namespace BranchNodeConnections {
                           int &NumInlets,
                           Array1D_string &InletNodeNames,
                           Array1D_int &InletNodeNums,
-                          Array1D<NodeInputManager::compFluidStream> &InletFluidStreams,
+                          Array1D<NodeInputManager::CompFluidStream> &InletFluidStreams,
                           int &NumOutlets,
                           Array1D_string &OutletNodeNames,
                           Array1D_int &OutletNodeNums,
-                          Array1D<NodeInputManager::compFluidStream> &OutletFluidStreams,
+                          Array1D<NodeInputManager::CompFluidStream> &OutletFluidStreams,
                           bool &ErrorsFound // set to true if errors found, unchanged otherwise
     );
 

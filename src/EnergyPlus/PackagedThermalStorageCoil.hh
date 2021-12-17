@@ -69,11 +69,12 @@ namespace PackagedThermalStorageCoil {
     using namespace DataHVACGlobals;
 
     // control types
-    enum class iModeCtrlType
+    enum class PTSCCtrlType
     {
-        Unassigned,
+        Invalid = -1,
         ScheduledOpModes,   // control over TES modes is via local schedule
         EMSActuatedOpModes, // control over TES modes is via EMS
+        Num
     };
 
     // Control Modes
@@ -86,25 +87,29 @@ namespace PackagedThermalStorageCoil {
     constexpr int DischargeOnlyMode = 5;
 
     // storage media
-    enum class iMedia
+    enum class MediaType
     {
-        Unassigned,
+        Invalid = -1,
         FluidBased,
         IceBased,
+        Num
     };
 
     // Water Systems
-    enum class iWaterSys
+    enum class CondensateAction
     {
-        Unassigned,
-        CondensateDiscarded, // default mode where water is "lost"
-        CondensateToTank,    // collect coil condensate from air and store in water storage tank
+        Invalid = -1,
+        Discard, // default mode where water is "lost"
+        ToTank,  // collect coil condensate from air and store in water storage tank
+        Num
     };
 
-    enum class iWaterSupply
+    enum class EvapWaterSupply
     {
+        Invalid = -1,
         WaterSupplyFromMains,
         WaterSupplyFromTank,
+        Num
     };
 
     // Dehumidification control modes (DehumidControlMode)
@@ -113,12 +118,12 @@ namespace PackagedThermalStorageCoil {
     struct PackagedTESCoolingCoilStruct
     {
         // Members
-        std::string Name;              // Name of TES cooling package
-        int AvailSchedNum;             // pointer to availability schedule
-        iModeCtrlType ModeControlType; // how are operation modes controlled
-        int ControlModeSchedNum;       // pointer to control schedule if used
-        bool EMSControlModeOn;         // if true, then EMS actuator has been used
-        Real64 EMSControlModeValue;    // value to use from EMS actuator for control mode
+        std::string Name;             // Name of TES cooling package
+        int AvailSchedNum;            // pointer to availability schedule
+        PTSCCtrlType ModeControlType; // how are operation modes controlled
+        int ControlModeSchedNum;      // pointer to control schedule if used
+        bool EMSControlModeOn;        // if true, then EMS actuator has been used
+        Real64 EMSControlModeValue;   // value to use from EMS actuator for control mode
         int CurControlMode;
         int ControlModeErrorIndex;
         Real64 RatedEvapAirVolFlowRate;  // [m3/s]
@@ -295,16 +300,16 @@ namespace PackagedThermalStorageCoil {
         Real64 BasinHeaterPowerFTempDiff;                   // Basin heater power for evaporatively cooled condensers [W/K]
         int BasinHeaterAvailSchedNum;                       // basin heater availability schedule pointer num
         Real64 BasinHeaterSetpointTemp;                     // evap water basin temperature setpoint [C]
-        iWaterSupply EvapWaterSupplyMode;                   // where does evap water come from
+        EvapWaterSupply EvapWaterSupplyMode;                // where does evap water come from
         std::string EvapWaterSupplyName;                    // name of water source e.g. water storage tank
         int EvapWaterSupTankID;                             // supply tank index, if any
         int EvapWaterTankDemandARRID;                       // evap water demand array index
-        iWaterSys CondensateCollectMode;                    // where does condensate  water go to
+        CondensateAction CondensateCollectMode;             // where does condensate  water go to
         std::string CondensateCollectName;                  // name of water source e.g. water storage tank
         int CondensateTankID;
         int CondensateTankSupplyARRID;
         // TES tank
-        iMedia StorageMedia;                // water/fluid or ice based TES
+        MediaType StorageMedia;             // water/fluid or ice based TES
         std::string StorageFluidName;       // if user defined, name of fluid type
         int StorageFluidIndex;              // if user defined, index of fluid type
         Real64 FluidStorageVolume;          // volume of water in storage tank for water systems [m3/s]
@@ -360,7 +365,7 @@ namespace PackagedThermalStorageCoil {
 
         // Default Constructor
         PackagedTESCoolingCoilStruct()
-            : AvailSchedNum(0), ModeControlType(iModeCtrlType::Unassigned), ControlModeSchedNum(0), EMSControlModeOn(false), EMSControlModeValue(0.0),
+            : AvailSchedNum(0), ModeControlType(PTSCCtrlType::Invalid), ControlModeSchedNum(0), EMSControlModeOn(false), EMSControlModeValue(0.0),
               CurControlMode(OffMode), ControlModeErrorIndex(0), RatedEvapAirVolFlowRate(0.0), RatedEvapAirMassFlowRate(0.0), EvapAirInletNodeNum(0),
               EvapAirOutletNodeNum(0), CoolingOnlyModeIsAvailable(false), CoolingOnlyRatedTotCap(0.0), CoolingOnlyRatedSHR(0.0),
               CoolingOnlyRatedCOP(0.0), CoolingOnlyCapFTempCurve(0), CoolingOnlyCapFTempObjectNum(0), CoolingOnlyCapFFlowCurve(0),
@@ -403,19 +408,19 @@ namespace PackagedThermalStorageCoil {
               CondAirOutletNodeNum(0), CondenserType(DataHeatBalance::RefrigCondenserType::Air), CondenserAirVolumeFlow(0.0),
               CondenserAirFlowSizingFactor(0.0), CondenserAirMassFlow(0.0), EvapCondEffect(0.0), CondInletTemp(0.0), EvapCondPumpElecNomPower(0.0),
               EvapCondPumpElecEnergy(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterAvailSchedNum(0), BasinHeaterSetpointTemp(0.0),
-              EvapWaterSupplyMode(iWaterSupply::WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
-              CondensateCollectMode(iWaterSys::CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0),
-              StorageMedia(iMedia::Unassigned), StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0),
-              StorageCapacitySizingFactor(0.0), MinimumFluidTankTempLimit(0.0), MaximumFluidTankTempLimit(100.0), RatedFluidTankTemp(0.0),
-              StorageAmbientNodeNum(0), StorageUA(0.0), TESPlantConnectionAvailable(false), TESPlantInletNodeNum(0), TESPlantOutletNodeNum(0),
-              TESPlantLoopNum(0), TESPlantLoopSideNum(DataPlant::LoopSideLocation::Invalid), TESPlantBranchNum(0), TESPlantCompNum(0), TESPlantDesignVolumeFlowRate(0.0),
-              TESPlantDesignMassFlowRate(0.0), TESPlantEffectiveness(0.0), TimeElapsed(0.0), IceFracRemain(0.0), IceFracRemainLastTimestep(0.0),
-              FluidTankTempFinal(0.0), FluidTankTempFinalLastTimestep(0.0), QdotPlant(0.0), Q_Plant(0.0), QdotAmbient(0.0), Q_Ambient(0.0),
-              QdotTES(0.0), Q_TES(0.0), ElecCoolingPower(0.0), ElecCoolingEnergy(0.0), EvapTotCoolingRate(0.0), EvapTotCoolingEnergy(0.0),
-              EvapSensCoolingRate(0.0), EvapSensCoolingEnergy(0.0), EvapLatCoolingRate(0.0), EvapLatCoolingEnergy(0.0), RuntimeFraction(0.0),
-              CondenserRuntimeFraction(0.0), ElectColdWeatherPower(0.0), ElectColdWeatherEnergy(0.0), ElectEvapCondBasinHeaterPower(0.0),
-              ElectEvapCondBasinHeaterEnergy(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapWaterStarvMakupRate(0.0),
-              EvapWaterStarvMakup(0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0)
+              EvapWaterSupplyMode(EvapWaterSupply::WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              CondensateCollectMode(CondensateAction::Discard), CondensateTankID(0), CondensateTankSupplyARRID(0), StorageMedia(MediaType::Invalid),
+              StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0), StorageCapacitySizingFactor(0.0),
+              MinimumFluidTankTempLimit(0.0), MaximumFluidTankTempLimit(100.0), RatedFluidTankTemp(0.0), StorageAmbientNodeNum(0), StorageUA(0.0),
+              TESPlantConnectionAvailable(false), TESPlantInletNodeNum(0), TESPlantOutletNodeNum(0), TESPlantLoopNum(0), TESPlantLoopSideNum(DataPlant::LoopSideLocation::Invalid),
+              TESPlantBranchNum(0), TESPlantCompNum(0), TESPlantDesignVolumeFlowRate(0.0), TESPlantDesignMassFlowRate(0.0),
+              TESPlantEffectiveness(0.0), TimeElapsed(0.0), IceFracRemain(0.0), IceFracRemainLastTimestep(0.0), FluidTankTempFinal(0.0),
+              FluidTankTempFinalLastTimestep(0.0), QdotPlant(0.0), Q_Plant(0.0), QdotAmbient(0.0), Q_Ambient(0.0), QdotTES(0.0), Q_TES(0.0),
+              ElecCoolingPower(0.0), ElecCoolingEnergy(0.0), EvapTotCoolingRate(0.0), EvapTotCoolingEnergy(0.0), EvapSensCoolingRate(0.0),
+              EvapSensCoolingEnergy(0.0), EvapLatCoolingRate(0.0), EvapLatCoolingEnergy(0.0), RuntimeFraction(0.0), CondenserRuntimeFraction(0.0),
+              ElectColdWeatherPower(0.0), ElectColdWeatherEnergy(0.0), ElectEvapCondBasinHeaterPower(0.0), ElectEvapCondBasinHeaterEnergy(0.0),
+              EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapWaterStarvMakupRate(0.0), EvapWaterStarvMakup(0.0), EvapCondPumpElecPower(0.0),
+              EvapCondPumpElecConsumption(0.0)
         {
         }
     };

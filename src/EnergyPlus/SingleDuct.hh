@@ -70,13 +70,16 @@ namespace SingleDuct {
 
     enum class Action
     {
+        Invalid = -1,
         Normal,
         ReverseAction,
         ReverseActionWithLimits,
-        HeatingActionNotUsed
+        HeatingActionNotUsed,
+        Num
     };
     enum class SysType
     {
+        Invalid = -1,
         SingleDuctVAVReheat,
         SingleDuctConstVolReheat,
         SingleDuctConstVolNoReheat,
@@ -84,22 +87,26 @@ namespace SingleDuct {
         SingleDuctVAVReheatVSFan,
         SingleDuctCBVAVReheat,
         SingleDuctCBVAVNoReheat,
-        Unknown
+        Num,
     };
     enum class HeatingCoilType : int
     {
+        Invalid = -1,
         None,
         Gas,
         Electric,
         SimpleHeating,
-        SteamAirHeating
+        SteamAirHeating,
+        Num,
     };
     enum class MinFlowFraction
     {
+        Invalid = -1,
         Constant,
         Scheduled,
         Fixed,
-        MinFracNotUsed
+        MinFracNotUsed,
+        Num
     };
 
     struct SingleDuctAirTerminalFlowConditions
@@ -124,8 +131,8 @@ namespace SingleDuct {
         // Members
         int SysNum;                                         // index to single duct air terminal unit
         std::string SysName;                                // Name of the Sys
-        std::string SysType;                                // Type of Sys ie. VAV, Mixing, Inducing, etc.
-        enum SysType SysType_Num;                           // Numeric Equivalent for System type
+        std::string sysType;                                // Type of Sys ie. VAV, Mixing, Inducing, etc.
+        SysType SysType_Num;                                // Numeric Equivalent for System type
         std::string Schedule;                               // Sys Operation Schedule
         int SchedPtr;                                       // Pointer to the correct schedule
         std::string ReheatComp;                             // Type of the Reheat Coil Object
@@ -219,7 +226,7 @@ namespace SingleDuct {
 
         // Default Constructor
         SingleDuctAirTerminal()
-            : SysNum(-1), SysType_Num(SysType::Unknown), SchedPtr(0), ReheatComp_Num(HeatingCoilType::None), ReheatComp_Index(0),
+            : SysNum(-1), SysType_Num(SysType::Invalid), SchedPtr(0), ReheatComp_Num(HeatingCoilType::None), ReheatComp_Index(0),
               ReheatComp_PlantType(DataPlant::PlantEquipmentType::Invalid), Fan_Num(0), Fan_Index(0), ControlCompTypeNum(0), CompErrIndex(0),
               MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), MaxHeatAirVolFlowRate(0.0), HeatAirMassFlowRateMax(0.0),
               ZoneMinAirFracMethod(MinFlowFraction::Constant), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ZoneMinAirFracReport(0.0),
@@ -232,7 +239,7 @@ namespace SingleDuct {
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
               OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid),
               HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0),
-              OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassgined), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
+              OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Invalid), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
               ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), MyEnvrnFlag(true),
               MySizeFlag(true), GetGasElecHeatCoilCap(true), PlantLoopScanFlag(true), MassFlow1(0.0), MassFlow2(0.0), MassFlow3(0.0),
               MassFlowDiff(0.0)
@@ -328,7 +335,7 @@ namespace SingleDuct {
               DOASEnthalpy(0.0), DOASPressure(0.0), DOASMassFlowRate(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0), MixedAirEnthalpy(0.0),
               MixedAirPressure(0.0), MixedAirMassFlowRate(0.0), MassFlowRateMaxAvail(0.0), ADUNum(0), TermUnitSizingIndex(0), OneTimeInitFlag(true),
               OneTimeInitFlag2(true), ZoneEqNum(0), CtrlZoneInNodeIndex(0), ZoneNum(0), NoOAFlowInputFromUser(true), OARequirementsPtr(0),
-              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Unassgined), printWarning(true)
+              AirLoopNum(0), DesignPrimaryAirVolRate(0.0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Invalid), printWarning(true)
         {
         }
 

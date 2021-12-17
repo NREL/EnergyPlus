@@ -359,7 +359,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling; // 'Heating'
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "SIMPLE";
-        state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::HeatingSimple; // 'SIMPLE'
+        state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = CoilModel::HeatingSimple; // 'SIMPLE'
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
 
         state.dataWaterCoils->WaterCoil(CoilNum).UACoil = NumArray(1);
@@ -372,7 +372,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                        AlphArray(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::compFluidStream::Secondary,
+                                                                                       NodeInputManager::CompFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
                                                                                         AlphArray(4),
@@ -381,7 +381,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::compFluidStream::Secondary,
+                                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                      AlphArray(5),
@@ -390,7 +390,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                       AlphArray(6),
@@ -399,7 +399,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsNotParent);
 
         if (AlphArray(7) == "NOMINALCAPACITY") { // not "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE"
@@ -537,7 +537,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Cooling";
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling; // 'Cooling'
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "DETAILED FLAT FIN";
-        state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::CoolingDetailed; // 'DETAILED FLAT FIN'
+        state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = CoilModel::CoolingDetailed; // 'DETAILED FLAT FIN'
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
 
         state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = NumArray(1);
@@ -598,7 +598,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                        AlphArray(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::compFluidStream::Secondary,
+                                                                                       NodeInputManager::CompFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
                                                                                         AlphArray(4),
@@ -607,7 +607,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::compFluidStream::Secondary,
+                                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                      AlphArray(5),
@@ -616,7 +616,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                       AlphArray(6),
@@ -625,7 +625,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsNotParent);
 
         // A7 ; \field Name of Water Storage Tank for Condensate Collection
@@ -762,7 +762,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Cooling";
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling; // 'Cooling'
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "Cooling";
-        state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = iCoilModel::CoolingSimple; // 'Cooling'
+        state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = CoilModel::CoolingSimple; // 'Cooling'
         state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
 
         state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = NumArray(1); // Liquid mass flow rate at Design  kg/s
@@ -798,7 +798,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                        AlphArray(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       NodeInputManager::compFluidStream::Secondary,
+                                                                                       NodeInputManager::CompFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
                                                                                         AlphArray(4),
@@ -807,7 +807,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        NodeInputManager::compFluidStream::Secondary,
+                                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                      AlphArray(5),
@@ -816,7 +816,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                       AlphArray(6),
@@ -825,7 +825,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsNotParent);
 
         // The default is SimpleAnalysis = 2.  and DetailedAnalysis   =1
@@ -1073,7 +1073,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
         bool WaterCoilOnAirLoop = true;
         for (tempCoilNum = 1; tempCoilNum <= state.dataWaterCoils->NumWaterCoils; ++tempCoilNum) {
             if (state.dataWaterCoils->WaterCoil(tempCoilNum).ControllerIndex > 0) {
-                SimAirServingZones::CompType CoilTypeNum(SimAirServingZones::CompType::Unassigned);
+                SimAirServingZones::CompType CoilTypeNum(SimAirServingZones::CompType::Invalid);
                 std::string CompType;
                 std::string CompName = state.dataWaterCoils->WaterCoil(tempCoilNum).Name;
                 if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
@@ -1209,7 +1209,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                            state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum);
 
         // effective fin diameter for detailed flat fin coil
-        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
             state.dataWaterCoils->WaterCoil(CoilNum).EffectiveFinDiam =
                 std::sqrt(4.0 * state.dataWaterCoils->WaterCoil(CoilNum).FinDiam * state.dataWaterCoils->WaterCoil(CoilNum).CoilDepth /
                           (DataGlobalConstants::Pi * state.dataWaterCoils->WaterCoil(CoilNum).NumOfTubeRows *
@@ -1289,7 +1289,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
 
         // Check for zero design cooling capacity as specified by coil design inputs
         if (state.dataWaterCoils->MyCoilDesignFlag(CoilNum) &&
-            (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingSimple) &&
+            (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingSimple) &&
             (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) &&
             (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) {
 
@@ -1338,7 +1338,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
         }
 
         if (state.dataWaterCoils->MyCoilDesignFlag(CoilNum) &&
-            (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingSimple) &&
+            (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingSimple) &&
             (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate > 0.0) &&
             (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0)) { // 'Cooling'
 
@@ -1389,7 +1389,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                             state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp = state.dataWaterCoils->TOutNew;
                             // update outlet air conditions used for sizing
                             std::string CompType;
-                            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) {
+                            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) {
                                 CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);
                             } else {
                                 CompType = cAllCoilTypes(Coil_CoolingWater);
@@ -2336,8 +2336,8 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             state.dataSize->DataPltSizCoolNum = PltSizCoolNum;
             state.dataSize->DataWaterLoopNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum;
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
-                CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);                                      // Coil:Cooling:Water:DetailedGeometry
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+                CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);                                     // Coil:Cooling:Water:DetailedGeometry
             } else {
                 CompType = cAllCoilTypes(Coil_CoolingWater); // Coil:Cooling:Water
             }
@@ -2387,8 +2387,8 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             // calculate pre-sizing data needed for specific functions (e.g., CoolingWaterDesAirInletTempSizing needs HRin and air flow)
             // these will be calculated again after other parameters are known
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
-                TempSize = AutoSize;                                                                      // coil report
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+                TempSize = AutoSize;                                                                     // coil report
             } else {
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat; // preserve input if entered
             }
@@ -2417,7 +2417,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             }
             // end pre-sizing data calculations
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                 bPRINT = false;       // do not print this sizing request since this coil does not have a design inlet air temp input field (we
                                       // should print this!)
                 TempSize = AutoSize;  // not an input for this model
@@ -2434,7 +2434,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp = sizerCWDesInletAirTemp.size(state, TempSize, ErrorsFound);
             state.dataSize->DataDesInletAirTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp;
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                 bPRINT = false;       // no field for detailed water coil, should print to eio anyway
                 TempSize = AutoSize;  // coil report
                 SizingString.clear(); // doesn't matter
@@ -2460,7 +2460,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             }
 
             if (state.dataSize->CurZoneEqNum > 0) { // zone equipment use air inlet humrat to calculate design outlet air temperature
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;      // no field for detailed water coil, should print to eio anyway
                     TempSize = AutoSize; // coil report
                 } else {
@@ -2471,7 +2471,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(state, TempSize, ErrorsFound);
             }
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                 bPRINT = false;       // no field for detailed water coil, should print to eio anyway
                 TempSize = AutoSize;  // coil report
                 SizingString.clear(); // doesn't matter
@@ -2490,7 +2490,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             if (state.dataSize->CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This
                                                  // will change the order of the eio file.
-                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+                if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;      // no field for detailed water coil, should print this to eio anyway
                     TempSize = AutoSize; // coil report
                 } else {
@@ -2501,7 +2501,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat = sizerCWDesInHumRat.size(state, TempSize, ErrorsFound);
             }
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                 bPRINT = false;      // no field for detailed water coil, should print this to eio anyway
                 TempSize = AutoSize; // coil report
             } else {
@@ -2537,7 +2537,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = sizerCWWaterflow.size(state, TempSize, ErrorsFound);
             state.dataSize->DataWaterFlowUsedForSizing = state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                 bPRINT = false; // do not print this sizing request since this coil does not have a design air flow rate input field (we
                                 // should print this!)
             } else {
@@ -2560,7 +2560,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 ShowContinueError(state, "The autosize value for max air volume flow rate is zero");
             }
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) {
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) {
 
                 FieldNum = 16; //  N16, \field Number of Tubes per Row
                 bPRINT = true;
@@ -6399,9 +6399,9 @@ void CheckActuatorNode(EnergyPlusData &state,
 }
 
 void CheckForSensorAndSetPointNode(EnergyPlusData &state,
-                                   int const SensorNodeNum,                    // controller sensor node number
-                                   HVACControllers::iCtrl const ControlledVar, // controlled variable type
-                                   bool &NodeNotFound                          // true if matching air outlet node not found
+                                   int const SensorNodeNum,                          // controller sensor node number
+                                   HVACControllers::CtrlVarType const ControlledVar, // controlled variable type
+                                   bool &NodeNotFound                                // true if matching air outlet node not found
 )
 {
 
@@ -6417,7 +6417,7 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
 
     // Using/Aliasing
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
-    using SetPointManager::iCtrlVarType;
+    using SetPointManager::CtrlVarType;
     using SetPointManager::NodeHasSPMCtrlVarType;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -6457,11 +6457,11 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
             }
             EMSSetPointErrorFlag = false;
             switch (ControlledVar) {
-            case HVACControllers::iCtrl::Temperature: {
-                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
+            case HVACControllers::CtrlVarType::Temperature: {
+                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::TemperatureSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
+                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::Temp)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                         ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
@@ -6472,11 +6472,11 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 }
                 break;
             }
-            case HVACControllers::iCtrl::HumidityRatio: {
-                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+            case HVACControllers::CtrlVarType::HumidityRatio: {
+                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
+                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::MaxHumRat)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                         ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
@@ -6487,11 +6487,11 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 }
                 break;
             }
-            case HVACControllers::iCtrl::TemperatureAndHumidityRatio: {
-                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
+            case HVACControllers::CtrlVarType::TemperatureAndHumidityRatio: {
+                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::TemperatureSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
+                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::Temp)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                         ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
@@ -6501,10 +6501,10 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     }
                 }
                 EMSSetPointErrorFlag = false;
-                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
+                    if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, CtrlVarType::MaxHumRat)) {
                         ShowWarningError(state,
                                          std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                         ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");

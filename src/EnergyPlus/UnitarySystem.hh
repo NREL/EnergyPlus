@@ -177,40 +177,47 @@ namespace UnitarySystems {
     struct UnitarySys : HVACSystemData
     {
 
-        enum class ControlType : int
+        enum class UnitarySysCtrlType : int
         {
+            Invalid = -1,
             None,
             Load,
             Setpoint,
-            CCMASHRAE
+            CCMASHRAE,
+            Num
         };
 
         enum class DehumCtrlType : int
         {
+            Invalid = -1,
             None,
             CoolReheat,
-            Multimode
+            Multimode,
+            Num
         };
 
         enum class FanPlace : int
         {
+            Invalid = -1,
             NotYetSet,
             BlowThru,
-            DrawThru
+            DrawThru,
+            Num
         };
 
-        // Airflow control for contant fan mode
-        enum class UseCompFlow : int
+        // Airflow control for constant fan mode
+        enum class UseCompFlow
         {
-            FlowNotYetSet,
-            UseCompressorOnFlow, // set compressor OFF air flow rate equal to compressor ON air flow rate
-            UseCompressorOffFlow // set compressor OFF air flow rate equal to user defined value
+            Invalid = -1,
+            On,  // set compressor OFF air flow rate equal to compressor ON air flow rate
+            Off, // set compressor OFF air flow rate equal to user defined value
+            Num
         };
 
         // Parent models simulated using UnitarySystem source code
-        enum class SysType : int
+        enum class SysType
         {
-            Unassigned = -1,
+            Invalid = -1,
             Unitary,          // AirloopHVAC:UnitarySystem
             CoilCoolingDX,    // CoilSystem:Cooling:DX
             CoilCoolingWater, // CoilSystem:Cooling:Water
@@ -222,7 +229,7 @@ namespace UnitarySystems {
         SysType m_sysType;
         bool m_ThisSysInputShouldBeGotten;
         int m_SysAvailSchedPtr; // Pointer to the availability schedule
-        ControlType m_ControlType;
+        UnitarySysCtrlType m_ControlType;
         DehumCtrlType m_DehumidControlType_Num;
         bool m_Humidistat;
         bool m_ValidASHRAECoolCoil;

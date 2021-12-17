@@ -2623,7 +2623,7 @@ namespace AirflowNetworkBalanceManager {
                                                     "AirflowNetwork:Multizone:Surface",
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     ObjectIsParent);
                         state.dataAirflowNetwork->MultizoneExternalNodeData(i).OutAirNodeNum = NodeNum;       // Name of outdoor air node
                         state.dataAirflowNetwork->MultizoneExternalNodeData(i).height = Node(NodeNum).Height; // Nodal height
@@ -7180,7 +7180,7 @@ namespace AirflowNetworkBalanceManager {
         state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
         state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
 
-        state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpTypeEnum::BtwxtMethod;
+        state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpType::BtwxtMethod;
 
         state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
         state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
@@ -10569,7 +10569,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                         if (state.dataAirflowNetwork->AirflowNetworkNodeData(Node2).EPlusTypeNum == iEPlusNodeType::ZIN) {
                             if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
-                                    .EPlusTypeNum == iEPlusComponentType::Unassigned)
+                                    .EPlusTypeNum == iEPlusComponentType::Invalid)
                                 continue;
                         }
                         NodeMass = Node(state.dataAirflowNetwork->AirflowNetworkNodeData(Node3).EPlusNodeNum).MassFlowRate;
@@ -11290,7 +11290,7 @@ namespace AirflowNetworkBalanceManager {
         // Eliminate node not related to AirLoopHVAC
         for (k = 1; k <= state.dataBranchNodeConnections->NumOfNodeConnections; ++k) {
             if (NodeFound(state.dataBranchNodeConnections->NodeConnections(k).NodeNumber)) continue;
-            if (state.dataBranchNodeConnections->NodeConnections(k).FluidStream == NodeInputManager::compFluidStream::Secondary) {
+            if (state.dataBranchNodeConnections->NodeConnections(k).FluidStream == NodeInputManager::CompFluidStream::Secondary) {
                 NodeFound(state.dataBranchNodeConnections->NodeConnections(k).NodeNumber) = true;
             }
         }
@@ -11879,7 +11879,7 @@ namespace AirflowNetworkBalanceManager {
             j = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum;
             if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::CVF) {
                 if (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0])
-                        .EPlusTypeNum == iEPlusNodeType::Unassigned)
+                        .EPlusTypeNum == iEPlusNodeType::Invalid)
                     state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0])
                         .EPlusTypeNum = iEPlusNodeType::FIN;
                 state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1]).EPlusTypeNum =
@@ -12046,13 +12046,13 @@ namespace AirflowNetworkBalanceManager {
         // Assigning inlet and outlet nodes for a splitter
         for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfNodes; ++i) {
             if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusNodeNum == state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1)) {
-                if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum == iEPlusNodeType::Unassigned)
+                if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum == iEPlusNodeType::Invalid)
                     state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum = iEPlusNodeType::SPI;
             }
             for (j = 1; j <= state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2); ++j) {
                 if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusNodeNum ==
                     state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(j + 2)) {
-                    if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum == iEPlusNodeType::Unassigned)
+                    if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum == iEPlusNodeType::Invalid)
                         state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum = iEPlusNodeType::SPO;
                 }
             }
@@ -12632,7 +12632,7 @@ namespace AirflowNetworkBalanceManager {
 
             // Default Constructor
             AFNExtSurfacesProp()
-                : SurfNum(0), MSDNum(0), ZoneNum(0), MZDZoneNum(0), ExtNodeNum(0), facadeNum(0), curve(0), CompTypeNum(iComponentTypeNum::Unassigned),
+                : SurfNum(0), MSDNum(0), ZoneNum(0), MZDZoneNum(0), ExtNodeNum(0), facadeNum(0), curve(0), CompTypeNum(iComponentTypeNum::Invalid),
                   NodeHeight(0.0), OpeningArea(0.0), Height(0.0), Width(0.0), DischCoeff(0.0)
             {
             }

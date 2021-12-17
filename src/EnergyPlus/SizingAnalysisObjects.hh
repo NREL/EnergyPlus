@@ -75,7 +75,7 @@ public:
 class ZoneTimestepObject
 {
 public:
-    DataGlobalConstants::KindOfSim kindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+    DataGlobalConstants::KindOfSim kindOfSim = DataGlobalConstants::KindOfSim::Invalid;
     int envrnNum = 0;
     int dayOfSim = 0; // since start of simulation
     int hourOfDay = 0;

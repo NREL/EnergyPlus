@@ -80,9 +80,9 @@ namespace OutputReportTabular {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    enum class iAggType
+    enum class AggType
     {
-        Unassigned,
+        Invalid = -1,
         SumOrAvg,
         Maximum,
         Minimum,
@@ -96,32 +96,38 @@ namespace OutputReportTabular {
         SumOrAverageHoursShown,
         MaximumDuringHoursShown,
         MinimumDuringHoursShown,
+        Num
     };
 
-    enum class iTableStyle
+    enum class TableStyle
     {
-        Unassigned,
+        Invalid = -1,
         Comma,
         Tab,
         Fixed,
         HTML,
         XML,
+        Num
     };
 
-    enum class iUnitsStyle
+    enum class UnitsStyle
     {
+        Invalid = -1,
         None,
         JtoKWH,
         JtoMJ,
         JtoGJ,
         InchPound,
         NotFound,
+        Num
     };
 
-    enum class endUseSubTableType
+    enum class EndUseSubTableType
     {
-        bySubCategory,
-        bySpaceType
+        Invalid = -1,
+        BySubCategory,
+        BySpaceType,
+        Num
     };
 
     // These correspond to the columns in the load component table
@@ -173,11 +179,13 @@ namespace OutputReportTabular {
 
     constexpr const char *validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
 
-    enum class iOutputType
+    enum class OutputType
     {
-        zoneOutput,
-        airLoopOutput,
-        facilityOutput,
+        Invalid = -1,
+        Zone,
+        AirLoop,
+        Facility,
+        Num
     };
 
     // MODULE VARIABLE DECLARATIONS:
@@ -194,6 +202,7 @@ namespace OutputReportTabular {
     // LineTypes for reading the stat file
     enum class StatLineType
     {
+        Invalid = -1,
         Initialized, // used as a dummy placeholder
         StatisticsLine,
         LocationLine,
@@ -203,16 +212,16 @@ namespace OutputReportTabular {
         DataSourceLine,
         WMOStationLine,
         DesignConditionsLine,
-        heatingConditionsLine,
-        coolingConditionsLine,
-        stdHDDLine,
-        stdCDDLine,
-        maxDryBulbLine,
-        minDryBulbLine,
-        maxDewPointLine,
-        minDewPointLine,
-        wthHDDLine,
-        wthCDDLine,
+        HeatingConditionsLine,
+        CoolingConditionsLine,
+        StdHDDLine,
+        StdCDDLine,
+        MaxDryBulbLine,
+        MinDryBulbLine,
+        MaxDewPointLine,
+        MinDewPointLine,
+        WithHDDLine,
+        WithCDDLine,
         KoppenLine,
         KoppenDes1Line,
         KoppenDes2Line,
@@ -220,6 +229,7 @@ namespace OutputReportTabular {
         AshStdDes1Line,
         AshStdDes2Line,
         AshStdDes3Line,
+        Num
     };
 
     static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesTubularGCLS = {DataHeatBalance::IntGainType::DaylightingDeviceTubular};
@@ -247,7 +257,7 @@ namespace OutputReportTabular {
         // Default Constructor
         OutputTableBinnedType()
             : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(OutputProcessor::VariableType::NotFound),
-              avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), scheduleIndex(0)
+              avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::Zone), scheduleIndex(0)
         {
         }
     };
@@ -324,7 +334,7 @@ namespace OutputReportTabular {
         // Members
         std::string variMeter;          // the name of the variable or meter
         std::string colHead;            // the column header to use instead of the variable name (only for predefined)
-        iAggType aggregate;             // the type of aggregation for the variable (see aggType parameters)
+        AggType aggregate;              // the type of aggregation for the variable (see aggType parameters)
         OutputProcessor::Unit varUnits; // Units enumeration
         std::string variMeterUpper;     // the name of the variable or meter uppercased
         OutputProcessor::VariableType typeOfVar;
@@ -336,8 +346,8 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyFieldSetInputType()
-            : aggregate(iAggType::Unassigned), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
-              varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::TimeStepZone)
+            : aggregate(AggType::Invalid), varUnits(OutputProcessor::Unit::None), typeOfVar(OutputProcessor::VariableType::NotFound), keyCount(0),
+              varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::Zone)
         {
         }
     };
@@ -365,7 +375,7 @@ namespace OutputReportTabular {
         OutputProcessor::StoreType avgSum;       // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType;  // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;             // the units string, may be blank
-        iAggType aggType;                        // index to the type of aggregation (see list of parameters)
+        AggType aggType;                         // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;                   // monthly results
         Array1D<Real64> duration;                // the time during which results are summed for use in averages
         Array1D_int timeStamp;                   // encoded timestamp of max or min
@@ -375,8 +385,8 @@ namespace OutputReportTabular {
         // Default Constructor
         MonthlyColumnsType()
             : varNum(0), typeOfVar(OutputProcessor::VariableType::NotFound), avgSum(OutputProcessor::StoreType::Averaged),
-              stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(iAggType::Unassigned),
-              reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
+              stepType(OutputProcessor::TimeStepType::Zone), units(OutputProcessor::Unit::None), aggType(AggType::Invalid), reslt(12, 0.0),
+              duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
     };
@@ -501,7 +511,7 @@ namespace OutputReportTabular {
     int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown);
 
     void AddMonthlyFieldSetInput(
-        EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate);
+        EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, AggType const inAggregate);
 
     void InitializeTabularMonthly(EnergyPlusData &state);
 
@@ -513,7 +523,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularStyle(EnergyPlusData &state);
 
-    iUnitsStyle SetUnitsStyleFromString(std::string const &unitStringIn);
+    UnitsStyle SetUnitsStyleFromString(std::string const &unitStringIn);
 
     void GetInputOutputTableSummaryReports(EnergyPlusData &state);
 
@@ -600,12 +610,12 @@ namespace OutputReportTabular {
     void WriteBEPSTable(EnergyPlusData &state);
 
     void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
-                                            endUseSubTableType tableType,
+                                            EndUseSubTableType tableType,
                                             Array2D<Real64> &endUseSubOther,
                                             Array2D<Real64> &collapsedEndUse,
                                             Array3D<Real64> &collapsedEndUseSub,
                                             Array1D_bool &needOtherRow,
-                                            const iUnitsStyle unitsStyle_cur,
+                                            const UnitsStyle unitsStyle_cur,
                                             const bool produceTabular,
                                             const bool produceSQLite);
 
@@ -653,7 +663,7 @@ namespace OutputReportTabular {
 
     int unitsFromHeading(EnergyPlusData &state, std::string &heading);
 
-    int unitsFromHeading(EnergyPlusData &state, std::string &heading, iUnitsStyle unitsStyle_para);
+    int unitsFromHeading(EnergyPlusData &state, std::string &heading, UnitsStyle unitsStyle_para);
 
     std::vector<std::string> splitCommaString(std::string const &inputString);
 
@@ -718,16 +728,16 @@ namespace OutputReportTabular {
 
     void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal);
 
-    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, iUnitsStyle unitsStyle_para);
+    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, UnitsStyle unitsStyle_para);
 
     void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int curAirLoop);
 
     void OutputCompLoadSummary(EnergyPlusData &state,
-                               EnergyPlus::OutputReportTabular::iOutputType kind,
+                               EnergyPlus::OutputReportTabular::OutputType kind,
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
                                int zoneOrAirLoopIndex,
-                               iUnitsStyle unitsStyle_para,
+                               UnitsStyle unitsStyle_para,
                                bool produceTabular_para,
                                bool produceSQLite_para);
 
@@ -749,9 +759,9 @@ namespace OutputReportTabular {
                     Optional_string_const footnoteText = _);
 
     bool produceDualUnitsFlags(int iUnit_Sys,
-                               EnergyPlus::OutputReportTabular::iUnitsStyle unitsStyle_Tab,
-                               EnergyPlus::OutputReportTabular::iUnitsStyle unitsStyle_Sql,
-                               iUnitsStyle &unitsStyle_Cur,
+                               EnergyPlus::OutputReportTabular::UnitsStyle unitsStyle_Tab,
+                               EnergyPlus::OutputReportTabular::UnitsStyle unitsStyle_Sql,
+                               UnitsStyle &unitsStyle_Cur,
                                bool &produce_Tab,
                                bool &produce_Sql);
 
@@ -868,8 +878,8 @@ namespace OutputReportTabular {
 struct OutputReportTabularData : BaseGlobalStruct
 {
 
-    OutputReportTabular::iUnitsStyle unitsStyle = OutputReportTabular::iUnitsStyle::None;
-    OutputReportTabular::iUnitsStyle unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;
+    OutputReportTabular::UnitsStyle unitsStyle = OutputReportTabular::UnitsStyle::None;
+    OutputReportTabular::UnitsStyle unitsStyle_SQLite = OutputReportTabular::UnitsStyle::NotFound;
     int OutputTableBinnedCount = 0;
     int BinResultsTableCount = 0;
     int BinResultsIntervalCount = 0;
@@ -896,8 +906,8 @@ struct OutputReportTabularData : BaseGlobalStruct
     Array1D<std::ofstream *> TabularOutputFile = Array1D<std::ofstream *>(
         OutputReportTabular::maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
     Array1D_string del = Array1D_string(OutputReportTabular::maxNumStyles);                                    // the delimiter to use
-    Array1D<OutputReportTabular::iTableStyle> TableStyle = Array1D<OutputReportTabular::iTableStyle>(
-        OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned); // see list of parameters
+    Array1D<OutputReportTabular::TableStyle> TableStyle = Array1D<OutputReportTabular::TableStyle>(
+        OutputReportTabular::maxNumStyles, OutputReportTabular::TableStyle::Invalid); // see list of parameters
 
     Real64 timeInYear = 0.0;
 
@@ -1126,7 +1136,7 @@ struct OutputReportTabularData : BaseGlobalStruct
     int ErrCount1 = 0;
     Array1D<OutputProcessor::VariableType> MonthlyColumnsTypeOfVar;
     Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
-    Array1D<OutputReportTabular::iAggType> MonthlyColumnsAggType;
+    Array1D<OutputReportTabular::AggType> MonthlyColumnsAggType;
     Array1D_int MonthlyColumnsVarNum;
     Array1D_int MonthlyTablesNumColumns;
     int curFirstColumn = 0;
@@ -1224,8 +1234,8 @@ struct OutputReportTabularData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
-        this->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;
+        this->unitsStyle = OutputReportTabular::UnitsStyle::None;
+        this->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::NotFound;
         this->OutputTableBinnedCount = 0;
         this->BinResultsTableCount = 0;
         this->BinResultsIntervalCount = 0;
@@ -1245,7 +1255,7 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->TabularOutputFile = Array1D<std::ofstream *>(
             OutputReportTabular::maxNumStyles, {&this->csv_stream, &this->tab_stream, &this->fix_stream, &this->htm_stream, &this->xml_stream});
         this->del = Array1D_string(OutputReportTabular::maxNumStyles);
-        this->TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned);
+        this->TableStyle = Array1D<OutputReportTabular::TableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::TableStyle::Invalid);
         this->timeInYear = 0.0;
         this->displayTabularBEPS = false;
         this->displayLEEDSummary = false;

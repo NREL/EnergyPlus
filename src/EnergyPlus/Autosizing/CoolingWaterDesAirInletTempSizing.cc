@@ -74,7 +74,7 @@ Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInTemp;
             }
             Real64 fanDeltaT = 0.0;
-            if (this->dataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+            if (this->dataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
                 // calculate fan heat to get fan air-side delta T
                 Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                 if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {
@@ -109,7 +109,7 @@ Real64 CoolingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
                                            (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).RetTempAtCoolPeak;
                 }
                 Real64 fanDeltaT = 0.0;
-                if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::BlowThru) {
                     // calculate fan heat to get fan air-side delta T
                     Real64 FanCoolLoad = this->calcFanDesHeatGain(this->dataAirFlowUsedForSizing);
                     if (this->dataDesInletAirHumRat > 0.0 && this->dataAirFlowUsedForSizing > 0.0) {

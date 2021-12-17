@@ -188,7 +188,7 @@ std::string BaseSizer::getLastErrorMessages()
 
 void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 {
-    if (this->sizingType == AutoSizingType::Unknown) {
+    if (this->sizingType == AutoSizingType::Invalid) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
         this->addErrorMessage(msg);
         ShowSevereError(state, msg);
@@ -788,7 +788,7 @@ void BaseSizer::clearState()
     dataAirFlowUsedForSizing = 0.0;
     dataDesInletAirTemp = 0.0;
     dataDesAccountForFanHeat = false;
-    dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+    dataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
     dataDesicRegCoil = false;
     dataHeatSizeRatio = 0.0;
     dataZoneUsedForSizing = 0;

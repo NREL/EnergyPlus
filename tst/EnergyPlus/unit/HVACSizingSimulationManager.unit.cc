@@ -124,10 +124,10 @@ protected:
         state->dataGlobal->NumOfTimeStepInHour = 4;
         state->dataWeatherManager->TimeStepFraction = 1.0 / double(state->dataGlobal->NumOfTimeStepInHour);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = &state->dataGlobal->TimeStepZone;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0; // init
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = &state->dataHVACGlobal->TimeStepSys;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = &state->dataGlobal->TimeStepZone;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0; // init
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = &state->dataHVACGlobal->TimeStepSys;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0;
     }
 
     virtual void TearDown()
@@ -186,20 +186,20 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
 
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                 state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // ... End hour loop.
@@ -212,12 +212,12 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                 state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 state->dataLoopNodes->Node(1).Temp = 10.0;
@@ -225,8 +225,8 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // End hour loop.
@@ -240,21 +240,21 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     while (state->dataGlobal->DayOfSim < state->dataGlobal->NumOfDayInEnvrn) {
         ++state->dataGlobal->DayOfSim;
         for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
             for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
                  ++state->dataGlobal->TimeStep) {
                 for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                    state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                        (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                    state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                        (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                     state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                     state->dataLoopNodes->Node(1).Temp = 10.0;
                     state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                     testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
                 }
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
             } // TimeStep loop
         }     // ... End hour loop.
@@ -269,21 +269,21 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     while (state->dataGlobal->DayOfSim < state->dataGlobal->NumOfDayInEnvrn) {
         ++state->dataGlobal->DayOfSim;
         for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
             for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
                  ++state->dataGlobal->TimeStep) {
                 for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                    state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                        (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                    state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                        (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                     state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                     state->dataLoopNodes->Node(1).Temp = 10.0;
                     state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                     testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
                 }
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
             } // TimeStep loop
         }     // ... End hour loop.
@@ -401,20 +401,20 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 1;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                 state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 state->dataLoopNodes->Node(1).Temp = 10.0;
                 state->dataPlnt->PlantLoop(1).HeatingDemand = state->dataGlobal->HourOfDay * 10.0;
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // ... End hour loop.
@@ -426,12 +426,12 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                 state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 state->dataLoopNodes->Node(1).Temp = 10.0;
@@ -439,8 +439,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // End hour loop.
@@ -547,13 +547,13 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 1;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                 state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 state->dataLoopNodes->Node(1).Temp = 10.0;
@@ -561,8 +561,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
             // E+ doesn't really update zone step data until system steps are done
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // ... End hour loop.
@@ -574,13 +574,13 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                 state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 state->dataLoopNodes->Node(1).Temp = 10.0;
@@ -588,8 +588,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // End hour loop.
@@ -635,16 +635,16 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 1;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
 
             state->dataHVACGlobal->NumOfSysTimeSteps = state->dataGlobal->TimeStep;
             state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                 state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 state->dataLoopNodes->Node(1).Temp = 10.0;
@@ -652,8 +652,8 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
             // E+ doesn't really update zone step data until system steps are done
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // ... End hour loop.
@@ -665,15 +665,15 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 0.0;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 0.0;
         for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour; ++state->dataGlobal->TimeStep) {
             state->dataHVACGlobal->NumOfSysTimeSteps = state->dataGlobal->TimeStep;
             state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone / state->dataHVACGlobal->NumOfSysTimeSteps;
 
             for (int SysTimestepLoop = 1; SysTimestepLoop <= state->dataHVACGlobal->NumOfSysTimeSteps; ++SysTimestepLoop) {
-                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute +=
-                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep) * 60.0;
+                state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute +=
+                    (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep) * 60.0;
 
                 state->dataLoopNodes->Node(1).MassFlowRate = state->dataGlobal->HourOfDay * 0.1;
                 state->dataLoopNodes->Node(1).Temp = 10.0;
@@ -681,8 +681,8 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
                 testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep(*state);
             }
-            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute +=
-                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep) * 60.0;
+            state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute +=
+                (*state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep) * 60.0;
             testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep(*state);
         } // TimeStep loop
     }     // End hour loop.

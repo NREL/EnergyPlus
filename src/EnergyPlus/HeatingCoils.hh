@@ -69,13 +69,14 @@ namespace HeatingCoils {
 
     enum class HeatObjTypes // reclaim heat object types
     {
-        Unassigned,
+        Invalid = -1,
         COMPRESSORRACK_REFRIGERATEDCASE,
         COIL_DX_COOLING, // single speed DX
         COIL_DX_MULTISPEED,
         COIL_DX_MULTIMODE,
         CONDENSER_REFRIGERATION,
-        COIL_DX_VARIABLE_COOLING
+        COIL_DX_VARIABLE_COOLING,
+        Num
     };
 
     struct HeatingCoilEquipConditions
@@ -151,7 +152,7 @@ namespace HeatingCoils {
               FuelUseRate(0.0), ElecUseRate(0.0), Efficiency(0.0), NominalCapacity(0.0), DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0),
               AvailTemperature(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), TempSetPointNodeNum(0), Control(0), PLFCurveIndex(0),
               ParasiticElecLoad(0.0), ParasiticFuelLoad(0.0), ParasiticFuelRate(0.0), ParasiticFuelCapacity(0.0), RTF(0.0), RTFErrorIndex(0),
-              RTFErrorCount(0), PLFErrorIndex(0), PLFErrorCount(0), ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(HeatObjTypes::Unassigned),
+              RTFErrorCount(0), PLFErrorIndex(0), PLFErrorCount(0), ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(HeatObjTypes::Invalid),
               NumOfStages(0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
               FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), AirLoopNum(0)
         {

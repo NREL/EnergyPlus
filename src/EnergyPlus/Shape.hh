@@ -62,7 +62,7 @@ namespace EnergyPlus {
 
 enum class ShapeType
 {
-    Unknown,
+    Invalid = -1,
     Triangle,
     Quadrilateral,
     Rectangle,
@@ -72,16 +72,18 @@ enum class ShapeType
     RectangularRightFin,
     TriangularWindow,
     Convex,
-    Nonconvex
+    Nonconvex,
+    Num
 };
 
 enum class ShapeCat
 {
-    Unknown,
+    Invalid = -1,
     Triangular,
     Rectangular,
     Convex,
-    Nonconvex
+    Nonconvex,
+    Num
 };
 
 } // namespace EnergyPlus

@@ -68,28 +68,36 @@ namespace IceThermalStorage {
 
     enum class IceStorageType
     {
+        Invalid = -1,
         Simple,
-        Detailed
+        Detailed,
+        Num
     };
 
     enum class CurveVars
     {
+        Invalid = -1,
         FracChargedLMTD,
         FracDischargedLMTD,
         LMTDMassFlow,
-        LMTDFracCharged
+        LMTDFracCharged,
+        Num
     };
 
     enum class DetIce
     {
-        InsideMelt, // Inside melt system--charge starting with bare coil
-        OutsideMelt // Outside melt system--charge from existing ice layer on coil
+        Invalid = -1,
+        InsideMelt,  // Inside melt system--charge starting with bare coil
+        OutsideMelt, // Outside melt system--charge from existing ice layer on coil
+        Num
     };
 
     enum class ITSType
     {
+        Invalid = -1,
         IceOnCoilInternal,
-        IceOnCoilExternal
+        IceOnCoilExternal,
+        Num
     };
 
     struct SimpleIceStorageData : PlantComponent

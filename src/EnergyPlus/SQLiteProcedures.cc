@@ -113,20 +113,20 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
                     if (numAlphas > 1) {
                         std::string option2 = alphas(2);
                         if (UtilityRoutines::SameString(option2, "None")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::None;
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::None;
                         } else if (UtilityRoutines::SameString(option2, "JtoKWH")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
                         } else if (UtilityRoutines::SameString(option2, "JtoMJ")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoMJ;
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoMJ;
                         } else if (UtilityRoutines::SameString(option2, "JtoGJ")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoGJ;
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoGJ;
                         } else if (UtilityRoutines::SameString(option2, "InchPound")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
                         } else { // (UtilityRoutines::SameString(option2, "UseOutputControlTableStyles")) {
                             // Jan 2021 Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
                             // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point;
                             // This will be updated again and got concretely assigned first thing in OutputReportTabular::WriteTabularReports().
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound; // sql_ort->unitsStyle;
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::NotFound; // sql_ort->unitsStyle;
                         }
                     }
                 } else if (UtilityRoutines::SameString(option, "Simple")) {

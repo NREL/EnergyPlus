@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
     GetSysInput(*state);
 
     EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:NoReheat",
-              state->dataSingleDuct->sd_airterminal(1).SysType);                    // AT SD constant volume no reheat object type
+              state->dataSingleDuct->sd_airterminal(1).sysType);                    // AT SD constant volume no reheat object type
     EXPECT_EQ("SDCVNOREHEATAT1", state->dataSingleDuct->sd_airterminal(1).SysName); // AT SD constant volume no reheat name
     EXPECT_EQ("AVAILSCHEDULE", state->dataSingleDuct->sd_airterminal(1).Schedule);  // AT SD constant volume no reheat availability schedule name
     EXPECT_EQ(0.50, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);    // maximum volume flow Rate

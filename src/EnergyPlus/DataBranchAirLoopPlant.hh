@@ -66,21 +66,22 @@ namespace DataBranchAirLoopPlant {
     // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a positive value which is the curve manager index)
     enum class PressureCurveType
     {
-        Unassigned = -2,
-        Error = -1,
-        None = 0,
-        Pressure = 1,
-        Generic = 2
+        Invalid = -1,
+        None,
+        Pressure,
+        Generic,
+        Num
     };
 
     // Parameters for flow Control Types for branch flow resolution inside splitter/mixers
-    enum class ControlTypeEnum
+    enum class ControlType
     {
-        Unknown,
+        Invalid = -1,
         Active,
         Passive,
         SeriesActive,
-        Bypass
+        Bypass,
+        Num
     };
 
     // Types

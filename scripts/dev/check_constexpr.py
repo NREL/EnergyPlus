@@ -91,6 +91,11 @@ const_num_str = const_num_str.replace("PAREN", const_num_paren_str)
 const_num_str = const_num_str.replace("EQUAL", const_num_equal_str)
 const_num_pattern = re.compile(const_num_str)
 
+# const_num_wrapped_str = r"CONSTTYPE VARNAME\((?!.)"
+# const_num_wrapped_str = const_num_wrapped_str.replace("CONSTTYPE", const_type_str)
+# const_num_wrapped_str = const_num_wrapped_str.replace("VARNAME", var_name_str)
+# const_num_wrapped_pattern = re.compile(const_num_wrapped_str)
+
 array_const_str = r"(static )?Array[12345]D<(int|bool|double|Real64)> const VARNAME\("
 array_const_str = array_const_str.replace("VARNAME", var_name_str)
 array_const_pattern = re.compile(array_const_str)
@@ -197,6 +202,16 @@ class TestMatching(unittest.TestCase):
         ]
         for n in no_match:
             self.assertFalse(re.match(array_const_pattern, n))
+
+    # def test_const_num_wrapped(self):
+    #     # match these
+    #     yes_match = [
+    #         "const int VarName(",
+    #         "const Real64 VarName(",
+    #         "const int A("
+    #     ]
+    #     for y in yes_match:
+    #         self.assertTrue(re.match(const_num_wrapped_pattern, y))
 
     def test_const_num(self):
         # match these

@@ -671,7 +671,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     EXPECT_EQ(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
 
     // calculate fan heat to get fan air-side delta T
-    state->dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+    state->dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
     state->dataSize->DataFanIndex = 0;
     state->dataSize->DataAirFlowUsedForSizing = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow;
     Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(

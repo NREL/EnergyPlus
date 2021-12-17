@@ -1784,7 +1784,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     // set conditions for test
     int AbsChillNum = 1;
-    DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
+    DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
     Real64 AbsChillEvapLoad;
     bool AbsChillRunFlag = true;
     // check chiller inputs

@@ -64,8 +64,10 @@ namespace FluidCoolers {
 
     enum class PerfInputMethod
     {
+        Invalid = -1,
         NOMINAL_CAPACITY,
-        U_FACTOR
+        U_FACTOR,
+        Num
     };
 
     struct FluidCoolerspecs : PlantComponent
