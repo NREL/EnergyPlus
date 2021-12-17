@@ -187,7 +187,7 @@ namespace OutdoorAirUnit {
         // Default Constructor
         OAEquipList()
             : Type(CompType::Invalid), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
-              CoilType(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
+              CoilType(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), FluidIndex(0),
               MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
         }
