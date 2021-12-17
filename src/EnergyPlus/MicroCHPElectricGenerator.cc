@@ -325,7 +325,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -335,7 +335,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
                 state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Heat Recovery Nodes");
@@ -350,7 +350,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Secondary,
+                                                    NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             state.dataCHPElectGen->MicroCHP(GeneratorNum).AirOutletNodeName = AlphArray(7); //  A7 Air Outlet Node Name
@@ -362,7 +362,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    NodeInputManager::compFluidStream::Secondary,
+                                                    NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             state.dataCHPElectGen->MicroCHP(GeneratorNum).FuelSupplyID =
@@ -767,7 +767,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
         this->A42Model.TengLast = 20.0;
         this->A42Model.TempCWOutLast = 20.0;
         this->A42Model.TimeElapsed = 0.0;
-        this->A42Model.OpMode = DataGenerators::OperatingMode::Unassigned;
+        this->A42Model.OpMode = DataGenerators::OperatingMode::Invalid;
         this->A42Model.OffModeTime = 0.0;
         this->A42Model.StandyByModeTime = 0.0;
         this->A42Model.WarmUpModeTime = 0.0;
@@ -863,7 +863,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
 
     static constexpr std::string_view RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
 
-    DataGenerators::OperatingMode CurrentOpMode = DataGenerators::OperatingMode::Unassigned;
+    DataGenerators::OperatingMode CurrentOpMode = DataGenerators::OperatingMode::Invalid;
     Real64 AllowedLoad = 0.0;
     Real64 PLRforSubtimestepStartUp(1.0);
     Real64 PLRforSubtimestepShutDown(0.0);

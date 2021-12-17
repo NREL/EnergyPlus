@@ -75,6 +75,7 @@ namespace HybridEvapCoolingModel {
 
     enum class SYSTEMOUTPUTS
     {
+        Invalid = -1,
         VENTILATION_AIR_V,
         SUPPLY_MASS_FLOW,
         SYSTEM_FUEL_USE,
@@ -86,7 +87,8 @@ namespace HybridEvapCoolingModel {
         OSECOND_FUEL_USE,
         OTHIRD_FUEL_USE,
         OWATER_USE,
-        OEXTERNAL_STATIC_PRESSURE
+        OEXTERNAL_STATIC_PRESSURE,
+        Num
     };
 
     class CModeSolutionSpace

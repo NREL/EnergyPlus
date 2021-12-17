@@ -2179,7 +2179,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
     }
     auto &Pollution = state.dataPollutionModule->Pollution;
     auto &FuelType = state.dataPollutionModule->FuelType;
-    for (Loop = 1; Loop <= static_cast<int>(PollFactor::NUM); ++Loop) {
+    for (Loop = 1; Loop <= static_cast<int>(PollFactor::Num); ++Loop) {
 
         if (FuelType.FuelTypeNames(Loop).empty()) continue;
 
@@ -3024,7 +3024,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Source",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3036,7 +3036,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "CO2",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3048,7 +3048,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "CO",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3060,7 +3060,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "CH4",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3072,7 +3072,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "NOx",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3084,7 +3084,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "N2O",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3096,7 +3096,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "SO2",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3108,7 +3108,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "PM",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3120,7 +3120,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "PM10",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3132,7 +3132,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "PM2.5",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3144,7 +3144,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "NH3",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3156,7 +3156,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "NMVOC",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3168,7 +3168,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Hg",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3180,7 +3180,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Pb",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3192,7 +3192,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "WaterEnvironmentalFactors",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3204,7 +3204,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Nuclear High",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3216,7 +3216,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Nuclear Low",
-                                    "ElectricEmissions",
+                                    "ElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3228,7 +3228,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Source",
-                                    "PurchasedElectricEmissions",
+                                    "PurchasedElectricityEmissions",
                                     _,
                                     "");
                 SetupOutputVariable(state,
@@ -3240,7 +3240,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     "Site",
                                     _,
                                     "Source",
-                                    "SoldElectricEmissions",
+                                    "SoldElectricityEmissions",
                                     _,
                                     "");
             } else if (SELECT_CASE_var == "GASOLINE") {
@@ -4035,7 +4035,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     _,
                                     "");
                 SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel1 CO2 Water Consumption Volume",
+                                    "Environmental Impact OtherFuel1 Water Consumption Volume",
                                     OutputProcessor::Unit::L,
                                     Pollution.OtherFuel1Comp.WaterPollution,
                                     OutputProcessor::SOVTimeStepType::System,
@@ -4242,7 +4242,7 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                     _,
                                     "");
                 SetupOutputVariable(state,
-                                    "Environmental Impact OtherFuel2 CO2 Water Consumption Volume",
+                                    "Environmental Impact OtherFuel2 Water Consumption Volume",
                                     OutputProcessor::Unit::L,
                                     Pollution.OtherFuel2Comp.WaterPollution,
                                     OutputProcessor::SOVTimeStepType::System,
@@ -6191,52 +6191,45 @@ void ReadEnergyMeters(EnergyPlusData &state)
     auto &Pollution = state.dataPollutionModule->Pollution;
     auto &FuelType = state.dataPollutionModule->FuelType;
 
-    FuelType.ElecFacility = GetInstantMeterValue(state, FuelType.ElecFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-                            GetInstantMeterValue(state, FuelType.ElecFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
-    FuelType.DieselFacility =
-        GetInstantMeterValue(state, FuelType.DieselFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.DieselFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+    FuelType.ElecFacility = GetInstantMeterValue(state, FuelType.ElecFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                            GetInstantMeterValue(state, FuelType.ElecFacilityIndex, OutputProcessor::TimeStepType::System);
+    FuelType.DieselFacility = GetInstantMeterValue(state, FuelType.DieselFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                              GetInstantMeterValue(state, FuelType.DieselFacilityIndex, OutputProcessor::TimeStepType::System);
     FuelType.PurchCoolFacility =
-        GetInstantMeterValue(state, FuelType.PurchCoolFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.PurchCoolFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        GetInstantMeterValue(state, FuelType.PurchCoolFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+        GetInstantMeterValue(state, FuelType.PurchCoolFacilityIndex, OutputProcessor::TimeStepType::System);
     FuelType.PurchHeatFacility =
-        GetInstantMeterValue(state, FuelType.PurchHeatFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.PurchHeatFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
-    FuelType.NatGasFacility =
-        GetInstantMeterValue(state, FuelType.NatGasFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.NatGasFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
-    FuelType.GasolineFacility =
-        GetInstantMeterValue(state, FuelType.GasolineFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.GasolineFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
-    FuelType.CoalFacility = GetInstantMeterValue(state, FuelType.CoalFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-                            GetInstantMeterValue(state, FuelType.CoalFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
-    FuelType.FuelOil1Facility =
-        GetInstantMeterValue(state, FuelType.FuelOil1FacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.FuelOil1FacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
-    FuelType.FuelOil2Facility =
-        GetInstantMeterValue(state, FuelType.FuelOil2FacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.FuelOil2FacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
-    FuelType.PropaneFacility =
-        GetInstantMeterValue(state, FuelType.PropaneFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.PropaneFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        GetInstantMeterValue(state, FuelType.PurchHeatFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+        GetInstantMeterValue(state, FuelType.PurchHeatFacilityIndex, OutputProcessor::TimeStepType::System);
+    FuelType.NatGasFacility = GetInstantMeterValue(state, FuelType.NatGasFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                              GetInstantMeterValue(state, FuelType.NatGasFacilityIndex, OutputProcessor::TimeStepType::System);
+    FuelType.GasolineFacility = GetInstantMeterValue(state, FuelType.GasolineFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                                GetInstantMeterValue(state, FuelType.GasolineFacilityIndex, OutputProcessor::TimeStepType::System);
+    FuelType.CoalFacility = GetInstantMeterValue(state, FuelType.CoalFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                            GetInstantMeterValue(state, FuelType.CoalFacilityIndex, OutputProcessor::TimeStepType::System);
+    FuelType.FuelOil1Facility = GetInstantMeterValue(state, FuelType.FuelOil1FacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                                GetInstantMeterValue(state, FuelType.FuelOil1FacilityIndex, OutputProcessor::TimeStepType::System);
+    FuelType.FuelOil2Facility = GetInstantMeterValue(state, FuelType.FuelOil2FacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                                GetInstantMeterValue(state, FuelType.FuelOil2FacilityIndex, OutputProcessor::TimeStepType::System);
+    FuelType.PropaneFacility = GetInstantMeterValue(state, FuelType.PropaneFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                               GetInstantMeterValue(state, FuelType.PropaneFacilityIndex, OutputProcessor::TimeStepType::System);
     FuelType.OtherFuel1Facility =
-        GetInstantMeterValue(state, FuelType.OtherFuel1FacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.OtherFuel1FacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        GetInstantMeterValue(state, FuelType.OtherFuel1FacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+        GetInstantMeterValue(state, FuelType.OtherFuel1FacilityIndex, OutputProcessor::TimeStepType::System);
     FuelType.OtherFuel2Facility =
-        GetInstantMeterValue(state, FuelType.OtherFuel2FacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.OtherFuel2FacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        GetInstantMeterValue(state, FuelType.OtherFuel2FacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+        GetInstantMeterValue(state, FuelType.OtherFuel2FacilityIndex, OutputProcessor::TimeStepType::System);
     FuelType.ElecProducedFacility =
-        GetInstantMeterValue(state, FuelType.ElecProducedFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.ElecProducedFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
-    FuelType.SteamFacility =
-        GetInstantMeterValue(state, FuelType.SteamFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.SteamFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        GetInstantMeterValue(state, FuelType.ElecProducedFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+        GetInstantMeterValue(state, FuelType.ElecProducedFacilityIndex, OutputProcessor::TimeStepType::System);
+    FuelType.SteamFacility = GetInstantMeterValue(state, FuelType.SteamFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+                             GetInstantMeterValue(state, FuelType.SteamFacilityIndex, OutputProcessor::TimeStepType::System);
     FuelType.ElecPurchasedFacility =
-        GetInstantMeterValue(state, FuelType.ElecPurchasedFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.ElecPurchasedFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        GetInstantMeterValue(state, FuelType.ElecPurchasedFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+        GetInstantMeterValue(state, FuelType.ElecPurchasedFacilityIndex, OutputProcessor::TimeStepType::System);
     FuelType.ElecSurplusSoldFacility =
-        GetInstantMeterValue(state, FuelType.ElecSurplusSoldFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
-        GetInstantMeterValue(state, FuelType.ElecSurplusSoldFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        GetInstantMeterValue(state, FuelType.ElecSurplusSoldFacilityIndex, OutputProcessor::TimeStepType::Zone) * FracTimeStepZone +
+        GetInstantMeterValue(state, FuelType.ElecSurplusSoldFacilityIndex, OutputProcessor::TimeStepType::System);
 
     // Now these fuel types have to be sorted and summed into categories that we have pollution factors for.
     // The Off-Site Electricity is the total needed by the facility minus the amount generated on-site.

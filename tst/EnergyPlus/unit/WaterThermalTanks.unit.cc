@@ -5330,7 +5330,7 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
                                          EnergyPlus::WaterThermalTanks::WaterHeaterSide::Use,
                                          plantLoopSide,
                                          false,
-                                         DataBranchAirLoopPlant::ControlTypeEnum::Bypass,
+                                         DataBranchAirLoopPlant::ControlType::Bypass,
                                          outletTemp,
                                          deadbandTemp,
                                          setPtTemp);

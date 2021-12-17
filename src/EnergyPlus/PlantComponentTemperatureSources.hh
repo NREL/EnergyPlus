@@ -67,11 +67,12 @@ struct EnergyPlusData;
 namespace PlantComponentTemperatureSources {
 
     // MODULE PARAMETER DEFINITIONS:
-    enum class iTempSpecType
+    enum class TempSpecType
     {
-        Unassigned,
+        Invalid = -1,
         Constant,
         Schedule,
+        Num
     };
 
     struct WaterSourceSpecs : PlantComponent
@@ -86,7 +87,7 @@ namespace PlantComponentTemperatureSources {
         bool EMSOverrideOnMassFlowRateMax;      // if true EMS is calling to override maximum mass flow
         Real64 EMSOverrideValueMassFlowRateMax; // value to use if EMS is overriding max mass flow
         Real64 MassFlowRate;
-        iTempSpecType TempSpecType; // temperature specification type
+        TempSpecType tempSpecType; // temperature specification type
         std::string TempSpecScheduleName;
         int TempSpecScheduleNum;
         Real64 BoundaryTemp;
@@ -104,7 +105,7 @@ namespace PlantComponentTemperatureSources {
         // Default Constructor
         WaterSourceSpecs()
             : InletNodeNum(0), OutletNodeNum(0), DesVolFlowRate(0.0), DesVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0),
-              EMSOverrideOnMassFlowRateMax(false), EMSOverrideValueMassFlowRateMax(0.0), MassFlowRate(0.0), TempSpecType(iTempSpecType::Unassigned),
+              EMSOverrideOnMassFlowRateMax(false), EMSOverrideValueMassFlowRateMax(0.0), MassFlowRate(0.0), tempSpecType(TempSpecType::Invalid),
               TempSpecScheduleNum(0), BoundaryTemp(0.0), OutletTemp(0.0), InletTemp(0.0), HeatRate(0.0), HeatEnergy(0.0), Location(0, 0, 0, 0),
               SizFac(0.0), CheckEquipName(true), MyFlag(true), MyEnvironFlag(true), IsThisSized(false)
         {

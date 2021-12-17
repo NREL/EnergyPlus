@@ -69,6 +69,7 @@ namespace IntegratedHeatPump {
     // operation mode
     enum class IHPOperationMode : int
     {
+        Invalid = -1,
         IdleMode,
         SCMode,
         SHMode,
@@ -77,7 +78,8 @@ namespace IntegratedHeatPump {
         SCWHMatchWHMode,
         SCDWHMode,
         SHDWHElecHeatOffMode,
-        SHDWHElecHeatOnMode
+        SHDWHElecHeatOnMode,
+        Num
     };
 
     struct IntegratedHeatPumpData // variable speed coil

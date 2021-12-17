@@ -154,6 +154,10 @@ std::string IdfParser::parse_value(std::string const &idf, size_t &index, bool &
     case Token::COMMA:
     case Token::SEMICOLON:
         break;
+    default:
+        // need to properly fail here at some point for the 'invalid' and 'num' cases
+        // adding 'assert(false)' was causing build errors
+        break;
     }
 
     success = false;

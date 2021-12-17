@@ -170,7 +170,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_VariableInfo)
     // EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
     // EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
     // EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
-    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int repordId = 1;
 
     Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, repordId, Unit::C);
@@ -192,7 +192,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo1)
 {
 
     json OutputVars;
-    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
@@ -226,7 +226,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 {
 
     json OutputData;
-    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);

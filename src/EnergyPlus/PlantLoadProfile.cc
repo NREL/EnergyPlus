@@ -370,7 +370,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(state,
                                                                                                 state.dataIPShortCut->cAlphaArgs(3),
@@ -379,7 +379,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                NodeInputManager::compFluidStream::Primary,
+                                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                                 ObjectIsNotParent);
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).LoadSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));

@@ -177,11 +177,13 @@ namespace DataSizing {
     constexpr int GlobalCoolingSizingFactorMode(103);
     constexpr int LoopComponentSizingFactorMode(104);
 
-    enum class zoneFanPlacement
+    enum class ZoneFanPlacement
     {
-        zoneFanPlaceNotSet,
-        zoneBlowThru,
-        zoneDrawThru
+        Invalid = -1,
+        NotSet,
+        BlowThru,
+        DrawThru,
+        Num
     };
 
     // Types
@@ -496,12 +498,12 @@ namespace DataSizing {
         {
         }
 
-        Real64 applyTermUnitSizingCoolFlow(Real64 const &coolFlowWithOA, // Cooling flow rate with MinOA limit applied
-                                           Real64 const &coolFlowNoOA    // Cooling flow rate without MinOA limit applied
+        Real64 applyTermUnitSizingCoolFlow(Real64 coolFlowWithOA, // Cooling flow rate with MinOA limit applied
+                                           Real64 coolFlowNoOA    // Cooling flow rate without MinOA limit applied
         );
 
-        Real64 applyTermUnitSizingHeatFlow(Real64 const &heatFlowWithOA, // Heating flow rate with MinOA limit applied
-                                           Real64 const &heatFlowNoOA    // Heating flow rate without MinOA limit applied
+        Real64 applyTermUnitSizingHeatFlow(Real64 heatFlowWithOA, // Heating flow rate with MinOA limit applied
+                                           Real64 heatFlowNoOA    // Heating flow rate without MinOA limit applied
         );
     };
 
@@ -1149,7 +1151,7 @@ struct SizingData : BaseGlobalStruct
     bool DataNomCapInpMeth = false;                  // True if heating coil is sized by CoilPerfInpMeth == NomCa
     int DataFanEnumType = -1;                        // Fan type used during sizing
     int DataFanIndex = -1;                           // Fan index used during sizing
-    DataSizing::zoneFanPlacement DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet; // identifies location of fan wrt coil
+    DataSizing::ZoneFanPlacement DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
     EPVector<DataSizing::OARequirementsData> OARequirements;
     EPVector<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
@@ -1327,7 +1329,7 @@ struct SizingData : BaseGlobalStruct
         this->DataNomCapInpMeth = false;
         this->DataFanEnumType = -1;
         this->DataFanIndex = -1;
-        this->DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+        this->DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
         this->DataDXSpeedNum = 0;
         this->OARequirements.deallocate();
         this->ZoneAirDistribution.deallocate();

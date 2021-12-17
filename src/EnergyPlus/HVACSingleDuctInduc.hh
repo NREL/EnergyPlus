@@ -66,9 +66,10 @@ namespace HVACSingleDuctInduc {
 
     enum class SingleDuct_CV
     {
-        Unassigned = -1,
+        Invalid = -1,
         TwoPipeInduc,
-        FourPipeInduc
+        FourPipeInduc,
+        Num
     };
 
     struct IndUnitData
@@ -132,7 +133,7 @@ namespace HVACSingleDuctInduc {
 
         // Default Constructor
         IndUnitData()
-            : UnitType_Num(SingleDuct_CV::Unassigned), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0), InducRatio(2.5), PriAirInNode(0),
+            : UnitType_Num(SingleDuct_CV::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0), InducRatio(2.5), PriAirInNode(0),
               SecAirInNode(0), OutAirNode(0), HWControlNode(0), CWControlNode(0), HCoil_Num(0),
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolHotWaterFlow(0.0), MaxHotWaterFlow(0.0), MinVolHotWaterFlow(0.0),
               MinHotWaterFlow(0.0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), HWCoilFailNum1(0),

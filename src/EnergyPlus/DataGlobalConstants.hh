@@ -61,6 +61,7 @@ namespace DataGlobalConstants {
 
     enum class EndUse
     {
+        Invalid = -1,
         Heating,
         Cooling,
         InteriorLights,
@@ -74,11 +75,13 @@ namespace DataGlobalConstants {
         HeatRecovery,
         WaterSystem,
         Refrigeration,
-        Cogeneration
+        Cogeneration,
+        Num
     };
 
     enum class ResourceType
     {
+        Invalid = -1,
         None,
         Electricity,
         Natural_Gas,
@@ -125,28 +128,33 @@ namespace DataGlobalConstants {
         WellWater,
         Condensate,
         OtherFuel1,
-        OtherFuel2
+        OtherFuel2,
+        Num
     };
 
     enum class CallIndicator
     {
+        Invalid = -1,
         BeginDay,
         DuringDay,
         EndDay,
         EndZoneSizingCalc,
-        EndSysSizingCalc
+        EndSysSizingCalc,
+        Num
     };
 
     // Parameters for KindOfSim
     enum class KindOfSim
     {
-        Unassigned = 0,
+        // TODO: enum check
+        Invalid = -1,
         DesignDay = 1,
         RunPeriodDesign = 2,
         RunPeriodWeather = 3,
         HVACSizeDesignDay = 4,       // a regular design day run during HVAC Sizing Simulation
         HVACSizeRunPeriodDesign = 5, // a weather period design day run during HVAC Sizing Simulation
-        ReadAllWeatherData = 6       // a weather period for reading all weather data prior to the simulation
+        ReadAllWeatherData = 6,      // a weather period for reading all weather data prior to the simulation
+        Num
     };
 
     Real64 constexpr MaxEXPArg = 709.78;       // maximum exponent in EXP() function

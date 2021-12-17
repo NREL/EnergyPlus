@@ -87,16 +87,20 @@ namespace DXCoils {
     constexpr int MaxModes(MaxCapacityStages *(MaxDehumidModes + 1)); // Maximum number of performance modes
 
     // Water Systems
-    enum class iCondensate
+    enum class CondensateCollectAction
     {
-        Discarded, // default mode where water is "lost"
-        ToTank,    // collect coil condensate from air and store in water storage tank
+        Invalid = -1,
+        Discard, // default mode where water is "lost"
+        ToTank,  // collect coil condensate from air and store in water storage tank
+        Num
     };
 
-    enum class iWaterSupply
+    enum class EvapWaterSupply
     {
+        Invalid = -1,
         FromMains,
         FromTank,
+        Num
     };
 
     // Types
@@ -325,12 +329,12 @@ namespace DXCoils {
         std::string HighAmbBuffer1; // holds warning message until next iteration (only prints 1 message/iteration)
         std::string HighAmbBuffer2; // holds warning message until next iteration (only prints 1 message/iteration)
         // begin variables for Water System interactions
-        iWaterSupply EvapWaterSupplyMode; // where does water come from
-        std::string EvapWaterSupplyName;  // name of water source e.g. water storage tank
+        EvapWaterSupply EvapWaterSupplyMode; // where does water come from
+        std::string EvapWaterSupplyName;     // name of water source e.g. water storage tank
         int EvapWaterSupTankID;
         int EvapWaterTankDemandARRID;
-        iCondensate CondensateCollectMode; // where does water come from
-        std::string CondensateCollectName; // name of water source e.g. water storage tank
+        CondensateCollectAction CondensateCollectMode; // where does water come from
+        std::string CondensateCollectName;             // name of water source e.g. water storage tank
         int CondensateTankID;
         int CondensateTankSupplyARRID;
         Real64 CondensateVdot; // rate of water condensation from air stream [m3/s]
@@ -462,8 +466,8 @@ namespace DXCoils {
               PartLoadRatio(0.0), TotalCoolingEnergy(0.0), SensCoolingEnergy(0.0), LatCoolingEnergy(0.0), TotalCoolingEnergyRate(0.0),
               SensCoolingEnergyRate(0.0), LatCoolingEnergyRate(0.0), ElecCoolingConsumption(0.0), ElecCoolingPower(0.0),
               CoolingCoilRuntimeFraction(0.0), TotalHeatingEnergy(0.0), TotalHeatingEnergyRate(0.0), ElecHeatingConsumption(0.0),
-              ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Unassigned),
-              DefrostControl(StandardRatings::HPdefrostControl::Unassigned), EIRFPLR(0), DefrostEIRFT(0), RegionNum(0), MinOATCompressor(0.0),
+              ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Invalid),
+              DefrostControl(StandardRatings::HPdefrostControl::Invalid), EIRFPLR(0), DefrostEIRFT(0), RegionNum(0), MinOATCompressor(0.0),
               OATempCompressorOn(0.0), MaxOATCompressor(0.0), MaxOATDefrost(0.0), DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0),
               HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
               HeatingPerformanceOATType(DryBulbIndicator), HPCoilIsInCoilSystemHeatingDX(false), OATempCompressorOnOffBlank(false),
@@ -480,24 +484,18 @@ namespace DXCoils {
               RatedHPWHCondWaterFlow(0.0), ElecWaterHeatingPower(0.0), ElecWaterHeatingConsumption(0.0), FanPowerIncludedInCOP(true),
               CondPumpHeatInCapacity(false), CondPumpPowerInCOP(false), LowTempLast(0.0), HighTempLast(0.0), ErrIndex1(0), ErrIndex2(0), ErrIndex3(0),
               ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
-              PrintHighAmbMessage(false), EvapWaterSupplyMode(iWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
-              CondensateCollectMode(iCondensate::Discarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
+              PrintHighAmbMessage(false), EvapWaterSupplyMode(EvapWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
+              CondensateCollectMode(CondensateCollectAction::Discard), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
               CondensateVol(0.0), CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(DataGlobalConstants::ResourceType::None), NumOfSpeeds(0),
               PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0), MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true),
               HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false), SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0),
               SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
               SecCoilSHRFF(0), SecCoilAirFlow(0.0), SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0),
               SecCoilSensibleHeatGainRate(0.0), SecCoilTotalHeatRemovalRate(0.0), SecCoilSensibleHeatRemovalRate(0.0),
-              SecCoilLatentHeatRemovalRate(0.0), IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0),
-              // MSSecCoilSHRFT( 0 ),
-              // MSSecCoilSHRFF( 0 ),
-              // MSSecCoilAirFlow( 0.0 ),
-              // MSSecCoilAirFlowScalingFactor( 0.0 ),
-              // MSSecCoilRatedSHR( 0.0 )
-              MSSpeedNumLS(1), MSSpeedNumHS(2), MSSpeedRatio(0.0), MSCycRatio(0.0), VRFIUPtr(0), VRFOUPtr(0), EvaporatingTemp(4.0),
-              CondensingTemp(40.0), C1Te(0.0), C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), SH(0.0), SC(0.0), ActualSH(0.0), ActualSC(0.0),
-              RateBFVRFIUEvap(0.0592), RateBFVRFIUCond(0.1360), CAPFTErrIndex(0), EIRFTErrIndex(0), reportCoilFinalSizes(true), capModFacTotal(0.0),
-              AirLoopNum(0)
+              SecCoilLatentHeatRemovalRate(0.0), IsSecondaryDXCoilInZone(false), IsDXCoilInZone(false), CompressorPartLoadRatio(0.0), MSSpeedNumLS(1),
+              MSSpeedNumHS(2), MSSpeedRatio(0.0), MSCycRatio(0.0), VRFIUPtr(0), VRFOUPtr(0), EvaporatingTemp(4.0), CondensingTemp(40.0), C1Te(0.0),
+              C2Te(0.0), C3Te(0.0), C1Tc(0.0), C2Tc(0.0), C3Tc(0.0), SH(0.0), SC(0.0), ActualSH(0.0), ActualSC(0.0), RateBFVRFIUEvap(0.0592),
+              RateBFVRFIUCond(0.1360), CAPFTErrIndex(0), EIRFTErrIndex(0), reportCoilFinalSizes(true), capModFacTotal(0.0), AirLoopNum(0)
         {
         }
     };
@@ -759,13 +757,13 @@ namespace DXCoils {
     );
 
     int getCoilInNodeIndex(EnergyPlusData &state,
-                           int const &CoilIndex, // coil index
-                           bool &ErrorsFound     // set to true if problem
+                           int CoilIndex,    // coil index
+                           bool &ErrorsFound // set to true if problem
     );
 
     int getCoilOutNodeIndex(EnergyPlusData &state,
-                            int const &CoilIndex, // coil index
-                            bool &ErrorsFound     // set to true if problem
+                            int CoilIndex,    // coil index
+                            bool &ErrorsFound // set to true if problem
     );
 
     int GetCoilCondenserInletNode(EnergyPlusData &state,

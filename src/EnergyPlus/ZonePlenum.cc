@@ -346,7 +346,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::ZoneNode,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent);
         // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
         state.dataHeatBal->Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber =
@@ -359,7 +359,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsNotParent);
 
         InducedNodeListName = AlphArray(5);
@@ -373,7 +373,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                     "AirLoopHVAC:ReturnPlenum",
                     state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName,
                     DataLoopNode::NodeConnectionType::InducedAir,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
                     cAlphaFields(5));
@@ -476,7 +476,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                                         AlphArray(1),
                                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                                         ObjectIsNotParent);
         }
 
@@ -574,7 +574,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::ZoneNode,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent);
         // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
         state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber =
@@ -587,7 +587,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                            AlphArray(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsNotParent);
 
         state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).NumOutletNodes = NumAlphas - 4;
@@ -638,7 +638,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                                          AlphArray(1),
                                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                                          ObjectIsNotParent);
         }
 
@@ -1256,7 +1256,7 @@ void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, b
     } // For FirstCall
 }
 
-int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)
+int GetReturnPlenumIndex(EnergyPlusData &state, int const ExNodeNum)
 {
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1292,7 +1292,7 @@ int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)
     return WhichPlenum;
 }
 
-void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
+void GetReturnPlenumName(EnergyPlusData &state, int const ReturnPlenumIndex, std::string &ReturnPlenumName)
 {
 
     // Obtains and Allocates ZonePlenum related parameters from input file
@@ -1307,7 +1307,7 @@ void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, st
     }
 }
 
-int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
+int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const InNodeNum)
 {
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

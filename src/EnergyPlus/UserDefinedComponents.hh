@@ -100,8 +100,8 @@ namespace UserDefinedComponents {
         // Default Constructor
         PlantConnectionStruct()
             : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), LoopNum(0), LoopSideNum(0), BranchNum(0),
-              CompNum(0), InletNodeNum(0), OutletNodeNum(0), FlowPriority(DataPlant::LoopFlowStatus::Unknown),
-              HowLoadServed(DataPlant::HowMet::Unknown), LowOutTempLimit(0.0), HiOutTempLimit(0.0), MassFlowRateRequest(0.0), MassFlowRateMin(0.0),
+              CompNum(0), InletNodeNum(0), OutletNodeNum(0), FlowPriority(DataPlant::LoopFlowStatus::Invalid),
+              HowLoadServed(DataPlant::HowMet::Invalid), LowOutTempLimit(0.0), HiOutTempLimit(0.0), MassFlowRateRequest(0.0), MassFlowRateMin(0.0),
               MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0),
               InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
         {

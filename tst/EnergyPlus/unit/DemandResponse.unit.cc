@@ -87,10 +87,10 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
     GetDemandManagerInput(*state);
     auto &DemandMgr(state->dataDemandManager->DemandMgr);
     EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn, DemandMgr(1).AvailSchedule);
-    EXPECT_TRUE(compare_enums(Limit::ManagerLimitFixed, DemandMgr(1).LimitControl));
+    EXPECT_TRUE(compare_enums(ManagerLimit::Fixed, DemandMgr(1).LimitControl));
     EXPECT_DOUBLE_EQ(60.0, DemandMgr(1).LimitDuration);
     EXPECT_DOUBLE_EQ(0.2, DemandMgr(1).FixedRate);
-    EXPECT_TRUE(compare_enums(Selection::ManagerSelectionAll, DemandMgr(1).SelectionControl));
+    EXPECT_TRUE(compare_enums(ManagerSelection::All, DemandMgr(1).SelectionControl));
     EXPECT_EQ(1, DemandMgr(1).NumOfLoads);
 }
 

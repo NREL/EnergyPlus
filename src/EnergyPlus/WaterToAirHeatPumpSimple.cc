@@ -376,7 +376,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Water,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Secondary,
+                                  NodeInputManager::CompFluidStream::Secondary,
                                   DataLoopNode::ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -386,7 +386,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Water,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Secondary,
+                                  NodeInputManager::CompFluidStream::Secondary,
                                   DataLoopNode::ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -396,7 +396,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   DataLoopNode::ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -406,7 +406,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   DataLoopNode::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
@@ -555,7 +555,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Water,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Secondary,
+                                  NodeInputManager::CompFluidStream::Secondary,
                                   DataLoopNode::ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -565,7 +565,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Water,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Secondary,
+                                  NodeInputManager::CompFluidStream::Secondary,
                                   DataLoopNode::ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -575,7 +575,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   DataLoopNode::ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -585,7 +585,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   DataLoopNode::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
@@ -1417,25 +1417,25 @@ namespace WaterToAirHeatPumpSimple {
                         Real64 FanCoolLoad = 0.0;
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
                             } // end switch
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                DataAirSystems::fanPlacement::BlowThru) {
+                                DataAirSystems::FanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                       DataAirSystems::fanPlacement::DrawThru) {
+                                       DataAirSystems::FanPlacement::DrawThru) {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             }
                         }
@@ -1505,21 +1505,21 @@ namespace WaterToAirHeatPumpSimple {
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
                             } // end switch
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                            if (state.dataSize->DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                            if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
@@ -1604,25 +1604,25 @@ namespace WaterToAirHeatPumpSimple {
                         Real64 FanCoolLoad = 0.0;
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
                             } // end switch
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                DataAirSystems::fanPlacement::BlowThru) {
+                                DataAirSystems::FanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                       DataAirSystems::fanPlacement::DrawThru) {
+                                       DataAirSystems::FanPlacement::DrawThru) {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             }
                         }
@@ -1689,21 +1689,21 @@ namespace WaterToAirHeatPumpSimple {
                         Real64 FanCoolLoad = 0.0;
                         if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
                             switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::structArrayLegacyFanModels: {
+                            case DataAirSystems::StructArrayLegacyFanModels: {
                                 FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::objectVectorOOFanSystemModel: {
+                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
                                 FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
-                            case DataAirSystems::fanModelTypeNotYetSet: {
+                            case DataAirSystems::Invalid: {
                                 // do nothing
                                 break;
                             }
                             } // end switch
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                            if (state.dataSize->DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                            if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                             } else {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);

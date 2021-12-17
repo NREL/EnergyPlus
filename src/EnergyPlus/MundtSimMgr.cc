@@ -227,7 +227,7 @@ namespace MundtSimMgr {
         }
         for (auto &e : state.dataMundtSimMgr->LineNode) {
             e.AirNodeName.clear();
-            e.ClassType = DataRoomAirModel::AirNodeType::Unassigned;
+            e.ClassType = DataRoomAirModel::AirNodeType::Invalid;
             e.Height = 0.0;
             e.Temp = 25.0;
         }

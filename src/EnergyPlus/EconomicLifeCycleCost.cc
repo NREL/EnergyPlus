@@ -223,7 +223,7 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key BeginningOfYear
         //      \default EndOfYear
         elcc->discountConvention = static_cast<DiscConv>(getEnumerationValue(DiscConvNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(2))));
-        if (elcc->discountConvention == DiscConv::Unassigned) {
+        if (elcc->discountConvention == DiscConv::Invalid) {
             elcc->discountConvention = DiscConv::EndOfYear;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + AlphaArray(2) +
@@ -235,7 +235,7 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key CurrentDollar
         //      \default ConstantDollar
         elcc->inflationApproach = static_cast<InflAppr>(getEnumerationValue(InflApprNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3))));
-        if (elcc->inflationApproach == InflAppr::Unassigned) {
+        if (elcc->inflationApproach == InflAppr::Invalid) {
             elcc->inflationApproach = InflAppr::ConstantDollar;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
@@ -394,7 +394,7 @@ void GetInputLifeCycleCostParameters(EnergyPlusData &state)
         //      \key None
         //      \default None
         elcc->depreciationMethod = static_cast<DeprMethod>(getEnumerationValue(DeprMethodNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(6))));
-        if (elcc->depreciationMethod == DeprMethod::Unassigned) {
+        if (elcc->depreciationMethod == DeprMethod::Invalid) {
             elcc->depreciationMethod = DeprMethod::None;
             if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                 ShowWarningError(state,
@@ -502,7 +502,7 @@ void GetInputLifeCycleCostRecurringCosts(EnergyPlusData &state)
         //        \default ServicePeriod
         elcc->RecurringCosts[iInObj].startOfCosts =
             static_cast<StartCosts>(getEnumerationValue(StartCostNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3))));
-        if (elcc->RecurringCosts[iInObj].startOfCosts == StartCosts::Unassigned) {
+        if (elcc->RecurringCosts[iInObj].startOfCosts == StartCosts::Invalid) {
             elcc->RecurringCosts[iInObj].startOfCosts = StartCosts::ServicePeriod;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
@@ -691,7 +691,7 @@ void GetInputLifeCycleCostNonrecurringCost(EnergyPlusData &state)
         //      \default ServicePeriod
         elcc->NonrecurringCost[iInObj].startOfCosts =
             static_cast<StartCosts>(getEnumerationValue(StartCostNamesUC, UtilityRoutines::MakeUPPERCase(AlphaArray(3))));
-        if (elcc->NonrecurringCost[iInObj].startOfCosts == StartCosts::Unassigned) {
+        if (elcc->NonrecurringCost[iInObj].startOfCosts == StartCosts::Invalid) {
             elcc->NonrecurringCost[iInObj].startOfCosts = StartCosts::ServicePeriod;
             ShowWarningError(state,
                              CurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + AlphaArray(3) +
@@ -979,6 +979,7 @@ void GetInputLifeCycleCostUseAdjustment(EnergyPlusData &state)
         }
     }
 }
+
 //======================================================================================================================
 //======================================================================================================================
 

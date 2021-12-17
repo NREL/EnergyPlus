@@ -87,19 +87,24 @@ namespace PlantPipingSystemsManager {
 
     enum class SegmentFlow
     {
+        Invalid = -1,
         IncreasingZ,
-        DecreasingZ
+        DecreasingZ,
+        Num
     };
 
     enum class MeshDistribution
     {
+        Invalid = -1,
         Uniform,
         SymmetricGeometric,
-        Geometric
+        Geometric,
+        Num
     };
 
     enum class RegionType
     {
+        Invalid = -1,
         Pipe,
         BasementWall,
         BasementFloor,
@@ -114,21 +119,25 @@ namespace PlantPipingSystemsManager {
         UnderFloor,
         HorizInsXSide,
         HorizInsZSide,
-        VertInsLowerEdge
+        VertInsLowerEdge,
+        Num
     };
 
     enum class Direction
     {
+        Invalid = -1,
         PositiveY,
         NegativeY,
         PositiveX,
         NegativeX,
         PositiveZ,
-        NegativeZ
+        NegativeZ,
+        Num
     };
 
     enum class PartitionType
     {
+        Invalid = -1,
         BasementWall,
         BasementFloor,
         Pipe,
@@ -141,12 +150,13 @@ namespace PlantPipingSystemsManager {
         UnderFloor,
         HorizInsXSide,
         VertInsLowerEdge,
-        HorizInsZSide
+        HorizInsZSide,
+        Num
     };
 
     enum class CellType
     {
-        Unknown,
+        Invalid = -1,
         Pipe,
         GeneralField,
         GroundSurface,
@@ -158,7 +168,8 @@ namespace PlantPipingSystemsManager {
         Slab,
         HorizInsulation,
         VertInsulation,
-        ZoneGroundInterface
+        ZoneGroundInterface,
+        Num
     };
 
     struct BaseThermalPropertySet
@@ -270,7 +281,7 @@ namespace PlantPipingSystemsManager {
         CartesianPipeCellInformation() = default;
 
         CartesianPipeCellInformation(Real64 GridCellWidth,
-                                     RadialSizing const &PipeSizes,
+                                     EnergyPlus::PlantPipingSystemsManager::RadialSizing PipeSizes,
                                      int NumRadialNodes,
                                      Real64 CellDepth,
                                      Real64 InsulationThickness,
@@ -403,7 +414,7 @@ namespace PlantPipingSystemsManager {
         {
         }
 
-        bool inline contains(PointF const &p) const
+        bool inline contains(EnergyPlus::PlantPipingSystemsManager::PointF p) const
         {
             return ((this->X_min <= p.X) && (p.X < (this->X_min + this->Width)) && (this->Y_min <= p.Y) && (p.Y < (this->Y_min + this->Height)));
         }
@@ -434,7 +445,7 @@ namespace PlantPipingSystemsManager {
         Real64 Z_min = 0.0;
         Real64 Z_max = 0.0;
         Point3DReal Centroid;
-        CellType cellType = CellType::Unknown;
+        CellType cellType = CellType::Invalid;
         std::map<Direction, NeighborInformation> NeighborInfo;
         CartesianPipeCellInformation PipeCellData;
 

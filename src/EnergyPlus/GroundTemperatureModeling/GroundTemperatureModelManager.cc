@@ -81,7 +81,7 @@ namespace GroundTemperatureManager {
 
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        GroundTempObjType objectType(GroundTempObjType::Unassigned);
+        GroundTempObjType objectType(GroundTempObjType::Invalid);
 
         auto &CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
 

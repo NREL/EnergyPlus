@@ -81,8 +81,10 @@ namespace WindowManager {
 
     enum class WindowsModel
     {
+        Invalid = -1,
         BuiltIn,
-        External
+        External,
+        Num
     };
 
     // Class that reads IDF object and decides if interior or exterior window models
@@ -103,8 +105,10 @@ namespace WindowManager {
 
     enum class WindowsOpticalModel
     {
+        Invalid = -1,
         Simplified,
-        BSDF
+        BSDF,
+        Num
     };
 
     class CWindowOpticalModel

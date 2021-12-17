@@ -267,7 +267,7 @@ namespace BoilerSteam {
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Steam,
                                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                                NodeInputManager::compFluidStream::Primary,
+                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                  state.dataIPShortCut->cAlphaArgs(4),
@@ -276,7 +276,7 @@ namespace BoilerSteam {
                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                  DataLoopNode::NodeFluidType::Steam,
                                                                                  DataLoopNode::NodeConnectionType::Outlet,
-                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
@@ -378,7 +378,7 @@ namespace BoilerSteam {
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
                 EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->BoilerOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                    state, this->BoilerOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->MissingSetPointErrDone) {
@@ -611,9 +611,9 @@ namespace BoilerSteam {
     }
 
     void BoilerSpecs::calculate(EnergyPlusData &state,
-                                Real64 &MyLoad,                                             // W - hot water demand to be met by boiler
-                                bool const RunFlag,                                         // TRUE if boiler operating
-                                DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
+                                Real64 &MyLoad,                                         // W - hot water demand to be met by boiler
+                                bool const RunFlag,                                     // TRUE if boiler operating
+                                DataBranchAirLoopPlant::ControlType const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
         // SUBROUTINE INFORMATION:
@@ -654,7 +654,7 @@ namespace BoilerSteam {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive)
                 this->BoilerMassFlowRate = state.dataLoopNodes->Node(this->BoilerInletNodeNum).MassFlowRate;
             return;
         }

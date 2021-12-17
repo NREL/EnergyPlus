@@ -497,7 +497,7 @@ namespace HVACDXHeatPumpSystem {
                                 state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::iTemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                    state, ControlNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state,
                                                     DXHeatPumpSystem(DXSysIndex).DXHeatPumpSystemType +
