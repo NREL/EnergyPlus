@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.6;
+  Version,22.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1943,13 +1943,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Room_1_Flr_3 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
-
-  Schedule:Compact,
     Room_1_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -1969,13 +1962,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Room_2_Flr_3 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
 
   Schedule:Compact,
     Room_2_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Name
@@ -1999,13 +1985,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Room_3_Mult19_Flr_3 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
-
-  Schedule:Compact,
     Room_3_Mult19_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2025,13 +2004,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Room_4_Mult19_Flr_3 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
 
   Schedule:Compact,
     Room_4_Mult19_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Name
@@ -2055,13 +2027,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Room_5_Flr_3 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
-
-  Schedule:Compact,
     Room_5_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2081,13 +2046,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Room_6_Flr_3 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
 
   Schedule:Compact,
     Room_6_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Name
@@ -2111,13 +2069,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Room_1_Flr_6 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
-
-  Schedule:Compact,
     Room_1_Flr_6 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2137,13 +2088,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Room_2_Flr_6 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
 
   Schedule:Compact,
     Room_2_Flr_6 Water Equipment Hot Supply Temp Sched,  !- Name
@@ -2167,13 +2111,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Room_3_Mult9_Flr_6 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60.00;      !- Field 3
-
-  Schedule:Compact,
     Room_3_Mult9_Flr_6 Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2193,13 +2130,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Kitchen_Flr_6 Water Equipment Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Kitchen_Flr_6 Water Equipment Hot Supply Temp Sched,  !- Name
@@ -14308,7 +14238,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_1_Flr_3 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_1_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_1_Flr_3,            !- Zone Name
@@ -14320,7 +14250,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_2_Flr_3 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_2_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_2_Flr_3,            !- Zone Name
@@ -14332,7 +14262,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_3_Mult19_Flr_3 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_3_Mult19_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_3_Mult19_Flr_3,     !- Zone Name
@@ -14344,7 +14274,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_4_Mult19_Flr_3 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_4_Mult19_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_4_Mult19_Flr_3,     !- Zone Name
@@ -14356,7 +14286,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_5_Flr_3 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_5_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_5_Flr_3,            !- Zone Name
@@ -14368,7 +14298,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_6_Flr_3 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_6_Flr_3 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_6_Flr_3,            !- Zone Name
@@ -14380,7 +14310,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_1_Flr_6 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_1_Flr_6 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_1_Flr_6,            !- Zone Name
@@ -14392,7 +14322,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_2_Flr_6 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_2_Flr_6 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_2_Flr_6,            !- Zone Name
@@ -14404,7 +14334,7 @@
     WaterUse,                !- End-Use Subcategory
     1.31389e-06,             !- Peak Flow Rate {m3/s}
     GuestRoom_SWH_Sch,       !- Flow Rate Fraction Schedule Name
-    Room_3_Mult9_Flr_6 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Room_3_Mult9_Flr_6 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Room_3_Mult9_Flr_6,      !- Zone Name
@@ -14416,7 +14346,7 @@
     WaterUse,                !- End-Use Subcategory
     0.00013985,              !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Kitchen_Flr_6 Water Equipment Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Kitchen_Flr_6 Water Equipment Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Kitchen_Flr_6,           !- Zone Name

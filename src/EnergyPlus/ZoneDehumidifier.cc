@@ -205,8 +205,8 @@ namespace ZoneDehumidifier {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetZoneDehumidifierInput");
         static std::string const CurrentModuleObject("ZoneHVAC:Dehumidifier:DX");
-        Real64 const RatedInletAirTemp(26.7);
-        Real64 const RatedInletAirRH(60.0);
+        Real64 constexpr RatedInletAirTemp(26.7);
+        Real64 constexpr RatedInletAirRH(60.0);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneDehumidIndex;          // Loop index
@@ -281,7 +281,7 @@ namespace ZoneDehumidifier {
                                                                                                           Alphas(1),
                                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                                           ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
@@ -292,7 +292,7 @@ namespace ZoneDehumidifier {
                                                                                                            Alphas(1),
                                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                                            ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal

@@ -736,7 +736,7 @@ void CalcCoPlanarNess(Array1D<Vector> &Surf, int const NSides, bool &IsCoPlanar,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const DistTooSmall(1.e-4);
+    Real64 constexpr DistTooSmall(1.e-4);
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na

@@ -52,7 +52,6 @@
 
 // C++ Headers
 #include <memory>
-#include <vector>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
@@ -265,7 +264,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1)
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
 
     // Case 1 ACBuss - Generators 1000+2000=3000, thermal 500+750=1250
-    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::aCBuss;
+    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::ACBuss;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 1000.0;
     //	ElecLoadCenter( LoadCenterNum ).ElecGen( 1 ).ElectProdRate = 1000.0;
@@ -340,7 +339,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2)
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
 
     // Case 2 ACBussStorage - Generators 1000+2000=3000, Storage 200-150=50
-    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::aCBussStorage;
+    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::ACBussStorage;
     //	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storagePresent
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj =
         std::make_unique<ElectricStorage>(*state, "TEST STORAGE BANK");
@@ -442,7 +441,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
 
     // Case 3 DCBussInverter   Inverter = 3000,
-    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::dCBussInverter;
+    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::DCBussInverter;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
         std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
@@ -553,7 +552,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
 
     // Case 4 DCBussInverterDCStorage    Inverter = 5000,
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType =
-        ElectPowerLoadCenter::ElectricBussType::dCBussInverterDCStorage;
+        ElectPowerLoadCenter::ElectricBussType::DCBussInverterDCStorage;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
         std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
@@ -651,7 +650,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
 
     // Case 5 DCBussInverterACStorage     Inverter = 5000, , Storage 200-150=50, thermal should still be same as Case 1
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType =
-        (ElectPowerLoadCenter::ElectricBussType::dCBussInverterACStorage);
+        (ElectPowerLoadCenter::ElectricBussType::DCBussInverterACStorage);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
         std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;

@@ -68,27 +68,30 @@ namespace DataBSDFWindow {
 
     enum class Basis
     {
-        Unassigned = -1,
+        Invalid = -1,
         WINDOW,
-        Custom
+        Custom,
+        Num
     };
 
     enum class BasisSymmetry
     {
-        Unassigned = -1,
+        Invalid = -1,
         Axisymmetric,
-        None
+        None,
+        Num
     };
 
     // Thermal calculations for complex fenestration can be used to generate reports for standard cases
     // noCondition is used when performing timestep calculations
-    // summerCondtion will override certain parameters so that produced results are matching standard summer WINDOW  = software results
-    // winterCondition will override certain parameters so that produced results are matching standard winter WINDOW  = software results
+    // 'Summer' will override certain parameters so that produced results are matching standard summer WINDOW  = software results
+    // 'Winter' will override certain parameters so that produced results are matching standard winter WINDOW  = software results
     enum class Condition
     {
-        Unassigned = -1,
-        summerCondition,
-        winterCondition
+        Invalid = -1,
+        Summer,
+        Winter,
+        Num
     };
 
     struct BasisElemDescr
@@ -159,7 +162,7 @@ namespace DataBSDFWindow {
         Array1D<BasisElemDescr> Grid;    // actual basis (to be constructed from matrix)
 
         // Default Constructor
-        BasisStruct() : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), BasisMatIndex(0), NBasis(0), NThetas(0)
+        BasisStruct() : BasisType(Basis::Invalid), BasisSymmetryType(BasisSymmetry::Invalid), BasisMatIndex(0), NBasis(0), NThetas(0)
         {
         }
     };
@@ -423,7 +426,7 @@ namespace DataBSDFWindow {
 
         // Default Constructor
         BSDFWindowInputStruct()
-            : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
+            : BasisType(Basis::Invalid), BasisSymmetryType(BasisSymmetry::Invalid), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
               BasisMatNcols(0), NBasis(0), SolFrtTransIndex(0), SolFrtTransNrows(0), SolFrtTransNcols(0), SolBkReflIndex(0), SolBkReflNrows(0),
               SolBkReflNcols(0), VisFrtTransIndex(0), VisFrtTransNrows(0), VisFrtTransNcols(0), VisBkReflIndex(0), VisBkReflNrows(0),
               VisBkReflNcols(0), NumLayers(0)

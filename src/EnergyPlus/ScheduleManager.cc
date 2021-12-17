@@ -113,7 +113,7 @@ namespace ScheduleManager {
                                   "CustomDay1",
                                   "CustomDay2"});
 
-    int const NumScheduleTypeLimitUnitTypes(14);
+    int constexpr NumScheduleTypeLimitUnitTypes(14);
     Array1D_string ScheduleTypeLimitUnitTypes(NumScheduleTypeLimitUnitTypes,
                                               {"Dimensionless",
                                                "Temperature",
@@ -2384,6 +2384,8 @@ namespace ScheduleManager {
                     case ScheduleInterpolation::No:
                         NoAverageLinear = "No";
                         break;
+                    default:
+                        assert(false);
                     }
                     for (Hr = 1; Hr <= 24; ++Hr) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {

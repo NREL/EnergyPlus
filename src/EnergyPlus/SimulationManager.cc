@@ -671,7 +671,7 @@ namespace SimulationManager {
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
+        static constexpr std::array<int, 12> Div60 = {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string Alphas(10);
@@ -875,16 +875,16 @@ namespace SimulationManager {
             } else if (mod(60, state.dataGlobal->NumOfTimeStepInHour) != 0) {
                 MinInt = 9999;
                 for (Num = 1; Num <= 12; ++Num) {
-                    if (std::abs(state.dataGlobal->NumOfTimeStepInHour - Div60(Num)) > MinInt) continue;
-                    MinInt = state.dataGlobal->NumOfTimeStepInHour - Div60(Num);
+                    if (std::abs(state.dataGlobal->NumOfTimeStepInHour - Div60[Num - 1]) > MinInt) continue;
+                    MinInt = state.dataGlobal->NumOfTimeStepInHour - Div60[Num - 1];
                     Which = Num;
                 }
                 ShowWarningError(state,
                                  format("{}: Requested number ({}) not evenly divisible into 60, defaulted to nearest ({}).",
                                         CurrentModuleObject,
                                         state.dataGlobal->NumOfTimeStepInHour,
-                                        Div60(Which)));
-                state.dataGlobal->NumOfTimeStepInHour = Div60(Which);
+                                        Div60[Which - 1]));
+                state.dataGlobal->NumOfTimeStepInHour = Div60[Which - 1];
             }
             if (CondFDAlgo && state.dataGlobal->NumOfTimeStepInHour < 20) {
                 ShowWarningError(state,

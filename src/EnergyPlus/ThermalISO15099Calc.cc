@@ -109,7 +109,7 @@ void film(Real64 const tex, Real64 const tw, Real64 const ws, int const iwd, Rea
     //   hcout - convective film coeff [w m-2 k-1]
 
     // Locals
-    Real64 const conv(5.6783);
+    Real64 constexpr conv(5.6783);
 
     Real64 vc;
     Real64 acoef;
@@ -1367,7 +1367,7 @@ void therm1d(EnergyPlusData &state,
     // Simon: This is set to zero until it is resolved what to do with modifier
     ShadeHcModifiedOut = 0.0;
     CSMFlag = 0;
-    CalcOutcome = CalculationOutcome::Unknown;
+    CalcOutcome = CalculationOutcome::Invalid;
     curTempCorrection = 0;
     AchievedErrorTolerance = 0.0;
     curDifference = 0.0;
@@ -1920,7 +1920,7 @@ void therm1d(EnergyPlusData &state,
                 vfreevent);
     }
 
-    if (CalcOutcome == CalculationOutcome::Unknown) {
+    if (CalcOutcome == CalculationOutcome::Invalid) {
         ErrorMessage = "Tarcog failed to converge";
         nperr = 2; // error 2: failed to converge...
     }

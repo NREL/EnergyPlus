@@ -208,6 +208,12 @@ void ShowRecurringErrors(EnergyPlusData &state);
 
 namespace UtilityRoutines {
 
+    static constexpr std::array<std::string_view, 12> MonthNamesCC{
+        "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+
+    static constexpr std::array<std::string_view, 12> MonthNamesUC{
+        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
+
     template <class T> struct is_shared_ptr : std::false_type
     {
     };
@@ -354,7 +360,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const &str)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view str)
     {
         return FindItem(first, last, str, is_shared_ptr<typename std::iterator_traits<InputIterator>::value_type>{});
     }
@@ -582,7 +588,7 @@ namespace UtilityRoutines {
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
-                          bool const &AllowSteamAndDistrict = false);
+                          bool AllowSteamAndDistrict = false);
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
                                                    std::string &FuelTypeOutput,
@@ -594,7 +600,7 @@ namespace UtilityRoutines {
 constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {
     for (unsigned int i = 0; i < sList.size(); ++i) {
-        if (UtilityRoutines::SameString(sList[i], s)) return i;
+        if (sList[i] == s) return i;
     }
     return -1;
 }

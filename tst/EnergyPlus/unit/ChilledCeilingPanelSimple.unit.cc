@@ -83,23 +83,23 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 10.0;
     state->dataHeatBal->Zone(1).OutWetBulbTemp = 5.0;
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MAT;
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::MAT;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 22.0);
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MRT;
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::MRT;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 20.0);
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::Operative;
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::Operative;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 21.0);
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::ODB;
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::ODB;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 10.0);
 
-    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::OWB;
+    state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).controlType = CoolingPanelSimple::ClgPanelCtrlType::OWB;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);
     EXPECT_EQ(ControlTemp, 5.0);
 }

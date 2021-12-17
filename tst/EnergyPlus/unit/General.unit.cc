@@ -245,26 +245,21 @@ TEST_F(EnergyPlusFixture, General_CreateTimeIntervalString)
 
 Real64 Residual([[maybe_unused]] EnergyPlusData &state, Real64 const Frac, [[maybe_unused]] std::array<Real64, 1> const &Par)
 {
-    Real64 Residual;
     Real64 Request = 1.10;
-    Real64 Actual;
 
-    Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
+    Real64 Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
 
-    Residual = (Actual - Request) / Request;
+    Real64 Residual = (Actual - Request) / Request;
 
     return Residual;
 }
 
 Real64 ResidualTest([[maybe_unused]] EnergyPlusData &state, Real64 const Frac, [[maybe_unused]] std::array<Real64, 2> const &Par)
 {
-    Real64 ResidualTest;
     Real64 Request = 1.0 + 1.0e-12;
-    Real64 Actual;
+    Real64 Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
 
-    Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
-
-    ResidualTest = (Actual - Request) / Request;
+    Real64 ResidualTest = (Actual - Request) / Request;
     // Request = Par[0] + 1.0e-12;
     return ResidualTest;
 }

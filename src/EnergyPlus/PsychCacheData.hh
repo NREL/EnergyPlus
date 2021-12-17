@@ -54,7 +54,7 @@ namespace EnergyPlus {
 
 enum class PsychrometricFunction : int
 {
-    Unassigned = -1,
+    Invalid = -1,
     TdpFnTdbTwbPb,
     RhFnTdbWPb,
     TwbFnTdbWPb,

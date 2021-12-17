@@ -269,7 +269,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).numberOfDevices = 1;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device.allocate(state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices);
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompObjectName = "PEOPLE";
-    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompTypeOfNum = IntGainTypeOf_People;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompType = DataHeatBalance::IntGainType::People;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).ConvectGainRate = 300.0;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).LatentGainRate = 200.0;
 
@@ -278,8 +278,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataSurface->Surface(1).Area = 1.0;
     state->dataSurface->Surface(2).Area = 2.0;
 
-    state->dataSurface->Surface(1).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
-    state->dataSurface->Surface(2).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = HeatTransferModel::EMPD;
+    state->dataSurface->Surface(2).HeatTransferAlgorithm = HeatTransferModel::EMPD;
 
     state->dataSurface->SurfTAirRef = 0;
 

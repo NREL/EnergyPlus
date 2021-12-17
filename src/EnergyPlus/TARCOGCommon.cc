@@ -87,13 +87,13 @@ namespace TARCOGCommon {
         int j;
 
         LDSumMax = 0.0;
-        for (i = 1; i <= static_cast<int>(DeflectionParameters::mmax); i += 2) {
+        for (i = 1; i <= TARCOGParams::MMax; i += 2) {
             Real64 const sin_i(std::sin(i * DataGlobalConstants::PiOvr2));
             Real64 const pow_i_W(pow_2(i / Width));
-            for (j = 1; j <= static_cast<int>(DeflectionParameters::nmax); j += 2) {
+            for (j = 1; j <= TARCOGParams::NMax; j += 2) {
                 LDSumMax += (sin_i * std::sin(j * DataGlobalConstants::PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
-            } // do j = 1, DeflectionParameters::nmax, 2
-        }     // do i = 1, DeflectionParameters::mmax, 2
+            } // do j = 1, DeflectionParameters::NMax, 2
+        }     // do i = 1, DeflectionParameters::MMax, 2
 
         return LDSumMax;
     }
@@ -116,13 +116,13 @@ namespace TARCOGCommon {
         int j;
 
         LDSumMean = 0.0;
-        for (i = 1; i <= static_cast<int>(DeflectionParameters::mmax); i += 2) {
+        for (i = 1; i <= TARCOGParams::MMax; i += 2) {
             Real64 const pow_i_Pi_2(i * i * Pi_squared);
             Real64 const pow_i_W(pow_2(i / Width));
-            for (j = 1; j <= static_cast<int>(DeflectionParameters::nmax); j += 2) {
+            for (j = 1; j <= TARCOGParams::NMax; j += 2) {
                 LDSumMean += 4.0 / (pow_i_Pi_2 * pow_2(j) * pow_2(pow_i_W + pow_2(j / Height)));
-            } // do j = 1, DeflectionParameters::nmax, 2
-        }     // do i = 1, mmax, 2
+            } // do j = 1, DeflectionParameters::NMax, 2
+        }     // do i = 1, MMax, 2
 
         return LDSumMean;
     }

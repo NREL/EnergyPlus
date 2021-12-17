@@ -86,11 +86,12 @@ public:
 
     enum class Token : size_t
     {
-        NONE = 0,
-        FILE_END = 1,
-        DELIMITER = 2,
-        LINE_END = 3,
-        VALUE = 4
+        NONE,
+        FILE_END,
+        DELIMITER,
+        LINE_END,
+        VALUE,
+        Num
     };
 
 private:

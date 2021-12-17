@@ -87,11 +87,11 @@ namespace DataBranchNodeConnections {
         std::string ObjectType;                        // Object/Component Type of this node connection
         std::string ObjectName;                        // Name of the Object/Component Type of this node connection
         std::string ConnectionType;                    // Connection Type (must be valid) for this node connection
-        NodeInputManager::compFluidStream FluidStream; // Fluid Stream for this node connection
+        NodeInputManager::CompFluidStream FluidStream; // Fluid Stream for this node connection
         bool ObjectIsParent;                           // Indicator whether the object is a parent or not
 
         // Default Constructor
-        NodeConnectionDef() : NodeNumber(0), FluidStream(NodeInputManager::compFluidStream::Unassigned), ObjectIsParent(false)
+        NodeConnectionDef() : NodeNumber(0), FluidStream(NodeInputManager::CompFluidStream::Invalid), ObjectIsParent(false)
         {
         }
     };

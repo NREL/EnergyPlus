@@ -64,27 +64,17 @@ struct EnergyPlusData;
 
 namespace DataSystemVariables {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
+    int constexpr iUnicode_end = 0; // endline value when Unicode file
 
     // Shading methods
     enum class ShadingMethod
     {
+        Invalid = -1,
         PolygonClipping,
         PixelCounting,
         Scheduled,
-        Imported
+        Imported,
+        Num
     };
 
     // Functions
@@ -103,10 +93,6 @@ namespace DataSystemVariables {
 struct SystemVarsData : BaseGlobalStruct
 {
     bool firstTime = true;
-
-    int const iASCII_CR = 13;   // endline value when just CR instead of CR/LF
-    int const iUnicode_end = 0; // endline value when Unicode file
-    char const tabchar = '\t';
 
     DataSystemVariables::ShadingMethod shadingMethod = DataSystemVariables::ShadingMethod::PolygonClipping; // defines the shading method used
 
@@ -144,7 +130,7 @@ struct SystemVarsData : BaseGlobalStruct
     Real64 Time_Finish = 0.0;       // Call to CPU_Time for end time of simulation
     std::string MinReportFrequency; // String for minimum reporting frequency
     bool SortedIDD = true;          // after processing, use sorted IDD to obtain Defs, etc.
-    bool lMinimalShadowing = false; // TRUE if MinimalShadowing is to override Solar Distribution flag
+    bool lMinimalShadowing = false; // TRUE if Minimal is to override Solar Distribution flag
     fs::path envinputpath1;
     fs::path envinputpath2;
     bool TestAllPaths = false;

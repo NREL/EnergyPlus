@@ -74,33 +74,39 @@ namespace WeatherManager {
     // Following are Date Types read in from EPW file or IDF
     enum class DateType
     {
-        InvalidDate = -1,
+        Invalid = -1,
         MonthDay = 1,
         NthDayInMonth = 2,
-        LastDayInMonth = 3
+        LastDayInMonth = 3,
+        Num
     };
 
     // Water mains temperatures calculation methods
     enum class WaterMainsTempCalcMethod
     {
+        Invalid = -1,
         FixedDefault = 0,
         Schedule = 1,
         Correlation = 2,
-        CorrelationFromWeatherFile = 3
+        CorrelationFromWeatherFile = 3,
+        Num
     };
 
     enum class DesignDaySolarModel
     {
+        Invalid = -1,
         ASHRAE_ClearSky = 0,     // Design Day solar model ASHRAE ClearSky (default)
         Zhang_Huang = 1,         // Design Day solar model Zhang Huang
         SolarModel_Schedule = 2, // Design Day solar model (beam and diffuse) from user entered schedule
         ASHRAE_Tau = 3,          // Design Day solar model ASHRAE tau (per 2009 HOF)
-        ASHRAE_Tau2017 = 4       // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
+        ASHRAE_Tau2017 = 4,      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
+        Num
     };
 
     // Design Day Humidity Indicating Type
     enum class DDHumIndType
     {
+        Invalid = -1,
         WetBulb = 0,   // Wetbulb (default)
         DewPoint = 1,  // Dewpoint
         Enthalpy = 2,  // Enthalpy
@@ -108,20 +114,24 @@ namespace WeatherManager {
         RelHumSch = 4, // relhum schedule
         WBProfDef = 5, // Wetbulb default profile
         WBProfDif = 6, // Wetbulb difference profile
-        WBProfMul = 7  // Wetbulb multiplier profile
+        WBProfMul = 7, // Wetbulb multiplier profile
+        Num
     };
 
     // Design Day DryBulb Range Type
     enum class DDDBRangeType
     {
+        Invalid = -1,
         Default = 0,    // Default Multipliers
         Multiplier = 1, // Multiplier Schedule
         Difference = 2, // Difference Schedule
         Profile = 3,    // Temperature Profile
+        Num
     };
 
     enum class EmissivityCalcType
     {
+        Invalid = -1,
         ClarkAllenModel = 0,    // Use Clark & Allen model for sky emissivity calculation
         ScheduleValue = 1,      // User entered Schedule value for Weather Property
         DryBulbDelta = 2,       // User entered DryBulb difference Schedule value for Weather Property
@@ -130,17 +140,20 @@ namespace WeatherManager {
         IdsoModel = 5,          // Use Isdo model for sky emissivity calculation
         BerdahlMartinModel = 6, // Use Martin & Berdahl model for sky emissivity calculation
         SkyTAlgorithmA = 7,     // place holder
+        Num
     };
 
     enum class WeekDay
     {
+        Invalid = -1,
         Sunday = 1,
         Monday,
         Tuesday,
         Wednesday,
         Thursday,
         Friday,
-        Saturday
+        Saturday,
+        Num
     };
 
     struct EnvironmentData
@@ -188,7 +201,7 @@ namespace WeatherManager {
 
         // Default Constructor
         EnvironmentData()
-            : KindOfEnvrn(DataGlobalConstants::KindOfSim::Unassigned), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
+            : KindOfEnvrn(DataGlobalConstants::KindOfSim::Invalid), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
               HVACSizingIterationNum(0), TotalDays(0), StartJDay(0), StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0),
               EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0), UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true),
               UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0),
@@ -324,7 +337,7 @@ namespace WeatherManager {
 
         // Default Constructor
         SpecialDayData()
-            : DateType(DateType::InvalidDate), Month(0), Day(0), WeekDay(0), CompDate(0), WthrFile(false), Duration(0), DayType(0), ActStMon(0),
+            : DateType(DateType::Invalid), Month(0), Day(0), WeekDay(0), CompDate(0), WthrFile(false), Duration(0), DayType(0), ActStMon(0),
               ActStDay(0), Used(false)
         {
         }
@@ -371,7 +384,7 @@ namespace WeatherManager {
 
         // Default Constructor
         DaylightSavingPeriodData()
-            : StDateType(DateType::InvalidDate), StWeekDay(0), StMon(0), StDay(0), EnDateType(DateType::InvalidDate), EnMon(0), EnDay(0), EnWeekDay(0)
+            : StDateType(DateType::Invalid), StWeekDay(0), StMon(0), StDay(0), EnDateType(DateType::Invalid), EnMon(0), EnDay(0), EnWeekDay(0)
         {
         }
     };
@@ -1134,29 +1147,29 @@ struct WeatherManagerData : BaseGlobalStruct
         this->RunPeriodDesignInputUniqueNames.clear();
         this->TypicalExtremePeriods.deallocate();
 
-        this->EPWDST.StDateType = WeatherManager::DateType::InvalidDate;
+        this->EPWDST.StDateType = WeatherManager::DateType::Invalid;
         this->EPWDST.StWeekDay = 0;
         this->EPWDST.StMon = 0;
         this->EPWDST.StDay = 0;
-        this->EPWDST.EnDateType = WeatherManager::DateType::InvalidDate;
+        this->EPWDST.EnDateType = WeatherManager::DateType::Invalid;
         this->EPWDST.EnMon = 0;
         this->EPWDST.EnDay = 0;
         this->EPWDST.EnWeekDay = 0;
 
-        this->IDFDST.StDateType = WeatherManager::DateType::InvalidDate;
+        this->IDFDST.StDateType = WeatherManager::DateType::Invalid;
         this->IDFDST.StWeekDay = 0;
         this->IDFDST.StMon = 0;
         this->IDFDST.StDay = 0;
-        this->IDFDST.EnDateType = WeatherManager::DateType::InvalidDate;
+        this->IDFDST.EnDateType = WeatherManager::DateType::Invalid;
         this->IDFDST.EnMon = 0;
         this->IDFDST.EnDay = 0;
         this->IDFDST.EnWeekDay = 0;
 
-        this->DST.StDateType = WeatherManager::DateType::InvalidDate;
+        this->DST.StDateType = WeatherManager::DateType::Invalid;
         this->DST.StWeekDay = 0;
         this->DST.StMon = 0;
         this->DST.StDay = 0;
-        this->DST.EnDateType = WeatherManager::DateType::InvalidDate;
+        this->DST.EnDateType = WeatherManager::DateType::Invalid;
         this->DST.EnMon = 0;
         this->DST.EnDay = 0;
         this->DST.EnWeekDay = 0;

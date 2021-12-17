@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -161,7 +162,7 @@ namespace ZonePlenum {
 
     void SimAirZonePlenum(EnergyPlusData &state,
                           std::string_view CompName,
-                          int const iCompType,
+                          DataZoneEquipment::AirLoopHVAC const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
                           Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check
@@ -182,11 +183,11 @@ namespace ZonePlenum {
 
     void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
-    int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
+    int GetReturnPlenumIndex(EnergyPlusData &state, int ExNodeNum);
 
-    void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
+    void GetReturnPlenumName(EnergyPlusData &state, int ReturnPlenumIndex, std::string &ReturnPlenumName);
 
-    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
+    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int InNodeNum);
 
     bool ValidateInducedNode(EnergyPlusData &state, int const InduceNodeNum, int const NumReturnNodes, Array1D<int> const &ReturnNode);
 

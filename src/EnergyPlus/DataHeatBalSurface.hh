@@ -99,7 +99,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfCTFInside0;      // Construct.CTFInside(0)
     Array1D<Real64> SurfCTFSourceIn0;    // Construct.CTFSourceIn(0)
     Array1D<Real64> SurfTempOutHist;     // TH(1,1,SurfNum)
-    Array1D<Real64> SurfQSourceSinkHist; // QsrcHist(SurfNum, 1)
+    Array1D<Real64> SurfQSourceSinkHist; // SurfQsrcHist(SurfNum, 1)
 
     Array1D_int SurfIsAdiabatic;     // 0 not adiabatic, 1 is adiabatic
     Array1D_int SurfIsSourceOrSink;  // 0 no internal source/sink, 1 has internal source/sing
@@ -121,38 +121,38 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempUserLoc;      // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> SurfTempInMovInsRep;  // Temperature of interior movable insulation on the side facing the zone
 
-    Array1D<Real64> QConvInReport;         // Surface convection heat gain at inside face [J]
-    Array1D<Real64> QdotConvInRep;         // Surface convection heat transfer rate at inside face surface [W] (report)
+    Array1D<Real64> SurfQConvInReport;     // Surface convection heat gain at inside face [J]
+    Array1D<Real64> SurfQdotConvInRep;     // Surface convection heat transfer rate at inside face surface [W] (report)
     Array1D<Real64> SurfQdotConvInPerArea; // Surface conv heat transfer rate per m2 at inside face surf (report){w/m2]
 
     // these next three all are for net IR thermal radiation exchange with other surfaces in the model.
-    Array1D<Real64> QRadNetSurfInReport; // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadNetSurfInRep; // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> SurfQRadNetSurfInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQdotRadNetSurfInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next three all are for solar radiation gains on inside face
-    Array1D<Real64> QRadSolarInReport;        // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadSolarInRep;        // Surface thermal radiation heat transfer inside face surface [W]
-    Array1D<Real64> QdotRadSolarInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
+    Array1D<Real64> SurfQRadSolarInReport;        // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQdotRadSolarInRep;        // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> SurfQdotRadSolarInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
     // these next two all are for Lights visible radiation gains on inside face
-    Array1D<Real64> QRadLightsInReport; // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadLightsInRep; // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> SurfQRadLightsInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQdotRadLightsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next two all are for Internal Gains sources of radiation gains on inside face
-    Array1D<Real64> QRadIntGainsInReport; // Surface thermal radiation heat gain at Inside face [J]
-    Array1D<Real64> QdotRadIntGainsInRep; // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> SurfQRadIntGainsInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQdotRadIntGainsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next four all are for Radiative HVAC sources of radiation gains on inside face
     Array1D<bool> AnyRadiantSystems;          // True if there are any radiant systems
     Array1D<Real64> SurfQRadHVACInReport;     // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadHVACInRep;     // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> SurfQdotRadHVACInPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
 
-    Array1D<Real64> QConvOutReport;         // Surface convection heat gain at Outside face [J]
-    Array1D<Real64> QdotConvOutRep;         // Surface convection heat transfer rate at Outside face surface [W]
+    Array1D<Real64> SurfQConvOutReport;     // Surface convection heat gain at Outside face [J]
+    Array1D<Real64> SurfQdotConvOutRep;     // Surface convection heat transfer rate at Outside face surface [W]
     Array1D<Real64> SurfQdotConvOutPerArea; // Surface conv heat transfer rate per m2 at Outside face surf (report){w/m2]
 
-    Array1D<Real64> QRadOutReport;        // Surface thermal radiation heat gain at Outside face [J]
-    Array1D<Real64> QdotRadOutRep;        // Surface thermal radiation heat transfer outside face surface [W]
-    Array1D<Real64> QdotRadOutRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Outside face surf
-    Array1D<Real64> QAirExtReport;        // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
-    Array1D<Real64> QHeatEmiReport;       // Surface Outside Face Heat Emission to Air Rate [W]
+    Array1D<Real64> SurfQRadOutReport;        // Surface thermal radiation heat gain at Outside face [J]
+    Array1D<Real64> SurfQdotRadOutRep;        // Surface thermal radiation heat transfer outside face surface [W]
+    Array1D<Real64> SurfQdotRadOutRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Outside face surf
+    Array1D<Real64> SurfQAirExtReport;        // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
+    Array1D<Real64> SurfQHeatEmiReport;       // Surface Outside Face Heat Emission to Air Rate [W]
 
     Array1D<Real64> SurfOpaqInsFaceCondGainRep; // Opaq Surf Ins Face Cond when Opaq Surf Ins Face Cond >= 0
     Array1D<Real64> SurfOpaqInsFaceCondLossRep; // Opaq Surf Ins Face Cond when Opaq Surf Ins Face Cond  < 0
@@ -219,12 +219,12 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Array1D<Real64>> SurfInsideFluxHistMaster;  // Master flux history (on the time step for the construct) - inside (Hist Term, SurfNum)
     Array1D<Array1D<Real64>> SurfOutsideFluxHistMaster; // Master flux history (on the time step for the construct) - outside (Hist Term, SurfNum)
 
-    Array2D<Real64> TsrcHist;   // Temperature history at the source location (SurfNum,Term)
-    Array2D<Real64> TuserHist;  // Temperature history at the user specified location (SurfNum,Term)
-    Array2D<Real64> QsrcHist;   // Heat source/sink history for the surface (SurfNum,Term)
-    Array2D<Real64> TsrcHistM;  // Master temperature history at the source location (SurfNum,Term)
-    Array2D<Real64> TuserHistM; // Master temperature history at the user specified location (SurfNum,Term)
-    Array2D<Real64> QsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
+    Array2D<Real64> SurfTsrcHist;   // Temperature history at the source location (SurfNum,Term)
+    Array2D<Real64> SurfTuserHist;  // Temperature history at the user specified location (SurfNum,Term)
+    Array2D<Real64> SurfQsrcHist;   // Heat source/sink history for the surface (SurfNum,Term)
+    Array2D<Real64> SurfTsrcHistM;  // Master temperature history at the source location (SurfNum,Term)
+    Array2D<Real64> SurfTuserHistM; // Master temperature history at the user specified location (SurfNum,Term)
+    Array2D<Real64> SurfQsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
 
     Array2D<Real64> ZoneFractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
     Array1D_bool EnclSolRecDifShortFromZ;  // True if Zone gets short radiation from another
@@ -275,28 +275,28 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfTempSource.deallocate();
         this->SurfTempUserLoc.deallocate();
         this->SurfTempInMovInsRep.deallocate();
-        this->QConvInReport.deallocate();
-        this->QdotConvInRep.deallocate();
+        this->SurfQConvInReport.deallocate();
+        this->SurfQdotConvInRep.deallocate();
         this->SurfQdotConvInPerArea.deallocate();
-        this->QRadNetSurfInReport.deallocate();
-        this->QdotRadNetSurfInRep.deallocate();
-        this->QRadSolarInReport.deallocate();
-        this->QdotRadSolarInRep.deallocate();
-        this->QdotRadSolarInRepPerArea.deallocate();
-        this->QRadLightsInReport.deallocate();
-        this->QdotRadLightsInRep.deallocate();
-        this->QRadIntGainsInReport.deallocate();
-        this->QdotRadIntGainsInRep.deallocate();
+        this->SurfQRadNetSurfInReport.deallocate();
+        this->SurfQdotRadNetSurfInRep.deallocate();
+        this->SurfQRadSolarInReport.deallocate();
+        this->SurfQdotRadSolarInRep.deallocate();
+        this->SurfQdotRadSolarInRepPerArea.deallocate();
+        this->SurfQRadLightsInReport.deallocate();
+        this->SurfQdotRadLightsInRep.deallocate();
+        this->SurfQRadIntGainsInReport.deallocate();
+        this->SurfQdotRadIntGainsInRep.deallocate();
         this->AnyRadiantSystems.deallocate();
         this->SurfQRadHVACInReport.deallocate();
         this->SurfQdotRadHVACInRep.deallocate();
         this->SurfQdotRadHVACInPerArea.deallocate();
-        this->QConvOutReport.deallocate();
-        this->QdotConvOutRep.deallocate();
+        this->SurfQConvOutReport.deallocate();
+        this->SurfQdotConvOutRep.deallocate();
         this->SurfQdotConvOutPerArea.deallocate();
-        this->QRadOutReport.deallocate();
-        this->QdotRadOutRep.deallocate();
-        this->QdotRadOutRepPerArea.deallocate();
+        this->SurfQRadOutReport.deallocate();
+        this->SurfQdotRadOutRep.deallocate();
+        this->SurfQdotRadOutRepPerArea.deallocate();
         this->SurfOpaqInsFaceCondGainRep.deallocate();
         this->SurfOpaqInsFaceCondLossRep.deallocate();
         this->SurfOpaqInsFaceCond.deallocate();
@@ -337,10 +337,10 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfOutsideFluxHist.deallocate();
         this->SurfInsideFluxHistMaster.deallocate();
         this->SurfOutsideFluxHistMaster.deallocate();
-        this->TsrcHist.deallocate();
-        this->QsrcHist.deallocate();
-        this->TsrcHistM.deallocate();
-        this->QsrcHistM.deallocate();
+        this->SurfTsrcHist.deallocate();
+        this->SurfQsrcHist.deallocate();
+        this->SurfTsrcHistM.deallocate();
+        this->SurfQsrcHistM.deallocate();
         this->ZoneFractDifShortZtoZ.deallocate();
         this->EnclSolRecDifShortFromZ.deallocate();
         this->InterZoneWindow = false;

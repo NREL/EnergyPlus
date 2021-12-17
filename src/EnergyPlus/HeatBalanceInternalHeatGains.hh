@@ -56,9 +56,9 @@ namespace EnergyPlus {
 
 void SetupZoneInternalGain(EnergyPlusData &state,
                            int ZoneNum,
-                           std::string const &cComponentObject, // object class name for device contributing internal gain
-                           std::string const &cComponentName,   // user unique name for device
-                           int IntGainComp_TypeOfNum,
+                           std::string_view const &cComponentObject, // object class name for device contributing internal gain
+                           std::string_view const &cComponentName,   // user unique name for device
+                           DataHeatBalance::IntGainType IntGainCompType,
                            Real64 *ConvectionGainRate = nullptr, // pointer target for remote convection gain value to be accessed
                            Real64 *ReturnAirConvectionGainRate = nullptr,
                            Real64 *ThermalRadiationGainRate = nullptr, // pointer target for remote IR radiation gain value to be accessed
@@ -71,10 +71,10 @@ void SetupZoneInternalGain(EnergyPlusData &state,
 
 void SetupSpaceInternalGain(EnergyPlusData &state,
                             int SpaceNum,
-                            Real64 SpaceGainFraction,            // Fraction of gain value assigned to this space
-                            std::string const &cComponentObject, // object class name for device contributing internal gain
-                            std::string const &cComponentName,   // user unique name for device
-                            int IntGainComp_TypeOfNum,
+                            Real64 SpaceGainFraction,                 // Fraction of gain value assigned to this space
+                            std::string_view const &cComponentObject, // object class name for device contributing internal gain
+                            std::string_view const &cComponentName,   // user unique name for device
+                            DataHeatBalance::IntGainType IntGainCompType,
                             Real64 *ConvectionGainRate = nullptr, // pointer target for remote convection gain value to be accessed
                             Real64 *ReturnAirConvectionGainRate = nullptr,
                             Real64 *ThermalRadiationGainRate = nullptr, // pointer target for remote IR radiation gain value to be accessed
