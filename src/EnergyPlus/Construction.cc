@@ -1902,22 +1902,22 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
 
     for (int I = 1; I <= this->TotLayers; ++I) {
         int Layer = this->LayerPoint(I);
-        {
-            auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
-            if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Air) {
-                static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
-                print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
-            } else {
-                static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
-                print(state.files.eio,
-                      Format_701,
-                      state.dataMaterial->Material(Layer).Name,
-                      state.dataMaterial->Material(Layer).Thickness,
-                      state.dataMaterial->Material(Layer).Conductivity,
-                      state.dataMaterial->Material(Layer).Density,
-                      state.dataMaterial->Material(Layer).SpecHeat,
-                      state.dataMaterial->Material(Layer).Resistance);
-            }
+        switch (state.dataMaterial->Material(Layer).Group) {
+        case DataHeatBalance::MaterialGroup::Air: {
+            static constexpr std::string_view Format_702(" Material:Air,{},{:12.4N}\n");
+            print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
+        } break;
+        default: {
+            static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
+            print(state.files.eio,
+                  Format_701,
+                  state.dataMaterial->Material(Layer).Name,
+                  state.dataMaterial->Material(Layer).Thickness,
+                  state.dataMaterial->Material(Layer).Conductivity,
+                  state.dataMaterial->Material(Layer).Density,
+                  state.dataMaterial->Material(Layer).SpecHeat,
+                  state.dataMaterial->Material(Layer).Resistance);
+        } break;
         }
     }
 
