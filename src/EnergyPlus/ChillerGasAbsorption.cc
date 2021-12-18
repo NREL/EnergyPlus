@@ -1584,15 +1584,16 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
     lChillWaterMassFlowRate = state.dataLoopNodes->Node(lChillReturnNodeNum).MassFlowRate;
     lCondReturnTemp = state.dataLoopNodes->Node(lCondReturnNodeNum).Temp;
     // Commenting this could be cause of diffs - lCondWaterMassFlowRate = Node(lCondReturnNodeNum).MassFlowRate;
-    {
-        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-            ChillSupplySetPointTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-            ChillSupplySetPointTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempSetPointHi;
-        } else {
-            assert(false);
-        }
+    switch (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme) {
+    case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+        ChillSupplySetPointTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempSetPoint;
+    } break;
+    case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+        ChillSupplySetPointTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempSetPointHi;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
     ChillDeltaTemp = std::abs(lChillReturnTemp - ChillSupplySetPointTemp);
 
@@ -1689,82 +1690,83 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
 
         LoopNum = this->CWLoopNum;
         LoopSideNum = this->CWLoopSideNum;
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock);
-            if (SELECT_CASE_var == DataPlant::FlowLock::Unlocked) { // mass flow rates may be changed by loop components
-                this->PossibleSubcooling = false;
+        switch (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock) {
+        case DataPlant::FlowLock::Unlocked: { // mass flow rates may be changed by loop components
+            this->PossibleSubcooling = false;
+            lCoolingLoad = std::abs(MyLoad);
+            if (ChillDeltaTemp != 0.0) {
+                lChillWaterMassFlowRate = std::abs(lCoolingLoad / (Cp_CW * ChillDeltaTemp));
+                if (lChillWaterMassFlowRate - lChillWaterMassflowratemax > DataBranchAirLoopPlant::MassFlowTolerance) this->PossibleSubcooling = true;
+
+                PlantUtilities::SetComponentFlowRate(state,
+                                                     lChillWaterMassFlowRate,
+                                                     this->ChillReturnNodeNum,
+                                                     this->ChillSupplyNodeNum,
+                                                     this->CWLoopNum,
+                                                     this->CWLoopSideNum,
+                                                     this->CWBranchNum,
+                                                     this->CWCompNum);
+                // Commenting this could cause diffs - lChillSupplyTemp = ChillSupplySetPointTemp;
+            } else {
+                lChillWaterMassFlowRate = 0.0;
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "GasAbsorberChillerModel:Cooling\"" + this->Name + "\", DeltaTemp = 0 in mass flow calculation",
+                                               this->DeltaTempCoolErrCount);
+            }
+            lChillSupplyTemp = ChillSupplySetPointTemp;
+        } break;
+        case DataPlant::FlowLock::Locked: { // mass flow rates may not be changed by loop components
+            lChillWaterMassFlowRate = state.dataLoopNodes->Node(lChillReturnNodeNum).MassFlowRate;
+            if (this->PossibleSubcooling) {
                 lCoolingLoad = std::abs(MyLoad);
-                if (ChillDeltaTemp != 0.0) {
-                    lChillWaterMassFlowRate = std::abs(lCoolingLoad / (Cp_CW * ChillDeltaTemp));
-                    if (lChillWaterMassFlowRate - lChillWaterMassflowratemax > DataBranchAirLoopPlant::MassFlowTolerance)
-                        this->PossibleSubcooling = true;
 
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         lChillWaterMassFlowRate,
-                                                         this->ChillReturnNodeNum,
-                                                         this->ChillSupplyNodeNum,
-                                                         this->CWLoopNum,
-                                                         this->CWLoopSideNum,
-                                                         this->CWBranchNum,
-                                                         this->CWCompNum);
-                    // Commenting this could cause diffs - lChillSupplyTemp = ChillSupplySetPointTemp;
-                } else {
-                    lChillWaterMassFlowRate = 0.0;
-                    ShowRecurringWarningErrorAtEnd(state,
-                                                   "GasAbsorberChillerModel:Cooling\"" + this->Name + "\", DeltaTemp = 0 in mass flow calculation",
-                                                   this->DeltaTempCoolErrCount);
-                }
+                ChillDeltaTemp = lCoolingLoad / lChillWaterMassFlowRate / Cp_CW;
+                lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - ChillDeltaTemp;
+            } else {
+                ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - ChillSupplySetPointTemp;
+                lCoolingLoad = std::abs(lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp);
                 lChillSupplyTemp = ChillSupplySetPointTemp;
-            } else if (SELECT_CASE_var == DataPlant::FlowLock::Locked) { // mass flow rates may not be changed by loop components
-                lChillWaterMassFlowRate = state.dataLoopNodes->Node(lChillReturnNodeNum).MassFlowRate;
-                if (this->PossibleSubcooling) {
-                    lCoolingLoad = std::abs(MyLoad);
+            }
+            // Check that the Chiller Supply outlet temp honors both plant loop temp low limit and also the chiller low limit
+            if (lChillSupplyTemp < lCHWLowLimitTemp) {
+                if ((state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lCHWLowLimitTemp) > DataPlant::DeltaTempTol) {
+                    lChillSupplyTemp = lCHWLowLimitTemp;
+                    ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                    lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
+                } else {
+                    lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
+                    ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                    lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
+                }
+            }
+            if (lChillSupplyTemp < state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin) {
+                if ((state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin) >
+                    DataPlant::DeltaTempTol) {
+                    lChillSupplyTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin;
+                    ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                    lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
+                } else {
+                    lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
+                    ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                    lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
+                }
+            }
 
+            // Checks Coolingload on the basis of the machine limits.
+            if (lCoolingLoad > std::abs(MyLoad)) {
+                if (lChillWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+                    lCoolingLoad = std::abs(MyLoad);
                     ChillDeltaTemp = lCoolingLoad / lChillWaterMassFlowRate / Cp_CW;
                     lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - ChillDeltaTemp;
                 } else {
-                    ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - ChillSupplySetPointTemp;
-                    lCoolingLoad = std::abs(lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp);
-                    lChillSupplyTemp = ChillSupplySetPointTemp;
-                }
-                // Check that the Chiller Supply outlet temp honors both plant loop temp low limit and also the chiller low limit
-                if (lChillSupplyTemp < lCHWLowLimitTemp) {
-                    if ((state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lCHWLowLimitTemp) > DataPlant::DeltaTempTol) {
-                        lChillSupplyTemp = lCHWLowLimitTemp;
-                        ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
-                        lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
-                    } else {
-                        lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
-                        ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
-                        lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
-                    }
-                }
-                if (lChillSupplyTemp < state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin) {
-                    if ((state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin) >
-                        DataPlant::DeltaTempTol) {
-                        lChillSupplyTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin;
-                        ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
-                        lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
-                    } else {
-                        lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
-                        ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
-                        lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
-                    }
-                }
-
-                // Checks Coolingload on the basis of the machine limits.
-                if (lCoolingLoad > std::abs(MyLoad)) {
-                    if (lChillWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-                        lCoolingLoad = std::abs(MyLoad);
-                        ChillDeltaTemp = lCoolingLoad / lChillWaterMassFlowRate / Cp_CW;
-                        lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - ChillDeltaTemp;
-                    } else {
-                        lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
-                        ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
-                        lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
-                    }
+                    lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
+                    ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                    lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
                 }
             }
+        } break;
+        default:
+            break;
         }
 
         // Calculate operating part load ratio for cooling
@@ -1945,15 +1947,16 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
     // initialize entering conditions
     lHotWaterReturnTemp = state.dataLoopNodes->Node(lHeatReturnNodeNum).Temp;
     lHotWaterMassFlowRate = state.dataLoopNodes->Node(lHeatReturnNodeNum).MassFlowRate;
-    {
-        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-            HeatSupplySetPointTemp = state.dataLoopNodes->Node(lHeatSupplyNodeNum).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-            HeatSupplySetPointTemp = state.dataLoopNodes->Node(lHeatSupplyNodeNum).TempSetPointLo;
-        } else {
-            assert(false);
-        }
+    switch (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme) {
+    case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+        HeatSupplySetPointTemp = state.dataLoopNodes->Node(lHeatSupplyNodeNum).TempSetPoint;
+    } break;
+    case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+        HeatSupplySetPointTemp = state.dataLoopNodes->Node(lHeatSupplyNodeNum).TempSetPointLo;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
     HeatDeltaTemp = std::abs(lHotWaterReturnTemp - HeatSupplySetPointTemp);
 
@@ -1979,33 +1982,35 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
         //    chilled water flow,
         //    cooling load taken by the chiller, and
         //    supply temperature
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock);
-            if (SELECT_CASE_var == DataPlant::FlowLock::Unlocked) { // mass flow rates may be changed by loop components
-                lHeatingLoad = std::abs(MyLoad);
-                if (HeatDeltaTemp != 0) {
-                    lHotWaterMassFlowRate = std::abs(lHeatingLoad / (Cp_HW * HeatDeltaTemp));
+        switch (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock) {
+        case DataPlant::FlowLock::Unlocked: { // mass flow rates may be changed by loop components
+            lHeatingLoad = std::abs(MyLoad);
+            if (HeatDeltaTemp != 0) {
+                lHotWaterMassFlowRate = std::abs(lHeatingLoad / (Cp_HW * HeatDeltaTemp));
 
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         lHotWaterMassFlowRate,
-                                                         this->HeatReturnNodeNum,
-                                                         this->HeatSupplyNodeNum,
-                                                         this->HWLoopNum,
-                                                         this->HWLoopSideNum,
-                                                         this->HWBranchNum,
-                                                         this->HWCompNum);
+                PlantUtilities::SetComponentFlowRate(state,
+                                                     lHotWaterMassFlowRate,
+                                                     this->HeatReturnNodeNum,
+                                                     this->HeatSupplyNodeNum,
+                                                     this->HWLoopNum,
+                                                     this->HWLoopSideNum,
+                                                     this->HWBranchNum,
+                                                     this->HWCompNum);
 
-                } else {
-                    lHotWaterMassFlowRate = 0.0;
-                    ShowRecurringWarningErrorAtEnd(state,
-                                                   "GasAbsorberChillerModel:Heating\"" + this->Name + "\", DeltaTemp = 0 in mass flow calculation",
-                                                   this->DeltaTempHeatErrCount);
-                }
-                lHotWaterSupplyTemp = HeatSupplySetPointTemp;
-            } else if (SELECT_CASE_var == DataPlant::FlowLock::Locked) { // mass flow rates may not be changed by loop components
-                lHotWaterSupplyTemp = HeatSupplySetPointTemp;
-                lHeatingLoad = std::abs(lHotWaterMassFlowRate * Cp_HW * HeatDeltaTemp);
+            } else {
+                lHotWaterMassFlowRate = 0.0;
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "GasAbsorberChillerModel:Heating\"" + this->Name + "\", DeltaTemp = 0 in mass flow calculation",
+                                               this->DeltaTempHeatErrCount);
             }
+            lHotWaterSupplyTemp = HeatSupplySetPointTemp;
+        } break;
+        case DataPlant::FlowLock::Locked: { // mass flow rates may not be changed by loop components
+            lHotWaterSupplyTemp = HeatSupplySetPointTemp;
+            lHeatingLoad = std::abs(lHotWaterMassFlowRate * Cp_HW * HeatDeltaTemp);
+        } break;
+        default:
+            break;
         }
 
         // Calculate operating part load ratio for cooling
