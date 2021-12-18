@@ -642,13 +642,15 @@ namespace BoilerSteam {
         this->BoilerLoad = 0.0;
         this->BoilerMassFlowRate = 0.0;
 
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo;
-            }
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo;
+        } break;
+        default:
+            break;
         }
         // If the specified load is 0.0 or the boiler should not run then we leave this subroutine.Before leaving
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
@@ -689,16 +691,17 @@ namespace BoilerSteam {
             DataPlant::FlowLock::Unlocked) { // TODO: Components shouldn't check FlowLock
             // Calculate the flow for the boiler
 
-            {
-                auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                    BoilerDeltaTemp =
-                        state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint - state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
-                } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
-                    BoilerDeltaTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo -
-                                      state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
-                }
+            switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+            case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+                BoilerDeltaTemp =
+                    state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint - state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
+            } break;
+            default: { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
+                BoilerDeltaTemp =
+                    state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo - state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
+            } break;
             }
+
             this->BoilerOutletTemp = BoilerDeltaTemp + state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
 
             Real64 const EnthSteamOutDry =
@@ -721,25 +724,29 @@ namespace BoilerSteam {
             // Set the boiler flow rate from inlet node and then check performance
             this->BoilerMassFlowRate = state.dataLoopNodes->Node(this->BoilerInletNodeNum).MassFlowRate;
             // Assume that it can meet the setpoint
-            {
-                auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                    BoilerDeltaTemp =
-                        state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint - state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
-                } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                    BoilerDeltaTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo -
-                                      state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
-                }
+            switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+            case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+                BoilerDeltaTemp =
+                    state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint - state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
+            } break;
+            case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+                BoilerDeltaTemp =
+                    state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo - state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
+            } break;
+            default:
+                break;
             }
             // If boiler outlet temp is already greater than setpoint than it does not need to operate this iteration
             if (BoilerDeltaTemp < 0.0) {
-                {
-                    auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                        this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                        this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo;
-                    }
+                switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+                case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+                    this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint;
+                } break;
+                case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+                    this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo;
+                } break;
+                default:
+                    break;
                 }
                 Real64 const EnthSteamOutDry =
                     FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
@@ -749,14 +756,15 @@ namespace BoilerSteam {
                 this->BoilerLoad = (this->BoilerMassFlowRate * LatentEnthSteam);
 
             } else {
-
-                {
-                    auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                        this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                        this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo;
-                    }
+                switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+                case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+                    this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint;
+                } break;
+                case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+                    this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo;
+                } break;
+                default:
+                    break;
                 }
 
                 Real64 const EnthSteamOutDry =
@@ -773,13 +781,15 @@ namespace BoilerSteam {
                 this->BoilerLoad = MyLoad;
 
                 // Reset later , here just for calculating latent heat
-                {
-                    auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                        this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                        this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo;
-                    }
+                switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+                case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+                    this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint;
+                } break;
+                case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+                    this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo;
+                } break;
+                default:
+                    break;
                 }
 
                 Real64 const EnthSteamOutDry =

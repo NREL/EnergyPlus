@@ -3295,125 +3295,125 @@ namespace AirflowNetworkBalanceManager {
                     state.dataAirflowNetwork->MultizoneSurfaceData(i).VentingSchName = "";
                     state.dataAirflowNetwork->MultizoneSurfaceData(i).VentingSchNum = 0;
                 }
-                {
-                    auto const SELECT_CASE_var(state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSurfCtrNum);
-                    if ((SELECT_CASE_var == VentControlType::Temp) || (SELECT_CASE_var == VentControlType::AdjTemp)) {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum =
-                            GetScheduleIndex(state, state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName);
-                        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName == std::string()) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject +
-                                                " object, No Ventilation Schedule was found, but is required when ventilation control is "
-                                                "Temperature.");
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            ErrorsFound = true;
-                        } else if (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum == 0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject +
-                                                " object, Invalid Ventilation Schedule, required when ventilation control is Temperature.");
-                            ShowContinueError(state, "..Schedule name in error = " + state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName);
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            ErrorsFound = true;
-                        }
-                        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp < 0.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + CurrentModuleObject + " object, Low Temperature difference value < 0.0d0");
-                            ShowContinueError(state,
-                                              format("..Input value={:.1R}, Value will be reset to 0.0.",
-                                                     state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp));
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp = 0.0;
-                        }
-                        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp >= 100.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + CurrentModuleObject + " object, Low Temperature difference value >= 100.0d0");
-                            ShowContinueError(state,
-                                              format("..Input value = {:.1R}, Value will be reset to 0.0",
-                                                     state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp));
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            state.dataAirflowNetwork->MultizoneZoneData(i).LowValueTemp = 0.0;
-                        }
-                        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueTemp <=
-                            state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + CurrentModuleObject +
-                                                 " object, Upper Temperature <= Lower Temperature difference value.");
-                            ShowContinueError(state,
-                                              format("..Input value = {:.1R}, Value will be reset to 100.0",
-                                                     state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueTemp));
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueTemp = 100.0;
-                        }
-
-                    } else if ((SELECT_CASE_var == VentControlType::Enth) || (SELECT_CASE_var == VentControlType::AdjEnth)) {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum =
-                            GetScheduleIndex(state, state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName);
-                        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName == std::string()) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject +
-                                                " object, No Ventilation Schedule was found, but is required when ventilation control is Enthalpy.");
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            ErrorsFound = true;
-                        } else if (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum == 0) {
-                            ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject +
-                                                " object, Invalid Ventilation Schedule, required when ventilation control is Enthalpy.");
-                            ShowContinueError(state, "..Schedule name in error = " + state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName);
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            ErrorsFound = true;
-                        }
-                        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth < 0.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + CurrentModuleObject + " object, Low Enthalpy difference value < 0.0d0");
-                            ShowContinueError(state,
-                                              format("..Input value = {:.1R}, Value will be reset to 0.0",
-                                                     state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth));
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth = 0.0;
-                        }
-                        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth >= 300000.0) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + CurrentModuleObject + " object, Low Enthalpy difference value >= 300000.0");
-                            ShowContinueError(state,
-                                              format("..Input value = {:.1R}, Value will be reset to 0.0",
-                                                     state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth));
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            state.dataAirflowNetwork->MultizoneZoneData(i).LowValueEnth = 0.0;
-                        }
-                        if (state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueEnth <=
-                            state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth) {
-                            ShowWarningError(state,
-                                             std::string{RoutineName} + CurrentModuleObject +
-                                                 " object, Upper Enthalpy <= Lower Enthalpy difference value.");
-                            ShowContinueError(state,
-                                              format("..Input value = {:.1R}, Value will be set to 300000.0",
-                                                     state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueEnth));
-                            ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
-                            state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueEnth = 300000.0;
-                        }
-
-                    } else if (SELECT_CASE_var == VentControlType::Const) {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-
-                    } else if (SELECT_CASE_var == VentControlType::ASH55) {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-
-                    } else if (SELECT_CASE_var == VentControlType::CEN15251) {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-
-                    } else if (SELECT_CASE_var == VentControlType::NoVent) {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-
-                    } else if (SELECT_CASE_var == VentControlType::ZoneLevel) {
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                        state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-
-                    } else {
+                switch (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSurfCtrNum) {
+                case VentControlType::Temp:
+                case VentControlType::AdjTemp: {
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum =
+                        GetScheduleIndex(state, state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName);
+                    if (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName == std::string()) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject +
+                                            " object, No Ventilation Schedule was found, but is required when ventilation control is "
+                                            "Temperature.");
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        ErrorsFound = true;
+                    } else if (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum == 0) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject +
+                                            " object, Invalid Ventilation Schedule, required when ventilation control is Temperature.");
+                        ShowContinueError(state, "..Schedule name in error = " + state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName);
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        ErrorsFound = true;
                     }
+                    if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp < 0.0) {
+                        ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " object, Low Temperature difference value < 0.0d0");
+                        ShowContinueError(state,
+                                          format("..Input value={:.1R}, Value will be reset to 0.0.",
+                                                 state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp));
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp = 0.0;
+                    }
+                    if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp >= 100.0) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + CurrentModuleObject + " object, Low Temperature difference value >= 100.0d0");
+                        ShowContinueError(state,
+                                          format("..Input value = {:.1R}, Value will be reset to 0.0",
+                                                 state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp));
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        state.dataAirflowNetwork->MultizoneZoneData(i).LowValueTemp = 0.0;
+                    }
+                    if (state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueTemp <=
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + CurrentModuleObject +
+                                             " object, Upper Temperature <= Lower Temperature difference value.");
+                        ShowContinueError(state,
+                                          format("..Input value = {:.1R}, Value will be reset to 100.0",
+                                                 state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueTemp));
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueTemp = 100.0;
+                    }
+
+                } break;
+                case VentControlType::Enth:
+                case VentControlType::AdjEnth: {
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum =
+                        GetScheduleIndex(state, state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName);
+                    if (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName == std::string()) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject +
+                                            " object, No Ventilation Schedule was found, but is required when ventilation control is Enthalpy.");
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        ErrorsFound = true;
+                    } else if (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum == 0) {
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject +
+                                            " object, Invalid Ventilation Schedule, required when ventilation control is Enthalpy.");
+                        ShowContinueError(state, "..Schedule name in error = " + state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName);
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        ErrorsFound = true;
+                    }
+                    if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth < 0.0) {
+                        ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " object, Low Enthalpy difference value < 0.0d0");
+                        ShowContinueError(state,
+                                          format("..Input value = {:.1R}, Value will be reset to 0.0",
+                                                 state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth));
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth = 0.0;
+                    }
+                    if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth >= 300000.0) {
+                        ShowWarningError(state,
+                                         std::string{RoutineName} + CurrentModuleObject + " object, Low Enthalpy difference value >= 300000.0");
+                        ShowContinueError(state,
+                                          format("..Input value = {:.1R}, Value will be reset to 0.0",
+                                                 state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth));
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        state.dataAirflowNetwork->MultizoneZoneData(i).LowValueEnth = 0.0;
+                    }
+                    if (state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueEnth <=
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth) {
+                        ShowWarningError(
+                            state, std::string{RoutineName} + CurrentModuleObject + " object, Upper Enthalpy <= Lower Enthalpy difference value.");
+                        ShowContinueError(state,
+                                          format("..Input value = {:.1R}, Value will be set to 300000.0",
+                                                 state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueEnth));
+                        ShowContinueError(state, "..for Surface = \"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\"");
+                        state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueEnth = 300000.0;
+                    }
+
+                } break;
+                case VentControlType::Const: {
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
+                } break;
+                case VentControlType::ASH55: {
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
+                } break;
+                case VentControlType::CEN15251: {
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
+                } break;
+                case VentControlType::NoVent: {
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
+                } break;
+                case VentControlType::ZoneLevel: {
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
+                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
+                } break;
+                default:
+                    break;
                 }
             }
         }
@@ -12283,29 +12283,28 @@ namespace AirflowNetworkBalanceManager {
 
         // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
         for (int i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfLinks; ++i) {
-            {
-                auto const SELECT_CASE_var(
-                    state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum);
-                if (SELECT_CASE_var == iComponentTypeNum::CVF) { // 'CVF'
-                    int typeNum =
-                        state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).TypeNum;
-                    if (state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanTypeNum == FanType_SimpleVAV) {
-                        if (state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanModelFlag) {
-                            state.dataAirflowNetwork->DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
-                                state.dataHVACFan->fanObjs[state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate *
-                                state.dataEnvrn->StdRhoAir;
-                        } else {
-                            Real64 FanFlow; // Return type
-                            GetFanVolFlow(state, state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanIndex, FanFlow);
-                            state.dataAirflowNetwork->DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * state.dataEnvrn->StdRhoAir;
-                        }
+            switch (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).CompTypeNum) {
+            case iComponentTypeNum::CVF: { // 'CVF'
+                int typeNum =
+                    state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum).TypeNum;
+                if (state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanTypeNum == FanType_SimpleVAV) {
+                    if (state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanModelFlag) {
+                        state.dataAirflowNetwork->DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
+                            state.dataHVACFan->fanObjs[state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate *
+                            state.dataEnvrn->StdRhoAir;
+                    } else {
+                        Real64 FanFlow; // Return type
+                        GetFanVolFlow(state, state.dataAirflowNetwork->DisSysCompCVFData(typeNum).FanIndex, FanFlow);
+                        state.dataAirflowNetwork->DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * state.dataEnvrn->StdRhoAir;
                     }
-                } else if (SELECT_CASE_var == iComponentTypeNum::FAN) { //'FAN'
-                                                                        // Check ventilation status for large openings
-                } else if (SELECT_CASE_var == iComponentTypeNum::SOP) { //'Simple opening'
-                } else if (SELECT_CASE_var == iComponentTypeNum::TMU) { // Terminal unit
-                } else {
                 }
+            } break;
+            case iComponentTypeNum::FAN:
+            case iComponentTypeNum::SOP:
+            case iComponentTypeNum::TMU:
+                break;
+            default:
+                break;
             }
         }
     }
