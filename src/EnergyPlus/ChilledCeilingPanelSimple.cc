@@ -181,20 +181,18 @@ void SimCoolingPanel(EnergyPlusData &state,
             MinWaterFlow = state.dataLoopNodes->Node(ThisCP.WaterInletNode).MassFlowRateMinAvail;
         }
 
-        {
-            auto const SELECT_CASE_var(ThisCP.EquipType);
-
-            if (SELECT_CASE_var == DataPlant::PlantEquipmentType::CoolingPanel_Simple) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-                ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
-            } else {
-                ShowSevereError(state,
-                                "SimCoolingPanelSimple: Errors in CoolingPanel=" +
-                                    state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
-                ShowContinueError(state,
-                                  format("Invalid or unimplemented equipment type={}",
-                                         state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
-                ShowFatalError(state, "Preceding condition causes termination.");
-            }
+        switch (ThisCP.EquipType) {
+        case DataPlant::PlantEquipmentType::CoolingPanel_Simple: { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+            ThisCP.CalcCoolingPanel(state, CoolingPanelNum);
+        } break;
+        default: {
+            ShowSevereError(
+                state, "SimCoolingPanelSimple: Errors in CoolingPanel=" + state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipID);
+            ShowContinueError(
+                state,
+                format("Invalid or unimplemented equipment type={}", state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).EquipType));
+            ShowFatalError(state, "Preceding condition causes termination.");
+        } break;
         }
 
         PowerMet = ThisCP.TotPower;
@@ -1538,23 +1536,27 @@ void CoolingPanelParams::SetCoolingPanelControlTemp(EnergyPlusData &state, Real6
 
     // Using/Aliasing
 
-    {
-        auto const SELECT_CASE_var(this->controlType);
-        if (SELECT_CASE_var == ClgPanelCtrlType::MAT) {
-            ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-        } else if (SELECT_CASE_var == ClgPanelCtrlType::MRT) {
-            ControlTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
-        } else if (SELECT_CASE_var == ClgPanelCtrlType::Operative) {
-            ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-        } else if (SELECT_CASE_var == ClgPanelCtrlType::ODB) {
-            ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
-        } else if (SELECT_CASE_var == ClgPanelCtrlType::OWB) {
-            ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
-        } else { // Should never get here
-            ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-            ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
-            ShowFatalError(state, "Preceding condition causes termination.");
-        }
+    switch (this->controlType) {
+    case ClgPanelCtrlType::MAT: {
+        ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+    } break;
+    case ClgPanelCtrlType::MRT: {
+        ControlTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+    } break;
+    case ClgPanelCtrlType::Operative: {
+        ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
+    } break;
+    case ClgPanelCtrlType::ODB: {
+        ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+    } break;
+    case ClgPanelCtrlType::OWB: {
+        ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
+    } break;
+    default: { // Should never get here
+        ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+        ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
+        ShowFatalError(state, "Preceding condition causes termination.");
+    } break;
     }
 }
 
