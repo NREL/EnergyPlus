@@ -2103,13 +2103,15 @@ namespace EvaporativeFluidCoolers {
         Real64 inletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
         this->OutletWaterTemp = inletWaterTemp;
         AirFlowRate = 0.0;
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
-            }
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
+        } break;
+        default:
+            break;
         }
 
         // Added for fluid bypass. First assume no fluid bypass
@@ -2285,13 +2287,15 @@ namespace EvaporativeFluidCoolers {
         Real64 OutletWaterTemp2ndStage = this->OutletWaterTemp;
         Real64 AirFlowRate = 0.0;
         Real64 TempSetPoint = 0.0;
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
-            }
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
+        } break;
+        default:
+            break;
         }
 
         //   MassFlowTol is a parameter to indicate a no flow condition
