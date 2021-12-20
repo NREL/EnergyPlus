@@ -119,10 +119,7 @@ namespace WaterToAirHeatPumpSimple {
         int AirOutletNodeNum;         // Node Number of the Air Outlet
         int WaterInletNodeNum;        // Node Number of the Water Onlet
         int WaterOutletNodeNum;       // Node Number of the Water Outlet
-        int LoopNum;                  // plant loop index for water side
-        DataPlant::LoopSideLocation LoopSide;                 // plant loop side index
-        int BranchNum;                // plant branch index
-        int CompNum;                  // plant component index
+        PlantLocation plantLoc;
         int WaterCyclingMode;         // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
         // 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
         int LastOperatingMode; // type of coil calling for water flow, either heating or cooling,
@@ -152,7 +149,7 @@ namespace WaterToAirHeatPumpSimple {
               RatedWaterVolFlowRate(0.0), RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolTotal(0.0),
               RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0),
               SensCoolCapCurveIndex(0), CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), WaterCyclingMode(0), LastOperatingMode(DataHVACGlobals::WaterCycling),
+              plantLoc{}, WaterCyclingMode(0), LastOperatingMode(DataHVACGlobals::WaterCycling),
               WaterFlowMode(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0),
               MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), FanDelayTime(0.0), reportCoilFinalSizes(true)
         {
