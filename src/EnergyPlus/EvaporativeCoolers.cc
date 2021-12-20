@@ -172,22 +172,26 @@ void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIn
     // With the correct EvapCoolNum Initialize
     InitEvapCooler(state, EvapCoolNum); // Initialize all related parameters
 
-    {
-        auto const SELECT_CASE_var(EvapCond(EvapCoolNum).evapCoolerType);
-
-        if (SELECT_CASE_var == EvapCoolerType::DirectCELDEKPAD) {
-            CalcDirectEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
-        } else if (SELECT_CASE_var == EvapCoolerType::IndirectCELDEKPAD) {
-            CalcDryIndirectEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
-        } else if (SELECT_CASE_var == EvapCoolerType::IndirectWETCOIL) {
-            CalcWetIndirectEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
-        } else if (SELECT_CASE_var == EvapCoolerType::IndirectRDDSpecial) {
-            CalcResearchSpecialPartLoad(state, EvapCoolNum);
-            CalcIndirectResearchSpecialEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
-        } else if (SELECT_CASE_var == EvapCoolerType::DirectResearchSpecial) {
-            CalcResearchSpecialPartLoad(state, EvapCoolNum);
-            CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
-        }
+    switch (EvapCond(EvapCoolNum).evapCoolerType) {
+    case EvapCoolerType::DirectCELDEKPAD: {
+        CalcDirectEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
+    } break;
+    case EvapCoolerType::IndirectCELDEKPAD: {
+        CalcDryIndirectEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
+    } break;
+    case EvapCoolerType::IndirectWETCOIL: {
+        CalcWetIndirectEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
+    } break;
+    case EvapCoolerType::IndirectRDDSpecial: {
+        CalcResearchSpecialPartLoad(state, EvapCoolNum);
+        CalcIndirectResearchSpecialEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
+    } break;
+    case EvapCoolerType::DirectResearchSpecial: {
+        CalcResearchSpecialPartLoad(state, EvapCoolNum);
+        CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum, ZoneEvapCoolerPLR);
+    } break;
+    default:
+        break;
     }
     // Update the current Evap Cooler to the outlet nodes
     UpdateEvapCooler(state, EvapCoolNum);
@@ -1262,19 +1266,24 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         HardSizeNoDesRun = false; // Check if design infomation is available
     }
 
-    {
-        auto const SELECT_CASE_var(EvapCond(EvapCoolNum).evapCoolerType);
-        if (SELECT_CASE_var == EvapCoolerType::IndirectCELDEKPAD) {
-            CompType = "EvaporativeCooler:Indirect:CelDekPad";
-        } else if (SELECT_CASE_var == EvapCoolerType::IndirectWETCOIL) {
-            CompType = "EvaporativeCooler:Indirect:WetCoil";
-        } else if (SELECT_CASE_var == EvapCoolerType::IndirectRDDSpecial) {
-            CompType = "EvaporativeCooler:Indirect:ResearchSpecial";
-        } else if (SELECT_CASE_var == EvapCoolerType::DirectResearchSpecial) {
-            CompType = "EvaporativeCooler:Direct:ResearchSpecial";
-        } else if (SELECT_CASE_var == EvapCoolerType::DirectCELDEKPAD) {
-            CompType = "EvaporativeCooler:Direct:CelDekPad";
-        }
+    switch (EvapCond(EvapCoolNum).evapCoolerType) {
+    case EvapCoolerType::IndirectCELDEKPAD: {
+        CompType = "EvaporativeCooler:Indirect:CelDekPad";
+    } break;
+    case EvapCoolerType::IndirectWETCOIL: {
+        CompType = "EvaporativeCooler:Indirect:WetCoil";
+    } break;
+    case EvapCoolerType::IndirectRDDSpecial: {
+        CompType = "EvaporativeCooler:Indirect:ResearchSpecial";
+    } break;
+    case EvapCoolerType::DirectResearchSpecial: {
+        CompType = "EvaporativeCooler:Direct:ResearchSpecial";
+    } break;
+    case EvapCoolerType::DirectCELDEKPAD: {
+        CompType = "EvaporativeCooler:Direct:CelDekPad";
+    } break;
+    default:
+        break;
     }
 
     // Search once for the object on an air system
@@ -2225,32 +2234,33 @@ void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum)
 
         // Get full load result, depending on model
         EvapCond(EvapCoolNum).PartLoadFract = 1.0;
-        {
-            auto const SELECT_CASE_var(EvapCond(EvapCoolNum).evapCoolerType);
-            if (SELECT_CASE_var == EvapCoolerType::IndirectRDDSpecial) {
-                CalcIndirectResearchSpecialEvapCooler(state, EvapCoolNum);
-                UpdateEvapCooler(state, EvapCoolNum);
-                FullOutput = Node(InletNode).MassFlowRate *
-                             (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+        switch (EvapCond(EvapCoolNum).evapCoolerType) {
+        case EvapCoolerType::IndirectRDDSpecial: {
+            CalcIndirectResearchSpecialEvapCooler(state, EvapCoolNum);
+            UpdateEvapCooler(state, EvapCoolNum);
+            FullOutput = Node(InletNode).MassFlowRate *
+                         (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 
-                ReqOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(EvapCond(EvapCoolNum).DesiredOutletTemp, Node(InletNode).HumRat) -
-                                                            PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+            ReqOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(EvapCond(EvapCoolNum).DesiredOutletTemp, Node(InletNode).HumRat) -
+                                                        PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 
-                // now reinit after test call
-                InitEvapCooler(state, EvapCoolNum);
+            // now reinit after test call
+            InitEvapCooler(state, EvapCoolNum);
 
-            } else if (SELECT_CASE_var == EvapCoolerType::DirectResearchSpecial) {
-                CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum);
-                UpdateEvapCooler(state, EvapCoolNum);
-                FullOutput = Node(OutletNode).Temp - Node(InletNode).Temp;
-                ReqOutput = EvapCond(EvapCoolNum).DesiredOutletTemp - Node(InletNode).Temp;
+        } break;
+        case EvapCoolerType::DirectResearchSpecial: {
+            CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum);
+            UpdateEvapCooler(state, EvapCoolNum);
+            FullOutput = Node(OutletNode).Temp - Node(InletNode).Temp;
+            ReqOutput = EvapCond(EvapCoolNum).DesiredOutletTemp - Node(InletNode).Temp;
 
-                // now reinit after test call
-                InitEvapCooler(state, EvapCoolNum);
+            // now reinit after test call
+            InitEvapCooler(state, EvapCoolNum);
 
-            } else {
-                assert(false);
-            }
+        } break;
+        default: {
+            assert(false);
+        } break;
         }
 
         // Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
