@@ -4407,25 +4407,33 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                 } else {
                     tableBody(1, 6) = "automatic";
                 }
-                {
-                    auto const SELECT_CASE_var(tariff(iTariff).convChoice);
-                    if (SELECT_CASE_var == EconConv::USERDEF) {
-                        tableBody(1, 7) = "User Defined";
-                    } else if (SELECT_CASE_var == EconConv::KWH) {
-                        tableBody(1, 7) = "kWh";
-                    } else if (SELECT_CASE_var == EconConv::THERM) {
-                        tableBody(1, 7) = "Therm";
-                    } else if (SELECT_CASE_var == EconConv::MMBTU) {
-                        tableBody(1, 7) = "MMBtu";
-                    } else if (SELECT_CASE_var == EconConv::MJ) {
-                        tableBody(1, 7) = "MJ";
-                    } else if (SELECT_CASE_var == EconConv::KBTU) {
-                        tableBody(1, 7) = "kBtu";
-                    } else if (SELECT_CASE_var == EconConv::MCF) {
-                        tableBody(1, 7) = "MCF";
-                    } else if (SELECT_CASE_var == EconConv::CCF) {
-                        tableBody(1, 7) = "CCF";
-                    }
+                switch (tariff(iTariff).convChoice) {
+                case EconConv::USERDEF: {
+                    tableBody(1, 7) = "User Defined";
+                } break;
+                case EconConv::KWH: {
+                    tableBody(1, 7) = "kWh";
+                } break;
+                case EconConv::THERM: {
+                    tableBody(1, 7) = "Therm";
+                } break;
+                case EconConv::MMBTU: {
+                    tableBody(1, 7) = "MMBtu";
+                } break;
+                case EconConv::MJ: {
+                    tableBody(1, 7) = "MJ";
+                } break;
+                case EconConv::KBTU: {
+                    tableBody(1, 7) = "kBtu";
+                } break;
+                case EconConv::MCF: {
+                    tableBody(1, 7) = "MCF";
+                } break;
+                case EconConv::CCF: {
+                    tableBody(1, 7) = "CCF";
+                } break;
+                default:
+                    break;
                 }
                 columnWidth = 14; // array assignment - same for all columns
                 WriteSubtitle(state, "General");
