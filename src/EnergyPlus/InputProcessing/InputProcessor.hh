@@ -138,7 +138,7 @@ public:
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
     void getObjectItem(EnergyPlusData &state,
-                       std::string_view const &Object,
+                       std::string_view Object,
                        int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
@@ -155,8 +155,8 @@ public:
     int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
     int getObjectItemNum(EnergyPlusData &state,
-                         std::string_view const &ObjType, // Object Type (ref: IDD Objects)
-                         std::string_view const &ObjName  // Name of the object type
+                         std::string_view ObjType, // Object Type (ref: IDD Objects)
+                         std::string_view ObjName  // Name of the object type
     );
 
     int getObjectItemNum(EnergyPlusData &state,

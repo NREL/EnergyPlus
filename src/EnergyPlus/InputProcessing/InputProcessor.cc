@@ -898,7 +898,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
 }
 
 void InputProcessor::getObjectItem(EnergyPlusData &state,
-                                   std::string_view const &Object,
+                                   std::string_view Object,
                                    int const Number,
                                    Array1S_string Alphas,
                                    int &NumAlphas,
@@ -1173,8 +1173,8 @@ int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Obje
 }
 
 int InputProcessor::getObjectItemNum(EnergyPlusData &state,
-                                     std::string_view const &ObjType, // Object Type (ref: IDD Objects)
-                                     std::string_view const &ObjName  // Name of the object type
+                                     std::string_view ObjType, // Object Type (ref: IDD Objects)
+                                     std::string_view ObjName  // Name of the object type
 )
 {
     // PURPOSE OF THIS SUBROUTINE:
