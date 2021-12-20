@@ -92,10 +92,7 @@ namespace BaseboardRadiator {
         Real64 AirOutletTemp;
         Real64 Power;
         Real64 Energy;
-        int LoopNum;     // plant loop index
-        DataPlant::LoopSideLocation LoopSideNum; // plant loop side index
-        int BranchNum;   // plant loop branch index
-        int CompNum;     // plant loop component index
+        PlantLocation plantLoc;
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
@@ -114,8 +111,7 @@ namespace BaseboardRadiator {
             : SchedPtr(0), EquipType(DataPlant::PlantEquipmentType::Invalid), ZonePtr(0), WaterInletNode(0), WaterOutletNode(0),
               ControlCompTypeNum(0), CompErrIndex(0), UA(0.0), WaterMassFlowRate(0.0), WaterVolFlowRateMax(0.0), WaterMassFlowRateMax(0.0),
               Offset(0.0), AirMassFlowRate(0.0), DesAirMassFlowRate(0.0), WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterInletEnthalpy(0.0),
-              WaterOutletEnthalpy(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0), Energy(0.0), LoopNum(0),
-              LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0),
+              WaterOutletEnthalpy(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0), Energy(0.0), plantLoc{}, BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0),
               HeatingCapMethod(0), ScaledHeatingCapacity(0.0), MySizeFlag(true), CheckEquipName(true), SetLoopIndexFlag(true), MyEnvrnFlag(true)
         {
         }
