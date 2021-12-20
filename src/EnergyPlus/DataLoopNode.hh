@@ -108,30 +108,12 @@ namespace DataLoopNode {
     constexpr bool ObjectIsNotParent(false);
     constexpr bool IncrementFluidStreamYes(true);
 
-    constexpr const char *ValidNodeFluidTypes(NodeFluidType const NodeFluidType) // Valid Fluid Types for Nodes
-    {
-        switch (NodeFluidType) {
-        case NodeFluidType::Blank:
-            return "blank";
+    // Valid Fluid Types for Nodes
+    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> ValidNodeFluidTypes = {
+        "blank", "Air", "Water", "Steam", "Electric"};
 
-        case NodeFluidType::Air:
-            return "Air";
-
-        case NodeFluidType::Water:
-            return "Water";
-
-        case NodeFluidType::Steam:
-            return "Steam";
-
-        case NodeFluidType::Electric:
-            return "Electric";
-
-        default:
-            return "blank";
-        }
-    }
-
-    constexpr const char *ValidConnectionTypes(NodeConnectionType const NodeConnectionType) // Valid Connection Types for Nodes
+    // Valid Connection Types for Nodes
+    constexpr const char *ValidConnectionTypes(NodeConnectionType const NodeConnectionType)
     {
 
         switch (NodeConnectionType) {

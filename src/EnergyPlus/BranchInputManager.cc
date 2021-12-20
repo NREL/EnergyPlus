@@ -2643,7 +2643,7 @@ namespace BranchInputManager {
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                         BranchFluidType = state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType;
                         InitialBranchFluidNode = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
-                        OriginalBranchFluidType = DataLoopNode::ValidNodeFluidTypes(DataLoopNode::NodeFluidType::Blank);
+                        OriginalBranchFluidType = DataLoopNode::ValidNodeFluidTypes[static_cast<int>(DataLoopNode::NodeFluidType::Blank)];
                     } else if (BranchFluidType !=
                                    state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType &&
                                state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode).FluidType !=
@@ -2663,7 +2663,7 @@ namespace BranchInputManager {
                         BranchFluidNodes(NumFluidNodes) = state.dataBranchInputManager->Branch(Found).Component(Loop).InletNode;
                         BranchFluidType = state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType;
                         InitialBranchFluidNode = state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode;
-                        OriginalBranchFluidType = DataLoopNode::ValidNodeFluidTypes(BranchFluidType);
+                        OriginalBranchFluidType = DataLoopNode::ValidNodeFluidTypes[static_cast<int>(BranchFluidType)];
                     } else if (BranchFluidType !=
                                    state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType &&
                                state.dataLoopNodes->Node(state.dataBranchInputManager->Branch(Found).Component(Loop).OutletNode).FluidType !=
@@ -2727,7 +2727,8 @@ namespace BranchInputManager {
                         continue;
                     }
                     for (Loop2 = Ptr; Loop2 <= EndPtr; ++Loop2) {
-                        cBranchFluidType = DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(BranchFluidNodes(Loop2)).FluidType);
+                        cBranchFluidType =
+                            DataLoopNode::ValidNodeFluidTypes[static_cast<int>(state.dataLoopNodes->Node(BranchFluidNodes(Loop2)).FluidType)];
                         if (cBranchFluidType.empty()) cBranchFluidType = "**Unknown**";
                         ShowContinueError(state,
                                           "....Node=" + state.dataLoopNodes->NodeID(BranchFluidNodes(Loop2)) + ", Fluid Type=" + cBranchFluidType);

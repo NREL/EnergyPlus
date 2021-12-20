@@ -117,7 +117,7 @@ public:
 
     int getNumSectionsFound(std::string const &SectionWord);
 
-    int getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord);
+    int getNumObjectsFound(EnergyPlusData &state, std::string_view const &ObjectWord);
 
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
@@ -138,7 +138,7 @@ public:
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
     void getObjectItem(EnergyPlusData &state,
-                       std::string const &Object,
+                       std::string_view const &Object,
                        int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
@@ -155,8 +155,8 @@ public:
     int getJSONObjNum(EnergyPlusData &state, std::string const &Object, int const Number);
 
     int getObjectItemNum(EnergyPlusData &state,
-                         std::string const &ObjType, // Object Type (ref: IDD Objects)
-                         std::string const &ObjName  // Name of the object type
+                         std::string_view const &ObjType, // Object Type (ref: IDD Objects)
+                         std::string_view const &ObjName  // Name of the object type
     );
 
     int getObjectItemNum(EnergyPlusData &state,
@@ -181,10 +181,10 @@ public:
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);
 
     void getObjectDefMaxArgs(EnergyPlusData &state,
-                             std::string const &ObjectWord, // Object for definition
-                             int &NumArgs,                  // How many arguments (max) this Object can have
-                             int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
-                             int &NumNumeric                // How many Numeric arguments (max) this Object can have
+                             std::string_view const &ObjectWord, // Object for definition
+                             int &NumArgs,                       // How many arguments (max) this Object can have
+                             int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
+                             int &NumNumeric                     // How many Numeric arguments (max) this Object can have
     );
 
     void preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal); // True if a preprocessor flags a fatal error

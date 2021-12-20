@@ -503,7 +503,7 @@ int InputProcessor::getNumSectionsFound(std::string const &SectionWord)
     return static_cast<int>(SectionWord_iter.value().size());
 }
 
-int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const &ObjectWord)
+int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string_view const &ObjectWord)
 {
 
     // FUNCTION INFORMATION:
@@ -521,10 +521,10 @@ int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const 
     // Look up object in list of objects.  If there, return the
     // number of objects found in the current input.  If not, return 0.
 
-    auto const &find_obj = epJSON.find(ObjectWord);
+    auto const &find_obj = epJSON.find(std::string(ObjectWord));
 
     if (find_obj == epJSON.end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
             return 0;
         }
@@ -533,10 +533,10 @@ int InputProcessor::getNumObjectsFound(EnergyPlusData &state, std::string const 
         return static_cast<int>(find_obj.value().size());
     }
 
-    if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
+    if (schema["properties"].find(std::string(ObjectWord)) == schema["properties"].end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowWarningError(state, "Requested Object not found in Definitions: " + ObjectWord);
+            ShowWarningError(state, fmt::format("Requested Object not found in Definitions: {}", ObjectWord));
         }
     }
     return 0;
@@ -898,7 +898,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
 }
 
 void InputProcessor::getObjectItem(EnergyPlusData &state,
-                                   std::string const &Object,
+                                   std::string_view const &Object,
                                    int const Number,
                                    Array1S_string Alphas,
                                    int &NumAlphas,
@@ -919,15 +919,15 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the 'number' 'object' from the IDFRecord data structure.
 
-    int adjustedNumber = getJSONObjNum(state, Object, Number); // if incoming input is idf, then use idf object order
+    int adjustedNumber = getJSONObjNum(state, std::string(Object), Number); // if incoming input is idf, then use idf object order
 
     auto objectInfo = ObjectInfo();
     objectInfo.objectType = Object;
     // auto sorted_iterators = find_iterators;
 
-    auto find_iterators = objectCacheMap.find(Object);
+    auto find_iterators = objectCacheMap.find(std::string(Object));
     if (find_iterators == objectCacheMap.end()) {
-        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(Object));
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(Object)));
         if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
             return;
         }
@@ -1001,7 +1001,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
         auto const &field_info = legacy_idd_field_info.find(field);
         auto const &field_info_val = field_info.value();
         if (field_info == legacy_idd_field_info.end()) {
-            ShowFatalError(state, "Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema.");
+            ShowFatalError(state, fmt::format(R"(Could not find field = "{}" in "{}" in epJSON Schema.)", field, Object));
         }
 
         bool within_idf_fields = (i < maxFields.max_fields);
@@ -1057,7 +1057,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
                     auto const &field_info_val = field_info.value();
 
                     if (field_info == legacy_idd_field_info.end()) {
-                        ShowFatalError(state, "Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema.");
+                        ShowFatalError(state, fmt::format(R"(Could not find field = "{}" in "{}" in epJSON Schema.)", field_name, Object));
                     }
 
                     bool within_idf_extensible_fields = (extensible_count < maxFields.max_extensible_fields);
@@ -1173,17 +1173,17 @@ int InputProcessor::getJSONObjNum(EnergyPlusData &state, std::string const &Obje
 }
 
 int InputProcessor::getObjectItemNum(EnergyPlusData &state,
-                                     std::string const &ObjType, // Object Type (ref: IDD Objects)
-                                     std::string const &ObjName  // Name of the object type
+                                     std::string_view const &ObjType, // Object Type (ref: IDD Objects)
+                                     std::string_view const &ObjName  // Name of the object type
 )
 {
     // PURPOSE OF THIS SUBROUTINE:
     // Get the occurrence number of an object of type ObjType and name ObjName
 
     json *obj;
-    auto obj_iter = epJSON.find(ObjType);
-    if (obj_iter == epJSON.end() || obj_iter.value().find(ObjName) == obj_iter.value().end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjType));
+    auto obj_iter = epJSON.find(std::string(ObjType));
+    if (obj_iter == epJSON.end() || obj_iter.value().find(std::string(ObjName)) == obj_iter.value().end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjType)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             return -1; // indicates object type not found, see function GeneralRoutines::ValidateComponent
         }
@@ -1206,7 +1206,7 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     if (!found) {
         return 0; // indicates object name not found, see function GeneralRoutines::ValidateComponent
     }
-    return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
+    return getIDFObjNum(state, std::string(ObjType), object_item_num); // if incoming input is idf, then return idf object order
 }
 
 int InputProcessor::getObjectItemNum(EnergyPlusData &state,
@@ -1383,10 +1383,10 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
 }
 
 void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
-                                         std::string const &ObjectWord, // Object for definition
-                                         int &NumArgs,                  // How many arguments (max) this Object can have
-                                         int &NumAlpha,                 // How many Alpha arguments (max) this Object can have
-                                         int &NumNumeric                // How many Numeric arguments (max) this Object can have
+                                         std::string_view const &ObjectWord, // Object for definition
+                                         int &NumArgs,                       // How many arguments (max) this Object can have
+                                         int &NumAlpha,                      // How many Alpha arguments (max) this Object can have
+                                         int &NumNumeric                     // How many Numeric arguments (max) this Object can have
 )
 {
     // PURPOSE OF THIS SUBROUTINE:
@@ -1398,28 +1398,28 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     NumAlpha = 0;
     NumNumeric = 0;
     json *object;
-    if (schema["properties"].find(ObjectWord) == schema["properties"].end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
+    if (schema["properties"].find(std::string(ObjectWord)) == schema["properties"].end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowSevereError(state, "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
+            ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
         }
         object = &schema["properties"][tmp_umit->second];
     } else {
-        object = &schema["properties"][ObjectWord];
+        object = &schema["properties"][std::string(ObjectWord)];
     }
     const json &legacy_idd = object->at("legacy_idd");
 
     json *objects;
-    if (epJSON.find(ObjectWord) == epJSON.end()) {
-        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
+    if (epJSON.find(std::string(ObjectWord)) == epJSON.end()) {
+        auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(std::string(ObjectWord)));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
-            ShowSevereError(state, "getObjectDefMaxArgs: Did not find object=\"" + ObjectWord + "\" in list of objects.");
+            ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
         }
         objects = &epJSON[tmp_umit->second];
     } else {
-        objects = &epJSON[ObjectWord];
+        objects = &epJSON[std::string(ObjectWord)];
     }
 
     size_t max_size = 0;

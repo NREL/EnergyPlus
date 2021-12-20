@@ -147,17 +147,8 @@ namespace OutdoorAirUnit {
         Num
     };
 
-    constexpr const char *CurrentModuleObjects(CurrentObject const co)
-    {
-        switch (co) {
-        case CurrentObject::OAUnit:
-            return "ZoneHVAC:OutdoorAirUnit";
-        case CurrentObject::EqList:
-            return "ZoneHVAC:OutdoorAirUnit:EquipmentList";
-        default:
-            return "";
-        }
-    }
+    constexpr static std::array<std::string_view, static_cast<int>(CurrentObject::Num)> CurrentModuleObjects = {
+        "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:OutdoorAirUnit:EquipmentList"};
 
     struct OAEquipList
     {

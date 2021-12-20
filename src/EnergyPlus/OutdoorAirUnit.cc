@@ -285,11 +285,11 @@ namespace OutdoorAirUnit {
         if (!state.dataOutdoorAirUnit->GetOutdoorAirUnitInputFlag) return;
 
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
-            state, CurrentModuleObjects(CurrentObject::OAUnit), TotalArgs, NumAlphas, NumNums);
+            state, CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)], TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
-            state, CurrentModuleObjects(CurrentObject::EqList), TotalArgs, NumAlphas, NumNums);
+            state, CurrentModuleObjects[static_cast<int>(CurrentObject::EqList)], TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -301,7 +301,7 @@ namespace OutdoorAirUnit {
         lNumericBlanks.dimension(MaxNums, true);
         cAlphaArgs.allocate(NumAlphas);
 
-        CurrentModuleObject = CurrentModuleObjects(CurrentObject::OAUnit);
+        CurrentModuleObject = CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)];
         state.dataOutdoorAirUnit->NumOfOAUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataOutdoorAirUnit->OutAirUnit.allocate(state.dataOutdoorAirUnit->NumOfOAUnits);
@@ -640,10 +640,16 @@ namespace OutdoorAirUnit {
             OutAirUnit(OAUnitNum).ComponentListName = ComponentListName;
             if (!lAlphaBlanks(16)) {
                 ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-                    state, CurrentModuleObjects(CurrentObject::EqList), ComponentListName);
+                    state, CurrentModuleObjects[static_cast<int>(CurrentObject::EqList)], ComponentListName);
                 if (ListNum > 0) {
-                    state.dataInputProcessing->inputProcessor->getObjectItem(
-                        state, CurrentModuleObjects(CurrentObject::EqList), ListNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+                    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                             CurrentModuleObjects[static_cast<int>(CurrentObject::EqList)],
+                                                                             ListNum,
+                                                                             AlphArray,
+                                                                             NumAlphas,
+                                                                             NumArray,
+                                                                             NumNums,
+                                                                             IOStat);
                     NumInList = (NumAlphas - 1) / 2; // potential problem if puts in type but not name
                     if (mod(NumAlphas - 1, 2) != 0) ++NumInList;
                     OutAirUnit(OAUnitNum).NumComponents = NumInList;
@@ -1553,13 +1559,13 @@ namespace OutdoorAirUnit {
             if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (OutAirUnit(OAUnitNum).OutAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state,
-                                                 CurrentModuleObjects(CurrentObject::OAUnit),
+                                                 CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)],
                                                  OutAirUnit(OAUnitNum).Name,
                                                  "User-Specified Outdoor Air Flow Rate [m3/s]",
                                                  OutAirUnit(OAUnitNum).OutAirVolFlow);
                 }
             } else {
-                CheckZoneSizing(state, CurrentModuleObjects(CurrentObject::OAUnit), OutAirUnit(OAUnitNum).Name);
+                CheckZoneSizing(state, std::string(CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)]), OutAirUnit(OAUnitNum).Name);
                 OutAirVolFlowDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 if (OutAirVolFlowDes < SmallAirVolFlow) {
                     OutAirVolFlowDes = 0.0;
@@ -1567,7 +1573,7 @@ namespace OutdoorAirUnit {
                 if (IsAutoSize) {
                     OutAirUnit(OAUnitNum).OutAirVolFlow = OutAirVolFlowDes;
                     BaseSizer::reportSizerOutput(state,
-                                                 CurrentModuleObjects(CurrentObject::OAUnit),
+                                                 CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)],
                                                  OutAirUnit(OAUnitNum).Name,
                                                  "Design Size Outdoor Air Flow Rate [m3/s]",
                                                  OutAirVolFlowDes);
@@ -1575,14 +1581,14 @@ namespace OutdoorAirUnit {
                     if (OutAirUnit(OAUnitNum).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
                         OutAirVolFlowUser = OutAirUnit(OAUnitNum).OutAirVolFlow;
                         BaseSizer::reportSizerOutput(state,
-                                                     CurrentModuleObjects(CurrentObject::OAUnit),
+                                                     CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)],
                                                      OutAirUnit(OAUnitNum).Name,
                                                      "User-Specified Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 BaseSizer::reportSizerOutput(state,
-                                                             CurrentModuleObjects(CurrentObject::OAUnit),
+                                                             CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)],
                                                              OutAirUnit(OAUnitNum).Name,
                                                              "Design Size Outdoor Air Flow Rate [m3/s]",
                                                              OutAirVolFlowDes);
@@ -1608,7 +1614,7 @@ namespace OutdoorAirUnit {
             if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (OutAirUnit(OAUnitNum).ExtAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state,
-                                                 CurrentModuleObjects(CurrentObject::OAUnit),
+                                                 CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)],
                                                  OutAirUnit(OAUnitNum).Name,
                                                  "User-Specified Exhaust Air Flow Rate [m3/s]",
                                                  OutAirUnit(OAUnitNum).ExtAirVolFlow);
@@ -1619,7 +1625,7 @@ namespace OutdoorAirUnit {
                 if (IsAutoSize) {
                     OutAirUnit(OAUnitNum).ExtAirVolFlow = ExtAirVolFlowDes;
                     BaseSizer::reportSizerOutput(state,
-                                                 CurrentModuleObjects(CurrentObject::OAUnit),
+                                                 CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)],
                                                  OutAirUnit(OAUnitNum).Name,
                                                  "Design Size Exhaust Air Flow Rate [m3/s]",
                                                  ExtAirVolFlowDes);
@@ -1627,14 +1633,14 @@ namespace OutdoorAirUnit {
                     if (OutAirUnit(OAUnitNum).ExtAirVolFlow > 0.0 && ExtAirVolFlowDes > 0.0) {
                         ExtAirVolFlowUser = OutAirUnit(OAUnitNum).ExtAirVolFlow;
                         BaseSizer::reportSizerOutput(state,
-                                                     CurrentModuleObjects(CurrentObject::OAUnit),
+                                                     CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)],
                                                      OutAirUnit(OAUnitNum).Name,
                                                      "User-Specified Exhaust Air Flow Rate [m3/s]",
                                                      ExtAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(ExtAirVolFlowDes - ExtAirVolFlowUser) / ExtAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 BaseSizer::reportSizerOutput(state,
-                                                             CurrentModuleObjects(CurrentObject::OAUnit),
+                                                             CurrentModuleObjects[static_cast<int>(CurrentObject::OAUnit)],
                                                              OutAirUnit(OAUnitNum).Name,
                                                              "Design Size Exhaust Air Flow Rate [m3/s]",
                                                              ExtAirVolFlowDes);
