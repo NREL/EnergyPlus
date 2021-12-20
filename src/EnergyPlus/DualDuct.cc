@@ -165,21 +165,18 @@ namespace DualDuct {
             thisDualDuct.InitDualDuct(state, FirstHVACIteration); // Initialize all Damper related parameters
 
             // Calculate the Correct Damper Model with the current DDNum
-            {
-                auto const SELECT_CASE_var(thisDualDuct.DamperType);
-
-                if (SELECT_CASE_var == DualDuctDamper::ConstantVolume) { // 'AirTerminal:DualDuct:ConstantVolume'
-
-                    thisDualDuct.SimDualDuctConstVol(state, ZoneNum, ZoneNodeNum);
-
-                } else if (SELECT_CASE_var == DualDuctDamper::VariableVolume) { // 'AirTerminal:DualDuct:VAV'
-
-                    thisDualDuct.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
-
-                } else if (SELECT_CASE_var == DualDuctDamper::OutdoorAir) {
-
-                    thisDualDuct.SimDualDuctVAVOutdoorAir(state, ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
-                }
+            switch (thisDualDuct.DamperType) {
+            case DualDuctDamper::ConstantVolume: { // 'AirTerminal:DualDuct:ConstantVolume'
+                thisDualDuct.SimDualDuctConstVol(state, ZoneNum, ZoneNodeNum);
+            } break;
+            case DualDuctDamper::VariableVolume: { // 'AirTerminal:DualDuct:VAV'
+                thisDualDuct.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
+            } break;
+            case DualDuctDamper::OutdoorAir: {
+                thisDualDuct.SimDualDuctVAVOutdoorAir(state, ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
+            } break;
+            default:
+                break;
             }
 
             // Update the current Damper to the outlet nodes
