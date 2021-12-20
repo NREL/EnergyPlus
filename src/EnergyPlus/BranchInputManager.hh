@@ -139,7 +139,7 @@ namespace BranchInputManager {
         // Default Constructor
         BranchData()
             : PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Invalid), PressureCurveIndex(0),
-              FluidType(DataLoopNode::NodeFluidType::Blank), NumOfComponents(0)
+              FluidType(DataLoopNode::NodeFluidType::Invalid), NumOfComponents(0)
         {
         }
 

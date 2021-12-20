@@ -203,7 +203,7 @@ namespace ChillerIndirectAbsorption {
               GeneratorDeltaTempWasAutoSized(true), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), GeneratorInputCurvePtr(0), PumpPowerCurvePtr(0), CapFCondenserTempPtr(0),
               CapFEvaporatorTempPtr(0), CapFGeneratorTempPtr(0), HeatInputFCondTempPtr(0), HeatInputFEvapTempPtr(0), ErrCount2(0),
-              GenHeatSourceType(DataLoopNode::NodeFluidType::Blank), SteamFluidIndex(0), Available(false), ON(false),
+              GenHeatSourceType(DataLoopNode::NodeFluidType::Invalid), SteamFluidIndex(0), Available(false), ON(false),
               FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), MinCondInletTempCtr(0),
               MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
               CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0),

@@ -433,7 +433,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                ErrorsFound,
                                                                                state.dataIPShortCut->cCurrentModuleObject,
                                                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                                               DataLoopNode::NodeFluidType::Blank,
+                                                                               DataLoopNode::NodeFluidType::Invalid,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
                                                                                NodeInputManager::CompFluidStream::Secondary,
                                                                                DataLoopNode::ObjectIsNotParent);
@@ -443,7 +443,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                                 ErrorsFound,
                                                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                                                DataLoopNode::NodeFluidType::Blank,
+                                                                                DataLoopNode::NodeFluidType::Invalid,
                                                                                 DataLoopNode::NodeConnectionType::Outlet,
                                                                                 NodeInputManager::CompFluidStream::Secondary,
                                                                                 DataLoopNode::ObjectIsNotParent);
