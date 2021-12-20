@@ -3610,14 +3610,15 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     YR = std::tan(state.dataDaylightingManager->PHSUN + 0.001);
                     POSFAC = DayltgGlarePositionFactor(XR, YR);
 
-                    {
-                        auto const SELECT_CASE_var(CalledFrom);
-
-                        if (SELECT_CASE_var == DataDaylighting::CalledFor::RefPoint) {
-                            WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint);
-                        } else if (SELECT_CASE_var == DataDaylighting::CalledFor::MapPoint) {
-                            WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd;
-                        }
+                    switch (CalledFrom) {
+                    case DataDaylighting::CalledFor::RefPoint: {
+                        WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(IWin).SolidAngAtRefPtWtd(iRefPoint);
+                    } break;
+                    case DataDaylighting::CalledFor::MapPoint: {
+                        WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd;
+                    } break;
+                    default:
+                        break;
                     }
 
                     if (POSFAC != 0.0 && WindowSolidAngleDaylightPoint > 0.000001) {
@@ -8889,15 +8890,16 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
     iConst = state.dataSurface->SurfaceWindow(iWin).ComplexFen.State(CurCplxFenState).Konst;
     SolBmIndex = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).SolBmIndex(iHour, state.dataGlobal->TimeStep);
 
-    {
-        auto const SELECT_CASE_var(CalledFrom);
-        if (SELECT_CASE_var == DataDaylighting::CalledFor::RefPoint) {
-            WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(iWin).SolidAngAtRefPtWtd(iRefPoint);
-        } else if (SELECT_CASE_var == DataDaylighting::CalledFor::MapPoint) {
-            WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd;
-        } else {
-            assert(false); // Bad CalledFrom argument
-        }
+    switch (CalledFrom) {
+    case DataDaylighting::CalledFor::RefPoint: {
+        WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(iWin).SolidAngAtRefPtWtd(iRefPoint);
+    } break;
+    case DataDaylighting::CalledFor::MapPoint: {
+        WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd;
+    } break;
+    default: {
+        assert(false); // Bad CalledFrom argument
+    } break;
     }
 
     if (WindowSolidAngleDaylightPoint < 1e-6) return;
