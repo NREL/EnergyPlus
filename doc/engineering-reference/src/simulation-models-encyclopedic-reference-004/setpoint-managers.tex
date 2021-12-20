@@ -70,7 +70,7 @@ Otherwise:
 \end{equation}
 
 The parameter \(T_{set}\) is determined as per the following pseudo code:
- 
+
 If \({T_{out,low}} < {T_{out,high}}\) ~then
 
 ~~~ If \({T_{out}} \le {T_{out,low}}\) ~then
@@ -94,6 +94,28 @@ Otherwise
 End IF
 
 \emph{\({T_{set}}\)}will be applied to the node or nodes specified in the \emph{SetpointManager:OutdoorAirReset} object input.
+
+\subsection{Outdoor Air Reset}\label{outdoor-air-reset}
+
+The input object SetpointManager:SystemNodeReset provides a setpoint manager that places a temperature or humidity setpoint on a system node (or any other user-specified system node) according to the return temperature or humidity using a reset strategy. The user defines a reset rule for this strategy by specifying two supply temperature or humidity ratio setpoints at two return air temperatures or humidity ratios. Generally the lower supply temperature (or humidity ratio) setpoint is matched with the higher return air temperature (or humidity ratio) and vice versa.
+
+The parameter \(T_{set}\) is determined as per the following pseudo code:
+
+If \({T_{ret,low}} < {T_{ret,high}}\) ~then
+     If \({T_{ret}} \le {T_{ret,low}}\) ~then
+          \({T_{set}} = {T_{set,atRetlow}}\)
+     End If
+     If \({T_{ret}} \ge {T_{ret,high}}\) ~then
+          \({T_{set}} = {T_{set,atRethigh}}\)
+     Else
+          \({T_{set}} = {T_{set,atRetlow}} - (({T_{ret}} - {T_{ret,low}})/({T_{ret,high}} - {T_{ret,low}}))\cdot ({T_{set,atRetlow}} - {T_{set,atRethigh}})\)
+     End If
+Else
+     \({T_{set}} = 0.5({T_{set,atRetlow}} + {T_{set,atRethigh)}}\)
+End IF
+
+\emph{\({T_{set}}\)} will be applied to the node or nodes specified in the \emph{SetpointManager:SystemNodeReset} object input.
+When humidity ratio is selected as the control variable, the same pseudo code, but addressing humidity ratio, will be applied.
 
 \subsection{Single Zone Reheat Heating and Cooling}\label{single-zone-reheat-heating-and-cooling}
 
