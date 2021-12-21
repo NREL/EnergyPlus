@@ -60,11 +60,6 @@ namespace EnergyPlus {
 
 namespace DataLoopNode {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
     enum class NodeFluidType
     {
         Invalid = -1,
@@ -78,7 +73,6 @@ namespace DataLoopNode {
     enum class NodeConnectionType
     {
         Invalid = -1,
-        Blank,
         Inlet,
         Outlet,
         Internal,
@@ -97,8 +91,6 @@ namespace DataLoopNode {
         Num
     };
 
-    constexpr int NumValidConnectionTypes(15);
-
     constexpr Real64 SensedLoadFlagValue(-999.0);
     constexpr Real64 SensedNodeFlagValue(-999.0);
 
@@ -109,6 +101,7 @@ namespace DataLoopNode {
 
     // Valid Fluid Types for Nodes
     constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> ValidNodeFluidTypes = {"Air", "Water", "Steam", "Electric"};
+    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> ValidNodeFluidTypesUC = {"AIR", "WATER", "STEAM", "ELECTRIC"};
 
     // Valid Connection Types for Nodes
     constexpr const char *ValidConnectionTypes(NodeConnectionType const NodeConnectionType)

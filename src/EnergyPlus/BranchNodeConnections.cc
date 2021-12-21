@@ -265,13 +265,9 @@ bool IsValidConnectionType(std::string_view ConnectionType)
     // This function determines if a connection type is valid.
 
     // Return value
-    bool IsValid;
+    bool IsValid = false;
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int Count;
-
-    IsValid = false;
-    for (Count = 1; Count <= NumValidConnectionTypes; ++Count) {
+    for (int Count = 0; Count < static_cast<int>(NodeConnectionType::Num); ++Count) {
         if (ConnectionType != DataLoopNode::ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(Count))) continue;
         IsValid = true;
         break;
@@ -1699,8 +1695,8 @@ void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, Array1D_
     Array1D_int ListArray;
     Array1D_string ConnectionTypes(15);
 
-    for (int nodetype = 1; nodetype <= NumValidConnectionTypes; ++nodetype) {
-        ConnectionTypes(nodetype) = ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(nodetype));
+    for (int nodetype = 0; nodetype < static_cast<int>(NodeConnectionType::Num); ++nodetype) {
+        ConnectionTypes(nodetype + 1) = ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(nodetype));
     }
 
     if (allocated(NodeConnectType)) NodeConnectType.deallocate();
@@ -1715,7 +1711,7 @@ void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, Array1D_
             NodeConnectType(NodeConnectIndex) =
                 UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->NodeConnections(ListArray(NodeConnectIndex)).ConnectionType,
                                                 ConnectionTypes,
-                                                NumValidConnectionTypes);
+                                                static_cast<int>(NodeConnectionType::Num));
         }
     } else {
         if (NodeNumber > 0) {
