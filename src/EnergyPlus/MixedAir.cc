@@ -2775,62 +2775,59 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
     }
     if (OAControllerMyOneTimeFlag(OAControllerNum)) {
         // Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
-        {
-            auto const SELECT_CASE_var(thisOAController.ControllerType_Num);
-
-            if (SELECT_CASE_var == MixedAirControllerType::ControllerOutsideAir) {
-                thisOASys = 0;
-                for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
-                    // find which OAsys has this controller
-                    found = UtilityRoutines::FindItemInList(thisOAController.Name,
-                                                            state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName,
-                                                            isize(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName));
-                    if (found != 0) {
-                        thisOASys = OASysNum;
-                        state.dataAirLoop->OutsideAirSys(thisOASys).OAControllerIndex = GetOAController(state, thisOAController.Name);
-                        break; // we found it
-                    }
+        switch (thisOAController.ControllerType_Num) {
+        case MixedAirControllerType::ControllerOutsideAir: {
+            thisOASys = 0;
+            for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
+                // find which OAsys has this controller
+                found = UtilityRoutines::FindItemInList(thisOAController.Name,
+                                                        state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName,
+                                                        isize(state.dataAirLoop->OutsideAirSys(OASysNum).ControllerName));
+                if (found != 0) {
+                    thisOASys = OASysNum;
+                    state.dataAirLoop->OutsideAirSys(thisOASys).OAControllerIndex = GetOAController(state, thisOAController.Name);
+                    break; // we found it
                 }
-                if (thisOASys == 0) {
-                    ShowSevereError(state, "InitOAController: Did not find OAController=\"" + thisOAController.Name + "\".");
-                    ShowContinueError(state, "in list of valid OA Controllers.");
-                    ErrorsFound = true;
-                }
-                thisNumForMixer = UtilityRoutines::FindItem(CurrentModuleObjects(static_cast<int>(CMO::OAMixer)),
-                                                            state.dataAirLoop->OutsideAirSys(thisOASys).ComponentType,
-                                                            isize(state.dataAirLoop->OutsideAirSys(thisOASys).ComponentType));
-                if (thisNumForMixer != 0) {
-                    equipName = state.dataAirLoop->OutsideAirSys(thisOASys).ComponentName(thisNumForMixer);
-                    thisMixerIndex = UtilityRoutines::FindItemInList(equipName, state.dataMixedAir->OAMixer);
-                    if (thisMixerIndex != 0) {
-                        thisOAController.InletNode = state.dataMixedAir->OAMixer(thisMixerIndex).InletNode;
-                    } else {
-                        ShowSevereError(state, "InitOAController: Did not find OAMixer=\"" + equipName + "\".");
-                        ShowContinueError(state, "in list of valid OA Mixers.");
-                        ErrorsFound = true;
-                    }
-                } else {
-                    ShowSevereError(state, "InitOAController: Did not find OutdoorAir:Mixer Component=\"OutdoorAir:Mixer\".");
-                    ShowContinueError(state, "in list of valid OA Components.");
-                    ErrorsFound = true;
-                }
-
-                if (thisOAController.InletNode == 0) { // throw an error
-                    ShowSevereError(
-                        state, "InitOAController: Failed to find proper inlet node for OutdoorAir:Mixer and Controller = " + thisOAController.Name);
-                    ErrorsFound = true;
-                }
-
-            } else if (SELECT_CASE_var == MixedAirControllerType::ControllerStandAloneERV) {
-                // set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
-                // with the assumption that equipment is bypassed....
-
-                thisOAController.InletNode = thisOAController.OANode;
-
-            } else {
-                ShowSevereError(state, "InitOAController: Failed to find ControllerType: " + thisOAController.ControllerType);
+            }
+            if (thisOASys == 0) {
+                ShowSevereError(state, "InitOAController: Did not find OAController=\"" + thisOAController.Name + "\".");
+                ShowContinueError(state, "in list of valid OA Controllers.");
                 ErrorsFound = true;
             }
+            thisNumForMixer = UtilityRoutines::FindItem(CurrentModuleObjects(static_cast<int>(CMO::OAMixer)),
+                                                        state.dataAirLoop->OutsideAirSys(thisOASys).ComponentType,
+                                                        isize(state.dataAirLoop->OutsideAirSys(thisOASys).ComponentType));
+            if (thisNumForMixer != 0) {
+                equipName = state.dataAirLoop->OutsideAirSys(thisOASys).ComponentName(thisNumForMixer);
+                thisMixerIndex = UtilityRoutines::FindItemInList(equipName, state.dataMixedAir->OAMixer);
+                if (thisMixerIndex != 0) {
+                    thisOAController.InletNode = state.dataMixedAir->OAMixer(thisMixerIndex).InletNode;
+                } else {
+                    ShowSevereError(state, "InitOAController: Did not find OAMixer=\"" + equipName + "\".");
+                    ShowContinueError(state, "in list of valid OA Mixers.");
+                    ErrorsFound = true;
+                }
+            } else {
+                ShowSevereError(state, "InitOAController: Did not find OutdoorAir:Mixer Component=\"OutdoorAir:Mixer\".");
+                ShowContinueError(state, "in list of valid OA Components.");
+                ErrorsFound = true;
+            }
+
+            if (thisOAController.InletNode == 0) { // throw an error
+                ShowSevereError(state,
+                                "InitOAController: Failed to find proper inlet node for OutdoorAir:Mixer and Controller = " + thisOAController.Name);
+                ErrorsFound = true;
+            }
+        } break;
+        case MixedAirControllerType::ControllerStandAloneERV: {
+            // set the inlet node to also equal the OA node because this is a special controller for economizing stand alone ERV
+            // with the assumption that equipment is bypassed....
+            thisOAController.InletNode = thisOAController.OANode;
+        } break;
+        default: {
+            ShowSevereError(state, "InitOAController: Failed to find ControllerType: " + thisOAController.ControllerType);
+            ErrorsFound = true;
+        } break;
         }
 
         OAControllerMyOneTimeFlag(OAControllerNum) = false;
@@ -3496,69 +3493,75 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             if (std::abs(rOffset) < 0.000000001) continue;
 
             // ECONOMIZER - outdoor air dry-bulb temperature sensor offset
-            {
-                auto const SELECT_CASE_var(iEco);
-                if ((SELECT_CASE_var == EconoOp::FixedDryBulb) || (SELECT_CASE_var == EconoOp::DifferentialDryBulb) ||
-                    (SELECT_CASE_var == EconoOp::FixedDewPointAndDryBulb) || (SELECT_CASE_var == EconoOp::ElectronicEnthalpy) ||
-                    (SELECT_CASE_var == EconoOp::DifferentialDryBulbAndEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::TemperatureSensorOffset_OutdoorAir) {
-                        // FaultModel:TemperatureSensorOffset:OutdoorAir
-                        thisOAController.OATemp += rOffset;
-                        thisOAController.InletTemp += rOffset;
-                    }
-                } else {
+            switch (iEco) {
+            case EconoOp::FixedDryBulb:
+            case EconoOp::DifferentialDryBulb:
+            case EconoOp::FixedDewPointAndDryBulb:
+            case EconoOp::ElectronicEnthalpy:
+            case EconoOp::DifferentialDryBulbAndEnthalpy: {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::TemperatureSensorOffset_OutdoorAir) {
+                    // FaultModel:TemperatureSensorOffset:OutdoorAir
+                    thisOAController.OATemp += rOffset;
+                    thisOAController.InletTemp += rOffset;
                 }
+            } break;
+            default:
+                break;
             }
 
             // ECONOMIZER - outdoor air humidity ratio sensor offset. really needed ???
-            {
-                auto const SELECT_CASE_var(iEco);
-                if ((SELECT_CASE_var == EconoOp::FixedDewPointAndDryBulb) || (SELECT_CASE_var == EconoOp::ElectronicEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::HumiditySensorOffset_OutdoorAir) {
-                        // FaultModel:HumiditySensorOffset:OutdoorAir
-                        thisOAController.OAHumRat += rOffset;
-                        thisOAController.InletHumRat += rOffset;
-                    }
-                } else {
+            switch (iEco) {
+            case EconoOp::FixedDewPointAndDryBulb:
+            case EconoOp::ElectronicEnthalpy: {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::HumiditySensorOffset_OutdoorAir) {
+                    // FaultModel:HumiditySensorOffset:OutdoorAir
+                    thisOAController.OAHumRat += rOffset;
+                    thisOAController.InletHumRat += rOffset;
                 }
+            } break;
+            default:
+                break;
             }
 
             // ECONOMIZER - outdoor air enthalpy sensor offset
-            {
-                auto const SELECT_CASE_var(iEco);
-                if ((SELECT_CASE_var == EconoOp::FixedEnthalpy) || (SELECT_CASE_var == EconoOp::ElectronicEnthalpy) ||
-                    (SELECT_CASE_var == EconoOp::DifferentialDryBulbAndEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::EnthalpySensorOffset_OutdoorAir) {
-                        // FaultModel:EnthalpySensorOffset:OutdoorAir
-                        thisOAController.OAEnth += rOffset;
-                        thisOAController.InletEnth += rOffset;
-                    }
-                } else {
+            switch (iEco) {
+            case EconoOp::FixedEnthalpy:
+            case EconoOp::ElectronicEnthalpy:
+            case EconoOp::DifferentialDryBulbAndEnthalpy: {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::EnthalpySensorOffset_OutdoorAir) {
+                    // FaultModel:EnthalpySensorOffset:OutdoorAir
+                    thisOAController.OAEnth += rOffset;
+                    thisOAController.InletEnth += rOffset;
                 }
+            } break;
+            default:
+                break;
             }
 
             // ECONOMIZER - return air dry-bulb temperature sensor offset
-            {
-                auto const SELECT_CASE_var(iEco);
-                if ((SELECT_CASE_var == EconoOp::DifferentialDryBulb) || (SELECT_CASE_var == EconoOp::DifferentialDryBulbAndEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::TemperatureSensorOffset_ReturnAir) {
-                        // FaultModel:TemperatureSensorOffset:ReturnAir
-                        thisOAController.RetTemp += rOffset;
-                    }
-                } else {
+            switch (iEco) {
+            case EconoOp::DifferentialDryBulb:
+            case EconoOp::DifferentialDryBulbAndEnthalpy: {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::TemperatureSensorOffset_ReturnAir) {
+                    // FaultModel:TemperatureSensorOffset:ReturnAir
+                    thisOAController.RetTemp += rOffset;
                 }
+            } break;
+            default:
+                break;
             }
 
             // ECONOMIZER - return air enthalpy sensor offset
-            {
-                auto const SELECT_CASE_var(iEco);
-                if ((SELECT_CASE_var == EconoOp::ElectronicEnthalpy) || (SELECT_CASE_var == EconoOp::DifferentialDryBulbAndEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::EnthalpySensorOffset_ReturnAir) {
-                        // FaultModel:EnthalpySensorOffset:ReturnAir
-                        thisOAController.RetEnth += rOffset;
-                    }
-                } else {
+            switch (iEco) {
+            case EconoOp::ElectronicEnthalpy:
+            case EconoOp::DifferentialDryBulbAndEnthalpy: {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::EnthalpySensorOffset_ReturnAir) {
+                    // FaultModel:EnthalpySensorOffset:ReturnAir
+                    thisOAController.RetEnth += rOffset;
                 }
+            } break;
+            default:
+                break;
             }
         }
     }
@@ -5111,49 +5114,42 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
 
         if (state.dataSize->CurSysNum > 0) {
 
-            {
-                auto const SELECT_CASE_var(this->ControllerType_Num);
-
-                if (SELECT_CASE_var == MixedAirControllerType::ControllerOutsideAir) {
-
-                    CheckSysSizing(state, CurrentModuleObject, this->Name);
-
-                    {
-                        auto const SELECT_CASE_var1(state.dataSize->CurDuctType);
-                        if (SELECT_CASE_var1 == Main) {
-                            this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        } else if (SELECT_CASE_var1 == Cooling) {
-                            this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
-                        } else if (SELECT_CASE_var1 == Heating) {
-                            this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
-                        } else if (SELECT_CASE_var1 == Other) {
-                            this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        } else {
-                            this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
-                        }
+            switch (this->ControllerType_Num) {
+            case MixedAirControllerType::ControllerOutsideAir: {
+                CheckSysSizing(state, CurrentModuleObject, this->Name);
+                {
+                    auto const SELECT_CASE_var1(state.dataSize->CurDuctType);
+                    if (SELECT_CASE_var1 == Main) {
+                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    } else if (SELECT_CASE_var1 == Cooling) {
+                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                    } else if (SELECT_CASE_var1 == Heating) {
+                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                    } else if (SELECT_CASE_var1 == Other) {
+                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    } else {
+                        this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                     }
-
-                } else if (SELECT_CASE_var == MixedAirControllerType::ControllerStandAloneERV) {
-
-                } else {
                 }
+            } break;
+            case MixedAirControllerType::ControllerStandAloneERV: {
+            } break;
+            default:
+                break;
             }
 
         } else if (state.dataSize->CurZoneEqNum > 0) {
 
-            {
-                auto const SELECT_CASE_var(this->ControllerType_Num);
-
-                if (SELECT_CASE_var == MixedAirControllerType::ControllerOutsideAir) {
-
-                    CheckZoneSizing(state, CurrentModuleObject, this->Name);
-                    this->MaxOA = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow,
-                                      state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
-
-                } else if (SELECT_CASE_var == MixedAirControllerType::ControllerStandAloneERV) {
-
-                } else {
-                }
+            switch (this->ControllerType_Num) {
+            case MixedAirControllerType::ControllerOutsideAir: {
+                CheckZoneSizing(state, CurrentModuleObject, this->Name);
+                this->MaxOA = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow,
+                                  state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
+            } break;
+            case MixedAirControllerType::ControllerStandAloneERV: {
+            } break;
+            default:
+                break;
             }
         }
 
