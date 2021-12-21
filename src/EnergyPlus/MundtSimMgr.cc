@@ -496,25 +496,30 @@ namespace MundtSimMgr {
         // set up air node ID
         state.dataMundtSimMgr->NumRoomNodes = 0;
         for (NodeNum = 1; NodeNum <= state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneNum); ++NodeNum) {
-            {
-                auto const SELECT_CASE_var(state.dataMundtSimMgr->LineNode(NodeNum, state.dataMundtSimMgr->MundtZoneNum).ClassType);
-                if (SELECT_CASE_var == AirNodeType::InletAirNode) { // inlet
-                    state.dataMundtSimMgr->SupplyNodeID = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::FloorAirNode) { // floor
-                    state.dataMundtSimMgr->MundtFootAirID = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::ControlAirNode) { // thermostat
-                    state.dataMundtSimMgr->TstatNodeID = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::CeilingAirNode) { // ceiling
-                    state.dataMundtSimMgr->MundtCeilAirID = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::MundtRoomAirNode) { // wall
-                    ++state.dataMundtSimMgr->NumRoomNodes;
-                    state.dataMundtSimMgr->RoomNodeIDs(state.dataMundtSimMgr->NumRoomNodes) = NodeNum;
-                } else if (SELECT_CASE_var == AirNodeType::ReturnAirNode) { // return
-                    state.dataMundtSimMgr->ReturnNodeID = NodeNum;
-                } else {
-                    ShowSevereError(state, "SetupMundtModel: Non-Standard Type of Air Node for Mundt Model");
-                    ErrorsFound = true;
-                }
+            switch (state.dataMundtSimMgr->LineNode(NodeNum, state.dataMundtSimMgr->MundtZoneNum).ClassType) {
+            case AirNodeType::InletAirNode: { // inlet
+                state.dataMundtSimMgr->SupplyNodeID = NodeNum;
+            } break;
+            case AirNodeType::FloorAirNode: { // floor
+                state.dataMundtSimMgr->MundtFootAirID = NodeNum;
+            } break;
+            case AirNodeType::ControlAirNode: { // thermostat
+                state.dataMundtSimMgr->TstatNodeID = NodeNum;
+            } break;
+            case AirNodeType::CeilingAirNode: { // ceiling
+                state.dataMundtSimMgr->MundtCeilAirID = NodeNum;
+            } break;
+            case AirNodeType::MundtRoomAirNode: { // wall
+                ++state.dataMundtSimMgr->NumRoomNodes;
+                state.dataMundtSimMgr->RoomNodeIDs(state.dataMundtSimMgr->NumRoomNodes) = NodeNum;
+            } break;
+            case AirNodeType::ReturnAirNode: { // return
+                state.dataMundtSimMgr->ReturnNodeID = NodeNum;
+            } break;
+            default: {
+                ShowSevereError(state, "SetupMundtModel: Non-Standard Type of Air Node for Mundt Model");
+                ErrorsFound = true;
+            } break;
             }
         }
 
