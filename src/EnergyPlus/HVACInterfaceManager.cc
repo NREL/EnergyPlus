@@ -1246,92 +1246,94 @@ void SetupCommonPipes(EnergyPlusData &state)
         auto &first_demand_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).Type);
         auto &first_supply_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).Type);
 
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);
-            if (SELECT_CASE_var == DataPlant::CommonPipeType::No) {
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::No;
+        switch (state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType) {
+        case DataPlant::CommonPipeType::No: {
+            PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::No;
 
-            } else if (SELECT_CASE_var == DataPlant::CommonPipeType::Single) { // Uncontrolled ('single') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::Single;
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).Flow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Temperature",
-                                    OutputProcessor::Unit::C,
-                                    PlantCommonPipe(CurLoopNum).Temp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Flow Direction Status",
-                                    OutputProcessor::Unit::None,
-                                    PlantCommonPipe(CurLoopNum).FlowDir,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
+        } break;
+        case DataPlant::CommonPipeType::Single: { // Uncontrolled ('single') common pipe
+            PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::Single;
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                PlantCommonPipe(CurLoopNum).Flow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataPlnt->PlantLoop(CurLoopNum).Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Temperature",
+                                OutputProcessor::Unit::C,
+                                PlantCommonPipe(CurLoopNum).Temp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataPlnt->PlantLoop(CurLoopNum).Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Flow Direction Status",
+                                OutputProcessor::Unit::None,
+                                PlantCommonPipe(CurLoopNum).FlowDir,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
-                if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
-                    // If/when the model supports variable-pumping primary, this can be removed.
-                    ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
-                    ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                    ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
-                    ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::CommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::TwoWay;
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Primary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).PriCPLegFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Secondary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).SecCPLegFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Primary to Secondary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).PriToSecFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Secondary to Primary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).SecToPriFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-
-                // check type of pump on supply side inlet
-                if (first_supply_component_type == PlantEquipmentType::PumpConstantSpeed) {
-                    PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Constant;
-                } else if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
-                    PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Variable;
-                    // If/when the model supports variable-pumping primary, this can be removed.
-                    ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
-                    ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                    ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
-                    ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
-                }
-                // check type of pump on demand side inlet
-                if (first_demand_component_type == PlantEquipmentType::PumpConstantSpeed) {
-                    PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Constant;
-                } else if (first_demand_component_type == PlantEquipmentType::PumpVariableSpeed) {
-                    PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Variable;
-                }
+            if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
+                // If/when the model supports variable-pumping primary, this can be removed.
+                ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
+                ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
+                ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
             }
+        } break;
+        case DataPlant::CommonPipeType::TwoWay: { // Controlled ('two-way') common pipe
+            PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::TwoWay;
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Primary Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                PlantCommonPipe(CurLoopNum).PriCPLegFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataPlnt->PlantLoop(CurLoopNum).Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Secondary Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                PlantCommonPipe(CurLoopNum).SecCPLegFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataPlnt->PlantLoop(CurLoopNum).Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Primary to Secondary Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                PlantCommonPipe(CurLoopNum).PriToSecFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataPlnt->PlantLoop(CurLoopNum).Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Secondary to Primary Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                PlantCommonPipe(CurLoopNum).SecToPriFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                state.dataPlnt->PlantLoop(CurLoopNum).Name);
+
+            // check type of pump on supply side inlet
+            if (first_supply_component_type == PlantEquipmentType::PumpConstantSpeed) {
+                PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Constant;
+            } else if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
+                PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Variable;
+                // If/when the model supports variable-pumping primary, this can be removed.
+                ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
+                ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
+                ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
+                ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
+            }
+            // check type of pump on demand side inlet
+            if (first_demand_component_type == PlantEquipmentType::PumpConstantSpeed) {
+                PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Constant;
+            } else if (first_demand_component_type == PlantEquipmentType::PumpVariableSpeed) {
+                PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Variable;
+            }
+        } break;
+        default:
+            break;
         }
     }
 
