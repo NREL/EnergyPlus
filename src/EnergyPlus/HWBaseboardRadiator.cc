@@ -210,35 +210,34 @@ namespace HWBaseboardRadiator {
                 MinWaterFlow = state.dataLoopNodes->Node(HWBaseboard(BaseboardNum).WaterInletNode).MassFlowRateMinAvail;
             }
 
-            {
-                auto const SELECT_CASE_var(HWBaseboard(BaseboardNum).EquipType);
-
-                if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water) { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
-                    ControlCompOutput(state,
-                                      HWBaseboard(BaseboardNum).EquipID,
-                                      cCMO_BBRadiator_Water,
-                                      BaseboardNum,
-                                      FirstHVACIteration,
-                                      QZnReq,
-                                      HWBaseboard(BaseboardNum).WaterInletNode,
-                                      MaxWaterFlow,
-                                      MinWaterFlow,
-                                      HWBaseboardDesignDataObject.Offset,
-                                      HWBaseboard(BaseboardNum).ControlCompTypeNum,
-                                      HWBaseboard(BaseboardNum).CompErrIndex,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      _,
-                                      HWBaseboard(BaseboardNum).LoopNum,
-                                      HWBaseboard(BaseboardNum).LoopSideNum,
-                                      HWBaseboard(BaseboardNum).BranchNum);
-                } else {
-                    ShowSevereError(state, "SimBaseboard: Errors in Baseboard=" + HWBaseboard(BaseboardNum).EquipID);
-                    ShowContinueError(state, format("Invalid or unimplemented equipment type={}", HWBaseboard(BaseboardNum).EquipType));
-                    ShowFatalError(state, "Preceding condition causes termination.");
-                }
+            switch (HWBaseboard(BaseboardNum).EquipType) {
+            case DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water: { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
+                ControlCompOutput(state,
+                                  HWBaseboard(BaseboardNum).EquipID,
+                                  cCMO_BBRadiator_Water,
+                                  BaseboardNum,
+                                  FirstHVACIteration,
+                                  QZnReq,
+                                  HWBaseboard(BaseboardNum).WaterInletNode,
+                                  MaxWaterFlow,
+                                  MinWaterFlow,
+                                  HWBaseboardDesignDataObject.Offset,
+                                  HWBaseboard(BaseboardNum).ControlCompTypeNum,
+                                  HWBaseboard(BaseboardNum).CompErrIndex,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  _,
+                                  HWBaseboard(BaseboardNum).LoopNum,
+                                  HWBaseboard(BaseboardNum).LoopSideNum,
+                                  HWBaseboard(BaseboardNum).BranchNum);
+            } break;
+            default: {
+                ShowSevereError(state, "SimBaseboard: Errors in Baseboard=" + HWBaseboard(BaseboardNum).EquipID);
+                ShowContinueError(state, format("Invalid or unimplemented equipment type={}", HWBaseboard(BaseboardNum).EquipType));
+                ShowFatalError(state, "Preceding condition causes termination.");
+            } break;
             }
 
             PowerMet = HWBaseboard(BaseboardNum).TotPower;
