@@ -173,18 +173,15 @@ namespace HVACSingleDuctInduc {
         state.dataSize->TermUnitIU = true;
 
         // Select the correct unit type
-        {
-            auto const SELECT_CASE_var(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num);
-
-            if (SELECT_CASE_var == SingleDuct_CV::FourPipeInduc) {
-
-                SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-
-            } else {
-                ShowSevereError(state, "Illegal Induction Unit Type used=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType);
-                ShowContinueError(state, "Occurs in Induction Unit=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
-                ShowFatalError(state, "Preceding condition causes termination.");
-            }
+        switch (state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num) {
+        case SingleDuct_CV::FourPipeInduc: {
+            SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
+        } break;
+        defatul : {
+            ShowSevereError(state, "Illegal Induction Unit Type used=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType);
+            ShowContinueError(state, "Occurs in Induction Unit=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
+            ShowFatalError(state, "Preceding condition causes termination.");
+        } break;
         }
 
         state.dataSize->TermUnitIU = false;
