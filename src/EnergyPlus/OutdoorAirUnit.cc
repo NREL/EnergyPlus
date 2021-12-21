@@ -1957,53 +1957,55 @@ namespace OutdoorAirUnit {
             }
 
             // Control type check
-            {
-                auto const SELECT_CASE_var(UnitControlType);
-                if (SELECT_CASE_var == OAUnitCtrlType::Neutral) {
-                    SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                    // Neutral Control Condition
-                    if (DesOATemp == SetPointTemp) {
-                        OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
-                        AirOutletTemp = DesOATemp;
-                        OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
+            switch (UnitControlType) {
+            case OAUnitCtrlType::Neutral: {
+                SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+                // Neutral Control Condition
+                if (DesOATemp == SetPointTemp) {
+                    OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
+                    AirOutletTemp = DesOATemp;
+                    OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
+                    SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
+                } else {
+                    if (DesOATemp < SetPointTemp) { // Heating MODE
+                        OutAirUnit(OAUnitNum).OperatingMode = Operation::HeatingMode;
+                        AirOutletTemp = SetPointTemp;
+                        OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
                         SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                    } else {
-                        if (DesOATemp < SetPointTemp) { // Heating MODE
-                            OutAirUnit(OAUnitNum).OperatingMode = Operation::HeatingMode;
-                            AirOutletTemp = SetPointTemp;
-                            OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                        } else if (DesOATemp > SetPointTemp) { // Cooling Mode
-                            OutAirUnit(OAUnitNum).OperatingMode = Operation::CoolingMode;
-                            AirOutletTemp = SetPointTemp;
-                            OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                        }
-                    }
-                    // SetPoint Temperature Condition
-                } else if (SELECT_CASE_var == OAUnitCtrlType::Temperature) {
-                    SetPointTemp = DesOATemp;
-                    HiCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr);
-                    LoCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr);
-                    if ((DesOATemp <= HiCtrlTemp) && (DesOATemp >= LoCtrlTemp)) {
-                        OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
-                        AirOutletTemp = DesOATemp;
-                        OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
+                    } else if (DesOATemp > SetPointTemp) { // Cooling Mode
+                        OutAirUnit(OAUnitNum).OperatingMode = Operation::CoolingMode;
+                        AirOutletTemp = SetPointTemp;
+                        OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
                         SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                    } else {
-                        if (SetPointTemp < LoCtrlTemp) {
-                            OutAirUnit(OAUnitNum).OperatingMode = Operation::HeatingMode;
-                            AirOutletTemp = LoCtrlTemp;
-                            OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                        } else if (SetPointTemp > HiCtrlTemp) {
-                            OutAirUnit(OAUnitNum).OperatingMode = Operation::CoolingMode;
-                            AirOutletTemp = HiCtrlTemp;
-                            OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
-                        }
                     }
                 }
+                // SetPoint Temperature Condition
+            } break;
+            case OAUnitCtrlType::Temperature: {
+                SetPointTemp = DesOATemp;
+                HiCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).HiCtrlTempSchedPtr);
+                LoCtrlTemp = GetCurrentScheduleValue(state, OutAirUnit(OAUnitNum).LoCtrlTempSchedPtr);
+                if ((DesOATemp <= HiCtrlTemp) && (DesOATemp >= LoCtrlTemp)) {
+                    OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
+                    AirOutletTemp = DesOATemp;
+                    OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
+                    SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
+                } else {
+                    if (SetPointTemp < LoCtrlTemp) {
+                        OutAirUnit(OAUnitNum).OperatingMode = Operation::HeatingMode;
+                        AirOutletTemp = LoCtrlTemp;
+                        OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
+                        SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
+                    } else if (SetPointTemp > HiCtrlTemp) {
+                        OutAirUnit(OAUnitNum).OperatingMode = Operation::CoolingMode;
+                        AirOutletTemp = HiCtrlTemp;
+                        OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
+                        SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
+                    }
+                }
+            } break;
+            default:
+                break;
             }
 
             // Fan positioning
