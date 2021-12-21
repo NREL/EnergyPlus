@@ -182,10 +182,10 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
     GLHESlinky thisGLHE;
 
     state->dataPlnt->PlantLoop.allocate(1);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
 
-    state->dataPlnt->PlantLoop(thisGLHE.loopNum).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(thisGLHE.loopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(thisGLHE.plantLoc.loopNum).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(thisGLHE.plantLoc.loopNum).FluidIndex = 1;
 
     thisGLHE.inletTemp = 5.0;
     thisGLHE.massFlowRate = 0.01;
@@ -1287,7 +1287,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UHF)
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20;
     thisGLHE.designFlow = 0.00075708;
 
@@ -1641,7 +1641,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_UBHWT)
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20;
     thisGLHE.designFlow = 0.00075708;
 
@@ -2126,7 +2126,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
 
@@ -2431,7 +2431,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 13.0;
     thisGLHE.designFlow = 0.000303 * 4;
 
@@ -2728,7 +2728,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -3027,7 +3027,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -3326,7 +3326,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -3625,7 +3625,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -3924,7 +3924,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 
@@ -4223,7 +4223,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     SetupBranchControlTypes(*state);
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
-    thisGLHE.loopNum = 1;
+    thisGLHE.plantLoc.loopNum = 1;
     state->dataLoopNodes->Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
 

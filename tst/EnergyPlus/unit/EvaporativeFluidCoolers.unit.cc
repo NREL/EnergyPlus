@@ -108,10 +108,10 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     thisEFC.WaterInletNodeNum = 1;
     thisEFC.WaterOutletNodeNum = 2;
     thisEFC.OutdoorAirInletNodeNum = 0;
-    thisEFC.LoopNum = 1;
-    thisEFC.LoopSideNum = DataPlant::LoopSideLocation::Demand;
-    thisEFC.BranchNum = 1;
-    thisEFC.CompNum = 1;
+    thisEFC.plantLoc.loopNum = 1;
+    thisEFC.plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    thisEFC.plantLoc.branchNum = 1;
+    thisEFC.plantLoc.compNum = 1;
     PlantLocation pl;
     state->dataEnvrn->OutDryBulbTemp = 20.0;
     state->dataEnvrn->OutHumRat = 0.02;

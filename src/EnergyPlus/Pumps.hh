@@ -153,11 +153,8 @@ namespace Pumps {
         std::string PressureCurve_Name; // - placeholder for pump curve name
         PumpType pumpType;              // pump type enumerator, based on local parameter values, used to identify
         // index in the cPumpTypes string array to do error reporting
-        DataPlant::PlantEquipmentType TypeOf_Num;    // pump type of number in reference to the dataplant values
-        int LoopNum;                                 // loop where pump is located
-        DataPlant::LoopSideLocation LoopSideNum;                             // LoopSide index on loop where pump is located
-        int BranchNum;                               // branch index on LoopSide where pump is located
-        int CompNum;                                 // component index on branch where pump is located
+        DataPlant::PlantEquipmentType TypeOf_Num; // pump type of number in reference to the dataplant values
+        PlantLocation plantLoc;
         PumpControlType PumpControl;                 // Integer equivalent of PumpControlType
         int PumpScheduleIndex;                       // Schedule Pointer
         int InletNodeNum;                            // Node number on the inlet side of the plant
@@ -214,7 +211,7 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-            : pumpType(PumpType::Invalid), TypeOf_Num(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
+            : pumpType(PumpType::Invalid), TypeOf_Num(DataPlant::PlantEquipmentType::Invalid), plantLoc{},
               PumpControl(PumpControlType::Invalid), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0),
               SequencingScheme(PumpBankControlSeq::Invalid), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0),
               MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false),

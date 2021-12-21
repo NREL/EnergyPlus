@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -113,10 +114,7 @@ namespace HWBaseboardRadiator {
         Real64 Energy;
         Real64 ConvEnergy;
         Real64 RadEnergy;
-        int LoopNum;     // plant loop index
-        DataPlant::LoopSideLocation LoopSideNum; // plant loop side index
-        int BranchNum;   // plant loop branch index
-        int CompNum;     // plant loop component index
+        PlantLocation plantLoc;
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
@@ -132,7 +130,7 @@ namespace HWBaseboardRadiator {
               WaterInletTempStd(0.0), WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0),
               WaterOutletEnthalpy(0.0), AirInletTempStd(0.0), AirInletTemp(0.0), AirOutletTemp(0.0), AirInletHumRat(0.0), AirOutletTempStd(0.0),
               FracConvect(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0),
-              RadEnergy(0.0), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), BBLoadReSimIndex(0), BBMassFlowReSimIndex(0),
+              RadEnergy(0.0), plantLoc{}, BBLoadReSimIndex(0), BBMassFlowReSimIndex(0),
               BBInletTempFlowReSimIndex(0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
         }

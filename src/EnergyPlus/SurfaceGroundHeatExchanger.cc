@@ -545,10 +545,10 @@ namespace SurfaceGroundHeatExchanger {
         // If loop operation is controlled by an environmental variable (DBtemp, WBtemp, etc)
         // then shut branch down when equipment is not scheduled to run.
         DesignFlow =
-            RegulateCondenserCompFlowReqOp(state, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlowRate);
+            RegulateCondenserCompFlowReqOp(state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->DesignMassFlowRate);
 
         SetComponentFlowRate(
-            state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+            state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
 
         // get the current flow rate - module variable
         state.dataSurfaceGroundHeatExchangers->FlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
@@ -1134,7 +1134,7 @@ namespace SurfaceGroundHeatExchanger {
         }
         // arguments are glycol name, temperature, and concentration
         if (Temperature < 0.0) { // check if fluid is water and would be freezing
-            if (state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex == WaterIndex) {
+            if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex == WaterIndex) {
                 if (this->FrozenErrIndex1 == 0) {
                     ShowWarningMessage(
                         state,
@@ -1155,7 +1155,7 @@ namespace SurfaceGroundHeatExchanger {
             }
         }
         CpWater = GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
         ReD = 4.0 * WaterMassFlow / (DataGlobalConstants::Pi * MUactual * this->TubeDiameter * this->TubeCircuits);
@@ -1366,7 +1366,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // Calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
-        if (state.dataPlnt->PlantLoop(this->LoopNum).FluidName == "WATER") {
+        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName == "WATER") {
             if (InletTemp < 0.0) {
                 ShowRecurringWarningErrorAtEnd(state,
                                                "UpdateSurfaceGroundHeatExchngr: Water is frozen in Surf HX=" + this->Name,
@@ -1378,9 +1378,9 @@ namespace SurfaceGroundHeatExchanger {
         }
 
         CpFluid = GetSpecificHeatGlycol(state,
-                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                         this->InletTemp,
-                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                         RoutineName);
 
         SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum);
@@ -1444,10 +1444,10 @@ namespace SurfaceGroundHeatExchanger {
         ScanPlantLoopsForObject(state,
                                 this->Name,
                                 DataPlant::PlantEquipmentType::GrndHtExchgSurface,
-                                this->LoopNum,
-                                this->LoopSideNum,
-                                this->BranchNum,
-                                this->CompNum,
+                                this->plantLoc.loopNum,
+                                this->plantLoc.loopSideNum,
+                                this->plantLoc.branchNum,
+                                this->plantLoc.compNum,
                                 errFlag,
                                 _,
                                 _,
@@ -1459,9 +1459,9 @@ namespace SurfaceGroundHeatExchanger {
             ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");
         }
         rho = GetDensityGlycol(state,
-                               state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                DataPrecisionGlobals::constant_zero,
-                               state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                RoutineName);
         this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
         InitComponentNodes(state,
@@ -1469,10 +1469,10 @@ namespace SurfaceGroundHeatExchanger {
                            this->DesignMassFlowRate,
                            this->InletNodeNum,
                            this->OutletNodeNum,
-                           this->LoopNum,
-                           this->LoopSideNum,
-                           this->BranchNum,
-                           this->CompNum);
+                           this->plantLoc.loopNum,
+                           this->plantLoc.loopSideNum,
+                           this->plantLoc.branchNum,
+                           this->plantLoc.compNum);
         RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
     }
     void SurfaceGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)

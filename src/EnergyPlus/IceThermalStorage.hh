@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -111,10 +112,7 @@ namespace IceThermalStorage {
         int PltInletNodeNum;      // Node number on the inlet side of the plant
         int PltOutletNodeNum;     // Node number on the outlet side of the plant
         // loop topology variables
-        int LoopNum;
-        DataPlant::LoopSideLocation LoopSideNum;
-        int BranchNum;
-        int CompNum;
+       PlantLocation plantLoc;
         Real64 DesignMassFlowRate;
         Real64 FreezeTemp;
         bool ResetXForITSFlag;
@@ -147,7 +145,7 @@ namespace IceThermalStorage {
 
         // Default Constructor
         SimpleIceStorageData()
-            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
+            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), plantLoc{},
               DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0),
               XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0),
               ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0),

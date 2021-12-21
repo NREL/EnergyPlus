@@ -910,7 +910,7 @@ void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->Type, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+        state, this->Name, this->Type, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
     }
@@ -1111,14 +1111,14 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     // Thus, this is called at the beginning of every time step once.
 
     this->FluidSpecHeat = GetSpecificHeatGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                 state.dataPipeHT->nsvInletTemp,
-                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                 RoutineName);
     this->FluidDensity = GetDensityGlycol(state,
-                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                           state.dataPipeHT->nsvInletTemp,
-                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                           RoutineName);
 
     // At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
@@ -1568,7 +1568,7 @@ void PipeHTData::UpdatePipesHeatTransfer(EnergyPlusData &state)
         state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMaxAvail;
     state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Quality = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Quality;
     // Only pass pressure if we aren't doing a pressure simulation
-    switch (state.dataPlnt->PlantLoop(this->LoopNum).PressureSimType) {
+    switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PressureSimType) {
     case DataPlant::PressSimType::NoPressure:
         state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Press = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Press;
         break;
@@ -1726,7 +1726,7 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     int LoopNum;
 
     // retrieve loop index for this component so we can look up fluid properties
-    LoopNum = this->LoopNum;
+    LoopNum = this->plantLoc.loopNum;
 
     // since the fluid properties routine doesn't have Prandtl, we'll just use water values
     idx = 0;

@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     HWBaseboard(1).WaterMassFlowRateMax = 0.40;
     HWBaseboard(1).AirMassFlowRateStd = 0.5;
     HWBaseboard(1).SchedPtr = -1;
-    HWBaseboard(1).LoopNum = 1;
+    HWBaseboard(1).plantLoc.loopNum = 1;
     HWBaseboard(1).UA = 370;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
@@ -156,9 +156,9 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     HWBaseboard(1).WaterMassFlowRateMax = 0.40;
     HWBaseboard(1).AirMassFlowRateStd = 0.5;
     HWBaseboard(1).SchedPtr = -1;
-    HWBaseboard(1).LoopNum = 1;
-    HWBaseboard(1).LoopSideNum = DataPlant::LoopSideLocation::Demand;
-    HWBaseboard(1).BranchNum = 1;
+    HWBaseboard(1).plantLoc.loopNum = 1;
+    HWBaseboard(1).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    HWBaseboard(1).plantLoc.branchNum = 1;
     HWBaseboard(1).UA = 400.0;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
