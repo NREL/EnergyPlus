@@ -209,15 +209,16 @@ namespace IceThermalStorage {
 
         Real64 TempSetPt(0.0);
         Real64 TempIn = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
-        {
-            auto const SELECT_CASE_var1(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPt = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                TempSetPt = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
-            } else {
-                assert(false);
-            }
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            TempSetPt = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            TempSetPt = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+        } break;
+        default: {
+            assert(false);
+        } break;
         }
         Real64 DemandMdot = this->DesignMassFlowRate;
 
@@ -330,15 +331,16 @@ namespace IceThermalStorage {
         int NodeNumOut = this->PlantOutNodeNum;                    // Plant loop outlet node number for component
         Real64 TempIn = state.dataLoopNodes->Node(NodeNumIn).Temp; // Inlet temperature to component (from plant loop) [C]
         Real64 TempSetPt(0.0);                                     // Setpoint temperature defined by loop controls [C]
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->PlantLoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPt = state.dataLoopNodes->Node(NodeNumOut).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                TempSetPt = state.dataLoopNodes->Node(NodeNumOut).TempSetPointHi;
-            } else {
-                assert(false);
-            }
+        switch (state.dataPlnt->PlantLoop(this->PlantLoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            TempSetPt = state.dataLoopNodes->Node(NodeNumOut).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            TempSetPt = state.dataLoopNodes->Node(NodeNumOut).TempSetPointHi;
+        } break;
+        default: {
+            assert(false);
+        } break;
         }
 
         int IterNum = 0;
@@ -1539,13 +1541,15 @@ namespace IceThermalStorage {
 
         this->ITSInletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp; //[C]
         this->ITSOutletTemp = this->ITSInletTemp;                                   //[C]
-        {
-            auto const SELECT_CASE_var1(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
-            }
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+        } break;
+        default:
+            break;
         }
         this->ITSCoolingRate = 0.0;   //[W]
         this->ITSCoolingEnergy = 0.0; //[J]
@@ -1574,13 +1578,15 @@ namespace IceThermalStorage {
 
         this->ITSInletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp; //[C]
         this->ITSOutletTemp = this->ITSInletTemp;                                   //[C]
-        {
-            auto const SELECT_CASE_var1(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
-            }
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+        } break;
+        default:
+            break;
         }
         this->ITSCoolingRate = 0.0;   //[W]
         this->ITSCoolingEnergy = 0.0; //[J]
@@ -1721,13 +1727,13 @@ namespace IceThermalStorage {
         this->ITSCoolingRate = 0.0;
         this->ITSCoolingEnergy = 0.0;
 
-        {
-            auto const SELECT_CASE_var1(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var1 == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
-            }
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+        } break;
         }
 
         // Initialize processed U values
@@ -1818,15 +1824,16 @@ namespace IceThermalStorage {
 
         Real64 ITSInletTemp_loc = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
         Real64 ITSOutletTemp_loc = 0.0;
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                ITSOutletTemp_loc = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                ITSOutletTemp_loc = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
-            } else {
-                assert(false);
-            }
+        switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+            ITSOutletTemp_loc = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+        } break;
+        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+            ITSOutletTemp_loc = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+        } break;
+        default: {
+            assert(false);
+        } break;
         }
 
         Real64 LogTerm = (ITSInletTemp_loc - FreezTemp) / (ITSOutletTemp_loc - FreezTemp);
@@ -1851,25 +1858,27 @@ namespace IceThermalStorage {
         // METHODOLOGY EMPLOYED:
         // This routine is function of XCurIceFrac, and UA value is based on 1 hour.
 
-        {
-            auto const SELECT_CASE_var(this->ITSType_Num);
-            if (SELECT_CASE_var == ITSType::IceOnCoilInternal) {
-                Real64 y = XCurIceFrac_loc;
-                UAIceCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
-                              this->ITSNomCap / TimeInterval / 10.0; // [W/C]
-                y = 1.0 - XCurIceFrac_loc;
-                UAIceDisCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
-                                 this->ITSNomCap / TimeInterval / 10.0; // [W/C]
-                HLoss_loc = 0.0;
-            } else if (SELECT_CASE_var == ITSType::IceOnCoilExternal) {
-                Real64 y = XCurIceFrac_loc;
-                UAIceCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
-                              this->ITSNomCap / TimeInterval / 10.0; // [W/C]
-                y = 1.0 - XCurIceFrac_loc;
-                UAIceDisCh_loc = (1.1756 - 5.3689 * y + 17.3602 * pow_2(y) - 30.1077 * pow_3(y) + 25.6387 * pow_4(y) - 8.5102 * pow_5(y)) *
-                                 this->ITSNomCap / TimeInterval / 10.0; // [W/C]
-                HLoss_loc = 0.0;
-            }
+        switch (this->ITSType_Num) {
+        case ITSType::IceOnCoilInternal: {
+            Real64 y = XCurIceFrac_loc;
+            UAIceCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
+                          this->ITSNomCap / TimeInterval / 10.0; // [W/C]
+            y = 1.0 - XCurIceFrac_loc;
+            UAIceDisCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
+                             this->ITSNomCap / TimeInterval / 10.0; // [W/C]
+            HLoss_loc = 0.0;
+        } break;
+        case ITSType::IceOnCoilExternal: {
+            Real64 y = XCurIceFrac_loc;
+            UAIceCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
+                          this->ITSNomCap / TimeInterval / 10.0; // [W/C]
+            y = 1.0 - XCurIceFrac_loc;
+            UAIceDisCh_loc = (1.1756 - 5.3689 * y + 17.3602 * pow_2(y) - 30.1077 * pow_3(y) + 25.6387 * pow_4(y) - 8.5102 * pow_5(y)) *
+                             this->ITSNomCap / TimeInterval / 10.0; // [W/C]
+            HLoss_loc = 0.0;
+        } break;
+        default:
+            break;
         }
     }
 
