@@ -3778,26 +3778,29 @@ namespace HeatRecovery {
         } else if (Z < SMALL) { // Eps independent of flow arrangement
             Eps = 1.0 - std::exp(-NTU);
         } else {
-            {
-                auto const SELECT_CASE_var(FlowArr);
-                if (SELECT_CASE_var == HXConfiguration::CounterFlow) { // COUNTER FLOW
-                    if (std::abs(Z - 1.0) < SMALL) {
-                        Eps = NTU / (NTU + 1.0);
-                    } else {
-                        Temp = std::exp(-NTU * (1.0 - Z));
-                        Eps = (1.0 - Temp) / (1.0 - Z * Temp);
-                    }
-                } else if (SELECT_CASE_var == HXConfiguration::ParallelFlow) { // PARALLEL FLOW
-                    Temp = (1.0 + Z);
-                    Eps = (1.0 - std::exp(-NTU * Temp)) / Temp;
-                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowBothUnmixed) { // CROSS FLOW BOTH UNMIXED
-                    Temp = Z * std::pow(NTU, -0.22);
-                    Eps = 1.0 - std::exp((std::exp(-NTU * Temp) - 1.0) / Temp);
-                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowOther) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
-                    Eps = (1.0 - std::exp(-Z * (1.0 - std::exp(-NTU)))) / Z;
+            switch (FlowArr) {
+            case HXConfiguration::CounterFlow: { // COUNTER FLOW
+                if (std::abs(Z - 1.0) < SMALL) {
+                    Eps = NTU / (NTU + 1.0);
                 } else {
-                    ShowFatalError(state, format("HeatRecovery: Illegal flow arrangement in CalculateEpsFromNTUandZ, Value={}", FlowArr));
+                    Temp = std::exp(-NTU * (1.0 - Z));
+                    Eps = (1.0 - Temp) / (1.0 - Z * Temp);
                 }
+            } break;
+            case HXConfiguration::ParallelFlow: { // PARALLEL FLOW
+                Temp = (1.0 + Z);
+                Eps = (1.0 - std::exp(-NTU * Temp)) / Temp;
+            } break;
+            case HXConfiguration::CrossFlowBothUnmixed: { // CROSS FLOW BOTH UNMIXED
+                Temp = Z * std::pow(NTU, -0.22);
+                Eps = 1.0 - std::exp((std::exp(-NTU * Temp) - 1.0) / Temp);
+            } break;
+            case HXConfiguration::CrossFlowOther: { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
+                Eps = (1.0 - std::exp(-Z * (1.0 - std::exp(-NTU)))) / Z;
+            } break;
+            default: {
+                ShowFatalError(state, format("HeatRecovery: Illegal flow arrangement in CalculateEpsFromNTUandZ, Value={}", FlowArr));
+            } break;
             }
         }
     }
@@ -3890,23 +3893,26 @@ namespace HeatRecovery {
             NTU = -std::log(1.0 - Eps);
         } else {
             // calculate based on configuration
-            {
-                auto const SELECT_CASE_var(FlowArr);
-                if (SELECT_CASE_var == HXConfiguration::CounterFlow) { // COUNTER FLOW
-                    if (std::abs(Z - 1.0) < SMALL) {
-                        NTU = Eps / (1.0 - Eps);
-                    } else {
-                        NTU = 1.0 / (Z - 1.0) * std::log((1.0 - Eps) / (1.0 - Eps * Z));
-                    }
-                } else if (SELECT_CASE_var == HXConfiguration::ParallelFlow) { // PARALLEL FLOW
-                    NTU = -std::log(-Eps - Eps * Z + 1.0) / (Z + 1.0);
-                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowBothUnmixed) { // CROSS FLOW BOTH UNMIXED
-                    NTU = GetNTUforCrossFlowBothUnmixed(state, Eps, Z);
-                } else if (SELECT_CASE_var == HXConfiguration::CrossFlowOther) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
-                    NTU = -std::log(1.0 + std::log(1.0 - Eps * Z) / Z);
+            switch (FlowArr) {
+            case HXConfiguration::CounterFlow: { // COUNTER FLOW
+                if (std::abs(Z - 1.0) < SMALL) {
+                    NTU = Eps / (1.0 - Eps);
                 } else {
-                    ShowFatalError(state, format("HeatRecovery: Illegal flow arrangement in CalculateNTUfromEpsAndZ, Value={}", FlowArr));
+                    NTU = 1.0 / (Z - 1.0) * std::log((1.0 - Eps) / (1.0 - Eps * Z));
                 }
+            } break;
+            case HXConfiguration::ParallelFlow: { // PARALLEL FLOW
+                NTU = -std::log(-Eps - Eps * Z + 1.0) / (Z + 1.0);
+            } break;
+            case HXConfiguration::CrossFlowBothUnmixed: { // CROSS FLOW BOTH UNMIXED
+                NTU = GetNTUforCrossFlowBothUnmixed(state, Eps, Z);
+            } break;
+            case HXConfiguration::CrossFlowOther: { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
+                NTU = -std::log(1.0 + std::log(1.0 - Eps * Z) / Z);
+            } break;
+            default: {
+                ShowFatalError(state, format("HeatRecovery: Illegal flow arrangement in CalculateNTUfromEpsAndZ, Value={}", FlowArr));
+            } break;
             }
         }
     }
