@@ -3700,67 +3700,72 @@ namespace HVACUnitaryBypassVAV {
             }
         }
 
-        {
-            auto const SELECT_CASE_var(CBVAV(CBVAVNum).PriorityControl);
-            if (SELECT_CASE_var == PriorityCtrlMode::CoolingPriority) {
-                if (QZoneReqCool < 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                } else if (QZoneReqHeat > 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                }
-            } else if (SELECT_CASE_var == PriorityCtrlMode::HeatingPriority) {
+        switch (CBVAV(CBVAVNum).PriorityControl) {
+        case PriorityCtrlMode::CoolingPriority: {
+            if (QZoneReqCool < 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+            } else if (QZoneReqHeat > 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+            }
+        } break;
+        case PriorityCtrlMode::HeatingPriority: {
+            if (QZoneReqHeat > 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+            } else if (QZoneReqCool < 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+            }
+        } break;
+        case PriorityCtrlMode::ZonePriority: {
+            if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
                 if (QZoneReqHeat > 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 } else if (QZoneReqCool < 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 }
-            } else if (SELECT_CASE_var == PriorityCtrlMode::ZonePriority) {
-                if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
-                    if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    } else if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    }
-                } else if (CBVAV(CBVAVNum).NumZonesCooled > CBVAV(CBVAVNum).NumZonesHeated) {
-                    if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    }
-                } else {
-                    if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    } else if (std::abs(QZoneReqCool) == std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    }
+            } else if (CBVAV(CBVAVNum).NumZonesCooled > CBVAV(CBVAVNum).NumZonesHeated) {
+                if (QZoneReqCool < 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                } else if (QZoneReqHeat > 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 }
-            } else if (SELECT_CASE_var == PriorityCtrlMode::LoadPriority) {
+            } else {
                 if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                } else if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
-                    if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    } else if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    }
-                } else if (CBVAV(CBVAVNum).NumZonesHeated < CBVAV(CBVAVNum).NumZonesCooled) {
-                    if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    }
-                } else {
-                    if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    }
+                } else if (std::abs(QZoneReqCool) == std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 }
             }
+        } break;
+        case PriorityCtrlMode::LoadPriority: {
+            if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+            } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+            } else if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
+                if (QZoneReqHeat > 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                } else if (QZoneReqCool < 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                }
+            } else if (CBVAV(CBVAVNum).NumZonesHeated < CBVAV(CBVAVNum).NumZonesCooled) {
+                if (QZoneReqCool < 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                } else if (QZoneReqHeat > 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                }
+            } else {
+                if (QZoneReqCool < 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                } else if (QZoneReqHeat > 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                }
+            }
+            break;
+        default:
+            break;
+        }
         }
 
         if (CBVAV(CBVAVNum).LastMode != CBVAV(CBVAVNum).HeatCoolMode) {
