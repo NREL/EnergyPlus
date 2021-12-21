@@ -60,11 +60,12 @@ struct EnergyPlusData;
 
 namespace ZoneContaminantPredictorCorrector {
 
-    void ManageZoneContaminanUpdates(EnergyPlusData &state,
-                                     int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                                     bool const ShortenTimeStepSys,
-                                     bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
-                                     Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
+    void
+    ManageZoneContaminanUpdates(EnergyPlusData &state,
+                                DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                                bool const ShortenTimeStepSys,
+                                bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
+                                Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );
 
     void GetZoneContaminanInputs(EnergyPlusData &state);

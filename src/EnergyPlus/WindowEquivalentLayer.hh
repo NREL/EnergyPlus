@@ -89,8 +89,8 @@ namespace WindowEquivalentLayer {
     );
 
     void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
-                                      CFSTY &FS,              // fenestration system
-                                      int const DiffBeamFlag, // isDIFF: calc diffuse properties
+                                      CFSTY &FS,                      // fenestration system
+                                      SolarArrays const DiffBeamFlag, // isDIFF: calc diffuse properties
                                       Array2A<Real64> Abs1,
                                       Real64 const IncA,   // angle of incidence, radians
                                       Real64 const VProfA, // inc solar vertical profile angle, radians
@@ -103,7 +103,7 @@ namespace WindowEquivalentLayer {
                                      Real64 &SurfInsideTemp,  // Inside window surface temperature (innermost face) [C]
                                      Real64 &SurfOutsideTemp, // Outside surface temperature (C)
                                      Real64 &SurfOutsideEmiss,
-                                     int const CalcCondition // Calucation condition (summer, winter or no condition)
+                                     DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
     );
 
     void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)
@@ -114,8 +114,8 @@ namespace WindowEquivalentLayer {
     );
 
     Real64 P01(EnergyPlusData &state,
-               Real64 const P,         // property
-               std::string const &WHAT // identifier for err msg
+               Real64 const P,             // property
+               std::string_view const WHAT // identifier for err msg
     );
 
     Real64
@@ -752,8 +752,8 @@ namespace WindowEquivalentLayer {
 
     void CalcEQLOpticalProperty(EnergyPlusData &state,
                                 int const SurfNum,
-                                int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
-                                Array2A<Real64> CFSAbs  // absorbed beam solar radiation by layers fraction
+                                SolarArrays const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
+                                Array2A<Real64> CFSAbs          // absorbed beam solar radiation by layers fraction
     );
 
     void CalcEQLWindowStandardRatings(EnergyPlusData &state, int const ConstrNum); // construction index

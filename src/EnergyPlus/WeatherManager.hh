@@ -60,6 +60,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -73,32 +74,39 @@ namespace WeatherManager {
     // Following are Date Types read in from EPW file or IDF
     enum class DateType
     {
-        InvalidDate = -1,
+        Invalid = -1,
         MonthDay = 1,
         NthDayInMonth = 2,
-        LastDayInMonth = 3
+        LastDayInMonth = 3,
+        Num
     };
 
     // Water mains temperatures calculation methods
     enum class WaterMainsTempCalcMethod
     {
+        Invalid = -1,
+        FixedDefault = 0,
         Schedule = 1,
         Correlation = 2,
-        CorrelationFromWeatherFile = 3
+        CorrelationFromWeatherFile = 3,
+        Num
     };
 
     enum class DesignDaySolarModel
     {
+        Invalid = -1,
         ASHRAE_ClearSky = 0,     // Design Day solar model ASHRAE ClearSky (default)
         Zhang_Huang = 1,         // Design Day solar model Zhang Huang
         SolarModel_Schedule = 2, // Design Day solar model (beam and diffuse) from user entered schedule
         ASHRAE_Tau = 3,          // Design Day solar model ASHRAE tau (per 2009 HOF)
-        ASHRAE_Tau2017 = 4       // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
+        ASHRAE_Tau2017 = 4,      // Design Day solar model ASHRAE tau (per 2013 and 2017 HOF)
+        Num
     };
 
     // Design Day Humidity Indicating Type
     enum class DDHumIndType
     {
+        Invalid = -1,
         WetBulb = 0,   // Wetbulb (default)
         DewPoint = 1,  // Dewpoint
         Enthalpy = 2,  // Enthalpy
@@ -106,20 +114,24 @@ namespace WeatherManager {
         RelHumSch = 4, // relhum schedule
         WBProfDef = 5, // Wetbulb default profile
         WBProfDif = 6, // Wetbulb difference profile
-        WBProfMul = 7  // Wetbulb multiplier profile
+        WBProfMul = 7, // Wetbulb multiplier profile
+        Num
     };
 
     // Design Day DryBulb Range Type
     enum class DDDBRangeType
     {
+        Invalid = -1,
         Default = 0,    // Default Multipliers
         Multiplier = 1, // Multiplier Schedule
         Difference = 2, // Difference Schedule
         Profile = 3,    // Temperature Profile
+        Num
     };
 
     enum class EmissivityCalcType
     {
+        Invalid = -1,
         ClarkAllenModel = 0,    // Use Clark & Allen model for sky emissivity calculation
         ScheduleValue = 1,      // User entered Schedule value for Weather Property
         DryBulbDelta = 2,       // User entered DryBulb difference Schedule value for Weather Property
@@ -128,17 +140,20 @@ namespace WeatherManager {
         IdsoModel = 5,          // Use Isdo model for sky emissivity calculation
         BerdahlMartinModel = 6, // Use Martin & Berdahl model for sky emissivity calculation
         SkyTAlgorithmA = 7,     // place holder
+        Num
     };
 
     enum class WeekDay
     {
+        Invalid = -1,
         Sunday = 1,
         Monday,
         Tuesday,
         Wednesday,
         Thursday,
         Friday,
-        Saturday
+        Saturday,
+        Num
     };
 
     struct EnvironmentData
@@ -182,15 +197,17 @@ namespace WeatherManager {
         bool MatchYear;                  // for actual weather will be true
         bool ActualWeather;              // true when using actual weather data
         int RawSimDays;                  // number of basic sim days.
+        bool firstHrInterpUseHr1;        // true when using Hour 1 for first hour interpolations; false to use Hour 24
 
         // Default Constructor
         EnvironmentData()
-            : KindOfEnvrn(DataGlobalConstants::KindOfSim::Unassigned), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
+            : KindOfEnvrn(DataGlobalConstants::KindOfSim::Invalid), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0),
               HVACSizingIterationNum(0), TotalDays(0), StartJDay(0), StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0),
               EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0), UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true),
               UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false), NumSimYears(1), CurrentCycle(0), WP_Type1(0),
               SkyTempModel(EmissivityCalcType::ClarkAllenModel), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
-              RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0)
+              RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0),
+              firstHrInterpUseHr1(false)
         {
         }
     };
@@ -267,13 +284,14 @@ namespace WeatherManager {
         bool RollDayTypeOnRepeat;     // If repeating run period, increment day type on repeat.
         bool TreatYearsAsConsecutive; // When year rolls over, increment year and recalculate Leap Year
         bool actualWeather;           // true when using actual weather data
+        bool firstHrInterpUsingHr1;   // true for using Hour 1 for first hour interpolate; fals for using Hour 24
 
         // Default Constructor
         RunPeriodData()
             : totalDays(365), startMonth(1), startDay(1), startJulianDate(2457755), startYear(2017), endMonth(12), endDay(31), endJulianDate(2458119),
               endYear(2017), dayOfWeek(1), startWeekDay(WeekDay::Sunday), useDST(false), useHolidays(false), applyWeekendRule(false), useRain(true),
               useSnow(true), monWeekDay{{1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6}}, numSimYears(1), isLeapYear(false), RollDayTypeOnRepeat(true),
-              TreatYearsAsConsecutive(true), actualWeather(false)
+              TreatYearsAsConsecutive(true), actualWeather(false), firstHrInterpUsingHr1(false)
         {
         }
     };
@@ -319,7 +337,7 @@ namespace WeatherManager {
 
         // Default Constructor
         SpecialDayData()
-            : DateType(DateType::InvalidDate), Month(0), Day(0), WeekDay(0), CompDate(0), WthrFile(false), Duration(0), DayType(0), ActStMon(0),
+            : DateType(DateType::Invalid), Month(0), Day(0), WeekDay(0), CompDate(0), WthrFile(false), Duration(0), DayType(0), ActStMon(0),
               ActStDay(0), Used(false)
         {
         }
@@ -366,7 +384,7 @@ namespace WeatherManager {
 
         // Default Constructor
         DaylightSavingPeriodData()
-            : StDateType(DateType::InvalidDate), StWeekDay(0), StMon(0), StDay(0), EnDateType(DateType::InvalidDate), EnMon(0), EnDay(0), EnWeekDay(0)
+            : StDateType(DateType::Invalid), StWeekDay(0), StMon(0), StDay(0), EnDateType(DateType::Invalid), EnMon(0), EnDay(0), EnWeekDay(0)
         {
         }
     };
@@ -578,10 +596,10 @@ namespace WeatherManager {
     );
 
     void ErrorInterpretWeatherDataLine(
-        EnergyPlusData &state, int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string &SaveLine, std::string &Line);
+        EnergyPlusData &state, int WYear, int WMonth, int WDay, int WHour, int WMinute, std::string_view SaveLine, std::string_view Line);
 
     void InterpretWeatherDataLine(EnergyPlusData &state,
-                                  std::string &Line,
+                                  std::string_view Line,
                                   bool &ErrorFound, // True if an error is found, false otherwise
                                   int &WYear,
                                   int &WMonth,
@@ -942,7 +960,7 @@ struct WeatherManagerData : BaseGlobalStruct
                            // holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination
                            // angle | Value of the equation of time formula
     // NOLINTNEXTLINE(cert-err58-cpp)
-    Array1D<WeatherManager::DayWeatherVariables> DesignDay; // Design day environments
+    EPVector<WeatherManager::DayWeatherVariables> DesignDay; // Design day environments
     // NOLINTNEXTLINE(cert-err58-cpp)
     WeatherManager::MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) |
                                          // Wind Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) |
@@ -950,19 +968,19 @@ struct WeatherManagerData : BaseGlobalStruct
                                          // Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
     WeatherManager::MissingDataCounts Missed;              // NOLINT(cert-err58-cpp)
     WeatherManager::RangeDataCounts OutOfRange;            // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::DesignDayData> DesDayInput;    // Design day Input Data NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::DesignDayData> DesDayInput;   // Design day Input Data NOLINT(cert-err58-cpp)
     Array1D<WeatherManager::EnvironmentData> Environment;  // Environment data NOLINT(cert-err58-cpp)
     Array1D<WeatherManager::RunPeriodData> RunPeriodInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodInputUniqueNames;
-    Array1D<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;
-    Array1D<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData EPWDST;                   // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData IDFDST;                   // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData DST;                      // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData DST;                       // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)
 
     std::shared_ptr<BaseGroundTempsModel> siteShallowGroundTempsPtr;
     std::shared_ptr<BaseGroundTempsModel> siteBuildingSurfaceGroundTempsPtr;
@@ -1023,8 +1041,9 @@ struct WeatherManagerData : BaseGlobalStruct
         this->GroundTempsFCFromEPWHeader = Array1D<Real64>(12, 0.0);
         this->GroundReflectances = Array1D<Real64>(12, 0.2);
 
-        this->SnowGndRefModifier = 1.0;              // Modifier to ground reflectance during snow
-        this->SnowGndRefModifierForDayltg = 1.0;     // Modifier to ground reflectance during snow for daylighting
+        this->SnowGndRefModifier = 1.0;          // Modifier to ground reflectance during snow
+        this->SnowGndRefModifierForDayltg = 1.0; // Modifier to ground reflectance during snow for daylighting
+        this->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::FixedDefault;
         this->WaterMainsTempsSchedule = 0;           // Water mains temperature schedule
         this->WaterMainsTempsAnnualAvgAirTemp = 0.0; // Annual average outdoor air temperature (C)
         this->WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
@@ -1128,29 +1147,29 @@ struct WeatherManagerData : BaseGlobalStruct
         this->RunPeriodDesignInputUniqueNames.clear();
         this->TypicalExtremePeriods.deallocate();
 
-        this->EPWDST.StDateType = WeatherManager::DateType::InvalidDate;
+        this->EPWDST.StDateType = WeatherManager::DateType::Invalid;
         this->EPWDST.StWeekDay = 0;
         this->EPWDST.StMon = 0;
         this->EPWDST.StDay = 0;
-        this->EPWDST.EnDateType = WeatherManager::DateType::InvalidDate;
+        this->EPWDST.EnDateType = WeatherManager::DateType::Invalid;
         this->EPWDST.EnMon = 0;
         this->EPWDST.EnDay = 0;
         this->EPWDST.EnWeekDay = 0;
 
-        this->IDFDST.StDateType = WeatherManager::DateType::InvalidDate;
+        this->IDFDST.StDateType = WeatherManager::DateType::Invalid;
         this->IDFDST.StWeekDay = 0;
         this->IDFDST.StMon = 0;
         this->IDFDST.StDay = 0;
-        this->IDFDST.EnDateType = WeatherManager::DateType::InvalidDate;
+        this->IDFDST.EnDateType = WeatherManager::DateType::Invalid;
         this->IDFDST.EnMon = 0;
         this->IDFDST.EnDay = 0;
         this->IDFDST.EnWeekDay = 0;
 
-        this->DST.StDateType = WeatherManager::DateType::InvalidDate;
+        this->DST.StDateType = WeatherManager::DateType::Invalid;
         this->DST.StWeekDay = 0;
         this->DST.StMon = 0;
         this->DST.StDay = 0;
-        this->DST.EnDateType = WeatherManager::DateType::InvalidDate;
+        this->DST.EnDateType = WeatherManager::DateType::Invalid;
         this->DST.EnMon = 0;
         this->DST.EnDay = 0;
         this->DST.EnWeekDay = 0;
@@ -1206,14 +1225,15 @@ struct WeatherManagerData : BaseGlobalStruct
           PrintEnvrnStamp(false), Sigma(5.6697e-8), YearOfSim(1), NumDaysInYear(365), EnvironmentReportNbr(0), EnvironmentReportChr(""),
           WeatherFileExists(false), LocationGathered(false), WeatherFileLatitude(0.0), WeatherFileLongitude(0.0), WeatherFileTimeZone(0.0),
           WeatherFileElevation(0.0), GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
-          SnowGndRefModifierForDayltg(1.0), WaterMainsTempsSchedule(0), WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0),
-          WaterMainsTempsScheduleName(""), wthFCGroundTemps(false), TotRunPers(0), TotRunDesPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0),
-          WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true),
-          UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false), IDFDaylightSaving(false), DaylightSavingIsActive(false),
-          WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0), NumWPSkyTemperatures(0),
-          RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0), HorizIRSky(0.0),
-          TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0),
-          DatesShouldBeReset(false), StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
+          SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{WeatherManager::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0),
+          WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""), wthFCGroundTemps(false),
+          TotRunPers(0), TotRunDesPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0),
+          NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true), UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false),
+          IDFDaylightSaving(false), DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0),
+          NumEPWTypExtSets(0), NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0),
+          SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0),
+          EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0), DatesShouldBeReset(false),
+          StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
     {
     }
 };

@@ -656,7 +656,7 @@ AvailabilityManagerAssignmentList,
   Differential Thermostat Availability Manager,     !- Name
   Collector Outlet Node,                                                   !- Hot Node Name
   Water Heater Source Outlet Node,                               !- Cold Node Name
-  10.0,                                                                                     !- Temperature Difference On Limit (delta C)
+  .0,                                                                                     !- Temperature Difference On Limit (delta C)
   2.0;                                                                                       !- Temperature Difference Off Limit (delta C)
 \end{lstlisting}
 
@@ -666,7 +666,7 @@ The \hyperref[availabilitymanagerdifferentialthermostat]{AvailabilityManager:Dif
 
 This object is used to model unglazed transpired solar collectors (UTSC) used to condition outdoor air. These collectors are generally used to heat air drawn through perforated absorbers that are heated by the sun and also recover heat conducted out through the underlying wall. The SolarCollector:UnglazedTranspired object represents a single collector attached to one or more \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects and to one or more outdoor air systems. Therefore the transpired collector is part of both the thermal envelope and the HVAC system. An example file is provided called TranspiredCollectors.idf.
 
-The area and orientation of the collector is obtained from \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects, which are referenced by name. Although the collector surface itself is slightly detached from the underlying building wall (or roof), no additional surface object is needed to represent the collector itself. When modeling transpired collectors, it is important to consider the size of the collector when developing the building model's \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects because the underlying surfaces must match the collector. For example, if the collector covers only part of the wall, then that wall should be split into separate surfaces where one matches the size of the collector. A single collector can be associated with as many \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The collector can be arranged at any tilt angle by describing the surfaces appropriately. The surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
+The area and orientation of the collector is obtained from \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects, which are referenced by name. Although the collector surface itself is slightly detached from the underlying building wall (or roof), no additional surface object is needed to represent the collector itself. When modeling transpired collectors, it is important to consider the size of the collector when developing the building model's \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects because the underlying surfaces must match the collector. For example, if the collector covers only part of the wall, then that wall should be split into separate surfaces where one matches the size of the collector. A single collector can be associated with as many \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects as desired since this object is extensible. The collector can be arranged at any tilt angle by describing the surfaces appropriately. The surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
 
 The collector conditions outdoor air and is connected to the outdoor air system using the usual method of specifying node names. Using the UTSC model requires specifying a relatively complete HVAC air system that includes an outdoor air path. This will typically require using a set of objects that, at a minimum, will include: \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList}, \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}, \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}, \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}, \hyperref[outdoorairmixer]{OutdoorAir:Mixer}, \hyperref[setpointmanagermixedair]{SetpointManager:MixedAir}, and \hyperref[controlleroutdoorair]{Controller:OutdoorAir}. A single UTSC can serve more than one outdoor air system but requires also using a separate object, called \hyperref[solarcollectorunglazedtranspiredmultisystem]{SolarCollector:UnglazedTranspired:Multisystem} to specify node connections.
 
@@ -807,7 +807,7 @@ This field is used to enter a value for the coefficient used to determine natura
 
 \paragraph{Field: Surface \textless{}\#\textgreater{} Name}\label{field-surface-name-3-001}
 
-The remaining fields are used to name the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects that are associated with the UTSC. These are the underlying heat transfer surfaces and are defined elsewhere in the input file. These other surfaces should all specify OtherSideConditionsModel as their exterior environment. The input object can currently accommodate up to ten surfaces, but it is extensible.
+The remaining fields are used to name the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects that are associated with the UTSC. These are the underlying heat transfer surfaces and are defined elsewhere in the input file. These other surfaces should all specify OtherSideConditionsModel as their exterior environment. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 An example of this object follows.
 
@@ -950,7 +950,7 @@ The efficiency of the UTSC solar collector.
 
 \subsection{SolarCollector:UnglazedTranspired:Multisystem}\label{solarcollectorunglazedtranspiredmultisystem}
 
-This object is used to model unglazed transpired solar collectors (UTSC) that are connected to multiple outdoor air systems. This object supplements the \hyperref[solarcollectorunglazedtranspired]{SolarCollector:UnglazedTranspired} object and is only necessary if more than one air system is connected to a single transpired collector. After the name field, there are sets of four node names used to define the connections of each air system. Each set contains node names for inlet, outlet, control, and zone. If more than five air systems are needed, this object is extensible.
+This object is used to model unglazed transpired solar collectors (UTSC) that are connected to multiple outdoor air systems. This object supplements the \hyperref[solarcollectorunglazedtranspired]{SolarCollector:UnglazedTranspired} object and is only necessary if more than one air system is connected to a single transpired collector. After the name field, there are sets of four node names used to define the connections of each air system. Each set contains node names for inlet, outlet, control, and zone.
 
 \subsubsection{Field: Solar Collector Name}\label{field-solar-collector-name}
 
@@ -958,7 +958,7 @@ This field is used to identify the name of the \hyperref[solarcollectorunglazedt
 
 \subsubsection{Field Set: Inlet Node, Outlet Node, Mixed Air Node, Zone Node}\label{field-set-inlet-node-outlet-node-mixed-air-node-zone-node}
 
-The following four fields form a repeating set of four fields. One set is used for each outdoor air system that is connected to the collector.
+This object is extensible, so the following four fields can be repeated as needed. One set is used for each outdoor air system that is connected to the collector.
 
 \subsubsection{Field: Outdoor Air System \textless{}\#\textgreater{} Collector Inlet Node}\label{field-outdoor-air-system-collector-inlet-node}
 

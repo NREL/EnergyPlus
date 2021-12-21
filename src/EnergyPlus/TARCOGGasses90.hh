@@ -79,7 +79,7 @@ namespace TARCOGGasses90 {
                   Real64 &dens,
                   Real64 &cp,
                   Real64 &pr,
-                  int standard,
+                  TARCOGGassesParams::Stdrd standard,
                   int &nperr,
                   std::string &ErrorMessage);
 

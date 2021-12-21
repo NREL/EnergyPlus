@@ -795,6 +795,13 @@ ENERGYPLUSLIB_API Real64 tomorrowWeatherAlbedoAtTime(EnergyPlusState state, int 
 /// \see apiDataFullyReady
 /// \see apiErrorFlag
 ENERGYPLUSLIB_API Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the cumulative simulation time from the start of the environment, in hours
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 currentSimTime(EnergyPlusState state);
 
 #ifdef __cplusplus
 }

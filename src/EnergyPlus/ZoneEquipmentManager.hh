@@ -69,14 +69,14 @@ namespace ZoneEquipmentManager {
     {
         // Members
         std::string EquipType;
-        int EquipType_Num;
+        int EquipTypeEnum;
         std::string EquipName;
         int EquipPtr;
         int CoolingPriority;
         int HeatingPriority;
 
         // Default Constructor
-        SimulationOrder() : EquipType_Num(0), EquipPtr(0), CoolingPriority(0), HeatingPriority(0)
+        SimulationOrder() : EquipTypeEnum(0), EquipPtr(0), CoolingPriority(0), HeatingPriority(0)
         {
         }
     };
@@ -158,6 +158,8 @@ namespace ZoneEquipmentManager {
     );
 
     void AutoCalcDOASControlStrategy(EnergyPlusData &state);
+
+    void ReportInfiltrations(EnergyPlusData &state);
 
     void ReportZoneSizingDOASInputs(EnergyPlusData &state,
                                     std::string const &ZoneName,         // the name of the zone

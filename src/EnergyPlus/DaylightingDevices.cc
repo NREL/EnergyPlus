@@ -62,12 +62,14 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -111,9 +113,9 @@ namespace DaylightingDevices {
     // Although visible and solar radiation are similar, solar gain is simulated very differently from the
     // daylighting illuminance calculations.  The gain from direct beam solar is found using the
     // solar beam transmittance.  The diffuse solar, however, is more complicated.  A sky/ground integration
-    // is NOT performed.  Instead anisotropic sky view factor multipliers (AnisoSkyMult) are calculated for
+    // is NOT performed.  Instead anisotropic sky view factor multipliers (SurfAnisoSkyMult) are calculated for
     // each surface.  The diffuse sky/ground transmittance of the TDD is solved using a modification of the
-    // AnisoSkyMult.  The ground radiation transmittance and anisotropic sky transmittance are found separately.
+    // SurfAnisoSkyMult.  The ground radiation transmittance and anisotropic sky transmittance are found separately.
     // See CalcTDDTransSolIso, CalcTDDTransSolHorizon, CalcTDDTransSolAniso below.
     // For thermal conductive/convective gain, TDDs are treated as one big object with an effective R value.
     // The outside face temperature of the dome and the inside face temperature of the diffuser are calculated
@@ -154,18 +156,17 @@ namespace DaylightingDevices {
     // shelf construction, and the sun and sky illuminance on the shelf.  All the luminance is added to the
     // diffuse upgoing flux.  The shelf view factor to sky is assumed to be 1.0 for lack of better information.
     // The outside shelf is treated similarly in the heat balance simulation, but here the shelf view factor to
-    // sky is conveniently given by AnisoSkyMult.  NOTE:  The solar shading code was modified to allow sunlit
-    // fraction, sunlit area, AnisoSkyMult, etc. to be calculated for attached shading surfaces.
+    // sky is conveniently given by SurfAnisoSkyMult.  NOTE:  The solar shading code was modified to allow sunlit
+    // fraction, sunlit area, SurfAnisoSkyMult, etc. to be calculated for attached shading surfaces.
     // Future shelf model improvements:
     // 1. Allow beam and downgoing flux to pass the end of the inside shelf depending on actual shelf goemetry.
     // 2. Reduce outside shelf view factor to sky (for daylighting) by taking into account anisotropic sky
-    //    distribution and shading, i.e. the daylighting equivalent of AnisoSkyMult.
+    //    distribution and shading, i.e. the daylighting equivalent of SurfAnisoSkyMult.
     // 3. Expand view factor to shelf calculation to handle more complicated geometry.
     // REFERENCES:
     // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
 
     // Using/Aliasing
-    using DataHeatBalance::MinimalShadowing;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::SurfaceClass;
 
@@ -184,9 +185,6 @@ namespace DaylightingDevices {
 
         // METHODOLOGY EMPLOYED:
         // Daylighting and thermal variables are calculated.  BeamTrans/COSAngle table is calculated.
-
-        // Using/Aliasing
-        using DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;   // TDD pipe object number
@@ -308,7 +306,7 @@ namespace DaylightingDevices {
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum),
                                           "DaylightingDevice:Tubular",
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name,
-                                          IntGainTypeOf_DaylightingDeviceTubular,
+                                          DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                           &state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
 
                 } // TZoneNum
@@ -321,58 +319,58 @@ namespace DaylightingDevices {
                                     "Tubular Daylighting Device Transmitted Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransmittedSolar,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Pipe Absorbed Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Gain Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatGain,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Heat Loss Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).HeatLoss,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
 
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Solar Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Beam Visible Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisBeam,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Solar Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolDiff,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
                 SetupOutputVariable(state,
                                     "Tubular Daylighting Device Diffuse Visible Transmittance",
                                     OutputProcessor::Unit::None,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff,
-                                    "Zone",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name);
 
             } // PipeNum
@@ -403,18 +401,12 @@ namespace DaylightingDevices {
 
                 if (state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor < 0) CalcViewFactorToShelf(state, ShelfNum);
 
-                if (state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor + state.dataSurface->Surface(WinSurf).ViewFactorSky +
-                        state.dataSurface->Surface(WinSurf).ViewFactorGround >
-                    1.0) {
-                    ShowWarningError(state,
-                                     format("DaylightingDevice:Shelf = {}:  Window view factors to sky [{:.2R}],",
-                                            state.dataDaylightingDevicesData->Shelf(ShelfNum).Name,
-                                            state.dataSurface->Surface(WinSurf).ViewFactorSky));
-                    ShowContinueError(state,
-                                      format("ground [{:.2R}], and outside shelf [{:.2R}] add up to > 1.0.",
-                                             state.dataSurface->Surface(WinSurf).ViewFactorGround,
-                                             state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor));
-                }
+                adjustViewFactorsWithShelf(state,
+                                           state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor,
+                                           state.dataSurface->Surface(WinSurf).ViewFactorSky,
+                                           state.dataSurface->Surface(WinSurf).ViewFactorGround,
+                                           WinSurf,
+                                           ShelfNum);
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!state.dataDaylightingDevices->ShelfReported) {
@@ -772,6 +764,18 @@ namespace DaylightingDevices {
             } // PipeNum
 
             if (state.dataDaylightingDevices->GetTDDInputErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Tubular input.");
+            state.dataDaylightingManager->TDDTransVisBeam.allocate(24, state.dataDaylightingDevicesData->NumOfTDDPipes);
+            state.dataDaylightingManager->TDDFluxInc.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
+            state.dataDaylightingManager->TDDFluxTrans.allocate(24, 4, state.dataDaylightingDevicesData->NumOfTDDPipes);
+            for (int tddNum = 1; tddNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++tddNum) {
+                for (int hr = 1; hr <= 24; ++hr) {
+                    state.dataDaylightingManager->TDDTransVisBeam(hr, tddNum) = 0.0;
+                    for (int iSky = 1; iSky <= 4; ++iSky) {
+                        state.dataDaylightingManager->TDDFluxInc(hr, iSky, tddNum) = 0.0;
+                        state.dataDaylightingManager->TDDFluxTrans(hr, iSky, tddNum) = 0.0;
+                    }
+                }
+            }
         }
     }
 
@@ -842,7 +846,7 @@ namespace DaylightingDevices {
                         state.dataDaylightingDevices->GetShelfInputErrorsFound = true;
                     }
 
-                    if (state.dataSurface->Surface(SurfNum).Shelf > 0) {
+                    if (state.dataSurface->SurfDaylightingShelfInd(SurfNum) > 0) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Window " +
                                             state.dataIPShortCut->cAlphaArgs(2) + " is referenced by more than one shelf.");
@@ -877,7 +881,7 @@ namespace DaylightingDevices {
                     }
 
                     state.dataDaylightingDevicesData->Shelf(ShelfNum).Window = SurfNum;
-                    state.dataSurface->Surface(SurfNum).Shelf = ShelfNum;
+                    state.dataSurface->SurfDaylightingShelfInd(SurfNum) = ShelfNum;
                 }
 
                 // Get inside shelf heat transfer surface (optional)
@@ -990,6 +994,7 @@ namespace DaylightingDevices {
                         state.dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
                         state.dataSurface->Surface(SurfNum).HeatTransSurf = true;
                         state.dataSurface->Surface(SurfNum).Construction = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = ConstrNum;
                         state.dataConstruction->Construct(ConstrNum).IsUsed = true;
                     }
                 }
@@ -1043,8 +1048,8 @@ namespace DaylightingDevices {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const N(100000.0); // Number of integration points
-        Real64 const xTol(150.0); // Tolerance factor to skip iterations where dT is approximately 0
+        Real64 constexpr N(100000.0); // Number of integration points
+        Real64 constexpr xTol(150.0); // Tolerance factor to skip iterations where dT is approximately 0
         // Must be >= 1.0, increase this number to decrease the execution time
         Real64 const myLocalTiny(TINY(1.0));
 
@@ -1119,7 +1124,7 @@ namespace DaylightingDevices {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        int const NPH(1000); // Number of altitude integration points
+        int constexpr NPH(1000); // Number of altitude integration points
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 FluxInc = 0.0;   // Incident solar flux
@@ -1139,7 +1144,7 @@ namespace DaylightingDevices {
             Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
             // Calculate total TDD transmittance for given angle
-            trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam);
+            trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam);
 
             FluxInc += P * SINI * dPH;
             FluxTrans += trans * P * SINI * dPH;
@@ -1184,7 +1189,7 @@ namespace DaylightingDevices {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        int const NTH(18); // Number of azimuth integration points
+        int constexpr NTH(18); // Number of azimuth integration points
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 FluxInc = 0.0;   // Incident solar flux
@@ -1208,7 +1213,7 @@ namespace DaylightingDevices {
                 Real64 COSI = CosPhi * std::cos(TH - Theta); // Cosine of the incident angle
 
                 // Calculate total TDD transmittance for given angle
-                Real64 trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam); // Total beam solar transmittance of TDD
+                Real64 trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam); // Total beam solar transmittance of TDD
 
                 FluxInc += COSI * dTH;
                 FluxTrans += trans * COSI * dTH;
@@ -1245,11 +1250,11 @@ namespace DaylightingDevices {
         // and have a different transmittance applied to each component.
         //   FluxInc = IsoSkyRad + CircumSolarRad + HorizonRad
         //   FluxTrans = T1*IsoSkyRad + T2*CircumSolarRad + T3*HorizonRad
-        // It turns out that FluxTrans/FluxInc is equivalent to AnisoSkyTDDMult/AnisoSkyMult.
-        // AnisoSkyMult has been conveniently calculated already in AnisoSkyViewFactors in SolarShading.cc.
-        // AnisoSkyMult = MultIsoSky*DifShdgRatioIsoSky + MultCircumSolar*SunlitFrac + MultHorizonZenith*DifShdgRatioHoriz
+        // It turns out that FluxTrans/FluxInc is equivalent to AnisoSkyTDDMult/SurfAnisoSkyMult.
+        // SurfAnisoSkyMult has been conveniently calculated already in AnisoSkyViewFactors in SolarShading.cc.
+        // SurfAnisoSkyMult = MultIsoSky*DifShdgRatioIsoSky + MultCircumSolar*SunlitFrac + MultHorizonZenith*DifShdgRatioHoriz
         // In this routine a similar AnisoSkyTDDMult is calculated that applies the appropriate transmittance to each
-        // of the components above.  The result is Trans = AnisoSkyTDDMult/AnisoSkyMult.
+        // of the components above.  The result is Trans = AnisoSkyTDDMult/SurfAnisoSkyMult.
         // Shading and orientation are already taken care of by DifShdgRatioIsoSky and DifShdgRatioHoriz.
 
         // REFERENCES:
@@ -1271,23 +1276,23 @@ namespace DaylightingDevices {
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-            state.dataHeatBal->SolarDistribution == MinimalShadowing) {
-            IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->DifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) * state.dataHeatBal->DifShdgRatioHoriz(DomeSurf);
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
+            IsoSkyRad = state.dataSolarShading->SurfMultIsoSky(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioIsoSky(DomeSurf);
+            HorizonRad = state.dataSolarShading->SurfMultHorizonZenith(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioHoriz(DomeSurf);
         } else {
-            IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->curDifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) *
-                         state.dataHeatBal->DifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+            IsoSkyRad = state.dataSolarShading->SurfMultIsoSky(DomeSurf) * state.dataSolarShading->SurfCurDifShdgRatioIsoSky(DomeSurf);
+            HorizonRad = state.dataSolarShading->SurfMultHorizonZenith(DomeSurf) *
+                         state.dataSolarShading->SurfDifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
         }
-        CircumSolarRad = state.dataHeatBal->MultCircumSolar(DomeSurf) *
-                         state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+        CircumSolarRad = state.dataSolarShading->SurfMultCircumSolar(DomeSurf) *
+                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, DomeSurf);
 
         AnisoSkyTDDMult = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso * IsoSkyRad +
-                          TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam) * CircumSolarRad +
+                          TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam) * CircumSolarRad +
                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon * HorizonRad;
 
-        if (state.dataHeatBal->AnisoSkyMult(DomeSurf) > 0.0) {
-            CalcTDDTransSolAniso = AnisoSkyTDDMult / state.dataHeatBal->AnisoSkyMult(DomeSurf);
+        if (state.dataSolarShading->SurfAnisoSkyMult(DomeSurf) > 0.0) {
+            CalcTDDTransSolAniso = AnisoSkyTDDMult / state.dataSolarShading->SurfAnisoSkyMult(DomeSurf);
         } else {
             CalcTDDTransSolAniso = 0.0;
         }
@@ -1296,9 +1301,9 @@ namespace DaylightingDevices {
     }
 
     Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,                                   // TDD pipe object number
-                    Real64 const COSI,                                   // Cosine of the incident angle
-                    DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
+                    int const PipeNum,                                  // TDD pipe object number
+                    Real64 const COSI,                                  // Cosine of the incident angle
+                    DataDaylightingDevices::RadType const RadiationType // Radiation type flag
     )
     {
 
@@ -1353,24 +1358,24 @@ namespace DaylightingDevices {
         {
             auto const SELECT_CASE_var(RadiationType);
 
-            if (SELECT_CASE_var == DataDaylightingDevices::iRadType::VisibleBeam) {
+            if (SELECT_CASE_var == DataDaylightingDevices::RadType::VisibleBeam) {
                 transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransVisBeamCoef);
                 transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam);
                 transDiff = state.dataConstruction->Construct(constDiff).TransDiffVis; // May want to change to POLYF also!
 
                 TransTDD = transDome * transPipe * transDiff;
 
-            } else if (SELECT_CASE_var == DataDaylightingDevices::iRadType::SolarBeam) {
+            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarBeam) {
                 transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransSolBeamCoef);
                 transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam);
                 transDiff = state.dataConstruction->Construct(constDiff).TransDiff; // May want to change to POLYF also!
 
                 TransTDD = transDome * transPipe * transDiff;
 
-            } else if (SELECT_CASE_var == DataDaylightingDevices::iRadType::SolarAniso) {
+            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarAniso) {
                 TransTDD = CalcTDDTransSolAniso(state, PipeNum, COSI);
 
-            } else if (SELECT_CASE_var == DataDaylightingDevices::iRadType::SolarIso) {
+            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarIso) {
                 TransTDD = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso;
             }
         }
@@ -1510,8 +1515,8 @@ namespace DaylightingDevices {
                     state.dataSurface->SurfWinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
-            QRefl +=
-                state.dataHeatBal->QS(state.dataSurface->Surface(DiffSurf).SolarEnclIndex) * state.dataSurface->Surface(DiffSurf).Area * transDiff;
+            QRefl += state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(DiffSurf).SolarEnclIndex) *
+                     state.dataSurface->Surface(DiffSurf).Area * transDiff;
 
             TotTDDPipeGain = state.dataSurface->SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) -
                              state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * state.dataSurface->Surface(DiffSurf).Area +
@@ -1617,6 +1622,172 @@ namespace DaylightingDevices {
         E4 = std::pow(pow_2(N) * (1.0 + pow_2(M) + pow_2(N)) / ((1.0 + pow_2(N)) * (pow_2(M) + pow_2(N))), pow_2(N));
 
         state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor = (1.0 / (DataGlobalConstants::Pi * M)) * (E1 + 0.25 * std::log(E2 * E3 * E4));
+    }
+
+    void adjustViewFactorsWithShelf(
+        EnergyPlusData &state, Real64 &viewFactorToShelf, Real64 &viewFactorToSky, Real64 &viewFactorToGround, int WinSurf, int ShelfNum)
+    {
+        // First, make sure none of the view factors are less than zero and return if there isn't a problem or if
+        // view factor to shelf greater than one.  Both cases together would also eliminate if other views are zero
+        // which means nothing would need to be done.
+        if (viewFactorToSky <= 0.0) viewFactorToSky = 0.0;
+        if (viewFactorToGround <= 0.0) viewFactorToGround = 0.0;
+        if (viewFactorToShelf <= 0.0) { // No shelf impact for which to account
+            ShowWarningError(state,
+                             format("DaylightingDevice:Shelf = {}:  Window view factor to shelf was less than 0.  This should not happen.",
+                                    state.dataDaylightingDevicesData->Shelf(ShelfNum).Name));
+            ShowContinueError(state, "The view factor has been reset to zero.");
+            viewFactorToShelf = 0.0;
+            if ((viewFactorToGround + viewFactorToSky) > 1.0) { // This data came in incorrect, fix by proportional reduction
+                viewFactorToGround = viewFactorToGround / (viewFactorToGround + viewFactorToSky);
+                viewFactorToSky = 1.0 - viewFactorToGround;
+                ShowWarningError(state,
+                                 format("DaylightingDevice:Shelf = {}:  The sum of the window view factors to ground and sky were greater than 1.  "
+                                        "This should not happen.",
+                                        state.dataDaylightingDevicesData->Shelf(ShelfNum).Name));
+                ShowContinueError(
+                    state, "The view factors have been reset to so that they do not exceed 1.  Check/fix your input file data to avoid this issue.");
+            }
+            return;
+        }
+        if (viewFactorToShelf + viewFactorToSky + viewFactorToGround <= 1.0) return; // nothing wrong here
+        if (viewFactorToShelf >= 1.0) { // Don't allow shelf view of greater than 1 (zero out other views)
+            ShowWarningError(state,
+                             format("DaylightingDevice:Shelf = {}:  Window view factor to shelf was greater than 1.  This should not happen.",
+                                    state.dataDaylightingDevicesData->Shelf(ShelfNum).Name));
+            ShowContinueError(state, "The view factor has been reset to 1 and the other view factors to sky and ground have been set to 0.");
+            viewFactorToShelf = 1.0;
+            viewFactorToGround = 0.0;
+            viewFactorToSky = 0.0;
+            return;
+        }
+
+        // If the flow is still here, there is something that needs to be adjusted so set the maximum shelf height and the minimum window height
+        int ShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).OutSurf;
+        Real64 zShelfMax = state.dataSurface->Surface(ShelfSurf).Vertex(1).z;
+        Real64 zShelfMin = zShelfMax;
+        for (int vertex = 2; vertex <= state.dataSurface->Surface(ShelfSurf).Sides; ++vertex) {
+            if (state.dataSurface->Surface(ShelfSurf).Vertex(vertex).z > zShelfMax)
+                zShelfMax = state.dataSurface->Surface(ShelfSurf).Vertex(vertex).z;
+            if (state.dataSurface->Surface(ShelfSurf).Vertex(vertex).z < zShelfMin)
+                zShelfMin = state.dataSurface->Surface(ShelfSurf).Vertex(vertex).z;
+        }
+        Real64 zWinMax = state.dataSurface->Surface(WinSurf).Vertex(1).z;
+        Real64 zWinMin = zWinMax;
+        for (int vertex = 2; vertex <= state.dataSurface->Surface(WinSurf).Sides; ++vertex) {
+            if (state.dataSurface->Surface(WinSurf).Vertex(vertex).z > zWinMax) zWinMax = state.dataSurface->Surface(WinSurf).Vertex(vertex).z;
+            if (state.dataSurface->Surface(WinSurf).Vertex(vertex).z < zWinMin) zWinMin = state.dataSurface->Surface(WinSurf).Vertex(vertex).z;
+        }
+
+        Real64 leftoverViewFactor;
+        // Now correct the view factors based on the location of the shelf with respect to the window
+        ShowWarningError(
+            state,
+            format("DaylightingDevice:Shelf = {}:  Window view factor to shelf [{:.2R}] results in a sum of view factors greater than 1.",
+                   state.dataDaylightingDevicesData->Shelf(ShelfNum).Name,
+                   state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor));
+        if (zWinMin >= zShelfMax) { // Shelf is fully below window, reduce view to ground first based on view to shelf
+            ShowContinueError(
+                state,
+                "Since the light shelf is below the window to which it is associated, the view factor of the window to the ground was reduced");
+            ShowContinueError(
+                state, "and possibly also the view factor to the sky. Check you input and/or consider turning off autosizing of the view factors.");
+            leftoverViewFactor = 1.0 - viewFactorToShelf - viewFactorToSky;
+            if (leftoverViewFactor >= 0.0) {
+                viewFactorToGround = leftoverViewFactor; // Other view factors okay
+            } else {
+                viewFactorToGround = 0.0;
+                viewFactorToSky = 1.0 - viewFactorToShelf;
+                if (viewFactorToSky < 0.0) {
+                    viewFactorToSky = 0.0;
+                    viewFactorToShelf = 1.0;
+                }
+            }
+
+        } else if (zShelfMin >= zWinMax) { // Shelf is fully above window, reduce view to sky first based on view to shelf
+            ShowContinueError(
+                state, "Since the light shelf is above the window to which it is associated, the view factor of the window to the sky was reduced");
+            ShowContinueError(
+                state,
+                "and possibly also the view factor to the ground. Check you input and/or consider turning off autosizing of the view factors.");
+            leftoverViewFactor = 1.0 - viewFactorToShelf - viewFactorToGround;
+            if (leftoverViewFactor >= 0.0) {
+                viewFactorToSky = leftoverViewFactor;
+            } else {
+                viewFactorToSky = 0.0;
+                viewFactorToGround = 1.0 - viewFactorToShelf;
+                if (viewFactorToGround < 0.0) {
+                    viewFactorToGround = 0.0;
+                    viewFactorToShelf = 1.0;
+                }
+            }
+        } else { // At least part of the shelf is somewhere in the middle of the window so we need to split out the view factors
+            ShowContinueError(
+                state,
+                "Since the light shelf is neither fully above or fully below the window to which it is associated, the view factor of the window");
+            ShowContinueError(
+                state,
+                "to the ground and sky were both potentially reduced. Check you input and/or consider turning off autosizing of the view factors.");
+            Real64 zShelfAvg;
+            if (((zShelfMin >= zWinMin) && (zShelfMax <= zWinMax)) || // Shelf does not go above or below the window
+                ((zShelfMin < zWinMin) && (zShelfMax > zWinMax))) {   // Shelf goes both above AND below the window
+                zShelfAvg = 0.5 * (zShelfMin + zShelfMax);
+            } else if (zShelfMin < zWinMin) { // Shelf goes partially below the window only
+                Real64 fracAbove = 0.0;
+                if (zShelfMax > zShelfMin) {
+                    fracAbove = (zShelfMax - zWinMin) / (zShelfMax - zShelfMin);
+                    if (fracAbove > 1.0) fracAbove = 1.0;
+                }
+                zShelfAvg = zWinMin + fracAbove * (zShelfMax - zWinMin);
+            } else { // (zShelfMax > zWinMax): Shelf goes partially above window
+                Real64 fracBelow = 0.0;
+                if (zShelfMax > zShelfMin) {
+                    fracBelow = (zWinMax - zShelfMin) / (zShelfMax - zShelfMin);
+                }
+                zShelfAvg = zWinMax - fracBelow * (zWinMax - zShelfMin);
+            }
+
+            // Find height ratio based on shelf average height
+            Real64 heightRatio;
+            if (zWinMax > zWinMin) { // Window has a positive height
+                heightRatio = (zShelfAvg - zWinMin) / (zWinMax - zWinMin);
+                heightRatio = min(heightRatio, 1.0);
+                heightRatio = max(heightRatio, 0.0);
+            } else { // Window does not have a positive height (not realistic) so set height ratio based on shelf location
+                if (zShelfAvg > zWinMax) {
+                    heightRatio = 1.0;
+                } else {
+                    heightRatio = 0.0;
+                }
+            }
+
+            // Take what is left over after the view to shelf is subtracted and then distribute/adjust that proportionally
+            // for the views to ground and sky based on their original weights.  Finally, account for the location of the shelf
+            // with respect to the shelf and reset the values of the actual variables used in the rest of the simulation.
+            leftoverViewFactor = 1.0 - viewFactorToShelf; // By previous logic above, leftover is greater than zero and less than one
+            Real64 vfGroundAdjustMax;
+            Real64 vfGroundAdjustMin;
+            if (viewFactorToGround > viewFactorToShelf) { // How much view to ground could be reduced potentially if shelf at bottom
+                vfGroundAdjustMin = viewFactorToGround - viewFactorToShelf;
+            } else {
+                vfGroundAdjustMin = 0.0;
+            }
+            if (viewFactorToGround > leftoverViewFactor) { // How much view to ground could be reduced potentially if shelf at top
+                vfGroundAdjustMax = leftoverViewFactor;
+            } else {
+                vfGroundAdjustMax = viewFactorToGround;
+            }
+            viewFactorToGround = vfGroundAdjustMin + heightRatio * (vfGroundAdjustMax - vfGroundAdjustMin);
+            viewFactorToSky = leftoverViewFactor - viewFactorToGround;
+        }
+        ShowWarningError(state,
+                         format("DaylightingDevice:Shelf = {}:  As a result of user input (see previous messages), at least one view factor but "
+                                "possibly more than one was reduced.",
+                                state.dataDaylightingDevicesData->Shelf(ShelfNum).Name));
+        ShowContinueError(state,
+                          "These include the view factors to the ground, the sky, and the exterior light shelf.  Note that views to other exterior "
+                          "surfaces could further complicated this.");
+        ShowContinueError(state, "Please consider manually calculating or adjusting view factors to avoid this problem.");
     }
 
     void FigureTDDZoneGains(EnergyPlusData &state)

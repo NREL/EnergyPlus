@@ -16,7 +16,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/ArrayRS.fwd.hh>
 #include <ObjexxFCL/ArrayS.hh>
-#include <ObjexxFCL/CArray.hh>
 
 namespace ObjexxFCL {
 
@@ -99,8 +98,7 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~ArrayRS()
-	{}
+	~ArrayRS() = default;
 
 public: // Predicate
 

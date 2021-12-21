@@ -552,7 +552,7 @@ The short-wave radiation absorbed on the inside face of an opaque surface (floor
 
 \begin{equation}
 \begin{array}{l}
-QRadSWInAbs(SurfNum) = QS(ZoneNum)*AbsIntSurf(SurfNum) \\
+SurfOpaqQRadSWInAbs(SurfNum) = QS(ZoneNum)*AbsIntSurf(SurfNum) \\
 \quad \quad \quad \quad+ AISurf(SurfNum)*BeamSolarRad [W/m^2]
 \end{array}
 \label{eq:ShortWaveRadInsideFaceOpaqueSurf}
@@ -694,7 +694,7 @@ If zone \emph{ZoneNum} shares interior windows with other zones, \emph{QS(ZoneNu
 \begin{equation}
 \begin{array}{rl}
    QS(ZoneNum) \to & QS(ZoneNum) \\
-                   &+ \sum_{otherZones}\text{FractDifShortZtoZ(OtherZoneNum,ZoneNum)} \\
+                   &+ \sum_{otherZones}\text{ZoneFractDifShortZtoZ(OtherZoneNum,ZoneNum)} \\
                    &* [QD(OtherZoneNum) + ZoneIntGain(OtherZoneNum)\% QLTSW \\
                    &\quad + ZoneIntGain(OtherZoneNum)\% T\_QLTSW]
   \end{array}
@@ -702,7 +702,7 @@ If zone \emph{ZoneNum} shares interior windows with other zones, \emph{QS(ZoneNu
 
 where
 
-\emph{FractDifShortZtoZ(OtherZoneNum,ZoneNum)} = ``diffuse solar exchange factor'' = fraction of short-wave radiation in \emph{OtherZoneNum} that is transmitted to \emph{ZoneNum}. This factor is calculated in subroutine ComputeDifSolExcZonesWIZWindows taking into account multiple reflection between zones. For example, for two zones means that some of the radiation transmitted from Zone1 to Zone2 is reflected back to Zone1, and some of this is in turn reflected back to Zone2, etc.
+\emph{ZoneFractDifShortZtoZ(OtherZoneNum,ZoneNum)} = ``diffuse solar exchange factor'' = fraction of short-wave radiation in \emph{OtherZoneNum} that is transmitted to \emph{ZoneNum}. This factor is calculated in subroutine ComputeDifSolExcZonesWIZWindows taking into account multiple reflection between zones. For example, for two zones means that some of the radiation transmitted from Zone1 to Zone2 is reflected back to Zone1, and some of this is in turn reflected back to Zone2, etc.
 
 \paragraph{Interior Beam Radiation}\label{interior-beam-radiation}
 

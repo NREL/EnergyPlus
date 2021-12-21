@@ -166,7 +166,6 @@ namespace SimulationManager {
     using namespace ExternalInterface;
 
     // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
 
     void ManageSimulation(EnergyPlusData &state)
     {
@@ -252,8 +251,6 @@ namespace SimulationManager {
 
         PostIPProcessing(state);
 
-        InitializePsychRoutines(state);
-
         state.dataGlobal->BeginSimFlag = true;
         state.dataGlobal->BeginFullSimFlag = false;
         state.dataGlobal->DoOutputReporting = false;
@@ -266,13 +263,15 @@ namespace SimulationManager {
 
         OpenOutputFiles(state);
         GetProjectData(state);
+        InitializePsychRoutines(state);
         CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting(state);
         SetPredefinedTables(state);
         SetPreConstructionInputParameters(state); // establish array bounds for constructions early
 
-        SetupTimePointers(state, "Zone", state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers(state, "HVAC", TimeStepSys);
+        SetupTimePointers(
+            state, OutputProcessor::SOVTimeStepType::Zone, state.dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(state, OutputProcessor::SOVTimeStepType::HVAC, TimeStepSys);
 
         CheckIfAnyEMS(state);
         CheckIfAnyPlant(state);
@@ -285,18 +284,7 @@ namespace SimulationManager {
         ManageBranchInput(state); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
-        // Note this cannot be done if we are running within the library environment, nor would you really to do so
-        // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
-        // Note that some setup is deferred until later such as setting up output variables
-        if (!state.dataGlobal->eplusRunningViaAPI) {
-            state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
-        } else {
-            // if we ARE running via API, we should warn if any plugin objects are found and fail rather than running silently without them
-            bool invalidPluginObjects = EnergyPlus::PluginManagement::PluginManager::anyUnexpectedPluginObjects(state);
-            if (invalidPluginObjects) {
-                ShowFatalError(state, "Invalid Python Plugin object encounter causes program termination");
-            }
-        }
+        state.dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(state);
 
         state.dataGlobal->DoingSizing = true;
         ManageSizing(state);
@@ -508,7 +496,7 @@ namespace SimulationManager {
                     } else {
                         DisplayString(state, "Starting Simulation at " + state.dataEnvrn->CurMnDy + " for " + state.dataEnvrn->EnvironmentName);
                     }
-                    static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
+                    static constexpr std::string_view Format_700("Environment:WarmupDays,{:3}\n");
                     print(state.files.eio, Format_700, state.dataReportFlag->NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete(state);
                 } else if (state.dataReportFlag->DisplayPerfSimulationFlag) {
@@ -683,7 +671,7 @@ namespace SimulationManager {
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
+        static constexpr std::array<int, 12> Div60 = {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string Alphas(10);
@@ -887,16 +875,16 @@ namespace SimulationManager {
             } else if (mod(60, state.dataGlobal->NumOfTimeStepInHour) != 0) {
                 MinInt = 9999;
                 for (Num = 1; Num <= 12; ++Num) {
-                    if (std::abs(state.dataGlobal->NumOfTimeStepInHour - Div60(Num)) > MinInt) continue;
-                    MinInt = state.dataGlobal->NumOfTimeStepInHour - Div60(Num);
+                    if (std::abs(state.dataGlobal->NumOfTimeStepInHour - Div60[Num - 1]) > MinInt) continue;
+                    MinInt = state.dataGlobal->NumOfTimeStepInHour - Div60[Num - 1];
                     Which = Num;
                 }
                 ShowWarningError(state,
                                  format("{}: Requested number ({}) not evenly divisible into 60, defaulted to nearest ({}).",
                                         CurrentModuleObject,
                                         state.dataGlobal->NumOfTimeStepInHour,
-                                        Div60(Which)));
-                state.dataGlobal->NumOfTimeStepInHour = Div60(Which);
+                                        Div60[Which - 1]));
+                state.dataGlobal->NumOfTimeStepInHour = Div60[Which - 1];
             }
             if (CondFDAlgo && state.dataGlobal->NumOfTimeStepInHour < 20) {
                 ShowWarningError(state,
@@ -1034,7 +1022,7 @@ namespace SimulationManager {
                                 ShowWarningError(state, CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
                                 continue;
                             }
-                            std::string diagnosticName = *it;
+                            std::string diagnosticName = it->get<std::string>();
 
                             if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
                                 state.dataGlobal->DisplayExtraWarnings = true;
@@ -1181,11 +1169,16 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    state.dataGlobal->DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
+                    state.dataGlobal->DoCoilDirectSolutions =
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
-                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm")) == "CARROLLMRT";
+                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
+                }
+                if (fields.find("use_representative_surfaces_for_calculations") != fields.end()) {
+                    state.dataSurface->UseRepresentativeSurfaceCalculations =
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_representative_surfaces_for_calculations").get<std::string>()) == "YES";
                 }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);
@@ -1194,9 +1187,10 @@ namespace SimulationManager {
                 bool overrideMaxZoneTempDiff(false);
                 bool overrideSystemTimestep(false);
                 bool overrideMaxAllowedDelTemp(false);
+                bool overridePsychTsatFnPb(false);
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
-                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
+                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode").get<std::string>());
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
                     } else if (overrideModeValue == "MODE01") {
@@ -1225,15 +1219,24 @@ namespace SimulationManager {
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                     } else if (overrideModeValue == "MODE06") {
-                        // Mode05 plus internal variable MaxZoneTempDiff will be set to 1.00
+                        // Mode05 plus cubic spline interpolations in replacement of the original psychrometric function PsychTsatFnPb
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
+                        overridePsychTsatFnPb = true;
+                    } else if (overrideModeValue == "MODE07") {
+                        // Mode06 plus internal variable MaxZoneTempDiff will be set to 1.00
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
-                    } else if (overrideModeValue == "MODE07") {
-                        // Mode06 plus internal variable MaxAllowedDelTemp will be set to 0.1
+                        overridePsychTsatFnPb = true;
+                    } else if (overrideModeValue == "MODE08") {
+                        // Mode07 plus internal variable MaxAllowedDelTemp will be set to 0.1
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
@@ -1241,17 +1244,18 @@ namespace SimulationManager {
                         overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
                         overrideMaxAllowedDelTemp = true;
+                        overridePsychTsatFnPb = true;
                     } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
-                            state.dataConvergeParams->MaxZoneTempDiff = fields.at("maxzonetempdiff");
+                            state.dataConvergeParams->MaxZoneTempDiff = fields.at("maxzonetempdiff").get<Real64>();
                             ShowWarningError(state,
                                              format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: {:.4R}",
                                                     state.dataConvergeParams->MaxZoneTempDiff));
                             advancedModeUsed = true;
                         }
                         if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
-                            state.dataHeatBal->MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
+                            state.dataHeatBal->MaxAllowedDelTemp = fields.at("maxalloweddeltemp").get<Real64>();
                             ShowWarningError(
                                 state,
                                 format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: {:.4R}",
@@ -1304,6 +1308,16 @@ namespace SimulationManager {
                         state.dataConvergeParams->MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
                         state.dataHVACGlobal->LimitNumSysSteps = int(state.dataGlobal->TimeStepZone / state.dataConvergeParams->MinTimeStepSys);
                     }
+                    if (overridePsychTsatFnPb) {
+                        ShowWarningError(state,
+                                         "Due to PerformancePrecisionTradeoffs Override Mode, the saturated temperature will be calculated using "
+                                         "cubic spline interpolations in replacement of PsychTsatFnPb .");
+                        // Mode06 CSpline interpolation (64 Pa bin size + 20/16 bit)
+                        state.dataPsychrometrics->useInterpolationPsychTsatFnPb = true;
+#ifdef EP_cache_PsyTsatFnPb
+                        state.dataPsychCache->tsatprecision_bits = 20;
+#endif
+                    }
                     if (overrideMaxZoneTempDiff) {
                         ShowWarningError(
                             state, "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
@@ -1317,17 +1331,16 @@ namespace SimulationManager {
                 }
             }
         }
-
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting Project Input");
         }
 
         print(state.files.eio, "{}\n", "! <Version>, Version ID");
-        static constexpr auto Format_721(" Version, {}\n");
+        static constexpr std::string_view Format_721(" Version, {}\n");
         print(state.files.eio, Format_721, VersionID);
 
         print(state.files.eio, "{}\n", "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}");
-        static constexpr auto Format_731(" Timesteps per Hour, {:2}, {:2}\n");
+        static constexpr std::string_view Format_731(" Timesteps per Hour, {:2}, {:2}\n");
         print(state.files.eio, Format_731, state.dataGlobal->NumOfTimeStepInHour, state.dataGlobal->MinutesPerTimeStep);
 
         print(state.files.eio,
@@ -1335,7 +1348,7 @@ namespace SimulationManager {
               "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, Minimum Plant "
               "Iterations, Maximum Plant Iterations");
         MinInt = state.dataConvergeParams->MinTimeStepSys * 60.0;
-        static constexpr auto Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
+        static constexpr std::string_view Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
         print(state.files.eio,
               Format_733,
               MinInt,
@@ -1431,7 +1444,7 @@ namespace SimulationManager {
               "{}\n",
               "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time");
         // Formats
-        static constexpr auto Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R}, \n");
+        static constexpr std::string_view Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R}, \n");
 
         print(state.files.eio, Format_751, std::abs(deviationFromSetPtThresholdHtg), deviationFromSetPtThresholdClg);
 
@@ -1523,7 +1536,7 @@ namespace SimulationManager {
                              state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 
-        WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
+        WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
 
         if (state.dataSimulationManager->RunControlInInput) {
             if (state.dataGlobal->DoZoneSizing) {
@@ -1655,130 +1668,32 @@ namespace SimulationManager {
         }
     }
 
-    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName)
+    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &filePath, std::ios_base::openmode mode)
     {
-        auto result = std::make_unique<std::ofstream>(fileName);
+        auto result = std::make_unique<std::ofstream>(filePath, mode);
         if (!result->good()) {
-            ShowFatalError(state, "OpenOutputFiles: Could not open file " + fileName + " for output (write).");
+            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
         }
         return result;
     }
 
-    void OpenOutputJsonFiles(EnergyPlusData &state, JsonOutputStreams &jsonOutputStreams)
+    std::unique_ptr<fmt::ostream> OpenFmtStreamFile(EnergyPlusData &state, const fs::path &filePath)
     {
-
-        //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
-        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-            if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                jsonOutputStreams.json_stream = OpenStreamFile(state, jsonOutputStreams.outputJsonFileName);
-            }
-            if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                jsonOutputStreams.cbor_stream = OpenStreamFile(state, jsonOutputStreams.outputCborFileName);
-            }
-            if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                jsonOutputStreams.msgpack_stream = OpenStreamFile(state, jsonOutputStreams.outputMsgPackFileName);
-            }
+        std::unique_ptr<fmt::ostream> result = nullptr;
+#ifdef _WIN32
+        auto filePathStr = filePath.string();
+        auto path = filePathStr.c_str();
+#else
+        auto path = filePath.c_str();
+#endif
+        try {
+            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
+            result = std::make_unique<fmt::ostream>(std::move(f));
+        } catch (const std::system_error &error) {
+            ShowSevereError(state, error.what());
+            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
         }
-        //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
-        if (state.dataResultsFramework->resultsFramework->timeSeriesEnabled()) {
-            // Output detailed Zone time series file
-            if (state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.rDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.iDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneJsonFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneCborFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneMsgPackFileName);
-                }
-            }
-
-            // Output detailed HVAC time series file
-            if (state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacJsonFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacCborFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacMsgPackFileName);
-                }
-            }
-
-            // Output timestep time series file
-            if (state.dataResultsFramework->resultsFramework->RITimestepTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RITimestepTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSJsonFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSCborFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSMsgPackFileName);
-                }
-            }
-
-            // Output hourly time series file
-            if (state.dataResultsFramework->resultsFramework->RIHourlyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIHourlyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRJsonFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRCborFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRMsgPackFileName);
-                }
-            }
-
-            // Output daily time series file
-            if (state.dataResultsFramework->resultsFramework->RIDailyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIDailyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYJsonFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYCborFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYMsgPackFileName);
-                }
-            }
-
-            // Output monthly time series file
-            if (state.dataResultsFramework->resultsFramework->RIMonthlyTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIMonthlyTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNJsonFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNCborFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNMsgPackFileName);
-                }
-            }
-
-            // Output run period time series file
-            if (state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.iDataFrameEnabled() ||
-                state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.rDataFrameEnabled()) {
-                if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMJsonFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMCborFileName);
-                }
-                if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMMsgPackFileName);
-                }
-            }
-        }
+        return result;
     }
 
     void OpenOutputFiles(EnergyPlusData &state)
@@ -1837,7 +1752,7 @@ namespace SimulationManager {
         using namespace DataSystemVariables;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
+        static constexpr std::string_view EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string cEnvSetThreads;
@@ -1924,12 +1839,13 @@ namespace SimulationManager {
                   state.dataHeatBal->CondFDRelaxFactor);
         }
         // Report number of threads to eio file
-        static constexpr auto ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
-                                              "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
-                                              "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
-                                              "Parallel Sims");
+        static constexpr std::string_view ThreadingHeader(
+            "! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
+            "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
+            "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
+            "Parallel Sims");
         print(state.files.eio, "{}\n", ThreadingHeader);
-        static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
+        static constexpr std::string_view ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
         if (state.dataSysVars->Threading) {
             if (state.dataSysVars->iEnvSetThreads == 0) {
                 cEnvSetThreads = "Not Set";
@@ -2122,8 +2038,8 @@ namespace SimulationManager {
         using namespace DataBranchNodeConnections;
 
         // Formats
-        static constexpr auto Format_702("! <#{0} Node Connections>,<Number of {0} Node Connections>\n");
-        static constexpr auto Format_703(
+        static constexpr std::string_view Format_702("! <#{0} Node Connections>,<Number of {0} Node Connections>\n");
+        static constexpr std::string_view Format_703(
             "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>\n");
 
         state.dataBranchNodeConnections->NonConnectedNodes.dimension(state.dataLoopNodes->NumOfNodes, true);
@@ -2221,9 +2137,9 @@ namespace SimulationManager {
 
         if (NumNonConnected > 0) {
             print(state.files.bnd, "{}\n", "! ===============================================================");
-            static constexpr auto Format_705("! <#NonConnected Nodes>,<Number of NonConnected Nodes>\n #NonConnected Nodes,{}\n");
+            static constexpr std::string_view Format_705("! <#NonConnected Nodes>,<Number of NonConnected Nodes>\n #NonConnected Nodes,{}\n");
             print(state.files.bnd, Format_705, NumNonConnected);
-            static constexpr auto Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
+            static constexpr std::string_view Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
             print(state.files.bnd, "{}\n", Format_706);
             for (int Loop = 1; Loop <= state.dataLoopNodes->NumOfNodes; ++Loop) {
                 if (!state.dataBranchNodeConnections->NonConnectedNodes(Loop)) continue;
@@ -2261,14 +2177,15 @@ namespace SimulationManager {
         constexpr static auto errstring("**error**");
 
         // Formats
-        static constexpr auto Format_700("! <#Component Sets>,<Number of Component Sets>");
-        static constexpr auto Format_702("! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
-                                         "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>");
-        static constexpr auto Format_720("! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>");
-        static constexpr auto Format_722(
+        static constexpr std::string_view Format_700("! <#Component Sets>,<Number of Component Sets>");
+        static constexpr std::string_view Format_702("! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
+                                                     "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>");
+        static constexpr std::string_view Format_720("! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>");
+        static constexpr std::string_view Format_722(
             "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>");
-        static constexpr auto Format_723("! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
-                                         "Priority>,<Cooling Priority>");
+        static constexpr std::string_view Format_723(
+            "! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
+            "Priority>,<Cooling Priority>");
 
         // Report outside air node names on the Branch-Node Details file
         print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -2849,10 +2766,10 @@ namespace SimulationManager {
                 ChildOutNodeName.allocate(NumChildren);
                 ChildInNodeNum.allocate(NumChildren);
                 ChildOutNodeNum.allocate(NumChildren);
-                ChildCType = BlankString;
-                ChildCName = BlankString;
-                ChildInNodeName = BlankString;
-                ChildOutNodeName = BlankString;
+                ChildCType = std::string{};
+                ChildCName = std::string{};
+                ChildInNodeName = std::string{};
+                ChildOutNodeName = std::string{};
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
                 GetChildrenData(state,
@@ -2942,7 +2859,7 @@ namespace SimulationManager {
         Array1D_int VarIndexes;
         Array1D_int VarIDs;
         Array1D<OutputProcessor::TimeStepType> IndexTypes;
-        Array1D_int VarTypes;
+        Array1D<OutputProcessor::VariableType> VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
         std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;
@@ -3034,11 +2951,6 @@ namespace SimulationManager {
             ShowFatalError(state, "Preprocessor condition(s) cause termination.");
         }
 
-        // Set up more globals - process fluid input.
-        state.dataFluidProps->FluidIndex_Water = FindGlycol(state, "Water");
-        state.dataFluidProps->FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
-        state.dataFluidProps->FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
-
         state.dataInputProcessing->inputProcessor->preScanReportingVariables(state);
     }
 
@@ -3106,8 +3018,6 @@ void Resimulate(EnergyPlusData &state,
     //         ReportHeatBalance
 
     // Using/Aliasing
-    using DataHeatBalFanSys::iGetZoneSetPoints;
-    using DataHeatBalFanSys::iPredictStep;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
@@ -3142,14 +3052,22 @@ void Resimulate(EnergyPlusData &state,
 
     if (ResimHVAC) {
         // HVAC simulation
-        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(state,
+                             DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
+                             ZoneTempChange,
+                             false,
+                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                             0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-            ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+            ManageZoneContaminanUpdates(
+                state, DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         CalcAirFlowSimple(
             state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
-        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(
+            state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-            ManageZoneContaminanUpdates(state, iPredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+            ManageZoneContaminanUpdates(
+                state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
         ++state.dataDemandManager->DemandManagerHVACIterations;

@@ -621,7 +621,9 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         }
                     }
                 } else {
-                    if (state.dataSize->ZoneCoolingOnlyFan) {
+                    if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
+                        this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
+                    } else if (state.dataSize->ZoneCoolingOnlyFan) {
                         this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow;
                     } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
                         this->autoSizedValue = this->termUnitSizing(this->curTermUnitSizingNum).AirVolFlow;
@@ -629,8 +631,6 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                         this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
                     } else if (this->zoneHeatingOnlyFan) {
                         this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow;
-                    } else if (this->zoneEqSizing(this->curZoneEqNum).CoolingAirFlow) {
-                        this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).CoolingAirVolFlow;
                     } else {
                         this->autoSizedValue =
                             max(this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow, this->finalZoneSizing(this->curZoneEqNum).DesHeatVolFlow);

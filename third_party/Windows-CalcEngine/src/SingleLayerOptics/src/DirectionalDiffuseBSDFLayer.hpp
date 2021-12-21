@@ -5,27 +5,49 @@
 
 #include "BSDFLayer.hpp"
 
-namespace SingleLayerOptics {
+namespace SingleLayerOptics
+{
+    class CDirectionalDiffuseCell;
 
-	class CDirectionalDiffuseCell;
+    // All outgoing directions are calculated
+    class CDirectionalBSDFLayer : public CBSDFLayer
+    {
+    public:
+        CDirectionalBSDFLayer(const std::shared_ptr<CDirectionalDiffuseCell> & t_Cell,
+                              const CBSDFHemisphere & t_Hemisphere);
 
-	// All outgoing directions are calculated
-	class CDirectionalDiffuseBSDFLayer : public CBSDFLayer {
-	public:
-		CDirectionalDiffuseBSDFLayer( const std::shared_ptr< CDirectionalDiffuseCell >& t_Cell,
-		                              const std::shared_ptr< const CBSDFHemisphere >& t_Hemisphere );
+    protected:
+        std::shared_ptr<CDirectionalDiffuseCell> cellAsDirectionalDiffuse() const;
+        void calcDiffuseDistribution(const FenestrationCommon::Side aSide,
+                                     const CBeamDirection & incomingDirection,
+                                     const size_t incomingDirectionIndex) override;
+        void calcDiffuseDistribution_wv(const FenestrationCommon::Side aSide,
+                                        const CBeamDirection & incomingDirection,
+                                        const size_t incomingDirectionIndex) override;
 
-	protected:
-		std::shared_ptr< CDirectionalDiffuseCell > cellAsDirectionalDiffuse() const;
-		void calcDiffuseDistribution( const FenestrationCommon::Side aSide,
-		                              const CBeamDirection& t_Direction,
-		                              const size_t t_DirectionIndex );
-		void calcDiffuseDistribution_wv( const FenestrationCommon::Side aSide,
-		                                 const CBeamDirection& t_Direction,
-		                                 const size_t t_DirectionIndex );
+        virtual double diffuseDistributionScalar(size_t outgoingDirection) = 0;
+    };
 
-	};
+    class CDirectionalDiffuseBSDFLayer : public CDirectionalBSDFLayer
+    {
+    public:
+        CDirectionalDiffuseBSDFLayer(const std::shared_ptr<CDirectionalDiffuseCell> & t_Cell,
+                                     const CBSDFHemisphere & t_Hemisphere);
 
-}
+    protected:
+        double diffuseDistributionScalar(size_t outgoingDirection) override;
+    };
+
+    class CMatrixBSDFLayer : public CDirectionalBSDFLayer
+    {
+    public:
+        CMatrixBSDFLayer(const std::shared_ptr<CDirectionalDiffuseCell> & t_Cell,
+                         const CBSDFHemisphere & t_Hemisphere);
+
+    protected:
+        double diffuseDistributionScalar(size_t outgoingDirection) override;
+    };
+
+}   // namespace SingleLayerOptics
 
 #endif

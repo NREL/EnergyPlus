@@ -109,6 +109,10 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->dataSurface->Surface(10).Centroid.x = 1.0314909999999999;
     state->dataSurface->Surface(10).Centroid.y = 7.1687189999999994;
     state->dataSurface->Surface(10).Centroid.z = 1.6763999999999999;
+    state->dataSurface->SurfOutDryBulbTemp.allocate(10);
+    state->dataSurface->SurfOutWindSpeed.allocate(10);
+    state->dataSurface->SurfOutDryBulbTemp = 0.0;
+    state->dataSurface->SurfOutWindSpeed = 0.0;
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Volume = 996.75300003839993;

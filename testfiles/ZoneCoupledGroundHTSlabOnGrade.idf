@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !- Use '!' comments if they need to be retained when using the IDFEditor.
 !- =========== ALL OBJECTS IN CLASS: VERSION ===========
-! SlabOnGradeWithInsulation.idf
+! ZoneCoupledGroundHTSlabOnGrade.idf
 ! Basic File Description:
 ! This input file exemplifies the use of the Site:GroundDomain:Slab
 ! object to perform the simulation of ground coupled heat transfer.
@@ -43,7 +43,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,9.5;
+  Version,22.1;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -301,6 +301,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -317,6 +318,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -333,6 +335,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -349,6 +352,7 @@
     Wall,                    !- Surface Type
     Main Floor Wall Construction,  !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -365,6 +369,7 @@
     Roof,                    !- Surface Type
     Roof Construction,       !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -381,6 +386,7 @@
     Floor,                   !- Surface Type
     Floor Construction,      !- Construction Name
     Main Floor,              !- Zone Name
+    ,                        !- Space Name
     OtherSideConditionsModel,!- Outside Boundary Condition
     GroundCoupledOSCM,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

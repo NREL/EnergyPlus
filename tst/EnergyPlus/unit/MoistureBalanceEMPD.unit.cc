@@ -360,11 +360,11 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     auto const &material(state->dataMaterial->Material(1));
 
     Real64 Tsat(0.0);
-    state->dataHeatBalSurf->TempSurfIn.allocate(surfNum);
-    state->dataHeatBalSurf->TempSurfIn(surfNum) = 20.0;
+    state->dataHeatBalSurf->SurfTempIn.allocate(surfNum);
+    state->dataHeatBalSurf->SurfTempIn(surfNum) = 20.0;
 
     // Calculate average vapor density [kg/m^3]
-    Real64 Taver = state->dataHeatBalSurf->TempSurfIn(surfNum);
+    Real64 Taver = state->dataHeatBalSurf->SurfTempIn(surfNum);
     // Calculate RH for use in material property calculations.
     Real64 RV_Deep_Old = state->dataMstBalEMPD->RVdeepOld(surfNum);
     Real64 RVaver = state->dataMstBalEMPD->RVSurfLayerOld(surfNum);

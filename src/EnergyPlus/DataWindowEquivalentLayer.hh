@@ -76,21 +76,45 @@ namespace DataWindowEquivalentLayer {
     // CFSLAYER: layer types
     enum class LayerType
     {
-        Unassigned,
-        ltyNONE,   // unused / empty layer
-        ltyGLAZE,  // glazing layer i.e, purely specular
-        ltyDRAPE,  // pleated drapes/curtains
-        ltyROLLB,  // roller blind
-        ltyVBHOR,  // venetian blinds - horizontal
-        ltyVBVER,  // venetian blinds - vertical
-        ltyINSCRN, // insect screen
-        ltyROOM,   // indoor space and/or make no adjustment
-        ltyGZS     // glazing with spectral data (read from aux file)
+        Invalid = -1,
+        NONE,   // unused / empty layer
+        GLAZE,  // glazing layer i.e, purely specular
+        DRAPE,  // pleated drapes/curtains
+        ROLLB,  // roller blind
+        VBHOR,  // venetian blinds - horizontal
+        VBVER,  // venetian blinds - vertical
+        INSCRN, // insect screen
+        ROOM,   // indoor space and/or make no adjustment
+        GZS,    // glazing with spectral data (read from aux file)
+        Num
     };
 
     // index for solar arrays
-    int constexpr isDIFF = 1;
-    int constexpr isBEAM = 2;
+    enum class SolarArrays
+    {
+        Invalid = -1,
+        DIFF,
+        BEAM,
+        Num
+    };
+
+    // Parameters to indicate blind orientation for use with the Material
+    // derived type (see below):
+    enum class Orientation
+    {
+        Invalid = -1,
+        Horizontal,
+        Vertical,
+        Num
+    };
+
+    enum class AngleType
+    {
+        Invalid = -1,
+        Fixed,
+        Variable,
+        Num
+    };
 
     struct CFSLWP
     {
@@ -182,7 +206,7 @@ namespace DataWindowEquivalentLayer {
         //                   PHI_DEG = 20 if diffuse only
 
         // Default Constructor
-        CFSLAYER() : LTYPE(LayerType::Unassigned), iGZS(0), S(0.0), W(0.0), C(0.0), PHI_DEG(0.0), CNTRL(0)
+        CFSLAYER() : LTYPE(LayerType::Invalid), iGZS(0), S(0.0), W(0.0), C(0.0), PHI_DEG(0.0), CNTRL(0)
         {
         }
     };

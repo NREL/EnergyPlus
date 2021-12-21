@@ -105,10 +105,10 @@ namespace HVACHXAssistedCoolingCoil {
     };
 
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
-                                  std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
-                                  bool const FirstHVACIteration,         // FirstHVACIteration flag
-                                  int const CompOp,                      // compressor operation; 1=on, 0=off
-                                  Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
+                                  std::string_view HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+                                  bool const FirstHVACIteration,       // FirstHVACIteration flag
+                                  int const CompOp,                    // compressor operation; 1=on, 0=off
+                                  Real64 const PartLoadRatio,          // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
                                   int const FanOpMode,                    // Allows the parent object to control fan operation
                                   Optional_bool_const HXUnitEnable = _,   // flag to enable heat exchanger heat recovery
@@ -137,7 +137,7 @@ namespace HVACHXAssistedCoolingCoil {
 
     void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state,
                                             std::string const &CompType, // unused1208
-                                            std::string const &CompName,
+                                            std::string_view CompName,
                                             Real64 &Value,
                                             int &CompIndex);
 
@@ -162,7 +162,7 @@ namespace HVACHXAssistedCoolingCoil {
     );
 
     int GetCoilInletNode(EnergyPlusData &state,
-                         std::string const &CoilType, // must match coil types in this module
+                         std::string_view CoilType,   // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
@@ -174,7 +174,7 @@ namespace HVACHXAssistedCoolingCoil {
     );
 
     int GetCoilOutletNode(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
@@ -186,7 +186,7 @@ namespace HVACHXAssistedCoolingCoil {
     );
 
     std::string GetHXDXCoilName(EnergyPlusData &state,
-                                std::string const &CoilType, // must match coil types in this module
+                                std::string_view CoilType,   // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
@@ -212,7 +212,7 @@ namespace HVACHXAssistedCoolingCoil {
     );
 
     Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
-                                   std::string const &CoilType, // must match coil types in this module
+                                   std::string_view CoilType,   // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     );

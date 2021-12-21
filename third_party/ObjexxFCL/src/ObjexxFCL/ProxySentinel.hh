@@ -17,15 +17,8 @@ namespace ObjexxFCL {
 namespace internal {
 
 // ProxySentinel: Array Constructor Proxy Sentinel Class
-class ProxySentinel
+struct ProxySentinel
 {
-
-public: // Creation
-
-	// Default Constructor
-	ProxySentinel()
-	{}
-
 }; // ProxySentinel
 
 } // internal

@@ -71,8 +71,6 @@ using namespace DataLoopNode;
 using namespace FluidProperties;
 using namespace DataPlant;
 
-using namespace ObjexxFCL;
-
 TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 {
     Real64 LoadMet;
@@ -149,7 +147,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
 
     HWBaseboard(1).DesignObjectPtr = 1;
     HWBaseboard(1).EquipID = "HWRadiativeConvectiveBB";
-    HWBaseboard(1).EquipType = TypeOf_Baseboard_Rad_Conv_Water;
+    HWBaseboard(1).EquipType = DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water;
     HWBaseboard(1).ZonePtr = 1;
     HWBaseboard(1).AirInletTemp = 21.0;
     HWBaseboard(1).WaterInletTemp = 82.;
@@ -189,7 +187,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = HWBaseboard(1).EquipID;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = HWBaseboard(1).EquipType;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = HWBaseboard(1).EquipType;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWBaseboard(1).WaterInletNode;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWBaseboard(1).WaterOutletNode;
 

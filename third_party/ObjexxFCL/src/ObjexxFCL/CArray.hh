@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/CArray.fwd.hh>
-#include <ObjexxFCL/noexcept.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -96,7 +95,7 @@ public: // Creation
 	}
 
 	// Move Constructor
-	CArray( CArray && a ) NOEXCEPT :
+	CArray( CArray && a ) noexcept :
 	 size_( a.size_ ),
 	 data_( a.data_ )
 	{
@@ -234,7 +233,7 @@ public: // Assignment
 
 	// Move Assignment
 	CArray &
-	operator =( CArray && a ) NOEXCEPT
+	operator =( CArray && a ) noexcept
 	{
 		assert( this != &a );
 		size_ = a.size_;
@@ -494,17 +493,6 @@ public: // Inspector
 			length_sq += data_[ i ] * data_[ i ];
 		}
 		return std::sqrt( length_sq );
-	}
-
-	// Length Squared
-	T
-	length_squared() const
-	{
-		T length_sq( T( 0 ) );
-		for ( size_type i = 0; i < size_; ++i ) {
-			length_sq += data_[ i ] * data_[ i ];
-		}
-		return length_sq;
 	}
 
 public: // Modifier

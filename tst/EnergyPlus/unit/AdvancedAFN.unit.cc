@@ -62,7 +62,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::AirflowNetworkBalanceManager;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;
 using namespace CurveManager;
 
@@ -109,9 +108,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataEnvrn->OutDryBulbTemp = 15.0;
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBal->MRT.allocate(1);
+    state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 22.0;
-    state->dataHeatBal->MRT(1) = 22.0;
+    state->dataHeatBal->ZoneMRT(1) = 22.0;
 
     TimeOpenElapsed = 5.0;
     TimeCloseElapsed = 0.0;
@@ -124,9 +123,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     CurveNum = 1;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 21.2;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.09;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -139,9 +138,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
 
     CurveNum = 2;
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::Quadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 18.8;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.33;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
@@ -159,7 +158,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     EXPECT_EQ(1, CloseProbStatus);
 
     state->dataHeatBalFanSys->MAT(1) = 26.0;
-    state->dataHeatBal->MRT(1) = 26.0;
+    state->dataHeatBal->ZoneMRT(1) = 26.0;
     state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
         *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenProbStatus);

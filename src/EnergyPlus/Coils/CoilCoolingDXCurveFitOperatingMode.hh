@@ -101,10 +101,10 @@ struct CoilCoolingDXCurveFitOperatingMode
                            bool const singleMode);
 
     std::string name;
-    Real64 ratedGrossTotalCap = 0.0;
-    Real64 ratedEvapAirFlowRate = 0.0;
-    Real64 ratedCondAirFlowRate = 0.0;
-    Real64 ratedEvapAirMassFlowRate = 0.0;
+    Real64 ratedGrossTotalCap = 0.0;       // [W]
+    Real64 ratedEvapAirFlowRate = 0.0;     // [m3/s]
+    Real64 ratedCondAirFlowRate = 0.0;     // [m3/s]
+    Real64 ratedEvapAirMassFlowRate = 0.0; // [kg/s]
     bool ratedGrossTotalCapIsAutosized = false;
     bool ratedEvapAirFlowRateIsAutosized = false;
 
@@ -135,9 +135,12 @@ struct CoilCoolingDXCurveFitOperatingMode
 
     enum class CondenserType
     {
+        Invalid = -1,
         AIRCOOLED,
-        EVAPCOOLED
+        EVAPCOOLED,
+        Num
     };
+
     CondenserType condenserType = CondenserType::AIRCOOLED;
 
     Real64 condInletTemp = 0.0; // condenser inlet node temp or outdoor temp if no condenser node {C}

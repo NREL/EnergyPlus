@@ -169,3 +169,186 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     state->dataAirflowNetwork->DisSysCompCoilData.deallocate();
     state->dataAirflowNetwork->AirflowNetworkCompData.deallocate();
 }
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
+{
+
+    int NF;
+    std::array<Real64, 2> F = {0.0, 0.0};
+    std::array<Real64, 2> DF = {0.0, 0.0};
+
+    AirflowNetwork::SurfaceCrack crack;
+    crack.coefficient = 0.001;
+    crack.exponent = 0.65;
+
+    AirflowNetwork::AirProperties state0, state1;
+    Real64 sqrt_density = state0.sqrt_density; // = state1.sqrtDensity
+    Real64 viscosity = state0.viscosity;       // = state1.viscosity
+
+    Real64 dp{10.0};
+
+    // Linear
+    NF = crack.calculate(*state, true, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(0.01 * sqrt_density / viscosity, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    NF = crack.calculate(*state, true, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(-0.01 * sqrt_density / viscosity, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    // Nonlinear
+    NF = crack.calculate(*state, false, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(0.001 * std::pow(10.0, 0.65), F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    NF = crack.calculate(*state, false, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(-0.001 * std::pow(10.0, 0.65), F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_GenericCrack)
+{
+
+    std::array<Real64, 2> F = {0.0, 0.0};
+    std::array<Real64, 2> DF = {0.0, 0.0};
+
+    Real64 coef{0.001};
+    Real64 expo{0.65};
+
+    AirflowNetwork::AirProperties state0, state1;
+    Real64 sqrt_density = state0.sqrt_density; // = state1.sqrtDensity
+    Real64 viscosity = state0.viscosity;       // = state1.viscosity
+
+    Real64 dp{10.0};
+
+    // Linear
+    AirflowNetwork::generic_crack(coef, expo, true, dp, state0, state1, F, DF);
+    EXPECT_EQ(0.01 * sqrt_density / viscosity, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+
+    AirflowNetwork::generic_crack(coef, expo, true, -dp, state0, state1, F, DF);
+    EXPECT_EQ(-0.01 * sqrt_density / viscosity, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.001 * sqrt_density / viscosity, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+
+    // Nonlinear
+    AirflowNetwork::generic_crack(coef, expo, false, dp, state0, state1, F, DF);
+    EXPECT_EQ(0.001 * std::pow(10.0, 0.65), F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+
+    AirflowNetwork::generic_crack(coef, expo, false, -dp, state0, state1, F, DF);
+    EXPECT_EQ(-0.001 * std::pow(10.0, 0.65), F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_DOUBLE_EQ(0.000065 * std::pow(10.0, 0.65), DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedMassFlow)
+{
+
+    int NF;
+    std::array<Real64, 2> F = {0.0, 0.0};
+    std::array<Real64, 2> DF = {0.0, 0.0};
+
+    AirflowNetwork::SpecifiedMassFlow element;
+    element.mass_flow = 0.1;
+
+    AirflowNetwork::AirProperties state0, state1;
+
+    Real64 dp{10.0};
+    Real64 f = element.mass_flow;
+
+    // Linear
+    NF = element.calculate(*state, true, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(f, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    NF = element.calculate(*state, true, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(f, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    // Nonlinear tests
+    NF = element.calculate(*state, false, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(f, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    NF = element.calculate(*state, false, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(f, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_SpecifiedVolumeFlow)
+{
+
+    int NF;
+    std::array<Real64, 2> F = {0.0, 0.0};
+    std::array<Real64, 2> DF = {0.0, 0.0};
+
+    AirflowNetwork::SpecifiedVolumeFlow element;
+    element.volume_flow = 0.1;
+
+    AirflowNetwork::AirProperties state0, state1;
+    Real64 density = state0.density; // = state1.density
+
+    Real64 dp{10.0};
+    Real64 f = element.volume_flow * density;
+
+    // Linear
+    NF = element.calculate(*state, true, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(f, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    NF = element.calculate(*state, true, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(f, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    // Nonlinear tests
+    NF = element.calculate(*state, false, dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(f, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+
+    NF = element.calculate(*state, false, -dp, 0, 1.0, 1.0, state0, state1, F, DF);
+    EXPECT_EQ(f, F[0]);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_EQ(0.0, DF[0]);
+    EXPECT_EQ(0.0, DF[1]);
+    EXPECT_EQ(1, NF);
+}

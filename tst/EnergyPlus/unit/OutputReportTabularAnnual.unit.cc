@@ -50,8 +50,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
+
+// EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -62,7 +64,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::OutputReportTabularAnnual;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GetInput)
 {
@@ -134,8 +135,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -145,8 +146,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -156,16 +157,34 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_SetupGathering)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite3");
 
     state->dataGlobal->DoWeathSim = true;
 
@@ -208,8 +227,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -219,8 +238,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite2",
                         _,
                         "Electricity",
@@ -230,16 +249,34 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
                         "Exterior Lights Electric Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Average,
+                        "Lite3");
 
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 0.25;
@@ -251,7 +288,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     extLitUse = 1.01;
 
     // UpdateDataandReport( 1 ); not sure if this is needed
-    GatherAnnualResultsForTimeStep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    GatherAnnualResultsForTimeStep(*state, OutputProcessor::TimeStepType::Zone);
 
     // STOPPPED HERE. NOT SEEING THE POWER VARIABLE SHOWING UP
 
@@ -277,7 +314,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
     state->dataOutputProcessor->EnergyMeters(1).CurTSValue = -10.;
     state->dataOutputProcessor->EnergyMeters(2).CurTSValue = 50.;
-    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     std::vector<std::string> fieldSetParams = annualTables.back().inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "HEATING:MYTH:VARIABLE"); // m_colHead
@@ -289,7 +326,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults_MinMaxHrsShown
 
     state->dataOutputProcessor->EnergyMeters(1).CurTSValue = 15.;
     state->dataOutputProcessor->EnergyMeters(2).CurTSValue = 55.;
-    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::TimeStepZone);
+    annualTables.back().gatherForTimestep(*state, OutputProcessor::TimeStepType::Zone);
 
     fieldSetParams = annualTables.back().inspectTableFieldSets(0);
     EXPECT_EQ(fieldSetParams[0], "HEATING:MYTH:VARIABLE"); // m_colHead
@@ -336,8 +373,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         "Misc Facility Electric Energy",
                         OutputProcessor::Unit::J,
                         facilUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -394,8 +431,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         "Misc Facility Electric Energy",
                         OutputProcessor::Unit::J,
                         facilUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
                         "Lite1",
                         _,
                         "Electricity",
@@ -416,4 +453,105 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
     std::vector<AnnualTable>::iterator firstTable = state->dataOutputReportTabularAnnual->annualTables.begin();
 
     EXPECT_TRUE(firstTable->invalidAggregationOrder(*state));
+}
+
+TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
+{
+    // Test for #8921
+
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Annual,",
+        "  ANNUAL EXAMPLE,                         !- Name",
+        "  ,                                       !- Filter",
+        "  ,                                       !- Schedule Name",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 1",
+        "  SumOrAverage,                           !- Aggregation Type for Variable or Meter 1",
+        "  2,                                      !- Digits After Decimal 1",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 2",
+        "  Maximum,                                !- Aggregation Type for Variable or Meter 2",
+        "  2,                                      !- Digits After Decimal 2",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 3",
+        "  Minimum,                                !- Aggregation Type for Variable or Meter 3",
+        "  2,                                      !- Digits After Decimal 3",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 4",
+        "  ValueWhenMaximumOrMinimum,              !- Aggregation Type for Variable or Meter 4",
+        "  2,                                      !- Digits After Decimal 4",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 5",
+        "  HoursNonZero,                           !- Aggregation Type for Variable or Meter 5",
+        "  2,                                      !- Digits After Decimal 5",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 6",
+        "  HoursZero,                              !- Aggregation Type for Variable or Meter 6",
+        "  2,                                      !- Digits After Decimal 6",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 7",
+        "  HoursPositive,                          !- Aggregation Type for Variable or Meter 7",
+        "  2,                                      !- Digits After Decimal 7",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 8",
+        "  HoursNonPositive,                       !- Aggregation Type for Variable or Meter 8",
+        "  2,                                      !- Digits After Decimal 8",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 9",
+        "  HoursNegative,                          !- Aggregation Type for Variable or Meter 9",
+        "  2,                                      !- Digits After Decimal 9",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 10",
+        "  HoursNonNegative,                       !- Aggregation Type for Variable or Meter 10",
+        "  2,                                      !- Digits After Decimal 10",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 11",
+        "  HourInTenBinsMinToMax,                  !- Aggregation Type for Variable or Meter 11",
+        "  2,                                      !- Digits After Decimal 11",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 12",
+        "  HourInTenBinsZeroToMax,                 !- Aggregation Type for Variable or Meter 12",
+        "  2,                                      !- Digits After Decimal 12",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 13",
+        "  HourInTenBinsMinToZero,                 !- Aggregation Type for Variable or Meter 13",
+        "  2,                                      !- Digits After Decimal 13",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 14",
+        "  SumOrAverageDuringHoursShown,           !- Aggregation Type for Variable or Meter 14",
+        "  2,                                      !- Digits After Decimal 14",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 15",
+        "  MaximumDuringHoursShown,                !- Aggregation Type for Variable or Meter 15",
+        "  2,                                      !- Digits After Decimal 15",
+        "  Electricity:Facility,                   !- Variable or Meter or EMS Variable or Field Name 16",
+        "  MinimumDuringHoursShown,                !- Aggregation Type for Variable or Meter 16",
+        "  2;                                      !- Digits After Decimal 16",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataOutputProcessor->NumEnergyMeters = 1;
+    state->dataOutputProcessor->EnergyMeters.allocate(state->dataOutputProcessor->NumEnergyMeters);
+    state->dataOutputProcessor->EnergyMeters(1).Name = "Electricity:Facility";
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+
+    OutputReportTabularAnnual::GetInputTabularAnnual(*state);
+    EXPECT_EQ(state->dataOutputReportTabularAnnual->annualTables.size(), 1u);
+
+    OutputReportTabularAnnual::WriteAnnualTables(*state);
+
+    auto columnHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "ANNUAL EXAMPLE%")",
+        "TabularDataWithStrings");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // 17 agg types for the same variable requested above + the {TIMESTAMP} ones (but distinct, so counts as 1)
+    // + the BIN A TO BIN J ones
+    EXPECT_EQ(36, columnHeaders.size());
+
+    auto missingBracesHeaders = queryResult(
+        R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
+             WHERE ReportName LIKE "ANNUAL EXAMPLE%"
+             AND ColumnName LIKE "%{%" AND ColumnName NOT LIKE "%}%")",
+        "TabularDataWithStrings");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    // Should be none!
+    for (auto &col : missingBracesHeaders) {
+        std::string colHeader = col[0];
+        EXPECT_TRUE(false) << "Missing braces in monthly table for : " << colHeader;
+    }
 }

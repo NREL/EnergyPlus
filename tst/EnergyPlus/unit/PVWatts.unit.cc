@@ -69,10 +69,10 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Constructor)
 
     PVWattsGenerator pvw(*state, "PVArray", 4000.0, ModuleType::STANDARD, ArrayType::FIXED_ROOF_MOUNTED);
     EXPECT_DOUBLE_EQ(4000.0, pvw.getDCSystemCapacity());
-    EXPECT_EQ(ModuleType::STANDARD, pvw.getModuleType());
-    EXPECT_EQ(ArrayType::FIXED_ROOF_MOUNTED, pvw.getArrayType());
+    EXPECT_TRUE(compare_enums(ModuleType::STANDARD, pvw.getModuleType()));
+    EXPECT_TRUE(compare_enums(ArrayType::FIXED_ROOF_MOUNTED, pvw.getArrayType()));
     EXPECT_DOUBLE_EQ(0.14, pvw.getSystemLosses());
-    EXPECT_EQ(GeometryType::TILT_AZIMUTH, pvw.getGeometryType());
+    EXPECT_TRUE(compare_enums(GeometryType::TILT_AZIMUTH, pvw.getGeometryType()));
     EXPECT_DOUBLE_EQ(20.0, pvw.getTilt());
     EXPECT_DOUBLE_EQ(180.0, pvw.getAzimuth());
     EXPECT_DOUBLE_EQ(0.4, pvw.getGroundCoverageRatio());
@@ -133,17 +133,16 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
                                                  "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     process_idf(idfTxt);
     EXPECT_FALSE(has_err_output());
-    PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator(*state, "PVWattsArray1");
-    EXPECT_EQ(pvw1.getModuleType(), ModuleType::PREMIUM);
-    EXPECT_EQ(pvw1.getArrayType(), ArrayType::ONE_AXIS);
-    EXPECT_DOUBLE_EQ(0.4, pvw1.getGroundCoverageRatio());
-    PVWattsGenerator &pvw2 = GetOrCreatePVWattsGenerator(*state, "PVWattsArray2");
-    EXPECT_DOUBLE_EQ(0.4, pvw2.getGroundCoverageRatio());
-    PVWattsGenerator &pvw3 = GetOrCreatePVWattsGenerator(*state, "PVWattsArray3");
-    EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
-    EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
-    EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
-    EXPECT_EQ(static_cast<int>(state->dataPVWatts->PVWattsGenerators.size()), 3);
+    auto pvw1 = PVWattsGenerator::createFromIdfObj(*state, 1);
+    EXPECT_TRUE(compare_enums(pvw1->getModuleType(), ModuleType::PREMIUM));
+    EXPECT_TRUE(compare_enums(pvw1->getArrayType(), ArrayType::ONE_AXIS));
+    EXPECT_DOUBLE_EQ(0.4, pvw1->getGroundCoverageRatio());
+    auto pvw2 = PVWattsGenerator::createFromIdfObj(*state, 2);
+    EXPECT_DOUBLE_EQ(0.4, pvw2->getGroundCoverageRatio());
+    auto pvw3 = PVWattsGenerator::createFromIdfObj(*state, 3);
+    EXPECT_DOUBLE_EQ(175.0, pvw3->getAzimuth());
+    EXPECT_DOUBLE_EQ(21.0, pvw3->getTilt());
+    EXPECT_DOUBLE_EQ(0.5, pvw3->getGroundCoverageRatio());
 }
 
 TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
@@ -161,7 +160,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
                                                  ";",
                                                  "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     EXPECT_FALSE(process_idf(idfTxt, false));
-    ASSERT_THROW(GetOrCreatePVWattsGenerator(*state, "PVWattsArray1"), std::runtime_error);
+    ASSERT_THROW(PVWattsGenerator::createFromIdfObj(*state, 1), std::runtime_error);
     std::string const error_string = delimited_string(
         {"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_geometry_type] - \"asdf\" - Failed to match against any enum values.",
          "   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_type] - \"FixedRoofMount\" - Failed to match against any enum values.",

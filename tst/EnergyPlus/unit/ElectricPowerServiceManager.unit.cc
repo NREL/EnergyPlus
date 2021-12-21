@@ -52,7 +52,6 @@
 
 // C++ Headers
 #include <memory>
-#include <vector>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
@@ -67,7 +66,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
 {
@@ -266,7 +264,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1)
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
 
     // Case 1 ACBuss - Generators 1000+2000=3000, thermal 500+750=1250
-    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::aCBuss;
+    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::ACBuss;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 1000.0;
     //	ElecLoadCenter( LoadCenterNum ).ElecGen( 1 ).ElectProdRate = 1000.0;
@@ -341,10 +339,10 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2)
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
 
     // Case 2 ACBussStorage - Generators 1000+2000=3000, Storage 200-150=50
-    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::aCBussStorage;
+    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::ACBussStorage;
     //	ElectricPowerService::facilityElectricServiceObj->elecLoadCenterObjs[ 0 ]->storagePresent
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj =
-        std::unique_ptr<ElectricStorage>(new ElectricStorage(*state, "TEST STORAGE BANK"));
+        std::make_unique<ElectricStorage>(*state, "TEST STORAGE BANK");
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 1000.0;
 
@@ -443,9 +441,9 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
 
     // Case 3 DCBussInverter   Inverter = 3000,
-    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::dCBussInverter;
+    state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType = ElectPowerLoadCenter::ElectricBussType::DCBussInverter;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
-        std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+        std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 1000.0;
@@ -554,10 +552,10 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
 
     // Case 4 DCBussInverterDCStorage    Inverter = 5000,
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType =
-        ElectPowerLoadCenter::ElectricBussType::dCBussInverterDCStorage;
+        ElectPowerLoadCenter::ElectricBussType::DCBussInverterDCStorage;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
-        std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+        std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
 
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 2000.0;
@@ -652,12 +650,12 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
 
     // Case 5 DCBussInverterACStorage     Inverter = 5000, , Storage 200-150=50, thermal should still be same as Case 1
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->bussType =
-        (ElectPowerLoadCenter::ElectricBussType::dCBussInverterACStorage);
+        (ElectPowerLoadCenter::ElectricBussType::DCBussInverterACStorage);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterObj =
-        std::unique_ptr<DCtoACInverter>(new DCtoACInverter(*state, "TEST INVERTER"));
+        std::make_unique<DCtoACInverter>(*state, "TEST INVERTER");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->inverterPresent = true;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storageObj =
-        std::unique_ptr<ElectricStorage>(new ElectricStorage(*state, "TEST STORAGE BANK"));
+        std::make_unique<ElectricStorage>(*state, "TEST STORAGE BANK");
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVDischargeRate = 200.0;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->storOpCVChargeRate = 150.0;
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0]->electProdRate = 2000.0;
@@ -800,7 +798,7 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     createFacilityElectricPowerServiceObject(*state);
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(*state, 1));
     state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj =
-        std::unique_ptr<ElectricTransformer>(new ElectricTransformer(*state, "TRANSFORMER"));
+        std::make_unique<ElectricTransformer>(*state, "TRANSFORMER");
     Real64 expectedtransformerObjLossRate =
         state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->transformerObj->getLossRateForOutputPower(*state, 2000.0);
     // check the transformer loss rate for load and no load condition
@@ -1174,4 +1172,56 @@ TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
     discharging = false;
     battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, socMax, socMin);
     ASSERT_NEAR(battery.stateOfChargeFraction(), 0.95, 0.1);
+}
+
+TEST_F(EnergyPlusFixture, Battery_checkUserEfficiencyInputTest)
+{
+    Real64 userInputEfficiencyCharge;
+    Real64 userInputEfficiencyDischarge;
+    Real64 functionResult;
+    Real64 expectedResult;
+    bool errorsFound;
+
+    // Fix for Defect #8867: EnergyPlus was allowing zero efficiency which led to a divide by zero in ElectricPowerServiceManager.cc.
+    // Input is now tested to make sure that a zero value is not allowed.
+
+    // Test 1: charging, charging efficiency zero-->gets reset to minimum (0.001)
+    userInputEfficiencyCharge = 0.0;
+    expectedResult = 0.001;
+    errorsFound = false;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyCharge, "CHARGING", "Tatooine", errorsFound);
+    EXPECT_NEAR(functionResult, expectedResult, 0.00001);
+    std::string const error_string1 =
+        delimited_string({"   ** Severe  ** ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named Tatooine",
+                          "   **   ~~~   ** Please check your input value  for this electric storage unit and fix the charge efficiency."});
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
+    EXPECT_TRUE(errorsFound);
+
+    // Test 2: charging, value greater than minimum (0.001)-->just keep the user input value
+    userInputEfficiencyCharge = 0.7;
+    expectedResult = 0.7;
+    errorsFound = false;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyCharge, "CHARGING", "Tatooine", errorsFound);
+    EXPECT_NEAR(functionResult, expectedResult, 0.00001);
+    EXPECT_FALSE(errorsFound);
+
+    // Test 3: discharging, discharging efficiency less than minimum allowed-->gets reset to minimum (0.001)
+    userInputEfficiencyDischarge = -1.0;
+    expectedResult = 0.001;
+    errorsFound = false;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine", errorsFound);
+    EXPECT_NEAR(functionResult, expectedResult, 0.00001);
+    std::string const error_string2 = delimited_string(
+        {"   ** Severe  ** ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named Tatooine",
+         "   **   ~~~   ** Please check your input value  for this electric storage unit and fix the discharge efficiency."});
+    EXPECT_TRUE(compare_err_stream(error_string2, true));
+    EXPECT_TRUE(errorsFound);
+
+    // Test 4: discharging, value greater than minimum (0.001)-->just keep the user input value
+    userInputEfficiencyDischarge = 0.9;
+    expectedResult = 0.9;
+    errorsFound = false;
+    functionResult = checkUserEfficiencyInput(*state, userInputEfficiencyDischarge, "DISCHARGING", "Tatooine", errorsFound);
+    EXPECT_NEAR(functionResult, expectedResult, 0.00001);
+    EXPECT_FALSE(errorsFound);
 }

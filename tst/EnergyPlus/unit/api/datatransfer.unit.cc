@@ -146,10 +146,10 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
     {
         EnergyPlusFixture::SetUp();
         Real64 timeStep = 1.0;
-        OutputProcessor::SetupTimePointers(*state, "Zone", timeStep);
-        OutputProcessor::SetupTimePointers(*state, "HVAC", timeStep);
-        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+        OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+        OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
         state->dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(*state);
     }
 
@@ -178,14 +178,36 @@ public:
         state->dataInputProcessing->inputProcessor->preScanReportingVariables(*state);
         for (auto &val : this->realVariablePlaceholders) {
             if (val.meterType) {
-                SetupOutputVariable(
-                    *state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Sum", val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
+                SetupOutputVariable(*state,
+                                    val.varName,
+                                    OutputProcessor::Unit::kg_s,
+                                    val.value,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Summed,
+                                    val.varKey,
+                                    _,
+                                    "ELECTRICITY",
+                                    "HEATING",
+                                    _,
+                                    "System");
             } else {
-                SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+                SetupOutputVariable(*state,
+                                    val.varName,
+                                    OutputProcessor::Unit::kg_s,
+                                    val.value,
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::Average,
+                                    val.varKey);
             }
         }
         for (auto &val : this->intVariablePlaceholders) {
-            SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+            SetupOutputVariable(*state,
+                                val.varName,
+                                OutputProcessor::Unit::kg_s,
+                                val.value,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                val.varKey);
         }
     }
 
@@ -250,7 +272,7 @@ public:
     void simulateTimeStepAndReport()
     {
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
     }
 };
 

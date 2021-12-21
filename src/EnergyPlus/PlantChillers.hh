@@ -145,13 +145,13 @@ namespace PlantChillers {
         Real64 CondInletTemp;
         Real64 EvapInletTemp;
         Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
-        int plantTypeOfNum;
+        DataPlant::PlantEquipmentType ChillerType;
 
         // Default Constructor
         BaseChillerSpecs()
             : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
               CondenserType(DataPlant::CondenserType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
               EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),
               CondMassFlowRateMax(0.0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0),
@@ -170,7 +170,7 @@ namespace PlantChillers {
               HeatRecOutletTemp(0.0), // C - Heat Rec outlet temperature, water side
               AvgCondSinkTemp(0.0),   // condenser temperature value for use in curves [C]
               BasinHeaterPower(0.0),  // Basin heater power (W)
-              Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), BasinHeaterConsumption(0.0), plantTypeOfNum(0)
+              Power(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), BasinHeaterConsumption(0.0), ChillerType(DataPlant::PlantEquipmentType::Invalid)
 
         {
         }
@@ -251,9 +251,9 @@ namespace PlantChillers {
         void size(EnergyPlusData &state) override;
 
         void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad,                                       // operating load
-                       bool RunFlag,                                         // TRUE when chiller operating
-                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                       Real64 &MyLoad,                                   // operating load
+                       bool RunFlag,                                     // TRUE when chiller operating
+                       DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(EnergyPlusData &state,
@@ -267,6 +267,8 @@ namespace PlantChillers {
                               Real64 condInletTemp, // current condenser Inlet Temp
                               Real64 &QHeatRec      // amount of heat recovered
         );
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct EngineDrivenChillerSpecs : BaseChillerSpecs
@@ -355,9 +357,9 @@ namespace PlantChillers {
         void size(EnergyPlusData &state) override;
 
         void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad,                                       // operating load
-                       bool RunFlag,                                         // TRUE when chiller operating
-                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                       Real64 &MyLoad,                                   // operating load
+                       bool RunFlag,                                     // TRUE when chiller operating
+                       DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void calcHeatRecovery(EnergyPlusData &state,
@@ -369,6 +371,8 @@ namespace PlantChillers {
                     Real64 MyLoad, // current load
                     bool RunFlag   // TRUE if chiller operating
         );
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct GTChillerSpecs : BaseChillerSpecs
@@ -454,15 +458,17 @@ namespace PlantChillers {
         void size(EnergyPlusData &state) override;
 
         void calculate(EnergyPlusData &state,
-                       Real64 &MyLoad,                                       // operating load
-                       bool RunFlag,                                         // TRUE when chiller operating
-                       DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                       Real64 &MyLoad,                                   // operating load
+                       bool RunFlag,                                     // TRUE when chiller operating
+                       DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void update(EnergyPlusData &state,
                     Real64 MyLoad, // current load
                     bool RunFlag   // TRUE if chiller operating
         );
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct ConstCOPChillerSpecs : BaseChillerSpecs
@@ -491,9 +497,11 @@ namespace PlantChillers {
 
         void size(EnergyPlusData &state) override;
 
-        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag, DataBranchAirLoopPlant::ControlType EquipFlowCtrl);
 
         void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
 } // namespace PlantChillers
@@ -511,10 +519,10 @@ struct PlantChillersData : BaseGlobalStruct
     bool GetGasTurbineInput = true;
     bool GetConstCOPInput = true;
 
-    Array1D<PlantChillers::ElectricChillerSpecs> ElectricChiller;
-    Array1D<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
-    Array1D<PlantChillers::GTChillerSpecs> GTChiller;
-    Array1D<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
+    EPVector<PlantChillers::ElectricChillerSpecs> ElectricChiller;
+    EPVector<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
+    EPVector<PlantChillers::GTChillerSpecs> GTChiller;
+    EPVector<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
 
     void clear_state() override
     {

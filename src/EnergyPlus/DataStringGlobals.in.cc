@@ -48,29 +48,24 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::DataStringGlobals {
 
-namespace DataStringGlobals {
+// MODULE INFORMATION:
+//       AUTHOR         Linda K. Lawrie
+//       DATE WRITTEN   September 1997
+//       MODIFIED       na
+//       RE-ENGINEERED  na
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Linda K. Lawrie
-    //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
+// PURPOSE OF THIS MODULE:
+// This data-only module is a repository for string variables used in parsing
+// "pieces" of EnergyPlus.
 
-    // PURPOSE OF THIS MODULE:
-    // This data-only module is a repository for string variables used in parsing
-    // "pieces" of EnergyPlus.
-
-    std::string const
-        VerString("EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"); // String that
-                                                                                                                                      // represents
-                                                                                                                                      // version
-                                                                                                                                      // information
-    std::string const MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
-    std::string const
-        PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"); // API version string to be matched when using the Python API
-
-} // namespace DataStringGlobals
-
-} // namespace EnergyPlus
+// String that represents version information
+std::string const VerString("EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}");
+// String to be matched by Version object
+std::string const MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}");
+// API version string to be matched when using the Python API
+std::string const PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}");
+// Build platform for reporting in the help output
+std::string const BuildPlatformString("${BUILD_PLATFORM_STRING}");
+} // namespace EnergyPlus::DataStringGlobals

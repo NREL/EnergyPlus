@@ -16,7 +16,7 @@ jobs:
         python-version: 3.7
 
     - name: Set up LaTeX
-      run: sudo apt update && sudo apt install -y texlive texlive-xetex texlive-science
+      run: sudo apt update && sudo apt install -y texlive texlive-xetex texlive-science poppler-utils
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/doc/build

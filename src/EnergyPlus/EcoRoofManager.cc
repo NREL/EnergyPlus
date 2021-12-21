@@ -64,6 +64,7 @@
 #include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -98,10 +99,10 @@ namespace EcoRoofManager {
     // Functions
 
     void CalcEcoRoof(EnergyPlusData &state,
-                     int const SurfNum, // Indicator of Surface Number for the current surface
-                     int const ZoneNum, // Indicator for zone number where the current surface
-                     int &ConstrNum,    // Indicator for construction index for the current surface
-                     Real64 &TempExt    // Exterior temperature boundary condition
+                     int const SurfNum,   // Indicator of Surface Number for the current surface
+                     int const ZoneNum,   // Indicator for zone number where the current surface
+                     int const ConstrNum, // Indicator for construction index for the current surface
+                     Real64 &TempExt      // Exterior temperature boundary condition
     )
     {
         // SUBROUTINE INFORMATION
@@ -135,20 +136,20 @@ namespace EcoRoofManager {
         using ConvectionCoefficients::SetIntConvectionCoeff;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Kv(0.4);           // Von Karmen's constant (source FASST)
-        Real64 const rch(0.63);         // Turbulent Schimdt Number
-        Real64 const rche(0.71);        // Turbulent Prandtl Number
-        Real64 const Rair(0.286e3);     // Gas Constant of air J/Kg K
-        Real64 const g1(9.81);          // Gravity. In m/sec^2.
-        Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant W/m^2K^4
-        Real64 const Cpa(1005.6);       // Specific heat of Water Vapor. (J/Kg.K)
+        Real64 constexpr Kv(0.4);           // Von Karmen's constant (source FASST)
+        Real64 constexpr rch(0.63);         // Turbulent Schimdt Number
+        Real64 constexpr rche(0.71);        // Turbulent Prandtl Number
+        Real64 constexpr Rair(0.286e3);     // Gas Constant of air J/Kg K
+        Real64 constexpr g1(9.81);          // Gravity. In m/sec^2.
+        Real64 constexpr Sigma(5.6697e-08); // Stefan-Boltzmann constant W/m^2K^4
+        Real64 constexpr Cpa(1005.6);       // Specific heat of Water Vapor. (J/Kg.K)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
 
-        Real64 AbsThermSurf; // Thermal absoptance of the exterior surface
-        int RoughSurf;       // Roughness index of the exterior (ecoroof) surface.
-        Real64 HMovInsul;    // "Convection" coefficient of movable insulation
+        Real64 AbsThermSurf;                      // Thermal absoptance of the exterior surface
+        DataSurfaces::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
+        Real64 HMovInsul;                         // "Convection" coefficient of movable insulation
         //  REAL(r64)    :: HSky                ! "Convection" coefficient from sky to surface
         //  REAL(r64)    :: HAir                ! "Convection" coefficient from air to surface (radiation)
         //  INTEGER :: OPtr
@@ -177,7 +178,6 @@ namespace EcoRoofManager {
         Real64 Cfhn;   // transfer coefficient at near-neutral conditions
         Real64 Cf;     // bulk Transfer coefficient, equation 10 page 6 (FASST).
         Real64 ra;     // Aerodynamic Resistance
-        Real64 f1inv;  // intermediate calculation variable
         Real64 f2inv;  // intermediate calculation variable
         Real64 f1;     // intermediate calculation variable
         Real64 f2;     // intermediate calculation variable
@@ -226,7 +226,6 @@ namespace EcoRoofManager {
                         // consistent with FASST TR-04-25 p. x (W' = 2.0)
         }
 
-        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
         RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
         AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         HMovInsul = 0.0;
@@ -237,21 +236,19 @@ namespace EcoRoofManager {
                                         HMovInsul,
                                         RoughSurf,
                                         AbsThermSurf,
-                                        state.dataHeatBalSurf->TH(1, 1, SurfNum),
-                                        state.dataHeatBalSurf->HcExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HSkyExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HGrdExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HAirExtSurf(SurfNum));
+                                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
+                                        state.dataHeatBalSurf->SurfHcExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
-
-        RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->AnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
         Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
                1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
 
         if (state.dataEcoRoofMgr->EcoRoofbeginFlag) {
             state.dataEcoRoofMgr->EcoRoofbeginFlag = false;
-            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF)
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF)
                 ShowSevereError(state,
                                 "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
                                 "currently works only with CTF heat balance solution algorithm.");
@@ -297,117 +294,132 @@ namespace EcoRoofManager {
 
             // DJS NOVEMBER 2010 - Make calls to SetupOutput Variable to allow for reporting of ecoroof variables
 
-            SetupOutputVariable(
-                state, "Green Roof Soil Temperature", OutputProcessor::Unit::C, state.dataEcoRoofMgr->Tg, "Zone", "State", "Environment");
-            SetupOutputVariable(
-                state, "Green Roof Vegetation Temperature", OutputProcessor::Unit::C, state.dataEcoRoofMgr->Tf, "Zone", "State", "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Soil Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEcoRoofMgr->Tg,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Vegetation Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEcoRoofMgr->Tf,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Root Moisture Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataEcoRoofMgr->MeanRootMoisture,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Near Surface Moisture Ratio",
                                 OutputProcessor::Unit::None,
                                 state.dataEcoRoofMgr->Moisture,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Sensible Heat Transfer Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEcoRoofMgr->sensibleg,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Vegetation Sensible Heat Transfer Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEcoRoofMgr->sensiblef,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Vegetation Moisture Transfer Rate",
                                 OutputProcessor::Unit::m_s,
                                 state.dataEcoRoofMgr->Vfluxf,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Moisture Transfer Rate",
                                 OutputProcessor::Unit::m_s,
                                 state.dataEcoRoofMgr->Vfluxg,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Vegetation Latent Heat Transfer Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEcoRoofMgr->Lf,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Latent Heat Transfer Rate per Area",
                                 OutputProcessor::Unit::W_m2,
                                 state.dataEcoRoofMgr->Lg,
-                                "Zone",
-                                "State",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
                                 "Environment");
 
             SetupOutputVariable(state,
                                 "Green Roof Cumulative Precipitation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CumPrecip,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Cumulative Irrigation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CumIrrigation,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, state.dataEcoRoofMgr->CumRunoff, "Zone", "Sum", "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Cumulative Runoff Depth",
+                                OutputProcessor::Unit::m,
+                                state.dataEcoRoofMgr->CumRunoff,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Cumulative Evapotranspiration Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CumET,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Current Precipitation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CurrentPrecipitation,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Current Irrigation Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CurrentIrrigation,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Current Runoff Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CurrentRunoff,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Current Evapotranspiration Depth",
                                 OutputProcessor::Unit::m,
                                 state.dataEcoRoofMgr->CurrentET,
-                                "Zone",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
                                 "Environment");
 
             // DJS NOVEMBER 2010 - end of calls to setup output of ecoroof variables
@@ -476,16 +488,16 @@ namespace EcoRoofManager {
             if (state.dataConstruction->Construct(ConstrNum).CTFCross(0) > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
                 F1temp = state.dataConstruction->Construct(ConstrNum).CTFCross(0) /
-                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBal->HConvIn(SurfNum));
-                Qsoilpart1 = -state.dataHeatBalSurf->CTFConstOutPart(SurfNum) +
-                             F1temp * (state.dataHeatBalSurf->CTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
-                                       state.dataHeatBal->SurfQRadThermInAbs(SurfNum) +
-                                       state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
-                                       state.dataHeatBal->HConvIn(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
-                                       state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum));
+                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
+                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
+                             F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
+                                       state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum) +
+                                       state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->SurfQsrcHist(SurfNum, 1) +
+                                       state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
+                                       state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(SurfNum));
             } else {
-                Qsoilpart1 = -state.dataHeatBalSurf->CTFConstOutPart(SurfNum) +
-                             state.dataConstruction->Construct(ConstrNum).CTFCross(0) * state.dataHeatBalSurf->TempSurfIn(SurfNum);
+                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
+                             state.dataConstruction->Construct(ConstrNum).CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
                 F1temp = 0.0;
             }
 
@@ -546,8 +558,7 @@ namespace EcoRoofManager {
             // s/m and depends on wind speed, leaf's surface roughness,
             // and stability of atsmophere.
 
-            f1inv = min(1.0, (0.004 * RS + 0.005) / (0.81 * (0.004 * RS + 1.0))); // SW radiation-related term
-            f1 = 1.0 / f1inv;
+            CalculateEcoRoofSolar(state, RS, f1, SurfNum);
             if (state.dataEcoRoofMgr->MoistureMax == state.dataEcoRoofMgr->MoistureResidual) {
                 f2inv = 1.0e10;
             } else {
@@ -617,19 +628,19 @@ namespace EcoRoofManager {
                 Gammah = std::pow(1.0 - 5.0 * Rib, -0.5);
             }
 
-            if (RoughSurf == VerySmooth) { //  6= very smooth, 5=smooth, 4= med. sm. ,3= med. rough. , 2= rough, 1= Very rough
+            if (RoughSurf == DataSurfaces::SurfaceRoughness::VerySmooth) {
                 state.dataEcoRoofMgr->Zog = 0.0008;
-            } else if (RoughSurf == Smooth) {
+            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::Smooth) {
                 state.dataEcoRoofMgr->Zog = 0.0010;
-            } else if (RoughSurf == MediumSmooth) {
+            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::MediumSmooth) {
                 state.dataEcoRoofMgr->Zog = 0.0015;
-            } else if (RoughSurf == MediumRough) {
+            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::MediumRough) {
                 state.dataEcoRoofMgr->Zog = 0.0020;
-            } else if (RoughSurf == Rough) {
+            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::Rough) {
                 state.dataEcoRoofMgr->Zog = 0.0030;
             } else { // VeryRough
                 state.dataEcoRoofMgr->Zog = 0.005;
-            }
+            } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             Chng = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rch; // bulk transfer coefficient near ground
             Chg = Gammah * ((1.0 - sigmaf) * Chng + sigmaf * Cfhn);
@@ -740,7 +751,7 @@ namespace EcoRoofManager {
         } // if firstecosurface (if not we do NOT need to recalculate ecoroof energybalance as all ecoroof surfaces MUST be the same
         // this endif was moved here from the if statement regarding whether we are looking at the first ecoroof surface or not.
 
-        state.dataHeatBalSurf->TH(1, 1, SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
+        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEcoRoofMgr->Tgold; // SoilTemperature
         TempExt = state.dataEcoRoofMgr->Tgold;
     }
 
@@ -752,7 +763,7 @@ namespace EcoRoofManager {
                          Real64 const SoilThickness,
                          Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
                          Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-                         int &ConstrNum,      // Indicator for construction index for the current surface
+                         int const ConstrNum, // Indicator for construction index for the current surface
                          Real64 &Alphag,
                          [[maybe_unused]] int const unit,    // unused1208
                          [[maybe_unused]] Real64 const Tg,   // unused1208
@@ -786,11 +797,11 @@ namespace EcoRoofManager {
         static Real64 const depth_fac((161240.0 * std::pow(2.0, -2.3)) / 60.0);
 
         // Soil Parameters from Reference listed in the code:
-        Real64 const alpha(23.0); // These parameters are empirical constants
-        Real64 const n(1.27);     // These parameters are empirical constants
-        Real64 const lambda(0.5); // These parameters are empirical constants
+        Real64 constexpr alpha(23.0); // These parameters are empirical constants
+        Real64 constexpr n(1.27);     // These parameters are empirical constants
+        Real64 constexpr lambda(0.5); // These parameters are empirical constants
         // This is another parameter of the soil which describes the soil conductivity at the saturation point (m/s)
-        Real64 const SoilConductivitySaturation(5.157e-7);
+        Real64 constexpr SoilConductivitySaturation(5.157e-7);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1192,6 +1203,22 @@ namespace EcoRoofManager {
         //  ,CumET,CumRunoff, CumIrrigation, SoilDensity, SoilSpecHeat,SoilConductivity,Alphag
         // 799 format(' ',I3,' ',I3,' ',' ',f9.3,' ',f6.2,' ',f6.2,' ',f5.3,' ',f5.3,' ',f6.4, '  '  &
         //    f7.3, ' ', f7.3, ' ',f7.3, ' ',f6.1,' ',f7.1,'  ',f6.3,'  ',f6.2)
+    }
+
+    void CalculateEcoRoofSolar(EnergyPlusData &state,
+                               Real64 &RS, // Solar on roof (assumed horizontal)
+                               Real64 &f1, // Solar term for Stomatal Resistance
+                               int const SurfNum)
+    {
+
+        // Use SOLCOS(3) here to calculate RS since as stated in comments above this is only done for one surface currently.
+        // So, it is better to assume that the roof is flat until multiple surfaces can be handled.  Then, the next line can
+        // use state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) instead of
+        // SOLCOS(3).
+        RS = max(state.dataEnvrn->SOLCOS(3), 0.0) * state.dataEnvrn->BeamSolarRad +
+             state.dataSolarShading->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
+        Real64 f1inv = min(1.0, (0.004 * RS + 0.005) / (0.81 * (0.004 * RS + 1.0)));
+        f1 = 1.0 / f1inv;
     }
 
 } // namespace EcoRoofManager

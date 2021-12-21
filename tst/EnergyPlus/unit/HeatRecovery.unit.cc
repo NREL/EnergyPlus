@@ -171,7 +171,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
     HXUnitOn = true;
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
     HXUnitOn = true;
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
@@ -205,7 +205,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     Tnode = state->dataHeatRecovery->ExchCond(ExchNum).SupOutTemp;
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is false so expect outlet = temperature based on effectiveness
     HXUnitOn = true;
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
                        (state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp - state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp))),
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -276,14 +276,14 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 
     // HXUnitOn is true and ControlToTemperatureSetPoint is true so expect outlet = set point temperature
     HXUnitOn = true;
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Plate;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Plate;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
     UpdateHeatRecovery(*state, ExchNum);
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).TempSetPoint,
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfigNum = Rotary;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchConfig = HXConfigurationType::Rotary;
     HXUnitOn = true;
     InitHeatRecovery(*state, ExchNum, CompanionCoilNum, 0);
     CalcAirToAirGenericHeatExch(*state, ExchNum, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag);
@@ -512,7 +512,8 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
 
     GetReturnAirPathInput(*state);
     GetAirPathData(*state);
-    ASSERT_EQ(SimAirServingZones::HeatXchngr, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num);
+    ASSERT_TRUE(
+        compare_enums(SimAirServingZones::CompType::HeatXchngr, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num));
 }
 
 TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
@@ -1114,6 +1115,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1130,6 +1132,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1146,6 +1149,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1162,6 +1166,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1178,6 +1183,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    ROOF,                    !- Surface Type",
         "    ROOF-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1194,6 +1200,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C1-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1210,6 +1217,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C2-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1226,6 +1234,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C3-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1242,6 +1251,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C4-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1258,6 +1268,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    PLENUM-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C5-1,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1274,6 +1285,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1290,6 +1302,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C1-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1306,6 +1319,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1322,6 +1336,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB21,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1338,6 +1353,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB41,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1354,6 +1370,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE1-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB51,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1370,6 +1387,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1386,6 +1404,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C2-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1402,6 +1421,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1418,6 +1438,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB12,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1434,6 +1455,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB32,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1450,6 +1472,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE2-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB52,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1466,6 +1489,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1482,6 +1506,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C3-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1498,6 +1523,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1514,6 +1540,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB23,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1530,6 +1557,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB43,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1546,6 +1574,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE3-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB53,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1562,6 +1591,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    WALL-1,                  !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1578,6 +1608,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C4-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1594,6 +1625,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1610,6 +1642,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB14,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1626,6 +1659,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB34,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1642,6 +1676,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE4-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB54,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1658,6 +1693,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    CEILING,                 !- Surface Type",
         "    CLNG-1,                  !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    C5-1P,                   !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1674,6 +1710,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    FLOOR,                   !- Surface Type",
         "    FLOOR-SLAB-1,            !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Ground,                  !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1690,6 +1727,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB15,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1706,6 +1744,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB25,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1722,6 +1761,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB35,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1738,6 +1778,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    WALL,                    !- Surface Type",
         "    INT-WALL-1,              !- Construction Name",
         "    SPACE5-1,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    SB45,                    !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -3088,10 +3129,9 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    DOAS OA Mixing Box;      !- Component 2 Name",
 
         "AirLoopHVAC:OutdoorAirSystem,",
-        "    DOAS OA System,          !- Name",
+        "    DOAS OA System,           !- Name",
         "    DOAS OA System Controllers,  !- Controller List Name",
-        "    DOAS OA System Equipment,!- Outdoor Air Equipment List Name",
-        "    DOAS Availability Managers;  !- Availability Manager List Name",
+        "    DOAS OA System Equipment; !- Outdoor Air Equipment List Name",
 
         "OutdoorAir:Mixer,",
         "    SPACE1-1 OA Mixing Box,  !- Name",
@@ -4099,8 +4139,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 1;
     // check user-inputs
-    EXPECT_EQ(thisOAController.Econo, MixedAir::iEconoOp::NoEconomizer);
-    EXPECT_EQ(thisOAController.Lockout, MixedAir::iLockoutType::NoLockoutPossible); // no lockout
+    EXPECT_TRUE(compare_enums(thisOAController.Econo, MixedAir::EconoOp::NoEconomizer));
+    EXPECT_TRUE(compare_enums(thisOAController.Lockout, MixedAir::LockoutType::NoLockoutPossible)); // no lockout
     EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
     EXPECT_FALSE(thisOAController.EconBypass); // no bypass
 
@@ -4211,7 +4251,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     state->dataMixedAir->OAController.allocate(OAContrllerNum);
     auto &thisOAController(state->dataMixedAir->OAController(OAContrllerNum));
     // initialize OA controller
-    thisOAController.ControllerType_Num = MixedAir::iControllerType::ControllerOutsideAir;
+    thisOAController.ControllerType_Num = MixedAir::MixedAirControllerType::ControllerOutsideAir;
 
     int OASysNum = 1;
     state->dataAirLoop->OutsideAirSys.allocate(OASysNum);
@@ -4225,8 +4265,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     state->dataSize->CurDuctType = Main;
 
     // test 1: the HX is in OA System, no economizer, no-bypass
-    thisOAController.Econo = MixedAir::iEconoOp::NoEconomizer;
-    thisOAController.Lockout = MixedAir::iLockoutType::NoLockoutPossible; // no lockout
+    thisOAController.Econo = MixedAir::EconoOp::NoEconomizer;
+    thisOAController.Lockout = MixedAir::LockoutType::NoLockoutPossible; // no lockout
     thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum;
     thisOAController.EconBypass = false; // economizer control action type, no bypass
     // run HX sizing calculation
@@ -4235,7 +4275,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
 
     // test 2: the HX is on OA system but with economizer, and no-bypass
-    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb; // with economizer
+    thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb; // with economizer
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
     SizeHeatRecovery(*state, ExchNum);
@@ -4243,7 +4283,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20); // minimum flow
     ;
     // test 3: the HX is on OA system but with economizer, and no-bypass
-    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb; // with economizer
+    thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb; // with economizer
     thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
@@ -4252,8 +4292,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.2); // maximum flow
 
     // test 4: the HX is on OA system, with economizer and lockout
-    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb;
-    thisOAController.Lockout = MixedAir::iLockoutType::LockoutWithHeatingPossible; // lockout
+    thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb;
+    thisOAController.Lockout = MixedAir::LockoutType::LockoutWithHeatingPossible; // lockout
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
     SizeHeatRecovery(*state, ExchNum);
@@ -4261,8 +4301,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
 
     // test 5: the HX is on OA system, with economizer and lockout
-    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb;
-    thisOAController.Lockout = MixedAir::iLockoutType::LockoutWithCompressorPossible; // lockout
+    thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb;
+    thisOAController.Lockout = MixedAir::LockoutType::LockoutWithCompressorPossible; // lockout
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
     SizeHeatRecovery(*state, ExchNum);
@@ -4270,7 +4310,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
 
     // test 6: the HX is on OA system but with economizer and bypass
-    thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb;
+    thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb;
     thisOAController.EconBypass = true; // with bypass
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation

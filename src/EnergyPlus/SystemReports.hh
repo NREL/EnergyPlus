@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -63,12 +64,14 @@ struct EnergyPlusData;
 
 namespace SystemReports {
 
-    enum class iEndUseType
+    enum class EndUseType
     {
+        Invalid = -1,
         NoHeatNoCool,
         CoolingOnly,
         HeatingOnly,
         HeatAndCool,
+        Num
     };
 
     struct Energy
@@ -246,7 +249,7 @@ namespace SystemReports {
 
     void FindDemandSideMatch(EnergyPlusData &state,
                              std::string const &CompType, // Inlet node of the component to find the match of
-                             std::string const &CompName, // Outlet node of the component to find the match of
+                             std::string_view CompName,   // Outlet node of the component to find the match of
                              bool &MatchFound,            // Set to .TRUE. when a match is found
                              int &MatchLoopType,          // Loop number of the match
                              int &MatchLoop,              // Loop number of the match
@@ -374,8 +377,8 @@ struct SystemReportsData : BaseGlobalStruct
     Array1D_bool NoLoadFlag;
     Array1D_bool UnmetLoadFlag;
 
-    Array1D<SystemReports::SummarizeLoads> Vent;
-    Array1D<SystemReports::SysPreDefRepType> SysPreDefRep;
+    EPVector<SystemReports::SummarizeLoads> Vent;
+    EPVector<SystemReports::SysPreDefRepType> SysPreDefRep;
 
     bool OneTimeFlag_FindFirstLastPtr = true;
     bool OneTimeFlag_InitEnergyReports = true;

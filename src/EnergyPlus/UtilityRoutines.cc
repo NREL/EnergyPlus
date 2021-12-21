@@ -52,7 +52,6 @@ extern "C" {
 
 // C++ Headers
 #include <cstdlib>
-#include <exception>
 #include <iostream>
 
 // ObjexxFCL Headers
@@ -87,15 +86,17 @@ extern "C" {
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+
+// Third Party Headers
+#include <fast_float/fast_float.h>
 
 namespace EnergyPlus {
 
 namespace UtilityRoutines {
 
-    Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
+    Real64 ProcessNumber(std::string_view String, bool &ErrorFlag)
     {
 
         // FUNCTION INFORMATION:
@@ -121,28 +122,55 @@ namespace UtilityRoutines {
         // List directed Fortran input/output.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const ValidNumerics("0123456789.+-EeDd");
-
         Real64 rProcessNumber = 0.0;
-        //  Make sure the string has all what we think numerics should have
-        std::string PString(stripped(String));
-        std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
-        if (StringLen == 0) return rProcessNumber;
-        bool parseFailed = false;
-        if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
-            // make FORTRAN floating point number (containing 'd' or 'D')
-            // standardized by replacing 'd' or 'D' with 'e'
-            std::replace_if(
-                std::begin(PString), std::end(PString), [](const char c) { return c == 'D' || c == 'd'; }, 'e');
-            // then parse as a normal floating point value
-            parseFailed = !readItem(PString, rProcessNumber);
-            ErrorFlag = false;
+
+        if (String.empty()) return rProcessNumber;
+
+        auto const front_trim(String.find_first_not_of(' '));
+        auto const back_trim(String.find_last_not_of(' '));
+        if (front_trim == std::string::npos || back_trim == std::string::npos) {
+            return rProcessNumber;
         } else {
+            String = String.substr(front_trim, back_trim - front_trim + 1);
+        }
+
+        auto result = fast_float::from_chars(String.data(), String.data() + String.size(), rProcessNumber);
+        size_t remaining_size = result.ptr - String.data();
+        if (result.ec == std::errc::result_out_of_range || result.ec == std::errc::invalid_argument) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
-        }
-        if (parseFailed) {
+        } else if (remaining_size != String.size()) {
+            if (*result.ptr == '+' || *result.ptr == '-') {
+                ++result.ptr;
+                remaining_size = result.ptr - String.data();
+                if (remaining_size == String.size()) {
+                    rProcessNumber = 0.0;
+                    ErrorFlag = true;
+                }
+            }
+            if (*result.ptr == 'd' || *result.ptr == 'D') {
+                // make FORTRAN floating point number (containing 'd' or 'D')
+                // standardized by replacing 'd' or 'D' with 'e'
+                std::string str{String};
+                std::replace_if(
+                    str.begin(), str.end(), [](const char c) { return c == 'D' || c == 'd'; }, 'e');
+                return ProcessNumber(str, ErrorFlag);
+            } else if (*result.ptr == 'e' || *result.ptr == 'E') {
+                ++result.ptr;
+                remaining_size = result.ptr - String.data();
+                for (size_t i = remaining_size; i < String.size(); ++i, ++result.ptr) {
+                    if (!std::isdigit(*result.ptr)) {
+                        rProcessNumber = 0.0;
+                        ErrorFlag = true;
+                        return rProcessNumber;
+                    }
+                }
+            } else {
+                rProcessNumber = 0.0;
+                ErrorFlag = true;
+            }
+        } else if (!std::isfinite(rProcessNumber)) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }
@@ -150,7 +178,7 @@ namespace UtilityRoutines {
         return rProcessNumber;
     }
 
-    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int const NumItems)
+    int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -174,7 +202,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int const NumItems)
+    int FindItemInList(std::string_view const String, Array1S_string const ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -198,7 +226,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int const NumItems)
+    int FindItemInSortedList(std::string_view const String, Array1S_string const ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -234,7 +262,7 @@ namespace UtilityRoutines {
         return Probe;
     }
 
-    int FindItem(std::string const &String, Array1D_string const &ListOfItems, int const NumItems)
+    int FindItem(std::string_view const String, Array1D_string const &ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -259,7 +287,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    int FindItem(std::string const &String, Array1S_string const ListOfItems, int const NumItems)
+    int FindItem(std::string_view const String, Array1S_string const ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -284,7 +312,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    std::string MakeUPPERCase(std::string const &InputString)
+    std::string MakeUPPERCase(std::string_view const InputString)
     {
 
         // FUNCTION INFORMATION:
@@ -396,10 +424,10 @@ namespace UtilityRoutines {
         }
     }
 
-    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound)
+    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string_view StringToDisplay, bool &ErrorFound)
     {
         if (NameToVerify.empty()) {
-            ShowSevereError(state, StringToDisplay + " Name, cannot be blank");
+            ShowSevereError(state, std::string{StringToDisplay} + " Name, cannot be blank");
             ErrorFound = true;
             NameToVerify = "xxxxx";
             return true;
@@ -407,13 +435,13 @@ namespace UtilityRoutines {
         return false;
     }
 
-    size_t case_insensitive_hasher::operator()(const std::string &key) const noexcept
+    size_t case_insensitive_hasher::operator()(const std::string_view key) const noexcept
     {
         std::string keyCopy = MakeUPPERCase(key);
         return std::hash<std::string>()(keyCopy);
     }
 
-    bool case_insensitive_comparator::operator()(const std::string &a, const std::string &b) const noexcept
+    bool case_insensitive_comparator::operator()(const std::string_view a, const std::string_view b) const noexcept
     {
         return SameString(a, b);
     }
@@ -436,22 +464,24 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!FileSystem::fileExists(state.dataStrGlobals->outputPerfLogFileName)) {
+            if (!FileSystem::fileExists(state.dataStrGlobals->outputPerfLogFilePath)) {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFileName, std::fstream::out); // open file normally
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::out); // open file normally
                     if (!fsPerfLog) {
-                        ShowFatalError(
-                            state, "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFileName + "\" for output (write).");
+                        ShowFatalError(state,
+                                       "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFilePath.string() +
+                                           "\" for output (write).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
             } else {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFileName, std::fstream::app); // append to already existing file
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::app); // append to already existing file
                     if (!fsPerfLog) {
-                        ShowFatalError(
-                            state, "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFileName + "\" for output (append).");
+                        ShowFatalError(state,
+                                       "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFilePath.string() +
+                                           "\" for output (append).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -464,7 +494,7 @@ namespace UtilityRoutines {
                           std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
                           bool &FuelTypeErrorsFound,
-                          bool const &AllowSteamAndDistrict)
+                          bool const AllowSteamAndDistrict)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam
@@ -722,14 +752,11 @@ int AbortEnergyPlus(EnergyPlusData &state)
         auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
         if (!tempfl.good()) {
-            DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+            DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
         }
         print(
             tempfl, "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
-
-    // Output detailed ZONE time series data
-    SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
     state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
@@ -873,20 +900,17 @@ int EndEnergyPlus(EnergyPlusData &state)
     {
         auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
         if (!tempfl.good()) {
-            DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+            DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
         }
         print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
-
-    // Output detailed ZONE time series data
-    SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
     state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
 #endif
-    std::cerr << "EnergyPlus Completed Successfully." << std::endl;
+    if (state.dataGlobal->printConsoleOutput) std::cerr << "EnergyPlus Completed Successfully." << std::endl;
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
@@ -898,8 +922,8 @@ int EndEnergyPlus(EnergyPlusData &state)
     return EXIT_SUCCESS;
 }
 
-void ConvertCaseToUpper(std::string const &InputString, // Input string
-                        std::string &OutputString       // Output string (in UpperCase)
+void ConvertCaseToUpper(std::string_view InputString, // Input string
+                        std::string &OutputString     // Output string (in UpperCase)
 )
 {
 
@@ -919,8 +943,8 @@ void ConvertCaseToUpper(std::string const &InputString, // Input string
     // case alphabet, it makes an appropriate substitution.
 
     // Using/Aliasing
-    static std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    static std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
+    static constexpr std::string_view UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
+    static constexpr std::string_view LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
 
     OutputString = InputString;
 
@@ -932,8 +956,8 @@ void ConvertCaseToUpper(std::string const &InputString, // Input string
     }
 }
 
-void ConvertCaseToLower(std::string const &InputString, // Input string
-                        std::string &OutputString       // Output string (in LowerCase)
+void ConvertCaseToLower(std::string_view InputString, // Input string
+                        std::string &OutputString     // Output string (in LowerCase)
 )
 {
 
@@ -953,8 +977,8 @@ void ConvertCaseToLower(std::string const &InputString, // Input string
     // case alphabet, it makes an appropriate substitution.
 
     // Using/Aliasing
-    static std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    static std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
+    static constexpr std::string_view UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
+    static constexpr std::string_view LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
 
     OutputString = InputString;
 
@@ -1603,7 +1627,7 @@ void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, Op
         // CacheIPErrorFile is never opened or closed
         // so this output would just go to stdout
         // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
-        std::cout << ErrorMessage << '\n';
+        if (state.dataGlobal->printConsoleOutput) std::cout << ErrorMessage << '\n';
     }
     if (present(OutUnit1)) {
         print(OutUnit1(), "  {}", ErrorMessage);
@@ -1676,7 +1700,7 @@ void ShowRecurringErrors(EnergyPlusData &state)
 
     using General::strip_trailing_zeros;
 
-    static std::string const StatMessageStart(" **   ~~~   ** ");
+    static constexpr std::string_view StatMessageStart(" **   ~~~   ** ");
 
     int Loop;
     std::string StatMessage;
@@ -1744,7 +1768,7 @@ void ShowRecurringErrors(EnergyPlusData &state)
                 if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;
             }
             if (error.ReportMax || error.ReportMin || error.ReportSum) {
-                ShowMessage(state, StatMessageStart + StatMessage);
+                ShowMessage(state, std::string{StatMessageStart} + StatMessage);
             }
         }
         ShowMessage(state, "");

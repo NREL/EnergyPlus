@@ -65,7 +65,7 @@ struct AutoCalculateSizer : BaseSizer
     }
     ~AutoCalculateSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct MaxHeaterOutletTempSizer : BaseSizer
@@ -77,7 +77,7 @@ struct MaxHeaterOutletTempSizer : BaseSizer
     }
     ~MaxHeaterOutletTempSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct ZoneCoolingLoadSizer : BaseSizer
@@ -89,7 +89,7 @@ struct ZoneCoolingLoadSizer : BaseSizer
     }
     ~ZoneCoolingLoadSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct ZoneHeatingLoadSizer : BaseSizer
@@ -101,7 +101,7 @@ struct ZoneHeatingLoadSizer : BaseSizer
     }
     ~ZoneHeatingLoadSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct ASHRAEMinSATCoolingSizer : BaseSizer
@@ -113,7 +113,7 @@ struct ASHRAEMinSATCoolingSizer : BaseSizer
     }
     ~ASHRAEMinSATCoolingSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct ASHRAEMaxSATHeatingSizer : BaseSizer
@@ -125,7 +125,7 @@ struct ASHRAEMaxSATHeatingSizer : BaseSizer
     }
     ~ASHRAEMaxSATHeatingSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct DesiccantDehumidifierBFPerfDataFaceVelocitySizer : BaseSizer
@@ -137,7 +137,7 @@ struct DesiccantDehumidifierBFPerfDataFaceVelocitySizer : BaseSizer
     }
     ~DesiccantDehumidifierBFPerfDataFaceVelocitySizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct HeatingCoilDesAirInletTempSizer : BaseSizer
@@ -149,7 +149,7 @@ struct HeatingCoilDesAirInletTempSizer : BaseSizer
     }
     ~HeatingCoilDesAirInletTempSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct HeatingCoilDesAirOutletTempSizer : BaseSizer
@@ -161,7 +161,7 @@ struct HeatingCoilDesAirOutletTempSizer : BaseSizer
     }
     ~HeatingCoilDesAirOutletTempSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 struct HeatingCoilDesAirInletHumRatSizer : BaseSizer
@@ -173,7 +173,7 @@ struct HeatingCoilDesAirInletHumRatSizer : BaseSizer
     }
     ~HeatingCoilDesAirInletHumRatSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 } // namespace EnergyPlus

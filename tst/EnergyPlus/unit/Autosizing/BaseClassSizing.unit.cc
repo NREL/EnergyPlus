@@ -69,7 +69,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
-using namespace ObjexxFCL;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -91,7 +90,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     state->dataSize->SysSizPeakDDNum(1).TimeStepAtTotCoolPk.allocate(1);
 
     // one-time global initialization
-    int const DesignDayForPeak = 1;
+    int constexpr DesignDayForPeak = 1;
     state->dataSize->SysSizPeakDDNum(1).SensCoolPeakDD = DesignDayForPeak;
     state->dataSize->SysSizPeakDDNum(1).CoolFlowPeakDD = DesignDayForPeak;
     state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = DesignDayForPeak;
@@ -106,8 +105,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)
     state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1250000;
 
     // one-time argument initialization
-    int const sysNum = 1;
-    Real64 const CpAir = 4179;
+    int constexpr sysNum = 1;
+    Real64 constexpr CpAir = 4179;
 
     // argument return values
     Real64 designFlowValue;
@@ -196,7 +195,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     state->dataSize->SysSizPeakDDNum(1).TimeStepAtTotCoolPk.allocate(1);
 
     // one-time global initialization
-    int const DesignDayForPeak = 0;
+    int constexpr DesignDayForPeak = 0;
     state->dataSize->SysSizPeakDDNum(1).SensCoolPeakDD = DesignDayForPeak;
     state->dataSize->SysSizPeakDDNum(1).CoolFlowPeakDD = DesignDayForPeak;
     state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = DesignDayForPeak;
@@ -208,8 +207,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT_NoPeak)
     state->dataSize->CalcSysSizing(1).SumZoneCoolLoadSeq(1) = 1250000;
 
     // one-time argument initialization
-    int const sysNum = 1;
-    Real64 const CpAir = 4179;
+    int constexpr sysNum = 1;
+    Real64 constexpr CpAir = 4179;
 
     // argument return values
     Real64 designFlowValue;
@@ -455,7 +454,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::Invalid;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -492,7 +491,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     // With Test Fan 4 fan heat
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 1;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
@@ -513,7 +512,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 2;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanVecIndex = 2;
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = DataHVACGlobals::CoolingCapacitySizing;
@@ -533,7 +532,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
 
 TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
 {
-    int const ZoneNum = 1;
+    int constexpr ZoneNum = 1;
     std::string CompName;       // component name
     std::string CompType;       // component type
     std::string SizingString;   // input field sizing description
@@ -884,7 +883,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     // EXPECT_EQ("EquipmentSummary", OutputReportPredefined::reportName(5).name);
     // OutputReportPredefined::reportName(5).show = true;
 
-    int const ZoneNum = 1;
+    int constexpr ZoneNum = 1;
     std::string CompName;       // component name
     std::string CompType;       // component type
     std::string SizingString;   // input field sizing description
@@ -1104,6 +1103,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1120,6 +1120,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1136,6 +1137,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1152,6 +1154,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1168,6 +1171,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
         "    Floor,                   !- Surface Type",
         "    FLOOR,                   !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zn001:Flr001,            !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
@@ -1184,6 +1188,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",

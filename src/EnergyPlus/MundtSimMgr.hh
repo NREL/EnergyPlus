@@ -64,42 +64,19 @@ struct EnergyPlusData;
 
 namespace MundtSimMgr {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const CpAir;    // Specific heat of air
-    extern Real64 const MinSlope; // Bound on result from Mundt model
-    extern Real64 const MaxSlope; // Bound on result from Mundt Model
-
-    // MODULE DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE MundtSimMgr
-
-    // main subsroutine
-
-    // Routines for transferring data between surface and air domains
-
-    // Routines for actual calculations in Mundt model
-
     // Types
 
     struct DefineLinearModelNode
     {
         // Members
-        std::string AirNodeName; // Name of air nodes
-        int ClassType;           // Type of air nodes
-        Real64 Height;           // Z coordinates [m] node's Control Vol. center
-        Real64 Temp;             // Surface temperature BC
-        Array1D_bool SurfMask;   // Limit of 60 surfaces at current sizing
+        std::string AirNodeName;                 // Name of air nodes
+        DataRoomAirModel::AirNodeType ClassType; // Type of air nodes
+        Real64 Height;                           // Z coordinates [m] node's Control Vol. center
+        Real64 Temp;                             // Surface temperature BC
+        Array1D_bool SurfMask;                   // Limit of 60 surfaces at current sizing
 
         // Default Constructor
-        DefineLinearModelNode() : ClassType(0), Height(0.0), Temp(0.0)
+        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Invalid), Height(0.0), Temp(0.0)
         {
         }
     };

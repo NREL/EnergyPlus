@@ -70,14 +70,16 @@ namespace DataRoomAirModel {
     // Parameters to indicate room air model selected
     enum class RoomAirModel : int
     {
-        UserDefined = 1,   // user defined patterns
-        Mixing = 2,        // mixing air model
-        Mundt = 3,         // Mundt nodal model
-        UCSDDV = 4,        // UCSD Displacement Ventilation model
-        UCSDCV = 5,        // UCSD-CV
-        UCSDUFI = 6,       // UCSD UFAD interior zone model
-        UCSDUFE = 7,       // UCSD UFAD exterior zone model
-        AirflowNetwork = 8 // RoomAirModel_AirflowNetwork interior zone model
+        Invalid = -1,
+        UserDefined,    // user defined patterns
+        Mixing,         // mixing air model
+        Mundt,          // Mundt nodal model
+        UCSDDV,         // UCSD Displacement Ventilation model
+        UCSDCV,         // UCSD-CV
+        UCSDUFI,        // UCSD UFAD interior zone model
+        UCSDUFE,        // UCSD UFAD exterior zone model
+        AirflowNetwork, // RoomAirModel_AirflowNetwork interior zone model
+        Num
     };
     constexpr const char *ChAirModel[] = {
         "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
@@ -85,64 +87,69 @@ namespace DataRoomAirModel {
     // Parameters to indicate air temperature coupling scheme
     enum class CouplingScheme : int
     {
-        Direct = 1,
-        Indirect = 2
+        Invalid = -1,
+        Direct,
+        Indirect,
+        Num
     };
 
     // Parameters to indicate type of air node, which is dependent on air models
-    int constexpr InletAirNode = 0;               // air node at inlet (for Mundt and Rees&Haves Models)
-    int constexpr FloorAirNode = 1;               // air node at floor (for Mundt and Rees&Haves Models)
-    int constexpr ControlAirNode = 2;             // air node at control point (for Mundt Model)
-    int constexpr CeilingAirNode = 3;             // air node at ceiling (for Mundt Model)
-    int constexpr MundtRoomAirNode = 4;           // air node for vertical walls (for Mundt Model)
-    int constexpr ReturnAirNode = 10;             // air node for return (for Mundt and Rees&Haves Models)
-    int constexpr AirflowNetworkRoomAirNode = 11; // air node for airflow network based room air model
-    int constexpr PlumeAirNode1 = 2;              // air node for plume load (for Rees&Haves Model)
-    int constexpr PlumeAirNode2 = 3;              // air node for plume load (for Rees&Haves Model)
-    int constexpr PlumeAirNode3 = 4;              // air node for plume load (for Rees&Haves Model)
-    int constexpr PlumeAirNode4 = 5;              // air node for plume load (for Rees&Haves Model)
-    int constexpr RoomAirNode1 = 6;               // air node for vertical walls (for Rees&Haves Model)
-    int constexpr RoomAirNode2 = 7;               // air node for vertical walls (for Rees&Haves Model)
-    int constexpr RoomAirNode3 = 8;               // air node for vertical walls (for Rees&Haves Model)
-    int constexpr RoomAirNode4 = 9;               // air node for vertical walls (for Rees&Haves Model)
+    enum class AirNodeType
+    {
+        Invalid = -1,
+        InletAirNode,              // air node at inlet (for Mundt and Rees&Haves Models)
+        FloorAirNode,              // air node at floor (for Mundt and Rees&Haves Models)
+        ControlAirNode,            // air node at control point (for Mundt Model)
+        CeilingAirNode,            // air node at ceiling (for Mundt Model)
+        MundtRoomAirNode,          // air node for vertical walls (for Mundt Model)
+        ReturnAirNode,             // air node for return (for Mundt and Rees&Haves Models)
+        AirflowNetworkRoomAirNode, // air node for airflow network based room air model
+        PlumeAirNode,              // air node for plume load (for Rees&Haves Model)
+        RoomAirNode,               // air node for vertical walls (for Rees&Haves Model)
+        Num
+    };
 
     // user-defined pattern two gradient interpolation modes
     enum class UserDefinedPatternMode
     {
-        Unassigned,
+        Invalid = -1,
         OutdoorDryBulbMode,  // by outdoor air bulb.
         SensibleCoolingMode, // by sensible cooling load
         SensibleHeatingMode, // by sensible heating load
         ZoneAirTempMode,     // by zone air temperature
-        DeltaOutdoorZone     // by difference between zone and outdoor
+        DeltaOutdoorZone,    // by difference between zone and outdoor
+        Num
     };
 
     // user defined temperature pattern types
     enum class UserDefinedPatternType
     {
-        Unassigned,
+        Invalid = -1,
         ConstGradTempPattern,  // constant gradient in vertical direction
         TwoGradInterpPattern,  // two gradient interpolation
         NonDimenHeightPattern, // non-dimensionalized height
-        SurfMapTempPattern     // arbitrary surface mappings
+        SurfMapTempPattern,    // arbitrary surface mappings
+        Num
     };
 
     // parameters to indicate diffuser type
     enum class Diffuser
     {
-        Unassigned,
+        Invalid = -1,
         Swirl,
         VarArea,
         DisplVent,
         LinBarGrille,
-        Custom
+        Custom,
+        Num
     };
 
     enum class Comfort
     {
-        VComfort_Invalid,
-        VComfort_Jet,
-        VComfort_Recirculation
+        Invalid = -1,
+        Jet,
+        Recirculation,
+        Num
     };
 
     struct AirModelData
@@ -171,14 +178,14 @@ namespace DataRoomAirModel {
         std::string Name; // name
         std::string ZoneName;
         int ZonePtr;               // Pointer to the zone number for this statement
-        int ClassType;             // depending on type of model
+        AirNodeType ClassType;     // depending on type of model
         Real64 Height;             // height
         Real64 ZoneVolumeFraction; // portion of zone air volume associated with this node
         Array1D_bool SurfMask;     // limit of 60 surfaces at current sizing
         bool IsZone;               // TRUE if this node is zone node
 
         // Default Constructor
-        AirNodeData() : ZonePtr(0), ClassType(0), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
+        AirNodeData() : ZonePtr(0), ClassType(AirNodeType::Invalid), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
         {
         }
     };
@@ -212,7 +219,7 @@ namespace DataRoomAirModel {
         // for comfort models
 
         // Default Constructor
-        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::VComfort_Invalid)
+        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::Invalid)
         {
         }
     };
@@ -283,8 +290,8 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFIData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0),
-              CalcTransHeight(false), A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Invalid), TransHeight(0.0), CalcTransHeight(false),
+              A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
         {
         }
     };
@@ -320,8 +327,8 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFEData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0),
-              CalcTransHeight(false), A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Invalid), TransHeight(0.0), CalcTransHeight(false),
+              A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
         {
         }
     };
@@ -374,7 +381,7 @@ namespace DataRoomAirModel {
         // Default Constructor
         TwoVertGradInterpolPattern()
             : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0),
-              InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Unassigned), UpperBoundTempScale(0.0), LowerBoundTempScale(0.0),
+              InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Invalid), UpperBoundTempScale(0.0), LowerBoundTempScale(0.0),
               UpperBoundHeatRateScale(0.0), LowerBoundHeatRateScale(0.0)
         {
         }
@@ -407,8 +414,7 @@ namespace DataRoomAirModel {
         Real64 DeltaTexhaust;                    // (Texhaust - MAT) deg C
 
         // Default Constructor
-        TemperaturePatternStruct()
-            : PatrnID(0), PatternMode(UserDefinedPatternType::Unassigned), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
+        TemperaturePatternStruct() : PatrnID(0), PatternMode(UserDefinedPatternType::Invalid), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
         {
         }
     };
@@ -483,13 +489,14 @@ namespace DataRoomAirModel {
     {
         // Members
         // user variables
-        int TypeOfNum;                    // Internal type
-        std::string Name;                 // Intenral gain name
-        bool UseRoomAirModelTempForGains; // TRUE if user inputs temp for gains
-        bool FractionCheck;               // TRUE if a fraction of internal gain for each object is checked
+        DataHeatBalance::IntGainType Type; // Internal type
+        std::string Name;                  // Intenral gain name
+        bool UseRoomAirModelTempForGains;  // TRUE if user inputs temp for gains
+        bool FractionCheck;                // TRUE if a fraction of internal gain for each object is checked
 
         // Default Constructor
-        RoomAirflowNetworkNodeInternalGainsStruct() : TypeOfNum(0), UseRoomAirModelTempForGains(false), FractionCheck(false)
+        RoomAirflowNetworkNodeInternalGainsStruct()
+            : Type(DataHeatBalance::IntGainType::Invalid), UseRoomAirModelTempForGains(false), FractionCheck(false)
         {
         }
     };
@@ -534,9 +541,10 @@ namespace DataRoomAirModel {
         Array1D<bool> SurfMask;                                     // Sized to num of surfs in Zone, true if surface is associated with this node
         std::string NodeIntGainsListName;                           // name of node's internal gains list
         bool HasIntGainsAssigned;                                   // True if this node has internal gain assigned
-        int NumIntGains;                                            // Number of internal gain objects
-        Array1D<int> IntGainsDeviceIndices;                         // sized to NumIntGains, index pointers to internal gains struct
-        Array1D<Real64> IntGainsFractions;                          // sized to NumIntGains, gain fractions to this node
+        int NumIntGains;                                            // Number of matching internal gain objects for all spaces in the zone
+        Array1D<int> intGainsDeviceSpaces;                          // index pointers to space struct
+        Array1D<int> IntGainsDeviceIndices;                         // index pointers to internal gains struct
+        Array1D<Real64> IntGainsFractions;                          // gain fractions to this node
         Array1D<RoomAirflowNetworkNodeInternalGainsStruct> IntGain; // Internal gain struct
         std::string NodeHVACListName;                               // name of node's HVAC list
         bool HasHVACAssigned;                                       // True if HVAC systems are assigned to this node

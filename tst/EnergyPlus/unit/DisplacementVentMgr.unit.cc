@@ -78,8 +78,8 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV(1) = true;
     state->dataSurface->Surface.allocate(TotSurfaces);
-    state->dataHeatBal->TempEffBulkAir.allocate(TotSurfaces);
-    state->dataHeatBalSurf->TempSurfIn.allocate(TotSurfaces);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(TotSurfaces);
+    state->dataHeatBalSurf->SurfTempIn.allocate(TotSurfaces);
     state->dataRoomAirMod->DVHcIn.allocate(TotSurfaces);
     state->dataRoomAirMod->ZTMX.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->ZTOC.allocate(state->dataGlobal->NumOfZones);
@@ -159,6 +159,11 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataSurface->Surface(3).Vertex(4).y = -1.48693002;
     state->dataSurface->Surface(3).Vertex(4).z = 8.5343999852;
 
+    state->dataSurface->SurfIntConvCoeffIndex.allocate(TotSurfaces);
+    state->dataSurface->SurfTAirRef.allocate(TotSurfaces);
+    state->dataSurface->SurfIntConvCoeffIndex = 0.0;
+    state->dataSurface->SurfTAirRef = 0;
+
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
 
@@ -221,9 +226,9 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     state->dataRoomAirMod->ZTMX(1) = 20.0;
     state->dataRoomAirMod->ZTOC(1) = 21.0;
-    state->dataHeatBalSurf->TempSurfIn(1) = 23.0;
-    state->dataHeatBalSurf->TempSurfIn(2) = 23.0;
-    state->dataHeatBalSurf->TempSurfIn(3) = 23.0;
+    state->dataHeatBalSurf->SurfTempIn(1) = 23.0;
+    state->dataHeatBalSurf->SurfTempIn(2) = 23.0;
+    state->dataHeatBalSurf->SurfTempIn(3) = 23.0;
 
     HcUCSDDV(*state, 1, 0.5);
 
@@ -237,8 +242,8 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     state->dataRoomAirMod->IsZoneDV.deallocate();
     state->dataSurface->Surface.deallocate();
-    state->dataHeatBal->TempEffBulkAir.deallocate();
-    state->dataHeatBalSurf->TempSurfIn.deallocate();
+    state->dataHeatBal->SurfTempEffBulkAir.deallocate();
+    state->dataHeatBalSurf->SurfTempIn.deallocate();
     state->dataRoomAirMod->DVHcIn.deallocate();
     state->dataRoomAirMod->ZTMX.deallocate();
     state->dataRoomAirMod->ZTOC.deallocate();
@@ -268,15 +273,15 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
 TEST_F(EnergyPlusFixture, DVThirdOrderFloorTempCalculation)
 {
-    Real64 const tempHistoryTerm = 0; // no history
-    Real64 const HAT_floor = 20;
-    Real64 const HA_floor = 1;
-    Real64 const MCpT_Total = 40;
-    Real64 const MCp_Total = 2;
-    Real64 const occupiedTemp = 25;
-    Real64 const nonAirSystemResponse = 0;
-    Real64 const zoneMultiplier = 1;
-    Real64 const airCap = 100;
+    Real64 constexpr tempHistoryTerm = 0; // no history
+    Real64 constexpr HAT_floor = 20;
+    Real64 constexpr HA_floor = 1;
+    Real64 constexpr MCpT_Total = 40;
+    Real64 constexpr MCp_Total = 2;
+    Real64 constexpr occupiedTemp = 25;
+    Real64 constexpr nonAirSystemResponse = 0;
+    Real64 constexpr zoneMultiplier = 1;
+    Real64 constexpr airCap = 100;
 
     Real64 temp = calculateThirdOrderFloorTemperature(
         tempHistoryTerm, HAT_floor, HA_floor, MCpT_Total, MCp_Total, occupiedTemp, nonAirSystemResponse, zoneMultiplier, airCap);

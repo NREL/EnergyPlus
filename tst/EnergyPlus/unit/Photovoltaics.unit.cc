@@ -99,11 +99,11 @@ TEST_F(EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero)
 
     state->dataPhotovoltaic->NumPVs = 3;
     state->dataPhotovoltaic->PVarray(1).SurfacePtr = 1;
-    state->dataPhotovoltaic->PVarray(1).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
+    state->dataPhotovoltaic->PVarray(1).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Invalid;
     state->dataPhotovoltaic->PVarray(2).SurfacePtr = 2;
-    state->dataPhotovoltaic->PVarray(2).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
+    state->dataPhotovoltaic->PVarray(2).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Invalid;
     state->dataPhotovoltaic->PVarray(3).SurfacePtr = 3;
-    state->dataPhotovoltaic->PVarray(3).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Unassigned;
+    state->dataPhotovoltaic->PVarray(3).CellIntegrationMode = EnergyPlus::DataPhotovoltaics::CellIntegration::Invalid;
 
     state->dataSurface->Surface(1).Zone = 1;
     state->dataSurface->Surface(1).ZoneName = "Zone1";

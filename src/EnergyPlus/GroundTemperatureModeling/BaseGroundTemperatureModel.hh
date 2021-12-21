@@ -51,18 +51,32 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
 
+enum class GroundTempObjType
+{
+    Invalid = -1,
+    KusudaGroundTemp,
+    FiniteDiffGroundTemp,
+    SiteBuildingSurfaceGroundTemp,
+    SiteShallowGroundTemp,
+    SiteDeepGroundTemp,
+    SiteFCFactorMethodGroundTemp,
+    XingGroundTemp,
+    Num
+};
+
 // Base class
 class BaseGroundTempsModel
 {
 public:
     // Public Members
-    int objectType;
+    GroundTempObjType objectType;
     std::string objectName;
     bool errorsFound;
 
@@ -73,7 +87,7 @@ public:
     BaseGroundTempsModel &operator=(BaseGroundTempsModel &&) = delete;
 
     // Default Constructor
-    BaseGroundTempsModel() : objectType(0), errorsFound(false)
+    BaseGroundTempsModel() : objectType(GroundTempObjType::Invalid), errorsFound(false)
     {
     }
 
@@ -87,16 +101,12 @@ public:
 protected:
     static void write_ground_temps(InputOutputFile &os, const std::string &name, const Array1D<Real64> &data)
     {
-        print(os,
-              "! "
-              "<Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{C}},Nov{{C}},Dec{{C}"
-              "}\n",
-              name);
-        print(os, " Site:GroundTemperature:{}", name);
-        for (int i = 1; i <= 12; ++i) {
-            print(os, ", {:6.2F}", data(i));
-        }
-        print(os, "\n");
+        print<FormatSyntax::FMT>(os,
+                                 "! "
+                                 "<Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{"
+                                 "C}},Nov{{C}},Dec{{C}}\n",
+                                 name);
+        print<FormatSyntax::FMT>(os, " Site:GroundTemperature:{}, {}\n", name, fmt::format("{:6.2F}", fmt::join(data, ", ")));
     }
 };
 

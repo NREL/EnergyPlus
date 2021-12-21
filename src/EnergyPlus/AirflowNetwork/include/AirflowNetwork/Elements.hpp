@@ -103,7 +103,7 @@ namespace AirflowNetwork {
     // MODULE PARAMETER DEFINITIONS:
     enum class iComponentTypeNum : int
     {
-        Unassigned = 0,
+        Invalid = 0,
         DOP = 1,  // Detailed large opening component
         SOP = 2,  // Simple opening component
         SCR = 3,  // Surface crack component
@@ -123,11 +123,16 @@ namespace AirflowNetwork {
         HOP = 17, // Horizontal opening component
         RVD = 18, // Reheat VAV terminal damper
         OAF = 19, // Distribution system OA
-        REL = 20  // Distribution system relief air
+        REL = 20, // Distribution system relief air
+        SMF = 21, // Specified mass flow component
+        SVF = 22, // Specified volume flow component
+        Num
     };
 
     enum class ComponentType
     {
+        // TODO: enum check
+        Invalid = -1,
         DOP = 1, // Detailed large opening component
         SOP,     // Simple opening component
         SCR,     // Surface crack component
@@ -147,26 +152,30 @@ namespace AirflowNetwork {
         HOP,     // Horizontal opening component
         RVD,     // Reheat VAV terminal damper
         OAF,     // Distribution system OA
-        REL      // Distribution system relief air
+        REL,     // Distribution system relief air
+        SMF,     // Specified mass flow component
+        SVF,     // Specified volume flow component
+        Num
     };
 
     // EPlus component Type
     enum class iEPlusComponentType : int
     {
-        Unassigned = 0,
+        Invalid = 0,
         SCN = 1, // Supply connection
         RCN = 2, // Return connection
         RHT = 3, // Reheat terminal
         FAN = 4, // Fan
         COI = 5, // Heating or cooling coil
         HEX = 6, // Heat exchanger
-        RVD = 7  // Reheat VAV terminal damper
+        RVD = 7, // Reheat VAV terminal damper
+        Num
     };
 
     // EPlus node type
     enum class iEPlusNodeType : int
     {
-        Unassigned = 0,
+        Invalid = 0,
         ZIN = 1,  // Zone inlet node
         ZOU = 2,  // Zone outlet node
         SPL = 3,  // Splitter node
@@ -180,14 +189,16 @@ namespace AirflowNetwork {
         DIN = 11, // Damper Inlet node
         DOU = 12, // Damper Outlet Node
         SPI = 13, // Splitter inlet Node
-        SPO = 14  // Splitter Outlet Node
+        SPO = 14, // Splitter Outlet Node
+        Num
     };
 
     enum class iWPCCntr : int
     {
-        Unassigned = 0,
+        Invalid = 0,
         Input = 1,
-        SurfAvg = 2
+        SurfAvg = 2,
+        Num
     };
 
     int constexpr PressureCtrlExhaust = 1;
@@ -221,21 +232,24 @@ namespace AirflowNetwork {
     {
         enum class Solver
         {
+            Invalid = -1,
             SkylineLU,
-            ConjugateGradient
+            ConjugateGradient,
+            Num
         };
+
         // Members
         std::string AirflowNetworkSimuName; // Provide a unique object name
         std::string Control;                // AirflowNetwork control: MULTIZONE WITH DISTRIBUTION,
         // MULTIZONE WITHOUT DISTRIBUTION
         // MULTIZONE WITH DISTRIBUTION ONLY DURING FAN OPERATION,
         // and NO MULTIZONE OR DISTRIBUTION
-        std::string WPCCntr;                     // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
-        iWPCCntr iWPCCnt = iWPCCntr::Unassigned; // Integer equivalent for WPCCntr field
-        std::string BldgType;                    // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
-        std::string HeightOption;                // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
-        int MaxIteration;                        // Maximum number of iteration, default 500
-        int InitFlag;                            // Initialization flag
+        std::string WPCCntr;                  // Wind pressure coefficient input control: "SURFACE-AVERAGE CALCULATION", or "INPUT"
+        iWPCCntr iWPCCnt = iWPCCntr::Invalid; // Integer equivalent for WPCCntr field
+        std::string BldgType;                 // Building type: "LOWRISE" or "HIGHRISE" at WPCCntr = "SURFACE-AVERAGE CALCULATIO"
+        std::string HeightOption;             // Height Selection: "ExternalNode" or "OpeningHeight" at WPCCntr = "INPUT"
+        int MaxIteration;                     // Maximum number of iteration, default 500
+        int InitFlag;                         // Initialization flag
         Solver solver;
         Real64 RelTol;               // Relative airflow convergence
         Real64 AbsTol;               // Absolute airflow convergence
@@ -573,16 +587,72 @@ namespace AirflowNetwork {
         }
     };
 
+    struct SpecifiedMassFlow : public AirflowElement // Specified mass flow element
+    {
+        // Members
+        Real64 mass_flow; // Mass Flow [kg/s]
+
+        // Default Constructor
+        SpecifiedMassFlow() : mass_flow(0.0)
+        {
+        }
+
+        int calculate([[maybe_unused]] EnergyPlusData &state,
+                      [[maybe_unused]] bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      [[maybe_unused]] Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i,                // Linkage number
+                      const Real64 multiplier,                     // Element multiplier
+                      const Real64 control,                        // Element control signal
+                      [[maybe_unused]] const AirProperties &propN, // Node 1 properties
+                      [[maybe_unused]] const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,                    // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::SMF;
+        }
+    };
+
+    struct SpecifiedVolumeFlow : public AirflowElement // Specified mass flow element
+    {
+        // Members
+        Real64 volume_flow; // Volume Flow [m3/s]
+
+        // Default Constructor
+        SpecifiedVolumeFlow() : volume_flow(0.0)
+        {
+        }
+
+        int calculate([[maybe_unused]] EnergyPlusData &state,
+                      [[maybe_unused]] bool const LFLAG,   // Initialization flag.If = 1, use laminar relationship
+                      [[maybe_unused]] Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i,        // Linkage number
+                      const Real64 multiplier,             // Element multiplier
+                      const Real64 control,                // Element control signal
+                      const AirProperties &propN,          // Node 1 properties
+                      const AirProperties &propM,          // Node 2 properties
+                      std::array<Real64, 2> &F,            // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF            // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::SVF;
+        }
+    };
+
     struct ReferenceConditions // Surface crack standard conditions
     {
         // Members
-        std::string name;     // Name of standard conditions component
-        Real64 temperature;   // Standard temperature for crack data
-        Real64 pressure;      // Standard barometric pressure for crack data
-        Real64 humidityRatio; // Standard humidity ratio for crack data
+        std::string name;      // Name of standard conditions component
+        Real64 temperature;    // Standard temperature for crack data
+        Real64 pressure;       // Standard barometric pressure for crack data
+        Real64 humidity_ratio; // Standard humidity ratio for crack data
 
-        ReferenceConditions(const std::string &name, Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidityRatio = 0.0)
-            : name(name), temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
+        ReferenceConditions(const std::string &name, Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidity_ratio = 0.0)
+            : name(name), temperature(temperature), pressure(pressure), humidity_ratio(humidity_ratio)
         {
         }
 
@@ -595,32 +665,32 @@ namespace AirflowNetwork {
     struct SurfaceCrack : public AirflowElement // Surface crack component
     {
         // Members
-        // std::string ExternalNodeNames; // Name of external node.Not required for internal surface
-        Real64 FlowCoef;  // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
-        Real64 FlowExpo;  // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
-        Real64 StandardT; // Standard temperature for crack data
-        Real64 StandardP; // Standard barometric pressure for crack data
-        Real64 StandardW; // Standard humidity ratio for crack data
+        Real64 coefficient;         // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+        Real64 exponent;            // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
+        Real64 reference_density;   // Reference density for crack data
+        Real64 reference_viscosity; // Reference viscosity for crack data
 
         // Default Constructor
-        SurfaceCrack() : FlowCoef(0.0), FlowExpo(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0)
+        SurfaceCrack()
+            : coefficient(0.0), exponent(0.0), reference_density(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0)),
+              reference_viscosity(AIRDYNAMICVISCOSITY(20.0))
         {
         }
 
-        int calculate(EnergyPlusData &state,
-                      bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                              // Linkage number
-                      [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                      [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirProperties &propN,               // Node 1 properties
-                      const AirProperties &propM,               // Node 2 properties
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+        int calculate([[maybe_unused]] EnergyPlusData &state,
+                      bool const linear,            // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,           // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i, // Linkage number
+                      const Real64 multiplier,      // Element multiplier
+                      const Real64 control,         // Element control signal
+                      const AirProperties &propN,   // Node 1 properties
+                      const AirProperties &propM,   // Node 2 properties
+                      std::array<Real64, 2> &F,     // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF     // Partial derivative:  DF/DP
         );
 
         virtual int calculate(EnergyPlusData &state,
-                              const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                              const Real64 pdrop,         // Total pressure drop across a component (P1 - P2) [Pa]
                               const Real64 multiplier,    // Element multiplier
                               const Real64 control,       // Element control signal
                               const AirProperties &propN, // Node 1 properties
@@ -786,9 +856,10 @@ namespace AirflowNetwork {
         std::array<int, 2> NodeNums;          // Node numbers
         int LinkNum;                          // Linkage number
         AirflowElement *element;              // Pointer to airflow element
+        Real64 control;                       // Control value
 
         // Default Constructor
-        AirflowNetworkLinkage() : NodeHeights{{0.0, 0.0}}, CompNum(0), NodeNums{{0, 0}}, LinkNum(0)
+        AirflowNetworkLinkage() : NodeHeights{{0.0, 0.0}}, CompNum(0), NodeNums{{0, 0}}, LinkNum(0), element(nullptr), control(1.0)
         {
         }
 
@@ -1272,7 +1343,7 @@ namespace AirflowNetwork {
         // Default Constructor
         AirflowNetworkNodeProp()
             : NodeHeight(0.0), NodeNum(0), NodeTypeNum(0), EPlusZoneNum(0), EPlusNodeNum(0), ExtNodeNum(0), OutAirNodeNum(0),
-              EPlusTypeNum(iEPlusNodeType::Unassigned), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
+              EPlusTypeNum(iEPlusNodeType::Invalid), RAFNNodeNum(0), NumOfLinks(0), AirLoopNum(0)
         {
         }
     };
@@ -1290,7 +1361,7 @@ namespace AirflowNetwork {
         iEPlusComponentType EPlusTypeNum; // Provide EPlus component type
 
         // Default Constructor
-        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Unassigned), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Unassigned)
+        AirflowNetworkCompProp() : CompTypeNum(iComponentTypeNum::Invalid), TypeNum(0), CompNum(0), EPlusTypeNum(iEPlusComponentType::Invalid)
         {
         }
     };
@@ -1308,7 +1379,7 @@ namespace AirflowNetwork {
 
         // Default Constructor
         AirflowNetworkLinkageProp()
-            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Unassigned), VAVTermDamper(false),
+            : AirflowNetworkLinkage(), ZoneNum(0), DetOpenNum(0), ConnectionFlag(iEPlusComponentType::Invalid), VAVTermDamper(false),
               LinkageViewFactorObjectNum(0), AirLoopNum(0)
         {
         }
@@ -1493,6 +1564,8 @@ namespace AirflowNetwork {
         Real64 TotalLat;
         Real64 SumMCp;
         Real64 SumMCpT;
+        Real64 SumMVCp;
+        Real64 SumMVCpT;
         Real64 SumMHr;
         Real64 SumMHrW;
         Real64 SumMMCp;
@@ -1509,8 +1582,8 @@ namespace AirflowNetwork {
         // Default Constructor
         AirflowNetworkExchangeProp()
             : MultiZoneSen(0.0), MultiZoneLat(0.0), LeakSen(0.0), LeakLat(0.0), CondSen(0.0), DiffLat(0.0), RadGain(0.0), TotalSen(0.0),
-              TotalLat(0.0), SumMCp(0.0), SumMCpT(0.0), SumMHr(0.0), SumMHrW(0.0), SumMMCp(0.0), SumMMCpT(0.0), SumMMHr(0.0), SumMMHrW(0.0),
-              SumMHrCO(0.0), SumMMHrCO(0.0), TotalCO2(0.0), SumMHrGC(0.0), SumMMHrGC(0.0), TotalGC(0.0)
+              TotalLat(0.0), SumMCp(0.0), SumMCpT(0.0), SumMVCp(0.0), SumMVCpT(0.0), SumMHr(0.0), SumMHrW(0.0), SumMMCp(0.0), SumMMCpT(0.0),
+              SumMMHr(0.0), SumMMHrW(0.0), SumMHrCO(0.0), SumMMHrCO(0.0), TotalCO2(0.0), SumMHrGC(0.0), SumMMHrGC(0.0), TotalGC(0.0)
         {
         }
     };
@@ -1659,6 +1732,7 @@ struct AirflowNetworkData : BaseGlobalStruct
     Real64 ExhaustFanMassFlowRate = 0.0; // Exhaust fan flow rate used in PressureStat
     int PressureSetFlag = 0;             // PressureSet flag
     Real64 ReliefMassFlowRate = 0.0;     // OA Mixer relief node flow rate used in PressureStat
+    bool AFNDefaultControlFlag = false;  // Default simulation control flag
 
     Array1D<AirflowNetwork::AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetwork::AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
@@ -1682,6 +1756,8 @@ struct AirflowNetworkData : BaseGlobalStruct
     Array1D<AirflowNetwork::HorizontalOpening> MultizoneCompHorOpeningData;
     Array1D<AirflowNetwork::SurfaceCrack> MultizoneSurfaceCrackData;
     Array1D<AirflowNetwork::EffectiveLeakageArea> MultizoneSurfaceELAData;
+    Array1D<AirflowNetwork::SpecifiedMassFlow> SpecifiedMassFlowData;
+    Array1D<AirflowNetwork::SpecifiedVolumeFlow> SpecifiedVolumeFlowData;
     Array1D<AirflowNetwork::MultizoneExternalNodeProp> MultizoneExternalNodeData;
     Array1D<AirflowNetwork::DeltaCpProp> DeltaCp;
     Array1D<AirflowNetwork::DeltaCpProp> EPDeltaCP;
@@ -1744,6 +1820,8 @@ struct AirflowNetworkData : BaseGlobalStruct
         this->MultizoneCompSimpleOpeningData.clear();
         this->MultizoneCompHorOpeningData.clear();
         this->MultizoneSurfaceCrackData.clear();
+        this->SpecifiedMassFlowData.clear();
+        this->SpecifiedVolumeFlowData.clear();
         this->MultizoneSurfaceELAData.clear();
         this->MultizoneExternalNodeData.clear();
         this->DeltaCp.clear();

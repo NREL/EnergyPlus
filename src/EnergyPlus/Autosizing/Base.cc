@@ -59,10 +59,10 @@
 namespace EnergyPlus {
 
 void BaseSizer::initializeWithinEP(EnergyPlusData &state,
-                                   const std::string &_compType,
-                                   const std::string &_compName,
-                                   bool const &_printWarningFlag,
-                                   std::string const &_callingRoutine)
+                                   std::string_view const _compType,
+                                   std::string_view const _compName,
+                                   bool _printWarningFlag,
+                                   std::string_view const _callingRoutine)
 {
     this->initialized = true;
     this->compType = _compType;
@@ -188,7 +188,7 @@ std::string BaseSizer::getLastErrorMessages()
 
 void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 {
-    if (this->sizingType == AutoSizingType::Unknown) {
+    if (this->sizingType == AutoSizingType::Invalid) {
         std::string msg = "Sizing Library Base Class: preSize, SizingType not defined.";
         this->addErrorMessage(msg);
         ShowSevereError(state, msg);
@@ -236,7 +236,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
                 }
             }
         }
-        if (this->unitarySysEqSizing.allocated())
+        if (allocated(this->unitarySysEqSizing))
             this->airLoopSysFlag =
                 this->unitarySysEqSizing(this->curSysNum).CoolingCapacity || this->unitarySysEqSizing(this->curSysNum).HeatingCapacity;
         if (this->curOASysNum > 0) {
@@ -245,7 +245,7 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
     }
 
     if (this->curZoneEqNum > 0) {
-        if (this->zoneEqSizing.allocated()) {
+        if (allocated(this->zoneEqSizing)) {
             this->sizingDesValueFromParent = this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent;
         }
         if (this->zoneSizingRunDone) {
@@ -304,16 +304,17 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 }
 
 void BaseSizer::reportSizerOutput(EnergyPlusData &state,
-                                  std::string const &CompType,
-                                  std::string const &CompName,
-                                  std::string const &VarDesc,
+                                  std::string_view CompType,
+                                  std::string_view CompName,
+                                  std::string_view VarDesc,
                                   Real64 const VarValue,
                                   Optional_string_const UsrDesc,
                                   Optional<Real64 const> UsrValue)
 {
 
-    static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
-    static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
+    static constexpr std::string_view Format_990(
+        "! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
+    static constexpr std::string_view Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
 
     // to do, make this a parameter. Unfortunately this function is used in MANY
     // places so it involves touching most of E+
@@ -328,7 +329,7 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
 
     if (present(UsrDesc) && present(UsrValue)) {
         print(state.files.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
-        OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, UsrDesc, UsrValue);
+        OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, UsrDesc(), UsrValue);
     } else if (present(UsrDesc) || present(UsrValue)) {
         ShowFatalError(state, "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
     }
@@ -337,7 +338,7 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
     if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
     if (present(UsrDesc) && present(UsrValue)) {
         if (state.dataSQLiteProcedures->sqlite)
-            state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc, UsrValue);
+            state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc(), UsrValue);
     }
 }
 
@@ -622,7 +623,7 @@ void BaseSizer::overrideSizingString(std::string &string)
     this->overrideSizeString = false;
 }
 
-Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
+Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
 {
     Real64 outAirFrac = 0.0;
     if (desMassFlow <= 0.0) return outAirFrac;
@@ -636,7 +637,7 @@ Real64 BaseSizer::setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &
     return outAirFrac;
 }
 
-Real64 BaseSizer::setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+Real64 BaseSizer::setHeatCoilInletTempForZoneEqSizing(Real64 const outAirFrac,
                                                       DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                       DataSizing::ZoneSizingData const &finalZoneSizing)
 {
@@ -654,7 +655,7 @@ Real64 BaseSizer::setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
     return coilInTemp;
 }
 
-Real64 BaseSizer::setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+Real64 BaseSizer::setHeatCoilInletHumRatForZoneEqSizing(Real64 const outAirFrac,
                                                         DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                         DataSizing::ZoneSizingData const &finalZoneSizing)
 {
@@ -670,7 +671,7 @@ Real64 BaseSizer::setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac
     return coilInHumRat;
 }
 
-Real64 BaseSizer::setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+Real64 BaseSizer::setCoolCoilInletTempForZoneEqSizing(Real64 const outAirFrac,
                                                       DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                       DataSizing::ZoneSizingData const &finalZoneSizing)
 {
@@ -688,7 +689,7 @@ Real64 BaseSizer::setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
     return coilInTemp;
 }
 
-Real64 BaseSizer::setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+Real64 BaseSizer::setCoolCoilInletHumRatForZoneEqSizing(Real64 const outAirFrac,
                                                         DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                         DataSizing::ZoneSizingData const &finalZoneSizing)
 {
@@ -787,7 +788,7 @@ void BaseSizer::clearState()
     dataAirFlowUsedForSizing = 0.0;
     dataDesInletAirTemp = 0.0;
     dataDesAccountForFanHeat = false;
-    dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+    dataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
     dataDesicRegCoil = false;
     dataHeatSizeRatio = 0.0;
     dataZoneUsedForSizing = 0;

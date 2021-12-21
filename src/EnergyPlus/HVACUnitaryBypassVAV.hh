@@ -72,30 +72,36 @@ namespace HVACUnitaryBypassVAV {
     constexpr int Off(0); // Signal DXCoil that compressor should not run
 
     // Mode of operation
+    // can't change these to enum class since these are used in SetupOutputVariable()
     int constexpr CoolingMode(1); // System operating mode is cooling
     int constexpr HeatingMode(2); // System operating mode is heating
 
     enum class DehumidControl // Dehumidification control modes (DehumidControlMode) for Multimode units only
     {
+        // TODO: enum check
+        Invalid = -1,
         None,
         Multimode,
-        CoolReheat
+        CoolReheat,
+        Num
     };
 
     enum class PriorityCtrlMode // Priority control mode (prioritized thermostat signal)
     {
-        Unassigned,
+        Invalid = -1,
         CoolingPriority, // Controls CBVAV system based on cooling priority
         HeatingPriority, // Controls CBVAV system based on heating priority
         ZonePriority,    // Controls CBVAV system based on number of zones priority
-        LoadPriority     // Controls CBVAV system based on total load priority
+        LoadPriority,    // Controls CBVAV system based on total load priority
+        Num
     };
 
     enum class AirFlowCtrlMode // Airflow control for contant fan mode
     {
-        Unassigned,
-        UseCompressorOnFlow, // Set compressor OFF air flow rate equal to compressor ON air flow rate
-        UseCompressorOffFlow // Set compressor OFF air flow rate equal to user defined value
+        Invalid = -1,
+        UseCompressorOnFlow,  // Set compressor OFF air flow rate equal to compressor ON air flow rate
+        UseCompressorOffFlow, // Set compressor OFF air flow rate equal to user defined value
+        Num
     };
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -104,48 +110,51 @@ namespace HVACUnitaryBypassVAV {
     {
         // Members
         // input data
-        std::string Name;                // Name of unit
-        std::string UnitType;            // Type of unit
-        std::string Sched;               // Availability schedule name
-        int SchedPtr;                    // Index number to availability schedule
-        Real64 MaxCoolAirVolFlow;        // System air volumetric flow rate during cooling operation [m3/s]
-        Real64 MaxHeatAirVolFlow;        // System air volumetric flow rate during heating operation [m3/s]
-        Real64 MaxNoCoolHeatAirVolFlow;  // System air volumetric flow rate when no cooling or heating [m3/s]
-        Real64 MaxCoolAirMassFlow;       // System air mass flow rate during cooling operation [kg/s]
-        Real64 MaxHeatAirMassFlow;       // System air mass flow rate during heating operation [kg/s]
-        Real64 MaxNoCoolHeatAirMassFlow; // System air mass flow rate when no cooling or heating [kg/s]
-        Real64 CoolOutAirVolFlow;        // OA volumetric flow rate during cooling operation [m3/s]
-        Real64 HeatOutAirVolFlow;        // OA volumetric flow rate during heating operation [m3/s]
-        Real64 NoCoolHeatOutAirVolFlow;  // OA volumetric flow rate when no cooling or heating [m3/s]
-        Real64 CoolOutAirMassFlow;       // OA mass flow rate during cooling operation [kg/s]
-        Real64 HeatOutAirMassFlow;       // OA mass flow rate during heating operation [kg/s]
-        Real64 NoCoolHeatOutAirMassFlow; // OA mass flow rate when no cooling or heating [kg/s]
-        int OutAirSchPtr;                // Index number to outside air multiplier schedule
-        int AirInNode;                   // Inlet air node number for CBVAV unit
-        int AirOutNode;                  // Outlet air node number for CBVAV unit
-        int CondenserNodeNum;            // DX Coil condenser air inlet node number
-        int MixerOutsideAirNode;         // Outside air node number for OA mixer
-        int MixerMixedAirNode;           // Mixed air node number for OA mixer
-        int MixerReliefAirNode;          // Relief air node number for OA mixer
-        int MixerInletAirNode;           // Return air node number for OA mixer
-        int SplitterOutletAirNode;       // Air node number for splitter (last component outlet node)
-        int PlenumMixerInletAirNode;     // only used when bypass is connected to plenum or mixer
-        std::string OAMixType;           // type of outside air mixer
-        std::string OAMixName;           // Name of OA mixer
-        int OAMixIndex;                  // Index to OA mixer
-        std::string FanName;             // Name of fan
-        std::string FanType;             // Type of fan
-        int FanPlace;                    // Fan placement is either blowthru (1) or drawthru (2)
-        int FanType_Num;                 // Fan type number (see DataHVACGlobals)
-        int FanIndex;                    // Index number to fan
-        int FanOpModeSchedPtr;           // Fan operating mode schedule pointer
-        Real64 FanVolFlow;               // Volumetric flow rate of system supply air fan [m3/s]
-        Real64 HeatingSpeedRatio;        // Fan speed ratio in heating mode
-        Real64 CoolingSpeedRatio;        // Fan speed ratio in cooling mode
-        Real64 NoHeatCoolSpeedRatio;     // Fan speed ratio when no cooling or heating
-        bool CheckFanFlow;               // Check fan volumetric flow versus system flow in init routine.
-        std::string DXCoolCoilName;      // Name of DX cooling coil
-        std::string DXCoolCoilType;      // Type of DX cooling coil, Coil:DX:Cooling:SingleSpeed or
+        std::string Name;                    // Name of unit
+        std::string UnitType;                // Type of unit
+        std::string Sched;                   // Availability schedule name
+        int SchedPtr;                        // Index number to availability schedule
+        Real64 MaxCoolAirVolFlow;            // System air volumetric flow rate during cooling operation [m3/s]
+        Real64 MaxHeatAirVolFlow;            // System air volumetric flow rate during heating operation [m3/s]
+        Real64 MaxNoCoolHeatAirVolFlow;      // System air volumetric flow rate when no cooling or heating [m3/s]
+        Real64 MaxCoolAirMassFlow;           // System air mass flow rate during cooling operation [kg/s]
+        Real64 MaxHeatAirMassFlow;           // System air mass flow rate during heating operation [kg/s]
+        Real64 MaxNoCoolHeatAirMassFlow;     // System air mass flow rate when no cooling or heating [kg/s]
+        Real64 CoolOutAirVolFlow;            // OA volumetric flow rate during cooling operation [m3/s]
+        Real64 HeatOutAirVolFlow;            // OA volumetric flow rate during heating operation [m3/s]
+        Real64 NoCoolHeatOutAirVolFlow;      // OA volumetric flow rate when no cooling or heating [m3/s]
+        Real64 CoolOutAirMassFlow;           // OA mass flow rate during cooling operation [kg/s]
+        Real64 HeatOutAirMassFlow;           // OA mass flow rate during heating operation [kg/s]
+        Real64 NoCoolHeatOutAirMassFlow;     // OA mass flow rate when no cooling or heating [kg/s]
+        int OutAirSchPtr;                    // Index number to outside air multiplier schedule
+        int AirInNode;                       // Inlet air node number for CBVAV unit
+        int AirOutNode;                      // Outlet air node number for CBVAV unit
+        int CondenserNodeNum;                // DX Coil condenser air inlet node number
+        int MixerOutsideAirNode;             // Outside air node number for OA mixer
+        int MixerMixedAirNode;               // Mixed air node number for OA mixer
+        int MixerReliefAirNode;              // Relief air node number for OA mixer
+        int MixerInletAirNode;               // Return air node number for OA mixer
+        int SplitterOutletAirNode;           // Air node number for splitter (last component outlet node)
+        int PlenumMixerInletAirNode;         // only used when bypass is connected to plenum or mixer
+        std::string OAMixType;               // type of outside air mixer
+        std::string OAMixName;               // Name of OA mixer
+        int OAMixIndex;                      // Index to OA mixer
+        std::string FanName;                 // Name of fan
+        std::string FanType;                 // Type of fan
+        int FanPlace;                        // Fan placement is either blowthru (1) or drawthru (2)
+        int FanType_Num;                     // Fan type number (see DataHVACGlobals)
+        int FanIndex;                        // Index number to fan
+        int FanOpModeSchedPtr;               // Fan operating mode schedule pointer
+        Real64 FanVolFlow;                   // Volumetric flow rate of system supply air fan [m3/s]
+        Real64 HeatingSpeedRatio;            // Fan speed ratio in heating mode
+        Real64 CoolingSpeedRatio;            // Fan speed ratio in cooling mode
+        Real64 NoHeatCoolSpeedRatio;         // Fan speed ratio when no cooling or heating
+        Real64 MaxONOFFCyclesperHourCycling; // Maximum cycling rate of heat pump [cycles/hr]
+        Real64 HPTimeConstantCycling;        // Heat pump time constant [s]
+        Real64 FanDelayTimeCycling;          // Fan delay time, time delay for the HP's fan to
+        bool CheckFanFlow;                   // Check fan volumetric flow versus system flow in init routine.
+        std::string DXCoolCoilName;          // Name of DX cooling coil
+        std::string DXCoolCoilType;          // Type of DX cooling coil, Coil:DX:Cooling:SingleSpeed or
         //               CoilSystem:Cooling:DX:HeatExchangerAssisted
         int DXCoolCoilType_Num;   // Numeric equivalent for DX cooling coil type
         int CoolCoilCompIndex;    // cooling coil component index number
@@ -265,23 +274,24 @@ namespace HVACUnitaryBypassVAV {
               CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutAirSchPtr(0), AirInNode(0), AirOutNode(0),
               CondenserNodeNum(0), MixerOutsideAirNode(0), MixerMixedAirNode(0), MixerReliefAirNode(0), MixerInletAirNode(0),
               SplitterOutletAirNode(0), PlenumMixerInletAirNode(0), OAMixIndex(0), FanPlace(0), FanType_Num(0), FanIndex(0), FanOpModeSchedPtr(0),
-              FanVolFlow(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), CheckFanFlow(true), DXCoolCoilType_Num(0),
-              CoolCoilCompIndex(0), DXCoolCoilIndexNum(0), DXHeatCoilIndexNum(0), HeatCoilType_Num(0), HeatCoilIndex(0), OpMode(0),
-              CoilControlNode(0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), HotWaterCoilMaxIterIndex(0),
-              HotWaterCoilMaxIterIndex2(0), MaxHeatCoilFluidFlow(0.0), DesignHeatingCapacity(0.0), DesignSuppHeatingCapacity(0.0),
-              MinOATCompressor(0.0), MinLATCooling(0.0), MaxLATHeating(0.0), TotHeatEnergyRate(0.0), TotHeatEnergy(0.0), TotCoolEnergyRate(0.0),
-              TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatHeatEnergyRate(0.0),
-              LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0),
-              CompPartLoadRatio(0.0), LastMode(0), AirFlowControl(AirFlowCtrlMode::Unassigned), CompPartLoadFrac(0.0), AirLoopNumber(0),
-              NumControlledZones(0), PriorityControl(PriorityCtrlMode::Unassigned), NumZonesCooled(0), NumZonesHeated(0), PLRMaxIter(0),
-              PLRMaxIterIndex(0), DXCoilInletNode(0), DXCoilOutletNode(0), HeatingCoilInletNode(0), HeatingCoilOutletNode(0), FanInletNodeNum(0),
-              OutletTempSetPoint(0.0), CoilTempSetPoint(0.0), HeatCoolMode(0), BypassMassFlowRate(0.0), DehumidificationMode(0),
-              DehumidControlType(DehumidControl::None), HumRatMaxCheck(true), DXIterationExceeded(0), DXIterationExceededIndex(0),
-              DXIterationFailed(0), DXIterationFailedIndex(0), DXCyclingIterationExceeded(0), DXCyclingIterationExceededIndex(0),
-              DXCyclingIterationFailed(0), DXCyclingIterationFailedIndex(0), DXHeatIterationExceeded(0), DXHeatIterationExceededIndex(0),
-              DXHeatIterationFailed(0), DXHeatIterationFailedIndex(0), DXHeatCyclingIterationExceeded(0), DXHeatCyclingIterationExceededIndex(0),
-              DXHeatCyclingIterationFailed(0), DXHeatCyclingIterationFailedIndex(0), HXDXIterationExceeded(0), HXDXIterationExceededIndex(0),
-              HXDXIterationFailed(0), HXDXIterationFailedIndex(0), MMDXIterationExceeded(0), MMDXIterationExceededIndex(0), MMDXIterationFailed(0),
+              FanVolFlow(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), MaxONOFFCyclesperHourCycling(4.0),
+              HPTimeConstantCycling(0.0), FanDelayTimeCycling(0.0), CheckFanFlow(true), DXCoolCoilType_Num(0), CoolCoilCompIndex(0),
+              DXCoolCoilIndexNum(0), DXHeatCoilIndexNum(0), HeatCoilType_Num(0), HeatCoilIndex(0), OpMode(0), CoilControlNode(0), CoilOutletNode(0),
+              LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxHeatCoilFluidFlow(0.0),
+              DesignHeatingCapacity(0.0), DesignSuppHeatingCapacity(0.0), MinOATCompressor(0.0), MinLATCooling(0.0), MaxLATHeating(0.0),
+              TotHeatEnergyRate(0.0), TotHeatEnergy(0.0), TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0),
+              SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0),
+              ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0), LastMode(0),
+              AirFlowControl(AirFlowCtrlMode::Invalid), CompPartLoadFrac(0.0), AirLoopNumber(0), NumControlledZones(0),
+              PriorityControl(PriorityCtrlMode::Invalid), NumZonesCooled(0), NumZonesHeated(0), PLRMaxIter(0), PLRMaxIterIndex(0), DXCoilInletNode(0),
+              DXCoilOutletNode(0), HeatingCoilInletNode(0), HeatingCoilOutletNode(0), FanInletNodeNum(0), OutletTempSetPoint(0.0),
+              CoilTempSetPoint(0.0), HeatCoolMode(0), BypassMassFlowRate(0.0), DehumidificationMode(0), DehumidControlType(DehumidControl::None),
+              HumRatMaxCheck(true), DXIterationExceeded(0), DXIterationExceededIndex(0), DXIterationFailed(0), DXIterationFailedIndex(0),
+              DXCyclingIterationExceeded(0), DXCyclingIterationExceededIndex(0), DXCyclingIterationFailed(0), DXCyclingIterationFailedIndex(0),
+              DXHeatIterationExceeded(0), DXHeatIterationExceededIndex(0), DXHeatIterationFailed(0), DXHeatIterationFailedIndex(0),
+              DXHeatCyclingIterationExceeded(0), DXHeatCyclingIterationExceededIndex(0), DXHeatCyclingIterationFailed(0),
+              DXHeatCyclingIterationFailedIndex(0), HXDXIterationExceeded(0), HXDXIterationExceededIndex(0), HXDXIterationFailed(0),
+              HXDXIterationFailedIndex(0), MMDXIterationExceeded(0), MMDXIterationExceededIndex(0), MMDXIterationFailed(0),
               MMDXIterationFailedIndex(0), DMDXIterationExceeded(0), DMDXIterationExceededIndex(0), DMDXIterationFailed(0),
               DMDXIterationFailedIndex(0), CRDXIterationExceeded(0), CRDXIterationExceededIndex(0), CRDXIterationFailed(0),
               CRDXIterationFailedIndex(0), FirstPass(true), plenumIndex(0), mixerIndex(0), changeOverTimer(-1.0), minModeChangeTime(-1.0),
@@ -291,10 +301,10 @@ namespace HVACUnitaryBypassVAV {
     };
 
     void SimUnitaryBypassVAV(EnergyPlusData &state,
-                             std::string const &CompName, // Name of the CBVAV system
-                             bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system time step
-                             int AirLoopNum,              // air loop index
-                             int &CompIndex               // Index to changeover-bypass VAV system
+                             std::string_view CompName, // Name of the CBVAV system
+                             bool FirstHVACIteration,   // TRUE if 1st HVAC simulation of system time step
+                             int AirLoopNum,            // air loop index
+                             int &CompIndex             // Index to changeover-bypass VAV system
     );
 
     void SimCBVAV(EnergyPlusData &state,
@@ -379,6 +389,16 @@ namespace HVACUnitaryBypassVAV {
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     );
 
+    Real64 VSCoilCyclingResidual(EnergyPlusData &state,
+                                 Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                 Array1D<Real64> const &Par  // par(1) = DX coil number
+    );
+
+    Real64 VSCoilSpeedResidual(EnergyPlusData &state,
+                               Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               Array1D<Real64> const &Par // par(1) = DX coil number
+    );
+
 } // namespace HVACUnitaryBypassVAV
 
 struct HVACUnitaryBypassVAVData : BaseGlobalStruct
@@ -398,7 +418,7 @@ struct HVACUnitaryBypassVAVData : BaseGlobalStruct
     Real64 TempSteamIn = 100.0;          // steam coil steam inlet temperature
     Array1D_bool CheckEquipName;
 
-    Array1D<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
+    EPVector<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
     bool GetInputFlag = true; // Flag set to make sure you get input once
 
     bool MyOneTimeFlag = true;    // Initialization flag

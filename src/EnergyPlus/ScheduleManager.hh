@@ -73,16 +73,17 @@ namespace ScheduleManager {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    int const MaxDayTypes(12);
+    int constexpr MaxDayTypes(12);
 
     enum class SchedType : int
     {
-        Unassigned = 0,
+        Invalid = -1,
         ScheduleInput_year = 1,
         ScheduleInput_compact = 2,
         ScheduleInput_file = 3,
         ScheduleInput_constant = 4,
-        ScheduleInput_external = 5
+        ScheduleInput_external = 5,
+        Num
     };
 
     // DERIVED TYPE DEFINITIONS
@@ -93,9 +94,11 @@ namespace ScheduleManager {
 
     enum class ScheduleInterpolation
     {
+        Invalid = -1,
         No,      // no interpolation
         Average, // interpolation only to resolve time intervals not matching timestep lengths (this was previously interpolate:yes)
-        Linear   // linear interpolation from the previous time to the current time for the entire schedule
+        Linear,  // linear interpolation from the previous time to the current time for the entire schedule
+        Num
     };
 
     // Derived Types Variables
@@ -151,16 +154,16 @@ namespace ScheduleManager {
     struct ScheduleData
     {
         // Members
-        std::string Name;                          // Schedule Name
-        int ScheduleTypePtr;                       // Index of Schedule Type
-        Array1D_int WeekSchedulePointer;           // one created for each day of possible simulation
-        SchedType SchType = SchedType::Unassigned; // what kind of object has been input.
-        bool Used;                                 // Indicator for this schedule being "used".
-        bool MaxMinSet;                            // Max/min values have been stored for this schedule
-        Real64 MaxValue;                           // Maximum value for this schedule
-        Real64 MinValue;                           // Minimum value for this schedule
-        Real64 CurrentValue;                       // For Reporting
-        bool EMSActuatedOn;                        // indicates if EMS computed
+        std::string Name;                       // Schedule Name
+        int ScheduleTypePtr;                    // Index of Schedule Type
+        Array1D_int WeekSchedulePointer;        // one created for each day of possible simulation
+        SchedType SchType = SchedType::Invalid; // what kind of object has been input.
+        bool Used;                              // Indicator for this schedule being "used".
+        bool MaxMinSet;                         // Max/min values have been stored for this schedule
+        Real64 MaxValue;                        // Maximum value for this schedule
+        Real64 MinValue;                        // Minimum value for this schedule
+        Real64 CurrentValue;                    // For Reporting
+        bool EMSActuatedOn;                     // indicates if EMS computed
         Real64 EMSValue;
 
         // Default Constructor
@@ -337,6 +340,7 @@ struct ScheduleManagerData : BaseGlobalStruct
     std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
     std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
+    std::map<fs::path, nlohmann::json> UniqueProcessedExternalFiles;
 
     // Integer Variables for the Module
     int NumScheduleTypes = 0;
@@ -361,6 +365,7 @@ struct ScheduleManagerData : BaseGlobalStruct
         UniqueDayScheduleNames.clear();
         UniqueWeekScheduleNames.clear();
         UniqueScheduleNames.clear();
+        UniqueProcessedExternalFiles.clear();
         DoScheduleReportingSetup = true;
 
         NumScheduleTypes = 0;

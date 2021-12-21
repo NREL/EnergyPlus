@@ -4,19 +4,20 @@
 #include <vector>
 #include <memory>
 
-namespace SingleLayerOptics {
+namespace SingleLayerOptics
+{
+    class CThetaLimits
+    {
+    public:
+        explicit CThetaLimits(const std::vector<double> & t_ThetaAngles);
 
-	class CThetaLimits {
-	public:
-		explicit CThetaLimits( const std::vector< double >& t_ThetaAngles );
+        std::shared_ptr<std::vector<double>> getThetaLimits() const;
 
-		std::shared_ptr< std::vector< double > > getThetaLimits() const;
+    private:
+        void createLimits(const std::vector<double> & t_ThetaAngles);
+        std::shared_ptr<std::vector<double>> m_ThetaLimits;
+    };
 
-	private:
-		void createLimits( const std::vector< double >& t_ThetaAngles );
-		std::shared_ptr< std::vector< double > > m_ThetaLimits;
-	};
-
-}
+}   // namespace SingleLayerOptics
 
 #endif

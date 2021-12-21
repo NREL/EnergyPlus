@@ -90,7 +90,7 @@ bool SurfaceOctreeCube::contains(Surface const &surface) const
 }
 
 // Surfaces Outer Cube Initilization
-void SurfaceOctreeCube::init(Array1D<Surface> &surfaces)
+void SurfaceOctreeCube::init(EPVector<Surface> &surfaces)
 {
     assert(d_ == 0u);
     assert(n_ == 0u);

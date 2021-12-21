@@ -4,32 +4,37 @@
 #include <memory>
 #include <map>
 
-namespace FenestrationCommon {
+namespace FenestrationCommon
+{
+    enum class Side;
+    enum class Property;
 
-	enum class Side;
-	enum class Property;
+}   // namespace FenestrationCommon
 
-}
+namespace SingleLayerOptics
+{
+    class CSurface;
 
-namespace SingleLayerOptics {
+    // class to be used for description of single component of the light. By single component it is
+    // assumed that light will not change state (from beam to diffuse) during propagation through
+    // the layer
+    class CLayerSingleComponent
+    {
+    public:
+        CLayerSingleComponent(const double t_Tf,
+                              const double t_Rf,
+                              const double t_Tb,
+                              const double t_Rb);
 
-	class CSurface;
+        double getProperty(const FenestrationCommon::Property t_Property,
+                           const FenestrationCommon::Side t_Side) const;
 
-	// class to be used for description of single component of the light. By single component it is assumed that light 
-	// will not change state (from beam to diffuse) during propagation through the layer
-	class CLayerSingleComponent {
-	public:
-		CLayerSingleComponent( const double t_Tf, const double t_Rf, const double t_Tb, const double t_Rb );
+        std::shared_ptr<CSurface> getSurface(const FenestrationCommon::Side t_Side) const;
 
-		double getProperty( const FenestrationCommon::Property t_Property, const FenestrationCommon::Side t_Side ) const;
+    private:
+        std::map<FenestrationCommon::Side, std::shared_ptr<CSurface>> m_Surface;
+    };
 
-		std::shared_ptr< CSurface > getSurface( const FenestrationCommon::Side t_Side ) const;
-
-	private:
-		std::map< FenestrationCommon::Side, std::shared_ptr< CSurface > > m_Surface;
-
-	};
-
-}
+}   // namespace SingleLayerOptics
 
 #endif

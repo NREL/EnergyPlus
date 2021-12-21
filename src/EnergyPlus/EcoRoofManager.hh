@@ -62,10 +62,10 @@ namespace EcoRoofManager {
     // Functions
 
     void CalcEcoRoof(EnergyPlusData &state,
-                     int const SurfNum, // Indicator of Surface Number for the current surface
-                     int const ZoneNum, // Indicator for zone number where the current surface
-                     int &ConstrNum,    // Indicator for construction index for the current surface
-                     Real64 &TempExt    // Exterior temperature boundary condition
+                     int const SurfNum,   // Indicator of Surface Number for the current surface
+                     int const ZoneNum,   // Indicator for zone number where the current surface
+                     int const ConstrNum, // Indicator for construction index for the current surface
+                     Real64 &TempExt      // Exterior temperature boundary condition
     );
 
     void UpdateSoilProps(EnergyPlusData &state,
@@ -76,13 +76,18 @@ namespace EcoRoofManager {
                          Real64 const SoilThickness,
                          Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
                          Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-                         int &ConstrNum,      // Indicator for construction index for the current surface
+                         int const ConstrNum, // Indicator for construction index for the current surface
                          Real64 &Alphag,
                          int const unit,    // unused1208
                          Real64 const Tg,   // unused1208
                          Real64 const Tf,   // unused1208
                          Real64 const Qsoil // unused1208
     );
+
+    void CalculateEcoRoofSolar(EnergyPlusData &state,
+                               Real64 &RS, // Solar radiation on a horizontal surface (roof)
+                               Real64 &f1, // Solar term in Stomatal Resistance
+                               int const SurfNum);
 
 } // namespace EcoRoofManager
 

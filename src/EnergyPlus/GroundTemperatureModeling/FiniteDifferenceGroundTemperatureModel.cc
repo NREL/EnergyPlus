@@ -73,7 +73,7 @@ namespace EnergyPlus {
 
 // Finite difference model factory
 std::shared_ptr<FiniteDiffGroundTempsModel>
-FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
+FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -99,7 +99,8 @@ FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int obje
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
     // Search through finite diff models here
-    std::string const cCurrentModuleObject = state.dataGrndTempModelMgr->CurrentModuleObjects(objectType_FiniteDiffGroundTemp);
+    std::string const cCurrentModuleObject =
+        state.dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::FiniteDiffGroundTemp));
     int numCurrModels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
@@ -300,7 +301,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
                 airDensity_num += state.dataEnvrn->OutAirDensity;
                 relHum_num += state.dataEnvrn->OutRelHumValue;
                 windSpeed_num += state.dataEnvrn->WindSpeed;
-                horizSolarRad_num += state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad;
+                horizSolarRad_num += max(state.dataEnvrn->SOLCOS(3), 0.0) * state.dataEnvrn->BeamSolarRad + state.dataEnvrn->DifSolarRad;
 
                 state.dataGlobal->BeginHourFlag = false;
                 state.dataGlobal->BeginDayFlag = false;
@@ -550,10 +551,10 @@ void FiniteDiffGroundTempsModel::updateSurfaceCellTemperature(EnergyPlusData &st
     Real64 latentHeatVaporization;
     Real64 evapotransHeatLoss_MJhrmin;
 
-    Real64 const rho_water(998.0);      // [kg/m3]
-    Real64 const airSpecificHeat(1003); // '[J/kg-K]
+    Real64 constexpr rho_water(998.0);      // [kg/m3]
+    Real64 constexpr airSpecificHeat(1003); // '[J/kg-K]
     // evapotranspiration parameters
-    Real64 const absor_Corrected(0.77);
+    Real64 constexpr absor_Corrected(0.77);
     Real64 const convert_Wm2_To_MJhrmin(3600.0 / 1000000.0);
     Real64 const convert_MJhrmin_To_Wm2(1.0 / convert_Wm2_To_MJhrmin);
 
@@ -762,7 +763,7 @@ bool FiniteDiffGroundTempsModel::checkFinalTemperatureConvergence(EnergyPlusData
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool converged = true;
-    Real64 const finalTempConvergenceCriteria = 0.05;
+    Real64 constexpr finalTempConvergenceCriteria = 0.05;
 
     if (state.dataGlobal->FDnumIterYears == maxYearsToIterate) return converged;
 
@@ -797,7 +798,7 @@ bool FiniteDiffGroundTempsModel::checkIterationTemperatureConvergence()
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool converged = true;
-    Real64 const iterationTempConvergenceCriteria = 0.00001;
+    Real64 constexpr iterationTempConvergenceCriteria = 0.00001;
 
     for (int cell = 1; cell <= totalNumCells; ++cell) {
 
@@ -833,14 +834,14 @@ void FiniteDiffGroundTempsModel::initDomain(EnergyPlusData &state)
     std::unique_ptr<KusudaGroundTempsModel> tempModel(new KusudaGroundTempsModel());
 
     tempModel->objectName = "KAModelForFDModel";
-    tempModel->objectType = objectType_KusudaGroundTemp;
+    tempModel->objectType = GroundTempObjType::KusudaGroundTemp;
     tempModel->aveGroundTemp = annualAveAirTemp;
     tempModel->aveGroundTempAmplitude =
         (maxDailyAirTemp - minDailyAirTemp) / 4.0; // Rough estimate here. Ground temps will not swing as far as the air temp.
     tempModel->phaseShiftInSecs = dayOfMinDailyAirTemp * DataGlobalConstants::SecsInDay;
     tempModel->groundThermalDiffisivity = baseConductivity / (baseDensity * baseSpecificHeat);
 
-    // Intialize temperatures and volume
+    // Initialize temperatures and volume
     for (int cell = 1; cell <= totalNumCells; ++cell) {
         auto &thisCell = cellArray(cell);
 

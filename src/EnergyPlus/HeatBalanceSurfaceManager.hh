@@ -96,6 +96,10 @@ namespace HeatBalanceSurfaceManager {
 
     void InitThermalAndFluxHistories(EnergyPlusData &state);
 
+    void EvalOutsideMovableInsulation(EnergyPlusData &state);
+
+    void EvalInsideMovableInsulation(EnergyPlusData &state);
+
     void InitSolarHeatGains(EnergyPlusData &state);
 
     void InitIntSolarDistribution(EnergyPlusData &state);
@@ -119,6 +123,10 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
+    void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+
+    void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, Optional_int_const ZoneToResimulate = _);
+
     void UpdateFinalSurfaceHeatBalance(EnergyPlusData &state);
 
     void UpdateThermalHistories(EnergyPlusData &state);
@@ -133,6 +141,8 @@ namespace HeatBalanceSurfaceManager {
     // *****************************************************************************
 
     void ReportSurfaceHeatBalance(EnergyPlusData &state);
+
+    void ReportNonRepresentativeSurfaceResults(EnergyPlusData &state);
 
     void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
 
@@ -151,7 +161,9 @@ namespace HeatBalanceSurfaceManager {
     void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                     Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    Real64 GetQdotConvOutRepPerArea(EnergyPlusData &state, int SurfNum);
+    Real64 GetSurfQdotRadHVACInPerArea(EnergyPlusData &state, int SurfNum);
+
+    Real64 GetQdotConvOutPerArea(EnergyPlusData &state, const int SurfNum);
 
     void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
@@ -169,8 +181,8 @@ namespace HeatBalanceSurfaceManager {
                                            const std::vector<int> &IZSurfs, // Last zone to simulate
                                            Optional_int_const ZoneToResimulate = _);
 
-    void TestSurfTempCalcHeatBalanceInsideSurf(
-        EnergyPlusData &state, Real64 TH12, DataSurfaces::SurfaceData &surface, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
+    void
+    TestSurfTempCalcHeatBalanceInsideSurf(EnergyPlusData &state, Real64 TH12, int const SurfNum, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
 
     void CalcOutsideSurfTemp(EnergyPlusData &state,
                              int SurfNum,      // Surface number DO loop counter
@@ -203,14 +215,12 @@ struct HeatBalSurfMgr : BaseGlobalStruct
     Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
 
     Array2D<Real64> DiffuseArray;
-    Array1D_bool FirstCalcZone; // for error message
 
     Real64 curQL = 0.0; // radiant value prior to adjustment for pulse for load component report
     Real64 adjQL = 0.0; // radiant value including adjustment for pulse for load component report
 
     bool ManageSurfaceHeatBalancefirstTime = true;
     bool InitSurfaceHeatBalancefirstTime = true;
-    bool ComputeIntSWAbsorpFactorsfirstTime = true; // First time through routine
     bool UpdateThermalHistoriesFirstTimeFlag = true;
     bool CalculateZoneMRTfirstTime = true; // Flag for first time calculations
     bool reportThermalResilienceFirstTime = true;
@@ -252,13 +262,11 @@ struct HeatBalSurfMgr : BaseGlobalStruct
         ZoneAESum.clear();
 
         DiffuseArray.clear();
-        FirstCalcZone.clear();
         curQL = 0.0;
         adjQL = 0.0;
 
         ManageSurfaceHeatBalancefirstTime = true;
         InitSurfaceHeatBalancefirstTime = true;
-        ComputeIntSWAbsorpFactorsfirstTime = true;
         UpdateThermalHistoriesFirstTimeFlag = true;
         CalculateZoneMRTfirstTime = true;
         reportThermalResilienceFirstTime = true;

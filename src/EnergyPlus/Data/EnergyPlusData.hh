@@ -150,7 +150,6 @@ struct HVACControllersData;
 struct HVACCooledBeamData;
 struct HVACCtrlData;
 struct HVACDXHeatPumpSystemData;
-struct HVACDXSystemData;
 struct HVACDuctData;
 struct HVACFanData;
 struct HVACGlobalsData;
@@ -212,7 +211,6 @@ struct OutputReportTabularData;
 struct OutputReportsData;
 struct OutputsData;
 struct OutsideEnergySourcesData;
-struct PVWattsData;
 struct PackagedTerminalHeatPumpData;
 struct PackagedThermalStorageCoilData;
 struct PhotovoltaicStateData;
@@ -248,6 +246,7 @@ struct RoomAirModelAirflowNetworkData;
 struct RoomAirModelData;
 struct RoomAirModelManagerData;
 struct RoomAirModelUserTempPatternData;
+struct RootFindingData;
 struct RuntimeLanguageData;
 struct RuntimeLanguageProcessorData;
 struct SQLiteProceduresData;
@@ -317,6 +316,7 @@ struct ZoneTempPredictorCorrectorData;
 
 struct EnergyPlusData : BaseGlobalStruct
 {
+    bool ready = true;
 
     IOFiles files;
 
@@ -410,7 +410,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<HVACCooledBeamData> dataHVACCooledBeam;
     std::unique_ptr<HVACCtrlData> dataHVACCtrl;
     std::unique_ptr<HVACDXHeatPumpSystemData> dataHVACDXHeatPumpSys;
-    std::unique_ptr<HVACDXSystemData> dataHVACDXSys;
     std::unique_ptr<HVACDuctData> dataHVACDuct;
     std::unique_ptr<HVACFanData> dataHVACFan;
     std::unique_ptr<HVACGlobalsData> dataHVACGlobal;
@@ -472,7 +471,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<OutputReportsData> dataOutputReports;
     std::unique_ptr<OutputsData> dataOutput;
     std::unique_ptr<OutsideEnergySourcesData> dataOutsideEnergySrcs;
-    std::unique_ptr<PVWattsData> dataPVWatts;
     std::unique_ptr<PackagedTerminalHeatPumpData> dataPTHP;
     std::unique_ptr<PackagedThermalStorageCoilData> dataPackagedThermalStorageCoil;
     std::unique_ptr<PhotovoltaicStateData> dataPhotovoltaicState;
@@ -508,6 +506,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<RoomAirModelData> dataRoomAirMod;
     std::unique_ptr<RoomAirModelManagerData> dataRoomAirModelMgr;
     std::unique_ptr<RoomAirModelUserTempPatternData> dataRoomAirModelTempPattern;
+    std::unique_ptr<RootFindingData> dataRootFinder;
     std::unique_ptr<RuntimeLanguageData> dataRuntimeLang;
     std::unique_ptr<RuntimeLanguageProcessorData> dataRuntimeLangProcessor;
     std::unique_ptr<SQLiteProceduresData> dataSQLiteProcedures;

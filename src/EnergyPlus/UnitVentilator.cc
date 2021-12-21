@@ -80,17 +80,15 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 
@@ -134,11 +132,31 @@ namespace UnitVentilator {
     using namespace Psychrometrics;
     using namespace FluidProperties;
 
-    static std::string const fluidNameSteam("STEAM");
-    static std::string const fluidNameWater("WATER");
+    static constexpr std::string_view fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameWater("WATER");
+
+    // Parameters for outside air control types:
+    int constexpr Heating_ElectricCoilType = 1;
+    int constexpr Heating_GasCoilType = 2;
+    int constexpr Heating_WaterCoilType = 3;
+    int constexpr Heating_SteamCoilType = 4;
+    int constexpr Cooling_CoilWaterCooling = 1;
+    int constexpr Cooling_CoilDetailedCooling = 2;
+    int constexpr Cooling_CoilHXAssisted = 3;
+    // OA operation modes
+    int constexpr VariablePercent = 1;
+    int constexpr FixedTemperature = 2;
+    int constexpr FixedOAControl = 3;
+    // coil operation
+    int constexpr On = 1; // normal coil operation
+
+    int constexpr NoneOption = 0;
+    int constexpr BothOption = 1;
+    int constexpr HeatingOption = 2;
+    int constexpr CoolingOption = 3;
 
     void SimUnitVentilator(EnergyPlusData &state,
-                           std::string const &CompName,   // name of the fan coil unit
+                           std::string_view CompName,     // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -167,7 +185,7 @@ namespace UnitVentilator {
         if (CompIndex == 0) {
             UnitVentNum = UtilityRoutines::FindItemInList(CompName, state.dataUnitVentilators->UnitVent);
             if (UnitVentNum == 0) {
-                ShowFatalError(state, "SimUnitVentilator: Unit not found=" + CompName);
+                ShowFatalError(state, "SimUnitVentilator: Unit not found=" + std::string{CompName});
             }
             CompIndex = UnitVentNum;
         } else {
@@ -246,15 +264,11 @@ namespace UnitVentilator {
         using Fans::GetFanVolFlow;
         using HVACHXAssistedCoolingCoil::GetHXCoilTypeAndName;
 
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterCooling;
-        using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::AutoSize;
         using SingleDuct::GetATMixer;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetUnitVentilatorInput: "); // include trailing blank
+        static constexpr std::string_view RoutineName("GetUnitVentilatorInput: "); // include trailing blank
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);      // Set to true if errors in input, fatal at end of routine
@@ -277,7 +291,6 @@ namespace UnitVentilator {
         Array1D_string cNumericFields; // Numeric field names
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        int CtrlZone;                  // index to loop counter
         int NodeNum;                   // index to loop counter
         bool ZoneNodeNotFound;         // used in error checking
 
@@ -330,7 +343,7 @@ namespace UnitVentilator {
             } else {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid");
                     ShowContinueError(state, "not found: " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -345,7 +358,8 @@ namespace UnitVentilator {
             state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr = GetScheduleIndex(state, Alphas(4)); // convert schedule name to pointer
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr == 0) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                    "\", invalid");
                 ShowContinueError(state, "not found: " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
                 ErrorsFound = true;
             }
@@ -357,27 +371,29 @@ namespace UnitVentilator {
             {
                 auto const SELECT_CASE_var(Alphas(3));
                 if (SELECT_CASE_var == "VARIABLEPERCENT") {
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = state.dataUnitVentilators->VariablePercent;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = VariablePercent;
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName = Alphas(5);
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr =
                         GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr == 0) {
-                        ShowSevereError(
-                            state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(
                             state, "not found:" + cAlphaFields(5) + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
                     } else if (!CheckScheduleValueMinMax(
                                    state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
-                        ShowSevereError(
-                            state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state,
                                           "out of range [0,1]: " + cAlphaFields(5) + "=\"" +
                                               state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == "FIXEDAMOUNT") {
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = state.dataUnitVentilators->FixedOAControl;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = FixedOAControl;
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName = Alphas(5);
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr =
                         GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
@@ -386,29 +402,32 @@ namespace UnitVentilator {
                         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                         ErrorsFound = true;
                     } else if (!CheckScheduleValueMinMax(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0)) {
-                        ShowSevereError(
-                            state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state,
                                           "out of range [0,1]: " + cAlphaFields(5) + "=\"" +
                                               state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == "FIXEDTEMPERATURE") {
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = state.dataUnitVentilators->FixedTemperature;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType = FixedTemperature;
                     state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedName = Alphas(5);
                     state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr =
                         GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr == 0) {
-                        ShowSevereError(
-                            state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state,
                                           " not found: " + cAlphaFields(5) + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName +
                                               "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(
-                        state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                        "\", invalid");
                     ShowContinueError(state, "Illegal " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
                 }
             }
@@ -429,7 +448,7 @@ namespace UnitVentilator {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsParent);
             state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode = GetOnlySingleNode(state,
                                                                                             Alphas(7),
@@ -438,7 +457,7 @@ namespace UnitVentilator {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            1,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
 
             // Get AirTerminal mixer data
@@ -455,6 +474,14 @@ namespace UnitVentilator {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_SupplySide) {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists = true;
             }
+            state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+                state, DataZoneEquipment::ZoneEquip::UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr == 0) {
+                ShowSevereError(
+                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\",");
+                ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
+                ErrorsFound = true;
+            }
 
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode = GetOnlySingleNode(state,
@@ -464,7 +491,7 @@ namespace UnitVentilator {
                                                                                                Alphas(1),
                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                                               1,
+                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             }
 
@@ -513,7 +540,7 @@ namespace UnitVentilator {
                                 if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
                                     FanVolFlow < state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow) {
                                     ShowSevereError(state,
-                                                    RoutineName + CurrentModuleObject + "=\"" +
+                                                    std::string{RoutineName} + CurrentModuleObject + "=\"" +
                                                         state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                                     ShowContinueError(state,
                                                       format("...air flow rate [{:.7T}] in fan object {} is less than the unit ventilator maximum "
@@ -527,13 +554,13 @@ namespace UnitVentilator {
                                     ErrorsFound = true;
                                 } else if (FanVolFlow == AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize) {
                                     ShowWarningError(state,
-                                                     RoutineName + CurrentModuleObject + "=\"" +
+                                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
                                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                                     ShowContinueError(state, "...the fan flow rate is autosized while the unit ventilator flow rate is not.");
                                     ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                                 } else if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow == AutoSize) {
                                     ShowWarningError(state,
-                                                     RoutineName + CurrentModuleObject + "=\"" +
+                                                     std::string{RoutineName} + CurrentModuleObject + "=\"" +
                                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                                     ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
                                     ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
@@ -554,7 +581,8 @@ namespace UnitVentilator {
                             }
                         } else {
                             ShowSevereError(state,
-                                            RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                             ShowContinueError(state, "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume.");
                             ErrorsFound = true;
                         }
@@ -571,7 +599,8 @@ namespace UnitVentilator {
                     if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
                         FanVolFlow < state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow) {
                         ShowSevereError(state,
-                                        RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError(
                             state,
                             format(
@@ -584,12 +613,14 @@ namespace UnitVentilator {
                         ErrorsFound = true;
                     } else if (FanVolFlow == AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize) {
                         ShowWarningError(state,
-                                         RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError(state, "...the fan flow rate is autosized while the unit ventilator flow rate is not.");
                         ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                     } else if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow == AutoSize) {
                         ShowWarningError(state,
-                                         RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
                         ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                     }
@@ -612,12 +643,12 @@ namespace UnitVentilator {
                                       Alphas(1),
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                      1,
+                                      NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 if (!lAlphaBlanks(8)) {
                     CheckAndAddAirNodeNumber(state, state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode, IsValid);
                     if (!IsValid) {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + ", Adding " + cAlphaFields(8) + '=' + Alphas(8));
+                        ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + ", Adding " + cAlphaFields(8) + '=' + Alphas(8));
                     }
                 }
 
@@ -628,7 +659,7 @@ namespace UnitVentilator {
                                                                                                    Alphas(1),
                                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                                    DataLoopNode::NodeConnectionType::ReliefAir,
-                                                                                                   1,
+                                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                                    ObjectIsNotParent);
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutNode = GetOnlySingleNode(state,
@@ -638,14 +669,14 @@ namespace UnitVentilator {
                                                                                                     Alphas(1),
                                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                    1,
+                                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
             } else {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode;
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutNode = state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode;
                 if (!lAlphaBlanks(8) || !lAlphaBlanks(9) || !lAlphaBlanks(10)) {
                     ShowWarningError(state,
-                                     RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
                                          "\" is connected to central DOA.");
                     if (!lAlphaBlanks(8)) {
                         ShowContinueError(state, "... input field " + cAlphaFields(8) + " should have been blank. Specified = " + Alphas(8));
@@ -659,7 +690,7 @@ namespace UnitVentilator {
                 }
             }
 
-            if (state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType == state.dataUnitVentilators->FixedOAControl) {
+            if (state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType == FixedOAControl) {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow = state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow;
                 state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName = state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedName;
                 state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr =
@@ -725,16 +756,17 @@ namespace UnitVentilator {
             {
                 auto const SELECT_CASE_var(Alphas(13));
                 if (SELECT_CASE_var == "HEATINGANDCOOLING") {
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = state.dataUnitVentilators->BothOption;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = BothOption;
                 } else if (SELECT_CASE_var == "HEATING") {
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = state.dataUnitVentilators->HeatingOption;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = HeatingOption;
                 } else if (SELECT_CASE_var == "COOLING") {
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = state.dataUnitVentilators->CoolingOption;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = CoolingOption;
                 } else if (SELECT_CASE_var == "NONE") {
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = state.dataUnitVentilators->NoneOption;
+                    state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = NoneOption;
                 } else {
-                    ShowSevereError(
-                        state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                        "\", invalid");
                     ShowContinueError(state, "illegal value: " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                     ErrorsFound = true;
                 }
@@ -770,8 +802,8 @@ namespace UnitVentilator {
             }
 
             // Get Coil information
-            if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->BothOption ||
-                state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->HeatingOption) {
+            if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == BothOption ||
+                state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == HeatingOption) {
                 // Heating coil information:
                 // A14, \field Heating Coil Object Type
                 //      \type choice
@@ -791,19 +823,19 @@ namespace UnitVentilator {
                     {
                         auto const SELECT_CASE_var(cHeatingCoilType);
                         if (SELECT_CASE_var == "COIL:HEATING:WATER") {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_WaterCoilType;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = Heating_WaterCoilType;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
                         } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_SteamCoilType;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = Heating_SteamCoilType;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
                         } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_ElectricCoilType;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = Heating_ElectricCoilType;
                         } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_GasCoilType;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = Heating_GasCoilType;
                         } else {
                             ShowSevereError(state,
-                                            RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                                "\", invalid");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                             ShowContinueError(state, "illegal value: " + cAlphaFields(15) + "=\"" + Alphas(15) + "\".");
                             ErrorsFound = true;
                             errFlag = true;
@@ -821,11 +853,11 @@ namespace UnitVentilator {
                         } else {
                             // The heating coil control node is necessary for a hot water coil, but not necessary for an
                             // electric or gas coil.
-                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_WaterCoilType ||
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_SteamCoilType) {
+                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_WaterCoilType ||
+                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_SteamCoilType) {
                                 // mine the hot water or steam node from the coil object
                                 errFlag = false;
-                                if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_WaterCoilType) {
+                                if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_WaterCoilType) {
                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode = GetCoilWaterInletNode(
                                         state, "Coil:Heating:Water", state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName, errFlag);
                                 } else {
@@ -859,34 +891,34 @@ namespace UnitVentilator {
                     {
                         auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType);
 
-                        if (SELECT_CASE_var == state.dataUnitVentilators->Heating_WaterCoilType) {
+                        if (SELECT_CASE_var == Heating_WaterCoilType) {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow = GetWaterCoilMaxFlowRate(
                                 state, "Coil:Heating:Water", state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName, ErrorsFound);
                             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow =
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow;
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->Heating_SteamCoilType) {
+                        } else if (SELECT_CASE_var == Heating_SteamCoilType) {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow = GetSteamCoilMaxFlowRate(
                                 state, "Coil:Heating:Steam", state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName, ErrorsFound);
                             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow =
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow;
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->Heating_ElectricCoilType) {
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->Heating_GasCoilType) {
+                        } else if (SELECT_CASE_var == Heating_ElectricCoilType) {
+                        } else if (SELECT_CASE_var == Heating_GasCoilType) {
                         } else {
                         }
                     }
                 } else { // heating coil is required for these options
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
                                         "\", missing heating coil");
                     ShowContinueError(state, "a heating coil is required for " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                     ErrorsFound = true;
                 } // IF (.NOT. lAlphaBlanks(15)) THEN - from the start of heating coil information
             }     // is option both or heating only
 
-            if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->BothOption ||
-                state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->CoolingOption) {
+            if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == BothOption ||
+                state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == CoolingOption) {
                 // Cooling coil information (if one is present):
                 // A16, \field Cooling Coil Object Type
                 //      \type choice
@@ -905,15 +937,16 @@ namespace UnitVentilator {
                     {
                         auto const SELECT_CASE_var(cCoolingCoilType);
                         if (SELECT_CASE_var == "COIL:COOLING:WATER") {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType = state.dataUnitVentilators->Cooling_CoilWaterCooling;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType = Cooling_CoilWaterCooling;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
                             state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName = Alphas(18);
                         } else if (SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType = state.dataUnitVentilators->Cooling_CoilDetailedCooling;
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType = Cooling_CoilDetailedCooling;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType =
+                                DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                             state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName = Alphas(18);
                         } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType = state.dataUnitVentilators->Cooling_CoilHXAssisted;
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType = Cooling_CoilHXAssisted;
                             GetHXCoilTypeAndName(state,
                                                  cCoolingCoilType,
                                                  Alphas(18),
@@ -921,14 +954,15 @@ namespace UnitVentilator {
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantType,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName);
                             if (UtilityRoutines::SameString(state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantType, "Coil:Cooling:Water")) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
+                                state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
                             } else if (UtilityRoutines::SameString(state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantType,
                                                                    "Coil:Cooling:Water:DetailedGeometry")) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
+                                state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType =
+                                    DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                             } else {
                                 ShowSevereError(state,
-                                                RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                                    "\", invalid");
+                                                std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                    state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                                 ShowContinueError(state, "For: " + cAlphaFields(17) + "=\"" + Alphas(17) + "\".");
                                 ShowContinueError(state,
                                                   "Invalid Coil Type=" + state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantType +
@@ -938,8 +972,8 @@ namespace UnitVentilator {
                             }
                         } else {
                             ShowSevereError(state,
-                                            RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                                "\", invalid");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                             ShowContinueError(state, "illegal value: " + cAlphaFields(17) + "=\"" + cCoolingCoilType + "\".");
                             ErrorsFound = true;
                             errFlag = true;
@@ -956,7 +990,7 @@ namespace UnitVentilator {
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\".");
                             ErrorsFound = true;
                         } else {
-                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType != state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType != Cooling_CoilHXAssisted) {
                                 // mine the cold water node from the coil object
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).ColdControlNode =
                                     GetCoilWaterInletNode(state,
@@ -989,16 +1023,16 @@ namespace UnitVentilator {
                     {
                         auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType);
 
-                        if (SELECT_CASE_var == state.dataUnitVentilators->Cooling_CoilWaterCooling) {
+                        if (SELECT_CASE_var == Cooling_CoilWaterCooling) {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow = GetWaterCoilMaxFlowRate(
                                 state, "Coil:Cooling:Water", state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName, ErrorsFound);
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->Cooling_CoilDetailedCooling) {
+                        } else if (SELECT_CASE_var == Cooling_CoilDetailedCooling) {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow =
                                 GetWaterCoilMaxFlowRate(state,
                                                         "Coil:Cooling:Water:DetailedGeometry",
                                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                         ErrorsFound);
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+                        } else if (SELECT_CASE_var == Cooling_CoilHXAssisted) {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow =
                                 GetHXAssistedCoilFlowRate(state,
                                                           "CoilSystem:Cooling:Water:HeatExchangerAssisted",
@@ -1009,7 +1043,7 @@ namespace UnitVentilator {
                     }
                 } else { // Cooling Coil is required for this/these options
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
                                         "\", missing cooling coil");
                     ShowContinueError(state, "a cooling coil is required for " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                     ErrorsFound = true;
@@ -1018,37 +1052,47 @@ namespace UnitVentilator {
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
                 // check that unit ventilator air inlet node is the same as a zone exhaust node
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                            ZoneNodeNotFound = false;
-                            break;
-                        }
+                for (NodeNum = 1;
+                     NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumExhaustNodes;
+                     ++NodeNum) {
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ExhaustNode(NodeNum)) {
+                        ZoneNodeNotFound = false;
+                        break;
                     }
                 }
                 if (ZoneNodeNotFound) {
-                    ShowSevereError(state,
-                                    CurrentModuleObject + " = \"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                        "\". Unit ventilator air inlet node name must be the same as a zone exhaust node name.");
-                    ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
-                    ShowContinueError(state,
-                                      "..Unit ventilator air inlet node name = " +
-                                          state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
-                    ErrorsFound = true;
+                    bool InletNodeFound = false;
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr > 0) {
+                        InletNodeFound = ZonePlenum::ValidateInducedNode(
+                            state,
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumReturnNodes,
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ReturnNode);
+                    }
+                    if (!InletNodeFound) {
+                        ShowSevereError(
+                            state,
+                            CurrentModuleObject + " = \"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                "\". Unit ventilator air inlet node name must be the same either as a zone exhaust node name or an induce "
+                                "air node in ZoePlenum.");
+                        ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                        ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                        ShowContinueError(state,
+                                          "..Unit ventilator unit air inlet node name = " +
+                                              state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
+                        ErrorsFound = true;
+                    }
                 }
                 // check that unit ventilator air outlet node is the same as a zone inlet node.
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                            ZoneNodeNotFound = false;
-                            break;
-                        }
+                for (NodeNum = 1;
+                     NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                     ++NodeNum) {
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                        ZoneNodeNotFound = false;
+                        break;
                     }
                 }
                 if (ZoneNodeNotFound) {
@@ -1065,15 +1109,13 @@ namespace UnitVentilator {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_InletSide) {
                     // check that unit ventilator air outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                                ZoneNodeNotFound = false;
-                                break;
-                            }
+                    for (NodeNum = 1;
+                         NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                         ++NodeNum) {
+                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                            ZoneNodeNotFound = false;
+                            break;
                         }
                     }
                     if (ZoneNodeNotFound) {
@@ -1116,15 +1158,13 @@ namespace UnitVentilator {
 
                     // check that air teminal mixer outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode ==
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                                ZoneNodeNotFound = false;
-                                break;
-                            }
+                    for (NodeNum = 1;
+                         NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                         ++NodeNum) {
+                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode ==
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                            ZoneNodeNotFound = false;
+                            break;
                         }
                     }
                     if (ZoneNodeNotFound) {
@@ -1136,12 +1176,51 @@ namespace UnitVentilator {
                                           "..Air terminal mixer outlet node name = " +
                                               state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode));
                         ErrorsFound = true;
+                    } else {
+                        bool ExhastNodeNotFound = true;
+                        // check exhaust node
+                        for (NodeNum = 1;
+                             NodeNum <=
+                             state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumExhaustNodes;
+                             ++NodeNum) {
+                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
+                                state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ExhaustNode(NodeNum)) {
+                                ExhastNodeNotFound = false;
+                                break;
+                            }
+                        }
+                        // check induce node
+                        if (ExhastNodeNotFound) {
+                            bool InletNodeFound = false;
+                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr > 0) {
+                                InletNodeFound = ZonePlenum::ValidateInducedNode(
+                                    state,
+                                    state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumReturnNodes,
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ReturnNode);
+                            }
+                            if (!InletNodeFound) {
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                    state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                ShowContinueError(
+                                    state,
+                                    "..UnitVentilator inlet node name must be the same as either a zone exhaust node name or an induced "
+                                    "air node in ZonePlenum.");
+                                ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
+                                ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
+                                ShowContinueError(state,
+                                                  "..UnitVentilator inlet node name = " +
+                                                      state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode));
+                                ErrorsFound = true;
+                            }
+                        }
                     }
                 }
             }
             {
                 auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption);
-                if (SELECT_CASE_var == state.dataUnitVentilators->BothOption) { // 'HeatingAndCooling'
+                if (SELECT_CASE_var == BothOption) { // 'HeatingAndCooling'
                     // Add cooling coil to component sets array when present
                     SetUpCompSets(state,
                                   CurrentModuleObject,
@@ -1160,7 +1239,7 @@ namespace UnitVentilator {
                                   "UNDEFINED",
                                   state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode));
 
-                } else if (SELECT_CASE_var == state.dataUnitVentilators->HeatingOption) { // 'Heating'
+                } else if (SELECT_CASE_var == HeatingOption) { // 'Heating'
                     // Add heating coil to component sets array when no cooling coil present
                     SetUpCompSets(state,
                                   CurrentModuleObject,
@@ -1170,7 +1249,7 @@ namespace UnitVentilator {
                                   state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode),
                                   state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode));
 
-                } else if (SELECT_CASE_var == state.dataUnitVentilators->CoolingOption) { // 'Cooling'
+                } else if (SELECT_CASE_var == CoolingOption) { // 'Cooling'
                     // Add cooling coil to component sets array when no heating coil present
                     SetUpCompSets(state,
                                   CurrentModuleObject,
@@ -1180,7 +1259,7 @@ namespace UnitVentilator {
                                   state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode),
                                   state.dataLoopNodes->NodeID(state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode));
 
-                } else if (SELECT_CASE_var == state.dataUnitVentilators->NoneOption) {
+                } else if (SELECT_CASE_var == NoneOption) {
 
                 } else {
                 }
@@ -1195,7 +1274,7 @@ namespace UnitVentilator {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(state, RoutineName + "Errors found in input.");
+        if (ErrorsFound) ShowFatalError(state, std::string{RoutineName} + "Errors found in input.");
 
         // Setup Report variables for the Unit Ventilators, CurrentModuleObject='ZoneHVAC:UnitVentilator'
         for (UnitVentNum = 1; UnitVentNum <= state.dataUnitVentilators->NumOfUnitVents; ++UnitVentNum) {
@@ -1203,73 +1282,73 @@ namespace UnitVentilator {
                                 "Zone Unit Ventilator Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).HeatPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).HeatEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Total Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).TotCoolPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).TotCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).SensCoolEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).ElecPower,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             // Note that the unit vent fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).ElecEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus,
-                                "System",
-                                "Average",
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num == FanType_SimpleOnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Ventilator Fan Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataUnitVentilators->UnitVent(UnitVentNum).FanPartLoadRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             }
         }
@@ -1282,7 +1361,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -1291,7 +1370,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
             } else {
@@ -1301,7 +1380,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -1310,7 +1389,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
             }
@@ -1323,7 +1402,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -1332,7 +1411,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
             } else {
@@ -1342,7 +1421,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -1351,7 +1430,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
             }
@@ -1382,18 +1461,14 @@ namespace UnitVentilator {
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataPlant::TypeOf_CoilSteamAirHeating;
-        using DataPlant::TypeOf_CoilWaterCooling;
-        using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
-        using DataPlant::TypeOf_CoilWaterSimpleHeating;
+
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::UnitVentilator_Num;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         using namespace DataZoneEnergyDemands;
 
-        static std::string const RoutineName("InitUnitVentilator");
+        static constexpr std::string_view RoutineName("InitUnitVentilator");
 
         int AirRelNode;  // relief air node number in unit ventilator loop
         int ColdConNode; // cold water control node number in unit ventilator loop
@@ -1426,21 +1501,22 @@ namespace UnitVentilator {
 
         if (allocated(ZoneComp)) {
             if (state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
                     state.dataUnitVentilators->UnitVent(UnitVentNum).AvailManagerListName;
-                ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
                 state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum) = false;
             }
-            state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus = ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
+            state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
         }
 
         if (state.dataUnitVentilators->MyPlantScanFlag(UnitVentNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
-                (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
+            if ((state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) ||
+                (state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
-                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_PlantTypeNum,
+                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
@@ -1464,12 +1540,12 @@ namespace UnitVentilator {
                         .Comp(state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum)
                         .NodeNumOut;
             }
-            if ((state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
-                (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
+            if ((state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
+                (state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantName,
-                                        state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum,
+                                        state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopNum,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CWLoopSide,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).CWBranchNum,
@@ -1559,7 +1635,7 @@ namespace UnitVentilator {
 
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilPresent) { // Only initialize these if a heating coil is actually present
 
-                if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_WaterCoilType) {
+                if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_WaterCoilType) {
 
                     rho = GetDensityGlycol(state,
                                            state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidName,
@@ -1582,7 +1658,7 @@ namespace UnitVentilator {
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum);
                 }
-                if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_SteamCoilType) {
+                if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_SteamCoilType) {
                     TempSteamIn = 100.00;
                     SteamDensity = GetSatDensityRefrig(
                         state, fluidNameSteam, TempSteamIn, 1.0, state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_FluidIndex, RoutineName);
@@ -1752,7 +1828,7 @@ namespace UnitVentilator {
         using SteamCoils::GetCoilSteamOutletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeUnitVentilator");
+        static constexpr std::string_view RoutineName("SizeUnitVentilator");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1833,22 +1909,22 @@ namespace UnitVentilator {
         DoWaterCoilSizing = false;
         CoilNum = 0;
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index;
         // unit ventilator is always blow thru
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
-        if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->BothOption) {
+        if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == BothOption) {
             state.dataSize->ZoneCoolingOnlyFan = true;
             state.dataSize->ZoneHeatingOnlyFan = true;
-        } else if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->HeatingOption) {
+        } else if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == HeatingOption) {
             state.dataSize->ZoneHeatingOnlyFan = true;
-        } else if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->CoolingOption) {
+        } else if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == CoolingOption) {
             state.dataSize->ZoneCoolingOnlyFan = true;
-        } else if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->NoneOption) {
+        } else if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == NoneOption) {
         }
 
         if (state.dataSize->CurZoneEqNum > 0) {
@@ -1992,7 +2068,7 @@ namespace UnitVentilator {
                     // DataScalableSizingON = false;
                 } else {
 
-                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption != state.dataUnitVentilators->NoneOption) {
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption != NoneOption) {
                         if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
                             SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
                             SizingMethod = CoolingAirflowSizing;
@@ -2138,7 +2214,7 @@ namespace UnitVentilator {
                 PrintFlag = true;
                 FieldNum = 1;
                 SizingString = state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames(FieldNum) + " [m3/s]";
-                if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->NoneOption) {
+                if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == NoneOption) {
 
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow == AutoSize) {
                         TempSize = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
@@ -2278,7 +2354,7 @@ namespace UnitVentilator {
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_WaterCoilType) {
+        if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_WaterCoilType) {
             if (state.dataSize->CurZoneEqNum > 0) {
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow > 0.0) {
@@ -2440,7 +2516,7 @@ namespace UnitVentilator {
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_SteamCoilType) {
+        if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_SteamCoilType) {
             if (state.dataSize->CurZoneEqNum > 0) {
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow > 0.0) {
@@ -2587,9 +2663,9 @@ namespace UnitVentilator {
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == state.dataUnitVentilators->Cooling_CoilWaterCooling ||
-            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == state.dataUnitVentilators->Cooling_CoilDetailedCooling ||
-            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+        if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == Cooling_CoilWaterCooling ||
+            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == Cooling_CoilDetailedCooling ||
+            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
 
             if (state.dataSize->CurZoneEqNum > 0) {
                 if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
@@ -2603,7 +2679,7 @@ namespace UnitVentilator {
                 } else {
                     CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
 
-                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
                         CoolingCoilName = GetHXDXCoilName(state,
                                                           state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                                                           state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
@@ -2763,7 +2839,7 @@ namespace UnitVentilator {
         }
 
         // set the design air flow rates for the heating and cooling coils
-        if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+        if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
             CoolingCoilName = GetHXDXCoilName(state,
                                               state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                                               state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
@@ -2853,20 +2929,18 @@ namespace UnitVentilator {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitVentilator_Num;
         using General::SolveRoot;
         using HeatingCoils::CheckHeatingCoilSchedule;
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::CheckSteamCoilSchedule;
-        using TempSolveRoot::SolveRoot;
         using WaterCoils::CheckWaterCoilSchedule;
 
-        Real64 const LowTempDiff(0.1); // Smallest allowed temperature difference for comparisons
+        Real64 constexpr LowTempDiff(0.1); // Smallest allowed temperature difference for comparisons
         // (below this value the temperatures are assumed equal)
-        Real64 const LowOAFracDiff(0.01); // Smallest allowed outside air fraction difference for comparison
+        Real64 constexpr LowOAFracDiff(0.01); // Smallest allowed outside air fraction difference for comparison
         // (below this value the fractions are assumed equal)
-        int const MaxIter(50); // maximum number of iterations
+        int constexpr MaxIter(50); // maximum number of iterations
 
         Real64 AirMassFlow;   // air mass flow rate [kg/sec]
         int AirRelNode;       // outside air relief node
@@ -2899,56 +2973,56 @@ namespace UnitVentilator {
 
         {
             auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption);
-            if (SELECT_CASE_var == state.dataUnitVentilators->BothOption) {
+            if (SELECT_CASE_var == BothOption) {
 
                 {
                     auto const SELECT_CASE_var1(state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType);
 
-                    if (SELECT_CASE_var1 == state.dataUnitVentilators->Heating_WaterCoilType) {
+                    if (SELECT_CASE_var1 == Heating_WaterCoilType) {
                         CheckWaterCoilSchedule(state,
                                                "Coil:Heating:Water",
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Heating_SteamCoilType) {
+                    } else if (SELECT_CASE_var1 == Heating_SteamCoilType) {
                         CheckSteamCoilSchedule(state,
                                                "Coil:Heating:Steam",
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Heating_ElectricCoilType) {
+                    } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
                         CheckHeatingCoilSchedule(state,
                                                  "Coil:Heating:Electric",
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Heating_GasCoilType) {
+                    } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
                         CheckHeatingCoilSchedule(state,
                                                  "Coil:Heating:Fuel",
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
                     } else {
-                        //      CALL ShowFatalError(state, 'Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
+                        //      CALL ShowFatalError(state, 'Illegal coil type='//TRIM(UnitVent(UnitVentNum)%Type))
                     }
                 }
 
                 {
                     auto const SELECT_CASE_var1(state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType);
 
-                    if (SELECT_CASE_var1 == state.dataUnitVentilators->Cooling_CoilWaterCooling) {
+                    if (SELECT_CASE_var1 == Cooling_CoilWaterCooling) {
                         CheckWaterCoilSchedule(state,
                                                "Coil:Cooling:Water",
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilSchedValue,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Cooling_CoilDetailedCooling) {
+                    } else if (SELECT_CASE_var1 == Cooling_CoilDetailedCooling) {
                         CheckWaterCoilSchedule(state,
                                                "Coil:Cooling:Water:DetailedGeometry",
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilSchedValue,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+                    } else if (SELECT_CASE_var1 == Cooling_CoilHXAssisted) {
                         CheckHXAssistedCoolingCoilSchedule(state,
                                                            "CoilSystem:Cooling:Water:HeatExchangerAssisted",
                                                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
@@ -2959,58 +3033,58 @@ namespace UnitVentilator {
                     }
                 }
 
-            } else if (SELECT_CASE_var == state.dataUnitVentilators->HeatingOption) {
+            } else if (SELECT_CASE_var == HeatingOption) {
 
                 {
                     auto const SELECT_CASE_var1(state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType);
 
-                    if (SELECT_CASE_var1 == state.dataUnitVentilators->Heating_WaterCoilType) {
+                    if (SELECT_CASE_var1 == Heating_WaterCoilType) {
                         CheckWaterCoilSchedule(state,
                                                "Coil:Heating:Water",
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Heating_SteamCoilType) {
+                    } else if (SELECT_CASE_var1 == Heating_SteamCoilType) {
                         CheckSteamCoilSchedule(state,
                                                "Coil:Heating:Steam",
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Heating_ElectricCoilType) {
+                    } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
                         CheckHeatingCoilSchedule(state,
                                                  "Coil:Heating:Electric",
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Heating_GasCoilType) {
+                    } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
                         CheckHeatingCoilSchedule(state,
                                                  "Coil:Heating:Fuel",
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilSchedValue,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
                     } else {
-                        //      CALL ShowFatalError(state, 'Illegal coil type='//TRIM(UnitVent(UnitVentNum)%HCoilType))
+                        //      CALL ShowFatalError(state, 'Illegal coil type='//TRIM(UnitVent(UnitVentNum)%Type))
                     }
                 }
 
-            } else if (SELECT_CASE_var == state.dataUnitVentilators->CoolingOption) {
+            } else if (SELECT_CASE_var == CoolingOption) {
 
                 {
                     auto const SELECT_CASE_var1(state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType);
 
-                    if (SELECT_CASE_var1 == state.dataUnitVentilators->Cooling_CoilWaterCooling) {
+                    if (SELECT_CASE_var1 == Cooling_CoilWaterCooling) {
                         CheckWaterCoilSchedule(state,
                                                "Coil:Cooling:Water",
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilSchedValue,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Cooling_CoilDetailedCooling) {
+                    } else if (SELECT_CASE_var1 == Cooling_CoilDetailedCooling) {
                         CheckWaterCoilSchedule(state,
                                                "Coil:Cooling:Water:DetailedGeometry",
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilSchedValue,
                                                state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index);
-                    } else if (SELECT_CASE_var1 == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+                    } else if (SELECT_CASE_var1 == Cooling_CoilHXAssisted) {
                         CheckHXAssistedCoolingCoilSchedule(state,
                                                            "CoilSystem:Cooling:Water:HeatExchangerAssisted",
                                                            state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
@@ -3021,7 +3095,7 @@ namespace UnitVentilator {
                     }
                 }
 
-            } else if (SELECT_CASE_var == state.dataUnitVentilators->NoneOption) {
+            } else if (SELECT_CASE_var == NoneOption) {
             }
         }
 
@@ -3097,14 +3171,12 @@ namespace UnitVentilator {
                 MinSteamFlow = state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotSteamFlow;
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
-                if (!FirstHVACIteration &&
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_WaterCoilType) {
+                if (!FirstHVACIteration && state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_WaterCoilType) {
                     MaxWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
                     MinWaterFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
                 }
 
-                if (!FirstHVACIteration &&
-                    state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == state.dataUnitVentilators->Heating_SteamCoilType) {
+                if (!FirstHVACIteration && state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_SteamCoilType) {
                     MaxSteamFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMaxAvail;
                     MinSteamFlow = state.dataLoopNodes->Node(ControlNode).MassFlowRateMinAvail;
                 }
@@ -3130,13 +3202,13 @@ namespace UnitVentilator {
                     {
                         auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType);
 
-                        if (SELECT_CASE_var == state.dataUnitVentilators->FixedOAControl) {
+                        if (SELECT_CASE_var == FixedOAControl) {
                             // In this control type, the outdoor air flow rate is fixed to the minimum value
                             // which is equal to the maximum value, regardless of all the other conditions.
 
                             state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->VariablePercent) {
+                        } else if (SELECT_CASE_var == VariablePercent) {
                             // This algorithm is probably a bit simplistic in that it just bounces
                             // back and forth between the maximum outside air and the minimum.  In
                             // REAL(r64)ity, a system *might* vary between the two based on the load in
@@ -3154,7 +3226,7 @@ namespace UnitVentilator {
                                 state.dataUnitVentilators->OAMassFlowRate = MaxOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
                             }
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->FixedTemperature) {
+                        } else if (SELECT_CASE_var == FixedTemperature) {
                             // In heating mode, the outside air for "fixed temperature" attempts
                             // to control the outside air fraction so that a desired temperature
                             // is met (if possible).  If this desired temperature is between the
@@ -3226,17 +3298,17 @@ namespace UnitVentilator {
                     {
                         auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType);
 
-                        if (SELECT_CASE_var == state.dataUnitVentilators->FixedOAControl) {
+                        if (SELECT_CASE_var == FixedOAControl) {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->VariablePercent) {
+                        } else if (SELECT_CASE_var == VariablePercent) {
                             // In heating mode, the outside air for "variable percent" control
                             // is set to the minimum value
                             state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->FixedTemperature) {
+                        } else if (SELECT_CASE_var == FixedTemperature) {
                             // In heating mode, the outside air for "fixed temperature" attempts
                             // to control the outside air fraction so that a desired temperature
                             // is met (if possible).  If this desired temperature is between the
@@ -3305,7 +3377,7 @@ namespace UnitVentilator {
                                 if (FirstHVACIteration) Par(2) = 1.0;
                                 Par(3) = double(OpMode);
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
                             }
                         }
 
@@ -3318,7 +3390,7 @@ namespace UnitVentilator {
                         {
                             auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType);
 
-                            if (SELECT_CASE_var == state.dataUnitVentilators->Heating_WaterCoilType) {
+                            if (SELECT_CASE_var == Heating_WaterCoilType) {
                                 // control water flow to obtain output matching QZnReq
                                 ControlCompOutput(state,
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
@@ -3341,9 +3413,8 @@ namespace UnitVentilator {
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
                                                   state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum);
 
-                            } else if ((SELECT_CASE_var == state.dataUnitVentilators->Heating_GasCoilType) ||
-                                       (SELECT_CASE_var == state.dataUnitVentilators->Heating_ElectricCoilType) ||
-                                       (SELECT_CASE_var == state.dataUnitVentilators->Heating_SteamCoilType)) {
+                            } else if ((SELECT_CASE_var == Heating_GasCoilType) || (SELECT_CASE_var == Heating_ElectricCoilType) ||
+                                       (SELECT_CASE_var == Heating_SteamCoilType)) {
 
                                 CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut);
                             }
@@ -3387,12 +3458,12 @@ namespace UnitVentilator {
                     {
                         auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType);
 
-                        if (SELECT_CASE_var == state.dataUnitVentilators->FixedOAControl) {
+                        if (SELECT_CASE_var == FixedOAControl) {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->VariablePercent) {
+                        } else if (SELECT_CASE_var == VariablePercent) {
 
                             state.dataUnitVentilators->OAMassFlowRate = SetOAMassFlowRateForCoolingVariablePercent(
                                 state,
@@ -3403,7 +3474,7 @@ namespace UnitVentilator {
                                 Tinlet,
                                 Toutdoor);
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->FixedTemperature) {
+                        } else if (SELECT_CASE_var == FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
                             Tdesired = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
                             MaxOAFrac = 1.0;
@@ -3467,12 +3538,12 @@ namespace UnitVentilator {
                     {
                         auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).OAControlType);
 
-                        if (SELECT_CASE_var == state.dataUnitVentilators->FixedOAControl) {
+                        if (SELECT_CASE_var == FixedOAControl) {
                             // In this control type, the outdoor air flow rate is fixed to the maximum value
                             // which is equal to the minimum value, regardless of all the other conditions.
                             state.dataUnitVentilators->OAMassFlowRate = MinOAFrac * state.dataLoopNodes->Node(OutsideAirNode).MassFlowRate;
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->VariablePercent) {
+                        } else if (SELECT_CASE_var == VariablePercent) {
 
                             state.dataUnitVentilators->OAMassFlowRate = SetOAMassFlowRateForCoolingVariablePercent(
                                 state,
@@ -3483,7 +3554,7 @@ namespace UnitVentilator {
                                 Tinlet,
                                 Toutdoor);
 
-                        } else if (SELECT_CASE_var == state.dataUnitVentilators->FixedTemperature) {
+                        } else if (SELECT_CASE_var == FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
                             Tdesired = GetCurrentScheduleValue(state, state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr);
 
@@ -3641,7 +3712,6 @@ namespace UnitVentilator {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitVentilator_Num;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PlantUtilities::SetComponentFlowRate;
@@ -3711,11 +3781,11 @@ namespace UnitVentilator {
             }
 
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
-                if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+                if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                              FirstHVACIteration,
-                                             state.dataUnitVentilators->On,
+                                             On,
                                              0.0,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index,
                                              ContFanCycCoil);
@@ -3732,14 +3802,14 @@ namespace UnitVentilator {
                 {
                     auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType);
 
-                    if (SELECT_CASE_var == state.dataUnitVentilators->Heating_WaterCoilType) {
+                    if (SELECT_CASE_var == Heating_WaterCoilType) {
 
                         SimulateWaterCoilComponents(state,
                                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                     FirstHVACIteration,
                                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index);
 
-                    } else if (SELECT_CASE_var == state.dataUnitVentilators->Heating_SteamCoilType) {
+                    } else if (SELECT_CASE_var == Heating_SteamCoilType) {
 
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
@@ -3760,8 +3830,7 @@ namespace UnitVentilator {
                                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HCoil_Index,
                                                     QCoilReq);
 
-                    } else if ((SELECT_CASE_var == state.dataUnitVentilators->Heating_ElectricCoilType) ||
-                               (SELECT_CASE_var == state.dataUnitVentilators->Heating_GasCoilType)) {
+                    } else if ((SELECT_CASE_var == Heating_ElectricCoilType) || (SELECT_CASE_var == Heating_GasCoilType)) {
 
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
@@ -3836,11 +3905,11 @@ namespace UnitVentilator {
                                      state.dataUnitVentilators->UnitVent(UnitVentNum).CWBranchNum,
                                      state.dataUnitVentilators->UnitVent(UnitVentNum).CWCompNum);
 
-                if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == state.dataUnitVentilators->Cooling_CoilHXAssisted) {
+                if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                              FirstHVACIteration,
-                                             state.dataUnitVentilators->On,
+                                             On,
                                              PartLoadRatio,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index,
                                              FanOpMode);
@@ -3860,7 +3929,7 @@ namespace UnitVentilator {
                 {
                     auto const SELECT_CASE_var(state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType);
 
-                    if (SELECT_CASE_var == state.dataUnitVentilators->Heating_WaterCoilType) {
+                    if (SELECT_CASE_var == Heating_WaterCoilType) {
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
                             mdot = 0.0;
@@ -3891,7 +3960,7 @@ namespace UnitVentilator {
                                                     FanOpMode,
                                                     PartLoadRatio);
 
-                    } else if (SELECT_CASE_var == state.dataUnitVentilators->Heating_SteamCoilType) {
+                    } else if (SELECT_CASE_var == Heating_SteamCoilType) {
 
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
@@ -3924,8 +3993,7 @@ namespace UnitVentilator {
                                                     FanOpMode,
                                                     PartLoadRatio);
 
-                    } else if ((SELECT_CASE_var == state.dataUnitVentilators->Heating_ElectricCoilType) ||
-                               (SELECT_CASE_var == state.dataUnitVentilators->Heating_GasCoilType)) {
+                    } else if ((SELECT_CASE_var == Heating_ElectricCoilType) || (SELECT_CASE_var == Heating_GasCoilType)) {
 
                         if (!state.dataUnitVentilators->HCoilOn) {
                             QCoilReq = 0.0;
@@ -4342,7 +4410,7 @@ namespace UnitVentilator {
         // Check to see what outside air will do, "turn off" cooling coil if OA can handle the load
         int CCoilInAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).FanOutletNode;
         int AirInNode = state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode;
-        Real64 const SmallLoad = -1.0; // Watts
+        Real64 constexpr SmallLoad = -1.0; // Watts
         Real64 CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(AirInNode).HumRat);
         QCoilReq = QZnReq - state.dataLoopNodes->Node(CCoilInAirNode).MassFlowRate * CpAirZn *
                                 (state.dataLoopNodes->Node(CCoilInAirNode).Temp - state.dataLoopNodes->Node(AirInNode).Temp);

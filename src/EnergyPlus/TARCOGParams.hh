@@ -65,45 +65,63 @@ int constexpr maxlay2(maxlay * 2);  // maximum number of glass surfaces (maxlay*
 int constexpr maxlay3(maxlay2 + 1); // maximum number of ? (maxlay2+1)
 
 //  Layer types:
-extern int const SPECULAR;
-extern int const VENETBLIND_VERT;
-extern int const WOVSHADE;
-extern int const PERFORATED;
-extern int const DIFFSHADE;
-extern int const BSDF;
-extern int const VENETBLIND_HORIZ;
-
-extern int const MinLayType;
-extern int const MaxLayType;
+enum class TARCOGLayerType : int
+{
+    Invalid = -1,
+    SPECULAR,
+    VENETBLIND_HORIZ,
+    WOVSHADE,
+    PERFORATED,
+    DIFFSHADE,
+    BSDF,
+    VENETBLIND_VERT,
+    Num
+};
 
 //  Thermal models:
-extern int const THERM_MOD_ISO15099;
-extern int const THERM_MOD_SCW;
-extern int const THERM_MOD_CSM;
+enum class TARCOGThermalModel : int
+{
+    Invalid = -1,
+    ISO15099,
+    SCW,
+    CSM,
+    CSM_WithSDThickness,
+    Num
+};
 
-extern int const YES_SupportPillar;
+int constexpr YES_SupportPillar = 1;
 
 // Deflection parameters
-extern int const NO_DEFLECTION_CALCULATION;
-extern int const DEFLECTION_CALC_TEMPERATURE;
-extern int const DEFLECTION_CALC_GAP_WIDTHS;
+enum class DeflectionCalculation : int
+{
+    Invalid = -1,
+    NONE,
+    TEMPERATURE,
+    GAP_WIDTHS,
+    Num
+};
 
 // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
-// will perform. By equation, these numbers will go to infinite and some test showed that going to nmax and mmax
+// will perform. By equation, these numbers will go to infinite and some test showed that going to NMax and MMax
 // values would produce enough precision
-extern int const mmax; // top m value for which "deflection sum" will be calculated
-extern int const nmax; // top n value for which "deflection sum" will be calculated
 
-//  CalcForcedVentilation flag:
-//  0 = Skip forced ventilation calc
-//  1 = Allow forced ventilation calc
-extern int const CalcForcedVentilation;
+constexpr int MMax = 5; // top m value for which "deflection sum" will be calculated
+constexpr int NMax = 5; // top n value for which "deflection sum" will be calculated
+
+enum class CalcForcedVentilation
+{
+    Invalid = -1,
+    Skip,
+    Allow,
+    Num
+};
 
 //  Calculation outcome
 enum class CalculationOutcome
 {
-    Unknown,
-    OK
+    Invalid = -1,
+    OK,
+    Num
 };
 
 int constexpr NumOfIterations(100);

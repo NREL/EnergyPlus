@@ -124,7 +124,7 @@ This numeric field is used to specify the number of different speed levels avail
 
 \paragraph{Field Set: (Speed Flow Fraction, Speed Electric Power Fraction)}\label{fieldset-flow-power-fractions-fansysmodel}
 
-This input object is extensible with a set of two fields for each speed that the fan can take.  A field set is pair of values for the flow fraction and electric power fraction at each speed. The sets should be arranged in increasing order so that the flow fractions become larger in subsequent field sets.  Typically the highest speed level will match the design maximum and have fractions of 1.0.
+A field set is pair of values for the flow fraction and electric power fraction at each speed. The sets should be arranged in increasing order so that the flow fractions become larger in subsequent field sets.  Typically the highest speed level will match the design maximum and have fractions of 1.0.  This object is extensible, so additional sets of the following two fields can be added to the end of this object.
 
 \paragraph{Field: Speed <\#> Flow Fraction}\label{field-speed-flow-fraction-fansysmodel}
 This is the flow fraction for the fan speed. This value is multiplied by the Design Maximum Air Flow Rate to obtain the flow rate when operating at this speed.

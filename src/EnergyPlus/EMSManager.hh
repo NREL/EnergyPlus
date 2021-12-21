@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -67,21 +68,23 @@ namespace EMSManager {
 
     enum class SPControlType
     {
-        iTemperatureSetPoint,      // integer for node setpoint control type
-        iTemperatureMinSetPoint,   // integer for node setpoint control type
-        iTemperatureMaxSetPoint,   // integer for node setpoint control type
-        iHumidityRatioSetPoint,    // integer for node setpoint control type
-        iHumidityRatioMinSetPoint, // integer for node setpoint control type
-        iHumidityRatioMaxSetPoint, // integer for node setpoint control type
-        iMassFlowRateSetPoint,     // integer for node setpoint control type
-        iMassFlowRateMinSetPoint,  // integer for node setpoint control type
-        iMassFlowRateMaxSetPoint   // integer for node setpoint control type
+        Invalid = -1,
+        TemperatureSetPoint,      // integer for node setpoint control type
+        TemperatureMinSetPoint,   // integer for node setpoint control type
+        TemperatureMaxSetPoint,   // integer for node setpoint control type
+        HumidityRatioSetPoint,    // integer for node setpoint control type
+        HumidityRatioMinSetPoint, // integer for node setpoint control type
+        HumidityRatioMaxSetPoint, // integer for node setpoint control type
+        MassFlowRateSetPoint,     // integer for node setpoint control type
+        MassFlowRateMinSetPoint,  // integer for node setpoint control type
+        MassFlowRateMaxSetPoint,  // integer for node setpoint control type
+        Num
     };
 
     // Parameters for EMS Calling Points
     enum class EMSCallFrom
     {
-        Unassigned,
+        Invalid = -1,
         ZoneSizing,
         SystemSizing,
         BeginNewEnvironment,
@@ -101,7 +104,8 @@ namespace EMSManager {
         UnitarySystemSizing,
         BeginZoneTimestepBeforeInitHeatBalance,
         BeginZoneTimestepAfterInitHeatBalance,
-        BeginZoneTimestepBeforeSetCurrentWeather
+        BeginZoneTimestepBeforeSetCurrentWeather,
+        Num
     };
 
     void CheckIfAnyEMS(EnergyPlusData &state);
@@ -120,7 +124,8 @@ namespace EMSManager {
 
     void ProcessEMSInput(EnergyPlusData &state, bool reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
-    void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
+    void GetVariableTypeAndIndex(
+        EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, OutputProcessor::VariableType &VarType, int &VarIndex);
 
     void EchoOutActuatorKeyChoices(EnergyPlusData &state);
 
@@ -131,7 +136,7 @@ namespace EMSManager {
     void UpdateEMSTrendVariables(EnergyPlusData &state);
 
     std::string controlTypeName(SPControlType SetPointType); // Maps int to the std::string equivalent
-                                                             // (eg iTemperatureSetPoint => "Temperature Setpoint")
+                                                             // (eg TemperatureSetPoint => "Temperature Setpoint")
 
     bool CheckIfNodeSetPointManaged(EnergyPlusData &state,
                                     int NodeNum, // index of node being checked.
@@ -173,34 +178,34 @@ namespace EMSManager {
 //  ScheduleManager and OutputProcessor. Followed pattern used for SetupOutputVariable
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       Real64 &rValue);
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       int &iValue);
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       bool &lValue);
 
 void SetupEMSInternalVariable(
-    EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue);
+    EnergyPlusData &state, std::string_view cDataTypeName, std::string_view cUniqueIDName, std::string_view cUnits, Real64 &rValue);
 
 void SetupEMSInternalVariable(
-    EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue);
+    EnergyPlusData &state, std::string_view cDataTypeName, std::string_view cUniqueIDName, std::string_view cUnits, int &iValue);
 
 struct EMSManagerData : BaseGlobalStruct
 {

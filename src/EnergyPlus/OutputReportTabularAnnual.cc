@@ -172,7 +172,7 @@ void AnnualTable::setupGathering(EnergyPlusData &state)
 // input fields, and ems variables are gathered.
 {
     int keyCount = 0;
-    int typeVar = 0;
+    OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::NotFound;
     OutputProcessor::StoreType avgSumVar;
     OutputProcessor::TimeStepType stepTypeVar;
     OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
@@ -338,7 +338,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
     std::vector<AnnualFieldSet>::iterator fldStRemainIt;
     for (unsigned int row = 0; row != m_objectNames.size(); row++) { // loop through by row.
         for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
-            int curTypeOfVar = fldStIt->m_typeOfVar;
+            OutputProcessor::VariableType curTypeOfVar = fldStIt->m_typeOfVar;
             OutputProcessor::TimeStepType curStepType = fldStIt->m_varStepType;
             if (curStepType == kindOfTimeStep) // this is a much simpler conditional than the code in monthly gathering
             {
@@ -498,7 +498,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                                 break; // for fldStRemainIt
                             } else if (fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::valueWhenMaxMin) {
                                 // this case is when the value should be set
-                                int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
+                                OutputProcessor::VariableType scanTypeOfVar = fldStRemainIt->m_typeOfVar;
                                 // int scanStepType = fldStRemainIt->m_varStepType;
                                 int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
                                 if (scanVarNum > 0) {
@@ -518,7 +518,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                     // and accumulate
                     if (activeHoursShown) {
                         for (fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); ++fldStRemainIt) {
-                            int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
+                            OutputProcessor::VariableType scanTypeOfVar = fldStRemainIt->m_typeOfVar;
                             // int scanStepType = fldStRemainIt->m_varStepType;
                             int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
                             Real64 oldScanValue = fldStRemainIt->m_cell[row].result;
@@ -607,7 +607,7 @@ void AnnualTable::resetGathering()
 Real64 AnnualTable::getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
 {
     Real64 elapsedTime;
-    if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
+    if (kindOfTimeStep == OutputProcessor::TimeStepType::Zone) {
         elapsedTime = state.dataHVACGlobal->TimeStepSys;
     } else {
         elapsedTime = state.dataGlobal->TimeStepZone;
@@ -618,7 +618,7 @@ Real64 AnnualTable::getElapsedTime(EnergyPlusData &state, OutputProcessor::TimeS
 Real64 AnnualTable::getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep)
 {
     Real64 secondsInTimeStep;
-    if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
+    if (kindOfTimeStep == OutputProcessor::TimeStepType::Zone) {
         secondsInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     } else {
         secondsInTimeStep = state.dataGlobal->TimeStepZoneSec;
@@ -630,7 +630,7 @@ void WriteAnnualTables(EnergyPlusData &state)
 {
     auto &annualTables(state.dataOutputReportTabularAnnual->annualTables);
     for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
-        OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
+        OutputReportTabular::UnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
         bool produceTabular = true;
         bool produceSQLite = false;
         if (produceDualUnitsFlags(
@@ -647,7 +647,7 @@ void WriteAnnualTables(EnergyPlusData &state)
     }
 }
 
-void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para)
+void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para)
 {
     Array1D_string columnHead;
     Array1D_int columnWidth;
@@ -714,7 +714,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsS
             curAggString = " {" + trim(curAggString) + '}';
         }
         // do the unit conversions
-        if (unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
+        if (unitsStyle == OutputReportTabular::UnitsStyle::InchPound) {
             varNameWithUnits = fldStIt->m_variMeter + unitEnumToStringBrackets(fldStIt->m_varUnits);
             OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
             OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
@@ -832,7 +832,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsS
                 curUnits += "/s";
             }
             fixUnitsPerSecond(curUnits, curConversionFactor);
-            columnHead(columnRecount - 1) = fldStIt->m_colHead + curAggString + '[' + curUnits + ']';
+            columnHead(columnRecount - 1) = fldStIt->m_colHead + curAggString + " [" + curUnits + ']';
             columnHead(columnRecount) = fldStIt->m_colHead + " {TIMESTAMP} ";
             minVal = storedMaxVal;
             maxVal = storedMinVal;
@@ -1030,20 +1030,20 @@ std::vector<std::string> AnnualTable::setupAggString()
     return retStringVec;
 }
 
-Real64 AnnualTable::setEnergyUnitStringAndFactor(OutputReportTabular::iUnitsStyle const unitsStyle, std::string &unitString)
+Real64 AnnualTable::setEnergyUnitStringAndFactor(OutputReportTabular::UnitsStyle const unitsStyle, std::string &unitString)
 {
     Real64 convFactor;
     // set the unit conversion
-    if (unitsStyle == OutputReportTabular::iUnitsStyle::None) {
+    if (unitsStyle == OutputReportTabular::UnitsStyle::None) {
         unitString = "J";
         convFactor = 1.0;
-    } else if (unitsStyle == OutputReportTabular::iUnitsStyle::JtoKWH) {
+    } else if (unitsStyle == OutputReportTabular::UnitsStyle::JtoKWH) {
         unitString = "kWh";
         convFactor = 1.0 / 3600000.0;
-    } else if (unitsStyle == OutputReportTabular::iUnitsStyle::JtoMJ) {
+    } else if (unitsStyle == OutputReportTabular::UnitsStyle::JtoMJ) {
         unitString = "MJ";
         convFactor = 1.0 / 1000000.0;
-    } else if (unitsStyle == OutputReportTabular::iUnitsStyle::JtoGJ) {
+    } else if (unitsStyle == OutputReportTabular::UnitsStyle::JtoGJ) {
         unitString = "GJ";
         convFactor = 1.0 / 1000000000.0;
     } else { // Should never happen but assures compilers of initialization
@@ -1190,11 +1190,11 @@ void AnnualTable::addTableOfContents(std::ostream &nameOfStream)
                  << "</a>    |   \n";
 }
 
-void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const &unitsStyle_para)
+void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::UnitsStyle const unitsStyle_para)
 {
     std::vector<AnnualFieldSet>::iterator fldStIt;
-    Real64 const veryLarge = 1.0E280;
-    Real64 const verySmall = -1.0E280;
+    Real64 constexpr veryLarge = 1.0E280;
+    Real64 constexpr verySmall = -1.0E280;
     for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
         int curAgg = fldStIt->m_aggregate;
         // for columns with binning aggregation types compute the statistics
@@ -1281,7 +1281,7 @@ bool AnnualTable::allRowsSameSizeDefferedVectors(std::vector<AnnualFieldSet>::it
 
 void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
                                                 std::vector<AnnualFieldSet>::iterator fldStIt,
-                                                OutputReportTabular::iUnitsStyle const unitsStyle)
+                                                OutputReportTabular::UnitsStyle const unitsStyle)
 {
     Real64 curConversionFactor;
     Real64 curConversionOffset;
@@ -1293,8 +1293,8 @@ void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
     Real64 curIP;
     Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
     // do the unit conversions
-    if (unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
-        varNameWithUnits = fldStIt->m_variMeter + '[' + unitEnumToString(fldStIt->m_varUnits) + ']';
+    if (unitsStyle == OutputReportTabular::UnitsStyle::InchPound) {
+        varNameWithUnits = fldStIt->m_variMeter + " [" + unitEnumToString(fldStIt->m_varUnits) + ']';
         OutputReportTabular::LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
         OutputReportTabular::GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     } else { // just do the Joule conversion
@@ -1363,9 +1363,9 @@ void AnnualTable::columnHeadersToTitleCase(EnergyPlusData &state)
         if (fldStIt->m_variMeter == fldStIt->m_colHead) {
             if (fldStIt->m_indexesForKeyVar.size() > 0) {
                 int varNum = fldStIt->m_indexesForKeyVar[0];
-                if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Real) {
+                if (fldStIt->m_typeOfVar == OutputProcessor::VariableType::Real) {
                     fldStIt->m_colHead = state.dataOutputProcessor->RVariableTypes(varNum).VarNameOnly;
-                } else if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Meter) {
+                } else if (fldStIt->m_typeOfVar == OutputProcessor::VariableType::Meter) {
                     fldStIt->m_colHead = state.dataOutputProcessor->EnergyMeters(varNum).Name;
                 }
             }
@@ -1407,7 +1407,7 @@ std::vector<std::string> AnnualTable::inspectTableFieldSets(int fldIndex)
     std::string outStr = std::to_string(fldSt.m_showDigits);
     // ints
     ret.push_back(outStr);
-    outStr = std::to_string(fldSt.m_typeOfVar);
+    outStr = std::to_string(static_cast<int>(fldSt.m_typeOfVar));
     ret.push_back(outStr);
     outStr = std::to_string(fldSt.m_keyCount);
     ret.push_back(outStr);

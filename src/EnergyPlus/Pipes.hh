@@ -54,7 +54,9 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -71,30 +73,30 @@ namespace Pipes {
 
         // Members
         std::string Name;
-        int TypeOf;        // type of pipe
-        int InletNodeNum;  // Node number on the inlet side of the plant
-        int OutletNodeNum; // Node number on the inlet side of the plant
-        int LoopNum;       // Index of plant loop where this pipe resides
-        int LoopSide;      // Index of plant loop side where this pipe resides
-        int BranchIndex;   // Index of plant Branch index where this pipe resides
-        int CompIndex;     // Index of plant Comp index where this pipe resides
-        bool OneTimeInit;
+        DataPlant::PlantEquipmentType Type; // type of pipe
+        int InletNodeNum;                   // Node number on the inlet side of the plant
+        int OutletNodeNum;                  // Node number on the inlet side of the plant
+        int LoopNum;                        // Index of plant loop where this pipe resides
+        int LoopSide;                       // Index of plant loop side where this pipe resides
+        int BranchIndex;                    // Index of plant Branch index where this pipe resides
+        int CompIndex;                      // Index of plant Comp index where this pipe resides
         bool CheckEquipName;
         bool EnvrnFlag;
 
         // Default Constructor
         LocalPipeData()
-            : TypeOf(0), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0), OneTimeInit(true),
+            : Type(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0),
               CheckEquipName(true), EnvrnFlag(true)
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
         void simulate([[maybe_unused]] EnergyPlusData &states,
                       const PlantLocation &calledFromLocation,
                       bool FirstHVACIteration,
                       Real64 &CurLoad,
                       bool RunFlag) override;
+        void oneTimeInit_new(EnergyPlusData &state) override;
         void oneTimeInit(EnergyPlusData &state) override;
         void initEachEnvironment(EnergyPlusData &state) const;
     };
@@ -106,7 +108,7 @@ namespace Pipes {
 struct PipesData : BaseGlobalStruct
 {
     bool GetPipeInputFlag = true;
-    Array1D<Pipes::LocalPipeData> LocalPipe;
+    EPVector<Pipes::LocalPipeData> LocalPipe;
     std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
     void clear_state() override

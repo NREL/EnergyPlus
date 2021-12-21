@@ -13,22 +13,27 @@ This will give the following display of options:
       -a, --annual                 Force annual simulation
       -c, --convert                Output IDF->epJSON or epJSON->IDF, dependent on
                                    input file type
-      -d, --output-directory ARG   Output directory path (default: current directory)
+      -d, --output-directory ARG   Output directory path (default: current
+                                   directory)
       -D, --design-day             Force design-day-only simulation
       -h, --help                   Display help information
       -i, --idd ARG                Input data dictionary path (default: Energy+.idd
                                    in executable directory)
+      -j, --jobs ARG               Multi-thread with N threads; 1 thread with no
+                                   arg.
       -m, --epmacro                Run EPMacro prior to simulation
       -p, --output-prefix ARG      Prefix for output file names (default: eplus)
       -r, --readvars               Run ReadVarsESO after simulation
       -s, --output-suffix ARG      Suffix style for output file names (default: L)
-                                      L: Legacy (e.g., eplustbl.csv)
-                                      C: Capital (e.g., eplusTable.csv)
-                                      D: Dash (e.g., eplus-table.csv)
+                                   L: Legacy (e.g., eplustbl.csv)
+                                   C: Capital (e.g., eplusTable.csv)
+                                   D: Dash (e.g., eplus-table.csv)
       -v, --version                Display version information
       -w, --weather ARG            Weather file path (default: in.epw in current
-                                   directory))
+                                   directory)
       -x, --expandobjects          Run ExpandObjects prior to simulation
+      --convert-only               Only convert IDF->epJSON or epJSON->IDF,
+                                   dependent on input file type. No simulation
     Example: energyplus -w weather.epw -r input.idf
 
 EnergyPlus can be run by specifying a number of options followed by the path to the input file (`input-file`). The file itself is usually in IDF (Input Data File) format, but it may also be in IMF (Input Macro File) format to be run with EPMacro using the `--epmacro` option.
@@ -53,6 +58,12 @@ The options generally fall into four categories:
 4. Input override switches:
    - `annual`
    - `design-day`
+   - `jobs`
+
+Notes
+-----
+
+As of V9.6, the `--jobs` option is only configured to increase thread usage for `GroundHeatExchanger:System` objects with the g-Function calculation method set to `UBHWTcalc`. As EnergyPlus continues to evolve, this may be adapted to control other features or models.
 
 Examples
 --------

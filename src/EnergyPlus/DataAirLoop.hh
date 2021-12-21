@@ -55,7 +55,9 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -234,7 +236,7 @@ namespace DataAirLoop {
         int OAControllerIndex;        // OA controller index in OAController
         Array1D_string ComponentName;
         Array1D_string ComponentType;
-        Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
+        Array1D<SimAirServingZones::CompType> ComponentTypeEnum; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
         std::vector<HVACSystemData *> compPointer;
@@ -245,7 +247,7 @@ namespace DataAirLoop {
         Array1D_int OutletNodeNum;   // component outlet node number
         bool HeatExchangerFlag;      // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum;          // AirLoopHVAC:DedicatedOutdoorAirSystem number
-        bool DXCoolingCoilFlag;      // True with DX cooling coil
+        bool DXCoolingCoilFlag;      // True with DX cooling coil, not used
 
         // Default Constructor
         OutsideAirSysProps()
@@ -285,14 +287,14 @@ struct DataAirLoopData : BaseGlobalStruct
     bool AirLoopInputsFilled = false; // Set to TRUE after first pass through air loop
     Real64 LoopDXCoilRTF = 0.0;       // OnOff fan run time fraction in an HVAC Air Loop
 
-    Array1D<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-    Array1D<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
-    Array1D<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-    Array1D<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
-    Array1D<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
-    Array1D<DataAirLoop::AirLoopFlowData> AirLoopFlow;
-    Array1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
-    Array1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
+    EPVector<DataAirLoop::AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    EPVector<DataAirLoop::AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    EPVector<DataAirLoop::DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    EPVector<DataAirLoop::AirLooptoZoneData> AirLoopZoneInfo;
+    EPVector<DataAirLoop::AirLoopControlData> AirLoopControlInfo;
+    EPVector<DataAirLoop::AirLoopFlowData> AirLoopFlow;
+    EPVector<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
+    EPVector<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
 
     void clear_state() override
     {

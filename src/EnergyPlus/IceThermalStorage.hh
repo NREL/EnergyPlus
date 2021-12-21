@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -66,28 +67,36 @@ namespace IceThermalStorage {
 
     enum class IceStorageType
     {
+        Invalid = -1,
         Simple,
-        Detailed
+        Detailed,
+        Num
     };
 
     enum class CurveVars
     {
+        Invalid = -1,
         FracChargedLMTD,
         FracDischargedLMTD,
         LMTDMassFlow,
-        LMTDFracCharged
+        LMTDFracCharged,
+        Num
     };
 
     enum class DetIce
     {
-        InsideMelt, // Inside melt system--charge starting with bare coil
-        OutsideMelt // Outside melt system--charge from existing ice layer on coil
+        Invalid = -1,
+        InsideMelt,  // Inside melt system--charge starting with bare coil
+        OutsideMelt, // Outside melt system--charge from existing ice layer on coil
+        Num
     };
 
     enum class ITSType
     {
+        Invalid = -1,
         IceOnCoilInternal,
-        IceOnCoilExternal
+        IceOnCoilExternal,
+        Num
     };
 
     struct SimpleIceStorageData : PlantComponent
@@ -150,7 +159,7 @@ namespace IceThermalStorage {
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitSimpleIceStorage(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void CalcIceStorageDormant(EnergyPlusData &state);
 
@@ -252,7 +261,7 @@ namespace IceThermalStorage {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void InitDetailedIceStorage(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void SimDetailedIceStorage(EnergyPlusData &state);
 
@@ -293,8 +302,8 @@ struct IceThermalStorageData : BaseGlobalStruct
     int NumSimpleIceStorage = 0;
     int NumDetailedIceStorage = 0;
     int TotalNumIceStorage = 0;
-    Array1D<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
-    Array1D<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
+    EPVector<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
+    EPVector<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
 
     void clear_state() override
     {

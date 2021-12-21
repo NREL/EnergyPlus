@@ -766,8 +766,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:Node,",
         "    Main Cooling Coil 1 Condenser Node,  !- Name",
@@ -977,6 +976,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -993,6 +993,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1026,6 +1027,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1042,6 +1044,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1058,6 +1061,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1114,6 +1118,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -1130,6 +1135,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1146,6 +1152,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1162,6 +1169,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1178,6 +1186,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1194,6 +1203,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -1718,8 +1728,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    OA Sys 1,                !- Name",
         "    OA Sys 1 Controllers,    !- Controller List Name",
-        "    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name",
-        "    VAV Sys 1 Avail List;    !- Availability Manager List Name",
+        "    OA Sys 1 Equipment;      !- Outdoor Air Equipment List Name",
 
         "  OutdoorAir:Node,",
         "    Main Cooling Coil 1 Condenser Node,  !- Name",
@@ -2180,6 +2189,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -2196,6 +2206,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2212,6 +2223,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2228,6 +2240,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2244,6 +2257,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2260,6 +2274,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space,                    !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2320,6 +2335,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " SunExposed,               !- Sun Exposure",
@@ -2336,6 +2352,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " CEILING,                  !- Surface Type",
         " CLNG-1,                   !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Outdoors,                 !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2352,6 +2369,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " FLOOR,                    !- Surface Type",
         " FLOOR-SLAB-1,             !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Ground,                   !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2368,6 +2386,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2384,6 +2403,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2400,6 +2420,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         " WALL,                     !- Surface Type",
         " INT-WALL-1,               !- Construction Name",
         " Space2,                   !- Zone Name",
+        "    ,                        !- Space Name",
         " Adiabatic,                !- Outside Boundary Condition",
         " ,                         !- Outside Boundary Condition Object",
         " NoSun,                    !- Sun Exposure",
@@ -2545,11 +2566,11 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag = false;
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag2 = false;
     // Current occupancy
-    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 1;
+    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 0.72, 0.0001);
     // Design occupancy
-    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 2;
+    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::ByDesignLevel;
     state->dataHeatBal->Zone(1).TotOccupants = 10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 1.32, 0.0001);
@@ -2613,7 +2634,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag = false;
     state->dataSingleDuct->SysATMixer(1).OneTimeInitFlag2 = false;
     // Current occupancy
-    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 1;
+    state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
 
     // InletSideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
     state->dataSingleDuct->SysATMixer(1).MixerType = DataHVACGlobals::ATMixer_InletSide;

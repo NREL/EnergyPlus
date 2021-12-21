@@ -96,11 +96,9 @@ namespace SizingManager {
                                     int &NumAlphas,
                                     Array1D<Real64> const &rNumericArgs,
                                     int &NumNumbers,
-                                    Array1D_bool const &lNumericFieldBlanks, // Unused
                                     Array1D_bool const &lAlphaFieldBlanks,
                                     Array1D_string const &cAlphaFieldNames,
-                                    Array1D_string const &cNumericFieldNames, // Unused
-                                    bool &ErrorsFound                         // If errors found in input
+                                    bool &ErrorsFound // If errors found in input
     );
 
     void GetZoneAirDistribution(EnergyPlusData &state);
@@ -112,6 +110,13 @@ namespace SizingManager {
     void GetSizingParams(EnergyPlusData &state);
 
     void GetZoneSizingInput(EnergyPlusData &state);
+
+    void ReportTemperatureInputError(EnergyPlusData &state,
+                                     std::string cObjectName,
+                                     int const paramNum,
+                                     Real64 comparisonTemperature,
+                                     bool const shouldFlagSevere,
+                                     bool &ErrorsFound);
 
     void GetZoneAndZoneListNames(
         EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
@@ -143,12 +148,12 @@ namespace SizingManager {
                          std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadType, // either "Sensible" or "Total"
-                         Real64 const &UserDesCap,        // User  Design Capacity
-                         Real64 const &CalcDesVolFlow,    // Calculated  Design Air Flow Rate
-                         Real64 const &UserDesVolFlow,    // User Design Air Flow Rate
+                         Real64 UserDesCap,               // User  Design Capacity
+                         Real64 CalcDesVolFlow,           // Calculated  Design Air Flow Rate
+                         Real64 UserDesVolFlow,           // User Design Air Flow Rate
                          std::string const &DesDayName,   // the name of the design day that produced the peak
                          std::string const &DesDayDate,   // the date that produced the peak
-                         int const &TimeStepIndex         // time step of the peak
+                         int TimeStepIndex                // time step of the peak
     );
 
     std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);

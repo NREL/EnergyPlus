@@ -70,21 +70,23 @@ namespace HVACControllers {
 
     // Using/Aliasing
     using DataAirSystems::DefinePrimaryAirSystem;
+    using DataHVACControllers::ControllerAction;
+    using DataHVACControllers::ControllerMode;
     using DataHVACControllers::ControllerSimple_Type;
     using DataHVACControllers::iFirstMode;
     using DataHVACControllers::iLastMode;
-    using DataHVACControllers::iModeNone;
-    using DataHVACControllers::iNoAction;
     using DataRootFinder::RootFinderDataType;
 
     // Parameters for controls used here
-    enum class iCtrl
+    enum class CtrlVarType
     {
+        Invalid = -1,
         NoControlVariable,
         Temperature,
         HumidityRatio,
         TemperatureAndHumidityRatio,
         Flow,
+        Num
     };
 
     struct SolutionTrackerType
@@ -92,10 +94,10 @@ namespace HVACControllers {
         // Members
         bool DefinedFlag;     // Flag set to TRUE when tracker is up-to-date. FALSE otherwise.
         Real64 ActuatedValue; // Actuated value
-        int Mode;             // Operational model of controller
+        ControllerMode Mode;  // Operational model of controller
 
         // Default Constructor
-        SolutionTrackerType() : DefinedFlag(true), ActuatedValue(0.0), Mode(iModeNone)
+        SolutionTrackerType() : DefinedFlag(true), ActuatedValue(0.0), Mode(ControllerMode::None)
         {
         }
     };
@@ -106,16 +108,16 @@ namespace HVACControllers {
         std::string ControllerName; // Name of the Controller
         std::string ControllerType; // Type of Controller
         int ControllerType_Num;
-        iCtrl ControlVar;  // The type of control variable being sensed
-        iCtrl ActuatorVar; // The variable that the controller will act on ie. flow
-        int Action;        // Controller Action - Reverse or Normal
+        CtrlVarType ControlVar;  // The type of control variable being sensed
+        CtrlVarType ActuatorVar; // The variable that the controller will act on ie. flow
+        ControllerAction Action; // Controller Action - Reverse or Normal
         // Controller must be initialized to set MinActuated and MaxActuated
         bool InitFirstPass;
         // --------------------
         // Internal data used for optimal restart across successive calls to SimAirLoop()
         // --------------------
-        int NumCalcCalls; // Number of Calc() calls since last call to Reset()
-        int Mode;         // Operational model of controller at current iteration
+        int NumCalcCalls;    // Number of Calc() calls since last call to Reset()
+        ControllerMode Mode; // Operational model of controller at current iteration
         // Flag indicating whether the current controller simulation was performed from a cold start
         // or following a speculative warm restart. Set in the ResetController() routine.
         // Used in the CheckController() routine.
@@ -162,11 +164,11 @@ namespace HVACControllers {
         int SensedNode;             // The sensed node number from the grid
         bool IsSetPointDefinedFlag; // If TRUE indicates that the setpoint has been defined and can
         // be used to compute DeltaSensed
-        Real64 SetPointValue;                          // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
-        Real64 SensedValue;                            // The sensed control variable of any type
-        Real64 DeltaSensed;                            // Difference of sensed to setpoint value for calculating proportional gain
-        Real64 Offset;                                 // This is the tolerance or droop from the error
-        SetPointManager::iCtrlVarType HumRatCntrlType; // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
+        Real64 SetPointValue;                         // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
+        Real64 SensedValue;                           // The sensed control variable of any type
+        Real64 DeltaSensed;                           // Difference of sensed to setpoint value for calculating proportional gain
+        Real64 Offset;                                // This is the tolerance or droop from the error
+        SetPointManager::CtrlVarType HumRatCntrlType; // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
         // --------------------
         // Other controller inputs, not yet used
         // --------------------
@@ -191,15 +193,15 @@ namespace HVACControllers {
 
         // Default Constructor
         ControllerPropsType()
-            : ControllerType_Num(ControllerSimple_Type), ControlVar(iCtrl::NoControlVariable), ActuatorVar(iCtrl::NoControlVariable),
-              Action(iNoAction), InitFirstPass(true), NumCalcCalls(0), Mode(iModeNone), DoWarmRestartFlag(false),
+            : ControllerType_Num(ControllerSimple_Type), ControlVar(CtrlVarType::NoControlVariable), ActuatorVar(CtrlVarType::NoControlVariable),
+              Action(ControllerAction::NoAction), InitFirstPass(true), NumCalcCalls(0), Mode(ControllerMode::None), DoWarmRestartFlag(false),
               ReuseIntermediateSolutionFlag(false), ReusePreviousSolutionFlag(false), SolutionTrackers(2), MaxAvailActuated(0.0), MaxAvailSensed(0.0),
               MinAvailActuated(0.0), MinAvailSensed(0.0), MaxVolFlowActuated(0.0), MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0),
               ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0),
               ActuatedNodePlantLoopBranchNum(0), SensedNode(0), IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0),
-              Offset(0.0), HumRatCntrlType(SetPointManager::iCtrlVarType::Unknown), Range(0.0), Limit(0.0), FirstTraceFlag(true),
-              BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
-              BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
+              Offset(0.0), HumRatCntrlType(SetPointManager::CtrlVarType::Invalid), Range(0.0), Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0),
+              BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false),
+              AirLoopControllerIndex(0), HumRatCtrlOverride(false)
         {
         }
     };
@@ -250,7 +252,7 @@ namespace HVACControllers {
                            int &ControllerIndex,
                            bool FirstHVACIteration,
                            int AirLoopNum, // unused1208
-                           int Operation,
+                           DataHVACControllers::ControllerOperation Operation,
                            bool &IsConvergedFlag,
                            bool &IsUpToDateFlag,
                            bool &BypassOAController,
@@ -292,10 +294,15 @@ namespace HVACControllers {
 
     void UpdateController(EnergyPlusData &state, int ControlNum);
 
-    void ExitCalcController(EnergyPlusData &state, int ControlNum, Real64 NextActuatedValue, int Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
+    void ExitCalcController(
+        EnergyPlusData &state, int ControlNum, Real64 NextActuatedValue, ControllerMode Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
 
-    void TrackAirLoopControllers(
-        EnergyPlusData &state, int AirLoopNum, int WarmRestartStatus, int AirLoopIterMax, int AirLoopIterTot, int AirLoopNumCalls);
+    void TrackAirLoopControllers(EnergyPlusData &state,
+                                 int AirLoopNum,
+                                 DataHVACControllers::ControllerWarmRestart WarmRestartStatus,
+                                 int AirLoopIterMax,
+                                 int AirLoopIterTot,
+                                 int AirLoopNumCalls);
 
     void TrackAirLoopController(EnergyPlusData &state,
                                 int AirLoopNum,       // Air loop index
@@ -325,7 +332,7 @@ namespace HVACControllers {
                                    int ControlNum,
                                    bool FirstHVACIteration,
                                    int AirLoopPass,
-                                   int Operation, // Operation to execute
+                                   DataHVACControllers::ControllerOperation Operation, // Operation to execute
                                    bool IsConvergedFlag);
 
     std::string CreateHVACTimeString(EnergyPlusData &state);

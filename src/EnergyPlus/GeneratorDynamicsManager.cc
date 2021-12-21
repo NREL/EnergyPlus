@@ -244,7 +244,7 @@ namespace GeneratorDynamicsManager {
         Real64 MinPel;                          // working variabel for min allowed by transient constraint
         Real64 PelInput;                        // holds initial value of IN var
         Real64 Pel;
-        DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Unassigned);
+        DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Invalid);
         Real64 SchedVal;
         Real64 ElectLoadForThermalRequest;
         bool ConstrainedMaxP;           // true if request was altered because of max power limit

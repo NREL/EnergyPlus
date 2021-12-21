@@ -136,6 +136,24 @@ ENERGYPLUSLIB_API int energyplus(EnergyPlusState state, int argc, const char *ar
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 ENERGYPLUSLIB_API void stopSimulation(EnergyPlusState state);
 
+/// \brief Allows disabling and enabling console output (stdout and stderr) during a run.
+/// \details Normally EnergyPlus will print lots of status update messages while running.  These can get in the way
+///          when calling EnergyPlus as a library.  This function allows the client to mute (and unmute) the standard output messages.
+///          Note that output messages can still be retrieved using callback functionality, even with the console output is muted.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] outputStatus An integer describing whether the console output should be printed: nonzero integer for yes, 0 for no.
+ENERGYPLUSLIB_API void setConsoleOutputState(EnergyPlusState state, int outputStatus);
+
+/// \brief Allows setting the EnergyPlus install root folder when calling EnergyPlus as a library (call this prior to running EnergyPlus)
+/// \details When EnergyPlus is run as a standalone executable, it is able to locate auxiliary tools relative to the running binary exe file.
+///          However, when calling as an API, the running binary will not be in the EnergyPlus install, and so EnergyPlus will fail to find those
+///          auxiliary tools.  To call these tools when running as a library, the install root must be set using this function.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] path Path to the EnergyPlus install root, for example "C:\\EnergyPlus-9-5-0", or "/usr/local/EnergyPlus-9-5-0"
+/// \remark It should be noted that in many workflows, it would be better to just call those auxiliary tools directly from an outside caller, rather
+///         than relying on EnergyPlus to do it via command line arguments.
+ENERGYPLUSLIB_API void setEnergyPlusRootDirectory(EnergyPlusState state, const char *path);
+
 /// \brief Asks EnergyPlus to issue a warning message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using
 ///          this function, which will issue a warning note in the standard error file and continue the simulation.

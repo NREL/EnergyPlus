@@ -227,7 +227,7 @@ namespace HVACFan {
 
     void FanSystem::set_size(EnergyPlusData &state)
     {
-        std::string static const routineName = "FanSystem::set_size ";
+        static constexpr std::string_view routineName = "FanSystem::set_size ";
 
         Real64 tempFlow = designAirVolFlowRate;
         bool bPRINT = true;
@@ -248,22 +248,24 @@ namespace HVACFan {
 
             switch (m_powerSizingMethod) {
 
-            case PowerSizingMethod::powerPerFlow: {
+            case PowerSizingMethod::PowerPerFlow: {
                 designElecPower = designAirVolFlowRate * m_elecPowerPerFlowRate;
                 break;
             }
-            case PowerSizingMethod::powerPerFlowPerPressure: {
+            case PowerSizingMethod::PowerPerFlowPerPressure: {
                 designElecPower = designAirVolFlowRate * deltaPress * m_elecPowerPerFlowRatePerPressure;
                 break;
             }
-            case PowerSizingMethod::totalEfficiencyAndPressure: {
+            case PowerSizingMethod::TotalEfficiencyAndPressure: {
                 designElecPower = designAirVolFlowRate * deltaPress / m_fanTotalEff;
                 break;
             }
-            case PowerSizingMethod::powerSizingMethodNotSet: {
+            case PowerSizingMethod::Invalid: {
                 // do nothing
                 break;
             }
+            default:
+                assert(false);
 
             } // end switch
 
@@ -367,12 +369,12 @@ namespace HVACFan {
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
           designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), fanIsSecondaryDriver(false),
           m_fanType_Num(0), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
-          m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::powerSizingMethodNotSet), m_elecPowerPerFlowRate(0.0),
+          m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::Invalid), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
-          m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::heatLossNotDetermined), m_qdotConvZone(0.0), m_qdotRadZone(0.0),
-          m_numSpeeds(0), m_inletAirMassFlowRate(0.0), m_outletAirMassFlowRate(0.0), m_maxAirMassFlowRate(0.0), m_inletAirTemp(0.0),
-          m_outletAirTemp(0.0), m_inletAirHumRat(0.0), m_outletAirHumRat(0.0), m_inletAirEnthalpy(0.0), m_outletAirEnthalpy(0.0),
-          m_objTurnFansOn(false), m_objTurnFansOff(false), m_objEnvrnFlag(true), m_objSizingFlag(true), m_fanPower(0.0), m_fanEnergy(0.0),
+          m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::Invalid), m_qdotConvZone(0.0), m_qdotRadZone(0.0), m_numSpeeds(0),
+          m_inletAirMassFlowRate(0.0), m_outletAirMassFlowRate(0.0), m_maxAirMassFlowRate(0.0), m_inletAirTemp(0.0), m_outletAirTemp(0.0),
+          m_inletAirHumRat(0.0), m_outletAirHumRat(0.0), m_inletAirEnthalpy(0.0), m_outletAirEnthalpy(0.0), m_objTurnFansOn(false),
+          m_objTurnFansOff(false), m_objEnvrnFlag(true), m_objSizingFlag(true), m_fanPower(0.0), m_fanEnergy(0.0),
           m_maxAirFlowRateEMSOverrideOn(false), m_maxAirFlowRateEMSOverrideValue(0.0), m_eMSFanPressureOverrideOn(false), m_eMSFanPressureValue(0.0),
           m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
           m_faultyFilterFlag(false), m_faultyFilterIndex(0),
@@ -381,7 +383,7 @@ namespace HVACFan {
     // oneTimePowerCurveCheck_( true )
     {
 
-        std::string const static routineName = "HVACFan constructor ";
+        static constexpr std::string_view routineName = "HVACFan constructor ";
         int numAlphas;    // Number of elements in the alpha array
         int numNums;      // Number of elements in the numeric array
         int numTotFields; // Total number of alpha and numeric fields
@@ -429,7 +431,7 @@ namespace HVACFan {
         } else {
             availSchedIndex = ScheduleManager::GetScheduleIndex(state, alphaArgs(2));
             if (availSchedIndex == 0) {
-                ShowSevereError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + alphaFieldNames(2) + " = " + alphaArgs(2));
                 errorsFound = true;
             }
@@ -441,7 +443,7 @@ namespace HVACFan {
                                                            alphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           1,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                             alphaArgs(4),
@@ -450,7 +452,7 @@ namespace HVACFan {
                                                             alphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            1,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
         BranchNodeConnections::TestCompSet(state, locCurrentModuleObject, alphaArgs(1), alphaArgs(3), alphaArgs(4), "Air Nodes");
@@ -467,7 +469,7 @@ namespace HVACFan {
         } else if (UtilityRoutines::SameString(alphaArgs(5), "Discrete")) {
             speedControl = SpeedControlMethod::Discrete;
         } else {
-            ShowSevereError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+            ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
             ShowContinueError(state, "Invalid " + alphaFieldNames(5) + " = " + alphaArgs(5));
             errorsFound = true;
         }
@@ -475,7 +477,7 @@ namespace HVACFan {
         m_minPowerFlowFrac = numericArgs(2);
         deltaPress = numericArgs(3);
         if (deltaPress <= 0.0) {
-            ShowSevereError(state, routineName + locCurrentModuleObject + " zero or negative, invalid entry in " + numericFieldNames(3));
+            ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + " zero or negative, invalid entry in " + numericFieldNames(3));
             errorsFound = true;
         }
         m_motorEff = numericArgs(4);
@@ -486,15 +488,15 @@ namespace HVACFan {
         }
         if (m_designElecPowerWasAutosized) {
             if (isAlphaFieldBlank(6)) {
-                m_powerSizingMethod = PowerSizingMethod::powerPerFlowPerPressure;
+                m_powerSizingMethod = PowerSizingMethod::PowerPerFlowPerPressure;
             } else if (UtilityRoutines::SameString(alphaArgs(6), "PowerPerFlow")) {
-                m_powerSizingMethod = PowerSizingMethod::powerPerFlow;
+                m_powerSizingMethod = PowerSizingMethod::PowerPerFlow;
             } else if (UtilityRoutines::SameString(alphaArgs(6), "PowerPerFlowPerPressure")) {
-                m_powerSizingMethod = PowerSizingMethod::powerPerFlowPerPressure;
+                m_powerSizingMethod = PowerSizingMethod::PowerPerFlowPerPressure;
             } else if (UtilityRoutines::SameString(alphaArgs(6), "TotalEfficiencyAndPressure")) {
-                m_powerSizingMethod = PowerSizingMethod::totalEfficiencyAndPressure;
+                m_powerSizingMethod = PowerSizingMethod::TotalEfficiencyAndPressure;
             } else {
-                ShowSevereError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + alphaFieldNames(6) + " = " + alphaArgs(6));
                 errorsFound = true;
             }
@@ -505,7 +507,7 @@ namespace HVACFan {
         if (!isAlphaFieldBlank(7)) {
             powerModFuncFlowFractionCurveIndex = CurveManager::GetCurveIndex(state, alphaArgs(7));
             if (powerModFuncFlowFractionCurveIndex == 0) {
-                ShowWarningError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowWarningError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + alphaFieldNames(7) + " = " + alphaArgs(7));
                 ShowContinueError(state, "Curve not found.");
                 if (speedControl == SpeedControlMethod::Continuous) {
@@ -514,7 +516,7 @@ namespace HVACFan {
             }
         } else { // blank
             if (speedControl == SpeedControlMethod::Continuous) {
-                ShowWarningError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowWarningError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Continuous speed control requires a fan power curve in " + alphaFieldNames(7) + " = " + alphaArgs(7));
                 errorsFound = true;
             }
@@ -522,13 +524,13 @@ namespace HVACFan {
         m_nightVentPressureDelta = numericArgs(10);
         m_nightVentFlowFraction = numericArgs(11); // not used
         m_zoneNum = UtilityRoutines::FindItemInList(alphaArgs(8), state.dataHeatBal->Zone);
-        if (m_zoneNum > 0) m_heatLossesDestination = ThermalLossDestination::zoneGains;
+        if (m_zoneNum > 0) m_heatLossesDestination = ThermalLossDestination::ZoneGains;
         if (m_zoneNum == 0) {
             if (isAlphaFieldBlank(8)) {
-                m_heatLossesDestination = ThermalLossDestination::lostToOutside;
+                m_heatLossesDestination = ThermalLossDestination::LostToOutside;
             } else {
-                m_heatLossesDestination = ThermalLossDestination::lostToOutside;
-                ShowWarningError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                m_heatLossesDestination = ThermalLossDestination::LostToOutside;
+                ShowWarningError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + alphaFieldNames(8) + " = " + alphaArgs(8));
                 ShowContinueError(state, "Zone name not found. Fan motor heat losses will not be added to a zone");
                 // continue with simulation but motor losses not sent to a zone.
@@ -564,7 +566,7 @@ namespace HVACFan {
                 }
             } else {
                 // field set input does not match number of speeds, throw warning
-                ShowSevereError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Fan with Discrete speed control does not have input for speed data that matches the number of speeds.");
                 errorsFound = true;
             }
@@ -576,7 +578,7 @@ namespace HVACFan {
                 }
             }
             if (increasingOrderError) {
-                ShowSevereError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state,
                                   "Fan with Discrete speed control and multiple speed levels does not have input with flow fractions arranged in "
                                   "increasing order.");
@@ -594,7 +596,7 @@ namespace HVACFan {
             }
             if (foundMissingPowerFraction) {
                 // field set input does not match number of speeds, throw warning
-                ShowSevereError(state, routineName + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
+                ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(
                     state,
                     "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
@@ -603,36 +605,65 @@ namespace HVACFan {
         }
 
         if (errorsFound) {
-            ShowFatalError(state, routineName + "Errors found in input for fan name = " + name + ".  Program terminates.");
+            ShowFatalError(state, std::string{routineName} + "Errors found in input for fan name = " + name + ".  Program terminates.");
         }
 
-        SetupOutputVariable(state, "Fan Electricity Rate", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
-        SetupOutputVariable(state, "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name);
-        SetupOutputVariable(state, "Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name);
+        SetupOutputVariable(state,
+                            "Fan Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            m_fanPower,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
+        SetupOutputVariable(state,
+                            "Fan Rise in Air Temperature",
+                            OutputProcessor::Unit::deltaC,
+                            m_deltaTemp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
+        SetupOutputVariable(state,
+                            "Fan Heat Gain to Air",
+                            OutputProcessor::Unit::W,
+                            m_powerLossToAir,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_fanEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
                             name,
                             _,
                             "Electricity",
                             "Fans",
                             m_endUseSubcategoryName,
                             "System");
-        SetupOutputVariable(state, "Fan Air Mass Flow Rate", OutputProcessor::Unit::kg_s, m_outletAirMassFlowRate, "System", "Average", name);
+        SetupOutputVariable(state,
+                            "Fan Air Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            m_outletAirMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            name);
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1) {
-            SetupOutputVariable(
-                state, "Fan Runtime Fraction", OutputProcessor::Unit::None, m_fanRunTimeFractionAtSpeed[0], "System", "Average", name);
+            SetupOutputVariable(state,
+                                "Fan Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                m_fanRunTimeFractionAtSpeed[0],
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name);
         } else if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) {
             for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
                 SetupOutputVariable(state,
                                     "Fan Runtime Fraction Speed " + fmt::to_string(speedLoop + 1),
                                     OutputProcessor::Unit::None,
                                     m_fanRunTimeFractionAtSpeed[speedLoop],
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::SOVTimeStepType::System,
+                                    OutputProcessor::SOVStoreType::Average,
                                     name);
             }
         }
@@ -648,9 +679,9 @@ namespace HVACFan {
                 state, "Fan", name, "Fan Autosized Air Flow Rate", "[m3/s]", m_maxAirFlowRateEMSOverrideOn, m_maxAirFlowRateEMSOverrideValue);
         }
 
-        if (m_heatLossesDestination == ThermalLossDestination::zoneGains) {
+        if (m_heatLossesDestination == ThermalLossDestination::ZoneGains) {
             SetupZoneInternalGain(
-                state, m_zoneNum, "Fan:SystemModel", name, DataHeatBalance::IntGainTypeOf_FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
+                state, m_zoneNum, "Fan:SystemModel", name, DataHeatBalance::IntGainType::FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
         }
 
         alphaArgs.deallocate();
@@ -990,6 +1021,8 @@ namespace HVACFan {
                     // do nothing
                     break;
                 }
+                default:
+                    assert(false);
                 } // end switch
                 m_outletAirMassFlowRate += localAirMassFlow[mode];
 
@@ -1035,7 +1068,7 @@ namespace HVACFan {
             }
         }
 
-        if (m_heatLossesDestination == ThermalLossDestination::zoneGains) {
+        if (m_heatLossesDestination == ThermalLossDestination::ZoneGains) {
             Real64 powerLossToZone = m_fanPower - m_powerLossToAir;
             m_qdotConvZone = powerLossToZone * (1.0 - m_zoneRadFract);
             m_qdotRadZone = powerLossToZone * m_zoneRadFract;

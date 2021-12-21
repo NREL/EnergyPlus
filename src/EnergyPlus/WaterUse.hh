@@ -100,8 +100,14 @@ namespace WaterUse {
         Real64 TargetTemp;      // Target (mixed) water temperature (C)
         Real64 MixedTemp;       // Actual outlet (mixed) water temperature (C)
         Real64 DrainTemp;
-        int Zone;                 // Index for zone object
-        int SensibleFracSchedule; // Pointer to schedule object
+        int CWHWTempErrorCount;     // - counter if hot water temp is less than cold water temp
+        int CWHWTempErrIndex;       // - index to recurring error structure for hot water temp
+        int TargetHWTempErrorCount; // - counter for target water temp error
+        int TargetHWTempErrIndex;   // - index to recurring error structure for target water temp
+        int TargetCWTempErrorCount; // - counter for target water temp error
+        int TargetCWTempErrIndex;   // - index to recurring error structure for target water temp
+        int Zone;                   // Index for zone object
+        int SensibleFracSchedule;   // Pointer to schedule object
         Real64 SensibleRate;
         Real64 SensibleEnergy;
         Real64 SensibleRateNoMultiplier;
@@ -121,10 +127,11 @@ namespace WaterUse {
         WaterEquipmentType()
             : Connections(0), PeakVolFlowRate(0.0), FlowRateFracSchedule(0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0),
               ColdMassFlowRate(0.0), HotMassFlowRate(0.0), TotalMassFlowRate(0.0), DrainMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0),
-              TargetTempSchedule(0), ColdTemp(0.0), HotTemp(0.0), TargetTemp(0.0), MixedTemp(0.0), DrainTemp(0.0), Zone(0), SensibleFracSchedule(0),
-              SensibleRate(0.0), SensibleEnergy(0.0), SensibleRateNoMultiplier(0.0), LatentFracSchedule(0), LatentRate(0.0), LatentEnergy(0.0),
-              LatentRateNoMultiplier(0.0), MoistureRate(0.0), MoistureMass(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0),
-              Energy(0.0), setupMyOutputVars(true)
+              TargetTempSchedule(0), ColdTemp(0.0), HotTemp(0.0), TargetTemp(0.0), MixedTemp(0.0), DrainTemp(0.0), CWHWTempErrorCount(0.0),
+              CWHWTempErrIndex(0.0), TargetHWTempErrorCount(0.0), TargetHWTempErrIndex(0.0), TargetCWTempErrorCount(0.0), TargetCWTempErrIndex(0.0),
+              Zone(0), SensibleFracSchedule(0), SensibleRate(0.0), SensibleEnergy(0.0), SensibleRateNoMultiplier(0.0), LatentFracSchedule(0),
+              LatentRate(0.0), LatentEnergy(0.0), LatentRateNoMultiplier(0.0), MoistureRate(0.0), MoistureMass(0.0), ColdVolume(0.0), HotVolume(0.0),
+              TotalVolume(0.0), Power(0.0), Energy(0.0), setupMyOutputVars(true)
         {
         }
 
@@ -208,8 +215,6 @@ namespace WaterUse {
         int PlantLoopBranchNum;
         int PlantLoopCompNum;
         bool MyEnvrnFlag;
-        bool setupMyOutputVars;
-        bool plantScanFlag;
 
         WaterConnectionsType()
             : Init(true), InitSizing(true), StandAlone(false), InletNode(0), OutletNode(0), SupplyTankNum(0), RecoveryTankNum(0), TankDemandID(0),
@@ -220,8 +225,7 @@ namespace WaterUse {
               DrainVolFlowRate(0.0), PeakMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0), MainsTemp(0.0), TankTemp(0.0),
               ColdSupplyTemp(0.0), ColdTemp(0.0), HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0),
               MainsVolume(0.0), TankVolume(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0),
-              MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0), MyEnvrnFlag(true),
-              setupMyOutputVars(true), plantScanFlag(true)
+              MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0), MyEnvrnFlag(true)
         {
         }
 
@@ -246,6 +250,10 @@ namespace WaterUse {
         void ReportWaterUse(EnergyPlusData &state);
 
         void setupOutputVars([[maybe_unused]] EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void oneTimeInit_new(EnergyPlusData &state) override;
     };
 
     void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);
@@ -267,7 +275,7 @@ struct WaterUseData : BaseGlobalStruct
     bool MyEnvrnFlagLocal;
     Array1D_bool CheckEquipName;
     Array1D<WaterUse::WaterEquipmentType> WaterEquipment;
-    Array1D<WaterUse::WaterConnectionsType> WaterConnections;
+    EPVector<WaterUse::WaterConnectionsType> WaterConnections;
 
     void clear_state() override
     {

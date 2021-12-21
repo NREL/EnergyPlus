@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
     state->dataHeatBalFanSys->MDotOA.allocate(1);
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
     state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
     state->dataHeatBalFanSys->ZoneW1.allocate(1);
 
@@ -496,10 +496,10 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
     state->dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
     state->dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
 
-    state->dataHeatBal->SNLoadPredictedRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(state->dataZoneCtrls->NumTempControlledZones);
-    state->dataHeatBal->SNLoadPredictedHSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
-    state->dataHeatBal->SNLoadPredictedCSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataHeatBal->ZoneSNLoadPredictedHSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
+    state->dataHeatBal->ZoneSNLoadPredictedCSPRate.allocate(state->dataZoneCtrls->NumTempControlledZones);
 
     state->dataHeatBalFanSys->LoadCorrectionFactor(HeatZoneNum) = 1.0;
     state->dataHeatBalFanSys->LoadCorrectionFactor(CoolZoneNum) = 1.0;
@@ -856,8 +856,8 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     int NoneAdapZoneNum(3);
     int DualZoneNum(4);
     int summerDesignDayTypeIndex(9);
-    int const ASH55_CENTRAL(2);
-    int const CEN15251_CENTRAL(5);
+    int constexpr ASH55_CENTRAL(2);
+    int constexpr CEN15251_CENTRAL(5);
 
     state->dataEnvrn->DayOfYear = 1;
     state->dataWeatherManager->Envrn = 1;
@@ -1026,7 +1026,6 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBalFanSys->MCPTC(ZoneNum) = 0.0;
     state->dataHeatBalFanSys->MDotCPOA(ZoneNum) = 0.0;
 
-    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
     state->dataHeatBalFanSys->SumConvHTRadSys(1) = 0.0;
     state->dataHeatBalFanSys->SumConvPool(1) = 0.0;
 
@@ -1071,10 +1070,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
     state->dataSurface->Surface.allocate(3);
-    state->dataHeatBal->HConvIn.allocate(3);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(3);
     state->dataLoopNodes->Node.allocate(4);
-    state->dataHeatBal->TempEffBulkAir.allocate(3);
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(3);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(3);
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
+
+    state->dataSurface->SurfTAirRef.allocate(3);
+    state->dataSurface->SurfTAirRef(1) = ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = ZoneSupplyAirTemp;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(2).HeatTransSurf = true;
@@ -1082,15 +1086,12 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataSurface->Surface(1).Area = 10.0;
     state->dataSurface->Surface(2).Area = 10.0;
     state->dataSurface->Surface(3).Area = 10.0;
-    state->dataSurface->Surface(1).TAirRef = ZoneMeanAirTemp;
-    state->dataSurface->Surface(2).TAirRef = AdjacentAirTemp;
-    state->dataSurface->Surface(3).TAirRef = ZoneSupplyAirTemp;
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
-    state->dataHeatBal->TempEffBulkAir(1) = 10.0;
-    state->dataHeatBal->TempEffBulkAir(2) = 10.0;
-    state->dataHeatBal->TempEffBulkAir(3) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBal->SurfTempEffBulkAir(1) = 10.0;
+    state->dataHeatBal->SurfTempEffBulkAir(2) = 10.0;
+    state->dataHeatBal->SurfTempEffBulkAir(3) = 10.0;
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -1101,9 +1102,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBal->HConvIn(1) = 0.5;
-    state->dataHeatBal->HConvIn(2) = 0.5;
-    state->dataHeatBal->HConvIn(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
@@ -1220,7 +1221,7 @@ TEST_F(EnergyPlusFixture, temperatureAndCountInSch_test)
     Real64 valueAtTime;
     int numDays;
     std::string monthAssumed;
-    const int wednesday = 4;
+    constexpr int wednesday = 4;
 
     state->dataEnvrn->Latitude = 30.; // northern hemisphere
     int sched1Index = GetScheduleIndex(*state, "SCHED1");
@@ -1298,14 +1299,14 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
 
-    state->dataHeatBal->SNLoadPredictedRate.allocate(1);
-    state->dataHeatBal->SNLoadPredictedHSPRate.allocate(1);
-    state->dataHeatBal->SNLoadPredictedCSPRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedHSPRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedCSPRate.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataZoneCtrls->TempControlledZone(1).DeltaTCutSet = 2.0;
     state->dataZoneCtrls->TempControlledZone(1).ActualZoneNum = 1;
@@ -1433,14 +1434,14 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataZoneTempPredictorCorrector->ZoneSetPointLast.allocate(1);
     state->dataZoneEnergyDemand->Setback.allocate(1);
 
-    state->dataHeatBal->SNLoadPredictedRate.allocate(1);
-    state->dataHeatBal->SNLoadPredictedHSPRate.allocate(1);
-    state->dataHeatBal->SNLoadPredictedCSPRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedHSPRate.allocate(1);
+    state->dataHeatBal->ZoneSNLoadPredictedCSPRate.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
 
     state->dataZoneCtrls->TempControlledZone(1).DeltaTCutSet = 2.0;
     state->dataZoneCtrls->TempControlledZone(1).ActualZoneNum = 1;

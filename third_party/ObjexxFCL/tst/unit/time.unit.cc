@@ -110,48 +110,10 @@ TEST( TimeTest, Clock )
 	EXPECT_TRUE( is_digit( ts[ 7 ] ) );
 }
 
-TEST( TimeTest, SystemClock )
-{
-	{
-		std::int64_t count, count_rate, count_max;
-		SYSTEM_CLOCK_64( count, count_rate, count_max );
-		EXPECT_TRUE( 0 <= count );
-		EXPECT_TRUE( 0 <= count_rate );
-		EXPECT_TRUE( 0 <= count_max );
-	}
-
-	{
-		std::int32_t count, count_rate, count_max;
-		SYSTEM_CLOCK_32( count, count_rate, count_max );
-		EXPECT_TRUE( 0 <= count );
-		EXPECT_TRUE( 0 <= count_rate );
-		EXPECT_TRUE( 0 <= count_max );
-		SYSTEM_CLOCK( count, count_rate, count_max );
-		EXPECT_TRUE( 0 <= count );
-		EXPECT_TRUE( 0 <= count_rate );
-		EXPECT_TRUE( 0 <= count_max );
-	}
-
-	{
-		std::int16_t count, count_rate, count_max;
-		SYSTEM_CLOCK_16( count, count_rate, count_max );
-		EXPECT_TRUE( 0 <= count );
-		EXPECT_TRUE( 0 <= count_rate );
-		EXPECT_TRUE( 0 <= count_max );
-	}
-}
-
 TEST( TimeTest, CpuTime )
 {
 	double time;
 	CPU_TIME( time );
-	EXPECT_TRUE( 0.0 <= time );
-}
-
-TEST( TimeTest, Clockx )
-{
-	double time;
-	CLOCKX( time );
 	EXPECT_TRUE( 0.0 <= time );
 }
 
@@ -252,15 +214,6 @@ TEST( TimeTest, Jdate )
 	std::string const j( JDATE() );
 	EXPECT_EQ( j.length(), 5u );
 	for ( int i = 0; i < 5; ++i ) {
-		EXPECT_TRUE( is_digit( j[ i ] ) );
-	}
-}
-
-TEST( TimeTest, Jdate4 )
-{
-	std::string const j( JDATE4() );
-	EXPECT_EQ( j.length(), 7u );
-	for ( int i = 0; i < 7; ++i ) {
 		EXPECT_TRUE( is_digit( j[ i ] ) );
 	}
 }

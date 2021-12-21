@@ -81,7 +81,7 @@ namespace EIRPlantLoopHeatPumps {
 
         // fixed configuration parameters
         std::string name;
-        int plantTypeOfNum = -1;
+        DataPlant::PlantEquipmentType EIRHPType = DataPlant::PlantEquipmentType::Invalid;
         std::string companionCoilName;
         EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
         Real64 sizingFactor = 1.0;
@@ -132,7 +132,7 @@ namespace EIRPlantLoopHeatPumps {
         int recurringConcurrentOperationWarningIndex = 0;
 
         // logic flags
-        bool oneTimeInit = true;
+        bool oneTimeInitFlag = true;
         bool envrnInit = true;
 
         // a couple worker functions to easily allow merging of cooling and heating operations
@@ -171,7 +171,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void resetReportingVariables();
 
-        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, const std::string &hp_name);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
 
         static void pairUpCompanionCoils(EnergyPlusData &state);
 
@@ -188,6 +188,8 @@ namespace EIRPlantLoopHeatPumps {
         {
             return a - b;
         }
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
 } // namespace EIRPlantLoopHeatPumps

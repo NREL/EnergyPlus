@@ -19,6 +19,5 @@
 #include <ObjexxFCL/Array3S.fwd.hh>
 #include <ObjexxFCL/Array4S.fwd.hh>
 #include <ObjexxFCL/Array5S.fwd.hh>
-#include <ObjexxFCL/Array6S.fwd.hh>
 
 #endif // ObjexxFCL_ArrayS_all_fwd_hh_INCLUDED

@@ -96,7 +96,6 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject2)
     state->dataResultsFramework->resultsFramework->setupOutputOptions(*state);
 
     EXPECT_TRUE(state->dataResultsFramework->resultsFramework->timeSeriesEnabled());
-    compare_json_stream("");
 }
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo)
@@ -171,7 +170,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_VariableInfo)
     // EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
     // EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
     // EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
-    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int repordId = 1;
 
     Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, repordId, Unit::C);
@@ -193,7 +192,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo1)
 {
 
     json OutputVars;
-    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
@@ -227,15 +226,15 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 {
 
     json OutputData;
-    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::Zone;
     int reportId = 1;
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 45);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 60);  // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 24, 45); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 24, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
 
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);

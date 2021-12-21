@@ -120,8 +120,7 @@ namespace FourPipeBeam {
 
         void set_size(EnergyPlusData &state);
 
-        Real64 residualSizing(EnergyPlusData &state, Real64 const airFlow // primary supply air flow rate in kg/s
-        );
+        Real64 residualSizing(EnergyPlusData &state, Real64 const airFlow, bool dummyParameter);
 
         void control(EnergyPlusData &state,
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -130,11 +129,9 @@ namespace FourPipeBeam {
 
         void calc(EnergyPlusData &state);
 
-        Real64 residualCooling(EnergyPlusData &state, Real64 const cWaterFlow // chilled water flow rate in kg/s
-        );
+        Real64 residualCooling(EnergyPlusData &state, Real64 const cWaterFlow, bool dummyParameter);
 
-        Real64 residualHeating(EnergyPlusData &state, Real64 const hWaterFlow // hot water flow rate in kg/s
-        );
+        Real64 residualHeating(EnergyPlusData &state, Real64 const hWaterFlow, bool dummyParameter);
 
         void update(EnergyPlusData &state) const;
 

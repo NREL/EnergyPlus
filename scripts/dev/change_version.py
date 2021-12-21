@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
@@ -57,10 +57,15 @@
 # Attempt to automatically change the version number of all idf and imf files in a repo
 # Two arguments: old version number and new version number
 
+# TODO: Change EPJSON files as well
+
 import codecs
 import fnmatch
+import json
 import os
 import sys
+
+EPJSON_INDENT = 4  # Note, this essentially standardizes our indent for EpJSON files
 
 
 # provide a nice usage function
@@ -93,6 +98,18 @@ for extension in ['*.idf', '*.imf']:
                     file_data = file_data.replace('VERSION,' + v_old, 'Version,' + v_new)
                 with codecs.open(os.path.join(root, filename), 'w', encoding='utf-8') as output_file:
                     output_file.write(file_data)
+
+# also epJSON files
+for folder in ['testfiles', 'performance_tests', 'datasets', os.path.join('testfiles', 'BasicsFiles')]:
+    this_dir = os.path.join(repo, folder)
+    for root, dir_names, file_names in os.walk(this_dir):
+        for filename in fnmatch.filter(file_names, '*.epJSON'):
+            with codecs.open(os.path.join(root, filename), encoding='utf-8', errors='ignore') as input_file:
+                file_data = input_file.read()
+                json_data = json.loads(file_data)
+                json_data['Version']['Version 1']['version_identifier'] = v_new
+            with codecs.open(os.path.join(root, filename), 'w', encoding='utf-8') as output_file:
+                output_file.write(json.dumps(json_data, indent=EPJSON_INDENT))
 
 # then walk across all the unit test files too
 for folder in [os.path.join('tst', 'EnergyPlus', 'unit')]:

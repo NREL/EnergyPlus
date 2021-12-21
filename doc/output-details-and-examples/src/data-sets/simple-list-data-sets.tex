@@ -66,6 +66,31 @@ Knowing the type of chiller that you want to simulate, you can find it and the a
   ! ElectricEIRChiller Carrier 23XL 724kW/6.04COP/Vanes  Centrifugal   724 (206)   6.04   Inlet Vanes
 \end{lstlisting}
 
+\subsection{CodeCompliantEquipment.idf}\label{codecompliantequipment.idf}
+
+This dataset includes performance curve objects that describe the part load performance of building energy code minimally compliant equipment. The dataset provides curves for the following EnergyPlus objects: Chiller:Electric:EIR. Sets of curves are provided for the following building energy codes minimum requirements: ASHRAE Standard 90.1-2019 Table 6.8.1-3, ASHRAE Standard 90.1-2019 Table G3.5.3.
+
+Generating performances curves meeting both full and part load efficiency numbers require solving a largely underdetermined system of equations. The number of unknowns depend on the type of curves, which mostly depend on the algorithm used by the software and used in models. It also means that an infinite number of solutions exists. One way to solve this issue is to turn it into a constrained problem and use a simple genetic algorithm (GA) with a well-defined objective or cost function to determine potential solutions with physical significance. A GA can have a short computational time, be scalable, versatile, find solutions to problems with large number of parameters to problems with multiple local optima so it is a good candidate for this task. The algorithm used to generate the curves in this dataset starts with a ``seed'' set of curves that can be user-modifiable, target full load, and part load efficiency as inputs.
+
+Among others, a ``nearest neighbor'' type method was developed to aggregate sets of curves and generate a generic set of curves for a specific target to be used as ``seed'' set of curves to the aforementioned algorithm. This method selects the N sets of performance curves that best match the targeted equipment characteristics in terms of capacity, full load efficiency, part load efficiency, and other applicable characteristics. Each selected sets of curves are scored based on how close it is to the targeted equipment characteristics. A wide mesh of values for each input variable(s) to each curve is then created and corresponding output calculated. The outputs are then weighted average based on their previously determined score. A regression and normalization at rated conditions is then performed to obtain the aggregated curves.
+
+\begin{lstlisting}
+
+!----------------------------------------------------------
+!- Beginning of performance curves for Chiller:Electric:EIR:
+
+Curve:Quadratic,
+    ASHRAE901_AppG_wtr_cent_gte150lt300ton_0.634kWpton_0.596IPLV.IP_eir-f-plr,    !- Name
+    0.30662667381140624,      !- Coefficient1 Constant
+    0.06295923908320235,      !- Coefficient2 x
+    0.6358315679053916,       !- Coefficient3 x2
+    0.0,                      !- Minimum Value of x
+    1.0,                      !- Maximum Value of x
+    ,                         !- Minimum Curve Output
+    ;                         !- Maximum Curve Output
+  
+\end{lstlisting}
+
 \subsection{CompositeWallConstructions.idf}\label{compositewallconstructions.idf}
 
 The Reference Data Set CompositeWallConstructions.idf contains constructions and associated materials for a set of \textbf{composite} walls. These are walls---such as stud walls---that have complicated heat-flow paths so that the conduction is two- or three-dimensional.

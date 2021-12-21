@@ -69,13 +69,14 @@ namespace HeatingCoils {
 
     enum class HeatObjTypes // reclaim heat object types
     {
-        Unassigned,
+        Invalid = -1,
         COMPRESSORRACK_REFRIGERATEDCASE,
         COIL_DX_COOLING, // single speed DX
         COIL_DX_MULTISPEED,
         COIL_DX_MULTIMODE,
         CONDENSER_REFRIGERATION,
-        COIL_DX_VARIABLE_COOLING
+        COIL_DX_VARIABLE_COOLING,
+        Num
     };
 
     struct HeatingCoilEquipConditions
@@ -151,7 +152,7 @@ namespace HeatingCoils {
               FuelUseRate(0.0), ElecUseRate(0.0), Efficiency(0.0), NominalCapacity(0.0), DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0),
               AvailTemperature(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), TempSetPointNodeNum(0), Control(0), PLFCurveIndex(0),
               ParasiticElecLoad(0.0), ParasiticFuelLoad(0.0), ParasiticFuelRate(0.0), ParasiticFuelCapacity(0.0), RTF(0.0), RTFErrorIndex(0),
-              RTFErrorCount(0), PLFErrorIndex(0), PLFErrorCount(0), ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(HeatObjTypes::Unassigned),
+              RTFErrorCount(0), PLFErrorIndex(0), PLFErrorCount(0), ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(HeatObjTypes::Invalid),
               NumOfStages(0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
               FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), AirLoopNum(0)
         {
@@ -169,7 +170,7 @@ namespace HeatingCoils {
     };
 
     void SimulateHeatingCoilComponents(EnergyPlusData &state,
-                                       std::string const &CompName,
+                                       std::string_view CompName,
                                        bool const FirstHVACIteration,
                                        Optional<Real64 const> QCoilReq = _, // coil load to be met
                                        Optional_int CompIndex = _,
@@ -262,7 +263,7 @@ namespace HeatingCoils {
 
     void CheckHeatingCoilSchedule(EnergyPlusData &state,
                                   std::string const &CompType, // unused1208
-                                  std::string const &CompName,
+                                  std::string_view CompName,
                                   Real64 &Value,
                                   int &CompIndex);
 
@@ -279,13 +280,13 @@ namespace HeatingCoils {
     );
 
     int GetCoilInletNode(EnergyPlusData &state,
-                         std::string const &CoilType, // must match coil types in this module
+                         std::string_view CoilType,   // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
     int GetCoilOutletNode(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );

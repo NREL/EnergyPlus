@@ -54,10 +54,10 @@
 #include <string>
 
 // EnergyPlus Headers
-#include "IOFiles.hh"
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -93,7 +93,7 @@ struct DataGlobal : BaseGlobalStruct
     bool stopSimulation = false;
     std::function<void(void *)> externalHVACManager;
     bool externalHVACManagerInitialized = false;
-    DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+    DataGlobalConstants::KindOfSim KindOfSim = DataGlobalConstants::KindOfSim::Invalid;
     bool sizingAnalysisEioHeaderDoneOnce = false;
     bool EndDayFlag = false;                          // True at the end of each day (last time step of last hour of day)
     bool EndHourFlag = false;                         // True at the end of each hour (last time step of hour)
@@ -104,6 +104,8 @@ struct DataGlobal : BaseGlobalStruct
     int NumOfDayInEnvrn = 0;                          // Number of days in the simulation for a particular environment
     int NumOfTimeStepInHour = 0;                      // Number of time steps in each hour of the simulation
     int NumOfZones = 0;                               // Total number of Zones for simulation
+    int numSpaces = 0;                                // Total number of Spaces for simulation
+    int numSpaceTypes = 0;                            // Number of unique space types
     int TimeStep = 0;                                 // Counter for time steps (fractional hours)
     Real64 TimeStepZone = 0.0;                        // Zone time step in fractional hours
     bool WarmupFlag = false;                          // True during the warmup portion of a simulation
@@ -141,6 +143,9 @@ struct DataGlobal : BaseGlobalStruct
     bool RedoSizesHVACSimulation = false;           // doing kick off simulation for redoing sizes as part of sizing
     bool FinalSizingHVACSizingSimIteration = false; // when doing HVAC sizing Simulation
     bool AnyEnergyManagementSystemInModel = false;  // true if there is any EMS or Erl in model.  otherwise false
+    bool AnySurfPropOverridesInModel = false;       // true if there is any EMS or Erl overriding the surface properties for any surface.
+    bool AnyConstrOverridesInModel = false;         // true if there is any EMS or Erl overriding the constructions for any surface.
+    bool AndShadingControlInModel = false;          // true if there is any window shading control for any fenestration surface
     bool AnyLocalEnvironmentsInModel = false;       // true if there is any local environmental data objected defined in model, otherwise false
     bool AnyPlantInModel = false;                   // true if there are any plant or condenser loops in model, otherwise false
     bool AnyIdealCondEntSetPointInModel = false;    // true if there is any ideal condenser entering set point manager in model.
@@ -163,6 +168,9 @@ struct DataGlobal : BaseGlobalStruct
     bool CountNonZoneEquip = true;
     int FDsimDay = 0;
     int FDnumIterYears = 0;
+    bool printConsoleOutput = true;
+    bool installRootOverride = false;
+    int numThread = 1;
 
     void clear_state() override
     {
@@ -194,7 +202,7 @@ struct DataGlobal : BaseGlobalStruct
         this->externalHVACManager = nullptr;
         this->externalHVACManagerInitialized = false;
         this->sizingAnalysisEioHeaderDoneOnce = false;
-        this->KindOfSim = DataGlobalConstants::KindOfSim::Unassigned;
+        this->KindOfSim = DataGlobalConstants::KindOfSim::Invalid;
         this->EndDayFlag = false;
         this->EndHourFlag = false;
         this->PreviousHour = 0;
@@ -204,6 +212,8 @@ struct DataGlobal : BaseGlobalStruct
         this->NumOfDayInEnvrn = 0;
         this->NumOfTimeStepInHour = 0;
         this->NumOfZones = 0;
+        this->numSpaces = 0;
+        this->numSpaceTypes = 0;
         this->TimeStep = 0;
         this->TimeStepZone = 0.0;
         this->WarmupFlag = false;
@@ -241,6 +251,9 @@ struct DataGlobal : BaseGlobalStruct
         this->RedoSizesHVACSimulation = false;
         this->FinalSizingHVACSizingSimIteration = false;
         this->AnyEnergyManagementSystemInModel = false;
+        this->AnyConstrOverridesInModel = false;
+        this->AnySurfPropOverridesInModel = false;
+        this->AndShadingControlInModel = false;
         this->AnyLocalEnvironmentsInModel = false;
         this->AnyPlantInModel = false;
         this->AnyIdealCondEntSetPointInModel = false;
@@ -263,6 +276,9 @@ struct DataGlobal : BaseGlobalStruct
         this->CountNonZoneEquip = true;
         this->FDsimDay = 0;
         this->FDnumIterYears = 0;
+        this->printConsoleOutput = true;
+        this->installRootOverride = false;
+        this->numThread = 1;
     }
 };
 

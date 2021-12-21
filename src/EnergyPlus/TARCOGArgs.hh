@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 
 namespace EnergyPlus::TARCOGArgs {
@@ -74,7 +75,7 @@ int ArgCheck(EnergyPlusData &state,
              Real64 fclr,
              Real64 VacuumPressure,
              Real64 VacuumMaxGapThickness,
-             int CalcDeflection,
+             TARCOGParams::DeflectionCalculation CalcDeflection,
              Real64 Pa,
              Real64 Pini,
              Real64 Tini,
@@ -120,13 +121,13 @@ int ArgCheck(EnergyPlusData &state,
              const Array1D<Real64> &SlatCurve,
              const Array1D<Real64> &vvent,
              const Array1D<Real64> &tvent,
-             const Array1D_int &LayerType,
+             const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
              const Array1D_int &nslice,
              const Array1D<Real64> &LaminateA,
              const Array1D<Real64> &LaminateB,
              const Array1D<Real64> &sumsol,
-             int standard,
-             int ThermalMod,
+             TARCOGGassesParams::Stdrd standard,
+             TARCOGParams::TARCOGThermalModel ThermalMod,
              Real64 SDScalar,
              std::string &ErrorMessage);
 
@@ -153,8 +154,8 @@ void PrepVariablesISO15099(int nlayer,
                            const Array1D<Real64> &SlatWidth,
                            const Array1D<Real64> &SlatAngle,
                            const Array1D<Real64> &SlatCond,
-                           const Array1D_int &LayerType,
-                           int ThermalMod,
+                           const Array1D<TARCOGParams::TARCOGLayerType> &LayerType,
+                           TARCOGParams::TARCOGThermalModel ThermalMod,
                            Real64 SDScalar,
                            Real64 &ShadeEmisRatioOut,
                            Real64 &ShadeEmisRatioIn,
