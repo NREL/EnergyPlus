@@ -180,17 +180,19 @@ void SimPackagedTerminalUnit(EnergyPlusData &state,
         }
         CompIndex = state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex;
     } else {
-        {
-            auto const SELECT_CASE_var(PTUnitType);
-            if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-                PTUnitNum = CompIndex;
-            } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-                PTUnitNum = CompIndex + state.dataPTHP->NumPTHP;
-            } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-                PTUnitNum = CompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-            } else {
-                assert(false);
-            }
+        switch (PTUnitType) {
+        case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+            PTUnitNum = CompIndex;
+        } break;
+        case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+            PTUnitNum = CompIndex + state.dataPTHP->NumPTHP;
+        } break;
+        case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+            PTUnitNum = CompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+        } break;
+        default: {
+            assert(false);
+        } break;
         }
         if (PTUnitNum > state.dataPTHP->NumPTUs || PTUnitNum < 1) {
             ShowFatalError(state,
@@ -6331,88 +6333,92 @@ void CalcPTUnit(EnergyPlusData &state,
     }
 
     if (state.dataPTHP->CoolingLoad && OutsideDryBulbTemp > state.dataPTHP->PTUnit(PTUnitNum).MinOATCompressorCooling) {
-        {
-            auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-            if ((SELECT_CASE_var == PTHPType::PTACUnit) || (SELECT_CASE_var == PTHPType::PTHPUnit)) {
-                if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-                    SimHXAssistedCoolingCoil(state,
-                                             state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                                             FirstHVACIteration,
-                                             On,
-                                             PartLoadFrac,
-                                             state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
-                                             state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                                             HXUnitOn);
-                } else {
-                    SimDXCoil(state,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                              On,
-                              FirstHVACIteration,
-                              state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
-                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                              PartLoadFrac,
-                              OnOffAirFlowRatio);
-                }
-                state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum);
-            } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
-                HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
-                SimWatertoAirHPSimple(state,
-                                      std::string(),
-                                      state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
-                                      QZnReq,
-                                      dOne,
-                                      OpMode,
-                                      WSHPRuntimeFrac,
-                                      state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                      state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
-                                      state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      iOne,
-                                      PartLoadFrac,
-                                      FirstHVACIteration,
-                                      OnOffAirFlowRatio);
-                state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
+        switch (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num) {
+        case PTHPType::PTACUnit:
+        case PTHPType::PTHPUnit: {
+            if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
+                SimHXAssistedCoolingCoil(state,
+                                         state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
+                                         FirstHVACIteration,
+                                         On,
+                                         PartLoadFrac,
+                                         state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
+                                         state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                                         HXUnitOn);
             } else {
+                SimDXCoil(state,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
+                          On,
+                          FirstHVACIteration,
+                          state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
+                          state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                          PartLoadFrac,
+                          OnOffAirFlowRatio);
             }
+            state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum);
+        } break;
+        case PTHPType::PTWSHPUnit: {
+            HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
+            SimWatertoAirHPSimple(state,
+                                  std::string(),
+                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                  QZnReq,
+                                  dOne,
+                                  OpMode,
+                                  WSHPRuntimeFrac,
+                                  state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                  state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
+                                  state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
+                                  iOne,
+                                  PartLoadFrac,
+                                  FirstHVACIteration,
+                                  OnOffAirFlowRatio);
+            state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
+        } break;
+        default:
+            break;
         }
     } else { // cooling coil is off
-        {
-            auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-            if ((SELECT_CASE_var == PTHPType::PTACUnit) || (SELECT_CASE_var == PTHPType::PTHPUnit)) {
-                if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-                    SimHXAssistedCoolingCoil(state,
-                                             state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                                             FirstHVACIteration,
-                                             Off,
-                                             dZero,
-                                             state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
-                                             state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                                             HXUnitOn);
-                } else {
-                    SimDXCoil(state,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                              Off,
-                              FirstHVACIteration,
-                              state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
-                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                              dZero,
-                              OnOffAirFlowRatio);
-                }
-            } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
-                SimWatertoAirHPSimple(state,
-                                      std::string(),
-                                      state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
-                                      dZero,
-                                      dZero,
-                                      OpMode,
-                                      dZero,
-                                      state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                      state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
-                                      state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      iZero,
-                                      dZero,
-                                      FirstHVACIteration);
+        switch (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num) {
+        case PTHPType::PTACUnit:
+        case PTHPType::PTHPUnit: {
+            if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
+                SimHXAssistedCoolingCoil(state,
+                                         state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
+                                         FirstHVACIteration,
+                                         Off,
+                                         dZero,
+                                         state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
+                                         state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                                         HXUnitOn);
             } else {
+                SimDXCoil(state,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
+                          Off,
+                          FirstHVACIteration,
+                          state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
+                          state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                          dZero,
+                          OnOffAirFlowRatio);
             }
+        } break;
+        case PTHPType::PTWSHPUnit: {
+            SimWatertoAirHPSimple(state,
+                                  std::string(),
+                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                  dZero,
+                                  dZero,
+                                  OpMode,
+                                  dZero,
+                                  state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                  state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
+                                  state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
+                                  iZero,
+                                  dZero,
+                                  FirstHVACIteration);
+        } break;
+        default:
+            break;
         }
     }
     if (state.dataPTHP->HeatingLoad && OutsideDryBulbTemp > state.dataPTHP->PTUnit(PTUnitNum).MinOATCompressorHeating) {
@@ -6475,37 +6481,38 @@ void CalcPTUnit(EnergyPlusData &state,
                                             PartLoadFrac);
             }
         } else {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-                if (SELECT_CASE_var == PTHPType::PTHPUnit) {
-                    SimDXCoil(state,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
-                              On,
-                              FirstHVACIteration,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                              PartLoadFrac,
-                              OnOffAirFlowRatio);
-                    state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum);
-                } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
-                    HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
-                    SimWatertoAirHPSimple(state,
-                                          std::string(),
-                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                                          QZnReq,
-                                          dZero,
-                                          OpMode,
-                                          WSHPRuntimeFrac,
-                                          state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                          state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
-                                          state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                          iOne,
-                                          PartLoadFrac,
-                                          FirstHVACIteration,
-                                          OnOffAirFlowRatio);
-                    state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
-                } else {
-                }
+            switch (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num) {
+            case PTHPType::PTHPUnit: {
+                SimDXCoil(state,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
+                          On,
+                          FirstHVACIteration,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                          state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                          PartLoadFrac,
+                          OnOffAirFlowRatio);
+                state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum);
+            } break;
+            case PTHPType::PTWSHPUnit: {
+                HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
+                SimWatertoAirHPSimple(state,
+                                      std::string(),
+                                      state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                      QZnReq,
+                                      dZero,
+                                      OpMode,
+                                      WSHPRuntimeFrac,
+                                      state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                      state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
+                                      state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
+                                      iOne,
+                                      PartLoadFrac,
+                                      FirstHVACIteration,
+                                      OnOffAirFlowRatio);
+                state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
+            } break;
+            default:
+                break;
             }
         }
     } else {
@@ -6553,34 +6560,35 @@ void CalcPTUnit(EnergyPlusData &state,
                                             PartLoadFrac);
             }
         } else {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-                if (SELECT_CASE_var == PTHPType::PTHPUnit) {
-                    SimDXCoil(state,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
-                              Off,
-                              FirstHVACIteration,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                              dZero,
-                              OnOffAirFlowRatio);
-                } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
-                    SimWatertoAirHPSimple(state,
-                                          std::string(),
-                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                                          dZero,
-                                          dZero,
-                                          OpMode,
-                                          dZero,
-                                          state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                          state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
-                                          state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                          iZero,
-                                          dZero,
-                                          FirstHVACIteration);
+            switch (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num) {
+            case PTHPType::PTHPUnit: {
+                SimDXCoil(state,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
+                          Off,
+                          FirstHVACIteration,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                          state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                          dZero,
+                          OnOffAirFlowRatio);
+            } break;
+            case PTHPType::PTWSHPUnit: {
+                SimWatertoAirHPSimple(state,
+                                      std::string(),
+                                      state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                      dZero,
+                                      dZero,
+                                      OpMode,
+                                      dZero,
+                                      state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                      state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
+                                      state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
+                                      iZero,
+                                      dZero,
+                                      FirstHVACIteration);
 
-                } else {
-                }
+            } break;
+            default:
+                break;
             }
         }
     }
@@ -7339,17 +7347,19 @@ int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, 
     // So ZoneEquipList()%EquipIndex() passed to this subroutine (which is actually CompIndex), is based on each object type
     // which was recalculated for total number of all three object type for use in PT data structure.
 
-    {
-        auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-            PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-        } else {
-            assert(false);
-        }
+    switch (PTUnitType) {
+    case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+        PTUnitNum = PTUnitCompIndex;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
 
     if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
@@ -7409,17 +7419,19 @@ int GetPTUnitOutAirNode(EnergyPlusData &state, int const PTUnitCompIndex, DataZo
     // So ZoneEquipList()%EquipIndex() passed to this subroutine (which is actually CompIndex), is based on each object type
     // which was recalculated for total number of all three object type for use in PT data structure.
 
-    {
-        auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-            PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-        } else {
-            assert(false);
-        }
+    switch (PTUnitType) {
+    case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+        PTUnitNum = PTUnitCompIndex;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
 
     if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
@@ -7481,17 +7493,19 @@ int GetPTUnitReturnAirNode(EnergyPlusData &state, int const PTUnitCompIndex, Dat
     // So ZoneEquipList()%EquipIndex() passed to this subroutine (which is actually CompIndex), is based on each object type
     // which was recalculated for total number of all three object type for use in PT data structure.
 
-    {
-        auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-            PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-        } else {
-            assert(false);
-        }
+    switch (PTUnitType) {
+    case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+        PTUnitNum = PTUnitCompIndex;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
 
     if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
@@ -7558,17 +7572,19 @@ int GetPTUnitMixedAirNode(EnergyPlusData &state, int const PTUnitCompIndex, Data
     // So ZoneEquipList()%EquipIndex() passed to this subroutine (which is actually CompIndex), is based on each object type
     // which was recalculated for total number of all three object type for use in PT data structure.
 
-    {
-        auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-            PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-        } else {
-            assert(false);
-        }
+    switch (PTUnitType) {
+    case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+        PTUnitNum = PTUnitCompIndex;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
 
     if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
