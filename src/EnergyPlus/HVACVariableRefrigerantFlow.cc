@@ -2296,38 +2296,39 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (lAlphaFieldBlanks(35)) {
             state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum = 0;
         } else {
-            {
-                auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType);
-                if ((SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Air) ||
-                    (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Evap)) {
-                    state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum = GetOnlySingleNode(state,
-                                                                                               cAlphaArgs(35),
-                                                                                               ErrorsFound,
-                                                                                               cCurrentModuleObject,
-                                                                                               state.dataHVACVarRefFlow->VRF(VRFNum).Name,
-                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                               NodeInputManager::CompFluidStream::Primary,
-                                                                                               ObjectIsNotParent);
-                    if (!CheckOutAirNodeNumber(state, state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum)) {
-                        ShowSevereError(state,
-                                        cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(35) +
-                                            " not a valid Outdoor Air Node = " + cAlphaArgs(35));
-                        ShowContinueError(state, "...node name does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-                        ErrorsFound = true;
-                    }
-                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Water) {
-                    state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum = GetOnlySingleNode(state,
-                                                                                               cAlphaArgs(35),
-                                                                                               ErrorsFound,
-                                                                                               cCurrentModuleObject,
-                                                                                               state.dataHVACVarRefFlow->VRF(VRFNum).Name,
-                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                                                               NodeInputManager::CompFluidStream::Secondary,
-                                                                                               ObjectIsNotParent);
-                } else {
+            switch (state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType) {
+            case DataHeatBalance::RefrigCondenserType::Air:
+            case DataHeatBalance::RefrigCondenserType::Evap: {
+                state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum = GetOnlySingleNode(state,
+                                                                                           cAlphaArgs(35),
+                                                                                           ErrorsFound,
+                                                                                           cCurrentModuleObject,
+                                                                                           state.dataHVACVarRefFlow->VRF(VRFNum).Name,
+                                                                                           DataLoopNode::NodeFluidType::Air,
+                                                                                           DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                           NodeInputManager::CompFluidStream::Primary,
+                                                                                           ObjectIsNotParent);
+                if (!CheckOutAirNodeNumber(state, state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum)) {
+                    ShowSevereError(state,
+                                    cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(35) +
+                                        " not a valid Outdoor Air Node = " + cAlphaArgs(35));
+                    ShowContinueError(state, "...node name does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
+                    ErrorsFound = true;
                 }
+            } break;
+            case DataHeatBalance::RefrigCondenserType::Water: {
+                state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum = GetOnlySingleNode(state,
+                                                                                           cAlphaArgs(35),
+                                                                                           ErrorsFound,
+                                                                                           cCurrentModuleObject,
+                                                                                           state.dataHVACVarRefFlow->VRF(VRFNum).Name,
+                                                                                           DataLoopNode::NodeFluidType::Water,
+                                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                                           NodeInputManager::CompFluidStream::Secondary,
+                                                                                           ObjectIsNotParent);
+            } break;
+            default:
+                break;
             }
         }
 
@@ -7068,18 +7069,21 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                 any(state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).CoolingCoilPresent)) {
                 state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
                 // test if heating load exists, account for thermostat control type
-                {
-                    auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority);
-                    if ((SELECT_CASE_var == ThermostatCtrlType::LoadPriority) || (SELECT_CASE_var == ThermostatCtrlType::ZonePriority)) {
-                        if (state.dataHVACVarRefFlow->SumHeatingLoads(VRFCond) > 0.0) EnableSystem = true;
-                    } else if (SELECT_CASE_var == ThermostatCtrlType::ThermostatOffsetPriority) {
-                        if (state.dataHVACVarRefFlow->MinDeltaT(VRFCond) < 0.0) EnableSystem = true;
-                    } else if ((SELECT_CASE_var == ThermostatCtrlType::ScheduledPriority) ||
-                               (SELECT_CASE_var == ThermostatCtrlType::MasterThermostatPriority)) {
-                        // can't switch modes if scheduled (i.e., would be switching to unscheduled mode)
-                        // or master TSTAT used (i.e., master zone only has a specific load - can't switch)
-                    } else {
-                    }
+                switch (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority) {
+                case ThermostatCtrlType::LoadPriority:
+                case ThermostatCtrlType::ZonePriority: {
+                    if (state.dataHVACVarRefFlow->SumHeatingLoads(VRFCond) > 0.0) EnableSystem = true;
+                } break;
+                case ThermostatCtrlType::ThermostatOffsetPriority: {
+                    if (state.dataHVACVarRefFlow->MinDeltaT(VRFCond) < 0.0) EnableSystem = true;
+                } break;
+                case ThermostatCtrlType::ScheduledPriority:
+                case ThermostatCtrlType::MasterThermostatPriority: {
+                    // can't switch modes if scheduled (i.e., would be switching to unscheduled mode)
+                    // or master TSTAT used (i.e., master zone only has a specific load - can't switch)
+                } break;
+                default:
+                    break;
                 }
                 if (EnableSystem) {
                     if ((OutsideDryBulbTemp >= state.dataHVACVarRefFlow->VRF(VRFCond).MinOATHeating &&
@@ -7158,16 +7162,19 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                 any(state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HeatingCoilPresent)) {
                 state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
                 // test if cooling load exists, account for thermostat control type
-                {
-                    auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority);
-                    if ((SELECT_CASE_var == ThermostatCtrlType::LoadPriority) || (SELECT_CASE_var == ThermostatCtrlType::ZonePriority)) {
-                        if (state.dataHVACVarRefFlow->SumCoolingLoads(VRFCond) < 0.0) EnableSystem = true;
-                    } else if (SELECT_CASE_var == ThermostatCtrlType::ThermostatOffsetPriority) {
-                        if (state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) > 0.0) EnableSystem = true;
-                    } else if ((SELECT_CASE_var == ThermostatCtrlType::ScheduledPriority) ||
-                               (SELECT_CASE_var == ThermostatCtrlType::MasterThermostatPriority)) {
-                    } else {
-                    }
+                switch (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority) {
+                case ThermostatCtrlType::LoadPriority:
+                case ThermostatCtrlType::ZonePriority: {
+                    if (state.dataHVACVarRefFlow->SumCoolingLoads(VRFCond) < 0.0) EnableSystem = true;
+                } break;
+                case ThermostatCtrlType::ThermostatOffsetPriority: {
+                    if (state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) > 0.0) EnableSystem = true;
+                } break;
+                case ThermostatCtrlType::ScheduledPriority:
+                case ThermostatCtrlType::MasterThermostatPriority: {
+                } break;
+                default:
+                    break;
                 }
                 if (EnableSystem) {
                     if ((OutsideDryBulbTemp >= state.dataHVACVarRefFlow->VRF(VRFCond).MinOATCooling &&
@@ -10641,116 +10648,121 @@ void InitializeOperatingMode(EnergyPlusData &state,
     }
 
     // Determine operating mode based on VRF type and thermostat control selection
-    {
-        auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority);
-        if (SELECT_CASE_var == ThermostatCtrlType::ThermostatOffsetPriority) {
-            if (state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) > std::abs(state.dataHVACVarRefFlow->MinDeltaT(VRFCond)) &&
-                state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) > 0.0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
-            } else if (state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) < std::abs(state.dataHVACVarRefFlow->MinDeltaT(VRFCond)) &&
-                       state.dataHVACVarRefFlow->MinDeltaT(VRFCond) < 0.0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            } else {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            }
-        } else if (SELECT_CASE_var == ThermostatCtrlType::LoadPriority) {
-            if (state.dataHVACVarRefFlow->SumHeatingLoads(VRFCond) > std::abs(state.dataHVACVarRefFlow->SumCoolingLoads(VRFCond)) &&
-                state.dataHVACVarRefFlow->SumHeatingLoads(VRFCond) > 0.0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            } else if (state.dataHVACVarRefFlow->SumHeatingLoads(VRFCond) <= std::abs(state.dataHVACVarRefFlow->SumCoolingLoads(VRFCond)) &&
-                       state.dataHVACVarRefFlow->SumCoolingLoads(VRFCond) < 0.0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
-            } else {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            }
-        } else if (SELECT_CASE_var == ThermostatCtrlType::ZonePriority) {
-            if (state.dataHVACVarRefFlow->NumHeatingLoads(VRFCond) > state.dataHVACVarRefFlow->NumCoolingLoads(VRFCond) &&
-                state.dataHVACVarRefFlow->NumHeatingLoads(VRFCond) > 0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            } else if (state.dataHVACVarRefFlow->NumHeatingLoads(VRFCond) <= state.dataHVACVarRefFlow->NumCoolingLoads(VRFCond) &&
-                       state.dataHVACVarRefFlow->NumCoolingLoads(VRFCond) > 0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
-            } else {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            }
-        } else if (SELECT_CASE_var == ThermostatCtrlType::ScheduledPriority) {
-            if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).SchedPriorityPtr) == 0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            } else if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).SchedPriorityPtr) == 1) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
-            } else {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            }
-        } else if (SELECT_CASE_var == ThermostatCtrlType::MasterThermostatPriority) {
-            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).RemainingOutputRequired /
-                       state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
-            if (state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).OpMode == DataHVACGlobals::ContFanCycCoil) {
-                SetCompFlowRate(state, state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex, VRFCond);
-
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
-                    // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
-                    state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex)
-                        .CalcVRF_FluidTCtrl(state,
-                                            state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex,
-                                            FirstHVACIteration,
-                                            0.0,
-                                            TempOutput,
-                                            OnOffAirFlowRatio,
-                                            SuppHeatCoilLoad);
-                } else {
-                    // Algorithm Type: VRF model based on system curve
-                    state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex)
-                        .CalcVRF(state,
-                                 state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex,
-                                 FirstHVACIteration,
-                                 0.0,
-                                 TempOutput,
-                                 OnOffAirFlowRatio,
-                                 SuppHeatCoilLoad);
-                }
-
-                LoadToCoolingSP =
-                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToCoolingSP /
-                    state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
-                LoadToHeatingSP =
-                    state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToHeatingSP /
-                    state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
-                if (TempOutput < LoadToHeatingSP) {
-                    state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-                    state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
-                } else if (TempOutput > LoadToCoolingSP) {
-                    state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
-                    state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                } else {
-                    state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-                    state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                }
-            } else if (ZoneLoad > 0.0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            } else if (ZoneLoad < 0.0) {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
-            } else {
-                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
-                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
-            }
-        } else if (SELECT_CASE_var == ThermostatCtrlType::FirstOnPriority) {
-            // na
+    switch (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority) {
+    case ThermostatCtrlType::ThermostatOffsetPriority: {
+        if (state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) > std::abs(state.dataHVACVarRefFlow->MinDeltaT(VRFCond)) &&
+            state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) > 0.0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+        } else if (state.dataHVACVarRefFlow->MaxDeltaT(VRFCond) < std::abs(state.dataHVACVarRefFlow->MinDeltaT(VRFCond)) &&
+                   state.dataHVACVarRefFlow->MinDeltaT(VRFCond) < 0.0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
         } else {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
         }
+    } break;
+    case ThermostatCtrlType::LoadPriority: {
+        if (state.dataHVACVarRefFlow->SumHeatingLoads(VRFCond) > std::abs(state.dataHVACVarRefFlow->SumCoolingLoads(VRFCond)) &&
+            state.dataHVACVarRefFlow->SumHeatingLoads(VRFCond) > 0.0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+        } else if (state.dataHVACVarRefFlow->SumHeatingLoads(VRFCond) <= std::abs(state.dataHVACVarRefFlow->SumCoolingLoads(VRFCond)) &&
+                   state.dataHVACVarRefFlow->SumCoolingLoads(VRFCond) < 0.0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+        } else {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+        }
+    } break;
+    case ThermostatCtrlType::ZonePriority: {
+        if (state.dataHVACVarRefFlow->NumHeatingLoads(VRFCond) > state.dataHVACVarRefFlow->NumCoolingLoads(VRFCond) &&
+            state.dataHVACVarRefFlow->NumHeatingLoads(VRFCond) > 0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+        } else if (state.dataHVACVarRefFlow->NumHeatingLoads(VRFCond) <= state.dataHVACVarRefFlow->NumCoolingLoads(VRFCond) &&
+                   state.dataHVACVarRefFlow->NumCoolingLoads(VRFCond) > 0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+        } else {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+        }
+    } break;
+    case ThermostatCtrlType::ScheduledPriority: {
+        if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).SchedPriorityPtr) == 0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+        } else if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRF(VRFCond).SchedPriorityPtr) == 1) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+        } else {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+        }
+    } break;
+    case ThermostatCtrlType::MasterThermostatPriority: {
+        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).RemainingOutputRequired /
+                   state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
+        if (state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).OpMode == DataHVACGlobals::ContFanCycCoil) {
+            SetCompFlowRate(state, state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex, VRFCond);
+
+            if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmType::FluidTCtrl) {
+                // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
+                state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex)
+                    .CalcVRF_FluidTCtrl(state,
+                                        state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex,
+                                        FirstHVACIteration,
+                                        0.0,
+                                        TempOutput,
+                                        OnOffAirFlowRatio,
+                                        SuppHeatCoilLoad);
+            } else {
+                // Algorithm Type: VRF model based on system curve
+                state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex)
+                    .CalcVRF(state,
+                             state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex,
+                             FirstHVACIteration,
+                             0.0,
+                             TempOutput,
+                             OnOffAirFlowRatio,
+                             SuppHeatCoilLoad);
+            }
+
+            LoadToCoolingSP =
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToCoolingSP /
+                state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
+            LoadToHeatingSP =
+                state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).OutputRequiredToHeatingSP /
+                state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
+            if (TempOutput < LoadToHeatingSP) {
+                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+            } else if (TempOutput > LoadToCoolingSP) {
+                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            } else {
+                state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+                state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            }
+        } else if (ZoneLoad > 0.0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+        } else if (ZoneLoad < 0.0) {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = true;
+        } else {
+            state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = false;
+            state.dataHVACVarRefFlow->CoolingLoad(VRFCond) = false;
+        }
+    } break;
+    case ThermostatCtrlType::FirstOnPriority: {
+        // na
+    } break;
+    default:
+        break;
     }
 
     // limit to one possible mode
