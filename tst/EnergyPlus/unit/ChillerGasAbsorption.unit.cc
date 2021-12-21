@@ -334,8 +334,8 @@ TEST_F(EnergyPlusFixture, GasAbsorption_calculateHeater_Fix_Test)
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    thisChillerHeater.HWLoopNum = 1;
-    thisChillerHeater.HWLoopSideNum = DataPlant::LoopSideLocation::Demand;
+    thisChillerHeater.HWplantLoc.loopNum = 1;
+    thisChillerHeater.HWplantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;

@@ -118,7 +118,7 @@ namespace HWBaseboardRadiator {
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        int HeatingCapMethod;         // - Method for heating capacity scaled sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
                                       // FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 
