@@ -66,8 +66,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace OutdoorAirUnit {
-    // component types addressed by this module
-    extern std::string const cMO_OutdoorAirUnit;
 
     enum class CompType : int
     {
@@ -138,17 +136,6 @@ namespace OutdoorAirUnit {
         NeutralMode, // signal coil shouldn't run
         Num
     };
-
-    enum class CurrentObject
-    {
-        Invalid = -1,
-        OAUnit,
-        EqList,
-        Num
-    };
-
-    constexpr static std::array<std::string_view, static_cast<int>(CurrentObject::Num)> CurrentModuleObjects = {
-        "ZoneHVAC:OutdoorAirUnit", "ZoneHVAC:OutdoorAirUnit:EquipmentList"};
 
     struct OAEquipList
     {
