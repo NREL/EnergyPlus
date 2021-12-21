@@ -3227,7 +3227,7 @@ namespace DesiccantDehumidifiers {
         case DesicDehumType::Generic: {
             return;
         } break;
-        defaul:
+        default:
             break;
         }
     }
