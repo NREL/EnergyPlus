@@ -245,32 +245,28 @@ namespace ReturnAirPathManager {
 
         for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
 
-            {
-                auto const SELECT_CASE_var(state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentTypeEnum(ComponentNum));
-
-                if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneMixer) { // 'AirLoopHVAC:ZoneMixer'
-
-                    if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                          state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                        SimAirMixer(state,
-                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
-                    }
-
-                } else if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum) { // 'AirLoopHVAC:ReturnPlenum'
-
-                    SimAirZonePlenum(state,
-                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-                                     DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum,
-                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
-
-                } else {
-                    ShowSevereError(state,
-                                    "Invalid AirLoopHVAC:ReturnPath Component=" +
-                                        state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
-                    ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).Name);
-                    ShowFatalError(state, "Preceding condition causes termination.");
+            switch (state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentTypeEnum(ComponentNum)) {
+            case DataZoneEquipment::AirLoopHVAC::ZoneMixer: { // 'AirLoopHVAC:ZoneMixer'
+                if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
+                      state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                    SimAirMixer(state,
+                                state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                                state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
                 }
+            } break;
+            case DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum: { // 'AirLoopHVAC:ReturnPlenum'
+                SimAirZonePlenum(state,
+                                 state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                                 DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum,
+                                 state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
+            } break;
+            default: {
+                ShowSevereError(state,
+                                "Invalid AirLoopHVAC:ReturnPath Component=" +
+                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
+                ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).Name);
+                ShowFatalError(state, "Preceding condition causes termination.");
+            } break;
             }
         }
     }
