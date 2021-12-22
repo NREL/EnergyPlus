@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -211,10 +212,7 @@ namespace LowTempRadiantSystem {
         bool CoolingSystem = false; // .TRUE. when the system is able to cool (parameters are valid)
         int ColdWaterInNode = 0;    // cold water inlet node
         int ColdWaterOutNode = 0;   // cold water outlet node
-        int CWLoopNum = 0;
-        DataPlant::LoopSideLocation CWLoopSide = DataPlant::LoopSideLocation::Invalid;
-        int CWBranchNum = 0;
-        int CWCompNum = 0;
+        PlantLocation CWPlantLoc{};
         int GlycolIndex = 0;             // Index to Glycol (Water) Properties
         int CondErrIndex = 0;            // Error index for recurring warning messages
         Real64 CondCausedTimeOff = 0.0;  // Amount of time condensation did or could have turned system off

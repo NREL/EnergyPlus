@@ -3117,9 +3117,9 @@ namespace FuelCellElectricGenerator {
                 this->ExhaustHX.THXexh = TprodGasIn - this->ExhaustHX.qHX / (NdotGas * CpProdGasMol * 1000.0);
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                                    TwaterIn,
-                                                                   state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
 
                 if (this->ExhaustHX.WaterMassFlowRate * Cp <= 0.0) {
@@ -3351,8 +3351,8 @@ namespace FuelCellElectricGenerator {
     {
         if (this->Type == DataPlant::PlantEquipmentType::Generator_FCStackCooler) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
-                                                            this->CWLoopNum,
-                                                            this->CWLoopSideNum,
+                                                            this->CWPlantLoc.loopNum,
+                                                            this->CWPlantLoc.loopSideNum,
                                                             DataPlant::PlantEquipmentType::Generator_FCStackCooler,
                                                             this->StackCooler.WaterInNode,
                                                             this->StackCooler.WaterOutNode,
@@ -3363,8 +3363,8 @@ namespace FuelCellElectricGenerator {
                                                             FirstHVACIteration);
         } else if (this->Type == DataPlant::PlantEquipmentType::Generator_FCExhaust) {
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
-                                                            this->CWLoopNum,
-                                                            this->CWLoopSideNum,
+                                                            this->CWPlantLoc.loopNum,
+                                                            this->CWPlantLoc.loopSideNum,
                                                             DataPlant::PlantEquipmentType::Generator_FCExhaust,
                                                             this->ExhaustHX.WaterInNode,
                                                             this->ExhaustHX.WaterOutNode,
@@ -3451,9 +3451,9 @@ namespace FuelCellElectricGenerator {
             this->Inverter.QairIntake = 0.0;
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                            DataGenerators::InitHRTemp,
-                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
             this->ExhaustHX.WaterMassFlowRateDesign = this->ExhaustHX.WaterVolumeFlowMax * rho;
@@ -3466,10 +3466,10 @@ namespace FuelCellElectricGenerator {
                                                this->ExhaustHX.WaterMassFlowRateDesign,
                                                this->ExhaustHX.WaterInNode,
                                                this->ExhaustHX.WaterOutNode,
-                                               this->CWLoopNum,
-                                               this->CWLoopSideNum,
-                                               this->CWBranchNum,
-                                               this->CWCompNum);
+                                               this->CWPlantLoc.loopNum,
+                                               this->CWPlantLoc.loopSideNum,
+                                               this->CWPlantLoc.branchNum,
+                                               this->CWPlantLoc.compNum);
 
             this->MyEnvrnFlag_Init = false;
             this->MyWarmupFlag_Init = true;
@@ -3501,10 +3501,10 @@ namespace FuelCellElectricGenerator {
                                                  mdot,
                                                  this->ExhaustHX.WaterInNode,
                                                  this->ExhaustHX.WaterOutNode,
-                                                 this->CWLoopNum,
-                                                 this->CWLoopSideNum,
-                                                 this->CWBranchNum,
-                                                 this->CWCompNum);
+                                                 this->CWPlantLoc.loopNum,
+                                                 this->CWPlantLoc.loopSideNum,
+                                                 this->CWPlantLoc.branchNum,
+                                                 this->CWPlantLoc.compNum);
 
             this->ExhaustHX.WaterMassFlowRate = mdot;
             this->ExhaustHX.WaterInletTemp = state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp;
@@ -3515,10 +3515,10 @@ namespace FuelCellElectricGenerator {
                                                  this->ExhaustHX.WaterMassFlowRate,
                                                  this->ExhaustHX.WaterInNode,
                                                  this->ExhaustHX.WaterOutNode,
-                                                 this->CWLoopNum,
-                                                 this->CWLoopSideNum,
-                                                 this->CWBranchNum,
-                                                 this->CWCompNum);
+                                                 this->CWPlantLoc.loopNum,
+                                                 this->CWPlantLoc.loopSideNum,
+                                                 this->CWPlantLoc.branchNum,
+                                                 this->CWPlantLoc.compNum);
 
             this->ExhaustHX.WaterInletTemp = state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp;
         }
@@ -3734,10 +3734,10 @@ namespace FuelCellElectricGenerator {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->NameExhaustHX,
                                                     DataPlant::PlantEquipmentType::Generator_FCExhaust,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
-                                                    this->CWBranchNum,
-                                                    this->CWCompNum,
+                                                    this->CWPlantLoc.loopNum,
+                                                    this->CWPlantLoc.loopSideNum,
+                                                    this->CWPlantLoc.branchNum,
+                                                    this->CWPlantLoc.compNum,
                                                     errFlag,
                                                     _,
                                                     _,

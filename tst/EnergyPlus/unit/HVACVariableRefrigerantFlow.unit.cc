@@ -5831,7 +5831,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     // call plant-side VRF
     auto vrfCondPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(*state, state->dataHVACVarRefFlow->VRF(VRFCond).Name);
     PlantLocation dummyLoc;
-    dummyLoc.loopNum = dynamic_cast<HVACVariableRefrigerantFlow::VRFCondenserEquipment *>(vrfCondPtr)->SourceLoopNum;
+    dummyLoc.loopNum = dynamic_cast<HVACVariableRefrigerantFlow::VRFCondenserEquipment *>(vrfCondPtr)->SourcePlantLoc.loopNum;
     vrfCondPtr->onInitLoopEquip(*state, dummyLoc);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -1000.0; // set cooling load
@@ -5865,14 +5865,14 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
     rho = GetDensityGlycol(*state,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                            state->dataSize->PlantSizData(1).ExitTemp,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
                            RoutineName);
     Cp = GetSpecificHeatGlycol(*state,
-                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                                state->dataSize->PlantSizData(1).ExitTemp,
-                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
                                RoutineName);
     CondVolFlowRate = max(state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity) /
                       (state->dataSize->PlantSizData(1).DeltaT * Cp * rho);
@@ -5880,9 +5880,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_DOUBLE_EQ(CondVolFlowRate, state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate);
 
     rho = GetDensityGlycol(*state,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                            DataGlobalConstants::InitConvTemp,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
                            RoutineName);
     EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
                      (state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho));

@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -337,15 +338,8 @@ namespace UnitarySystems {
         bool m_MySetPointCheckFlag;
         bool m_MySizingCheckFlag;
         bool m_InitHeatPump; // Heat pump initialization flag (for error reporting)
-
-        int m_HRLoopNum;
-        DataPlant::LoopSideLocation m_HRLoopSideNum {DataPlant::LoopSideLocation::Invalid};
-        int m_HRBranchNum;
-        int m_HRCompNum;
-        int m_SuppCoilLoopNum;
-        DataPlant::LoopSideLocation m_SuppCoilLoopSide {DataPlant::LoopSideLocation::Invalid};
-        int m_SuppCoilBranchNum;
-        int m_SuppCoilCompNum;
+        PlantLocation m_HRPlantLoc{};
+        PlantLocation m_SuppCoilPlantLoc{};
         int m_SuppCoilFluidOutletNodeNum;
 
         Real64 m_WSHPRuntimeFrac;

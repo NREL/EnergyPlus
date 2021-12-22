@@ -504,10 +504,10 @@ namespace AirLoopHVACDOAS {
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
                                                                 DataPlant::PlantEquipmentType::CoilWaterCooling,
-                                                                thisDOAS.CWLoopNum,
-                                                                thisDOAS.CWLoopSide,
-                                                                thisDOAS.CWBranchNum,
-                                                                thisDOAS.CWCompNum,
+                                                                thisDOAS.CWPlantLoc.loopNum,
+                                                                thisDOAS.CWPlantLoc.loopSideNum,
+                                                                thisDOAS.CWPlantLoc.branchNum,
+                                                                thisDOAS.CWPlantLoc.compNum,
                                                                 errorsFound,
                                                                 _,
                                                                 _,
@@ -537,10 +537,10 @@ namespace AirLoopHVACDOAS {
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
                                                                 DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                                                thisDOAS.HWLoopNum,
-                                                                thisDOAS.HWLoopSide,
-                                                                thisDOAS.HWBranchNum,
-                                                                thisDOAS.HWCompNum,
+                                                                thisDOAS.HWPlantLoc.loopNum,
+                                                                thisDOAS.HWPlantLoc.loopSideNum,
+                                                                thisDOAS.HWPlantLoc.branchNum,
+                                                                thisDOAS.HWPlantLoc.compNum,
                                                                 errorsFound,
                                                                 _,
                                                                 _,
@@ -577,10 +577,10 @@ namespace AirLoopHVACDOAS {
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
                                                                 DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling,
-                                                                thisDOAS.CWLoopNum,
-                                                                thisDOAS.CWLoopSide,
-                                                                thisDOAS.CWBranchNum,
-                                                                thisDOAS.CWCompNum,
+                                                                thisDOAS.CWPlantLoc.loopNum,
+                                                                thisDOAS.CWPlantLoc.loopSideNum,
+                                                                thisDOAS.CWPlantLoc.branchNum,
+                                                                thisDOAS.CWPlantLoc.compNum,
                                                                 errorsFound,
                                                                 _,
                                                                 _,
@@ -902,56 +902,56 @@ namespace AirLoopHVACDOAS {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_HeatCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidName,
                                                             DataGlobalConstants::HWInitConvTemp,
-                                                            state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->HWCtrlNodeNum,
                                                        state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->HWLoopNum,
-                                                       this->HWLoopSide,
-                                                       this->HWBranchNum,
-                                                       this->HWCompNum);
+                                                       this->HWPlantLoc.loopNum,
+                                                       this->HWPlantLoc.loopSideNum,
+                                                       this->HWPlantLoc.branchNum,
+                                                       this->HWPlantLoc.compNum);
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->CWCtrlNodeNum,
                                                        state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->CWLoopNum,
-                                                       this->CWLoopSide,
-                                                       this->CWBranchNum,
-                                                       this->CWCompNum);
+                                                       this->CWPlantLoc.loopNum,
+                                                       this->CWPlantLoc.loopSideNum,
+                                                       this->CWPlantLoc.branchNum,
+                                                       this->CWPlantLoc.compNum);
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
                                                             DataGlobalConstants::CWInitConvTemp,
-                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                             RoutineName);
                     PlantUtilities::InitComponentNodes(state,
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->CWCtrlNodeNum,
                                                        state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->CWLoopNum,
-                                                       this->CWLoopSide,
-                                                       this->CWBranchNum,
-                                                       this->CWCompNum);
+                                                       this->CWPlantLoc.loopNum,
+                                                       this->CWPlantLoc.loopSideNum,
+                                                       this->CWPlantLoc.branchNum,
+                                                       this->CWPlantLoc.compNum);
                 }
             }
 

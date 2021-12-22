@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataSize->PlantSizData(PltSizNum).DeltaT = 10.0;
     state->dataSize->PlantSizData(PltSizNum).LoopType = DataSizing::CoolingLoop;
     // Assign to the wrapper
-    state->dataPlantCentralGSHP->Wrapper(1).CWLoopNum = PltSizNum;
+    state->dataPlantCentralGSHP->Wrapper(1).CWPlantLoc.loopNum = PltSizNum;
 
     // Condenser Loop
     int PltSizCondNum = 2;
@@ -134,7 +134,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataSize->PlantSizData(PltSizCondNum).DeltaT = 5.6;
     state->dataSize->PlantSizData(PltSizCondNum).LoopType = DataSizing::CondenserLoop;
     // Assign to the wrapper
-    state->dataPlantCentralGSHP->Wrapper(1).GLHELoopNum = PltSizCondNum;
+    state->dataPlantCentralGSHP->Wrapper(1).GLHEPlantLoc.loopNum = PltSizCondNum;
 
     // Calculate expected values
     Real64 rho_evap = FluidProperties::GetDensityGlycol(*state,

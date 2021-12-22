@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/StandardRatings.hh>
 

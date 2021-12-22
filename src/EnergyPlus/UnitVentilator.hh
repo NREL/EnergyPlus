@@ -58,6 +58,7 @@
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -149,10 +150,7 @@ namespace UnitVentilator {
         int ColdControlNode;        // chilled water control node
         int ColdCoilOutNodeNum;     // chilled water coil out node
         Real64 ColdControlOffset;   // control tolerance
-        int CWLoopNum;              // index for plant loop with chilled water coil
-        DataPlant::LoopSideLocation CWLoopSide;             // index for plant loop side for chilled water coil
-        int CWBranchNum;            // index for plant branch for chilled water coil
-        int CWCompNum;              // index for plant component for chilled water coil
+        PlantLocation CWPlantLoc;              // index for plant component for chilled water coil
         // Report data
         Real64 HeatPower;  // unit heating output in watts
         Real64 HeatEnergy; // unit heating output in J
@@ -190,7 +188,7 @@ namespace UnitVentilator {
               HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), CCoilPresent(false), CCoil_Index(0),
               CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
               MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
-              ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
+              ColdControlOffset(0.0), CWPlantLoc{}, HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
               TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanPartLoadRatio(0.0),
               PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0),
               ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)

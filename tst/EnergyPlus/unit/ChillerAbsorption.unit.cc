@@ -1816,12 +1816,12 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     Real64 GenMassFlowRateTestResult =
         (state->dataLoopNodes->Node(EvapInletNode).MassFlowRate / thisChiller.EvapMassFlowRateMax) * thisChiller.GenMassFlowRateMax;
     // lock the evap flow at test condition specified
-    int LoopNum = thisChiller.CWLoopNum;
-    DataPlant::LoopSideLocation LoopSideNum = thisChiller.CWLoopSideNum;
+    int LoopNum = thisChiller.CWPlantLoc.loopNum;
+    DataPlant::LoopSideLocation LoopSideNum = thisChiller.CWPlantLoc.loopSideNum;
     state->dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::FlowLock::Locked;
     // calc generator flow
-    int GenLoopNum = thisChiller.GenLoopNum;
-    DataPlant::LoopSideLocation GenLoopSideNum = thisChiller.GenLoopSideNum;
+    int GenLoopNum = thisChiller.GenPlantLoc.loopNum;
+    DataPlant::LoopSideLocation GenLoopSideNum = thisChiller.GenPlantLoc.loopSideNum;
     state->dataPlnt->PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = DataPlant::FlowLock::Unlocked;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;

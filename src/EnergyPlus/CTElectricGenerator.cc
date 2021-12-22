@@ -569,9 +569,9 @@ namespace CTElectricGenerator {
             heatRecInTemp = state.dataLoopNodes->Node(heatRecInNode).Temp;
 
             heatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                                heatRecInTemp,
-                                                               state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             if (FirstHVACIteration && RunFlag) {
                 heatRecMdot = this->DesignHeatRecMassFlowRate;
@@ -776,10 +776,10 @@ namespace CTElectricGenerator {
                                                this->DesignHeatRecMassFlowRate,
                                                HeatRecInletNode,
                                                HeatRecOutletNode,
-                                               this->HRLoopNum,
-                                               this->HRLoopSideNum,
-                                               this->HRBranchNum,
-                                               this->HRCompNum);
+                                               this->HRPlantLoc.loopNum,
+                                               this->HRPlantLoc.loopSideNum,
+                                               this->HRPlantLoc.branchNum,
+                                               this->HRPlantLoc.compNum);
 
             this->MyEnvrnFlag = false;
         } // end environmental inits
@@ -800,20 +800,20 @@ namespace CTElectricGenerator {
                                                      mdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRLoopNum,
-                                                     this->HRLoopSideNum,
-                                                     this->HRBranchNum,
-                                                     this->HRCompNum);
+                                                     this->HRPlantLoc.loopNum,
+                                                     this->HRPlantLoc.loopSideNum,
+                                                     this->HRPlantLoc.branchNum,
+                                                     this->HRPlantLoc.compNum);
 
             } else {
                 PlantUtilities::SetComponentFlowRate(state,
                                                      this->HeatRecMdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRLoopNum,
-                                                     this->HRLoopSideNum,
-                                                     this->HRBranchNum,
-                                                     this->HRCompNum);
+                                                     this->HRPlantLoc.loopNum,
+                                                     this->HRPlantLoc.loopSideNum,
+                                                     this->HRPlantLoc.branchNum,
+                                                     this->HRPlantLoc.compNum);
             }
         }
     }
@@ -829,10 +829,10 @@ namespace CTElectricGenerator {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::PlantEquipmentType::Generator_CTurbine,
-                                                        this->HRLoopNum,
-                                                        this->HRLoopSideNum,
-                                                        this->HRBranchNum,
-                                                        this->HRCompNum,
+                                                        this->HRPlantLoc.loopNum,
+                                                        this->HRPlantLoc.loopSideNum,
+                                                        this->HRPlantLoc.branchNum,
+                                                        this->HRPlantLoc.compNum,
                                                         errFlag,
                                                         _,
                                                         _,
@@ -858,9 +858,9 @@ namespace CTElectricGenerator {
 
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
             this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -870,10 +870,10 @@ namespace CTElectricGenerator {
                                                this->DesignHeatRecMassFlowRate,
                                                HeatRecInletNode,
                                                HeatRecOutletNode,
-                                               this->HRLoopNum,
-                                               this->HRLoopSideNum,
-                                               this->HRBranchNum,
-                                               this->HRCompNum);
+                                               this->HRPlantLoc.loopNum,
+                                               this->HRPlantLoc.loopSideNum,
+                                               this->HRPlantLoc.branchNum,
+                                               this->HRPlantLoc.compNum);
 
             this->MySizeAndNodeInitFlag = false;
         }

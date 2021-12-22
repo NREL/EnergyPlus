@@ -507,8 +507,8 @@ namespace ICEngineElectricGenerator {
         // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions directly.
 
         PlantUtilities::UpdateComponentHeatRecoverySide(state,
-                                                        this->HRLoopNum,
-                                                        this->HRLoopSideNum,
+                                                        this->HRPlantLoc.loopNum,
+                                                        this->HRPlantLoc.loopSideNum,
                                                         DataPlant::PlantEquipmentType::Generator_ICEngine,
                                                         this->HeatRecInletNodeNum,
                                                         this->HeatRecOutletNodeNum,
@@ -756,9 +756,9 @@ namespace ICEngineElectricGenerator {
 
         Real64 HeatRecInTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
         Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                  state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                                  state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                                   HeatRecInTemp,
-                                                                  state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                                  state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                                   RoutineName);
 
         // Don't divide by zero - Note This also results in no heat recovery when
@@ -830,10 +830,10 @@ namespace ICEngineElectricGenerator {
                                                this->DesignHeatRecMassFlowRate,
                                                HeatRecInletNode,
                                                HeatRecOutletNode,
-                                               this->HRLoopNum,
-                                               this->HRLoopSideNum,
-                                               this->HRBranchNum,
-                                               this->HRCompNum);
+                                               this->HRPlantLoc.loopNum,
+                                               this->HRPlantLoc.loopSideNum,
+                                               this->HRPlantLoc.branchNum,
+                                               this->HRPlantLoc.compNum);
 
             this->MyEnvrnFlag = false;
         } // end environmental inits
@@ -854,20 +854,20 @@ namespace ICEngineElectricGenerator {
                                                      mdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRLoopNum,
-                                                     this->HRLoopSideNum,
-                                                     this->HRBranchNum,
-                                                     this->HRCompNum);
+                                                     this->HRPlantLoc.loopNum,
+                                                     this->HRPlantLoc.loopSideNum,
+                                                     this->HRPlantLoc.branchNum,
+                                                     this->HRPlantLoc.compNum);
 
             } else {
                 PlantUtilities::SetComponentFlowRate(state,
                                                      this->HeatRecMdotActual,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRLoopNum,
-                                                     this->HRLoopSideNum,
-                                                     this->HRBranchNum,
-                                                     this->HRCompNum);
+                                                     this->HRPlantLoc.loopNum,
+                                                     this->HRPlantLoc.loopSideNum,
+                                                     this->HRPlantLoc.branchNum,
+                                                     this->HRPlantLoc.compNum);
             }
         }
     }
@@ -895,10 +895,10 @@ namespace ICEngineElectricGenerator {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::Generator_ICEngine,
-                                                    this->HRLoopNum,
-                                                    this->HRLoopSideNum,
-                                                    this->HRBranchNum,
-                                                    this->HRCompNum,
+                                                    this->HRPlantLoc.loopNum,
+                                                    this->HRPlantLoc.loopSideNum,
+                                                    this->HRPlantLoc.branchNum,
+                                                    this->HRPlantLoc.compNum,
                                                     errFlag,
                                                     _,
                                                     _,
@@ -916,9 +916,9 @@ namespace ICEngineElectricGenerator {
 
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
             this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
@@ -929,10 +929,10 @@ namespace ICEngineElectricGenerator {
                                                this->DesignHeatRecMassFlowRate,
                                                this->HeatRecInletNodeNum,
                                                this->HeatRecOutletNodeNum,
-                                               this->HRLoopNum,
-                                               this->HRLoopSideNum,
-                                               this->HRBranchNum,
-                                               this->HRCompNum);
+                                               this->HRPlantLoc.loopNum,
+                                               this->HRPlantLoc.loopSideNum,
+                                               this->HRPlantLoc.branchNum,
+                                               this->HRPlantLoc.compNum);
 
             this->MySizeAndNodeInitFlag = false;
         }

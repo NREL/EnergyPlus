@@ -1004,7 +1004,7 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     // StackCooler: not included
 
     // other checks
-    EXPECT_EQ(1, thisFC->CWLoopNum);
+    EXPECT_EQ(1, thisFC->CWPlantLoc.loopNum);
 
     auto report = thisFC->Report;
     EXPECT_EQ(exhaustHX.qHX, report.qHX);
@@ -1951,7 +1951,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     // StackCooler: not included
 
     // other checks
-    EXPECT_EQ(1, thisFC->CWLoopNum);
+    EXPECT_EQ(1, thisFC->CWPlantLoc.loopNum);
 
     auto report = thisFC->Report;
     EXPECT_EQ(exhaustHX.qHX, report.qHX);

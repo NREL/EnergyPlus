@@ -113,10 +113,7 @@ namespace HVACSingleDuctInduc {
         Real64 MinVolColdWaterFlow; // m3/s
         Real64 MinColdWaterFlow;    // kg/s
         Real64 ColdControlOffset;   // control tolerance
-        int CWLoopNum;              // index for plant loop with chilled water coil
-        DataPlant::LoopSideLocation CWLoopSide;             // index for plant loop side for chilled water coil
-        int CWBranchNum;            // index for plant branch for chilled water coil
-        int CWCompNum;              // index for plant component for chilled water coil
+        PlantLocation CWPlantLoc{};              // index for plant component for chilled water coil
         int CWCoilFailNum1;         // index for errors
         int CWCoilFailNum2;         // index for errors
         std::string MixerName;      // name of air mixer component
@@ -138,8 +135,7 @@ namespace HVACSingleDuctInduc {
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolHotWaterFlow(0.0), MaxHotWaterFlow(0.0), MinVolHotWaterFlow(0.0),
               MinHotWaterFlow(0.0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), HWCoilFailNum1(0),
               HWCoilFailNum2(0), CCoil_Num(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolColdWaterFlow(0.0),
-              MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid),
-              CWBranchNum(0), CWCompNum(0), CWCoilFailNum1(0), CWCoilFailNum2(0), Mixer_Num(0), MaxPriAirMassFlow(0.0), MaxSecAirMassFlow(0.0),
+              MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), CWPlantLoc{}, CWCoilFailNum1(0), CWCoilFailNum2(0), Mixer_Num(0), MaxPriAirMassFlow(0.0), MaxSecAirMassFlow(0.0),
               ADUNum(0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
         {
         }

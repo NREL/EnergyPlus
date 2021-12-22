@@ -1128,10 +1128,10 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                            this->HeatRecMaxMassFlowRate,
                                            this->HeatRecInletNodeNum,
                                            this->HeatRecOutletNodeNum,
-                                           this->HRLoopNum,
-                                           this->HRLoopSideNum,
-                                           this->HRBranchNum,
-                                           this->HRCompNum);
+                                           this->HRPlantLoc.loopNum,
+                                           this->HRPlantLoc.loopSideNum,
+                                           this->HRPlantLoc.branchNum,
+                                           this->HRPlantLoc.compNum);
 
         state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp = 20.0; // Set the node temperature, assuming freeze control
         state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = 20.0;
@@ -1171,10 +1171,10 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                              DesiredMassFlowRate,
                                              this->HeatRecInletNodeNum,
                                              this->HeatRecOutletNodeNum,
-                                             this->HRLoopNum,
-                                             this->HRLoopSideNum,
-                                             this->HRBranchNum,
-                                             this->HRCompNum);
+                                             this->HRPlantLoc.loopNum,
+                                             this->HRPlantLoc.loopSideNum,
+                                             this->HRPlantLoc.branchNum,
+                                             this->HRPlantLoc.compNum);
     } else { // not FirstHVACIteration
         if (!RunFlag) {
             state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate =
@@ -1193,29 +1193,29 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                                      DesiredMassFlowRate,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRLoopNum,
-                                                     this->HRLoopSideNum,
-                                                     this->HRBranchNum,
-                                                     this->HRCompNum);
+                                                     this->HRPlantLoc.loopNum,
+                                                     this->HRPlantLoc.loopSideNum,
+                                                     this->HRPlantLoc.branchNum,
+                                                     this->HRPlantLoc.compNum);
             } else {
                 PlantUtilities::SetComponentFlowRate(state,
                                                      this->HeatRecMdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRLoopNum,
-                                                     this->HRLoopSideNum,
-                                                     this->HRBranchNum,
-                                                     this->HRCompNum);
+                                                     this->HRPlantLoc.loopNum,
+                                                     this->HRPlantLoc.loopSideNum,
+                                                     this->HRPlantLoc.branchNum,
+                                                     this->HRPlantLoc.compNum);
             }
         } else if (RunFlag && (!this->InternalFlowControl)) {
             PlantUtilities::SetComponentFlowRate(state,
                                                  this->HeatRecMdot,
                                                  this->HeatRecInletNodeNum,
                                                  this->HeatRecOutletNodeNum,
-                                                 this->HRLoopNum,
-                                                 this->HRLoopSideNum,
-                                                 this->HRBranchNum,
-                                                 this->HRCompNum);
+                                                 this->HRPlantLoc.loopNum,
+                                                 this->HRPlantLoc.loopSideNum,
+                                                 this->HRPlantLoc.branchNum,
+                                                 this->HRPlantLoc.compNum);
         }
     }
 }
@@ -1278,9 +1278,9 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     if (this->HeatRecActive) {
         HeatRecInTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
         HeatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                            HeatRecInTemp,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
         heatRecMdot = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
     } else {
@@ -1613,9 +1613,9 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
         //     Calculate heat recovery rate modifier curve output (function of water [volumetric] flow rate)
         if (this->HeatRecRateFWaterFlowCurveNum > 0) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                            HeatRecInTemp,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
             // Heat recovery fluid flow rate (m3/s)
@@ -1976,10 +1976,10 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Generator_MicroTurbine,
-                                                this->HRLoopNum,
-                                                this->HRLoopSideNum,
-                                                this->HRBranchNum,
-                                                this->HRCompNum,
+                                                this->HRPlantLoc.loopNum,
+                                                this->HRPlantLoc.loopSideNum,
+                                                this->HRPlantLoc.branchNum,
+                                                this->HRPlantLoc.compNum,
                                                 errFlag,
                                                 _,
                                                 _,
@@ -1997,9 +1997,9 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
 
         // size mass flow rate
         Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::InitConvTemp,
-                                                       state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
         this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
@@ -2010,10 +2010,10 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
                                            this->HeatRecMaxMassFlowRate,
                                            this->HeatRecInletNodeNum,
                                            this->HeatRecOutletNodeNum,
-                                           this->HRLoopNum,
-                                           this->HRLoopSideNum,
-                                           this->HRBranchNum,
-                                           this->HRCompNum);
+                                           this->HRPlantLoc.loopNum,
+                                           this->HRPlantLoc.loopSideNum,
+                                           this->HRPlantLoc.branchNum,
+                                           this->HRPlantLoc.compNum);
 
         this->MySizeAndNodeInitFlag = false;
     }

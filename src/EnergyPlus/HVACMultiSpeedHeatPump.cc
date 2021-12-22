@@ -1954,10 +1954,10 @@ namespace HVACMultiSpeedHeatPump {
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).Name,
                                         DataPlant::PlantEquipmentType::MultiSpeedHeatPumpRecovery,
-                                        MSHeatPump(MSHeatPumpNum).HRLoopNum,
-                                        MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
-                                        MSHeatPump(MSHeatPumpNum).HRBranchNum,
-                                        MSHeatPump(MSHeatPumpNum).HRCompNum,
+                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum,
+                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopSideNum,
+                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc.branchNum,
+                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc.compNum,
                                         errFlag,
                                         _,
                                         _,
@@ -2228,9 +2228,9 @@ namespace HVACMultiSpeedHeatPump {
             if ((MSHeatPump(MSHeatPumpNum).HeatRecActive) && (!MSHeatPump(MSHeatPumpNum).MyPlantScantFlag)) {
 
                 rho = GetDensityGlycol(state,
-                                       state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
-                                       state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
                 MSHeatPump(MSHeatPumpNum).DesignHeatRecMassFlowRate = MSHeatPump(MSHeatPumpNum).DesignHeatRecFlowRate * rho;
@@ -2240,10 +2240,10 @@ namespace HVACMultiSpeedHeatPump {
                                    MSHeatPump(MSHeatPumpNum).DesignHeatRecMassFlowRate,
                                    MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum,
                                    MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum,
-                                   MSHeatPump(MSHeatPumpNum).HRLoopNum,
-                                   MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
-                                   MSHeatPump(MSHeatPumpNum).HRBranchNum,
-                                   MSHeatPump(MSHeatPumpNum).HRCompNum);
+                                   MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum,
+                                   MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopSideNum,
+                                   MSHeatPump(MSHeatPumpNum).HRPlantLoc.branchNum,
+                                   MSHeatPump(MSHeatPumpNum).HRPlantLoc.compNum);
             }
             if (MSHeatPump(MSHeatPumpNum).CoilControlNode > 0) {
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow == AutoSize) {
@@ -2729,10 +2729,10 @@ namespace HVACMultiSpeedHeatPump {
                                  MdotHR,
                                  MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum,
                                  MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum,
-                                 MSHeatPump(MSHeatPumpNum).HRLoopNum,
-                                 MSHeatPump(MSHeatPumpNum).HRLoopSideNum,
-                                 MSHeatPump(MSHeatPumpNum).HRBranchNum,
-                                 MSHeatPump(MSHeatPumpNum).HRCompNum);
+                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum,
+                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopSideNum,
+                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc.branchNum,
+                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc.compNum);
         }
 
         // get operating capacity of water and steam coil
@@ -4493,9 +4493,9 @@ namespace HVACMultiSpeedHeatPump {
         if (HeatRecMassFlowRate > 0.0) {
 
             CpHeatRec = GetSpecificHeatGlycol(state,
-                                              state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidName,
+                                              state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidName,
                                               HeatRecInletTemp,
-                                              state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRLoopNum).FluidIndex,
+                                              state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidIndex,
                                               RoutineName);
 
             HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
