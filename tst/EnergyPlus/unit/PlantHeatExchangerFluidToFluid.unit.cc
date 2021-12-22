@@ -2349,13 +2349,13 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
 
     // when FirstHVACIteration is true, mass flow should match design max
     bool testFirstHVACIteration = true;
-    state->dataPlantHXFluidToFluid->FluidHX(1).control(*state, 1, -1000.0, testFirstHVACIteration);
+    state->dataPlantHXFluidToFluid->FluidHX(1).control(*state, -1000.0, testFirstHVACIteration);
 
     EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.MassFlowRateMax, 0.001);
 
     // when FirstHVACIteration is false, mass flow should be zero
     testFirstHVACIteration = false;
-    state->dataPlantHXFluidToFluid->FluidHX(1).control(*state, 1, -1000.0, testFirstHVACIteration);
+    state->dataPlantHXFluidToFluid->FluidHX(1).control(*state, -1000.0, testFirstHVACIteration);
     EXPECT_NEAR(state->dataLoopNodes->Node(2).MassFlowRate, 0.0, 0.001);
 }
 

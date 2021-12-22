@@ -151,10 +151,10 @@ void HeatExchangerStruct::simulate(EnergyPlusData &state,
     // for op scheme led HXs, only call controls if called from Loop Supply Side
     if ((this->controlMode == ControlType::OperationSchemeModulated) || (this->controlMode == ControlType::OperationSchemeOnOff)) {
         if (calledFromLocation.loopNum == this->SupplySideLoop.loopNum) {
-            this->control(state, calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
+            this->control(state, CurLoad, FirstHVACIteration);
         }
     } else {
-        this->control(state, calledFromLocation.loopNum, CurLoad, FirstHVACIteration);
+        this->control(state, CurLoad, FirstHVACIteration);
     }
 
     this->calculate(state,
@@ -918,7 +918,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
     }
 }
 
-void HeatExchangerStruct::control(EnergyPlusData &state, [[maybe_unused]] int const LoopNum, Real64 const MyLoad, bool FirstHVACIteration)
+void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration)
 {
 
     // SUBROUTINE INFORMATION:
