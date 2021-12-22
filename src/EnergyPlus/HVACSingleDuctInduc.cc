@@ -177,7 +177,7 @@ namespace HVACSingleDuctInduc {
         case SingleDuct_CV::FourPipeInduc: {
             SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
         } break;
-        defatul : {
+        default: {
             ShowSevereError(state, "Illegal Induction Unit Type used=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType);
             ShowContinueError(state, "Occurs in Induction Unit=" + state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
             ShowFatalError(state, "Preceding condition causes termination.");

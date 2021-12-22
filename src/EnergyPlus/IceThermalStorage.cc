@@ -1734,6 +1734,8 @@ namespace IceThermalStorage {
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
             this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
         } break;
+        default:
+            break;
         }
 
         // Initialize processed U values
