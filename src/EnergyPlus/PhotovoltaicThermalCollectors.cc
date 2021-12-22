@@ -571,17 +571,18 @@ namespace PhotovoltaicThermalCollectors {
         int InletNode = 0;
         int OutletNode = 0;
 
-        {
-            auto const SELECT_CASE_var(this->WorkingFluidType);
-            if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
-                InletNode = this->PlantInletNodeNum;
-                OutletNode = this->PlantOutletNodeNum;
-            } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
-                InletNode = this->HVACInletNodeNum;
-                OutletNode = this->HVACOutletNodeNum;
-            } else {
-                assert(false);
-            }
+        switch (this->WorkingFluidType) {
+        case WorkingFluidEnum::LIQUID: {
+            InletNode = this->PlantInletNodeNum;
+            OutletNode = this->PlantOutletNodeNum;
+        } break;
+        case WorkingFluidEnum::AIR: {
+            InletNode = this->HVACInletNodeNum;
+            OutletNode = this->HVACOutletNodeNum;
+        } break;
+        default: {
+            assert(false);
+        } break;
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && this->EnvrnInit) {
@@ -602,56 +603,57 @@ namespace PhotovoltaicThermalCollectors {
             this->Report.ToutletWorkFluid = 0.0;
             this->Report.BypassStatus = 0.0;
 
-            {
-                auto const SELECT_CASE_var(this->WorkingFluidType);
+            switch (this->WorkingFluidType) {
+            case WorkingFluidEnum::LIQUID: {
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                               DataGlobalConstants::HWInitConvTemp,
+                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                                               RoutineName);
 
-                if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
+                this->MaxMassFlowRate = this->DesignVolFlowRate * rho;
 
-                    Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                                   state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp,
-                                                                   state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
-                                                                   RoutineName);
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
+                                                   this->MaxMassFlowRate,
+                                                   InletNode,
+                                                   OutletNode,
+                                                   this->WLoopNum,
+                                                   this->WLoopSideNum,
+                                                   this->WLoopBranchNum,
+                                                   this->WLoopCompNum);
 
-                    this->MaxMassFlowRate = this->DesignVolFlowRate * rho;
+                this->Simple.LastCollectorTemp = 23.0;
 
-                    PlantUtilities::InitComponentNodes(state,
-                                                       0.0,
-                                                       this->MaxMassFlowRate,
-                                                       InletNode,
-                                                       OutletNode,
-                                                       this->WLoopNum,
-                                                       this->WLoopSideNum,
-                                                       this->WLoopBranchNum,
-                                                       this->WLoopCompNum);
-
-                    this->Simple.LastCollectorTemp = 23.0;
-
-                } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
-                    this->Simple.LastCollectorTemp = 23.0;
-                }
+            } break;
+            case WorkingFluidEnum::AIR: {
+                this->Simple.LastCollectorTemp = 23.0;
+            } break;
+            default:
+                break;
             }
 
             this->EnvrnInit = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnInit = true;
 
-        {
-            auto const SELECT_CASE_var(this->WorkingFluidType);
-
-            if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
-                // heating only right now, so control flow requests based on incident solar;
-                if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
-                    this->MassFlowRate = this->MaxMassFlowRate;
-                } else {
-                    this->MassFlowRate = 0.0;
-                }
-
-                PlantUtilities::SetComponentFlowRate(
-                    state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
-            } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
-                this->MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        switch (this->WorkingFluidType) {
+        case WorkingFluidEnum::LIQUID: {
+            // heating only right now, so control flow requests based on incident solar;
+            if (state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) > DataPhotovoltaics::MinIrradiance) {
+                this->MassFlowRate = this->MaxMassFlowRate;
+            } else {
+                this->MassFlowRate = 0.0;
             }
+
+            PlantUtilities::SetComponentFlowRate(
+                state, this->MassFlowRate, InletNode, OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
+        } break;
+        case WorkingFluidEnum::AIR: {
+            this->MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+        } break;
+        default:
+            break;
         }
     }
 
@@ -918,13 +920,15 @@ namespace PhotovoltaicThermalCollectors {
 
         int InletNode(0);
 
-        {
-            auto const SELECT_CASE_var(this->WorkingFluidType);
-            if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
-                InletNode = this->PlantInletNodeNum;
-            } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
-                InletNode = this->HVACInletNodeNum;
-            }
+        switch (this->WorkingFluidType) {
+        case WorkingFluidEnum::LIQUID: {
+            InletNode = this->PlantInletNodeNum;
+        } break;
+        case WorkingFluidEnum::AIR: {
+            InletNode = this->HVACInletNodeNum;
+        } break;
+        default:
+            break;
         }
 
         Real64 mdot = this->MassFlowRate;
@@ -939,15 +943,16 @@ namespace PhotovoltaicThermalCollectors {
 
                 Real64 Eff(0.0);
 
-                {
-                    auto const SELECT_CASE_var(this->Simple.ThermEfficMode);
-
-                    if (SELECT_CASE_var == ThermEfficEnum::FIXED) {
-                        Eff = this->Simple.ThermEffic;
-                    } else if (SELECT_CASE_var == ThermEfficEnum::SCHEDULED) {
-                        Eff = ScheduleManager::GetCurrentScheduleValue(state, this->Simple.ThermEffSchedNum);
-                        this->Simple.ThermEffic = Eff;
-                    }
+                switch (this->Simple.ThermEfficMode) {
+                case ThermEfficEnum::FIXED: {
+                    Eff = this->Simple.ThermEffic;
+                } break;
+                case ThermEfficEnum::SCHEDULED: {
+                    Eff = ScheduleManager::GetCurrentScheduleValue(state, this->Simple.ThermEffSchedNum);
+                    this->Simple.ThermEffic = Eff;
+                } break;
+                default:
+                    break;
                 }
 
                 Real64 PotentialHeatGain = state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum) * Eff * this->AreaCol;
@@ -1085,34 +1090,35 @@ namespace PhotovoltaicThermalCollectors {
         int InletNode;
         int OutletNode;
 
-        {
-            auto const SELECT_CASE_var(this->WorkingFluidType);
-            if (SELECT_CASE_var == WorkingFluidEnum::LIQUID) {
-                InletNode = this->PlantInletNodeNum;
-                OutletNode = this->PlantOutletNodeNum;
+        switch (this->WorkingFluidType) {
+        case WorkingFluidEnum::LIQUID: {
+            InletNode = this->PlantInletNodeNum;
+            OutletNode = this->PlantOutletNodeNum;
 
-                PlantUtilities::SafeCopyPlantNode(state, InletNode, OutletNode);
-                state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
+            PlantUtilities::SafeCopyPlantNode(state, InletNode, OutletNode);
+            state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
+        } break;
+        case WorkingFluidEnum::AIR: {
+            InletNode = this->HVACInletNodeNum;
+            OutletNode = this->HVACOutletNodeNum;
 
-            } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
-                InletNode = this->HVACInletNodeNum;
-                OutletNode = this->HVACOutletNodeNum;
+            // Set the outlet nodes for properties that just pass through & not used
+            state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+            state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMin = state.dataLoopNodes->Node(InletNode).MassFlowRateMin;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
+            state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
 
-                // Set the outlet nodes for properties that just pass through & not used
-                state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
-                state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
-                state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-                state.dataLoopNodes->Node(OutletNode).MassFlowRateMin = state.dataLoopNodes->Node(InletNode).MassFlowRateMin;
-                state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
-                state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
-                state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
-
-                // Set outlet node variables that are possibly changed
-                state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
-                state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat; // assumes dewpoint bound on cooling ....
-                state.dataLoopNodes->Node(OutletNode).Enthalpy =
-                    Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, state.dataLoopNodes->Node(OutletNode).HumRat);
-            }
+            // Set outlet node variables that are possibly changed
+            state.dataLoopNodes->Node(OutletNode).Temp = this->Report.ToutletWorkFluid;
+            state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat; // assumes dewpoint bound on cooling ....
+            state.dataLoopNodes->Node(OutletNode).Enthalpy =
+                Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, state.dataLoopNodes->Node(OutletNode).HumRat);
+        } break;
+        default:
+            break;
         }
     }
     void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
