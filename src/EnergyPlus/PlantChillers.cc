@@ -361,7 +361,7 @@ namespace PlantChillers {
                                                                                    ErrorsFound,
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeFluidType::Invalid,
+                                                                                   DataLoopNode::NodeFluidType::Blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
@@ -370,7 +370,7 @@ namespace PlantChillers {
                                                                                     ErrorsFound,
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::Invalid,
+                                                                                    DataLoopNode::NodeFluidType::Blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
@@ -2460,7 +2460,7 @@ namespace PlantChillers {
                                                                                    ErrorsFound,
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeFluidType::Invalid,
+                                                                                   DataLoopNode::NodeFluidType::Blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
@@ -2469,7 +2469,7 @@ namespace PlantChillers {
                                                                                     ErrorsFound,
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::Invalid,
+                                                                                    DataLoopNode::NodeFluidType::Blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
@@ -4579,7 +4579,7 @@ namespace PlantChillers {
                                                                                    ErrorsFound,
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeFluidType::Invalid,
+                                                                                   DataLoopNode::NodeFluidType::Blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
@@ -4588,7 +4588,7 @@ namespace PlantChillers {
                                                                                     ErrorsFound,
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::Invalid,
+                                                                                    DataLoopNode::NodeFluidType::Blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
@@ -6688,7 +6688,7 @@ namespace PlantChillers {
                                                                                    ErrorsFound,
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                   DataLoopNode::NodeFluidType::Invalid,
+                                                                                   DataLoopNode::NodeFluidType::Blank,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
@@ -6697,7 +6697,7 @@ namespace PlantChillers {
                                                                                     ErrorsFound,
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                    DataLoopNode::NodeFluidType::Invalid,
+                                                                                    DataLoopNode::NodeFluidType::Blank,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);

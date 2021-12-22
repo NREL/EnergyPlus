@@ -63,6 +63,7 @@ namespace DataLoopNode {
     enum class NodeFluidType
     {
         Invalid = -1,
+        Blank,
         Air,
         Water,
         Steam,
@@ -73,6 +74,7 @@ namespace DataLoopNode {
     enum class NodeConnectionType
     {
         Invalid = -1,
+        Blank,
         Inlet,
         Outlet,
         Internal,
@@ -100,8 +102,8 @@ namespace DataLoopNode {
     constexpr bool IncrementFluidStreamYes(true);
 
     // Valid Fluid Types for Nodes
-    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> ValidNodeFluidTypes = {"Air", "Water", "Steam", "Electric"};
-    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> ValidNodeFluidTypesUC = {"AIR", "WATER", "STEAM", "ELECTRIC"};
+    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> ValidNodeFluidTypes = {
+        "blank", "Air", "Water", "Steam", "Electric"};
 
     // Valid Connection Types for Nodes
     constexpr const char *ValidConnectionTypes(NodeConnectionType const NodeConnectionType)
@@ -220,7 +222,7 @@ namespace DataLoopNode {
 
         // Default Constructor
         NodeData()
-            : FluidType(NodeFluidType::Invalid), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue),
+            : FluidType(NodeFluidType::Blank), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue),
               TempLastTimestep(0.0), MassFlowRateRequest(0.0), MassFlowRate(0.0), MassFlowRateMin(0.0), MassFlowRateMax(SensedNodeFlagValue),
               MassFlowRateMinAvail(0.0), MassFlowRateMaxAvail(0.0), MassFlowRateSetPoint(0.0), Quality(0.0), Press(0.0), Enthalpy(0.0),
               EnthalpyLastTimestep(0.0), HumRat(0.0), HumRatMin(SensedNodeFlagValue), HumRatMax(SensedNodeFlagValue),
@@ -367,7 +369,7 @@ struct LoopNodeData : BaseGlobalStruct
     Array1D_string NodeID;
     Array1D<DataLoopNode::NodeData> Node; // dim to num nodes in SimHVAC
     DataLoopNode::NodeData DefaultNodeValues = {
-        DataLoopNode::NodeFluidType::Invalid,
+        DataLoopNode::NodeFluidType::Blank,
         0,
         0.0,
         0.0,
@@ -435,7 +437,7 @@ struct LoopNodeData : BaseGlobalStruct
         this->NumofMixers = 0;
         this->NodeID.deallocate();
         this->Node.deallocate();
-        this->DefaultNodeValues = DataLoopNode::NodeData(DataLoopNode::NodeFluidType::Invalid,
+        this->DefaultNodeValues = DataLoopNode::NodeData(DataLoopNode::NodeFluidType::Blank,
                                                          0,
                                                          0.0,
                                                          0.0,

@@ -612,7 +612,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                 ErrorsFound,
                                                                 CurrentModuleObject,
                                                                 AlphArray(1),
-                                                                DataLoopNode::NodeFluidType::Invalid,
+                                                                DataLoopNode::NodeFluidType::Blank,
                                                                 DataLoopNode::NodeConnectionType::Sensor,
                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                 ObjectIsNotParent);
@@ -621,7 +621,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                   ErrorsFound,
                                                                   CurrentModuleObject,
                                                                   AlphArray(1),
-                                                                  DataLoopNode::NodeFluidType::Invalid,
+                                                                  DataLoopNode::NodeFluidType::Blank,
                                                                   DataLoopNode::NodeConnectionType::Actuator,
                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                   ObjectIsNotParent);

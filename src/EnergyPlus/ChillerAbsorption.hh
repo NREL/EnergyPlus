@@ -184,7 +184,7 @@ namespace ChillerAbsorption {
               CondMassFlowRateMax(0.0), GenMassFlowRateMax(0.0), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
               OptPartLoadRat(0.0), TempDesCondIn(0.0), SteamLoadCoef(3, 0.0), PumpPowerCoef(3, 0.0), TempLowLimitEvapOut(0.0), ErrCount2(0),
-              GenHeatSourceType(DataLoopNode::NodeFluidType::Invalid), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false),
+              GenHeatSourceType(DataLoopNode::NodeFluidType::Blank), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false),
               GeneratorSubcool(0.0), SteamFluidIndex(0), GeneratorDeltaTemp(-99999.0), GeneratorDeltaTempWasAutoSized(true), CWLoopNum(0),
               CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0),
               GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),

@@ -134,7 +134,7 @@ namespace DataPlant {
 
         // Default Constructor
         PlantLoopData()
-            : FluidType(DataLoopNode::NodeFluidType::Invalid), FluidIndex(1), // default to water
+            : FluidType(DataLoopNode::NodeFluidType::Blank), FluidIndex(1), // default to water
               MFErrIndex(0), MFErrIndex1(0), MFErrIndex2(0), TempSetPointNodeNum(0), MaxBranch(0), MinTemp(0.0), MaxTemp(0.0), MinTempErrIndex(0),
               MaxTempErrIndex(0), MinVolFlowRate(0.0), MaxVolFlowRate(0.0), MaxVolFlowRateWasAutoSized(false), MinMassFlowRate(0.0),
               MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0),

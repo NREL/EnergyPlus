@@ -267,7 +267,7 @@ bool IsValidConnectionType(std::string_view ConnectionType)
     // Return value
     bool IsValid = false;
 
-    for (int Count = 0; Count < static_cast<int>(NodeConnectionType::Num); ++Count) {
+    for (int Count = 1; Count < static_cast<int>(NodeConnectionType::Num); ++Count) {
         if (ConnectionType != DataLoopNode::ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(Count))) continue;
         IsValid = true;
         break;
@@ -1695,8 +1695,8 @@ void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, Array1D_
     Array1D_int ListArray;
     Array1D_string ConnectionTypes(15);
 
-    for (int nodetype = 0; nodetype < static_cast<int>(NodeConnectionType::Num); ++nodetype) {
-        ConnectionTypes(nodetype + 1) = ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(nodetype));
+    for (int nodetype = 1; nodetype < static_cast<int>(NodeConnectionType::Num); ++nodetype) {
+        ConnectionTypes(nodetype) = ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(nodetype));
     }
 
     if (allocated(NodeConnectType)) NodeConnectType.deallocate();
