@@ -331,30 +331,29 @@ namespace EMSManager {
                 *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
             } else {
                 // Set the value and the actuated flag remotely on the actuated object via the pointer
-                switch (state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed) {
-                case PtrDataType::Real: {
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue =
-                        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number;
-                } break;
-                case PtrDataType::Integer: {
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
-                    tmpInteger = std::floor(state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number);
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = tmpInteger;
-                } break;
-                case PtrDataType::Logical: {
-                    *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
-                    if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number == 0.0) {
-                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
-                    } else if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number == 1.0) {
-                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = true;
-                    } else {
-                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
-                    }
+                {
+                    auto const SELECT_CASE_var(state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
 
-                } break;
-                default:
-                    break;
+                    if (SELECT_CASE_var == PtrDataType::Real) {
+                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
+                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue =
+                            state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number;
+                    } else if (SELECT_CASE_var == PtrDataType::Integer) {
+                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
+                        tmpInteger = std::floor(state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number);
+                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = tmpInteger;
+                    } else if (SELECT_CASE_var == PtrDataType::Logical) {
+                        *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = true;
+                        if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number == 0.0) {
+                            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+                        } else if (state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Number == 1.0) {
+                            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = true;
+                        } else {
+                            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+                        }
+
+                    } else {
+                    }
                 }
             }
         }
@@ -428,17 +427,19 @@ namespace EMSManager {
                 if (InternVarAvailNum <= 0) continue; // sometimes executes before completely finished setting up.
                 if (ErlVariableNum <= 0) continue;
 
-                switch (state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).PntrVarTypeUsed) {
-                case PtrDataType::Real: {
-                    state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value =
-                        SetErlValueNumber(*state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).RealValue);
-                } break;
-                case PtrDataType::Integer: {
-                    tmpReal = double(*state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).IntValue);
-                    state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = SetErlValueNumber(tmpReal);
-                } break;
-                default:
-                    break;
+                {
+                    auto const SELECT_CASE_var(state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).PntrVarTypeUsed);
+
+                    if (SELECT_CASE_var == PtrDataType::Real) {
+
+                        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value =
+                            SetErlValueNumber(*state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).RealValue);
+
+                    } else if (SELECT_CASE_var == PtrDataType::Integer) {
+
+                        tmpReal = double(*state.dataRuntimeLang->EMSInternalVarsAvailable(InternVarAvailNum).IntValue);
+                        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = SetErlValueNumber(tmpReal);
+                    }
                 }
             }
         }
@@ -1651,37 +1652,28 @@ namespace EMSManager {
     {
         std::string cControlTypeName;
 
-        switch (SetPointType) {
-        case SPControlType::TemperatureSetPoint: {
+        auto const SELECT_CASE_var(SetPointType);
+
+        if (SELECT_CASE_var == SPControlType::TemperatureSetPoint) {
             cControlTypeName = "Temperature Setpoint";
-        } break;
-        case SPControlType::TemperatureMinSetPoint: {
+        } else if (SELECT_CASE_var == SPControlType::TemperatureMinSetPoint) {
             cControlTypeName = "Temperature Minimum Setpoint";
-        } break;
-        case SPControlType::TemperatureMaxSetPoint: {
+        } else if (SELECT_CASE_var == SPControlType::TemperatureMaxSetPoint) {
             cControlTypeName = "Temperature Maximum Setpoint";
-        } break;
-        case SPControlType::HumidityRatioSetPoint: {
+        } else if (SELECT_CASE_var == SPControlType::HumidityRatioSetPoint) {
             cControlTypeName = "Humidity Ratio Setpoint";
-        } break;
-        case SPControlType::HumidityRatioMinSetPoint: {
+        } else if (SELECT_CASE_var == SPControlType::HumidityRatioMinSetPoint) {
             cControlTypeName = "Humidity Ratio Minimum Setpoint";
-        } break;
-        case SPControlType::HumidityRatioMaxSetPoint: {
+        } else if (SELECT_CASE_var == SPControlType::HumidityRatioMaxSetPoint) {
             cControlTypeName = "Humidity Ratio Maximum Setpoint";
-        } break;
-        case SPControlType::MassFlowRateSetPoint: {
+        } else if (SELECT_CASE_var == SPControlType::MassFlowRateSetPoint) {
             cControlTypeName = "Mass Flow Rate Setpoint";
-        } break;
-        case SPControlType::MassFlowRateMinSetPoint: {
+        } else if (SELECT_CASE_var == SPControlType::MassFlowRateMinSetPoint) {
             cControlTypeName = "Mass Flow Rate Minimum Available Setpoint";
-        } break;
-        case SPControlType::MassFlowRateMaxSetPoint: {
+        } else if (SELECT_CASE_var == SPControlType::MassFlowRateMaxSetPoint) {
             cControlTypeName = "Mass Flow Rate Maximum Available Setpoint";
-        } break;
-        default:
-            break;
         }
+
         return cControlTypeName;
     }
 
@@ -1763,36 +1755,25 @@ namespace EMSManager {
                 auto &nodeSetpointCheck = state.dataLoopNodes->NodeSetpointCheck(NodeNum);
                 nodeSetpointCheck.needsSetpointChecking = true;
 
-                switch (SetPointType) {
-                case SPControlType::TemperatureSetPoint: {
+                auto const SELECT_CASE_var(SetPointType);
+                if (SELECT_CASE_var == SPControlType::TemperatureSetPoint) {
                     nodeSetpointCheck.checkTemperatureSetPoint = true;
-                } break;
-                case SPControlType::TemperatureMinSetPoint: {
+                } else if (SELECT_CASE_var == SPControlType::TemperatureMinSetPoint) {
                     nodeSetpointCheck.checkTemperatureMinSetPoint = true;
-                } break;
-                case SPControlType::TemperatureMaxSetPoint: {
+                } else if (SELECT_CASE_var == SPControlType::TemperatureMaxSetPoint) {
                     nodeSetpointCheck.checkTemperatureMaxSetPoint = true;
-                } break;
-                case SPControlType::HumidityRatioSetPoint: {
+                } else if (SELECT_CASE_var == SPControlType::HumidityRatioSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioSetPoint = true;
-                } break;
-                case SPControlType::HumidityRatioMinSetPoint: {
+                } else if (SELECT_CASE_var == SPControlType::HumidityRatioMinSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioMinSetPoint = true;
-                } break;
-                case SPControlType::HumidityRatioMaxSetPoint: {
+                } else if (SELECT_CASE_var == SPControlType::HumidityRatioMaxSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioMaxSetPoint = true;
-                } break;
-                case SPControlType::MassFlowRateSetPoint: {
+                } else if (SELECT_CASE_var == SPControlType::MassFlowRateSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateSetPoint = true;
-                } break;
-                case SPControlType::MassFlowRateMinSetPoint: {
+                } else if (SELECT_CASE_var == SPControlType::MassFlowRateMinSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateMinSetPoint = true;
-                } break;
-                case SPControlType::MassFlowRateMaxSetPoint: {
+                } else if (SELECT_CASE_var == SPControlType::MassFlowRateMaxSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateMaxSetPoint = true;
-                } break;
-                default:
-                    break;
                 }
             }
         }
