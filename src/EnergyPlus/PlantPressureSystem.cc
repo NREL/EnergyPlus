@@ -126,17 +126,19 @@ void SimPressureDropSystem(EnergyPlusData &state,
         return;
 
     // Pass to another routine based on calling flag
-    {
-        auto const SELECT_CASE_var(CallType);
-        if (SELECT_CASE_var == DataPlant::PressureCall::Init) {
-            InitPressureDrop(state, LoopNum, FirstHVACIteration);
-        } else if (SELECT_CASE_var == DataPlant::PressureCall::Calc) {
-            BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
-        } else if (SELECT_CASE_var == DataPlant::PressureCall::Update) {
-            UpdatePressureDrop(state, LoopNum);
-        } else {
-            // Calling routines should only use the three possible keywords here
-        }
+    switch (CallType) {
+    case DataPlant::PressureCall::Init: {
+        InitPressureDrop(state, LoopNum, FirstHVACIteration);
+    } break;
+    case DataPlant::PressureCall::Calc: {
+        BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
+    } break;
+    case DataPlant::PressureCall::Update: {
+        UpdatePressureDrop(state, LoopNum);
+    } break;
+    default: {
+        // Calling routines should only use the three possible keywords here
+    } break;
     }
 }
 
@@ -411,28 +413,27 @@ void BranchPressureDrop(EnergyPlusData &state,
     NodeViscosity = GetViscosityGlycol(state, std::string(), NodeTemperature, FluidIndex, RoutineName);
 
     // Call the appropriate pressure calculation routine
-    {
-        auto const SELECT_CASE_var(pressureCurveType);
-        if (SELECT_CASE_var == DataBranchAirLoopPlant::PressureCurveType::Pressure) {
-            // DeltaP = [f*(L/D) + K] * (rho * V^2) / 2
-            BranchDeltaPress = PressureCurveValue(state, PressureCurveIndex, NodeMassFlow, NodeDensity, NodeViscosity);
-
-        } else if (SELECT_CASE_var == DataBranchAirLoopPlant::PressureCurveType::Generic) {
-            // DeltaP = func(mdot)
-            // Generic curve, only pass V1=mass flow rate
-            BranchDeltaPress = CurveValue(state, PressureCurveIndex, NodeMassFlow);
-
-        } else {
-            // Shouldn't end up here, but just in case
-            ++state.dataPlantPressureSys->ErrorCounter;
-            if (state.dataPlantPressureSys->ErrorCounter == 1) {
-                ShowSevereError(state, "Plant pressure simulation encountered a branch which contains invalid branch pressure curve type.");
-                ShowContinueError(state, "Occurs for branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
-                ShowContinueError(state, "This error will be issued only once, although other branches may encounter the same problem");
-                ShowContinueError(state, "For now, pressure drop on this branch will be set to zero.");
-                ShowContinueError(state, "Verify all pressure inputs and pressure drop output variables to ensure proper simulation");
-            }
+    switch (pressureCurveType) {
+    case DataBranchAirLoopPlant::PressureCurveType::Pressure: {
+        // DeltaP = [f*(L/D) + K] * (rho * V^2) / 2
+        BranchDeltaPress = PressureCurveValue(state, PressureCurveIndex, NodeMassFlow, NodeDensity, NodeViscosity);
+    } break;
+    case DataBranchAirLoopPlant::PressureCurveType::Generic: {
+        // DeltaP = func(mdot)
+        // Generic curve, only pass V1=mass flow rate
+        BranchDeltaPress = CurveValue(state, PressureCurveIndex, NodeMassFlow);
+    } break;
+    default: {
+        // Shouldn't end up here, but just in case
+        ++state.dataPlantPressureSys->ErrorCounter;
+        if (state.dataPlantPressureSys->ErrorCounter == 1) {
+            ShowSevereError(state, "Plant pressure simulation encountered a branch which contains invalid branch pressure curve type.");
+            ShowContinueError(state, "Occurs for branch: " + state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name);
+            ShowContinueError(state, "This error will be issued only once, although other branches may encounter the same problem");
+            ShowContinueError(state, "For now, pressure drop on this branch will be set to zero.");
+            ShowContinueError(state, "Verify all pressure inputs and pressure drop output variables to ensure proper simulation");
         }
+    } break;
     }
 
     // Log this pressure in the data structure to be handled by the update routine later

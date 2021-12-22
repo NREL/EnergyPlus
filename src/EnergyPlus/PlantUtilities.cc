@@ -948,26 +948,25 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
         }
 
         // Initialize, then check if we are out of range
-        {
-            auto const SELECT_CASE_var(CriteriaType);
-            if (SELECT_CASE_var == DataPlant::CriteriaType::MassFlowRate) {
-                if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_MassFlowRate) {
-                    state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::CriteriaType::Temperature) {
-                if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_Temperature) {
-                    state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::CriteriaType::HeatTransferRate) {
-                if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_HeatTransferRate) {
-                    state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
-                }
-
-            } else {
-                // Diagnostic fatal: improper criteria type
+        switch (CriteriaType) {
+        case DataPlant::CriteriaType::MassFlowRate: {
+            if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_MassFlowRate) {
+                state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
             }
+        } break;
+        case DataPlant::CriteriaType::Temperature: {
+            if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_Temperature) {
+                state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
+            }
+        } break;
+        case DataPlant::CriteriaType::HeatTransferRate: {
+            if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_HeatTransferRate) {
+                state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
+            }
+        } break;
+        default: {
+            // Diagnostic fatal: improper criteria type
+        } break;
         }
 
     } // if we have an index or not
