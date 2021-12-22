@@ -268,7 +268,7 @@ bool IsValidConnectionType(std::string_view ConnectionType)
     bool IsValid = false;
 
     for (int Count = 1; Count < static_cast<int>(NodeConnectionType::Num); ++Count) {
-        if (ConnectionType != DataLoopNode::ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(Count))) continue;
+        if (ConnectionType != DataLoopNode::ValidConnectionTypes[Count]) continue;
         IsValid = true;
         break;
     }
@@ -339,7 +339,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
 
     //  Check 1 -- check sensor and actuator nodes
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-        if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Sensor))
+        if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Sensor)])
             continue;
         IsValid = false;
         for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
@@ -348,10 +349,10 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Actuator))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Actuator)])
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Sensor))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Sensor)])
                 continue;
             IsValid = true;
         }
@@ -369,7 +370,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
 
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
-            ValidConnectionTypes(DataLoopNode::NodeConnectionType::Actuator))
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Actuator)])
             continue;
         IsValid = false;
         for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
@@ -378,13 +379,13 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Actuator))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Actuator)])
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Sensor))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Sensor)])
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAir))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::OutsideAir)])
                 continue;
             IsValid = true;
         }
@@ -404,7 +405,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 2a -- setpoint node must also be an inlet or an outlet (CR8212)
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
-            ValidConnectionTypes(DataLoopNode::NodeConnectionType::SetPoint))
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::SetPoint)])
             continue;
         IsValid = false;
         IsInlet = false;
@@ -415,16 +416,16 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::SetPoint))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::SetPoint)])
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAir))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::OutsideAir)])
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)])
                 IsInlet = true;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)])
                 IsOutlet = true;
             IsValid = true;
         }
@@ -456,7 +457,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 3 -- zone inlet nodes -- must be an outlet somewhere
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
-            ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneInlet))
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::ZoneInlet)])
             continue;
         IsValid = false;
         for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
@@ -465,7 +466,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType !=
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)])
                 continue;
             IsValid = true;
         }
@@ -484,7 +485,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 4 -- zone exhaust nodes -- must be an inlet somewhere
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
-            ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneExhaust))
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::ZoneExhaust)])
             continue;
         IsValid = false;
         for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
@@ -493,7 +494,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType !=
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)])
                 continue;
             IsValid = true;
         }
@@ -512,7 +513,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 5 -- return plenum induced air outlet nodes -- must be an inlet somewhere
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
-            ValidConnectionTypes(DataLoopNode::NodeConnectionType::InducedAir))
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::InducedAir)])
             continue;
         IsValid = false;
         for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
@@ -521,7 +522,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType !=
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)])
                 continue;
             IsValid = true;
         }
@@ -542,7 +543,8 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     //    b)  If an InletNode's object is not one of the above types, it is valid if the
     //        same node name appears as an INLET to an AirLoopHVAC, CondenserLoop, or PlantLoop.
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-        if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
+        if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)])
             continue;
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType == "AIRLOOPHVAC" ||
             state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType == "CONDENSERLOOP" ||
@@ -556,22 +558,22 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet) ||
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)] ||
                 state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneReturn) ||
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::ZoneReturn)] ||
                 state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneExhaust) ||
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::ZoneExhaust)] ||
                 state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::InducedAir) ||
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::InducedAir)] ||
                 state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::ReliefAir) ||
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::ReliefAir)] ||
                 state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAir)) {
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::OutsideAir)]) {
                 MatchedAtLeastOne = true;
                 continue;
             }
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet) &&
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)] &&
                 (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType == "AIRLOOPHVAC" ||
                  state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType == "CONDENSERLOOP" ||
                  state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType == "PLANTLOOP")) {
@@ -599,13 +601,14 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         // Only non-parent node connections
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectIsParent) continue;
-        if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
+        if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)])
             continue;
         for (Loop2 = Loop1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
             if (Loop1 == Loop2) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType !=
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)])
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber ==
                 state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber) {
@@ -629,14 +632,15 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         // Only non-parent node connections
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectIsParent) continue;
-        if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
+        if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)])
             continue;
         IsValid = true;
         for (Loop2 = Loop1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
             if (Loop1 == Loop2) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType !=
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)])
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber ==
                 state.dataBranchNodeConnections->NodeConnections(Loop1).NodeNumber) {
@@ -660,7 +664,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 9 -- nodes of type OutsideAirReference must be registered as DataLoopNode::NodeConnectionType::OutsideAir
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
-            ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAirReference))
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::OutsideAirReference)])
             continue;
         IsValid = false;
         for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
@@ -669,7 +673,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeNumber)
                 continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType !=
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::OutsideAir))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::OutsideAir)])
                 continue;
             IsValid = true;
             break;
@@ -728,18 +732,18 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NumOfNodeConnections < 2) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectIsParent) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)])
                 ++FluidStreamInletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream));
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType ==
-                ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
+                ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)])
                 ++FluidStreamOutletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream));
             for (Loop2 = Loop1 + 1; Loop2 <= NodeObjects(Object + 1) - 1; ++Loop2) {
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)])
                     ++FluidStreamInletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream));
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)])
                     ++FluidStreamOutletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream));
             }
             for (Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2) {
@@ -769,7 +773,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 11 - zone nodes may not be used as anything else except as a setpoint, sensor or actuator node
     for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
         if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType !=
-            ValidConnectionTypes(DataLoopNode::NodeConnectionType::ZoneNode))
+            ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::ZoneNode)])
             continue;
         IsValid = true;
         for (Loop2 = Loop1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
@@ -777,13 +781,13 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName ==
                 state.dataBranchNodeConnections->NodeConnections(Loop2).NodeName) {
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::Sensor))
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Sensor)])
                     continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::Actuator))
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Actuator)])
                     continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
-                    ValidConnectionTypes(DataLoopNode::NodeConnectionType::SetPoint))
+                    ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::SetPoint)])
                     continue;
                 ShowSevereError(state,
                                 "Node Connection Error, Node Name=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
@@ -1696,7 +1700,7 @@ void GetNodeConnectionType(EnergyPlusData &state, int const NodeNumber, Array1D_
     Array1D_string ConnectionTypes(15);
 
     for (int nodetype = 1; nodetype < static_cast<int>(NodeConnectionType::Num); ++nodetype) {
-        ConnectionTypes(nodetype) = ValidConnectionTypes(static_cast<DataLoopNode::NodeConnectionType>(nodetype));
+        ConnectionTypes(nodetype) = ValidConnectionTypes[nodetype];
     }
 
     if (allocated(NodeConnectType)) NodeConnectType.deallocate();

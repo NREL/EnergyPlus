@@ -689,7 +689,7 @@ namespace BranchInputManager {
                                        state.dataLoopNodes->NodeID(OutletNodeNum),
                                        "Connector:Mixer",
                                        MixerName,
-                                       DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
+                                       DataLoopNode::ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)],
                                        NodeInputManager::CompFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
@@ -721,7 +721,7 @@ namespace BranchInputManager {
                                                state.dataLoopNodes->NodeID(InletNodeNums(Loop)),
                                                "Connector:Mixer",
                                                MixerName,
-                                               DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
+                                               DataLoopNode::ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)],
                                                NodeInputManager::CompFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
@@ -847,7 +847,7 @@ namespace BranchInputManager {
                                        state.dataLoopNodes->NodeID(InletNodeNum),
                                        "Connector:Splitter",
                                        SplitterName,
-                                       DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
+                                       DataLoopNode::ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Inlet)],
                                        NodeInputManager::CompFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
@@ -880,7 +880,7 @@ namespace BranchInputManager {
                                                state.dataLoopNodes->NodeID(OutletNodeNums(Loop)),
                                                "Connector:Splitter",
                                                SplitterName,
-                                               DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
+                                               DataLoopNode::ValidConnectionTypes[static_cast<int>(DataLoopNode::NodeConnectionType::Outlet)],
                                                NodeInputManager::CompFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);

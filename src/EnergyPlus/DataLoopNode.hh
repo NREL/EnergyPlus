@@ -63,18 +63,18 @@ namespace DataLoopNode {
     enum class NodeFluidType
     {
         Invalid = -1,
-        Blank,
+        Blank, // TODO: remove, should be same as Invalid
         Air,
         Water,
         Steam,
-        Electric,
+        Electric, // TODO: Electric node "fluid" type?
         Num
     };
 
     enum class NodeConnectionType
     {
         Invalid = -1,
-        Blank,
+        Blank, // TODO: remove, should be same as Invalid
         Inlet,
         Outlet,
         Internal,
@@ -105,60 +105,22 @@ namespace DataLoopNode {
     constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> ValidNodeFluidTypes = {
         "blank", "Air", "Water", "Steam", "Electric"};
 
-    // Valid Connection Types for Nodes
-    constexpr const char *ValidConnectionTypes(NodeConnectionType const NodeConnectionType)
-    {
-
-        switch (NodeConnectionType) {
-        case NodeConnectionType::Inlet:
-            return "Inlet";
-
-        case NodeConnectionType::Outlet:
-            return "Outlet";
-
-        case NodeConnectionType::Internal:
-            return "Internal";
-
-        case NodeConnectionType::ZoneNode:
-            return "ZoneNode";
-
-        case NodeConnectionType::Sensor:
-            return "Sensor";
-
-        case NodeConnectionType::Actuator:
-            return "Actuator";
-
-        case NodeConnectionType::OutsideAir:
-            return "OutdoorAir";
-
-        case NodeConnectionType::ReliefAir:
-            return "ReliefAir";
-
-        case NodeConnectionType::ZoneInlet:
-            return "ZoneInlet";
-
-        case NodeConnectionType::ZoneReturn:
-            return "ZoneReturn";
-
-        case NodeConnectionType::ZoneExhaust:
-            return "ZoneExhaust";
-
-        case NodeConnectionType::SetPoint:
-            return "Setpoint";
-
-        case NodeConnectionType::Electric:
-            return "Electric";
-
-        case NodeConnectionType::OutsideAirReference:
-            return "OutsideAirReference";
-
-        case NodeConnectionType::InducedAir:
-            return "InducedAir";
-
-        default:
-            return "blank";
-        }
-    }
+    constexpr static std::array<std::string_view, static_cast<int>(NodeConnectionType::Num)> ValidConnectionTypes = {"blank",
+                                                                                                                     "Inlet",
+                                                                                                                     "Outlet",
+                                                                                                                     "Internal",
+                                                                                                                     "ZoneNode",
+                                                                                                                     "Sensor",
+                                                                                                                     "Actuator",
+                                                                                                                     "OutdoorAir",
+                                                                                                                     "ReliefAir",
+                                                                                                                     "ZoneInlet",
+                                                                                                                     "ZoneReturn",
+                                                                                                                     "ZoneExhaust",
+                                                                                                                     "Setpoint",
+                                                                                                                     "Electric",
+                                                                                                                     "OutsideAirReference",
+                                                                                                                     "InducedAir"};
 
     // Types
     struct NodeData

@@ -176,8 +176,9 @@ void GetNodeNums(EnergyPlusData &state,
     // Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
     FluidStreamNum = NodeFluidStream;
     for (Loop = 1; Loop <= NumNodes; ++Loop) {
-        if (static_cast<int>(nodeConnectionType) >= 1 && static_cast<int>(nodeConnectionType) < static_cast<int>(NodeConnectionType::Num)) {
-            ConnectionType = DataLoopNode::ValidConnectionTypes(nodeConnectionType);
+        auto nodeConnType(static_cast<int>(nodeConnectionType));
+        if (nodeConnType >= 1 && nodeConnType < static_cast<int>(NodeConnectionType::Num)) {
+            ConnectionType = DataLoopNode::ValidConnectionTypes[nodeConnType];
         } else {
             ConnectionType = format("{}-unknown", nodeConnectionType);
         }
@@ -814,8 +815,9 @@ int GetOnlySingleNode(EnergyPlusData &state,
         state.dataNodeInputMgr->GetOnlySingleNodeNodeNums(1) = 0;
     }
     if (NumNodes > 0) {
-        if (static_cast<int>(nodeConnectionType) >= 1 && static_cast<int>(nodeConnectionType) < static_cast<int>(NodeConnectionType::Num)) {
-            ConnectionType = DataLoopNode::ValidConnectionTypes(nodeConnectionType);
+        auto nodeConnType(static_cast<int>(nodeConnectionType));
+        if (nodeConnType >= 1 && nodeConnType < static_cast<int>(NodeConnectionType::Num)) {
+            ConnectionType = DataLoopNode::ValidConnectionTypes[nodeConnType];
         } else {
             ConnectionType = format("{}-unknown", nodeConnectionType);
         }
