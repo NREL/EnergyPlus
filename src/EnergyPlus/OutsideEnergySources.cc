@@ -293,26 +293,26 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
         // component model has not design flow rates, using data for overall plant loop
         PlantUtilities::InitComponentNodes(state,
-                                           state.dataPlnt->PlantLoop(this->LoopNum).MinMassFlowRate,
-                                           state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate,
+                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinMassFlowRate,
+                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate,
                                            this->InletNodeNum,
                                            this->OutletNodeNum,
-                                           this->LoopNum,
-                                           this->LoopSideNum,
-                                           this->BranchNum,
-                                           this->CompNum);
+                                           this->plantLoc.loopNum,
+                                           this->plantLoc.loopSideNum,
+                                           this->plantLoc.branchNum,
+                                           this->plantLoc.compNum);
         this->BeginEnvrnInitFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) this->BeginEnvrnInitFlag = true;
 
     Real64 TempPlantMassFlow(0.0);
     if (std::abs(MyLoad) > 0.0) {
-        TempPlantMassFlow = state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate;
+        TempPlantMassFlow = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate;
     }
 
     // get actual mass flow to use, hold in MassFlowRate variable
     PlantUtilities::SetComponentFlowRate(
-        state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+        state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
 
     this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
     this->MassFlowRate = TempPlantMassFlow;
@@ -340,17 +340,17 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
         typeName = "Heating";
     }
 
-    int const PltSizNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum;
+    int const PltSizNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
     if (PltSizNum > 0) {
         Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                              DataGlobalConstants::InitConvTemp,
-                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                              "SizeDistrict" + typeName);
         Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                  DataGlobalConstants::InitConvTemp,
-                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                  "SizeDistrict" + typeName);
         Real64 const NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
@@ -413,7 +413,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     static constexpr std::string_view RoutineName("SimDistrictEnergy");
 
     // set inlet and outlet nodes
-    int const LoopNum = this->LoopNum;
+    int const LoopNum = this->plantLoc.loopNum;
     Real64 const LoopMinTemp = state.dataPlnt->PlantLoop(LoopNum).MinTemp;
     Real64 const LoopMaxTemp = state.dataPlnt->PlantLoop(LoopNum).MaxTemp;
 
@@ -462,17 +462,17 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
     // Locate the unit on the plant loops for later usage
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+        state, this->Name, this->EnergyType, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
     }
     // set limits on outlet node temps to plant loop limits
-    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MinOutletTemp =
-        state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
-        state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
+    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).Branch(this->plantLoc.branchNum).Comp(this->plantLoc.compNum).MinOutletTemp =
+        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
+    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).Branch(this->plantLoc.branchNum).Comp(this->plantLoc.compNum).MaxOutletTemp =
+        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxTemp;
     // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxVolFlowRate);
 
     // this may need some help, if the objects change location later, due to a push_back,
     //  then the pointers to these output variables will be bad
