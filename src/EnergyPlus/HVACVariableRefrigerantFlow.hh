@@ -141,10 +141,7 @@ namespace HVACVariableRefrigerantFlow {
         int VRFSystemTypeNum;                  // integer equivalent of system type
         AlgorithmType VRFAlgorithmTypeNum;     // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
         DataPlant::PlantEquipmentType VRFType; // integer equivalent of index to DataPlant type
-        int SourceLoopNum;                     // plant data for water-cooled only
-        DataPlant::LoopSideLocation SourceLoopSideNum;                 // plant data for water-cooled only
-        int SourceBranchNum;                   // plant data for water-cooled only
-        int SourceCompNum;                     // plant data for water-cooled only
+        PlantLocation SourcePlantLoc;          // plant data for water-cooled only
         Real64 WaterCondenserDesignMassFlow;   // plant data for water-cooled only
         Real64 WaterCondenserMassFlow;         // Water condenser flow rate (kg/s)
         Real64 QCondenser;                     // Water condenser heat rejection/absorption (W)
@@ -376,8 +373,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // Default Constructor
         VRFCondenserEquipment()
-            : VRFSystemTypeNum(0), VRFAlgorithmTypeNum(AlgorithmType::Invalid), VRFType(DataPlant::PlantEquipmentType::Invalid), SourceLoopNum(0),
-              SourceLoopSideNum(DataPlant::LoopSideLocation::Invalid), SourceBranchNum(0), SourceCompNum(0), WaterCondenserDesignMassFlow(0.0), WaterCondenserMassFlow(0.0),
+            : VRFSystemTypeNum(0), VRFAlgorithmTypeNum(AlgorithmType::Invalid), VRFType(DataPlant::PlantEquipmentType::Invalid), SourcePlantLoc{}, WaterCondenserDesignMassFlow(0.0), WaterCondenserMassFlow(0.0),
               QCondenser(0.0), QCondEnergy(0.0), CondenserSideOutletTemp(0.0), SchedPtr(-1), CoolingCapacity(0.0), TotalCoolingCapacity(0.0),
               CoolingCombinationRatio(1.0), VRFCondPLR(0.0), VRFCondRTF(0.0), VRFCondCyclingRatio(0.0), CondenserInletTemp(0.0), CoolingCOP(0.0),
               OperatingCoolingCOP(0.0), RatedCoolingPower(0.0), HeatingCapacity(0.0), HeatingCapacitySizeRatio(1.0), LockHeatingCapacity(false),
@@ -731,10 +727,7 @@ namespace HVACVariableRefrigerantFlow {
         int SuppHeatCoilFluidInletNode;  // supplemental heating coil fluid inlet node
         int SuppHeatCoilFluidOutletNode; // supplemental heating coil fluid outlet node
         bool firstPass;                  // used to reset global sizing data
-        int SuppHeatCoilLoopNum;         // supplemental heating coil plant loop index
-        DataPlant::LoopSideLocation SuppHeatCoilLoopSide;        // supplemental heating coil plant loop side index
-        int SuppHeatCoilBranchNum;       // supplemental heating coil plant loop branch index
-        int SuppHeatCoilCompNum;         // supplemental heating coil plant component index
+        PlantLocation SuppHeatCoilPlantLoc; // supplemental heating coil plant component index
         Real64 coilInNodeT;              // coil inlet node temp at full flow (C)
         Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
         int fanInletNode;                // fan inlet node index
@@ -778,7 +771,7 @@ namespace HVACVariableRefrigerantFlow {
               EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0), FirstIterfailed(0), HVACSizingIndex(0),
               ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0),
               SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), SuppHeatCoilFluidOutletNode(0),
-              firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(DataPlant::LoopSideLocation::Invalid), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0),
+              firstPass(true), SuppHeatCoilPlantLoc{}, coilInNodeT(0.0),
               coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0), MySuppCoilPlantScanFlag(true), airLoopNum(0), isInOASys(false), isInAirLoop(false),
               isInZone(false), isSetPointControlled(false), coolSPActive(false), heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0),
               coilTempSetPoint(0.0), suppTempSetPoint(0.0), controlZoneMassFlowFrac(1.0), zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0),
