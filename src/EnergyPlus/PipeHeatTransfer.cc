@@ -144,13 +144,13 @@ void PipeHTData::simulate(EnergyPlusData &state,
     this->InitPipesHeatTransfer(state, FirstHVACIteration);
     // make the calculations
     for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= state.dataPipeHT->nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
-        {
-            auto const SELECT_CASE_var(this->EnvironmentPtr);
-            if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-                this->CalcBuriedPipeSoil(state);
-            } else {
-                this->CalcPipesHeatTransfer(state);
-            }
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::GroundEnv: {
+            this->CalcBuriedPipeSoil(state);
+        } break;
+        default: {
+            this->CalcPipesHeatTransfer(state);
+        } break;
         }
         this->PushInnerTimeStepArrays();
     }
@@ -1033,19 +1033,24 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
         }
 
         // should next choose environment temperature according to coupled with air or ground
-        {
-            auto const SELECT_CASE_var(this->EnvironmentPtr);
-            if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-                // EnvironmentTemp = GroundTemp
-            } else if (SELECT_CASE_var == EnvrnPtr::OutsideAirEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
-            } else if (SELECT_CASE_var == EnvrnPtr::ZoneEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
-            } else if (SELECT_CASE_var == EnvrnPtr::ScheduleEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
-            } else if (SELECT_CASE_var == EnvrnPtr::None) { // default to outside temp
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
-            }
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::GroundEnv: {
+            // EnvironmentTemp = GroundTemp
+        } break;
+        case EnvrnPtr::OutsideAirEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
+        } break;
+        case EnvrnPtr::ZoneEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+        } break;
+        case EnvrnPtr::ScheduleEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
+        } break;
+        case EnvrnPtr::None: { // default to outside temp
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
+        } break;
+        default:
+            break;
         }
 
         this->BeginEnvrnupdateFlag = false;
@@ -1209,23 +1214,27 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const
     FluidConvCoef = this->CalcPipeHeatTransCoef(state, state.dataPipeHT->nsvInletTemp, state.dataPipeHT->nsvMassFlowRate, this->PipeID);
 
     // heat transfer to air or ground
-    {
-        auto const SELECT_CASE_var(this->EnvironmentPtr);
-        if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-            // Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
-            // between pipe wall and next closest node.
-            EnvHeatTransCoef = this->SoilConductivity / (this->dSregular - (this->PipeID / 2.0));
-        } else if (SELECT_CASE_var == EnvrnPtr::OutsideAirEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::ZoneEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::ScheduleEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::None) {
-            EnvHeatTransCoef = 0.0;
-        } else {
-            EnvHeatTransCoef = 0.0;
-        }
+    switch (this->EnvironmentPtr) {
+    case EnvrnPtr::GroundEnv: {
+        // Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
+        // between pipe wall and next closest node.
+        EnvHeatTransCoef = this->SoilConductivity / (this->dSregular - (this->PipeID / 2.0));
+    } break;
+    case EnvrnPtr::OutsideAirEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::ZoneEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::ScheduleEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::None: {
+        EnvHeatTransCoef = 0.0;
+    } break;
+    default: {
+        EnvHeatTransCoef = 0.0;
+    } break;
     }
 
     // work out the coefficients
@@ -1839,33 +1848,33 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     bool CoefSet;
 
     // Set environmental variables
-    {
-        auto const SELECT_CASE_var(this->Type);
-
-        if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) {
-
-            {
-                auto const SELECT_CASE_var1(this->EnvironmentPtr);
-                if (SELECT_CASE_var1 == EnvrnPtr::ScheduleEnv) {
-                    AirTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
-                    AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
-
-                } else if (SELECT_CASE_var1 == EnvrnPtr::ZoneEnv) {
-                    AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
-                    AirVel = RoomAirVel;
-                }
-            }
-
-        } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) {
-
-            {
-                auto const SELECT_CASE_var1(this->EnvironmentPtr);
-                if (SELECT_CASE_var1 == EnvrnPtr::OutsideAirEnv) {
-                    AirTemp = state.dataLoopNodes->Node(this->EnvrAirNodeNum).Temp;
-                    AirVel = state.dataEnvrn->WindSpeed;
-                }
-            }
+    switch (this->Type) {
+    case DataPlant::PlantEquipmentType::PipeInterior: {
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::ScheduleEnv: {
+            AirTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
+            AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
+        } break;
+        case EnvrnPtr::ZoneEnv: {
+            AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+            AirVel = RoomAirVel;
+        } break;
+        default:
+            break;
         }
+    } break;
+    case DataPlant::PlantEquipmentType::PipeExterior: {
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::OutsideAirEnv: {
+            AirTemp = state.dataLoopNodes->Node(this->EnvrAirNodeNum).Temp;
+            AirVel = state.dataEnvrn->WindSpeed;
+        } break;
+        default:
+            break;
+        }
+    } break;
+    default:
+        break;
     }
 
     PipeOD = this->InsulationOD;
