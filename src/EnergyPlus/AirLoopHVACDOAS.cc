@@ -501,19 +501,8 @@ namespace AirLoopHVACDOAS {
                                               "The control node number is not found in " + CurrentModuleObject + " = " +
                                                   state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                                CompName,
-                                                                DataPlant::PlantEquipmentType::CoilWaterCooling,
-                                                                thisDOAS.CWPlantLoc.loopNum,
-                                                                thisDOAS.CWPlantLoc.loopSideNum,
-                                                                thisDOAS.CWPlantLoc.branchNum,
-                                                                thisDOAS.CWPlantLoc.compNum,
-                                                                errorsFound,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _);
+                        PlantUtilities::ScanPlantLoopsForObject(
+                            state, CompName, DataPlant::PlantEquipmentType::CoilWaterCooling, thisDOAS.CWPlantLoc, errorsFound, _, _, _, _, _);
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
@@ -534,19 +523,8 @@ namespace AirLoopHVACDOAS {
                                               "The control node number is not found in " + CurrentModuleObject + " = " +
                                                   state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                                CompName,
-                                                                DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                                                thisDOAS.HWPlantLoc.loopNum,
-                                                                thisDOAS.HWPlantLoc.loopSideNum,
-                                                                thisDOAS.HWPlantLoc.branchNum,
-                                                                thisDOAS.HWPlantLoc.compNum,
-                                                                errorsFound,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _);
+                        PlantUtilities::ScanPlantLoopsForObject(
+                            state, CompName, DataPlant::PlantEquipmentType::CoilWaterSimpleHeating, thisDOAS.HWPlantLoc, errorsFound, _, _, _, _, _);
                         if (errorsFound) { // is this really needed here, program fatals out later on when errorsFound = true
                             ShowFatalError(state, "GetAirLoopDOASInput: Program terminated for previous conditions.");
                         }
@@ -577,10 +555,7 @@ namespace AirLoopHVACDOAS {
                         PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
                                                                 DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling,
-                                                                thisDOAS.CWPlantLoc.loopNum,
-                                                                thisDOAS.CWPlantLoc.loopSideNum,
-                                                                thisDOAS.CWPlantLoc.branchNum,
-                                                                thisDOAS.CWPlantLoc.compNum,
+                                                                thisDOAS.CWPlantLoc,
                                                                 errorsFound,
                                                                 _,
                                                                 _,

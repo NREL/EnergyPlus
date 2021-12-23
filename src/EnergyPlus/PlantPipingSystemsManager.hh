@@ -683,10 +683,7 @@ namespace PlantPipingSystemsManager {
         bool NeedToFindOnPlantLoop = true;
         bool IsActuallyPartOfAHorizontalTrench = false;
         // Location of this pipe circuit in the PlantLoop topology
-        int LoopNum = 0;
-        DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid;
-        int BranchNum = 0;
-        int CompNum = 0;
+        PlantLocation plantLoc{};
         ExtendedFluidProperties CurFluidPropertySet; // is_used
         // Variables used to pass information from INIT-type routines to CALC-type routines
         Real64 CurCircuitInletTemp = 23.0;

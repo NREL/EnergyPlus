@@ -943,19 +943,8 @@ namespace HWBaseboardRadiator {
         if (SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        HWBaseboard(BaseboardNum).EquipID,
-                                        HWBaseboard(BaseboardNum).EquipType,
-                                        HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                        HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                                        HWBaseboard(BaseboardNum).plantLoc.branchNum,
-                                        HWBaseboard(BaseboardNum).plantLoc.compNum,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                ScanPlantLoopsForObject(
+                    state, HWBaseboard(BaseboardNum).EquipID, HWBaseboard(BaseboardNum).EquipType,HWBaseboard(BaseboardNum).plantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitHWBaseboard: Program terminated for previous conditions.");
                 }

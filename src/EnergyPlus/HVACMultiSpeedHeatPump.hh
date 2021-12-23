@@ -200,18 +200,9 @@ namespace HVACMultiSpeedHeatPump {
         int HotWaterCoilOutletNode;
         std::string HotWaterCoilName;
         int HotWaterCoilNum;
-        int LoopNum;                    // plant loop index for hot water and steam heating coil
-        DataPlant::LoopSideLocation LoopSide;                   // plant loop side  index for hot water and steam heating coil
-        int BranchNum;                  // plant loop branch index for water and steam heating coil
-        int CompNum;                    // plant loop component index for hot water and steam heating coil
-        int SuppLoopNum;                // plant loop index for hot water and steam supplemental heating coil
-        DataPlant::LoopSideLocation SuppLoopSide;               // plant loop side  index for hot water and steam supplemental heating coil
-        int SuppBranchNum;              // plant loop branch index for water and steam supplemental heating coil
-        int SuppCompNum;                // plant loop component index for hot water and steam supplemental heating coil
-        int HotWaterLoopNum;            // plant loop index for hot water and steam heating coil
-        DataPlant::LoopSideLocation HotWaterLoopSide;           // plant loop side  index for hot water and steam heating coil
-        int HotWaterBranchNum;          // plant loop branch index for water and steam heating coil
-        int HotWaterCompNum;            // plant loop component index for hot water and steam heating coil
+        PlantLocation plantLoc{};                    // plant loop component location for hot water and steam heating coil
+        PlantLocation SuppPlantLoc{};                // plant loop component location for hot water and steam supplemental heating coil
+        PlantLocation HotWaterPlantLoc{};            // plant loop component location for hot water and steam heating coil
         int HotWaterCoilMaxIterIndex;   // Index to recurring warning message
         int HotWaterCoilMaxIterIndex2;  // Index to recurring warning message
         int StageNum;                   // Stage number specified by staged thermostat
@@ -249,8 +240,6 @@ namespace HVACMultiSpeedHeatPump {
               AirFlowControl(AirflowControl::Invalid), ErrIndexCyc(0), ErrIndexVar(0), LoadLoss(0.0), SuppCoilAirInletNode(0),
               SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0), SuppCoilControlNode(0), MaxSuppCoilFluidFlow(0.0),
               SuppCoilOutletNode(0), CoilAirInletNode(0), CoilControlNode(0), MaxCoilFluidFlow(0.0), CoilOutletNode(0), HotWaterCoilControlNode(0),
-              HotWaterCoilOutletNode(0), HotWaterCoilNum(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), SuppLoopNum(0), SuppLoopSide(DataPlant::LoopSideLocation::Invalid),
-              SuppBranchNum(0), SuppCompNum(0), HotWaterLoopNum(0), HotWaterLoopSide(DataPlant::LoopSideLocation::Invalid), HotWaterBranchNum(0), HotWaterCompNum(0),
               HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), StageNum(0), Staged(false), CoolCountAvail(0), CoolIndexAvail(0),
               HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), MyEnvrnFlag(true),
               MySizeFlag(true), MyCheckFlag(true), MyFlowFracFlag(true), MyPlantScantFlag(true), MyStagedFlag(true), EMSOverrideCoilSpeedNumOn(false),

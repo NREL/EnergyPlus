@@ -57,6 +57,7 @@
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -76,16 +77,13 @@ namespace Pipes {
         DataPlant::PlantEquipmentType Type; // type of pipe
         int InletNodeNum;                   // Node number on the inlet side of the plant
         int OutletNodeNum;                  // Node number on the inlet side of the plant
-        int LoopNum;                        // Index of plant loop where this pipe resides
-        DataPlant::LoopSideLocation LoopSide;                       // Index of plant loop side where this pipe resides
-        int BranchIndex;                    // Index of plant Branch index where this pipe resides
-        int CompIndex;                      // Index of plant Comp index where this pipe resides
+        PlantLocation plantLoc{};             // Index of plant Comp location where this pipe resides
         bool CheckEquipName;
         bool EnvrnFlag;
 
         // Default Constructor
         LocalPipeData()
-            : Type(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchIndex(0), CompIndex(0),
+            : Type(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0),
               CheckEquipName(true), EnvrnFlag(true)
         {
         }

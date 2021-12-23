@@ -1526,19 +1526,8 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
     if (this->MyPlantScanFlag) {
         if (allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::Generator_MicroCHP,
-                                                    this->CWPlantLoc.loopNum,
-                                                    this->CWPlantLoc.loopSideNum,
-                                                    this->CWPlantLoc.branchNum,
-                                                    this->CWPlantLoc.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::Generator_MicroCHP, this->CWPlantLoc, errFlag, _, _, _, _, _);
 
             if (errFlag) {
                 ShowFatalError(state, "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");

@@ -1585,10 +1585,7 @@ namespace VentilatedSlab {
                 ScanPlantLoopsForObject(state,
                                         state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                         state.dataVentilatedSlab->VentSlab(Item).HeatingCoilType,
-                                        state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopSideNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.branchNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.compNum,
+                                        state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -1614,11 +1611,13 @@ namespace VentilatedSlab {
                 ScanPlantLoopsForObject(state,
                                         state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName,
                                         state.dataVentilatedSlab->VentSlab(Item).CoolingCoilType,
-                                        state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopSideNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.branchNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.compNum,
-                                        errFlag);
+                                        state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc,
+                                        errFlag,
+                                        Optional<const Real64>(),
+                                        Optional<const Real64>(),
+                                        ObjexxFCL::Optional_int(),
+                                        ObjexxFCL::Optional_int_const(),
+                                        ObjexxFCL::Optional_int_const());
                 if (errFlag) {
                     ShowContinueError(state,
                                       "Reference Unit=\"" + state.dataVentilatedSlab->VentSlab(Item).Name + "\", type=ZoneHVAC:VentilatedSlab");

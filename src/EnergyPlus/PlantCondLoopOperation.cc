@@ -1924,10 +1924,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     DataPlant::LoopSideLocation LoopSidePtr;
     int BranchPtr;
     int CompPtr;
-    int DummyLoopNum;
-    DataPlant::LoopSideLocation LoopSideNum;
-    int BranchNum;
-    int CompNum;
+    PlantLocation plantLoc{};
     int Index;
     int OpSchemePtr;
     int thisSchemeNum;
@@ -1980,19 +1977,8 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         Type = static_cast<DataPlant::PlantEquipmentType>(
                             getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
                         errFlag1 = false;
-                        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                                this_equip.Name,
-                                                                Type,
-                                                                DummyLoopNum,
-                                                                LoopSideNum,
-                                                                BranchNum,
-                                                                CompNum,
-                                                                errFlag1,
-                                                                _,
-                                                                _,
-                                                                NumSearchResults,
-                                                                _,
-                                                                LoopNum);
+                        PlantUtilities::ScanPlantLoopsForObject(
+                            state, this_equip.Name, Type, plantLoc, errFlag1, _, _, NumSearchResults, _, LoopNum);
 
                         if (errFlag1) {
                             ShowSevereError(state, "InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");
@@ -2002,10 +1988,10 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                             ShowFatalError(state, "InitLoadDistribution: Simulation terminated because of error in operation scheme.");
                         }
 
-                        this_equip.LoopNumPtr = DummyLoopNum;
-                        this_equip.LoopSideNumPtr = LoopSideNum;
-                        this_equip.BranchNumPtr = BranchNum;
-                        this_equip.CompNumPtr = CompNum;
+                        this_equip.LoopNumPtr = plantLoc.loopNum;
+                        this_equip.LoopSideNumPtr = plantLoc.loopSideNum;
+                        this_equip.BranchNumPtr = plantLoc.branchNum;
+                        this_equip.CompNumPtr = plantLoc.compNum;
 
                         if (ValidLoopEquipTypes[static_cast<int>(Type)] == LoopType::Plant && this_plant_loop.TypeOfLoop == LoopType::Condenser) {
                             ShowSevereError(state,
@@ -2049,11 +2035,11 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip(this_equip_list.Comp(EquipNum));
                         // dereference indices (stored in previous loop)
-                        DummyLoopNum = this_equip.LoopNumPtr;
-                        LoopSideNum = this_equip.LoopSideNumPtr;
-                        BranchNum = this_equip.BranchNumPtr;
-                        CompNum = this_equip.CompNumPtr;
-                        auto &dummy_loop_equip(state.dataPlnt->PlantLoop(DummyLoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
+                        plantLoc.loopNum = this_equip.LoopNumPtr;
+                        plantLoc.loopSideNum = this_equip.LoopSideNumPtr;
+                        plantLoc.branchNum = this_equip.BranchNumPtr;
+                        plantLoc.compNum = this_equip.CompNumPtr;
+                        auto &dummy_loop_equip(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum));
 
                         if (dummy_loop_equip.NumOpSchemes == 0) {
                             // first op scheme for this component, allocate OpScheme and its EquipList to size 1

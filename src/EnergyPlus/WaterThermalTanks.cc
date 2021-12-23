@@ -5943,19 +5943,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
     if (this->scanPlantLoopsFlag && allocated(state.dataPlnt->PlantLoop)) {
         if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->WaterThermalTankType,
-                                                    this->UseSide.loopNum,
-                                                    this->UseSide.loopSideNum,
-                                                    this->UseSide.branchNum,
-                                                    this->UseSide.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->UseInletNode,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, this->WaterThermalTankType, this->UseSide, errFlag, _, _, _, this->UseInletNode, _);
             if (errFlag) {
                 ShowFatalError(state, "InitWaterThermalTank: Program terminated due to previous condition(s).");
             }
@@ -5967,10 +5956,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Name,
                                                     state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).HPWHType,
-                                                    this->UseSide.loopNum,
-                                                    this->UseSide.loopSideNum,
-                                                    this->UseSide.branchNum,
-                                                    this->UseSide.compNum,
+                                                    this->UseSide,
                                                     errFlag,
                                                     _,
                                                     _,
@@ -5983,19 +5969,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
         }
         if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->WaterThermalTankType,
-                                                    this->SrcSide.loopNum,
-                                                    this->SrcSide.loopSideNum,
-                                                    this->SrcSide.branchNum,
-                                                    this->SrcSide.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->SourceInletNode,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, this->WaterThermalTankType, this->SrcSide, errFlag, _, _, _, this->SourceInletNode, _);
             if (this->UseInletNode > 0) {
                 PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                               this->UseSide.loopNum,

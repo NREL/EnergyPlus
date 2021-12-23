@@ -536,19 +536,8 @@ namespace HVACCooledBeam {
 
         if (CoolBeam(CBNum).PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    CoolBeam(CBNum).Name,
-                                    DataPlant::PlantEquipmentType::CooledBeamAirTerminal,
-                                    CoolBeam(CBNum).CWPlantLoc.loopNum,
-                                    CoolBeam(CBNum).CWPlantLoc.loopSideNum,
-                                    CoolBeam(CBNum).CWPlantLoc.branchNum,
-                                    CoolBeam(CBNum).CWPlantLoc.compNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+            ScanPlantLoopsForObject(
+                state, CoolBeam(CBNum).Name, DataPlant::PlantEquipmentType::CooledBeamAirTerminal, CoolBeam(CBNum).CWPlantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "InitCoolBeam: Program terminated for previous conditions.");
             }

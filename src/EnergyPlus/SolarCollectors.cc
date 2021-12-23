@@ -2201,19 +2201,7 @@ namespace SolarCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->Type,
-                                                        this->plantLoc.loopNum,
-                                                        this->plantLoc.loopSideNum,
-                                                        this->plantLoc.branchNum,
-                                                        this->plantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
                 }

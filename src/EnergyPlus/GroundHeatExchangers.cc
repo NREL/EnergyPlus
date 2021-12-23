@@ -3164,19 +3164,7 @@ void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(state,
-                            this->name,
-                            DataPlant::PlantEquipmentType::GrndHtExchgSystem,
-                            this->plantLoc.loopNum,
-                            this->plantLoc.loopSideNum,
-                            this->plantLoc.branchNum,
-                            this->plantLoc.compNum,
-                            errFlag,
-                            _,
-                            _,
-                            _,
-                            _,
-                            _);
+    ScanPlantLoopsForObject(state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSystem, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
@@ -3260,19 +3248,7 @@ void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(state,
-                            this->name,
-                            DataPlant::PlantEquipmentType::GrndHtExchgSlinky,
-                            this->plantLoc.loopNum,
-                            this->plantLoc.loopSideNum,
-                            this->plantLoc.branchNum,
-                            this->plantLoc.compNum,
-                            errFlag,
-                            _,
-                            _,
-                            _,
-                            _,
-                            _);
+    ScanPlantLoopsForObject(state, this->name, DataPlant::PlantEquipmentType::GrndHtExchgSlinky, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }

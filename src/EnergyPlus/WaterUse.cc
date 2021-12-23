@@ -1698,19 +1698,8 @@ namespace WaterUse {
 
         if (allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::WaterUseConnection,
-                                                    this->plantLoc.loopNum,
-                                                    this->plantLoc.loopSideNum,
-                                                    this->plantLoc.branchNum,
-                                                    this->plantLoc.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::WaterUseConnection, this->plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "InitConnections: Program terminated due to previous condition(s).");
             }

@@ -928,19 +928,8 @@ namespace WaterToAirHeatPumpSimple {
 
         if (state.dataWaterToAirHeatPumpSimple->MyPlantScanFlag(HPNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    simpleWatertoAirHP.Name,
-                                                    simpleWatertoAirHP.WAHPPlantType,
-                                                    simpleWatertoAirHP.plantLoc.loopNum,
-                                                    simpleWatertoAirHP.plantLoc.loopSideNum,
-                                                    simpleWatertoAirHP.plantLoc.branchNum,
-                                                    simpleWatertoAirHP.plantLoc.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, simpleWatertoAirHP.Name, simpleWatertoAirHP.WAHPPlantType, simpleWatertoAirHP.plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "InitSimpleWatertoAirHP: Program terminated for previous conditions.");
             }

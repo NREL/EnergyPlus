@@ -1333,11 +1333,13 @@ namespace IceThermalStorage {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::TS_IceDetailed,
-                                                    this->plantLoc.loopNum,
-                                                    this->plantLoc.loopSideNum,
-                                                    this->plantLoc.branchNum,
-                                                    this->plantLoc.compNum,
-                                                    errFlag);
+                                                    this->plantLoc,
+                                                    errFlag,
+                                                    Optional<const Real64>(),
+                                                    Optional<const Real64>(),
+                                                    ObjexxFCL::Optional_int(),
+                                                    ObjexxFCL::Optional_int_const(),
+                                                    ObjexxFCL::Optional_int_const());
 
             if (errFlag) {
                 ShowFatalError(state, "DetailedIceStorageData: oneTimeInit: Program terminated due to previous condition(s).");
@@ -1413,19 +1415,8 @@ namespace IceThermalStorage {
         if (this->MyPlantScanFlag) {
             // Locate the storage on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::TS_IceSimple,
-                                                    this->plantLoc.loopNum,
-                                                    this->plantLoc.loopSideNum,
-                                                    this->plantLoc.branchNum,
-                                                    this->plantLoc.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::TS_IceSimple, this->plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "SimpleIceStorageData:oneTimeInit: Program terminated due to previous condition(s).");
             }

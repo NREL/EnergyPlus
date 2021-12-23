@@ -313,19 +313,8 @@ namespace BoilerSteam {
     void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
     {
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::Boiler_Steam,
-                                                this->plantLoc.loopNum,
-                                                this->plantLoc.loopSideNum,
-                                                this->plantLoc.branchNum,
-                                                this->plantLoc.compNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, DataPlant::PlantEquipmentType::Boiler_Steam, this->plantLoc, errFlag, _, _, _, _, _);
         if (errFlag) {
             ShowFatalError(state, "InitBoiler: Program terminated due to previous condition(s).");
         }

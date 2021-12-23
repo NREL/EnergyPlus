@@ -2537,19 +2537,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
             (this->ReheatComp_PlantType == DataPlant::PlantEquipmentType::CoilSteamAirHeating)) {
             // setup plant topology indices for plant fed heating coils
             errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    this->ReheatName,
-                                    this->ReheatComp_PlantType,
-                                    this->HWplantLoc.loopNum,
-                                    this->HWplantLoc.loopSideNum,
-                                    this->HWplantLoc.branchNum,
-                                    this->HWplantLoc.compNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+            ScanPlantLoopsForObject(state, this->ReheatName, this->ReheatComp_PlantType, this->HWplantLoc, errFlag, _, _, _, _, _);
 
             if (errFlag) {
                 ShowContinueError(state, "Reference Unit=\"" + this->SysName + "\", type=" + this->sysType);

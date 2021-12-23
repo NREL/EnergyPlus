@@ -2085,50 +2085,17 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables(state);
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->ChillerType,
-                                                    this->CWPlantLoc.loopNum,
-                                                    this->CWPlantLoc.loopSideNum,
-                                                    this->CWPlantLoc.branchNum,
-                                                    this->CWPlantLoc.compNum,
-                                                    errFlag,
-                                                    this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
-                                                    this->EvapInletNodeNum,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, this->ChillerType, this->CWPlantLoc, errFlag, this->TempLowLimitEvapOut, _, _, this->EvapInletNodeNum, _);
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->ChillerType,
-                                                        this->CDPlantLoc.loopNum,
-                                                        this->CDPlantLoc.loopSideNum,
-                                                        this->CDPlantLoc.branchNum,
-                                                        this->CDPlantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->CondInletNodeNum,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->ChillerType, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->ChillerType,
-                                                        this->HRPlantLoc.loopNum,
-                                                        this->HRPlantLoc.loopSideNum,
-                                                        this->HRPlantLoc.branchNum,
-                                                        this->HRPlantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->HeatRecInletNodeNum,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->ChillerType, this->HRPlantLoc, errFlag, _, _, _, this->HeatRecInletNodeNum, _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, true);
             }
@@ -4243,50 +4210,17 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables(state);
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->ChillerType,
-                                                    this->CWPlantLoc.loopNum,
-                                                    this->CWPlantLoc.loopSideNum,
-                                                    this->CWPlantLoc.branchNum,
-                                                    this->CWPlantLoc.compNum,
-                                                    errFlag,
-                                                    this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
-                                                    this->EvapInletNodeNum,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, this->ChillerType, this->CWPlantLoc, errFlag, this->TempLowLimitEvapOut, _, _, this->EvapInletNodeNum, _);
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->ChillerType,
-                                                        this->CDPlantLoc.loopNum,
-                                                        this->CDPlantLoc.loopSideNum,
-                                                        this->CDPlantLoc.branchNum,
-                                                        this->CDPlantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->CondInletNodeNum,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->ChillerType, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->ChillerType,
-                                                        this->HRPlantLoc.loopNum,
-                                                        this->HRPlantLoc.loopSideNum,
-                                                        this->HRPlantLoc.branchNum,
-                                                        this->HRPlantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->HeatRecInletNodeNum,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->ChillerType, this->HRPlantLoc, errFlag, _, _, _, this->HeatRecInletNodeNum, _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, true);
             }
@@ -6308,50 +6242,17 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables(state);
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->ChillerType,
-                                                    this->CWPlantLoc.loopNum,
-                                                    this->CWPlantLoc.loopSideNum,
-                                                    this->CWPlantLoc.branchNum,
-                                                    this->CWPlantLoc.compNum,
-                                                    errFlag,
-                                                    this->TempLowLimitEvapOut,
-                                                    _,
-                                                    _,
-                                                    this->EvapInletNodeNum,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, this->ChillerType, this->CWPlantLoc, errFlag, this->TempLowLimitEvapOut, _, _, this->EvapInletNodeNum, _);
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->ChillerType,
-                                                        this->CDPlantLoc.loopNum,
-                                                        this->CDPlantLoc.loopSideNum,
-                                                        this->CDPlantLoc.branchNum,
-                                                        this->CDPlantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->CondInletNodeNum,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->ChillerType, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->ChillerType,
-                                                        this->HRPlantLoc.loopNum,
-                                                        this->HRPlantLoc.loopSideNum,
-                                                        this->HRPlantLoc.branchNum,
-                                                        this->HRPlantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->HeatRecInletNodeNum,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->ChillerType, this->HRPlantLoc, errFlag, _, _, _, this->HeatRecInletNodeNum, _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, true);
             }
@@ -7839,33 +7740,11 @@ namespace PlantChillers {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables(state);
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    this->ChillerType,
-                                                    this->CWPlantLoc.loopNum,
-                                                    this->CWPlantLoc.loopSideNum,
-                                                    this->CWPlantLoc.branchNum,
-                                                    this->CWPlantLoc.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->EvapInletNodeNum,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, this->ChillerType, this->CWPlantLoc, errFlag, _, _, _, this->EvapInletNodeNum, _);
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->ChillerType,
-                                                        this->CDPlantLoc.loopNum,
-                                                        this->CDPlantLoc.loopSideNum,
-                                                        this->CDPlantLoc.branchNum,
-                                                        this->CDPlantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->CondInletNodeNum,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, this->ChillerType, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
                 PlantUtilities::InterConnectTwoPlantLoopSides(
                     state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->ChillerType, true);
             }

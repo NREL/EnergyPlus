@@ -3731,19 +3731,8 @@ namespace FuelCellElectricGenerator {
         if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
 
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->NameExhaustHX,
-                                                    DataPlant::PlantEquipmentType::Generator_FCExhaust,
-                                                    this->CWPlantLoc.loopNum,
-                                                    this->CWPlantLoc.loopSideNum,
-                                                    this->CWPlantLoc.branchNum,
-                                                    this->CWPlantLoc.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->NameExhaustHX, DataPlant::PlantEquipmentType::Generator_FCExhaust, this->CWPlantLoc, errFlag, _, _, _, _, _);
 
             // if there is a stack cooler option it might be connected to plant as well
 

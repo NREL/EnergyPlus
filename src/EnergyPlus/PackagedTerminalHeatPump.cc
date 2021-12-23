@@ -4125,10 +4125,7 @@ void InitPTUnit(EnergyPlusData &state,
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopSideNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.branchNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.compNum,
+                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -4162,10 +4159,7 @@ void InitPTUnit(EnergyPlusData &state,
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopSideNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.branchNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.compNum,
+                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -4207,10 +4201,7 @@ void InitPTUnit(EnergyPlusData &state,
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum,
+                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -4225,9 +4216,9 @@ void InitPTUnit(EnergyPlusData &state,
 
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow =
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound) * rho;
@@ -4237,10 +4228,7 @@ void InitPTUnit(EnergyPlusData &state,
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum,
+                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -4262,10 +4250,10 @@ void InitPTUnit(EnergyPlusData &state,
                 }
             }
             // fill outlet node for coil
-            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum)
-                                                                        .LoopSide(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide)
-                                                                        .Branch(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum)
-                                                                        .Comp(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum)
+            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum)
+                                                                        .LoopSide(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum)
+                                                                        .Branch(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum)
+                                                                        .Comp(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum)
                                                                         .NodeNumOut;
             MyPlantScanFlag(PTUnitNum) = false;
         } else { // pthp not connected to plant
@@ -4674,9 +4662,9 @@ void InitPTUnit(EnergyPlusData &state,
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
                     if (CoilMaxVolFlowRate != AutoSize) {
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum).FluidIndex,
                                                RoutineNameSpace);
                         state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                     }
@@ -4702,10 +4690,10 @@ void InitPTUnit(EnergyPlusData &state,
                                state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
                                state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
         }
     } // end one time inits
 
@@ -4963,10 +4951,10 @@ void InitPTUnit(EnergyPlusData &state,
                                  mdot,
                                  state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                  state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
 
             //     simulate water coil to find operating capacity
             SimulateWaterCoilComponents(state,
@@ -4986,10 +4974,10 @@ void InitPTUnit(EnergyPlusData &state,
                                  mdot,
                                  state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                  state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
 
             //     simulate steam coil to find operating capacity
             SimulateSteamCoilComponents(state,
@@ -6155,10 +6143,10 @@ void ControlPTUnitOutput(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -6172,10 +6160,10 @@ void ControlPTUnitOutput(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -6619,10 +6607,10 @@ void CalcPTUnit(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -6635,10 +6623,10 @@ void CalcPTUnit(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -6666,10 +6654,10 @@ void CalcPTUnit(EnergyPlusData &state,
                                          MaxHotWaterFlow,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     QActual = SupHeaterLoad;
                     // simulate the hot water supplemental heating coil
                     SimulateWaterCoilComponents(state,
@@ -6751,10 +6739,10 @@ void CalcPTUnit(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
 
                     // simulate the steam supplemental heating coil
                     SimulateSteamCoilComponents(state,
@@ -6982,10 +6970,10 @@ Real64 HotWaterCoilResidual(EnergyPlusData &state,
                          mdot,
                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
     // simulate the hot water supplemental heating coil
     SimulateWaterCoilComponents(state,
                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
@@ -8157,10 +8145,10 @@ void ControlVSHPOutput(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -8174,10 +8162,10 @@ void ControlVSHPOutput(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -8782,10 +8770,10 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -8798,10 +8786,10 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -8829,10 +8817,10 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          MaxHotWaterFlow,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
                     QActual = SupHeaterLoad;
                     // simulate the hot water supplemental heating coil
                     SimulateWaterCoilComponents(state,
@@ -8916,10 +8904,10 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
 
                     // simulate the steam supplemental heating coil
                     SimulateSteamCoilComponents(state,

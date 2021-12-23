@@ -283,19 +283,8 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        DataPlant::PlantEquipmentType::ValveTempering,
-                                                        this->plantLoc.loopNum,
-                                                        this->plantLoc.loopSideNum,
-                                                        this->plantLoc.branchNum,
-                                                        this->plantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, DataPlant::PlantEquipmentType::ValveTempering, this->plantLoc, errFlag, _, _, _, _, _);
 
                 if (errFlag) {
                     ShowFatalError(state, "InitPlantValves: Program terminated due to previous condition(s).");

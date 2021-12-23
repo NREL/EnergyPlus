@@ -1628,10 +1628,7 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
 void ScanPlantLoopsForObject(EnergyPlusData &state,
                              std::string_view CompName,
                              DataPlant::PlantEquipmentType CompType,
-                             int &LoopNum,
-                             DataPlant::LoopSideLocation &LoopSideNum,
-                             int &BranchNum,
-                             int &CompNum,
+                             PlantLocation &plantLoc,
                              bool &errFlag,
                              Optional<Real64 const> LowLimitTemp,
                              Optional<Real64 const> HighLimitTemp,
@@ -1695,19 +1692,19 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                                     if (InletNodeNumber == this_component.NodeNumIn) {
                                         FoundComponent = true;
                                         ++FoundCount;
-                                        LoopNum = LoopCtr;
-                                        LoopSideNum = LoopSideCtr;
-                                        BranchNum = BranchCtr;
-                                        CompNum = CompCtr;
+                                        plantLoc.loopNum = LoopCtr;
+                                        plantLoc.loopSideNum = LoopSideCtr;
+                                        plantLoc.branchNum = BranchCtr;
+                                        plantLoc.compNum = CompCtr;
                                     }
                                 }
                             } else {
                                 FoundComponent = true;
                                 ++FoundCount;
-                                LoopNum = LoopCtr;
-                                LoopSideNum = LoopSideCtr;
-                                BranchNum = BranchCtr;
-                                CompNum = CompCtr;
+                                plantLoc.loopNum = LoopCtr;
+                                plantLoc.loopSideNum = LoopSideCtr;
+                                plantLoc.branchNum = BranchCtr;
+                                plantLoc.compNum = CompCtr;
                             }
                             if (present(LowLimitTemp)) {
                                 this_component.MinOutletTemp = LowLimitTemp;

@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -197,16 +198,13 @@ namespace PlantUtilities {
     void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string_view CompName,
                                  DataPlant::PlantEquipmentType CompType,
-                                 int &LoopNum,
-                                 DataPlant::LoopSideLocation &LoopSideNum,
-                                 int &BranchNum,
-                                 int &CompNum,
+                                 PlantLocation &plantLoc,
                                  bool &errFlag,
-                                 Optional<Real64 const> LowLimitTemp = _,
-                                 Optional<Real64 const> HighLimitTemp = _,
-                                 Optional_int CountMatchPlantLoops = _,
-                                 Optional_int_const InletNodeNumber = _,
-                                 Optional_int_const SingleLoopSearch = _);
+                                 Optional<Real64 const> LowLimitTemp,
+                                 Optional<Real64 const> HighLimitTemp,
+                                 Optional_int CountMatchPlantLoops,
+                                 Optional_int_const InletNodeNumber,
+                                 Optional_int_const SingleLoopSearch);
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                                   std::string_view const CallerName, // really used for error messages

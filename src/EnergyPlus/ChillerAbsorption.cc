@@ -696,10 +696,7 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_Absorption,
-                                            this->CWPlantLoc.loopNum,
-                                            this->CWPlantLoc.loopSideNum,
-                                            this->CWPlantLoc.branchNum,
-                                            this->CWPlantLoc.compNum,
+                                            this->CWPlantLoc,
                                             errFlag,
                                             this->TempLowLimitEvapOut,
                                             _,
@@ -707,19 +704,8 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->EvapInletNodeNum,
                                             _);
     if (this->CondInletNodeNum > 0) {
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::Chiller_Absorption,
-                                                this->CDPlantLoc.loopNum,
-                                                this->CDPlantLoc.loopSideNum,
-                                                this->CDPlantLoc.branchNum,
-                                                this->CDPlantLoc.compNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->CondInletNodeNum,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, DataPlant::PlantEquipmentType::Chiller_Absorption, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWPlantLoc.loopNum,
                                                       this->CWPlantLoc.loopSideNum,
@@ -729,19 +715,8 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                       true);
     }
     if (this->GeneratorInletNodeNum > 0) {
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::Chiller_Absorption,
-                                                this->GenPlantLoc.loopNum,
-                                                this->GenPlantLoc.loopSideNum,
-                                                this->GenPlantLoc.branchNum,
-                                                this->GenPlantLoc.compNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->GeneratorInletNodeNum,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, DataPlant::PlantEquipmentType::Chiller_Absorption, this->GenPlantLoc, errFlag, _, _, _, this->GeneratorInletNodeNum, _);
         PlantUtilities::InterConnectTwoPlantLoopSides(
             state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->GenPlantLoc.loopNum, this->GenPlantLoc.loopSideNum, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
     }

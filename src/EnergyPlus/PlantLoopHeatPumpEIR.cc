@@ -1200,19 +1200,8 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 
         // find this component on the plant
         bool thisErrFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->name,
-                                                this->EIRHPType,
-                                                this->loadSideLocation.loopNum,
-                                                this->loadSideLocation.loopSideNum,
-                                                this->loadSideLocation.branchNum,
-                                                this->loadSideLocation.compNum,
-                                                thisErrFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->loadSideNodes.inlet,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->name, this->EIRHPType, this->loadSideLocation, thisErrFlag, _, _, _, this->loadSideNodes.inlet, _);
 
         if (thisErrFlag) {
             ShowSevereError(state,
@@ -1234,19 +1223,8 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
 
         thisErrFlag = false;
         if (this->waterSource) {
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->name,
-                                                    this->EIRHPType,
-                                                    this->sourceSideLocation.loopNum,
-                                                    this->sourceSideLocation.loopSideNum,
-                                                    this->sourceSideLocation.branchNum,
-                                                    this->sourceSideLocation.compNum,
-                                                    thisErrFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->sourceSideNodes.inlet,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->name, this->EIRHPType, this->sourceSideLocation, thisErrFlag, _, _, _, this->sourceSideNodes.inlet, _);
 
             if (thisErrFlag) {
                 ShowSevereError(state,

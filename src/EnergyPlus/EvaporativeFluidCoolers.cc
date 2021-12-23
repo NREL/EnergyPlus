@@ -2755,8 +2755,7 @@ namespace EvaporativeFluidCoolers {
 
         if (this->OneTimeFlagForEachEvapFluidCooler) {
             // Locate the tower on the plant loops for later usage
-            PlantUtilities::ScanPlantLoopsForObject(
-                state, this->Name, this->Type, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, ErrorsFound, _, _, _, _, _);
+            PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, ErrorsFound, _, _, _, _, _);
 
             if (ErrorsFound) {
                 ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");

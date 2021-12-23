@@ -1119,10 +1119,7 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
-                                            this->CWPlantLoc.loopNum,
-                                            this->CWPlantLoc.loopSideNum,
-                                            this->CWPlantLoc.branchNum,
-                                            this->CWPlantLoc.compNum,
+                                            this->CWPlantLoc,
                                             errFlag,
                                             this->TempLowLimitEvapOut,
                                             _,
@@ -1130,19 +1127,8 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                             this->EvapInletNodeNum,
                                             _);
     if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
-                                                this->CDPlantLoc.loopNum,
-                                                this->CDPlantLoc.loopSideNum,
-                                                this->CDPlantLoc.branchNum,
-                                                this->CDPlantLoc.compNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->CondInletNodeNum,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, DataPlant::PlantEquipmentType::Chiller_ElectricEIR, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWPlantLoc.loopNum,
                                                       this->CWPlantLoc.loopSideNum,
@@ -1152,19 +1138,8 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                       true);
     }
     if (this->HeatRecActive) {
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
-                                                this->HRPlantLoc.loopNum,
-                                                this->HRPlantLoc.loopSideNum,
-                                                this->HRPlantLoc.branchNum,
-                                                this->HRPlantLoc.compNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->HeatRecInletNodeNum,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, DataPlant::PlantEquipmentType::Chiller_ElectricEIR, this->HRPlantLoc, errFlag, _, _, _, this->HeatRecInletNodeNum, _);
         PlantUtilities::InterConnectTwoPlantLoopSides(state,
                                                       this->CWPlantLoc.loopNum,
                                                       this->CWPlantLoc.loopSideNum,

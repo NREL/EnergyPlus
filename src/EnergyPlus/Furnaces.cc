@@ -5384,10 +5384,7 @@ namespace Furnaces {
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
                                             DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                            state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                            state.dataFurnaces->Furnace(FurnaceNum).CompNum,
+                                            state.dataFurnaces->Furnace(FurnaceNum).plantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -5401,9 +5398,9 @@ namespace Furnaces {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow *= rho;
                     }
@@ -5413,10 +5410,7 @@ namespace Furnaces {
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
                                             DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                            state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                            state.dataFurnaces->Furnace(FurnaceNum).CompNum,
+                                            state.dataFurnaces->Furnace(FurnaceNum).plantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -5435,10 +5429,10 @@ namespace Furnaces {
                     }
                 }
                 // fill outlet node for coil
-                state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode = state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum)
-                                                                             .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).LoopSide)
-                                                                             .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNum)
-                                                                             .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNum)
+                state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode = state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum)
+                                                                             .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopSideNum)
+                                                                             .Branch(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.branchNum)
+                                                                             .Comp(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.compNum)
                                                                              .NodeNumOut;
                 state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
@@ -5458,10 +5452,7 @@ namespace Furnaces {
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
                                             DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp,
+                                            state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -5475,9 +5466,9 @@ namespace Furnaces {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                     if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow > 0.0) {
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidIndex,
                                                RoutineName);
                         state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow *= rho;
                     }
@@ -5486,10 +5477,7 @@ namespace Furnaces {
                     ScanPlantLoopsForObject(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,
                                             DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                            state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp,
+                                            state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc,
                                             errFlag,
                                             _,
                                             _,
@@ -5509,10 +5497,10 @@ namespace Furnaces {
                 }
                 // fill outlet node for coil
                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode =
-                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp)
-                        .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp)
-                        .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp)
-                        .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp)
+                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum)
+                        .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopSideNum)
+                        .Branch(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.branchNum)
+                        .Comp(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.compNum)
                         .NodeNumOut;
                 state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
@@ -5559,9 +5547,9 @@ namespace Furnaces {
                             state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -5588,10 +5576,10 @@ namespace Furnaces {
                                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow,
                                    state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
                                    state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                   state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                   state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                   state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CompNum);
+                                   state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum,
+                                   state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopSideNum,
+                                   state.dataFurnaces->Furnace(FurnaceNum).plantLoc.branchNum,
+                                   state.dataFurnaces->Furnace(FurnaceNum).plantLoc.compNum);
             }
             if (state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode > 0) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
@@ -5605,9 +5593,9 @@ namespace Furnaces {
                             state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidName,
+                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -5631,10 +5619,10 @@ namespace Furnaces {
                                        state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow,
                                        state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
                                        state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                       state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                       state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                       state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                       state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
+                                       state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum,
+                                       state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopSideNum,
+                                       state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.branchNum,
+                                       state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.compNum);
                 }
             }
             state.dataFurnaces->MyEnvrnFlag(FurnaceNum) = false;
@@ -5886,10 +5874,10 @@ namespace Furnaces {
                                      mdot,
                                      state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
                                      state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                     state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                     state.dataFurnaces->Furnace(FurnaceNum).CompNum);
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopSideNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc.branchNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc.compNum);
                 //     simulate water coil to find operating capacity
                 SimulateWaterCoilComponents(state,
                                             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
@@ -5908,10 +5896,10 @@ namespace Furnaces {
                                      mdot,
                                      state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
                                      state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                     state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                     state.dataFurnaces->Furnace(FurnaceNum).CompNum);
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopSideNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc.branchNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).plantLoc.compNum);
 
                 //     simulate steam coil to find operating capacity
                 SimulateSteamCoilComponents(state,
@@ -5937,10 +5925,10 @@ namespace Furnaces {
                                      mdot,
                                      state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
                                      state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopSideNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.branchNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.compNum);
 
                 //     simulate water coil to find operating capacity
                 SimulateWaterCoilComponents(state,
@@ -5959,10 +5947,10 @@ namespace Furnaces {
                                      mdot,
                                      state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
                                      state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                     state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopSideNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.branchNum,
+                                     state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.compNum);
 
                 //     simulate steam coil to find operating capacity
                 SimulateSteamCoilComponents(state,
@@ -10368,10 +10356,10 @@ namespace Furnaces {
             CoilControlNode = state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode;
             CoilOutletNode = state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode;
             CoilTypeNum = state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num;
-            LoopNum = state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp;
-            LoopSideNum = state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp;
-            BranchNum = state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp;
-            CompNum = state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp;
+            LoopNum = state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum;
+            LoopSideNum = state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopSideNum;
+            BranchNum = state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.branchNum;
+            CompNum = state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.compNum;
             MaxHotWaterFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow;
         } else {
             HeatingCoilName = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName;
@@ -10379,10 +10367,10 @@ namespace Furnaces {
             CoilControlNode = state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode;
             CoilOutletNode = state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode;
             CoilTypeNum = state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num;
-            LoopNum = state.dataFurnaces->Furnace(FurnaceNum).LoopNum;
-            LoopSideNum = state.dataFurnaces->Furnace(FurnaceNum).LoopSide;
-            BranchNum = state.dataFurnaces->Furnace(FurnaceNum).BranchNum;
-            CompNum = state.dataFurnaces->Furnace(FurnaceNum).CompNum;
+            LoopNum = state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum;
+            LoopSideNum = state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopSideNum;
+            BranchNum = state.dataFurnaces->Furnace(FurnaceNum).plantLoc.branchNum;
+            CompNum = state.dataFurnaces->Furnace(FurnaceNum).plantLoc.compNum;
             MaxHotWaterFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow;
         }
 
@@ -10523,10 +10511,10 @@ namespace Furnaces {
                                  mdot,
                                  state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
                                  state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                 state.dataFurnaces->Furnace(FurnaceNum).LoopNum,
-                                 state.dataFurnaces->Furnace(FurnaceNum).LoopSide,
-                                 state.dataFurnaces->Furnace(FurnaceNum).BranchNum,
-                                 state.dataFurnaces->Furnace(FurnaceNum).CompNum);
+                                 state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum,
+                                 state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopSideNum,
+                                 state.dataFurnaces->Furnace(FurnaceNum).plantLoc.branchNum,
+                                 state.dataFurnaces->Furnace(FurnaceNum).plantLoc.compNum);
             SimulateWaterCoilComponents(state,
                                         state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName,
                                         FirstHVACIteration,
@@ -10539,10 +10527,10 @@ namespace Furnaces {
                                  mdot,
                                  state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
                                  state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                 state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp,
-                                 state.dataFurnaces->Furnace(FurnaceNum).LoopSideSupp,
-                                 state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp,
-                                 state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
+                                 state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum,
+                                 state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopSideNum,
+                                 state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.branchNum,
+                                 state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.compNum);
             // simulate the hot water supplemental heating coil
             SimulateWaterCoilComponents(state,
                                         state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName,

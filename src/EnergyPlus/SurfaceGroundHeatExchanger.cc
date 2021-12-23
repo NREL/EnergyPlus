@@ -1441,19 +1441,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // Locate the hx on the plant loops for later usage
         errFlag = false;
-        ScanPlantLoopsForObject(state,
-                                this->Name,
-                                DataPlant::PlantEquipmentType::GrndHtExchgSurface,
-                                this->plantLoc.loopNum,
-                                this->plantLoc.loopSideNum,
-                                this->plantLoc.branchNum,
-                                this->plantLoc.compNum,
-                                errFlag,
-                                _,
-                                _,
-                                _,
-                                _,
-                                _);
+        ScanPlantLoopsForObject(state, this->Name, DataPlant::PlantEquipmentType::GrndHtExchgSurface, this->plantLoc, errFlag, _, _, _, _, _);
 
         if (errFlag) {
             ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");

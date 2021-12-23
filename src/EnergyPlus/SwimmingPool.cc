@@ -821,19 +821,8 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
     if (this->MyPlantScanFlagPool && allocated(state.dataPlnt->PlantLoop)) {
         bool errFlag = false;
         if (this->WaterInletNode > 0) {
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::SwimmingPool_Indoor,
-                                                    this->HWplantLoc.loopNum,
-                                                    this->HWplantLoc.loopSideNum,
-                                                    this->HWplantLoc.branchNum,
-                                                    this->HWplantLoc.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->WaterInletNode,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::SwimmingPool_Indoor, this->HWplantLoc, errFlag, _, _, _, this->WaterInletNode, _);
             if (errFlag) {
                 ShowFatalError(state, std::string{RoutineName} + ": Program terminated due to previous condition(s).");
             }

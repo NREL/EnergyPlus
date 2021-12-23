@@ -1954,10 +1954,7 @@ namespace HVACMultiSpeedHeatPump {
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).Name,
                                         DataPlant::PlantEquipmentType::MultiSpeedHeatPumpRecovery,
-                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum,
-                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopSideNum,
-                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc.branchNum,
-                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc.compNum,
+                                        MSHeatPump(MSHeatPumpNum).HRPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -1977,10 +1974,7 @@ namespace HVACMultiSpeedHeatPump {
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                        MSHeatPump(MSHeatPumpNum).LoopNum,
-                                        MSHeatPump(MSHeatPumpNum).LoopSide,
-                                        MSHeatPump(MSHeatPumpNum).BranchNum,
-                                        MSHeatPump(MSHeatPumpNum).CompNum,
+                                        MSHeatPump(MSHeatPumpNum).plantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -1995,18 +1989,18 @@ namespace HVACMultiSpeedHeatPump {
 
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).plantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).plantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow =
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
-                                                               .LoopSide(MSHeatPump(MSHeatPumpNum).LoopSide)
-                                                               .Branch(MSHeatPump(MSHeatPumpNum).BranchNum)
-                                                               .Comp(MSHeatPump(MSHeatPumpNum).CompNum)
+                MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).plantLoc.loopNum)
+                                                               .LoopSide(MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum)
+                                                               .Branch(MSHeatPump(MSHeatPumpNum).plantLoc.branchNum)
+                                                               .Comp(MSHeatPump(MSHeatPumpNum).plantLoc.compNum)
                                                                .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
 
@@ -2015,10 +2009,7 @@ namespace HVACMultiSpeedHeatPump {
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                        MSHeatPump(MSHeatPumpNum).LoopNum,
-                                        MSHeatPump(MSHeatPumpNum).LoopSide,
-                                        MSHeatPump(MSHeatPumpNum).BranchNum,
-                                        MSHeatPump(MSHeatPumpNum).CompNum,
+                                        MSHeatPump(MSHeatPumpNum).plantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -2037,10 +2028,10 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
-                                                               .LoopSide(MSHeatPump(MSHeatPumpNum).LoopSide)
-                                                               .Branch(MSHeatPump(MSHeatPumpNum).BranchNum)
-                                                               .Comp(MSHeatPump(MSHeatPumpNum).CompNum)
+                MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).plantLoc.loopNum)
+                                                               .LoopSide(MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum)
+                                                               .Branch(MSHeatPump(MSHeatPumpNum).plantLoc.branchNum)
+                                                               .Comp(MSHeatPump(MSHeatPumpNum).plantLoc.compNum)
                                                                .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
             }
@@ -2049,10 +2040,7 @@ namespace HVACMultiSpeedHeatPump {
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                        MSHeatPump(MSHeatPumpNum).SuppLoopNum,
-                                        MSHeatPump(MSHeatPumpNum).SuppLoopSide,
-                                        MSHeatPump(MSHeatPumpNum).SuppBranchNum,
-                                        MSHeatPump(MSHeatPumpNum).SuppCompNum,
+                                        MSHeatPump(MSHeatPumpNum).plantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -2067,18 +2055,18 @@ namespace HVACMultiSpeedHeatPump {
 
                 if (MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow =
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
-                                                                   .LoopSide(MSHeatPump(MSHeatPumpNum).SuppLoopSide)
-                                                                   .Branch(MSHeatPump(MSHeatPumpNum).SuppBranchNum)
-                                                                   .Comp(MSHeatPump(MSHeatPumpNum).SuppCompNum)
+                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum)
+                                                                   .LoopSide(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum)
+                                                                   .Branch(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum)
+                                                                   .Comp(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum)
                                                                    .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
 
@@ -2087,10 +2075,7 @@ namespace HVACMultiSpeedHeatPump {
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                        MSHeatPump(MSHeatPumpNum).SuppLoopNum,
-                                        MSHeatPump(MSHeatPumpNum).SuppLoopSide,
-                                        MSHeatPump(MSHeatPumpNum).SuppBranchNum,
-                                        MSHeatPump(MSHeatPumpNum).SuppCompNum,
+                                        MSHeatPump(MSHeatPumpNum).SuppPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -2109,10 +2094,10 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
-                                                                   .LoopSide(MSHeatPump(MSHeatPumpNum).SuppLoopSide)
-                                                                   .Branch(MSHeatPump(MSHeatPumpNum).SuppBranchNum)
-                                                                   .Comp(MSHeatPump(MSHeatPumpNum).SuppCompNum)
+                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum)
+                                                                   .LoopSide(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum)
+                                                                   .Branch(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum)
+                                                                   .Comp(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum)
                                                                    .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
             }
@@ -2255,9 +2240,9 @@ namespace HVACMultiSpeedHeatPump {
                             GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).plantLoc.loopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).plantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                             MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -2266,10 +2251,10 @@ namespace HVACMultiSpeedHeatPump {
                                            MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow,
                                            MSHeatPump(MSHeatPumpNum).CoilControlNode,
                                            MSHeatPump(MSHeatPumpNum).CoilOutletNode,
-                                           MSHeatPump(MSHeatPumpNum).LoopNum,
-                                           MSHeatPump(MSHeatPumpNum).LoopSide,
-                                           MSHeatPump(MSHeatPumpNum).BranchNum,
-                                           MSHeatPump(MSHeatPumpNum).CompNum);
+                                           MSHeatPump(MSHeatPumpNum).plantLoc.loopNum,
+                                           MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum,
+                                           MSHeatPump(MSHeatPumpNum).plantLoc.branchNum,
+                                           MSHeatPump(MSHeatPumpNum).plantLoc.compNum);
                     }
                     if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingSteam) {
 
@@ -2292,10 +2277,10 @@ namespace HVACMultiSpeedHeatPump {
                                            MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow,
                                            MSHeatPump(MSHeatPumpNum).CoilControlNode,
                                            MSHeatPump(MSHeatPumpNum).CoilOutletNode,
-                                           MSHeatPump(MSHeatPumpNum).LoopNum,
-                                           MSHeatPump(MSHeatPumpNum).LoopSide,
-                                           MSHeatPump(MSHeatPumpNum).BranchNum,
-                                           MSHeatPump(MSHeatPumpNum).CompNum);
+                                           MSHeatPump(MSHeatPumpNum).plantLoc.loopNum,
+                                           MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum,
+                                           MSHeatPump(MSHeatPumpNum).plantLoc.branchNum,
+                                           MSHeatPump(MSHeatPumpNum).plantLoc.compNum);
                     }
                 }
             }
@@ -2309,9 +2294,9 @@ namespace HVACMultiSpeedHeatPump {
                             GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
                             MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                         }
@@ -2320,10 +2305,10 @@ namespace HVACMultiSpeedHeatPump {
                                            MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow,
                                            MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
                                            MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
-                                           MSHeatPump(MSHeatPumpNum).SuppLoopNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppLoopSide,
-                                           MSHeatPump(MSHeatPumpNum).SuppBranchNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppCompNum);
+                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum,
+                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum,
+                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum,
+                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum);
                     }
                     if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingSteam) {
 
@@ -2346,10 +2331,10 @@ namespace HVACMultiSpeedHeatPump {
                                            MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow,
                                            MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
                                            MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
-                                           MSHeatPump(MSHeatPumpNum).SuppLoopNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppLoopSide,
-                                           MSHeatPump(MSHeatPumpNum).SuppBranchNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppCompNum);
+                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum,
+                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum,
+                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum,
+                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum);
                     }
                 }
             }
@@ -2745,10 +2730,10 @@ namespace HVACMultiSpeedHeatPump {
                                      mdot,
                                      MSHeatPump(MSHeatPumpNum).CoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).CoilOutletNode,
-                                     MSHeatPump(MSHeatPumpNum).LoopNum,
-                                     MSHeatPump(MSHeatPumpNum).LoopSide,
-                                     MSHeatPump(MSHeatPumpNum).BranchNum,
-                                     MSHeatPump(MSHeatPumpNum).CompNum);
+                                     MSHeatPump(MSHeatPumpNum).plantLoc.loopNum,
+                                     MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum,
+                                     MSHeatPump(MSHeatPumpNum).plantLoc.branchNum,
+                                     MSHeatPump(MSHeatPumpNum).plantLoc.compNum);
                 //     simulate water coil to find operating capacity
                 SimulateWaterCoilComponents(
                     state, MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).HeatCoilNum, QActual);
@@ -2763,10 +2748,10 @@ namespace HVACMultiSpeedHeatPump {
                                      mdot,
                                      MSHeatPump(MSHeatPumpNum).CoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).CoilOutletNode,
-                                     MSHeatPump(MSHeatPumpNum).LoopNum,
-                                     MSHeatPump(MSHeatPumpNum).LoopSide,
-                                     MSHeatPump(MSHeatPumpNum).BranchNum,
-                                     MSHeatPump(MSHeatPumpNum).CompNum);
+                                     MSHeatPump(MSHeatPumpNum).plantLoc.loopNum,
+                                     MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum,
+                                     MSHeatPump(MSHeatPumpNum).plantLoc.branchNum,
+                                     MSHeatPump(MSHeatPumpNum).plantLoc.compNum);
 
                 //     simulate steam coil to find operating capacity
                 SimulateSteamCoilComponents(state,
@@ -2785,10 +2770,10 @@ namespace HVACMultiSpeedHeatPump {
                                      mdot,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
-                                     MSHeatPump(MSHeatPumpNum).SuppLoopNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppLoopSide,
-                                     MSHeatPump(MSHeatPumpNum).SuppBranchNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppCompNum);
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum,
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum,
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum,
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum);
                 //     simulate water coil to find operating capacity
                 SimulateWaterCoilComponents(
                     state, MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum, QActual);
@@ -2805,10 +2790,10 @@ namespace HVACMultiSpeedHeatPump {
                                      mdot,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
-                                     MSHeatPump(MSHeatPumpNum).SuppLoopNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppLoopSide,
-                                     MSHeatPump(MSHeatPumpNum).SuppBranchNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppCompNum);
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum,
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum,
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum,
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum);
 
                 //     simulate steam coil to find operating capacity
                 SimulateSteamCoilComponents(state,
@@ -4723,10 +4708,10 @@ namespace HVACMultiSpeedHeatPump {
             MaxCoilFluidFlow = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
             CoilControlNode = MSHeatPump(MSHeatPumpNum).CoilControlNode;
             CoilOutletNode = MSHeatPump(MSHeatPumpNum).CoilOutletNode;
-            LoopNum = MSHeatPump(MSHeatPumpNum).LoopNum;
-            LoopSide = MSHeatPump(MSHeatPumpNum).LoopSide;
-            BranchNum = MSHeatPump(MSHeatPumpNum).BranchNum;
-            CompNum = MSHeatPump(MSHeatPumpNum).CompNum;
+            LoopNum = MSHeatPump(MSHeatPumpNum).plantLoc.loopNum;
+            LoopSide = MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum;
+            BranchNum = MSHeatPump(MSHeatPumpNum).plantLoc.branchNum;
+            CompNum = MSHeatPump(MSHeatPumpNum).plantLoc.compNum;
         } else {
             HeatCoilType = MSHeatPump(MSHeatPumpNum).SuppHeatCoilType;
             state.dataHVACMultiSpdHP->HeatCoilName = MSHeatPump(MSHeatPumpNum).SuppHeatCoilName;
@@ -4734,16 +4719,16 @@ namespace HVACMultiSpeedHeatPump {
             MaxCoilFluidFlow = MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow;
             CoilControlNode = MSHeatPump(MSHeatPumpNum).SuppCoilControlNode;
             CoilOutletNode = MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode;
-            LoopNum = MSHeatPump(MSHeatPumpNum).SuppLoopNum;
-            LoopSide = MSHeatPump(MSHeatPumpNum).SuppLoopSide;
-            BranchNum = MSHeatPump(MSHeatPumpNum).SuppBranchNum;
-            CompNum = MSHeatPump(MSHeatPumpNum).SuppCompNum;
+            LoopNum = MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum;
+            LoopSide = MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum;
+            BranchNum = MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum;
+            CompNum = MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum;
         }
 
-        MSHeatPump(MSHeatPumpNum).HotWaterLoopNum = LoopNum;
-        MSHeatPump(MSHeatPumpNum).HotWaterLoopSide = LoopSide;
-        MSHeatPump(MSHeatPumpNum).HotWaterBranchNum = BranchNum;
-        MSHeatPump(MSHeatPumpNum).HotWaterCompNum = CompNum;
+        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.loopNum = LoopNum;
+        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.loopSideNum = LoopSide;
+        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.branchNum = BranchNum;
+        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.compNum = CompNum;
         MSHeatPump(MSHeatPumpNum).HotWaterCoilControlNode = CoilControlNode;
         MSHeatPump(MSHeatPumpNum).HotWaterCoilOutletNode = CoilOutletNode;
         MSHeatPump(MSHeatPumpNum).HotWaterCoilName = state.dataHVACMultiSpdHP->HeatCoilName;
@@ -4918,10 +4903,10 @@ namespace HVACMultiSpeedHeatPump {
                              mdot,
                              state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilControlNode,
                              state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilOutletNode,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterLoopNum,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterLoopSide,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterBranchNum,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCompNum);
+                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.loopNum,
+                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.loopSideNum,
+                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.branchNum,
+                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.compNum);
         // simulate the hot water supplemental heating coil
         SimulateWaterCoilComponents(state,
                                     state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilName,

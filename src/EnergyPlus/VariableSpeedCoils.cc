@@ -3826,19 +3826,8 @@ namespace VariableSpeedCoils {
                     CoilVSWAHPType = DataPlant::PlantEquipmentType::CoilVSWAHPHeatingEquationFit;
                 }
                 errFlag = false;
-                ScanPlantLoopsForObject(state,
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                        CoilVSWAHPType,
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.loopNum,
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.loopSideNum,
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.branchNum,
-                                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.compNum,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                ScanPlantLoopsForObject(
+                    state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, CoilVSWAHPType, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitVarSpeedCoil: Program terminated for previous conditions.");
                 }

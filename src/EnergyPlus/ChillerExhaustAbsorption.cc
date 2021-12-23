@@ -831,10 +831,7 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
-                                            this->CWPlantLoc.loopNum,
-                                            this->CWPlantLoc.loopSideNum,
-                                            this->CWPlantLoc.branchNum,
-                                            this->CWPlantLoc.compNum,
+                                            this->CWPlantLoc,
                                             errFlag,
                                             this->CHWLowLimitTemp,
                                             _,
@@ -845,19 +842,8 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
     }
 
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
-                                            this->HWPlantLoc.loopNum,
-                                            this->HWPlantLoc.loopSideNum,
-                                            this->HWPlantLoc.branchNum,
-                                            this->HWPlantLoc.compNum,
-                                            errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            this->HeatReturnNodeNum,
-                                            _);
+    PlantUtilities::ScanPlantLoopsForObject(
+        state, this->Name, DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption, this->HWPlantLoc, errFlag, _, _, _, this->HeatReturnNodeNum, _);
     if (errFlag) {
         ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
     }
@@ -866,10 +852,7 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
                                                 DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
-                                                this->CDPlantLoc.loopNum,
-                                                this->CDPlantLoc.loopSideNum,
-                                                this->CDPlantLoc.branchNum,
-                                                this->CDPlantLoc.compNum,
+                                                this->CDPlantLoc,
                                                 errFlag,
                                                 _,
                                                 _,

@@ -108,15 +108,14 @@ void LocalPipeData::simulate(EnergyPlusData &state,
 
     if (!state.dataGlobal->BeginEnvrnFlag) this->EnvrnFlag = true;
 
-    PlantUtilities::SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
+    PlantUtilities::SafeCopyPlantNode(state, this->InletNodeNum, this->OutletNodeNum, this->plantLoc.loopNum);
 }
 
 void LocalPipeData::oneTimeInit_new(EnergyPlusData &state)
 {
     int FoundOnLoop = 0;
     bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->Type, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, FoundOnLoop, _, _);
     // Clang can't tell that the FoundOnLoop argument is actually passed by reference since it is an optional, so it thinks FoundOnLoop is always 0.
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ConstantConditionsOC"
@@ -133,13 +132,13 @@ void LocalPipeData::initEachEnvironment(EnergyPlusData &state) const
 {
     PlantUtilities::InitComponentNodes(state,
                                        0.0,
-                                       state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate,
+                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate,
                                        this->InletNodeNum,
                                        this->OutletNodeNum,
-                                       this->LoopNum,
-                                       this->LoopSide,
-                                       this->BranchIndex,
-                                       this->CompIndex);
+                                       this->plantLoc.loopNum,
+                                       this->plantLoc.loopSideNum,
+                                       this->plantLoc.branchNum,
+                                       this->plantLoc.compNum);
 }
 void LocalPipeData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {

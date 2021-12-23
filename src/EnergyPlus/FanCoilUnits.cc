@@ -1171,19 +1171,8 @@ namespace FanCoilUnits {
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
-                ScanPlantLoopsForObject(state,
-                                        FanCoil(FanCoilNum).HCoilName,
-                                        FanCoil(FanCoilNum).HCoilPlantTypeOf,
-                                        FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum,
-                                        FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum,
-                                        FanCoil(FanCoilNum).HeatCoilPlantLoc.branchNum,
-                                        FanCoil(FanCoilNum).HeatCoilPlantLoc.compNum,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                ScanPlantLoopsForObject(
+                    state, FanCoil(FanCoilNum).HCoilName, FanCoil(FanCoilNum).HCoilPlantTypeOf, FanCoil(FanCoilNum).HeatCoilPlantLoc, errFlag, _, _, _, _, _);
 
                 if (errFlag) {
                     ShowContinueError(state, "Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
@@ -1204,19 +1193,8 @@ namespace FanCoilUnits {
 
             if ((FanCoil(FanCoilNum).CCoilPlantType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                 (FanCoil(FanCoilNum).CCoilPlantType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
-                ScanPlantLoopsForObject(state,
-                                        FanCoil(FanCoilNum).CCoilPlantName,
-                                        FanCoil(FanCoilNum).CCoilPlantType,
-                                        FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum,
-                                        FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum,
-                                        FanCoil(FanCoilNum).CoolCoilPlantLoc.branchNum,
-                                        FanCoil(FanCoilNum).CoolCoilPlantLoc.compNum,
-                                        errFlag,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _);
+                ScanPlantLoopsForObject(
+                    state, FanCoil(FanCoilNum).CCoilPlantName, FanCoil(FanCoilNum).CCoilPlantType, FanCoil(FanCoilNum).CoolCoilPlantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowContinueError(state, "Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");

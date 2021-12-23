@@ -300,8 +300,7 @@ void PlantProfileData::oneTimeInit_new(EnergyPlusData &state)
 
     if (allocated(state.dataPlnt->PlantLoop)) {
         errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->Name, this->Type, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, errFlag, _, _, _, _, _);
+        ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, _, _, _);
         if (errFlag) {
             ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
         }

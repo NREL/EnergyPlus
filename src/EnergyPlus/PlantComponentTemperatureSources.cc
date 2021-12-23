@@ -436,19 +436,8 @@ namespace PlantComponentTemperatureSources {
             this->setupOutputVars(state);
             // Locate the component on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::WaterSource,
-                                                    this->Location.loopNum,
-                                                    this->Location.loopSideNum,
-                                                    this->Location.branchNum,
-                                                    this->Location.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->InletNodeNum,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::WaterSource, this->Location, errFlag, _, _, _, this->InletNodeNum, _);
             if (errFlag) {
                 ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
             }

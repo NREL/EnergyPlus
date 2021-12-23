@@ -888,19 +888,8 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
     if (this->MyFlag) {
         // Locate the hx on the plant loops for later usage
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::GrndHtExchgPond,
-                                                this->plantLoc.loopNum,
-                                                this->plantLoc.loopSideNum,
-                                                this->plantLoc.branchNum,
-                                                this->plantLoc.compNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, DataPlant::PlantEquipmentType::GrndHtExchgPond, this->plantLoc, errFlag, _, _, _, _, _);
         if (errFlag) {
             ShowFatalError(state, "InitPondGroundHeatExchanger: Program terminated due to previous condition(s).");
         }

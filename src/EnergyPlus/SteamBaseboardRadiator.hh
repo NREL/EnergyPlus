@@ -105,7 +105,8 @@ namespace SteamBaseboardRadiator {
         Real64 Energy;     // Maximum heating energy [J]
         Real64 ConvEnergy; // Convective heating energy [J]
         Real64 RadEnergy;  // Radiant heating energy [J]
-        PlantLocation plantLoc;        int BBLoadReSimIndex;
+        PlantLocation plantLoc{};
+        int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
         Real64 ScaledHeatingCapacity; // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC

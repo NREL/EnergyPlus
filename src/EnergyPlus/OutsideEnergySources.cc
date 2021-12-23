@@ -461,8 +461,7 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
 
     // Locate the unit on the plant loops for later usage
     bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->EnergyType, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, errFlag, _, _, _, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->EnergyType, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
     }

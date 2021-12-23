@@ -909,8 +909,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
 void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->Type, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, errFlag, _, _, _, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
     }

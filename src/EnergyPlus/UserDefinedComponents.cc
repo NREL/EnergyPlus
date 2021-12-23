@@ -2416,11 +2416,13 @@ namespace UserDefinedComponents {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::PlantEquipmentType::CoilUserDefined,
-                                                        this->Loop.plantLoc.loopNum,
-                                                        this->Loop.plantLoc.loopSideNum,
-                                                        this->Loop.plantLoc.branchNum,
-                                                        this->Loop.plantLoc.compNum,
-                                                        errFlag);
+                                                        this->Loop.plantLoc,
+                                                        errFlag,
+                                                        Optional<const Real64>(),
+                                                        Optional<const Real64>(),
+                                                        ObjexxFCL::Optional_int(),
+                                                        ObjexxFCL::Optional_int_const(),
+                                                        ObjexxFCL::Optional_int_const());
                 if (errFlag) {
                     ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
@@ -2492,15 +2494,13 @@ namespace UserDefinedComponents {
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
                                                             DataPlant::PlantEquipmentType::ZoneHVACAirUserDefined,
-                                                            this->Loop(loop).plantLoc.loopNum,
-                                                            this->Loop(loop).plantLoc.loopSideNum,
-                                                            this->Loop(loop).plantLoc.branchNum,
-                                                            this->Loop(loop).plantLoc.compNum,
+                                                            this->Loop(loop).plantLoc,
                                                             errFlag,
                                                             _,
                                                             _,
                                                             _,
-                                                            this->Loop(loop).InletNodeNum);
+                                                            this->Loop(loop).InletNodeNum,
+                                                            ObjexxFCL::Optional_int_const());
                     if (errFlag) {
                         ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
@@ -2583,15 +2583,13 @@ namespace UserDefinedComponents {
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
                                                             DataPlant::PlantEquipmentType::AirTerminalUserDefined,
-                                                            this->Loop(loop).plantLoc.loopNum,
-                                                            this->Loop(loop).plantLoc.loopSideNum,
-                                                            this->Loop(loop).plantLoc.branchNum,
-                                                            this->Loop(loop).plantLoc.compNum,
+                                                            this->Loop(loop).plantLoc,
                                                             errFlag,
                                                             _,
                                                             _,
                                                             _,
-                                                            this->Loop(loop).InletNodeNum);
+                                                            this->Loop(loop).InletNodeNum,
+                                                            ObjexxFCL::Optional_int_const());
                     if (errFlag) {
                         ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
@@ -2730,15 +2728,13 @@ namespace UserDefinedComponents {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::PlantEquipmentType::PlantComponentUserDefined,
-                                                        this->Loop(ConnectionNum).plantLoc.loopNum,
-                                                        this->Loop(ConnectionNum).plantLoc.loopSideNum,
-                                                        this->Loop(ConnectionNum).plantLoc.branchNum,
-                                                        this->Loop(ConnectionNum).plantLoc.compNum,
+                                                        this->Loop(ConnectionNum).plantLoc,
                                                         errFlag,
                                                         _,
                                                         _,
                                                         _,
-                                                        this->Loop(ConnectionNum).InletNodeNum);
+                                                        this->Loop(ConnectionNum).InletNodeNum,
+                                                        ObjexxFCL::Optional_int_const());
                 if (errFlag) {
                     ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }

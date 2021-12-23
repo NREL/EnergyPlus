@@ -826,19 +826,8 @@ namespace CTElectricGenerator {
         if (this->MyPlantScanFlag) { // this flag to be removed
             if (allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        DataPlant::PlantEquipmentType::Generator_CTurbine,
-                                                        this->HRPlantLoc.loopNum,
-                                                        this->HRPlantLoc.loopSideNum,
-                                                        this->HRPlantLoc.branchNum,
-                                                        this->HRPlantLoc.compNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, DataPlant::PlantEquipmentType::Generator_CTurbine, this->HRPlantLoc, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError(state, "InitCTGenerators: Program terminated due to previous condition(s).");
                 }

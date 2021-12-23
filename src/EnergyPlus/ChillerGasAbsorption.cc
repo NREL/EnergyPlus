@@ -843,10 +843,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
                                             DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
-                                            this->CWplantLoc.loopNum,
-                                            this->CWplantLoc.loopSideNum,
-                                            this->CWplantLoc.branchNum,
-                                            this->CWplantLoc.compNum,
+                                            this->CWplantLoc,
                                             errFlag,
                                             this->CHWLowLimitTemp,
                                             _,
@@ -857,37 +854,15 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
     }
 
-    PlantUtilities::ScanPlantLoopsForObject(state,
-                                            this->Name,
-                                            DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
-                                            this->HWplantLoc.loopNum,
-                                            this->HWplantLoc.loopSideNum,
-                                            this->HWplantLoc.branchNum,
-                                            this->HWplantLoc.compNum,
-                                            errFlag,
-                                            _,
-                                            _,
-                                            _,
-                                            this->HeatReturnNodeNum,
-                                            _);
+    PlantUtilities::ScanPlantLoopsForObject(
+        state, this->Name, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, this->HWplantLoc, errFlag, _, _, _, this->HeatReturnNodeNum, _);
     if (errFlag) {
         ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
     }
 
     if (this->isWaterCooled) {
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
-                                                this->CDplantLoc.loopNum,
-                                                this->CDplantLoc.loopSideNum,
-                                                this->CDplantLoc.branchNum,
-                                                this->CDplantLoc.compNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                this->CondReturnNodeNum,
-                                                _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, this->CDplantLoc, errFlag, _, _, _, this->CondReturnNodeNum, _);
         if (errFlag) {
             ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
         }

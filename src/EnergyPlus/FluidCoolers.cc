@@ -761,8 +761,7 @@ void FluidCoolerspecs::oneTimeInit_new(EnergyPlusData &state)
     this->setupOutputVars(state);
     bool ErrorsFound = false;
     // Locate the tower on the plant loops for later usage
-    PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->FluidCoolerType, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, ErrorsFound, _, _, _, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->FluidCoolerType, this->plantLoc, ErrorsFound, _, _, _, _, _);
 
     if (ErrorsFound) {
         ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
