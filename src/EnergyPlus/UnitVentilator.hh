@@ -126,10 +126,7 @@ namespace UnitVentilator {
         int HotControlNode;        // hot water control node
         int HotCoilOutNodeNum;     // outlet of coil
         Real64 HotControlOffset;   // control tolerance
-        int HWLoopNum;             // index for plant loop with hot water coil
-        DataPlant::LoopSideLocation HWLoopSide;            // index for plant loop side for hot water coil
-        int HWBranchNum;           // index for plant branch for hot water coil
-        int HWCompNum;             // index for plant component for hot water coil
+        PlantLocation HWplantLoc{};             // index for plant location for hot water coil
         bool CCoilPresent;         // .TRUE. if unit ventilator has a cooling coil
         std::string CCoilName;     // name of cooling coil
         std::string CCoilTypeCh;   // type of cooling coil as character string (same as on idf file)
@@ -185,8 +182,7 @@ namespace UnitVentilator {
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
-              HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), CCoilPresent(false), CCoil_Index(0),
-              CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
+              CCoilPresent(false), CCoil_Index(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
               MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
               ColdControlOffset(0.0), CWPlantLoc{}, HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
               TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanPartLoadRatio(0.0),

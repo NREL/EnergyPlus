@@ -214,7 +214,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode = 1;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode = 2;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum = 1;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode;
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode = 3;
@@ -305,7 +305,7 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode = 1;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode = 2;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum = 1;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode;
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode = 3;
@@ -379,7 +379,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
 
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode = 1;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode = 2;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 1;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
 
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode = 3;
@@ -1155,10 +1155,10 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     PlantUtilities::ScanPlantLoopsForObject(*state,
                                             state->dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
                                             DataPlant::PlantEquipmentType::LowTempRadiant_VarFlow,
-                                            state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum,
-                                            state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopSide,
-                                            state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWBranchNum,
-                                            state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWCompNum,
+                                            state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum,
+                                            state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopSideNum,
+                                            state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.branchNum,
+                                            state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.compNum,
                                             ErrorsFound,
                                             _,
                                             _,
@@ -1203,14 +1203,14 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
                       state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity;
     // hot water flow rate sizing calculation
     Density = GetDensityGlycol(*state,
-                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum).FluidName,
+                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum).FluidName,
                                60.0,
-                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
+                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum).FluidIndex,
                                "AutosizeLowTempRadiantVariableFlowTest");
     Cp = GetSpecificHeatGlycol(*state,
-                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum).FluidName,
+                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum).FluidName,
                                60.0,
-                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum).FluidIndex,
+                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum).FluidIndex,
                                "AutosizeLowTempRadiantVariableFlowTest");
     HotWaterFlowRate = HeatingCapacity / (state->dataSize->PlantSizData(1).DeltaT * Cp * Density);
     // chilled water flow rate sizing calculation
@@ -2066,7 +2066,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystem)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = 2.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = 3.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum = 0;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 0;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).WaterVolFlowMax = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPowerUse = 1.0;
@@ -2116,7 +2116,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = 2.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = 3.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum = 0;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 0;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPowerUse = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).PumpEffic = 0.0;
@@ -2154,7 +2154,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = 2.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = 3.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum = 0;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 0;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPowerUse = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).PumpEffic = 0.0;
@@ -2199,7 +2199,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = 2.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = 3.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum = 0;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 0;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPowerUse = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).PumpEffic = 0.0;
@@ -2244,7 +2244,7 @@ TEST_F(LowTempRadiantSystemTest, InitLowTempRadiantSystemCFloPump)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = 2.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = 3.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum = 0;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 0;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPowerUse = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).PumpEffic = 0.0;
@@ -2418,7 +2418,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempCFloRadiantSystem_OperationMode)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate = 2.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate = 3.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum = 0;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 0;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).WaterVolFlowMax = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPumpHead = 1.0;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NomPowerUse = 1.0;
@@ -2483,7 +2483,7 @@ TEST_F(LowTempRadiantSystemTest, CalcLowTempHydrRadiantSystem_OperationMode)
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).EMSOverrideOnWaterMdot = false;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterMassFlowRate = 1.0;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum = 0;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum = 0;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum = 0;
 
     // heating
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).OperatingMode = 0;
@@ -2617,7 +2617,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
 
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode = 1;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode = 2;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 1;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
 
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode = 3;
@@ -2642,14 +2642,14 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
 
     // hot water volume flow rate sizing calculation
     Density = GetDensityGlycol(*state,
-                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum).FluidName,
+                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum).FluidName,
                                60.0,
-                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
+                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum).FluidIndex,
                                "LowTempRadConFlowSystemAutoSizeTempTest");
     Cp = GetSpecificHeatGlycol(*state,
-                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum).FluidName,
+                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum).FluidName,
                                60.0,
-                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum).FluidIndex,
+                               state->dataPlnt->PlantLoop(state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum).FluidIndex,
                                "LowTempRadConFlowSystemAutoSizeTempTest");
     Real64 HeatingLoad = state->dataSize->FinalZoneSizing(1).NonAirSysDesHeatLoad;
     Real64 DesHotWaterVolFlowRate = HeatingLoad / (state->dataSize->PlantSizData(1).DeltaT * Density * Cp);
@@ -2726,7 +2726,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).OperatingMode = HeatingMode;
     RadSysType = LowTempRadiantSystem::SystemType::HydronicSystem;
     Temperature = 10.0;
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWLoopNum = 1;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum = 1;
     HXEffectFuncResult =
         state->dataLowTempRadSys->HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(*state,
                                                                                      SurfNum,
@@ -2760,7 +2760,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).OperatingMode = HeatingMode;
     RadSysType = LowTempRadiantSystem::SystemType::ConstantFlowSystem;
     Temperature = 10.0;
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWLoopNum = 1;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 1;
     HXEffectFuncResult =
         state->dataLowTempRadSys->CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(*state,
                                                                                      SurfNum,

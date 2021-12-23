@@ -546,7 +546,7 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     // radiant systems)
     Real64 mdot = 0.0;
     PlantUtilities::SetComponentFlowRate(
-        state, mdot, this->WaterInletNode, this->WaterOutletNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
+        state, mdot, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc.loopNum, this->HWplantLoc.loopSideNum, this->HWplantLoc.branchNum, this->HWplantLoc.compNum);
     this->WaterInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
 
     // get the schedule values for different scheduled parameters
@@ -824,10 +824,10 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::SwimmingPool_Indoor,
-                                                    this->HWLoopNum,
-                                                    this->HWLoopSide,
-                                                    this->HWBranchNum,
-                                                    this->HWCompNum,
+                                                    this->HWplantLoc.loopNum,
+                                                    this->HWplantLoc.loopSideNum,
+                                                    this->HWplantLoc.branchNum,
+                                                    this->HWplantLoc.compNum,
                                                     errFlag,
                                                     _,
                                                     _,
@@ -854,10 +854,10 @@ void SwimmingPoolData::initSwimmingPoolPlantNodeFlow(EnergyPlusData &state) cons
                                                this->WaterMassFlowRateMax,
                                                this->WaterInletNode,
                                                this->WaterOutletNode,
-                                               this->HWLoopNum,
-                                               this->HWLoopSide,
-                                               this->HWBranchNum,
-                                               this->HWCompNum);
+                                               this->HWplantLoc.loopNum,
+                                               this->HWplantLoc.loopSideNum,
+                                               this->HWplantLoc.branchNum,
+                                               this->HWplantLoc.compNum);
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNode, this->WaterVolFlowMax);
         }
     }
@@ -962,7 +962,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
         MassFlowRate = 0.0;
     }
     PlantUtilities::SetComponentFlowRate(
-        state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWLoopNum, this->HWLoopSide, this->HWBranchNum, this->HWCompNum);
+        state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc.loopNum, this->HWplantLoc.loopSideNum, this->HWplantLoc.branchNum, this->HWplantLoc.compNum);
     this->WaterMassFlowRate = MassFlowRate;
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature

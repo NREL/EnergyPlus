@@ -1517,10 +1517,10 @@ namespace UnitVentilator {
                 ScanPlantLoopsForObject(state,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                         state.dataUnitVentilators->UnitVent(UnitVentNum).HeatingCoilType,
-                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
-                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
-                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
-                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum,
+                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
+                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
+                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum,
+                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum,
                                         errFlag,
                                         _,
                                         _,
@@ -1534,10 +1534,10 @@ namespace UnitVentilator {
                 }
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum =
-                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum)
-                        .LoopSide(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide)
-                        .Branch(state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum)
-                        .Comp(state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum)
+                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum)
+                        .LoopSide(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum)
+                        .Branch(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum)
+                        .Comp(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum)
                         .NodeNumOut;
             }
             if ((state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
@@ -1638,9 +1638,9 @@ namespace UnitVentilator {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_WaterCoilType) {
 
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidIndex,
                                            RoutineName);
 
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotWaterFlow =
@@ -1653,10 +1653,10 @@ namespace UnitVentilator {
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotWaterFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum);
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum,
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_SteamCoilType) {
                     TempSteamIn = 100.00;
@@ -1672,10 +1672,10 @@ namespace UnitVentilator {
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotSteamFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum);
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum,
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum);
                 }
             } //(UnitVent(UnitVentNum)%HCoilPresent)
 
@@ -2455,15 +2455,15 @@ namespace UnitVentilator {
                                 }
                                 rho =
                                     GetDensityGlycol(state,
-                                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidName,
+                                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidName,
                                                      DataGlobalConstants::HWInitConvTemp,
-                                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
+                                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidIndex,
                                                      RoutineName);
                                 Cp = GetSpecificHeatGlycol(
                                     state,
-                                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidName,
+                                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidName,
                                     DataGlobalConstants::HWInitConvTemp,
-                                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum).FluidIndex,
+                                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidIndex,
                                     RoutineName);
                                 MaxVolHotWaterFlowDes = DesHeatingLoad / (WaterCoilSizDeltaT * Cp * rho);
 
@@ -3132,10 +3132,10 @@ namespace UnitVentilator {
                                      mdot,
                                      state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
                                      state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
-                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
-                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
-                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
-                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum);
+                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
+                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
+                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum,
+                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum);
             }
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ColdControlNode > 0) {
                 mdot = 0.0;
@@ -3409,9 +3409,9 @@ namespace UnitVentilator {
                                                   _,
                                                   _,
                                                   _,
-                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
-                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
-                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum);
+                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
+                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
+                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum);
 
                             } else if ((SELECT_CASE_var == Heating_GasCoilType) || (SELECT_CASE_var == Heating_ElectricCoilType) ||
                                        (SELECT_CASE_var == Heating_SteamCoilType)) {
@@ -3948,10 +3948,10 @@ namespace UnitVentilator {
                                              mdot,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
-                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
-                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
-                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
-                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum);
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum,
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum);
                         SimulateWaterCoilComponents(state,
                                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                     FirstHVACIteration,
@@ -3980,10 +3980,10 @@ namespace UnitVentilator {
                                              mdot,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
-                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopNum,
-                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWLoopSide,
-                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWBranchNum,
-                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWCompNum);
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum,
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum);
                         SimulateSteamCoilComponents(state,
                                                     state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                                                     FirstHVACIteration,

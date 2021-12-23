@@ -161,18 +161,18 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
 
     // Test 1
     state->dataSwimmingPools->Pool(1).initSwimmingPoolPlantLoopIndex(*state);
-    EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWLoopNum, 1);
-    EXPECT_TRUE(compare_enums(state->dataSwimmingPools->Pool(1).HWLoopSide, DataPlant::LoopSideLocation::Demand));
-    EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWBranchNum, 1);
-    EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWCompNum, 1);
+    EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWplantLoc.loopNum, 1);
+    EXPECT_TRUE(compare_enums(state->dataSwimmingPools->Pool(1).HWplantLoc.loopSideNum, DataPlant::LoopSideLocation::Demand));
+    EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWplantLoc.branchNum, 1);
+    EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWplantLoc.compNum, 1);
 
     // Test 2
     state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool = true;
     state->dataSwimmingPools->Pool(2).initSwimmingPoolPlantLoopIndex(*state);
-    EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWLoopNum, 2);
-    EXPECT_TRUE(compare_enums(state->dataSwimmingPools->Pool(2).HWLoopSide, DataPlant::LoopSideLocation::Supply));
-    EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWBranchNum, 1);
-    EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWCompNum, 1);
+    EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWplantLoc.loopNum, 2);
+    EXPECT_TRUE(compare_enums(state->dataSwimmingPools->Pool(2).HWplantLoc.loopSideNum, DataPlant::LoopSideLocation::Supply));
+    EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWplantLoc.branchNum, 1);
+    EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWplantLoc.compNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
@@ -187,10 +187,10 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     state->dataSwimmingPools->Pool(1).Name = "FirstPool";
     state->dataSwimmingPools->Pool(1).WaterInletNode = 1;
     state->dataSwimmingPools->Pool(1).WaterOutletNode = 2;
-    state->dataSwimmingPools->Pool(1).HWLoopNum = 1;
-    state->dataSwimmingPools->Pool(1).HWLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataSwimmingPools->Pool(1).HWBranchNum = 1;
-    state->dataSwimmingPools->Pool(1).HWCompNum = 1;
+    state->dataSwimmingPools->Pool(1).HWplantLoc.loopNum = 1;
+    state->dataSwimmingPools->Pool(1).HWplantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataSwimmingPools->Pool(1).HWplantLoc.branchNum = 1;
+    state->dataSwimmingPools->Pool(1).HWplantLoc.compNum = 1;
 
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
