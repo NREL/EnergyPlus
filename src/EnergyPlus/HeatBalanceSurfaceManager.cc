@@ -1363,6 +1363,11 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurfMgr->RefAirTemp.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs.dimension(state.dataSurface->TotSurfaces, 0.0);
 
+    state.dataHeatBalSurf->SurfTInsideEMSOverrideOn.dimension(state.dataSurface->TotSurfaces, false);
+    state.dataHeatBalSurf->SurfTInsideEMSOverrideValue.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfTOutsideEMSOverrideOn.dimension(state.dataSurface->TotSurfaces, false);
+    state.dataHeatBalSurf->SurfTOutsideEMSOverrideValue.dimension(state.dataSurface->TotSurfaces, 0.0);
+
     state.dataHeatBal->SurfWinQRadSWwinAbs.dimension(state.dataSurface->TotSurfaces, DataWindowEquivalentLayer::CFSMAXNL + 1, 0.0);
     state.dataHeatBal->SurfWinInitialDifSolwinAbs.dimension(state.dataSurface->TotSurfaces, DataWindowEquivalentLayer::CFSMAXNL, 0.0);
     state.dataHeatBalSurf->SurfQRadSWOutMvIns.dimension(state.dataSurface->TotSurfaces, 0.0);
