@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {

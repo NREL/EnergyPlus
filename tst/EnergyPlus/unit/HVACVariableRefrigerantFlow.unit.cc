@@ -8426,7 +8426,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil.allocate(state->dataSteamCoils->NumSteamCoils);
     state->dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
-    state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
     state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = 100.0;
@@ -8438,10 +8438,10 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
     state->dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
-    state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
-    state->dataSteamCoils->SteamCoil(CoilNum).LoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
-    state->dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
     state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
     state->dataSteamCoils->GetSteamCoilsInputFlag = false;

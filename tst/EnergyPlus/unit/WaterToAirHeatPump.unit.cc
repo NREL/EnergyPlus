@@ -240,7 +240,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     bool FirstHVACIteration(true);
     Real64 RuntimeFrac(1.0);
     int CompOp(1);
-    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum = 1;
+    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum = 1;
 
     InitWatertoAirHP(
         *state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
                 0.000000001);
 
     HPNum = 2;
-    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum = 2;
+    state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum = 2;
     state->dataPlnt->PlantLoop(2).Name = "HotWaterLoop";
     state->dataPlnt->PlantLoop(2).FluidName = "HotWater";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
