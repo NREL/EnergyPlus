@@ -7622,18 +7622,18 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     auto &CWCoil(state->dataWaterCoils->WaterCoil(2));
     thisFanCoil.CCoilName_Index = 2;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-    CWCoil.WaterLoopNum = 2;
-    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    CWCoil.WaterLoopBranchNum = 1;
-    CWCoil.WaterLoopCompNum = 1;
+    CWCoil.WaterPlantLoc.loopNum = 2;
+    CWCoil.WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    CWCoil.WaterPlantLoc.branchNum = 1;
+    CWCoil.WaterPlantLoc.compNum = 1;
     // hot water coil
     auto &HWCoil(state->dataWaterCoils->WaterCoil(1));
     thisFanCoil.HCoilName_Index = 1;
     state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
-    HWCoil.WaterLoopNum = 1;
-    HWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    HWCoil.WaterLoopBranchNum = 1;
-    HWCoil.WaterLoopCompNum = 1;
+    HWCoil.WaterPlantLoc.loopNum = 1;
+    HWCoil.WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    HWCoil.WaterPlantLoc.branchNum = 1;
+    HWCoil.WaterPlantLoc.compNum = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
@@ -8054,18 +8054,18 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     auto &CWCoil(state->dataWaterCoils->WaterCoil(2));
     thisFanCoil.CCoilName_Index = 2;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-    CWCoil.WaterLoopNum = 2;
-    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    CWCoil.WaterLoopBranchNum = 1;
-    CWCoil.WaterLoopCompNum = 1;
+    CWCoil.WaterPlantLoc.loopNum = 2;
+    CWCoil.WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    CWCoil.WaterPlantLoc.branchNum = 1;
+    CWCoil.WaterPlantLoc.compNum = 1;
     // hot water coil
     auto &HWCoil(state->dataWaterCoils->WaterCoil(1));
     thisFanCoil.HCoilName_Index = 1;
     state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
-    HWCoil.WaterLoopNum = 1;
-    HWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    HWCoil.WaterLoopBranchNum = 1;
-    HWCoil.WaterLoopCompNum = 1;
+    HWCoil.WaterPlantLoc.loopNum = 1;
+    HWCoil.WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    HWCoil.WaterPlantLoc.branchNum = 1;
+    HWCoil.WaterPlantLoc.compNum = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
 
         auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));

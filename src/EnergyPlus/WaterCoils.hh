@@ -190,10 +190,7 @@ namespace WaterCoils {
         int AirOutletNodeNum;
         int WaterInletNodeNum;
         int WaterOutletNodeNum;
-        int WaterLoopNum;       // Plant loop index
-        DataPlant::LoopSideLocation WaterLoopSide;      // Plant loop side index
-        int WaterLoopBranchNum; // Plant loop branch index
-        int WaterLoopCompNum;   // Plant loop Comp index
+        PlantLocation WaterPlantLoc;       // Plant location struct
         // begin variables for Water System interactions
         int CondensateCollectMode;         // where does water come from
         std::string CondensateCollectName; // name of water source e.g. water storage tank
@@ -243,8 +240,7 @@ namespace WaterCoils {
               DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0), HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0),
               UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0), SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0),
               RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0), LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterLoopNum(0), WaterLoopSide(DataPlant::LoopSideLocation::Invalid), WaterLoopBranchNum(0),
-              WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
+              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),  CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
               CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
               DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
               ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false), heatRecoveryCoil(false)
