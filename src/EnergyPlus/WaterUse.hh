@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -210,10 +211,7 @@ namespace WaterUse {
         int NumWaterEquipment;
         int MaxIterationsErrorIndex; // recurring error index
         Array1D_int myWaterEquipArr;
-        int PlantLoopNum;
-        DataPlant::LoopSideLocation PlantLoopSide;
-        int PlantLoopBranchNum;
-        int PlantLoopCompNum;
+        PlantLocation plantLoc{};
         bool MyEnvrnFlag;
 
         WaterConnectionsType()
@@ -225,7 +223,7 @@ namespace WaterUse {
               DrainVolFlowRate(0.0), PeakMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0), MainsTemp(0.0), TankTemp(0.0),
               ColdSupplyTemp(0.0), ColdTemp(0.0), HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0),
               MainsVolume(0.0), TankVolume(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0),
-              MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(DataPlant::LoopSideLocation::Invalid), PlantLoopBranchNum(0), PlantLoopCompNum(0), MyEnvrnFlag(true)
+              MaxIterationsErrorIndex(0), MyEnvrnFlag(true)
         {
         }
 

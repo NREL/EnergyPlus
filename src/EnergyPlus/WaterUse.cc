@@ -1340,10 +1340,10 @@ namespace WaterUse {
                                                        this->PeakMassFlowRate,
                                                        this->InletNode,
                                                        this->OutletNode,
-                                                       this->PlantLoopNum,
-                                                       this->PlantLoopSide,
-                                                       this->PlantLoopBranchNum,
-                                                       this->PlantLoopCompNum);
+                                                       this->plantLoc.loopNum,
+                                                       this->plantLoc.loopSideNum,
+                                                       this->plantLoc.branchNum,
+                                                       this->plantLoc.compNum);
 
                     this->ReturnTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 }
@@ -1399,10 +1399,10 @@ namespace WaterUse {
                                                          this->HotMassFlowRate,
                                                          this->InletNode,
                                                          this->OutletNode,
-                                                         this->PlantLoopNum,
-                                                         this->PlantLoopSide,
-                                                         this->PlantLoopBranchNum,
-                                                         this->PlantLoopCompNum);
+                                                         this->plantLoc.loopNum,
+                                                         this->plantLoc.loopSideNum,
+                                                         this->plantLoc.branchNum,
+                                                         this->plantLoc.compNum);
 
                 } else {
                     Real64 DesiredHotWaterMassFlow = this->HotMassFlowRate;
@@ -1410,10 +1410,10 @@ namespace WaterUse {
                                                          DesiredHotWaterMassFlow,
                                                          this->InletNode,
                                                          this->OutletNode,
-                                                         this->PlantLoopNum,
-                                                         this->PlantLoopSide,
-                                                         this->PlantLoopBranchNum,
-                                                         this->PlantLoopCompNum);
+                                                         this->plantLoc.loopNum,
+                                                         this->plantLoc.loopSideNum,
+                                                         this->plantLoc.branchNum,
+                                                         this->plantLoc.compNum);
                     // readjust if more than actual available mass flow rate determined by the demand side manager
                     if ((this->HotMassFlowRate != DesiredHotWaterMassFlow) && (this->HotMassFlowRate > 0.0)) { // plant didn't give what was asked for
 
@@ -1604,7 +1604,7 @@ namespace WaterUse {
 
         if (this->InletNode > 0 && this->OutletNode > 0) {
             // Pass all variables from inlet to outlet node
-            PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->PlantLoopNum);
+            PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->plantLoc.loopNum);
 
             // Set outlet node variables that are possibly changed
             state.dataLoopNodes->Node(this->OutletNode).Temp = this->ReturnTemp;
@@ -1701,10 +1701,10 @@ namespace WaterUse {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::WaterUseConnection,
-                                                    this->PlantLoopNum,
-                                                    this->PlantLoopSide,
-                                                    this->PlantLoopBranchNum,
-                                                    this->PlantLoopCompNum,
+                                                    this->plantLoc.loopNum,
+                                                    this->plantLoc.loopSideNum,
+                                                    this->plantLoc.branchNum,
+                                                    this->plantLoc.compNum,
                                                     errFlag,
                                                     _,
                                                     _,
