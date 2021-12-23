@@ -940,10 +940,10 @@ namespace WaterToAirHeatPump {
             ScanPlantLoopsForObject(state,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
-                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum,
+                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum,
+                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopSideNum,
+                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.branchNum,
+                                    state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.compNum,
                                     errFlag,
                                     _,
                                     _,
@@ -951,7 +951,7 @@ namespace WaterToAirHeatPump {
                                     _,
                                     _);
 
-            if (state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName == "WATER") {
+            if (state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName == "WATER") {
                 if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SourceSideUACoeff < DataGlobalConstants::rTinyValue) {
                     ShowSevereError(state,
                                     "Input problem for water to air heat pump, \"" + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name + "\".");
@@ -1013,14 +1013,14 @@ namespace WaterToAirHeatPump {
 
             // The rest of the one time initializations
             rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName,
                                    DataGlobalConstants::InitConvTemp,
-                                   state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex,
                                    RoutineName);
             Cp = GetSpecificHeatGlycol(state,
-                                       state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName,
                                        DataGlobalConstants::InitConvTemp,
-                                       state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate =
@@ -1029,20 +1029,20 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HPTimeConstant = HPTimeConstant;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).FanDelayTime = FanDelayTime;
 
-            PlantOutletNode = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum)
-                                  .LoopSide(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide)
-                                  .Branch(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum)
-                                  .Comp(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum)
+            PlantOutletNode = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum)
+                                  .LoopSide(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopSideNum)
+                                  .Branch(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.branchNum)
+                                  .Comp(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.compNum)
                                   .NodeNumOut;
             InitComponentNodes(state,
                                0.0,
                                state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate,
                                WaterInletNode,
                                PlantOutletNode,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum);
+                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum,
+                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopSideNum,
+                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.branchNum,
+                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.compNum);
 
             state.dataLoopNodes->Node(WaterInletNode).Temp = 5.0;
             state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
@@ -1114,10 +1114,10 @@ namespace WaterToAirHeatPump {
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopSide,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum);
+                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum,
+                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopSideNum,
+                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.branchNum,
+                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.compNum);
 
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         //  IF (WatertoAirHP(HPNum)%InletWaterTemp < 0.0) THEN  ! Debug trap
@@ -1325,8 +1325,8 @@ namespace WaterToAirHeatPump {
 
         SourceSideInletTemp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy;
-        SourceSideFluidName = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName;
-        SourceSideFluidIndex = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex;
+        SourceSideFluidName = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName;
+        SourceSideFluidIndex = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex;
         SourceSideMassFlowRate = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate;
         SourceSideVolFlowRate =
             SourceSideMassFlowRate /
@@ -1947,8 +1947,8 @@ namespace WaterToAirHeatPump {
 
         SourceSideInletTemp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy;
-        SourceSideFluidName = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidName;
-        SourceSideFluidIndex = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum).FluidIndex;
+        SourceSideFluidName = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidName;
+        SourceSideFluidIndex = state.dataPlnt->PlantLoop(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex;
         SourceSideMassFlowRate = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate;
         SourceSideVolFlowRate =
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate /
