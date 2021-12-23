@@ -1363,11 +1363,6 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
     state.dataHeatBalSurfMgr->RefAirTemp.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-    state.dataHeatBalSurf->SurfTInsideEMSOverrideOn.dimension(state.dataSurface->TotSurfaces, false);
-    state.dataHeatBalSurf->SurfTInsideEMSOverrideValue.dimension(state.dataSurface->TotSurfaces, 0.0);
-    state.dataHeatBalSurf->SurfTOutsideEMSOverrideOn.dimension(state.dataSurface->TotSurfaces, false);
-    state.dataHeatBalSurf->SurfTOutsideEMSOverrideValue.dimension(state.dataSurface->TotSurfaces, 0.0);
-
     state.dataHeatBal->SurfWinQRadSWwinAbs.dimension(state.dataSurface->TotSurfaces, DataWindowEquivalentLayer::CFSMAXNL + 1, 0.0);
     state.dataHeatBal->SurfWinInitialDifSolwinAbs.dimension(state.dataSurface->TotSurfaces, DataWindowEquivalentLayer::CFSMAXNL, 0.0);
     state.dataHeatBalSurf->SurfQRadSWOutMvIns.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -6252,8 +6247,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
             {
                 auto const SELECT_CASE_var(Surface(SurfNum).ExtBoundCond);
 
-                if (state.dataHeatBalSurf->SurfTOutsideEMSOverrideOn(SurfNum)) {
-                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataHeatBalSurf->SurfTOutsideEMSOverrideValue(SurfNum);
+                if (state.dataSurface->SurfTOutsideEMSOverrideOn(SurfNum)) {
+                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataSurface->SurfTOutsideEMSOverrideValue(SurfNum);
                 } else if (SELECT_CASE_var == Ground) { // Surface in contact with ground
                     state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEnvrn->GroundTemp;
 
@@ -7114,9 +7109,9 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             Real64 const MAT_zone(state.dataHeatBalFanSys->MAT(ZoneNum));
             Real64 const HConvIn_surf(state.dataMstBal->HConvInFD(SurfNum) = state.dataHeatBalSurf->SurfHConvInt(SurfNum));
 
-            if (state.dataHeatBalSurf->SurfTInsideEMSOverrideOn(SurfNum)) {
-                state.dataHeatBalSurf->SurfTempInTmp(SurfNum) = state.dataHeatBalSurf->SurfTInsideEMSOverrideValue(SurfNum);
-                state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataHeatBalSurf->SurfTInsideEMSOverrideValue(SurfNum);
+            if (state.dataSurface->SurfTInsideEMSOverrideOn(SurfNum)) {
+                state.dataHeatBalSurf->SurfTempInTmp(SurfNum) = state.dataSurface->SurfTInsideEMSOverrideValue(SurfNum);
+                state.dataHeatBalSurf->SurfTempIn(SurfNum) = state.dataSurface->SurfTInsideEMSOverrideValue(SurfNum);
                 continue;
             }
 
@@ -7986,10 +7981,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 //                                        + IterDampConst * SurfTempInsOld(SurfNum)+ IsNotAdiabatic*IsNotSource*construct.CTFCross(0)
                 //                                        * TH11) * TempDiv;
 
-                if (state.dataHeatBalSurf->SurfTInsideEMSOverrideOn(surfNum)) {
+                if (state.dataSurface->SurfTInsideEMSOverrideOn(surfNum)) {
                     // Is TempSurfInTmp important, or is it really temporary storage?
-                    state.dataHeatBalSurf->SurfTempInTmp(surfNum) = state.dataHeatBalSurf->SurfTInsideEMSOverrideValue(surfNum);
-                    state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTInsideEMSOverrideValue(surfNum);
+                    state.dataHeatBalSurf->SurfTempInTmp(surfNum) = state.dataSurface->SurfTInsideEMSOverrideValue(surfNum);
+                    state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataSurface->SurfTInsideEMSOverrideValue(surfNum);
                     continue;
                 }
 

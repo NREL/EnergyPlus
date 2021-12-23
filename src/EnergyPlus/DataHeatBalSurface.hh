@@ -114,12 +114,6 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfWinCoeffAdjRatio; // Convective Coefficient Adjustment Ratio assuming highly conductive frames
                                           // Only applicable for exterior window surfaces
 
-    // EMS surface temp override
-    Array1D<bool> SurfTInsideEMSOverrideOn; // EMS Inside surface temperature override enable
-    Array1D<Real64> SurfTInsideEMSOverrideValue; // EMS Inside surface temperature override value
-    Array1D<bool> SurfTOutsideEMSOverrideOn; // EMS Outside surface temperature override enable
-    Array1D<Real64> SurfTOutsideEMSOverrideValue; // EMS Outside surface temperature override value
-
     Array1D<Real64> SurfHAirExt;          // Outside Radiation Coefficient to Air
     Array1D<Real64> SurfHSkyExt;          // Outside Radiation Coefficient to Sky
     Array1D<Real64> SurfHGrdExt;          // Outside Radiation Coefficient to Ground
@@ -274,11 +268,6 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfTempInTmp.deallocate();
         this->SurfHcExt.deallocate();
         this->SurfWinCoeffAdjRatio.deallocate();
-
-        this->SurfTInsideEMSOverrideOn.deallocate();
-        this->SurfTInsideEMSOverrideValue.deallocate();
-        this->SurfTOutsideEMSOverrideOn.deallocate();
-        this->SurfTOutsideEMSOverrideValue.deallocate();
 
         this->SurfHAirExt.deallocate();
         this->SurfHSkyExt.deallocate();

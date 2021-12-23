@@ -2234,16 +2234,16 @@ namespace EMSManager {
                                  state.dataSurface->Surface(SurfNum).Name,
                                  "Surface Inside Temperature",
                                  "[C]",
-                                 state.dataHeatBalSurf->SurfTInsideEMSOverrideOn(SurfNum),
-                                 state.dataHeatBalSurf->SurfTInsideEMSOverrideValue(SurfNum));
+                                 state.dataSurface->SurfTInsideEMSOverrideOn(SurfNum),
+                                 state.dataSurface->SurfTInsideEMSOverrideValue(SurfNum));
 
                 SetupEMSActuator(state,
                                  "Surface",
                                  state.dataSurface->Surface(SurfNum).Name,
                                  "Surface Outside Temperature",
                                  "[C]",
-                                 state.dataHeatBalSurf->SurfTOutsideEMSOverrideOn(SurfNum),
-                                 state.dataHeatBalSurf->SurfTOutsideEMSOverrideValue(SurfNum));
+                                 state.dataSurface->SurfTOutsideEMSOverrideOn(SurfNum),
+                                 state.dataSurface->SurfTOutsideEMSOverrideValue(SurfNum));
             }
         }
     }

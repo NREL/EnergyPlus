@@ -898,6 +898,12 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfViewFactorGroundEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfWindDirEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfWindDirEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+
+        state.dataSurface->SurfTInsideEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfTInsideEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfTOutsideEMSOverrideOn.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfTOutsideEMSOverrideValue.allocate(state.dataSurface->TotSurfaces);
+
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfEMSConstructionOverrideON(SurfNum) = false;
             state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum) = 0.0;
@@ -915,6 +921,10 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfViewFactorGroundEMSOverrideValue(SurfNum) = 0.0;
             state.dataSurface->SurfWindDirEMSOverrideOn(SurfNum) = false;
             state.dataSurface->SurfWindDirEMSOverrideValue(SurfNum) = 0.0;
+            state.dataSurface->SurfTInsideEMSOverrideOn(SurfNum) = false;
+            state.dataSurface->SurfTInsideEMSOverrideValue(SurfNum) = 0.0;
+            state.dataSurface->SurfTOutsideEMSOverrideOn(SurfNum) = false;
+            state.dataSurface->SurfTOutsideEMSOverrideValue(SurfNum) = 0.0;
         }
         // Following are surface hb arrays
         state.dataSurface->SurfOutDryBulbTemp.allocate(state.dataSurface->TotSurfaces);
