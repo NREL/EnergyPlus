@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -390,6 +391,7 @@ namespace EMSManager {
             SetupSurfaceConvectionActuators(state);
             SetupSurfaceConstructionActuators(state);
             SetupSurfaceOutdoorBoundaryConditionActuators(state);
+            SetupSurfaceTemperatureActuators(state);
             SetupZoneOutdoorBoundaryConditionActuators(state);
             GetEMSInput(state);
             state.dataEMSMgr->GetEMSUserInput = false;
@@ -2218,6 +2220,30 @@ namespace EMSManager {
                                  "[degree]",
                                  state.dataSurface->SurfWindDirEMSOverrideOn(SurfNum),
                                  state.dataSurface->SurfWindDirEMSOverrideValue(SurfNum));
+            }
+        }
+    }
+
+    void SetupSurfaceTemperatureActuators(EnergyPlusData &state)
+    {
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            if (state.dataSurface->Surface(SurfNum).Class != DataSurfaces::SurfaceClass::Window) {
+                SetupEMSActuator(state,
+                                 "Surface",
+                                 state.dataSurface->Surface(SurfNum).Name,
+                                 "Surface Inside Temperature",
+                                 "[C]",
+                                 state.dataHeatBalSurf->SurfTInsideEMSOverrideOn(SurfNum),
+                                 state.dataHeatBalSurf->SurfTInsideEMSOverrideValue(SurfNum));
+
+                SetupEMSActuator(state,
+                                 "Surface",
+                                 state.dataSurface->Surface(SurfNum).Name,
+                                 "Surface Outside Temperature",
+                                 "[C]",
+                                 state.dataHeatBalSurf->SurfTOutsideEMSOverrideOn(SurfNum),
+                                 state.dataHeatBalSurf->SurfTOutsideEMSOverrideValue(SurfNum));
             }
         }
     }
