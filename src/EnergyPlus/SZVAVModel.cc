@@ -135,10 +135,10 @@ namespace SZVAVModel {
             lowSpeedFanRatio = SZVAVModel.LowSpeedCoolFanRatio;
             coilFluidInletNode = SZVAVModel.CoolCoilFluidInletNode;
             coilFluidOutletNode = SZVAVModel.CoolCoilFluidOutletNodeNum;
-            coilLoopNum = SZVAVModel.CoolCoilLoopNum;
-            coilLoopSide = SZVAVModel.CoolCoilLoopSide;
-            coilBranchNum = SZVAVModel.CoolCoilBranchNum;
-            coilCompNum = SZVAVModel.CoolCoilCompNum;
+            coilLoopNum = SZVAVModel.CoolCoilPlantLoc.loopNum;
+            coilLoopSide = SZVAVModel.CoolCoilPlantLoc.loopSideNum;
+            coilBranchNum = SZVAVModel.CoolCoilPlantLoc.branchNum;
+            coilCompNum = SZVAVModel.CoolCoilPlantLoc.compNum;
             coilAirInletNode = SZVAVModel.CoolCoilInletNodeNum;
             coilAirOutletNode = SZVAVModel.CoolCoilOutletNodeNum;
         } else if (HeatingLoad) {
@@ -149,10 +149,10 @@ namespace SZVAVModel {
             lowSpeedFanRatio = SZVAVModel.LowSpeedHeatFanRatio;
             coilFluidInletNode = SZVAVModel.HeatCoilFluidInletNode;
             coilFluidOutletNode = SZVAVModel.HeatCoilFluidOutletNodeNum;
-            coilLoopNum = SZVAVModel.HeatCoilLoopNum;
-            coilLoopSide = SZVAVModel.HeatCoilLoopSide;
-            coilBranchNum = SZVAVModel.HeatCoilBranchNum;
-            coilCompNum = SZVAVModel.HeatCoilCompNum;
+            coilLoopNum = SZVAVModel.HeatCoilPlantLoc.loopNum;
+            coilLoopSide = SZVAVModel.HeatCoilPlantLoc.loopSideNum;
+            coilBranchNum = SZVAVModel.HeatCoilPlantLoc.branchNum;
+            coilCompNum = SZVAVModel.HeatCoilPlantLoc.compNum;
             coilAirInletNode = SZVAVModel.HeatCoilInletNodeNum;
             coilAirOutletNode = SZVAVModel.HeatCoilOutletNodeNum;
         } else { // should never get here, protect against uninitialized variables
@@ -575,10 +575,10 @@ namespace SZVAVModel {
             lowSpeedFanRatio = SZVAVModel.LowSpeedCoolFanRatio;
             coilFluidInletNode = SZVAVModel.CoolCoilFluidInletNode;
             coilFluidOutletNode = SZVAVModel.CoolCoilFluidOutletNodeNum;
-            coilLoopNum = SZVAVModel.CoolCoilLoopNum;
-            coilLoopSide = SZVAVModel.CoolCoilLoopSide;
-            coilBranchNum = SZVAVModel.CoolCoilBranchNum;
-            coilCompNum = SZVAVModel.CoolCoilCompNum;
+            coilLoopNum = SZVAVModel.CoolCoilPlantLoc.loopNum;
+            coilLoopSide = SZVAVModel.CoolCoilPlantLoc.loopSideNum;
+            coilBranchNum = SZVAVModel.CoolCoilPlantLoc.branchNum;
+            coilCompNum = SZVAVModel.CoolCoilPlantLoc.compNum;
             coilAirInletNode = SZVAVModel.CoolCoilInletNodeNum;
             coilAirOutletNode = SZVAVModel.CoolCoilOutletNodeNum;
         } else if (HeatingLoad) {
@@ -589,10 +589,10 @@ namespace SZVAVModel {
             lowSpeedFanRatio = SZVAVModel.LowSpeedHeatFanRatio;
             coilFluidInletNode = SZVAVModel.HeatCoilFluidInletNode;
             coilFluidOutletNode = SZVAVModel.HeatCoilFluidOutletNodeNum;
-            coilLoopNum = SZVAVModel.HeatCoilLoopNum;
-            coilLoopSide = SZVAVModel.HeatCoilLoopSide;
-            coilBranchNum = SZVAVModel.HeatCoilBranchNum;
-            coilCompNum = SZVAVModel.HeatCoilCompNum;
+            coilLoopNum = SZVAVModel.HeatCoilPlantLoc.loopNum;
+            coilLoopSide = SZVAVModel.HeatCoilPlantLoc.loopSideNum;
+            coilBranchNum = SZVAVModel.HeatCoilPlantLoc.branchNum;
+            coilCompNum = SZVAVModel.HeatCoilPlantLoc.compNum;
             coilAirInletNode = SZVAVModel.HeatCoilInletNodeNum;
             coilAirOutletNode = SZVAVModel.HeatCoilOutletNodeNum;
         } else { // should never get here, protect against uninitialized variables
@@ -1021,10 +1021,10 @@ namespace SZVAVModel {
             lowSpeedFanRatio = SZVAVModel.LowSpeedCoolFanRatio;
             coilFluidInletNode = SZVAVModel.CoolCoilFluidInletNode;
             coilFluidOutletNode = SZVAVModel.CoolCoilFluidOutletNodeNum;
-            coilLoopNum = SZVAVModel.CoolCoilLoopNum;
-            coilLoopSide = SZVAVModel.CoolCoilLoopSide;
-            coilBranchNum = SZVAVModel.CoolCoilBranchNum;
-            coilCompNum = SZVAVModel.CoolCoilCompNum;
+            coilLoopNum = SZVAVModel.CoolCoilPlantLoc.loopNum;
+            coilLoopSide = SZVAVModel.CoolCoilPlantLoc.loopSideNum;
+            coilBranchNum = SZVAVModel.CoolCoilPlantLoc.branchNum;
+            coilCompNum = SZVAVModel.CoolCoilPlantLoc.compNum;
             coilAirInletNode = SZVAVModel.CoolCoilInletNodeNum;
             coilAirOutletNode = SZVAVModel.CoolCoilOutletNodeNum;
         } else if (HeatingLoad) {
@@ -1035,10 +1035,10 @@ namespace SZVAVModel {
             lowSpeedFanRatio = SZVAVModel.LowSpeedHeatFanRatio;
             coilFluidInletNode = SZVAVModel.HeatCoilFluidInletNode;
             coilFluidOutletNode = SZVAVModel.HeatCoilFluidOutletNodeNum;
-            coilLoopNum = SZVAVModel.HeatCoilLoopNum;
-            coilLoopSide = SZVAVModel.HeatCoilLoopSide;
-            coilBranchNum = SZVAVModel.HeatCoilBranchNum;
-            coilCompNum = SZVAVModel.HeatCoilCompNum;
+            coilLoopNum = SZVAVModel.HeatCoilPlantLoc.loopNum;
+            coilLoopSide = SZVAVModel.HeatCoilPlantLoc.loopSideNum;
+            coilBranchNum = SZVAVModel.HeatCoilPlantLoc.branchNum;
+            coilCompNum = SZVAVModel.HeatCoilPlantLoc.compNum;
             coilAirInletNode = SZVAVModel.HeatCoilInletNodeNum;
             coilAirOutletNode = SZVAVModel.HeatCoilOutletNodeNum;
         } else { // should never get here, protect against uninitialized variables

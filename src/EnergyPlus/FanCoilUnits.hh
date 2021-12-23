@@ -62,6 +62,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -227,14 +228,8 @@ namespace FanCoilUnits {
         int CoolCoilFluidOutletNodeNum;  // chilled water coil outlet plant node
         int HeatCoilFluidInletNode;      // hot water control node
         int HeatCoilFluidOutletNodeNum;  // hot water coil outlet plant node
-        int CoolCoilLoopNum;             // index for plant loop with chilled water coil
-        DataPlant::LoopSideLocation CoolCoilLoopSide;            // index for plant loop side for chilled water coil
-        int CoolCoilBranchNum;           // index for plant branch for chilled water coil
-        int CoolCoilCompNum;             // index for plant component for chilled water coil
-        int HeatCoilLoopNum;             // index for plant loop with hot water coil
-        DataPlant::LoopSideLocation HeatCoilLoopSide;            // index for plant loop side for hot water coil
-        int HeatCoilBranchNum;           // index for plant branch for hot water coil
-        int HeatCoilCompNum;             // index for plant component for hot water coil
+        PlantLocation CoolCoilPlantLoc{};// index for plant location for chilled water coil
+        PlantLocation HeatCoilPlantLoc{};// index for plant location for hot water coil
         int CoolCoilInletNodeNum;        // index of cooling coil inlet node number
         int CoolCoilOutletNodeNum;       // index of cooling coil outlet node number
         int HeatCoilInletNodeNum;        // index of heating coil inlet node number
@@ -264,8 +259,7 @@ namespace FanCoilUnits {
               DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0), FirstPass(true), fanAvailSchIndex(0), MaxCoolCoilFluidFlow(0.0),
               MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), MaxNoCoolHeatAirMassFlow(0.0), MaxCoolAirMassFlow(0.0),
               MaxHeatAirMassFlow(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0),
-              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(DataPlant::LoopSideLocation::Invalid), CoolCoilBranchNum(0),
-              CoolCoilCompNum(0), HeatCoilLoopNum(0), HeatCoilLoopSide(DataPlant::LoopSideLocation::Invalid), HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilInletNodeNum(0),
+              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilInletNodeNum(0),
               CoolCoilOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ControlZoneNum(0), NodeNumOfControlledZone(0),
               ATMixerExists(false), ATMixerOutNode(0), FanPartLoadRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneMassFlowFrac(1.0),
               MaxIterIndex(0), RegulaFalsiFailedIndex(0)

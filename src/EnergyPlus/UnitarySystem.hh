@@ -468,15 +468,9 @@ namespace UnitarySystems {
         int CoolCoilInletNodeNum;        // Cooling coil air inlet node number
         int CoolCoilOutletNodeNum;       // Cooling coil air outlet node number
         int CoolCoilFluidOutletNodeNum;  // Cooling coil fluid outlet node number (from Plant Loop data)
-        int CoolCoilLoopNum;             // Plant loop num of chilled water coil
-        DataPlant::LoopSideLocation CoolCoilLoopSide{DataPlant::LoopSideLocation::Invalid};            // Supply side or demand side
-        int CoolCoilBranchNum;           // Branch of number of the cooling coil in the plant loop
-        int CoolCoilCompNum;             // Comp num of the cooling coil in the plant loop
+        PlantLocation CoolCoilPlantLoc{};// Location of the cooling coil in the plant loop
         int CoolCoilFluidInletNode;      // Cooling coil fluid inlet node
-        int HeatCoilLoopNum;             // Plant loop num of hot water or steam coil
-        DataPlant::LoopSideLocation HeatCoilLoopSide{DataPlant::LoopSideLocation::Invalid};            // Supply side or demand side
-        int HeatCoilBranchNum;           // Branch of number of the heating coil in the plant loop
-        int HeatCoilCompNum;             // Comp num of the heating coil in the plant loop
+        PlantLocation HeatCoilPlantLoc{};// Location of the heating coil in the plant loop
         int HeatCoilFluidInletNode;      // Heating coil fluid inlet node
         int HeatCoilFluidOutletNodeNum;  // Heating coil fluid outlet node number (from Plant Loop data)
         int HeatCoilInletNodeNum;        // Heating coil air inlet node number

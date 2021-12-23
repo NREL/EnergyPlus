@@ -190,10 +190,10 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.LowSpeedHeatFanRatio = 0.5;
     thisUnit.CoolCoilFluidInletNode = 0;
     thisUnit.CoolCoilFluidOutletNodeNum = 0;
-    thisUnit.CoolCoilLoopNum = 0;
-    thisUnit.CoolCoilLoopSide = DataPlant::LoopSideLocation::Invalid;
-    thisUnit.CoolCoilBranchNum = 0;
-    thisUnit.CoolCoilCompNum = 0;
+    thisUnit.CoolCoilPlantLoc.loopNum = 0;
+    thisUnit.CoolCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
+    thisUnit.CoolCoilPlantLoc.branchNum = 0;
+    thisUnit.CoolCoilPlantLoc.compNum = 0;
     thisUnit.CoolCoilInletNodeNum = 2;
     thisUnit.CoolCoilOutletNodeNum = 4;
 
@@ -201,10 +201,10 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.MaxHeatAirMassFlow = 0.2;
     thisUnit.HeatCoilFluidInletNode = 0;
     thisUnit.HeatCoilFluidOutletNodeNum = 0;
-    thisUnit.HeatCoilLoopNum = 0;
-    thisUnit.HeatCoilLoopSide = DataPlant::LoopSideLocation::Invalid;
-    thisUnit.HeatCoilBranchNum = 0;
-    thisUnit.HeatCoilCompNum = 0;
+    thisUnit.HeatCoilPlantLoc.loopNum = 0;
+    thisUnit.HeatCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
+    thisUnit.HeatCoilPlantLoc.branchNum = 0;
+    thisUnit.HeatCoilPlantLoc.compNum = 0;
     thisUnit.HeatCoilInletNodeNum = 4;
     thisUnit.HeatCoilOutletNodeNum = 3;
 
