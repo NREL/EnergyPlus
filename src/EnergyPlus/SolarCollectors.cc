@@ -931,9 +931,9 @@ namespace SolarCollectors {
             // Clear node initial conditions
             if (this->VolFlowRateMax > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                DataGlobalConstants::InitConvTemp,
-                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                RoutineName);
 
                 this->MassFlowRateMax = this->VolFlowRateMax * rho;
@@ -946,10 +946,10 @@ namespace SolarCollectors {
                                                this->MassFlowRateMax,
                                                this->InletNode,
                                                this->OutletNode,
-                                               this->WLoopNum,
-                                               this->WLoopSideNum,
-                                               this->WLoopBranchNum,
-                                               this->WLoopCompNum);
+                                               this->plantLoc.loopNum,
+                                               this->plantLoc.loopSideNum,
+                                               this->plantLoc.branchNum,
+                                               this->plantLoc.compNum);
 
             this->Init = false;
 
@@ -1027,10 +1027,10 @@ namespace SolarCollectors {
                                              this->MassFlowRate,
                                              this->InletNode,
                                              this->OutletNode,
-                                             this->WLoopNum,
-                                             this->WLoopSideNum,
-                                             this->WLoopBranchNum,
-                                             this->WLoopCompNum);
+                                             this->plantLoc.loopNum,
+                                             this->plantLoc.loopSideNum,
+                                             this->plantLoc.branchNum,
+                                             this->plantLoc.compNum);
 
         if (this->InitICS) {
 
@@ -1126,7 +1126,7 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
 
         // Gross area of collector (m2)
         Real64 area = state.dataSurface->Surface(SurfNum).Area;
@@ -1410,11 +1410,11 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
 
         // density of collector fluid (kg/m3)
         Real64 Rhow = FluidProperties::GetDensityGlycol(
-            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
 
         // calculate heat transfer coefficients and covers temperature:
         this->CalcHeatTransCoeffAndCoverTemp(state);
@@ -2124,9 +2124,9 @@ namespace SolarCollectors {
         // Set outlet node variables that are possibly changed
         state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            this->OutletTemp,
-                                                           state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
         state.dataLoopNodes->Node(this->OutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(this->OutletNode).Temp;
     }
@@ -2204,10 +2204,10 @@ namespace SolarCollectors {
                 PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->Type,
-                                                        this->WLoopNum,
-                                                        this->WLoopSideNum,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
+                                                        this->plantLoc.loopNum,
+                                                        this->plantLoc.loopSideNum,
+                                                        this->plantLoc.branchNum,
+                                                        this->plantLoc.compNum,
                                                         errFlag,
                                                         _,
                                                         _,
