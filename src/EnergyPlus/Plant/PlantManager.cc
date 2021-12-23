@@ -1577,9 +1577,8 @@ void GetPlantInput(EnergyPlusData &state)
             loopSide.noLoadConstantSpeedBranchFlowRateSteps.allocate(loopSide.TotalBranches - 2);
 
             // TODO: this is just intended to be temporary
-            loopSide.myLoopNum = LoopNum;
-            loopSide.myLoopSideNum = LoopSideNum;
-            loopSide.myOtherLoopSideNum = LoopSideOther[static_cast<int>(LoopSideNum)];
+            loopSide.plantLoc.loopNum = LoopNum;
+            loopSide.plantLoc.loopSideNum = LoopSideNum;
 
         } // ... end LoopSideNum=LoopSideLocation::Demand,LoopSideLocation::Supply
 
