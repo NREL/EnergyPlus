@@ -9887,15 +9887,8 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                     Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).VolFlowRateMax * rho;
                 }
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   Condenser(RefCondLoop).MassFlowRateMax,
-                                                   Condenser(RefCondLoop).InletNode,
-                                                   Condenser(RefCondLoop).OutletNode,
-                                                   Condenser(RefCondLoop).plantLoc.loopNum,
-                                                   Condenser(RefCondLoop).plantLoc.loopSideNum,
-                                                   Condenser(RefCondLoop).plantLoc.branchNum,
-                                                   Condenser(RefCondLoop).plantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, Condenser(RefCondLoop).MassFlowRateMax, Condenser(RefCondLoop).InletNode, Condenser(RefCondLoop).OutletNode);
             }
             for (int RefCompRackLoop = 1; RefCompRackLoop <= state.dataRefrigCase->NumRefrigeratedRacks; ++RefCompRackLoop) {
                 if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserType::Water) continue;
@@ -9916,11 +9909,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                    0.0,
                                                    RefrigRack(RefCompRackLoop).MassFlowRateMax,
                                                    RefrigRack(RefCompRackLoop).InletNode,
-                                                   RefrigRack(RefCompRackLoop).OutletNode,
-                                                   RefrigRack(RefCompRackLoop).plantLoc.loopNum,
-                                                   RefrigRack(RefCompRackLoop).plantLoc.loopSideNum,
-                                                   RefrigRack(RefCompRackLoop).plantLoc.branchNum,
-                                                   RefrigRack(RefCompRackLoop).plantLoc.compNum);
+                                                   RefrigRack(RefCompRackLoop).OutletNode);
             }
         }
         state.dataRefrigCase->InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = false;

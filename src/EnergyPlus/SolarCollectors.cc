@@ -941,15 +941,7 @@ namespace SolarCollectors {
                 this->MassFlowRateMax = BigNumber;
             }
 
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->MassFlowRateMax,
-                                               this->InletNode,
-                                               this->OutletNode,
-                                               this->plantLoc.loopNum,
-                                               this->plantLoc.loopSideNum,
-                                               this->plantLoc.branchNum,
-                                               this->plantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->MassFlowRateMax, this->InletNode, this->OutletNode);
 
             this->Init = false;
 

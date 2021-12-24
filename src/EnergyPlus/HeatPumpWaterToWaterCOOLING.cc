@@ -509,15 +509,7 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
                                                        RoutineName);
         this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->LoadSideDesignMassFlow,
-                                           this->LoadSideInletNodeNum,
-                                           this->LoadSideOutletNodeNum,
-                                           this->LoadPlantLoc.loopNum,
-                                           this->LoadPlantLoc.loopSideNum,
-                                           this->LoadPlantLoc.branchNum,
-                                           this->LoadPlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->LoadSideDesignMassFlow, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum);
 
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
@@ -526,15 +518,7 @@ void GshpPeCoolingSpecs::initialize(EnergyPlusData &state)
                                                 RoutineName);
         this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->SourceSideDesignMassFlow,
-                                           this->SourceSideInletNodeNum,
-                                           this->SourceSideOutletNodeNum,
-                                           this->SourcePlantLoc.loopNum,
-                                           this->SourcePlantLoc.loopSideNum,
-                                           this->SourcePlantLoc.branchNum,
-                                           this->SourcePlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->SourceSideDesignMassFlow, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum);
 
         state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp = 35.0;
     }

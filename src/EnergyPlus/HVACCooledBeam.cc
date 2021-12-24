@@ -570,15 +570,7 @@ namespace HVACCooledBeam {
                                    state.dataPlnt->PlantLoop(CoolBeam(CBNum).CWPlantLoc.loopNum).FluidIndex,
                                    RoutineName);
             CoolBeam(CBNum).MaxCoolWaterMassFlow = rho * CoolBeam(CBNum).MaxCoolWaterVolFlow;
-            InitComponentNodes(state,
-                               0.0,
-                               CoolBeam(CBNum).MaxCoolWaterMassFlow,
-                               InWaterNode,
-                               OutWaterNode,
-                               CoolBeam(CBNum).CWPlantLoc.loopNum,
-                               CoolBeam(CBNum).CWPlantLoc.loopSideNum,
-                               CoolBeam(CBNum).CWPlantLoc.branchNum,
-                               CoolBeam(CBNum).CWPlantLoc.compNum);
+            InitComponentNodes(state, 0.0, CoolBeam(CBNum).MaxCoolWaterMassFlow, InWaterNode, OutWaterNode);
             CoolBeam(CBNum).MySizeFlag = false;
         }
 
@@ -596,15 +588,7 @@ namespace HVACCooledBeam {
 
             InWaterNode = CoolBeam(CBNum).CWInNode;
             OutWaterNode = CoolBeam(CBNum).CWOutNode;
-            InitComponentNodes(state,
-                               0.0,
-                               CoolBeam(CBNum).MaxCoolWaterMassFlow,
-                               InWaterNode,
-                               OutWaterNode,
-                               CoolBeam(CBNum).CWPlantLoc.loopNum,
-                               CoolBeam(CBNum).CWPlantLoc.loopSideNum,
-                               CoolBeam(CBNum).CWPlantLoc.branchNum,
-                               CoolBeam(CBNum).CWPlantLoc.compNum);
+            InitComponentNodes(state, 0.0, CoolBeam(CBNum).MaxCoolWaterMassFlow, InWaterNode, OutWaterNode);
 
             if (CoolBeam(CBNum).AirLoopNum == 0) { // fill air loop index
                 if (CoolBeam(CBNum).CtrlZoneNum > 0 && CoolBeam(CBNum).ctrlZoneInNodeIndex > 0) {

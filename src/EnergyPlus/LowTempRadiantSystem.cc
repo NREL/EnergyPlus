@@ -2201,11 +2201,7 @@ namespace LowTempRadiantSystem {
                                        0.0,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxHeat,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopSideNum,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.branchNum,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.compNum);
+                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode);
                 }
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
@@ -2219,11 +2215,7 @@ namespace LowTempRadiantSystem {
                                        0.0,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxCool,
                                        state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopSideNum,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.branchNum,
-                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.compNum);
+                                       state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode);
                 }
             }
         }
@@ -2246,11 +2238,7 @@ namespace LowTempRadiantSystem {
                                        0.0,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopSideNum,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.branchNum,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.compNum);
+                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode);
                 }
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
                     rho = GetDensityGlycol(state,
@@ -2264,11 +2252,7 @@ namespace LowTempRadiantSystem {
                                        0.0,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopSideNum,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.branchNum,
-                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.compNum);
+                                       state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode);
                 }
                 state.dataLowTempRadSys->MySizeFlagCFlo(RadSysNum) = false;
             }
@@ -2327,22 +2311,14 @@ namespace LowTempRadiantSystem {
                                            0.0,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxHeat,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopSideNum,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.branchNum,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.compNum);
+                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode);
                     }
                     if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode > 0) {
                         InitComponentNodes(state,
                                            0.0,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxCool,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopSideNum,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.branchNum,
-                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.compNum);
+                                           state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode);
                     }
                 }
                 state.dataLowTempRadSys->MyEnvrnFlagHydr(RadSysNum) = false;
@@ -2373,22 +2349,14 @@ namespace LowTempRadiantSystem {
                                            0.0,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopSideNum,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.branchNum,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.compNum);
+                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode);
                     }
                     if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode > 0) {
                         InitComponentNodes(state,
                                            0.0,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdDesignWaterMassFlowRate,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopSideNum,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.branchNum,
-                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.compNum);
+                                           state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode);
                     }
                 }
                 state.dataLowTempRadSys->MyEnvrnFlagCFlo(RadSysNum) = false;

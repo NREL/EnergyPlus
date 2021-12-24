@@ -208,15 +208,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
 
         Real64 MaxFlowMultiplier = GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
-        InitComponentNodes(state,
-                           0.0,
-                           this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
-                           this->InletNode,
-                           this->OutletNode,
-                           this->plantLoc.loopNum,
-                           this->plantLoc.loopSideNum,
-                           this->plantLoc.branchNum,
-                           this->plantLoc.compNum);
+        InitComponentNodes(state, 0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, this->InletNode, this->OutletNode);
 
         this->EMSOverrideMassFlow = false;
         this->EMSMassFlowValue = 0.0;

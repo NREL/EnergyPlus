@@ -136,11 +136,7 @@ namespace UserDefinedComponents {
                                                this->Loop(thisLoop).MassFlowRateMin,
                                                this->Loop(thisLoop).MassFlowRateMax,
                                                this->Loop(thisLoop).InletNodeNum,
-                                               this->Loop(thisLoop).OutletNodeNum,
-                                               this->Loop(thisLoop).plantLoc.loopNum,
-                                               this->Loop(thisLoop).plantLoc.loopSideNum,
-                                               this->Loop(thisLoop).plantLoc.branchNum,
-                                               this->Loop(thisLoop).plantLoc.compNum);
+                                               this->Loop(thisLoop).OutletNodeNum);
 
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->Loop(thisLoop).InletNodeNum, this->Loop(thisLoop).DesignVolumeFlowRate);
 
@@ -283,11 +279,7 @@ namespace UserDefinedComponents {
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMin,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMax,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.OutletNodeNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.plantLoc.loopNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.plantLoc.loopSideNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.plantLoc.branchNum,
-                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.plantLoc.compNum);
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.OutletNodeNum);
 
                 PlantUtilities::RegisterPlantCompDesignFlow(state,
                                                             state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum,
@@ -394,11 +386,7 @@ namespace UserDefinedComponents {
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMin,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMax,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).plantLoc.loopNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).plantLoc.loopSideNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).plantLoc.branchNum,
-                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).plantLoc.compNum);
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum);
 
                     PlantUtilities::RegisterPlantCompDesignFlow(
                         state,
@@ -514,11 +502,7 @@ namespace UserDefinedComponents {
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMin,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMax,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).plantLoc.loopNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).plantLoc.loopSideNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).plantLoc.branchNum,
-                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).plantLoc.compNum);
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum);
 
                     PlantUtilities::RegisterPlantCompDesignFlow(
                         state,

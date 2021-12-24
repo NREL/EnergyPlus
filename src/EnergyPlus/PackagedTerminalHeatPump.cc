@@ -4643,11 +4643,7 @@ void InitPTUnit(EnergyPlusData &state,
                                0.0,
                                state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow,
                                state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopSideNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.branchNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.compNum);
+                               state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode);
         }
 
         if (state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode > 0) {
@@ -4689,11 +4685,7 @@ void InitPTUnit(EnergyPlusData &state,
                                0.0,
                                state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
                                state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum);
+                               state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode);
         }
     } // end one time inits
 

@@ -825,15 +825,7 @@ namespace ICEngineElectricGenerator {
             state.dataLoopNodes->Node(HeatRecInletNode).Temp = 20.0;
             state.dataLoopNodes->Node(HeatRecOutletNode).Temp = 20.0;
             // set the node max and min mass flow rates
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesignHeatRecMassFlowRate,
-                                               HeatRecInletNode,
-                                               HeatRecOutletNode,
-                                               this->HRPlantLoc.loopNum,
-                                               this->HRPlantLoc.loopSideNum,
-                                               this->HRPlantLoc.branchNum,
-                                               this->HRPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignHeatRecMassFlowRate, HeatRecInletNode, HeatRecOutletNode);
 
             this->MyEnvrnFlag = false;
         } // end environmental inits
@@ -913,15 +905,7 @@ namespace ICEngineElectricGenerator {
             this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
             this->HeatRecMdotDesign = this->DesignHeatRecMassFlowRate;
 
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesignHeatRecMassFlowRate,
-                                               this->HeatRecInletNodeNum,
-                                               this->HeatRecOutletNodeNum,
-                                               this->HRPlantLoc.loopNum,
-                                               this->HRPlantLoc.loopSideNum,
-                                               this->HRPlantLoc.branchNum,
-                                               this->HRPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignHeatRecMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
 
             this->MySizeAndNodeInitFlag = false;
         }

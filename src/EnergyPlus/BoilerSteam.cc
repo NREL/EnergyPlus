@@ -338,15 +338,7 @@ namespace BoilerSteam {
         this->DesMassFlowRate =
             this->NomCap / (LatentEnthSteam + CpWater * (this->TempUpLimitBoilerOut - state.dataLoopNodes->Node(BoilerInletNode).Temp));
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->DesMassFlowRate,
-                                           this->BoilerInletNodeNum,
-                                           this->BoilerOutletNodeNum,
-                                           this->plantLoc.loopNum,
-                                           this->plantLoc.loopSideNum,
-                                           this->plantLoc.branchNum,
-                                           this->plantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->DesMassFlowRate, this->BoilerInletNodeNum, this->BoilerOutletNodeNum);
 
         this->BoilerPressCheck = 0.0;
         this->FuelUsed = 0.0;

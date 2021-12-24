@@ -6089,15 +6089,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                                                            GetWaterThermalTankInput);
             this->MassFlowRateMin = this->VolFlowRateMin * rho;
             this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
-            PlantUtilities::InitComponentNodes(state,
-                                               this->MassFlowRateMin,
-                                               this->PlantUseMassFlowRateMax,
-                                               this->UseInletNode,
-                                               this->UseOutletNode,
-                                               this->UseSide.loopNum,
-                                               this->UseSide.loopSideNum,
-                                               this->UseSide.branchNum,
-                                               this->UseSide.compNum);
+            PlantUtilities::InitComponentNodes(state, this->MassFlowRateMin, this->PlantUseMassFlowRateMax, this->UseInletNode, this->UseOutletNode);
             this->UseOutletTemp = 0.0;
             this->UseMassFlowRate = 0.0;
             this->SavedUseOutletTemp = 0.0;
@@ -6117,15 +6109,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                                                            state.dataPlnt->PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                            GetWaterThermalTankInput);
             this->PlantSourceMassFlowRateMax = this->SourceDesignVolFlowRate * rho;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->PlantSourceMassFlowRateMax,
-                                               this->SourceInletNode,
-                                               this->SourceOutletNode,
-                                               this->SrcSide.loopNum,
-                                               this->SrcSide.loopSideNum,
-                                               this->SrcSide.branchNum,
-                                               this->SrcSide.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->PlantSourceMassFlowRateMax, this->SourceInletNode, this->SourceOutletNode);
 
             this->SourceOutletTemp = 0.0;
             this->SourceMassFlowRate = 0.0;

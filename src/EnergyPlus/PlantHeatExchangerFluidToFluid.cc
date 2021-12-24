@@ -645,11 +645,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                            this->DemandSideLoop.MassFlowRateMin,
                                            this->DemandSideLoop.MassFlowRateMax,
                                            this->DemandSideLoop.inletNodeNum,
-                                           this->DemandSideLoop.outletNodeNum,
-                                           this->DemandSideLoop.loopNum,
-                                           this->DemandSideLoop.loopSideNum,
-                                           this->DemandSideLoop.branchNum,
-                                           this->DemandSideLoop.compNum);
+                                           this->DemandSideLoop.outletNodeNum);
 
         rho = FluidProperties::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
@@ -661,11 +657,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                            this->SupplySideLoop.MassFlowRateMin,
                                            this->SupplySideLoop.MassFlowRateMax,
                                            this->SupplySideLoop.inletNodeNum,
-                                           this->SupplySideLoop.outletNodeNum,
-                                           this->SupplySideLoop.loopNum,
-                                           this->SupplySideLoop.loopSideNum,
-                                           this->SupplySideLoop.branchNum,
-                                           this->SupplySideLoop.compNum);
+                                           this->SupplySideLoop.outletNodeNum);
         this->MyEnvrnFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {

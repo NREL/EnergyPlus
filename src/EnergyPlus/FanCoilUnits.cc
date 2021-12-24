@@ -1266,22 +1266,14 @@ namespace FanCoilUnits {
                                    FanCoil(FanCoilNum).MinHotWaterFlow,
                                    FanCoil(FanCoilNum).MaxHeatCoilFluidFlow,
                                    FanCoil(FanCoilNum).HeatCoilFluidInletNode,
-                                   FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                   FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum,
-                                   FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum,
-                                   FanCoil(FanCoilNum).HeatCoilPlantLoc.branchNum,
-                                   FanCoil(FanCoilNum).HeatCoilPlantLoc.compNum);
+                                   FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum);
             }
 
             InitComponentNodes(state,
                                FanCoil(FanCoilNum).MinColdWaterFlow,
                                FanCoil(FanCoilNum).MaxCoolCoilFluidFlow,
                                FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-                               FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                               FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum,
-                               FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum,
-                               FanCoil(FanCoilNum).CoolCoilPlantLoc.branchNum,
-                               FanCoil(FanCoilNum).CoolCoilPlantLoc.compNum);
+                               FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum);
             //  Node(HotConNode)%MassFlowRateMax = FanCoil(FanCoilNum)%MaxHeatCoilFluidFlow
             //  Node(HotConNode)%MassFlowRateMin = FanCoil(FanCoilNum)%MinHotWaterFlow
             //  Node(ColdConNode)%MassFlowRateMax = FanCoil(FanCoilNum)%MaxCoolCoilFluidFlow

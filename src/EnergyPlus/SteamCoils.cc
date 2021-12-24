@@ -607,11 +607,7 @@ namespace SteamCoils {
                                0.0,
                                state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamMassFlowRate,
                                state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopSideNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum,
-                               state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum);
+                               state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum);
             MyEnvrnFlag(CoilNum) = false;
         } // End If for the Begin Environment initializations
 

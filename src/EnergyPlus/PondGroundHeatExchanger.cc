@@ -905,15 +905,7 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
                                                            RoutineName);
         this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
         this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->DesignMassFlowRate,
-                                           this->InletNodeNum,
-                                           this->OutletNodeNum,
-                                           this->plantLoc.loopNum,
-                                           this->plantLoc.loopSideNum,
-                                           this->plantLoc.branchNum,
-                                           this->plantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum);
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
 
         this->MyFlag = false;

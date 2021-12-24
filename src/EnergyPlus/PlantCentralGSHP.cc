@@ -1707,33 +1707,9 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
             this->HWMassFlowRateMax = this->HWVolFlowRate * rho;
             this->GLHEMassFlowRateMax = this->GLHEVolFlowRate * rho;
 
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->CHWMassFlowRateMax,
-                                               this->CHWInletNodeNum,
-                                               this->CHWOutletNodeNum,
-                                               this->CWPlantLoc.loopNum,
-                                               this->CWPlantLoc.loopSideNum,
-                                               this->CWPlantLoc.branchNum,
-                                               this->CWPlantLoc.compNum);
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->HWMassFlowRateMax,
-                                               this->HWInletNodeNum,
-                                               this->HWOutletNodeNum,
-                                               this->HWPlantLoc.loopNum,
-                                               this->HWPlantLoc.loopSideNum,
-                                               this->HWPlantLoc.branchNum,
-                                               this->HWPlantLoc.compNum);
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->GLHEMassFlowRateMax,
-                                               this->GLHEInletNodeNum,
-                                               this->GLHEOutletNodeNum,
-                                               this->GLHEPlantLoc.loopNum,
-                                               this->GLHEPlantLoc.loopSideNum,
-                                               this->GLHEPlantLoc.branchNum,
-                                               this->GLHEPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->CHWMassFlowRateMax, this->CHWInletNodeNum, this->CHWOutletNodeNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->HWMassFlowRateMax, this->HWInletNodeNum, this->HWOutletNodeNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->GLHEMassFlowRateMax, this->GLHEInletNodeNum, this->GLHEOutletNodeNum);
 
             // Initialize nodes for individual chiller heaters
             for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {

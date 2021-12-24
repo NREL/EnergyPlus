@@ -634,11 +634,7 @@ namespace BaseboardRadiator {
                                0.0,
                                baseboard->Baseboard(BaseboardNum).WaterMassFlowRateMax,
                                baseboard->Baseboard(BaseboardNum).WaterInletNode,
-                               baseboard->Baseboard(BaseboardNum).WaterOutletNode,
-                               baseboard->Baseboard(BaseboardNum).plantLoc.loopNum,
-                               baseboard->Baseboard(BaseboardNum).plantLoc.loopSideNum,
-                               baseboard->Baseboard(BaseboardNum).plantLoc.branchNum,
-                               baseboard->Baseboard(BaseboardNum).plantLoc.compNum);
+                               baseboard->Baseboard(BaseboardNum).WaterOutletNode);
             state.dataLoopNodes->Node(WaterInletNode).Temp = DataGlobalConstants::HWInitConvTemp;
             Cp = GetSpecificHeatGlycol(state,
                                        state.dataPlnt->PlantLoop(baseboard->Baseboard(BaseboardNum).plantLoc.loopNum).FluidName,

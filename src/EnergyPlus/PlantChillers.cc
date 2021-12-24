@@ -868,15 +868,7 @@ namespace PlantChillers {
                                                            RoutineName);
 
             this->EvapMassFlowRateMax = rho * this->EvapVolFlowRate;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->EvapMassFlowRateMax,
-                                               this->EvapInletNodeNum,
-                                               this->EvapOutletNodeNum,
-                                               this->CWPlantLoc.loopNum,
-                                               this->CWPlantLoc.loopSideNum,
-                                               this->CWPlantLoc.branchNum,
-                                               this->CWPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->EvapMassFlowRateMax, this->EvapInletNodeNum, this->EvapOutletNodeNum);
 
             // init maximum available condenser flow rate
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -891,15 +883,7 @@ namespace PlantChillers {
 
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->CondMassFlowRateMax,
-                                                   this->CondInletNodeNum,
-                                                   this->CondOutletNodeNum,
-                                                   this->CDPlantLoc.loopNum,
-                                                   this->CDPlantLoc.loopSideNum,
-                                                   this->CDPlantLoc.branchNum,
-                                                   this->CDPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(state, 0.0, this->CondMassFlowRateMax, this->CondInletNodeNum, this->CondOutletNodeNum);
             } else { // air or evap-air
 
                 rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, this->TempDesCondIn, 0.0, RoutineName);
@@ -925,15 +909,8 @@ namespace PlantChillers {
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->DesignHeatRecMassFlowRate,
-                                                   this->HeatRecInletNodeNum,
-                                                   this->HeatRecOutletNodeNum,
-                                                   this->HRPlantLoc.loopNum,
-                                                   this->HRPlantLoc.loopSideNum,
-                                                   this->HRPlantLoc.branchNum,
-                                                   this->HRPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->DesignHeatRecMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
                 this->HeatRecMaxCapacityLimit = this->HeatRecCapacityFraction * (this->NomCap + this->NomCap / this->COP);
 
                 if (this->HeatRecSetPointNodeNum > 0) {
@@ -2998,15 +2975,7 @@ namespace PlantChillers {
                                                            RoutineName);
 
             this->EvapMassFlowRateMax = rho * this->EvapVolFlowRate;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->EvapMassFlowRateMax,
-                                               this->EvapInletNodeNum,
-                                               this->EvapOutletNodeNum,
-                                               this->CWPlantLoc.loopNum,
-                                               this->CWPlantLoc.loopSideNum,
-                                               this->CWPlantLoc.branchNum,
-                                               this->CWPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->EvapMassFlowRateMax, this->EvapInletNodeNum, this->EvapOutletNodeNum);
 
             // init maximum available condenser flow rate
 
@@ -3022,15 +2991,7 @@ namespace PlantChillers {
 
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->CondMassFlowRateMax,
-                                                   this->CondInletNodeNum,
-                                                   this->CondOutletNodeNum,
-                                                   this->CDPlantLoc.loopNum,
-                                                   this->CDPlantLoc.loopSideNum,
-                                                   this->CDPlantLoc.branchNum,
-                                                   this->CDPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(state, 0.0, this->CondMassFlowRateMax, this->CondInletNodeNum, this->CondOutletNodeNum);
             } else { // air or evap-air
                 state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate =
                     this->CondVolFlowRate *
@@ -3055,15 +3016,8 @@ namespace PlantChillers {
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->DesignHeatRecMassFlowRate,
-                                                   this->HeatRecInletNodeNum,
-                                                   this->HeatRecOutletNodeNum,
-                                                   this->HRPlantLoc.loopNum,
-                                                   this->HRPlantLoc.loopSideNum,
-                                                   this->HRPlantLoc.branchNum,
-                                                   this->HRPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->DesignHeatRecMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
             }
 
             this->MyEnvrnFlag = false;
@@ -5034,15 +4988,7 @@ namespace PlantChillers {
                                                            RoutineName);
 
             this->EvapMassFlowRateMax = rho * this->EvapVolFlowRate;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->EvapMassFlowRateMax,
-                                               this->EvapInletNodeNum,
-                                               this->EvapOutletNodeNum,
-                                               this->CWPlantLoc.loopNum,
-                                               this->CWPlantLoc.loopSideNum,
-                                               this->CWPlantLoc.branchNum,
-                                               this->CWPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->EvapMassFlowRateMax, this->EvapInletNodeNum, this->EvapOutletNodeNum);
 
             // init maximum available condenser flow rate
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -5057,15 +5003,7 @@ namespace PlantChillers {
 
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->CondMassFlowRateMax,
-                                                   this->CondInletNodeNum,
-                                                   this->CondOutletNodeNum,
-                                                   this->CDPlantLoc.loopNum,
-                                                   this->CDPlantLoc.loopSideNum,
-                                                   this->CDPlantLoc.branchNum,
-                                                   this->CDPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(state, 0.0, this->CondMassFlowRateMax, this->CondInletNodeNum, this->CondOutletNodeNum);
             } else { // air or evap-air
                 state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate =
                     this->CondVolFlowRate *
@@ -5090,15 +5028,8 @@ namespace PlantChillers {
                                                         RoutineName);
                 this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->DesignHeatRecMassFlowRate,
-                                                   this->HeatRecInletNodeNum,
-                                                   this->HeatRecOutletNodeNum,
-                                                   this->HRPlantLoc.loopNum,
-                                                   this->HRPlantLoc.loopSideNum,
-                                                   this->HRPlantLoc.branchNum,
-                                                   this->HRPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->DesignHeatRecMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
             }
 
             this->MyEnvrnFlag = false;
@@ -6851,15 +6782,7 @@ namespace PlantChillers {
                                                            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->EvapMassFlowRateMax,
-                                               this->EvapInletNodeNum,
-                                               this->EvapOutletNodeNum,
-                                               this->CWPlantLoc.loopNum,
-                                               this->CWPlantLoc.loopSideNum,
-                                               this->CWPlantLoc.branchNum,
-                                               this->CWPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->EvapMassFlowRateMax, this->EvapInletNodeNum, this->EvapOutletNodeNum);
 
             // init maximum available condenser flow rate
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -6874,15 +6797,7 @@ namespace PlantChillers {
 
                 this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->CondMassFlowRateMax,
-                                                   this->CondInletNodeNum,
-                                                   this->CondOutletNodeNum,
-                                                   this->CDPlantLoc.loopNum,
-                                                   this->CDPlantLoc.loopSideNum,
-                                                   this->CDPlantLoc.branchNum,
-                                                   this->CDPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(state, 0.0, this->CondMassFlowRateMax, this->CondInletNodeNum, this->CondOutletNodeNum);
             } else { // air or evap-air
                 state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate =
                     this->CondVolFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, TempDesCondIn, 0.0, RoutineName);

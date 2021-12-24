@@ -684,11 +684,7 @@ namespace HVACSingleDuctInduc {
                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinHotWaterFlow,
                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxHotWaterFlow,
                                    HotConNode,
-                                   HWOutletNode,
-                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum,
-                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopSideNum,
-                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.branchNum,
-                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.compNum);
+                                   HWOutletNode);
             }
 
             ColdConNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWControlNode;
@@ -712,11 +708,7 @@ namespace HVACSingleDuctInduc {
                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinColdWaterFlow,
                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxColdWaterFlow,
                                    ColdConNode,
-                                   CWOutletNode,
-                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum,
-                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopSideNum,
-                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.branchNum,
-                                   state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.compNum);
+                                   CWOutletNode);
             }
 
             state.dataHVACSingleDuctInduc->MyEnvrnFlag(IUNum) = false;

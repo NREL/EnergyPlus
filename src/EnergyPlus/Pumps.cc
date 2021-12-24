@@ -1609,15 +1609,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
             // inlet node actually less than the 'minimum flow rate' specified by the user, than a
             // loop shutdown must  be triggered.
             mdotMin = 0.0;
-            InitComponentNodes(state,
-                               mdotMin,
-                               mdotMax,
-                               InletNode,
-                               OutletNode,
-                               state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum,
-                               state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum,
-                               state.dataPumps->PumpEquip(PumpNum).plantLoc.branchNum,
-                               state.dataPumps->PumpEquip(PumpNum).plantLoc.compNum);
+            InitComponentNodes(state, mdotMin, mdotMax, InletNode, OutletNode);
             state.dataPumps->PumpEquip(PumpNum).MassFlowRateMax = mdotMax;
             state.dataPumps->PumpEquip(PumpNum).MassFlowRateMin = state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate * SteamDensity;
 
@@ -1631,15 +1623,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
             // mdotMin = PumpEquip(PumpNum)%MinVolFlowRate * TempWaterDensity
             // see note above
             mdotMin = 0.0;
-            InitComponentNodes(state,
-                               mdotMin,
-                               mdotMax,
-                               InletNode,
-                               OutletNode,
-                               state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum,
-                               state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum,
-                               state.dataPumps->PumpEquip(PumpNum).plantLoc.branchNum,
-                               state.dataPumps->PumpEquip(PumpNum).plantLoc.compNum);
+            InitComponentNodes(state, mdotMin, mdotMax, InletNode, OutletNode);
             state.dataPumps->PumpEquip(PumpNum).MassFlowRateMax = mdotMax;
             state.dataPumps->PumpEquip(PumpNum).MassFlowRateMin = state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate * TempWaterDensity;
         }

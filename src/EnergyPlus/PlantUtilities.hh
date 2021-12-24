@@ -65,16 +65,7 @@ struct EnergyPlusData;
 namespace PlantUtilities {
 
     // Functions
-    void InitComponentNodes(EnergyPlusData &state,
-                            Real64 MinCompMdot,
-                            Real64 MaxCompMdot,
-                            int InletNode,   // component's inlet node index in node structure
-                            int OutletNode,  // component's outlet node index in node structure
-                            int LoopNum,     // plant loop index for PlantLoop structure
-                            DataPlant::LoopSideLocation LoopSideNum, // Loop side index for PlantLoop structure
-                            int BranchIndex, // branch index for PlantLoop
-                            int CompIndex    // component index for PlantLoop
-    );
+    void InitComponentNodes(EnergyPlusData &state, Real64 const MinCompMdot, Real64 const MaxCompMdot, int const InletNode, int const OutletNode);
 
     void SetComponentFlowRate(EnergyPlusData &state,
                               Real64 &CompFlow, // [kg/s]

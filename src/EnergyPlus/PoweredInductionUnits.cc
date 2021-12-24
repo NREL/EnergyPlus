@@ -937,11 +937,7 @@ void InitPIU(EnergyPlusData &state,
                                state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopSideNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.branchNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.compNum);
+                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum);
         }
 
         MySizeFlag(PIUNum) = false;
@@ -983,11 +979,7 @@ void InitPIU(EnergyPlusData &state,
                                state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopSideNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.branchNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.compNum);
+                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum);
         }
 
         if (state.dataPowerInductionUnits->PIU(PIUNum).AirLoopNum == 0) { // fill air loop index

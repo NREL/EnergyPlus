@@ -800,15 +800,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
 
         state.dataGenerator->FuelSupply(this->FuelSupplyID).QskinLoss = 0.0;
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->PlantMassFlowRateMax,
-                                           this->PlantInletNodeID,
-                                           this->PlantOutletNodeID,
-                                           this->CWPlantLoc.loopNum,
-                                           this->CWPlantLoc.loopSideNum,
-                                           this->CWPlantLoc.branchNum,
-                                           this->CWPlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->PlantMassFlowRateMax, this->PlantInletNodeID, this->PlantOutletNodeID);
     }
 
     if (!state.dataGlobal->BeginEnvrnFlag) {

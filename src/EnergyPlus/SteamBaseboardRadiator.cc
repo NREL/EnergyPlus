@@ -994,11 +994,7 @@ namespace SteamBaseboardRadiator {
                                0.0,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRateMax,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.loopNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.branchNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.compNum);
+                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode);
             state.dataLoopNodes->Node(SteamInletNode).Enthalpy = StartEnthSteam;
             state.dataLoopNodes->Node(SteamInletNode).Quality = 1.0;
             state.dataLoopNodes->Node(SteamInletNode).HumRat = 0.0;

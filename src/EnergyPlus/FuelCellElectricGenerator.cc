@@ -3461,15 +3461,8 @@ namespace FuelCellElectricGenerator {
             state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp = DataGenerators::InitHRTemp;
             state.dataLoopNodes->Node(this->ExhaustHX.WaterOutNode).Temp = DataGenerators::InitHRTemp;
 
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->ExhaustHX.WaterMassFlowRateDesign,
-                                               this->ExhaustHX.WaterInNode,
-                                               this->ExhaustHX.WaterOutNode,
-                                               this->CWPlantLoc.loopNum,
-                                               this->CWPlantLoc.loopSideNum,
-                                               this->CWPlantLoc.branchNum,
-                                               this->CWPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(
+                state, 0.0, this->ExhaustHX.WaterMassFlowRateDesign, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode);
 
             this->MyEnvrnFlag_Init = false;
             this->MyWarmupFlag_Init = true;

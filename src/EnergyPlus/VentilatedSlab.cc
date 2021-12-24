@@ -1728,11 +1728,7 @@ namespace VentilatedSlab {
                                        state.dataVentilatedSlab->VentSlab(Item).MinHotWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxHotWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).HotControlNode,
-                                       state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopSideNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.branchNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.compNum);
+                                       state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum);
                 }
                 if (state.dataVentilatedSlab->VentSlab(Item).HeatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating &&
                     !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
@@ -1748,11 +1744,7 @@ namespace VentilatedSlab {
                                        state.dataVentilatedSlab->VentSlab(Item).MinHotSteamFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxHotSteamFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).HotControlNode,
-                                       state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopSideNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.branchNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.compNum);
+                                       state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum);
                 }
             } //(VentSlab(Item)%HCoilPresent)
 
@@ -1771,11 +1763,7 @@ namespace VentilatedSlab {
                                        state.dataVentilatedSlab->VentSlab(Item).MinColdWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxColdWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).ColdControlNode,
-                                       state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopSideNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.branchNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.compNum);
+                                       state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum);
                 }
             }
 

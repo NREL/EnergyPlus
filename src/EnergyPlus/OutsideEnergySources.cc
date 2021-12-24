@@ -296,11 +296,7 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinMassFlowRate,
                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate,
                                            this->InletNodeNum,
-                                           this->OutletNodeNum,
-                                           this->plantLoc.loopNum,
-                                           this->plantLoc.loopSideNum,
-                                           this->plantLoc.branchNum,
-                                           this->plantLoc.compNum);
+                                           this->OutletNodeNum);
         this->BeginEnvrnInitFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) this->BeginEnvrnInitFlag = true;

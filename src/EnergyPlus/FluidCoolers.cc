@@ -777,15 +777,7 @@ void FluidCoolerspecs::initEachEnvironment(EnergyPlusData &state)
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
     this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
-    PlantUtilities::InitComponentNodes(state,
-                                       0.0,
-                                       this->DesWaterMassFlowRate,
-                                       this->WaterInletNodeNum,
-                                       this->WaterOutletNodeNum,
-                                       this->plantLoc.loopNum,
-                                       this->plantLoc.loopSideNum,
-                                       this->plantLoc.branchNum,
-                                       this->plantLoc.compNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->DesWaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum);
 }
 
 void FluidCoolerspecs::initialize(EnergyPlusData &state)

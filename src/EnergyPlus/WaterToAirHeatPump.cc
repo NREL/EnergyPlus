@@ -1031,15 +1031,8 @@ namespace WaterToAirHeatPump {
                                   .Branch(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.branchNum)
                                   .Comp(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.compNum)
                                   .NodeNumOut;
-            InitComponentNodes(state,
-                               0.0,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate,
-                               WaterInletNode,
-                               PlantOutletNode,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopSideNum,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.branchNum,
-                               state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.compNum);
+            InitComponentNodes(
+                state, 0.0, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate, WaterInletNode, PlantOutletNode);
 
             state.dataLoopNodes->Node(WaterInletNode).Temp = 5.0;
             state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;

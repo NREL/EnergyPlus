@@ -811,25 +811,9 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
             this->SourceSideDesignMassFlow = this->RatedSourceVolFlowCool * rho;
         }
 
-        InitComponentNodes(state,
-                           0.0,
-                           this->LoadSideDesignMassFlow,
-                           this->LoadSideInletNodeNum,
-                           this->LoadSideOutletNodeNum,
-                           this->LoadPlantLoc.loopNum,
-                           this->LoadPlantLoc.loopSideNum,
-                           this->LoadPlantLoc.branchNum,
-                           this->LoadPlantLoc.compNum);
+        InitComponentNodes(state, 0.0, this->LoadSideDesignMassFlow, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum);
 
-        InitComponentNodes(state,
-                           0.0,
-                           this->SourceSideDesignMassFlow,
-                           this->SourceSideInletNodeNum,
-                           this->SourceSideOutletNodeNum,
-                           this->SourcePlantLoc.loopNum,
-                           this->SourcePlantLoc.loopSideNum,
-                           this->SourcePlantLoc.branchNum,
-                           this->SourcePlantLoc.compNum);
+        InitComponentNodes(state, 0.0, this->SourceSideDesignMassFlow, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum);
 
         if (state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint == SensedNodeFlagValue)
             state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint = 0.0;

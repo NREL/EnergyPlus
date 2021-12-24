@@ -2660,25 +2660,9 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
         }
         if ((this->ReheatControlNode > 0) && !this->PlantLoopScanFlag) {
             if (this->ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
-                InitComponentNodes(state,
-                                   this->MinReheatSteamFlow,
-                                   this->MaxReheatSteamFlow,
-                                   this->ReheatControlNode,
-                                   this->ReheatCoilOutletNode,
-                                   this->HWplantLoc.loopNum,
-                                   this->HWplantLoc.loopSideNum,
-                                   this->HWplantLoc.branchNum,
-                                   this->HWplantLoc.compNum);
+                InitComponentNodes(state, this->MinReheatSteamFlow, this->MaxReheatSteamFlow, this->ReheatControlNode, this->ReheatCoilOutletNode);
             } else {
-                InitComponentNodes(state,
-                                   this->MinReheatWaterFlow,
-                                   this->MaxReheatWaterFlow,
-                                   this->ReheatControlNode,
-                                   this->ReheatCoilOutletNode,
-                                   this->HWplantLoc.loopNum,
-                                   this->HWplantLoc.loopSideNum,
-                                   this->HWplantLoc.branchNum,
-                                   this->HWplantLoc.compNum);
+                InitComponentNodes(state, this->MinReheatWaterFlow, this->MaxReheatWaterFlow, this->ReheatControlNode, this->ReheatCoilOutletNode);
             }
         }
         // Find air loop associated with terminal unit

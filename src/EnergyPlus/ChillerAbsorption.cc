@@ -795,15 +795,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
 
     this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
 
-    PlantUtilities::InitComponentNodes(state,
-                                       0.0,
-                                       this->EvapMassFlowRateMax,
-                                       this->EvapInletNodeNum,
-                                       this->EvapOutletNodeNum,
-                                       this->CWPlantLoc.loopNum,
-                                       this->CWPlantLoc.loopSideNum,
-                                       this->CWPlantLoc.branchNum,
-                                       this->CWPlantLoc.compNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->EvapMassFlowRateMax, this->EvapInletNodeNum, this->EvapOutletNodeNum);
 
     rho = FluidProperties::GetDensityGlycol(state,
                                             state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
@@ -813,15 +805,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
 
     this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
-    PlantUtilities::InitComponentNodes(state,
-                                       0.0,
-                                       this->CondMassFlowRateMax,
-                                       this->CondInletNodeNum,
-                                       this->CondOutletNodeNum,
-                                       this->CDPlantLoc.loopNum,
-                                       this->CDPlantLoc.loopSideNum,
-                                       this->CDPlantLoc.branchNum,
-                                       this->CDPlantLoc.compNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->CondMassFlowRateMax, this->CondInletNodeNum, this->CondOutletNodeNum);
     state.dataLoopNodes->Node(this->CondInletNodeNum).Temp = this->TempDesCondIn;
 
     if (this->GeneratorInletNodeNum > 0) {
@@ -862,15 +846,7 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
             this->GenMassFlowRateMax = this->QGenerator / (HfgSteam + CpWater * SteamDeltaT);
         }
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->GenMassFlowRateMax,
-                                           this->GeneratorInletNodeNum,
-                                           this->GeneratorOutletNodeNum,
-                                           this->GenPlantLoc.loopNum,
-                                           this->GenPlantLoc.loopSideNum,
-                                           this->GenPlantLoc.branchNum,
-                                           this->GenPlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->GenMassFlowRateMax, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum);
     }
 }
 

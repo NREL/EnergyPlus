@@ -2224,11 +2224,7 @@ namespace HVACMultiSpeedHeatPump {
                                    0.0,
                                    MSHeatPump(MSHeatPumpNum).DesignHeatRecMassFlowRate,
                                    MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum,
-                                   MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum,
-                                   MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum,
-                                   MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopSideNum,
-                                   MSHeatPump(MSHeatPumpNum).HRPlantLoc.branchNum,
-                                   MSHeatPump(MSHeatPumpNum).HRPlantLoc.compNum);
+                                   MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum);
             }
             if (MSHeatPump(MSHeatPumpNum).CoilControlNode > 0) {
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow == AutoSize) {
@@ -2250,11 +2246,7 @@ namespace HVACMultiSpeedHeatPump {
                                            0.0,
                                            MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow,
                                            MSHeatPump(MSHeatPumpNum).CoilControlNode,
-                                           MSHeatPump(MSHeatPumpNum).CoilOutletNode,
-                                           MSHeatPump(MSHeatPumpNum).plantLoc.loopNum,
-                                           MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum,
-                                           MSHeatPump(MSHeatPumpNum).plantLoc.branchNum,
-                                           MSHeatPump(MSHeatPumpNum).plantLoc.compNum);
+                                           MSHeatPump(MSHeatPumpNum).CoilOutletNode);
                     }
                     if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingSteam) {
 
@@ -2276,11 +2268,7 @@ namespace HVACMultiSpeedHeatPump {
                                            0.0,
                                            MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow,
                                            MSHeatPump(MSHeatPumpNum).CoilControlNode,
-                                           MSHeatPump(MSHeatPumpNum).CoilOutletNode,
-                                           MSHeatPump(MSHeatPumpNum).plantLoc.loopNum,
-                                           MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum,
-                                           MSHeatPump(MSHeatPumpNum).plantLoc.branchNum,
-                                           MSHeatPump(MSHeatPumpNum).plantLoc.compNum);
+                                           MSHeatPump(MSHeatPumpNum).CoilOutletNode);
                     }
                 }
             }
@@ -2304,11 +2292,7 @@ namespace HVACMultiSpeedHeatPump {
                                            0.0,
                                            MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow,
                                            MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
-                                           MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
-                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum);
+                                           MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode);
                     }
                     if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingSteam) {
 
@@ -2330,11 +2314,7 @@ namespace HVACMultiSpeedHeatPump {
                                            0.0,
                                            MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow,
                                            MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
-                                           MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
-                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum,
-                                           MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum);
+                                           MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode);
                     }
                 }
             }

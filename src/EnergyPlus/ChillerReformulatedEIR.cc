@@ -1043,15 +1043,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
 
         this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->EvapMassFlowRateMax,
-                                           this->EvapInletNodeNum,
-                                           this->EvapOutletNodeNum,
-                                           this->CWPlantLoc.loopNum,
-                                           this->CWPlantLoc.loopSideNum,
-                                           this->CWPlantLoc.branchNum,
-                                           this->CWPlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->EvapMassFlowRateMax, this->EvapInletNodeNum, this->EvapOutletNodeNum);
 
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
 
@@ -1061,15 +1053,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
                                                     state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                     RoutineName);
             this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->CondMassFlowRateMax,
-                                               this->CondInletNodeNum,
-                                               this->CondOutletNodeNum,
-                                               this->CDPlantLoc.loopNum,
-                                               this->CDPlantLoc.loopSideNum,
-                                               this->CDPlantLoc.branchNum,
-                                               this->CDPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->CondMassFlowRateMax, this->CondInletNodeNum, this->CondOutletNodeNum);
             state.dataLoopNodes->Node(this->CondInletNodeNum).Temp = this->TempRefCondIn;
         } else { // air or evap air condenser
             // Initialize maximum available condenser flow rate
@@ -1094,15 +1078,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
                                                     state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                     RoutineName);
             this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesignHeatRecMassFlowRate,
-                                               this->HeatRecInletNodeNum,
-                                               this->HeatRecOutletNodeNum,
-                                               this->HRPlantLoc.loopNum,
-                                               this->HRPlantLoc.loopSideNum,
-                                               this->HRPlantLoc.branchNum,
-                                               this->HRPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignHeatRecMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
             // overall capacity limit
             this->HeatRecMaxCapacityLimit = this->HeatRecCapacityFraction * (this->RefCap + this->RefCap / this->RefCOP);
         }

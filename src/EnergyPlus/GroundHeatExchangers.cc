@@ -3137,8 +3137,7 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
     Real64 fluidDensity = FluidProperties::GetDensityGlycol(
         state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
     this->designMassFlow = this->designFlow * fluidDensity;
-    PlantUtilities::InitComponentNodes(
-        state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum);
 
     this->lastQnSubHr = 0.0;
     state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->tempGround;
@@ -3222,8 +3221,7 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
     Real64 fluidDensity = FluidProperties::GetDensityGlycol(
         state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
     this->designMassFlow = this->designFlow * fluidDensity;
-    PlantUtilities::InitComponentNodes(
-        state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum);
 
     this->lastQnSubHr = 0.0;
     state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);

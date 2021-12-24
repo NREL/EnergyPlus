@@ -1643,15 +1643,8 @@ namespace HVACUnitaryBypassVAV {
                     }
                 } // end of IF(CBVAV(CBVAVNum)%MaxHeatCoilFluidFlow .EQ. DataSizing::AutoSize)THEN
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   CBVAV(CBVAVNum).MaxHeatCoilFluidFlow,
-                                                   CBVAV(CBVAVNum).CoilControlNode,
-                                                   CBVAV(CBVAVNum).CoilOutletNode,
-                                                   CBVAV(CBVAVNum).plantLoc.loopNum,
-                                                   CBVAV(CBVAVNum).plantLoc.loopSideNum,
-                                                   CBVAV(CBVAVNum).plantLoc.branchNum,
-                                                   CBVAV(CBVAVNum).plantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, CBVAV(CBVAVNum).MaxHeatCoilFluidFlow, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode);
 
             } // end of IF(CBVAV(CBVAVNum)%CoilControlNode .GT. 0)THEN
         }     // end one time inits

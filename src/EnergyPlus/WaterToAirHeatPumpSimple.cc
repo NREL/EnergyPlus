@@ -1053,11 +1053,7 @@ namespace WaterToAirHeatPumpSimple {
                                                    0.0,
                                                    simpleWatertoAirHP.DesignWaterMassFlowRate,
                                                    simpleWatertoAirHP.WaterInletNodeNum,
-                                                   simpleWatertoAirHP.WaterOutletNodeNum,
-                                                   simpleWatertoAirHP.plantLoc.loopNum,
-                                                   simpleWatertoAirHP.plantLoc.loopSideNum,
-                                                   simpleWatertoAirHP.plantLoc.branchNum,
-                                                   simpleWatertoAirHP.plantLoc.compNum);
+                                                   simpleWatertoAirHP.WaterOutletNodeNum);
 
                 simpleWatertoAirHP.SimFlag = true;
 

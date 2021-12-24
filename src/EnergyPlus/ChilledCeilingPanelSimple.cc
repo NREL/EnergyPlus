@@ -841,15 +841,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
                                        state.dataPlnt->PlantLoop(ThisCP.plantLoc.loopNum).FluidIndex,
                                        RoutineName);
                 ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
-                InitComponentNodes(state,
-                                   0.0,
-                                   ThisCP.WaterMassFlowRateMax,
-                                   ThisCP.WaterInletNode,
-                                   ThisCP.WaterOutletNode,
-                                   ThisCP.plantLoc.loopNum,
-                                   ThisCP.plantLoc.loopSideNum,
-                                   ThisCP.plantLoc.branchNum,
-                                   ThisCP.plantLoc.compNum);
+                InitComponentNodes(state, 0.0, ThisCP.WaterMassFlowRateMax, ThisCP.WaterInletNode, ThisCP.WaterOutletNode);
             }
         }
     }
@@ -866,15 +858,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
         ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
-        InitComponentNodes(state,
-                           0.0,
-                           ThisCP.WaterMassFlowRateMax,
-                           ThisCP.WaterInletNode,
-                           ThisCP.WaterOutletNode,
-                           ThisCP.plantLoc.loopNum,
-                           ThisCP.plantLoc.loopSideNum,
-                           ThisCP.plantLoc.branchNum,
-                           ThisCP.plantLoc.compNum);
+        InitComponentNodes(state, 0.0, ThisCP.WaterMassFlowRateMax, ThisCP.WaterInletNode, ThisCP.WaterOutletNode);
 
         ThisInNode.Temp = 7.0;
 

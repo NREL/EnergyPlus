@@ -413,15 +413,8 @@ namespace PlantValves {
 
             if ((InletNode > 0) && (OutletNode > 0)) {
                 //   Node(InletNode)%Temp = 0.0
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   state.dataLoopNodes->Node(PumpOutNode).MassFlowRateMax,
-                                                   this->PltInletNodeNum,
-                                                   this->PltOutletNodeNum,
-                                                   this->plantLoc.loopNum,
-                                                   this->plantLoc.loopSideNum,
-                                                   this->plantLoc.branchNum,
-                                                   this->plantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, state.dataLoopNodes->Node(PumpOutNode).MassFlowRateMax, this->PltInletNodeNum, this->PltOutletNodeNum);
             }
             this->environmentInit = false;
         }

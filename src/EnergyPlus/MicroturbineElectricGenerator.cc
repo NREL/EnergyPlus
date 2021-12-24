@@ -1123,15 +1123,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
         // set the node max and min mass flow rates
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->HeatRecMaxMassFlowRate,
-                                           this->HeatRecInletNodeNum,
-                                           this->HeatRecOutletNodeNum,
-                                           this->HRPlantLoc.loopNum,
-                                           this->HRPlantLoc.loopSideNum,
-                                           this->HRPlantLoc.branchNum,
-                                           this->HRPlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->HeatRecMaxMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
 
         state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp = 20.0; // Set the node temperature, assuming freeze control
         state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = 20.0;
@@ -1994,15 +1986,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
         this->HeatRecMaxMassFlowRate = rho * this->HeatRecMaxVolFlowRate;
 
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->HeatRecMaxMassFlowRate,
-                                           this->HeatRecInletNodeNum,
-                                           this->HeatRecOutletNodeNum,
-                                           this->HRPlantLoc.loopNum,
-                                           this->HRPlantLoc.loopSideNum,
-                                           this->HRPlantLoc.branchNum,
-                                           this->HRPlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->HeatRecMaxMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
 
         this->MySizeAndNodeInitFlag = false;
     }

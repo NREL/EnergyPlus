@@ -976,11 +976,7 @@ namespace HWBaseboardRadiator {
                                0.0,
                                HWBaseboard(BaseboardNum).WaterMassFlowRateMax,
                                HWBaseboard(BaseboardNum).WaterInletNode,
-                               HWBaseboard(BaseboardNum).WaterOutletNode,
-                               HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                               HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                               HWBaseboard(BaseboardNum).plantLoc.branchNum,
-                               HWBaseboard(BaseboardNum).plantLoc.compNum);
+                               HWBaseboard(BaseboardNum).WaterOutletNode);
 
             state.dataLoopNodes->Node(WaterInletNode).Temp = 60.0;
 

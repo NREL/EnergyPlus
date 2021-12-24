@@ -838,15 +838,7 @@ void SwimmingPoolData::initSwimmingPoolPlantNodeFlow(EnergyPlusData &state) cons
 
     if (!this->MyPlantScanFlagPool) {
         if (this->WaterInletNode > 0) {
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->WaterMassFlowRateMax,
-                                               this->WaterInletNode,
-                                               this->WaterOutletNode,
-                                               this->HWplantLoc.loopNum,
-                                               this->HWplantLoc.loopSideNum,
-                                               this->HWplantLoc.branchNum,
-                                               this->HWplantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->WaterMassFlowRateMax, this->WaterInletNode, this->WaterOutletNode);
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNode, this->WaterVolFlowMax);
         }
     }

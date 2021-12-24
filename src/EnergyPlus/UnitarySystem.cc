@@ -930,15 +930,8 @@ namespace UnitarySystems {
 
                 this->m_DesignHeatRecMassFlowRate = this->m_DesignHRWaterVolumeFlow * rho;
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->m_DesignHeatRecMassFlowRate,
-                                                   this->m_HeatRecoveryInletNodeNum,
-                                                   this->m_HeatRecoveryOutletNodeNum,
-                                                   this->m_HRPlantLoc.loopNum,
-                                                   this->m_HRPlantLoc.loopSideNum,
-                                                   this->m_HRPlantLoc.branchNum,
-                                                   this->m_HRPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->m_DesignHeatRecMassFlowRate, this->m_HeatRecoveryInletNodeNum, this->m_HeatRecoveryOutletNodeNum);
             }
             //   set fluid-side hardware limits
             if (this->CoolCoilFluidInletNode > 0) {
@@ -964,15 +957,8 @@ namespace UnitarySystems {
                     }
                 }
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->MaxCoolCoilFluidFlow,
-                                                   this->CoolCoilFluidInletNode,
-                                                   this->CoolCoilFluidOutletNodeNum,
-                                                   this->CoolCoilPlantLoc.loopNum,
-                                                   this->CoolCoilPlantLoc.loopSideNum,
-                                                   this->CoolCoilPlantLoc.branchNum,
-                                                   this->CoolCoilPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->MaxCoolCoilFluidFlow, this->CoolCoilFluidInletNode, this->CoolCoilFluidOutletNodeNum);
             }
             if (this->HeatCoilFluidInletNode > 0) {
 
@@ -1012,15 +998,8 @@ namespace UnitarySystems {
                     }
                 }
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->MaxHeatCoilFluidFlow,
-                                                   this->HeatCoilFluidInletNode,
-                                                   this->HeatCoilFluidOutletNodeNum,
-                                                   this->HeatCoilPlantLoc.loopNum,
-                                                   this->HeatCoilPlantLoc.loopSideNum,
-                                                   this->HeatCoilPlantLoc.branchNum,
-                                                   this->HeatCoilPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->MaxHeatCoilFluidFlow, this->HeatCoilFluidInletNode, this->HeatCoilFluidOutletNodeNum);
             }
             if (this->m_SuppCoilFluidInletNode > 0) {
                 if (this->m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
@@ -1056,15 +1035,8 @@ namespace UnitarySystems {
                             this->m_MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
                         }
                     }
-                    PlantUtilities::InitComponentNodes(state,
-                                                       0.0,
-                                                       this->m_MaxSuppCoilFluidFlow,
-                                                       this->m_SuppCoilFluidInletNode,
-                                                       this->m_SuppCoilFluidOutletNodeNum,
-                                                       this->m_SuppCoilPlantLoc.loopNum,
-                                                       this->m_SuppCoilPlantLoc.loopSideNum,
-                                                       this->m_SuppCoilPlantLoc.branchNum,
-                                                       this->m_SuppCoilPlantLoc.compNum);
+                    PlantUtilities::InitComponentNodes(
+                        state, 0.0, this->m_MaxSuppCoilFluidFlow, this->m_SuppCoilFluidInletNode, this->m_SuppCoilFluidOutletNodeNum);
                 }
             }
             this->m_MyEnvrnFlag = false;
@@ -9904,15 +9876,8 @@ namespace UnitarySystems {
                     }
                 }
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->MaxHeatCoilFluidFlow,
-                                                   this->HeatCoilFluidInletNode,
-                                                   this->HeatCoilFluidOutletNodeNum,
-                                                   this->HeatCoilPlantLoc.loopNum,
-                                                   this->HeatCoilPlantLoc.loopSideNum,
-                                                   this->HeatCoilPlantLoc.branchNum,
-                                                   this->HeatCoilPlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->MaxHeatCoilFluidFlow, this->HeatCoilFluidInletNode, this->HeatCoilFluidOutletNodeNum);
             }
             if (this->m_SuppCoilFluidInletNode > 0) {
                 if (this->m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
@@ -9946,15 +9911,8 @@ namespace UnitarySystems {
                             this->m_MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
                         }
                     }
-                    PlantUtilities::InitComponentNodes(state,
-                                                       0.0,
-                                                       this->m_MaxSuppCoilFluidFlow,
-                                                       this->m_SuppCoilFluidInletNode,
-                                                       this->m_SuppCoilFluidOutletNodeNum,
-                                                       this->m_SuppCoilPlantLoc.loopNum,
-                                                       this->m_SuppCoilPlantLoc.loopSideNum,
-                                                       this->m_SuppCoilPlantLoc.branchNum,
-                                                       this->m_SuppCoilPlantLoc.compNum);
+                    PlantUtilities::InitComponentNodes(
+                        state, 0.0, this->m_MaxSuppCoilFluidFlow, this->m_SuppCoilFluidInletNode, this->m_SuppCoilFluidOutletNodeNum);
                 }
             }
             this->m_MyEnvrnFlag2 = false;

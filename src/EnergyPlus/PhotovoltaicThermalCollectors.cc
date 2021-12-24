@@ -615,15 +615,7 @@ namespace PhotovoltaicThermalCollectors {
 
                     this->MaxMassFlowRate = this->DesignVolFlowRate * rho;
 
-                    PlantUtilities::InitComponentNodes(state,
-                                                       0.0,
-                                                       this->MaxMassFlowRate,
-                                                       InletNode,
-                                                       OutletNode,
-                                                       this->WPlantLoc.loopNum,
-                                                       this->WPlantLoc.loopSideNum,
-                                                       this->WPlantLoc.branchNum,
-                                                       this->WPlantLoc.compNum);
+                    PlantUtilities::InitComponentNodes(state, 0.0, this->MaxMassFlowRate, InletNode, OutletNode);
 
                     this->Simple.LastCollectorTemp = 23.0;
 

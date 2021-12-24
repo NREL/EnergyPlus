@@ -6669,11 +6669,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                0.0,
                                state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
                                state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
-                               state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
-                               state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum,
-                               state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopSideNum,
-                               state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.branchNum,
-                               state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.compNum);
+                               state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum);
         }
         //    IF(MyVRFCondFlag(VRFCond))THEN
         state.dataHVACVarRefFlow->VRF(VRFCond).HRTimer = 0.0;
@@ -6726,11 +6722,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                0.0,
                                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow,
                                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
-                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
-                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopNum,
-                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopSideNum,
-                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.branchNum,
-                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.compNum);
+                               state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode);
         }
 
         // the first time an air loop VRF TU is simulated set isSimulated = true so that the TU initialization
@@ -9231,15 +9223,8 @@ void VRFCondenserEquipment::SizeVRFCondenser(EnergyPlusData &state)
                                                         state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 this->WaterCondenserDesignMassFlow = this->WaterCondVolFlowRate * rho;
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   this->WaterCondenserDesignMassFlow,
-                                                   this->CondenserNodeNum,
-                                                   this->CondenserOutletNodeNum,
-                                                   this->SourcePlantLoc.loopNum,
-                                                   this->SourcePlantLoc.loopSideNum,
-                                                   this->SourcePlantLoc.branchNum,
-                                                   this->SourcePlantLoc.compNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->WaterCondenserDesignMassFlow, this->CondenserNodeNum, this->CondenserOutletNodeNum);
 
             } else {
                 ShowSevereError(state, "Autosizing of condenser water flow rate requires a condenser loop Sizing:Plant object");

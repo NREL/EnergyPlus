@@ -1199,11 +1199,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                            0.0,
                            state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate,
                            state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum,
-                           state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,
-                           state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum,
-                           state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopSideNum,
-                           state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.branchNum,
-                           state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.compNum);
+                           state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum);
 
         // effective fin diameter for detailed flat fin coil
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'

@@ -2065,15 +2065,7 @@ namespace CondenserLoopTowers {
                                                              RoutineName);
         this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
         this->DesWaterMassFlowRatePerCell = this->DesWaterMassFlowRate / this->NumCell;
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->DesWaterMassFlowRate,
-                                           this->WaterInletNodeNum,
-                                           this->WaterOutletNodeNum,
-                                           this->plantLoc.loopNum,
-                                           this->plantLoc.loopSideNum,
-                                           this->plantLoc.branchNum,
-                                           this->plantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->DesWaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum);
     }
 
     void CoolingTower::initialize(EnergyPlusData &state)

@@ -495,15 +495,7 @@ void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
                                                          RoutineName);
     this->DesMassFlowRate = this->VolFlowRate * rho;
 
-    PlantUtilities::InitComponentNodes(state,
-                                       0.0,
-                                       this->DesMassFlowRate,
-                                       this->BoilerInletNodeNum,
-                                       this->BoilerOutletNodeNum,
-                                       this->plantLoc.loopNum,
-                                       this->plantLoc.loopSideNum,
-                                       this->plantLoc.branchNum,
-                                       this->plantLoc.compNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->DesMassFlowRate, this->BoilerInletNodeNum, this->BoilerOutletNodeNum);
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) { // check if setpoint on outlet node
         if ((state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&

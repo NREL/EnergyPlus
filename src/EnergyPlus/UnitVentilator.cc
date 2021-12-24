@@ -1646,11 +1646,7 @@ namespace UnitVentilator {
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotWaterFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotWaterFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum);
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType == Heating_SteamCoilType) {
                     TempSteamIn = 100.00;
@@ -1665,11 +1661,7 @@ namespace UnitVentilator {
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotSteamFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotSteamFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum,
-                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum);
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum);
                 }
             } //(UnitVent(UnitVentNum)%HCoilPresent)
 
@@ -1688,11 +1680,7 @@ namespace UnitVentilator {
                                    state.dataUnitVentilators->UnitVent(UnitVentNum).MinColdWaterFlow,
                                    state.dataUnitVentilators->UnitVent(UnitVentNum).MaxColdWaterFlow,
                                    state.dataUnitVentilators->UnitVent(UnitVentNum).ColdControlNode,
-                                   state.dataUnitVentilators->UnitVent(UnitVentNum).ColdCoilOutNodeNum,
-                                   state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopNum,
-                                   state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopSideNum,
-                                   state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.branchNum,
-                                   state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.compNum);
+                                   state.dataUnitVentilators->UnitVent(UnitVentNum).ColdCoilOutNodeNum);
             }
             state.dataUnitVentilators->MyEnvrnFlag(UnitVentNum) = false;
         } // ...end start of environment inits

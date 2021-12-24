@@ -877,11 +877,7 @@ namespace UnitHeater {
                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).MinHotWaterFlow,
                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow,
                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum);
             }
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
                 TempSteamIn = 100.00;
@@ -896,11 +892,7 @@ namespace UnitHeater {
                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).MinHotSteamFlow,
                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotSteamFlow,
                                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                   state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum);
             }
 
             state.dataUnitHeaters->MyEnvrnFlag(UnitHeatNum) = false;

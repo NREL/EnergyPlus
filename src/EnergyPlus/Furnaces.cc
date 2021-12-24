@@ -5575,11 +5575,7 @@ namespace Furnaces {
                                    0.0,
                                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow,
                                    state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
-                                   state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum,
-                                   state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopSideNum,
-                                   state.dataFurnaces->Furnace(FurnaceNum).plantLoc.branchNum,
-                                   state.dataFurnaces->Furnace(FurnaceNum).plantLoc.compNum);
+                                   state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode);
             }
             if (state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode > 0) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
@@ -5618,11 +5614,7 @@ namespace Furnaces {
                                        0.0,
                                        state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow,
                                        state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
-                                       state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,
-                                       state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum,
-                                       state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopSideNum,
-                                       state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.branchNum,
-                                       state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.compNum);
+                                       state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode);
                 }
             }
             state.dataFurnaces->MyEnvrnFlag(FurnaceNum) = false;

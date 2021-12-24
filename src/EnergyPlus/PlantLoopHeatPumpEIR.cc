@@ -366,15 +366,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                                                        state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                        routineName);
         this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->loadSideDesignMassFlowRate,
-                                           this->loadSideNodes.inlet,
-                                           this->loadSideNodes.outlet,
-                                           this->loadSideLocation.loopNum,
-                                           this->loadSideLocation.loopSideNum,
-                                           this->loadSideLocation.branchNum,
-                                           this->loadSideLocation.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->loadSideDesignMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet);
 
         if (this->waterSource) {
             rho = FluidProperties::GetDensityGlycol(state,
@@ -383,15 +375,8 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                                                     state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
                                                     routineName);
             this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->sourceSideDesignMassFlowRate,
-                                               this->sourceSideNodes.inlet,
-                                               this->sourceSideNodes.outlet,
-                                               this->sourceSideLocation.loopNum,
-                                               this->sourceSideLocation.loopSideNum,
-                                               this->sourceSideLocation.branchNum,
-                                               this->sourceSideLocation.compNum);
+            PlantUtilities::InitComponentNodes(
+                state, 0.0, this->sourceSideDesignMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet);
         } else if (this->airSource) {
             rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataEnvrn->OutDryBulbTemp, 0.0, routineName);
             this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;

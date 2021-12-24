@@ -137,15 +137,7 @@ namespace PlantComponentTemperatureSources {
                                                            state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->MassFlowRateMax,
-                                               this->InletNodeNum,
-                                               this->OutletNodeNum,
-                                               this->Location.loopNum,
-                                               this->Location.loopSideNum,
-                                               this->Location.branchNum,
-                                               this->Location.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->MassFlowRateMax, this->InletNodeNum, this->OutletNodeNum);
 
             this->MyEnvironFlag = false;
         }

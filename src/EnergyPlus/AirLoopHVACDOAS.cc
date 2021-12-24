@@ -885,11 +885,7 @@ namespace AirLoopHVACDOAS {
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->HWCtrlNodeNum,
-                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->HWPlantLoc.loopNum,
-                                                       this->HWPlantLoc.loopSideNum,
-                                                       this->HWPlantLoc.branchNum,
-                                                       this->HWPlantLoc.compNum);
+                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum));
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
@@ -903,11 +899,7 @@ namespace AirLoopHVACDOAS {
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->CWCtrlNodeNum,
-                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->CWPlantLoc.loopNum,
-                                                       this->CWPlantLoc.loopSideNum,
-                                                       this->CWPlantLoc.branchNum,
-                                                       this->CWPlantLoc.compNum);
+                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum));
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
                     WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
@@ -922,11 +914,7 @@ namespace AirLoopHVACDOAS {
                                                        0.0,
                                                        CoilMaxVolFlowRate * rho,
                                                        this->CWCtrlNodeNum,
-                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum),
-                                                       this->CWPlantLoc.loopNum,
-                                                       this->CWPlantLoc.loopSideNum,
-                                                       this->CWPlantLoc.branchNum,
-                                                       this->CWPlantLoc.compNum);
+                                                       state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).OutletNodeNum(CompNum));
                 }
             }
 

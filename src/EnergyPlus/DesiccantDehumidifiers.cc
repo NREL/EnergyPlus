@@ -2011,11 +2011,7 @@ namespace DesiccantDehumidifiers {
                                            0.0,
                                            DesicDehum(DesicDehumNum).MaxCoilFluidFlow,
                                            DesicDehum(DesicDehumNum).CoilControlNode,
-                                           DesicDehum(DesicDehumNum).CoilOutletNode,
-                                           DesicDehum(DesicDehumNum).plantLoc.loopNum,
-                                           DesicDehum(DesicDehumNum).plantLoc.loopSideNum,
-                                           DesicDehum(DesicDehumNum).plantLoc.branchNum,
-                                           DesicDehum(DesicDehumNum).plantLoc.compNum);
+                                           DesicDehum(DesicDehumNum).CoilOutletNode);
                     }
 
                     MyEnvrnFlag(DesicDehumNum) = false;

@@ -1318,11 +1318,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopSideNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.branchNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.compNum);
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode);
                     }
 
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::WaterCoil_SimpleHeat) {
@@ -1342,11 +1338,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopSideNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.branchNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.compNum);
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode);
                     }
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::SteamCoil_AirHeat) {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
@@ -1363,11 +1355,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopSideNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.branchNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.compNum);
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode);
                     }
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::WaterCoil_CoolingHXAsst) {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
@@ -1386,11 +1374,7 @@ namespace OutdoorAirUnit {
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow,
                                            OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterInletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopSideNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.branchNum,
-                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.compNum);
+                                           OutAirUnit(OAUnitNum).OAEquip(compLoop).CoilWaterOutletNode);
                     }
                 }
             }

@@ -74,16 +74,7 @@ namespace EnergyPlus::PlantUtilities {
 //       MODIFIED       na
 //       RE-ENGINEERED  na
 
-void InitComponentNodes(EnergyPlusData &state,
-                        Real64 const MinCompMdot,
-                        Real64 const MaxCompMdot,
-                        int const InletNode,                    // component's inlet node index in node structure
-                        int const OutletNode,                   // component's outlet node index in node structure
-                        [[maybe_unused]] int const LoopNum,     // plant loop index for PlantLoop structure
-                        [[maybe_unused]] const DataPlant::LoopSideLocation LoopSideNum, // Loop side index for PlantLoop structure
-                        [[maybe_unused]] int const BranchIndex, // branch index for PlantLoop
-                        [[maybe_unused]] int const CompIndex    // component index for PlantLoop
-)
+void InitComponentNodes(EnergyPlusData &state, Real64 const MinCompMdot, Real64 const MaxCompMdot, int const InletNode, int const OutletNode)
 {
 
     // SUBROUTINE INFORMATION:

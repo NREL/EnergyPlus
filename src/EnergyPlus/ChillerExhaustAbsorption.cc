@@ -999,15 +999,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
             }
 
             this->DesCondMassFlowRate = rho * this->CondVolFlowRate;
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesCondMassFlowRate,
-                                               CondInletNode,
-                                               CondOutletNode,
-                                               this->CDPlantLoc.loopNum,
-                                               this->CDPlantLoc.loopSideNum,
-                                               this->CDPlantLoc.branchNum,
-                                               this->CDPlantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesCondMassFlowRate, CondInletNode, CondOutletNode);
         }
 
         if (this->HWPlantLoc.loopNum > 0) {
@@ -1021,15 +1013,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
         }
         this->DesHeatMassFlowRate = rho * this->HeatVolFlowRate;
         // init available hot water flow rate
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->DesHeatMassFlowRate,
-                                           HeatInletNode,
-                                           HeatOutletNode,
-                                           this->HWPlantLoc.loopNum,
-                                           this->HWPlantLoc.loopSideNum,
-                                           this->HWPlantLoc.branchNum,
-                                           this->HWPlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->DesHeatMassFlowRate, HeatInletNode, HeatOutletNode);
 
         if (this->CWPlantLoc.loopNum > 0) {
             rho = FluidProperties::GetDensityGlycol(state,
@@ -1042,15 +1026,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
         }
         this->DesEvapMassFlowRate = rho * this->EvapVolFlowRate;
         // init available hot water flow rate
-        PlantUtilities::InitComponentNodes(state,
-                                           0.0,
-                                           this->DesEvapMassFlowRate,
-                                           this->ChillReturnNodeNum,
-                                           this->ChillSupplyNodeNum,
-                                           this->CWPlantLoc.loopNum,
-                                           this->CWPlantLoc.loopSideNum,
-                                           this->CWPlantLoc.branchNum,
-                                           this->CWPlantLoc.compNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->DesEvapMassFlowRate, this->ChillReturnNodeNum, this->ChillSupplyNodeNum);
 
         this->envrnInit = false;
     }

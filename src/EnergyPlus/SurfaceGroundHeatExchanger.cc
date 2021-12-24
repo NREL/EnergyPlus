@@ -1452,15 +1452,7 @@ namespace SurfaceGroundHeatExchanger {
                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                RoutineName);
         this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
-        InitComponentNodes(state,
-                           0.0,
-                           this->DesignMassFlowRate,
-                           this->InletNodeNum,
-                           this->OutletNodeNum,
-                           this->plantLoc.loopNum,
-                           this->plantLoc.loopSideNum,
-                           this->plantLoc.branchNum,
-                           this->plantLoc.compNum);
+        InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum);
         RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
     }
     void SurfaceGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)

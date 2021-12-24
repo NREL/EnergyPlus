@@ -1363,15 +1363,7 @@ namespace IceThermalStorage {
             this->ChargeIterErrors = 0;
             this->DesignMassFlowRate = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate;
             // no design flow rates for model, assume min is zero and max is plant loop's max
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesignMassFlowRate,
-                                               this->PlantInNodeNum,
-                                               this->PlantOutNodeNum,
-                                               this->plantLoc.loopNum,
-                                               this->plantLoc.loopSideNum,
-                                               this->plantLoc.branchNum,
-                                               this->plantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->PlantInNodeNum, this->PlantOutNodeNum);
 
             if ((state.dataPlnt->PlantLoop(this->plantLoc.loopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                 (this->plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply)) {
@@ -1428,15 +1420,7 @@ namespace IceThermalStorage {
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag2) {
             this->DesignMassFlowRate = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate;
             // no design flow rates for model, assume min is zero and max is plant loop's max
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesignMassFlowRate,
-                                               this->PltInletNodeNum,
-                                               this->PltOutletNodeNum,
-                                               this->plantLoc.loopNum,
-                                               this->plantLoc.loopSideNum,
-                                               this->plantLoc.branchNum,
-                                               this->plantLoc.compNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum);
             if ((state.dataPlnt->PlantLoop(this->plantLoc.loopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                 (this->plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
