@@ -549,32 +549,31 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::Boiler_Simple;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 0; // just skip the supply side search
 
-    int loopNum = 0, branchNum = 0, compNum = 0;
-    DataPlant::LoopSideLocation loopSideNum = DataPlant::LoopSideLocation::Invalid;
+    PlantLocation plantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};
     bool errorFlag = false;
 
     // test simple searching first
     PlantUtilities::ScanPlantLoopsForObject(*state,
                                             "comp_name",
                                             DataPlant::PlantEquipmentType::Boiler_Simple,
-                                            this->plantLoc,
+                                            plantLoc,
                                             errorFlag,
                                             Optional<const Real64>(),
                                             Optional<const Real64>(),
                                             ObjexxFCL::Optional_int(),
                                             ObjexxFCL::Optional_int_const(),
                                             ObjexxFCL::Optional_int_const());
-    EXPECT_EQ(1, loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, loopSideNum));
-    EXPECT_EQ(1, branchNum);
-    EXPECT_EQ(1, compNum);
+    EXPECT_EQ(1, plantLoc.loopNum);
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, plantLoc.loopSideNum));
+    EXPECT_EQ(1, plantLoc.branchNum);
+    EXPECT_EQ(1, plantLoc.compNum);
     EXPECT_FALSE(errorFlag);
 
     // then test to make sure errorFlag is passed by reference
     PlantUtilities::ScanPlantLoopsForObject(*state,
                                             "comp_name_not_here",
                                             DataPlant::PlantEquipmentType::Boiler_Simple,
-                                            this->plantLoc,
+                                            plantLoc,
                                             errorFlag,
                                             Optional<const Real64>(),
                                             Optional<const Real64>(),
