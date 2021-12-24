@@ -1105,18 +1105,18 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
         mdotCond = this->CondMassFlowRateMax;
     }
 
-    PlantUtilities::SetComponentFlowRate(
-        state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CWPlantLoc.branchNum, this->CWPlantLoc.compNum);
+    PlantUtilities::SetComponentFlowRate(        state,
+ mdot,
+ this->EvapInletNodeNum,
+ this->EvapOutletNodeNum,
+ this->CWPlantLoc);
 
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         PlantUtilities::SetComponentFlowRate(state,
                                              mdotCond,
                                              this->CondInletNodeNum,
                                              this->CondOutletNodeNum,
-                                             this->CDPlantLoc.loopNum,
-                                             this->CDPlantLoc.loopSideNum,
-                                             this->CDPlantLoc.branchNum,
-                                             this->CDPlantLoc.compNum);
+                                             this->CDPlantLoc);
     }
     // Initialize heat recovery flow rates at node
     if (this->HeatRecActive) {
@@ -1143,7 +1143,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
         }
 
         PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, LoopNum, LoopSideNum, BranchIndex, CompIndex);
+            state, mdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
     }
 }
 
@@ -2084,10 +2084,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
                                              this->CondMassFlowRate,
                                              this->CondInletNodeNum,
                                              this->CondOutletNodeNum,
-                                             this->CDPlantLoc.loopNum,
-                                             this->CDPlantLoc.loopSideNum,
-                                             this->CDPlantLoc.branchNum,
-                                             this->CDPlantLoc.compNum);
+                                             this->CDPlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->CWPlantLoc.loopNum,
                                                     this->CWPlantLoc.loopSideNum,
@@ -2220,10 +2217,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
                                                  this->EvapMassFlowRate,
                                                  this->EvapInletNodeNum,
                                                  this->EvapOutletNodeNum,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
             if (this->EvapMassFlowRate != 0.0) {
                 EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
             } else {
@@ -2255,10 +2249,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
                 // Should we recalculate this with the corrected setpoint?
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(PlantLoopNum).LoopDemandCalcScheme);
@@ -2277,10 +2268,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
                 // No deltaT since component is not running
                 this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 this->QEvaporator = 0.0;
@@ -2329,10 +2317,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
                                              this->EvapMassFlowRate,
                                              this->EvapInletNodeNum,
                                              this->EvapOutletNodeNum,
-                                             this->CWPlantLoc.loopNum,
-                                             this->CWPlantLoc.loopSideNum,
-                                             this->CWPlantLoc.branchNum,
-                                             this->CWPlantLoc.compNum);
+                                             this->CWPlantLoc);
         //       Some other component set the flow to 0. No reason to continue with calculations.
         if (this->EvapMassFlowRate == 0.0) {
             MyLoad = 0.0;

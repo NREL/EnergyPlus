@@ -95,7 +95,7 @@ namespace PlantComponentTemperatureSources {
         Real64 InletTemp;
         Real64 HeatRate;
         Real64 HeatEnergy;
-        PlantLocation Location;
+        PlantLocation plantLoc{};
         Real64 SizFac; // sizing factor
         bool CheckEquipName;
         bool MyFlag;
@@ -106,7 +106,7 @@ namespace PlantComponentTemperatureSources {
         WaterSourceSpecs()
             : InletNodeNum(0), OutletNodeNum(0), DesVolFlowRate(0.0), DesVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0),
               EMSOverrideOnMassFlowRateMax(false), EMSOverrideValueMassFlowRateMax(0.0), MassFlowRate(0.0), tempSpecType(TempSpecType::Invalid),
-              TempSpecScheduleNum(0), BoundaryTemp(0.0), OutletTemp(0.0), InletTemp(0.0), HeatRate(0.0), HeatEnergy(0.0), Location(0, DataPlant::LoopSideLocation::Invalid, 0, 0),
+              TempSpecScheduleNum(0), BoundaryTemp(0.0), OutletTemp(0.0), InletTemp(0.0), HeatRate(0.0), HeatEnergy(0.0),
               SizFac(0.0), CheckEquipName(true), MyFlag(true), MyEnvironFlag(true), IsThisSized(false)
         {
         }

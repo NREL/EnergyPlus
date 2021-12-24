@@ -1188,10 +1188,7 @@ namespace SteamCoils {
                                          SteamMassFlowRate,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopSideNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum);
+                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
 
                     // recalculate if mass flow rate changed in previous call.
                     QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1304,10 +1301,7 @@ namespace SteamCoils {
                                              SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopSideNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
                         // Inlet equal to outlet when not required to run.
                         TempWaterOut = TempSteamIn;
 
@@ -1342,10 +1336,7 @@ namespace SteamCoils {
                                              SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopSideNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1378,10 +1369,7 @@ namespace SteamCoils {
                                              SteamMassFlowRate,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                              state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopSideNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum,
-                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum);
+                                             state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
@@ -1445,10 +1433,7 @@ namespace SteamCoils {
                                          SteamMassFlowRate,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum,
                                          state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopSideNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum,
-                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum);
+                                         state.dataSteamCoils->SteamCoil(CoilNum).plantLoc);
                     TempAirOut = TempAirIn;
                     TempWaterOut = TempSteamIn;
                     HeatingCoilLoad = 0.0;

@@ -1104,10 +1104,7 @@ namespace WaterToAirHeatPump {
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterMassFlowRate,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopSideNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.branchNum,
-                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.compNum);
+                             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc);
 
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         //  IF (WatertoAirHP(HPNum)%InletWaterTemp < 0.0) THEN  ! Debug trap

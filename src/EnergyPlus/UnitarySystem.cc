@@ -1124,10 +1124,7 @@ namespace UnitarySystems {
                                                      mdot,
                                                      this->CoolCoilFluidInletNode,
                                                      this->CoolCoilFluidOutletNodeNum,
-                                                     this->CoolCoilPlantLoc.loopNum,
-                                                     this->CoolCoilPlantLoc.loopSideNum,
-                                                     this->CoolCoilPlantLoc.branchNum,
-                                                     this->CoolCoilPlantLoc.compNum);
+                                                     this->CoolCoilPlantLoc);
                 //     simulate water coil to find operating capacity
                 WaterCoils::SimulateWaterCoilComponents(state,
                                                         this->m_CoolingCoilName,
@@ -1145,10 +1142,7 @@ namespace UnitarySystems {
                                                      mdot,
                                                      this->HeatCoilFluidInletNode,
                                                      this->HeatCoilFluidOutletNodeNum,
-                                                     this->HeatCoilPlantLoc.loopNum,
-                                                     this->HeatCoilPlantLoc.loopSideNum,
-                                                     this->HeatCoilPlantLoc.branchNum,
-                                                     this->HeatCoilPlantLoc.compNum);
+                                                     this->HeatCoilPlantLoc);
                 //     simulate water coil to find operating capacity
                 WaterCoils::SimulateWaterCoilComponents(state,
                                                         this->m_HeatingCoilName,
@@ -1167,10 +1161,7 @@ namespace UnitarySystems {
                                                      mdot,
                                                      this->HeatCoilFluidInletNode,
                                                      this->HeatCoilFluidOutletNodeNum,
-                                                     this->HeatCoilPlantLoc.loopNum,
-                                                     this->HeatCoilPlantLoc.loopSideNum,
-                                                     this->HeatCoilPlantLoc.branchNum,
-                                                     this->HeatCoilPlantLoc.compNum);
+                                                     this->HeatCoilPlantLoc);
                 //     simulate steam coil to find operating capacity
                 SteamCoils::SimulateSteamCoilComponents(
                     state,
@@ -1193,10 +1184,7 @@ namespace UnitarySystems {
                                                      mdot,
                                                      this->m_SuppCoilFluidInletNode,
                                                      this->m_SuppCoilFluidOutletNodeNum,
-                                                     this->m_SuppCoilPlantLoc.loopNum,
-                                                     this->m_SuppCoilPlantLoc.loopSideNum,
-                                                     this->m_SuppCoilPlantLoc.branchNum,
-                                                     this->m_SuppCoilPlantLoc.compNum);
+                                                     this->m_SuppCoilPlantLoc);
                 //     simulate water coil to find operating capacity
                 if (mdot > 0.0) { // not sure why this is here and not used for other coil types, wouldn't capacity be 0 if water flow = 0? Maybe a
                                   // speed issue where coil doesn't need to be simulation if mdot=0.
@@ -1220,10 +1208,7 @@ namespace UnitarySystems {
                                                      mdot,
                                                      this->m_SuppCoilFluidInletNode,
                                                      this->m_SuppCoilFluidOutletNodeNum,
-                                                     this->m_SuppCoilPlantLoc.loopNum,
-                                                     this->m_SuppCoilPlantLoc.loopSideNum,
-                                                     this->m_SuppCoilPlantLoc.branchNum,
-                                                     this->m_SuppCoilPlantLoc.compNum);
+                                                     this->m_SuppCoilPlantLoc);
                 //     simulate steam coil to find operating capacity
                 SteamCoils::SimulateSteamCoilComponents(
                     state,
@@ -1339,10 +1324,7 @@ namespace UnitarySystems {
                                                  mdot,
                                                  this->CoolCoilFluidInletNode,
                                                  this->CoolCoilFluidOutletNodeNum,
-                                                 this->CoolCoilPlantLoc.loopNum,
-                                                 this->CoolCoilPlantLoc.loopSideNum,
-                                                 this->CoolCoilPlantLoc.branchNum,
-                                                 this->CoolCoilPlantLoc.compNum);
+                                                 this->CoolCoilPlantLoc);
         }
         if (this->HeatCoilFluidInletNode > 0) {
             Real64 mdot = 0.0;
@@ -1350,10 +1332,7 @@ namespace UnitarySystems {
                                                  mdot,
                                                  this->HeatCoilFluidInletNode,
                                                  this->HeatCoilFluidOutletNodeNum,
-                                                 this->HeatCoilPlantLoc.loopNum,
-                                                 this->HeatCoilPlantLoc.loopSideNum,
-                                                 this->HeatCoilPlantLoc.branchNum,
-                                                 this->HeatCoilPlantLoc.compNum);
+                                                 this->HeatCoilPlantLoc);
         }
         if (this->m_SuppCoilFluidInletNode > 0) {
             Real64 mdot = 0.0;
@@ -1361,10 +1340,7 @@ namespace UnitarySystems {
                                                  mdot,
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
-                                                 this->m_SuppCoilPlantLoc.loopNum,
-                                                 this->m_SuppCoilPlantLoc.loopSideNum,
-                                                 this->m_SuppCoilPlantLoc.branchNum,
-                                                 this->m_SuppCoilPlantLoc.compNum);
+                                                 this->m_SuppCoilPlantLoc);
         }
 
         this->m_InitHeatPump = true;
@@ -7628,20 +7604,14 @@ namespace UnitarySystems {
                                                  state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).MassFlowRate,
                                                  this->CoolCoilFluidInletNode,
                                                  this->CoolCoilFluidOutletNodeNum,
-                                                 this->CoolCoilPlantLoc.loopNum,
-                                                 this->CoolCoilPlantLoc.loopSideNum,
-                                                 this->CoolCoilPlantLoc.branchNum,
-                                                 this->CoolCoilPlantLoc.compNum);
+                                                 this->CoolCoilPlantLoc);
         }
         if (this->HeatCoilFluidInletNode > 0) {
             PlantUtilities::SetComponentFlowRate(state,
                                                  state.dataLoopNodes->Node(this->HeatCoilFluidInletNode).MassFlowRate,
                                                  this->HeatCoilFluidInletNode,
                                                  this->HeatCoilFluidOutletNodeNum,
-                                                 this->HeatCoilPlantLoc.loopNum,
-                                                 this->HeatCoilPlantLoc.loopSideNum,
-                                                 this->HeatCoilPlantLoc.branchNum,
-                                                 this->HeatCoilPlantLoc.compNum);
+                                                 this->HeatCoilPlantLoc);
         }
 
         if (this->m_SuppCoilExists &&
@@ -7709,10 +7679,7 @@ namespace UnitarySystems {
                                                  state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate,
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
-                                                 this->m_SuppCoilPlantLoc.loopNum,
-                                                 this->m_SuppCoilPlantLoc.loopSideNum,
-                                                 this->m_SuppCoilPlantLoc.branchNum,
-                                                 this->m_SuppCoilPlantLoc.compNum);
+                                                 this->m_SuppCoilPlantLoc);
         }
 
         if (this->m_HeatRecActive) {
@@ -7720,10 +7687,7 @@ namespace UnitarySystems {
                                                  state.dataLoopNodes->Node(this->m_HeatRecoveryInletNodeNum).MassFlowRate,
                                                  this->m_HeatRecoveryInletNodeNum,
                                                  this->m_HeatRecoveryOutletNodeNum,
-                                                 this->m_HRPlantLoc.loopNum,
-                                                 this->m_HRPlantLoc.loopSideNum,
-                                                 this->m_HRPlantLoc.branchNum,
-                                                 this->m_HRPlantLoc.compNum);
+                                                 this->m_HRPlantLoc);
         }
     }
 
@@ -11841,10 +11805,7 @@ namespace UnitarySystems {
                                                      mdot,
                                                      this->CoolCoilFluidInletNode,
                                                      this->CoolCoilFluidOutletNodeNum,
-                                                     this->CoolCoilPlantLoc.loopNum,
-                                                     this->CoolCoilPlantLoc.loopSideNum,
-                                                     this->CoolCoilPlantLoc.branchNum,
-                                                     this->CoolCoilPlantLoc.compNum);
+                                                     this->CoolCoilPlantLoc);
 
                 WaterCoils::SimulateWaterCoilComponents(
                     state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
@@ -12266,10 +12227,7 @@ namespace UnitarySystems {
                                                              mdot,
                                                              this->CoolCoilFluidInletNode,
                                                              this->CoolCoilFluidOutletNodeNum,
-                                                             this->CoolCoilPlantLoc.loopNum,
-                                                             this->CoolCoilPlantLoc.loopSideNum,
-                                                             this->CoolCoilPlantLoc.branchNum,
-                                                             this->CoolCoilPlantLoc.compNum);
+                                                             this->CoolCoilPlantLoc);
 
                         WaterCoils::SimulateWaterCoilComponents(
                             state, CompName, FirstHVACIteration, this->m_CoolingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
@@ -13361,10 +13319,7 @@ namespace UnitarySystems {
                                                  mdot,
                                                  this->CoolCoilFluidInletNode,
                                                  this->CoolCoilFluidOutletNodeNum,
-                                                 this->CoolCoilPlantLoc.loopNum,
-                                                 this->CoolCoilPlantLoc.loopSideNum,
-                                                 this->CoolCoilPlantLoc.branchNum,
-                                                 this->CoolCoilPlantLoc.compNum);
+                                                 this->CoolCoilPlantLoc);
         }
     } // namespace UnitarySystems
 
@@ -13781,10 +13736,7 @@ namespace UnitarySystems {
                                                                  mdot,
                                                                  this->HeatCoilFluidInletNode,
                                                                  this->HeatCoilFluidOutletNodeNum,
-                                                                 this->HeatCoilPlantLoc.loopNum,
-                                                                 this->HeatCoilPlantLoc.loopSideNum,
-                                                                 this->HeatCoilPlantLoc.branchNum,
-                                                                 this->HeatCoilPlantLoc.compNum);
+                                                                 this->HeatCoilPlantLoc);
 
                             WaterCoils::SimulateWaterCoilComponents(
                                 state, CompName, FirstHVACIteration, this->m_HeatingCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
@@ -13796,10 +13748,7 @@ namespace UnitarySystems {
                                                                  mdot,
                                                                  this->HeatCoilFluidInletNode,
                                                                  this->HeatCoilFluidOutletNodeNum,
-                                                                 this->HeatCoilPlantLoc.loopNum,
-                                                                 this->HeatCoilPlantLoc.loopSideNum,
-                                                                 this->HeatCoilPlantLoc.branchNum,
-                                                                 this->HeatCoilPlantLoc.compNum);
+                                                                 this->HeatCoilPlantLoc);
 
                             SteamCoils::SimulateSteamCoilComponents(state,
                                                                     CompName,
@@ -14082,10 +14031,7 @@ namespace UnitarySystems {
                                                  mdot,
                                                  this->HeatCoilFluidInletNode,
                                                  this->HeatCoilFluidOutletNodeNum,
-                                                 this->HeatCoilPlantLoc.loopNum,
-                                                 this->HeatCoilPlantLoc.loopSideNum,
-                                                 this->HeatCoilPlantLoc.branchNum,
-                                                 this->HeatCoilPlantLoc.compNum);
+                                                 this->HeatCoilPlantLoc);
         }
     }
 
@@ -14267,10 +14213,7 @@ namespace UnitarySystems {
                                                                  mdot,
                                                                  this->m_SuppCoilFluidInletNode,
                                                                  this->m_SuppCoilFluidOutletNodeNum,
-                                                                 this->m_SuppCoilPlantLoc.loopNum,
-                                                                 this->m_SuppCoilPlantLoc.loopSideNum,
-                                                                 this->m_SuppCoilPlantLoc.branchNum,
-                                                                 this->m_SuppCoilPlantLoc.compNum);
+                                                                 this->m_SuppCoilPlantLoc);
 
                             WaterCoils::SimulateWaterCoilComponents(
                                 state, CompName, FirstHVACIteration, this->m_SuppHeatCoilIndex, _, this->m_FanOpMode, PartLoadFrac);
@@ -14282,10 +14225,7 @@ namespace UnitarySystems {
                                                                  mdot,
                                                                  this->m_SuppCoilFluidInletNode,
                                                                  this->m_SuppCoilFluidOutletNodeNum,
-                                                                 this->m_SuppCoilPlantLoc.loopNum,
-                                                                 this->m_SuppCoilPlantLoc.loopSideNum,
-                                                                 this->m_SuppCoilPlantLoc.branchNum,
-                                                                 this->m_SuppCoilPlantLoc.compNum);
+                                                                 this->m_SuppCoilPlantLoc);
 
                             SteamCoils::SimulateSteamCoilComponents(state,
                                                                     CompName,
@@ -14463,10 +14403,7 @@ namespace UnitarySystems {
                                                  mdot,
                                                  this->m_SuppCoilFluidInletNode,
                                                  this->m_SuppCoilFluidOutletNodeNum,
-                                                 this->m_SuppCoilPlantLoc.loopNum,
-                                                 this->m_SuppCoilPlantLoc.loopSideNum,
-                                                 this->m_SuppCoilPlantLoc.branchNum,
-                                                 this->m_SuppCoilPlantLoc.compNum);
+                                                 this->m_SuppCoilPlantLoc);
         }
     }
 

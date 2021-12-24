@@ -431,8 +431,11 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
     Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(
         state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->DesignMassFlowRate);
 
-    PlantUtilities::SetComponentFlowRate(
-        state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+    PlantUtilities::SetComponentFlowRate(        state,
+ DesignFlow,
+ this->InletNodeNum,
+ this->OutletNodeNum,
+ this->plantLoc);
 
     // get the current flow rate - module variable
     this->MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;

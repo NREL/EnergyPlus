@@ -132,9 +132,9 @@ namespace PlantComponentTemperatureSources {
         if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             this->MassFlowRateMax = this->DesVolFlowRate * rho;
             PlantUtilities::InitComponentNodes(state, 0.0, this->MassFlowRateMax, this->InletNodeNum, this->OutletNodeNum);
@@ -154,9 +154,9 @@ namespace PlantComponentTemperatureSources {
 
         // Calculate specific heat
         Real64 cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                            this->BoundaryTemp,
-                                                           state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
 
         // Calculate deltaT
@@ -200,10 +200,7 @@ namespace PlantComponentTemperatureSources {
                                              this->MassFlowRate,
                                              this->InletNodeNum,
                                              this->OutletNodeNum,
-                                             this->Location.loopNum,
-                                             this->Location.loopSideNum,
-                                             this->Location.branchNum,
-                                             this->Location.compNum);
+                                             this->plantLoc);
 
         // at this point the mass flow rate, inlet temp, and boundary temp structure vars have been updated
         // the calc routine will update the outlet temp and heat transfer rate/energies
@@ -284,7 +281,7 @@ namespace PlantComponentTemperatureSources {
         bool ErrorsFound(false);   // If errors detected in input
         Real64 DesVolFlowRateUser; // Hardsized design volume flow rate for reporting
         Real64 tmpVolFlowRate = this->DesVolFlowRate;
-        int PltSizNum = state.dataPlnt->PlantLoop(this->Location.loopNum).PlantSizNum;
+        int PltSizNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
             if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
@@ -370,9 +367,9 @@ namespace PlantComponentTemperatureSources {
         if (this->MassFlowRate > 0.0) {
             this->OutletTemp = this->BoundaryTemp;
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->Location.loopNum).FluidName,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                this->BoundaryTemp,
-                                                               state.dataPlnt->PlantLoop(this->Location.loopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             this->HeatRate = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
             this->HeatEnergy = this->HeatRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
@@ -429,7 +426,7 @@ namespace PlantComponentTemperatureSources {
             // Locate the component on the plant loops for later usage
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(
-                state, this->Name, DataPlant::PlantEquipmentType::WaterSource, this->Location, errFlag, _, _, _, this->InletNodeNum, _);
+                state, this->Name, DataPlant::PlantEquipmentType::WaterSource, this->plantLoc, errFlag, _, _, _, this->InletNodeNum, _);
             if (errFlag) {
                 ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
             }

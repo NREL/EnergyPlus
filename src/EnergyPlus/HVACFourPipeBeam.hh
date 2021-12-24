@@ -77,11 +77,12 @@ namespace FourPipeBeam {
               totBeamLengthWasAutosized(false), vDotNormRatedPrimAir(0.0), mDotNormRatedPrimAir(0.0), beamCoolingPresent(false), vDotDesignCW(0.0),
               vDotDesignCWWasAutosized(false), mDotDesignCW(0.0), qDotNormRatedCooling(0.0), deltaTempRatedCooling(0.0), vDotNormRatedCW(0.0),
               mDotNormRatedCW(0.0), modCoolingQdotDeltaTFuncNum(0), modCoolingQdotAirFlowFuncNum(0), modCoolingQdotCWFlowFuncNum(0), mDotCW(0.0),
-              cWTempIn(0.0), cWTempOut(0.0), cWTempOutErrorCount(0), cWInNodeNum(0), cWOutNodeNum(0), cWLocation(PlantLocation(0, DataPlant::LoopSideLocation::Invalid, 0, 0)),
+              cWTempIn(0.0), cWTempOut(0.0), cWTempOutErrorCount(0), cWInNodeNum(0), cWOutNodeNum(0),
+              cWplantLoc(PlantLocation(0, DataPlant::LoopSideLocation::Invalid, 0, 0)),
               beamHeatingPresent(false), vDotDesignHW(0.0), vDotDesignHWWasAutosized(false), mDotDesignHW(0.0), qDotNormRatedHeating(0.0),
               deltaTempRatedHeating(0.0), vDotNormRatedHW(0.0), mDotNormRatedHW(0.0), modHeatingQdotDeltaTFuncNum(0), modHeatingQdotAirFlowFuncNum(0),
               modHeatingQdotHWFlowFuncNum(0), mDotHW(0.0), hWTempIn(0.0), hWTempOut(0.0), hWTempOutErrorCount(0), hWInNodeNum(0), hWOutNodeNum(0),
-              hWLocation(PlantLocation(0, DataPlant::LoopSideLocation::Invalid, 0, 0)), beamCoolingEnergy(0.0), beamCoolingRate(0.0), beamHeatingEnergy(0.0), beamHeatingRate(0.0),
+              hWplantLoc(PlantLocation(0, DataPlant::LoopSideLocation::Invalid, 0, 0)), beamCoolingEnergy(0.0), beamCoolingRate(0.0), beamHeatingEnergy(0.0), beamHeatingRate(0.0),
               supAirCoolingEnergy(0.0), supAirCoolingRate(0.0), supAirHeatingEnergy(0.0), supAirHeatingRate(0.0), primAirFlow(0.0),
               OutdoorAirFlowRate(0.0), myEnvrnFlag(true), mySizeFlag(true), plantLoopScanFlag(true), zoneEquipmentListChecked(false),
               tDBZoneAirTemp(0.0), tDBSystemAir(0.0), mDotSystemAir(0.0), cpZoneAir(0.0), cpSystemAir(0.0), qDotSystemAir(0.0),
@@ -167,7 +168,7 @@ namespace FourPipeBeam {
         int cWTempOutErrorCount;          // counter for recurring errors in chilled water outlet temperature
         int cWInNodeNum;                  // chilled water inlet node
         int cWOutNodeNum;                 // chilled water outlet nod
-        PlantLocation cWLocation;         // chilled water plant loop location
+        PlantLocation cWplantLoc;         // chilled water plant loop location
         // heating
         bool beamHeatingPresent;          // true if hot water system is connected to beam
         Real64 vDotDesignHW;              // Design hot water volume flow rate (autosizable) (m3/s)
@@ -186,7 +187,7 @@ namespace FourPipeBeam {
         int hWTempOutErrorCount;          // counter for recurring errors in hot water outlet temperature
         int hWInNodeNum;                  // hot water inlet node
         int hWOutNodeNum;                 // hot water outlet node
-        PlantLocation hWLocation;         // hot water connection location structure
+        PlantLocation hWplantLoc;         // hot water connection location structure
 
         // output variables
         Real64 beamCoolingEnergy;   // beam sensible cooling energy of all beams in the zone [J]

@@ -925,10 +925,7 @@ namespace GeneratorDynamicsManager {
                                  MdotCW,
                                  InletNode,
                                  OutletNode,
-                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc.loopNum,
-                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc.loopSideNum,
-                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc.branchNum,
-                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc.compNum);
+                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc);
         }
 
         FuncDetermineCWMdotForInternalFlowControl = MdotCW;

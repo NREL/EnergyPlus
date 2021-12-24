@@ -792,20 +792,14 @@ namespace CTElectricGenerator {
                                                      mdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc.loopNum,
-                                                     this->HRPlantLoc.loopSideNum,
-                                                     this->HRPlantLoc.branchNum,
-                                                     this->HRPlantLoc.compNum);
+                                                     this->HRPlantLoc);
 
             } else {
                 PlantUtilities::SetComponentFlowRate(state,
                                                      this->HeatRecMdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc.loopNum,
-                                                     this->HRPlantLoc.loopSideNum,
-                                                     this->HRPlantLoc.branchNum,
-                                                     this->HRPlantLoc.compNum);
+                                                     this->HRPlantLoc);
             }
         }
     }

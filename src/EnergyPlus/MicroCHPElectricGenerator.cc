@@ -823,8 +823,11 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
     if (!this->A42Model.InternalFlowControl) {
 
         Real64 mdot = this->PlantMassFlowRateMax;
-        PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CWPlantLoc.branchNum, this->CWPlantLoc.compNum);
+        PlantUtilities::SetComponentFlowRate(            state,
+ mdot,
+ this->PlantInletNodeID,
+ this->PlantOutletNodeID,
+ this->CWPlantLoc);
         this->PlantMassFlowRate = mdot;
     }
 }
@@ -923,10 +926,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                  MdotCW,
                                                  this->PlantInletNodeID,
                                                  this->PlantOutletNodeID,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
             this->PlantMassFlowRate = MdotCW;
 
         } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeStandby) {
@@ -948,10 +948,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
                                                  MdotCW,
                                                  this->PlantInletNodeID,
                                                  this->PlantOutletNodeID,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
             this->PlantMassFlowRate = MdotCW;
 
         } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeWarmUp) {

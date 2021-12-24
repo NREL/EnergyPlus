@@ -1940,10 +1940,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
                          state.dataPumps->PumpMassFlowRate,
                          InletNode,
                          OutletNode,
-                         state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum,
-                         state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum,
-                         state.dataPumps->PumpEquip(PumpNum).plantLoc.branchNum,
-                         state.dataPumps->PumpEquip(PumpNum).plantLoc.compNum);
+                         state.dataPumps->PumpEquip(PumpNum).plantLoc);
 
     // Get RPM value for reporting as output
     // RPM is calculated using pump affinity laws for rotation speed

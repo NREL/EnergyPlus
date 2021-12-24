@@ -618,19 +618,13 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                              this->LoadSideWaterMassFlowRate,
                                              this->LoadSideInletNodeNum,
                                              this->LoadSideOutletNodeNum,
-                                             this->LoadPlantLoc.loopNum,
-                                             this->LoadPlantLoc.loopSideNum,
-                                             this->LoadPlantLoc.branchNum,
-                                             this->LoadPlantLoc.compNum);
+                                             this->LoadPlantLoc);
         this->SourceSideWaterMassFlowRate = 0.0;
         PlantUtilities::SetComponentFlowRate(state,
                                              this->SourceSideWaterMassFlowRate,
                                              this->SourceSideInletNodeNum,
                                              this->SourceSideOutletNodeNum,
-                                             this->SourcePlantLoc.loopNum,
-                                             this->SourcePlantLoc.loopSideNum,
-                                             this->SourcePlantLoc.branchNum,
-                                             this->SourcePlantLoc.compNum);
+                                             this->SourcePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadPlantLoc.loopNum,
                                                     this->LoadPlantLoc.loopSideNum,
@@ -658,20 +652,14 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                              this->LoadSideWaterMassFlowRate,
                                              this->LoadSideInletNodeNum,
                                              this->LoadSideOutletNodeNum,
-                                             this->LoadPlantLoc.loopNum,
-                                             this->LoadPlantLoc.loopSideNum,
-                                             this->LoadPlantLoc.branchNum,
-                                             this->LoadPlantLoc.compNum);
+                                             this->LoadPlantLoc);
 
         this->SourceSideWaterMassFlowRate = this->SourceSideDesignMassFlow;
         PlantUtilities::SetComponentFlowRate(state,
                                              this->SourceSideWaterMassFlowRate,
                                              this->SourceSideInletNodeNum,
                                              this->SourceSideOutletNodeNum,
-                                             this->SourcePlantLoc.loopNum,
-                                             this->SourcePlantLoc.loopSideNum,
-                                             this->SourcePlantLoc.branchNum,
-                                             this->SourcePlantLoc.compNum);
+                                             this->SourcePlantLoc);
         // get inlet temps
         this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
         this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
@@ -683,19 +671,13 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                  this->LoadSideWaterMassFlowRate,
                                                  this->LoadSideInletNodeNum,
                                                  this->LoadSideOutletNodeNum,
-                                                 this->LoadPlantLoc.loopNum,
-                                                 this->LoadPlantLoc.loopSideNum,
-                                                 this->LoadPlantLoc.branchNum,
-                                                 this->LoadPlantLoc.compNum);
+                                                 this->LoadPlantLoc);
             this->SourceSideWaterMassFlowRate = 0.0;
             PlantUtilities::SetComponentFlowRate(state,
                                                  this->SourceSideWaterMassFlowRate,
                                                  this->SourceSideInletNodeNum,
                                                  this->SourceSideOutletNodeNum,
-                                                 this->SourcePlantLoc.loopNum,
-                                                 this->SourcePlantLoc.loopSideNum,
-                                                 this->SourcePlantLoc.branchNum,
-                                                 this->SourcePlantLoc.compNum);
+                                                 this->SourcePlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->LoadPlantLoc.loopNum,
                                                         this->LoadPlantLoc.loopSideNum,

@@ -511,10 +511,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                                  state.dataHVACVarRefFlow->CondenserWaterMassFlowRate,
                                  state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
                                  state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
-                                 state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum,
-                                 state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopSideNum,
-                                 state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.branchNum,
-                                state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.compNum);
+                                 state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc);
             state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow = state.dataHVACVarRefFlow->CondenserWaterMassFlowRate;
             state.dataHVACVarRefFlow->VRF(VRFCond).CondenserSideOutletTemp = CondInletTemp;
         }
@@ -1278,10 +1275,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                              state.dataHVACVarRefFlow->CondenserWaterMassFlowRate,
                              state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
                              state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopSideNum,
-                             state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.branchNum,
-                            state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.compNum);
+                             state.dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc);
 
         // should be the same as above just entering this function
         //            VRF( VRFCond ).CondenserInletTemp = state.dataLoopNodes->Node(VRF(VRFCond).CondenserNodeNum).Temp;
@@ -6776,10 +6770,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                                      mdot,
                                                      state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
                                                      state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
-                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopNum,
-                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopSideNum,
-                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.branchNum,
-                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.compNum);
+                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc);
 
                 //     simulate water coil to find operating capacity
                 WaterCoils::SimulateWaterCoilComponents(state,
@@ -6796,10 +6787,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                                      mdot,
                                                      state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
                                                      state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
-                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopNum,
-                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopSideNum,
-                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.branchNum,
-                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.compNum);
+                                                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc);
 
                 //     simulate steam coil to find operating capacity
                 SteamCoils::SimulateSteamCoilComponents(state,
@@ -6822,10 +6810,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                              mdot,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
-                                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopNum,
-                                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopSideNum,
-                                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.branchNum,
-                                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.compNum);
+                                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc);
     }
 
     // one-time checks of flow rate vs fan flow rate
@@ -15628,10 +15613,7 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                                                      mdot,
                                                      this->SuppHeatCoilFluidInletNode,
                                                      this->SuppHeatCoilFluidOutletNode,
-                                                     this->SuppHeatCoilPlantLoc.loopNum,
-                                                     this->SuppHeatCoilPlantLoc.loopSideNum,
-                                                     this->SuppHeatCoilPlantLoc.branchNum,
-                                                     this->SuppHeatCoilPlantLoc.compNum);
+                                                     this->SuppHeatCoilPlantLoc);
             }
             //     simulate water heating coil
             WaterCoils::SimulateWaterCoilComponents(state,

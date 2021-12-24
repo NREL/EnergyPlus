@@ -1430,8 +1430,11 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     }
 
     if (CoolingPanelOn) {
-        SetComponentFlowRate(
-            state, waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+        SetComponentFlowRate(            state,
+ waterMassFlowRate,
+ this->WaterInletNode,
+ this->WaterOutletNode,
+ this->plantLoc);
         if (waterMassFlowRate <= 0.0) CoolingPanelOn = false;
     }
 

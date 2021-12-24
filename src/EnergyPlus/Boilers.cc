@@ -819,8 +819,11 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
         if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
             // Then find the flow rate and outlet temp
             this->BoilerMassFlowRate = BoilerMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(
-                state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+            PlantUtilities::SetComponentFlowRate(                state,
+ this->BoilerMassFlowRate,
+ BoilerInletNode,
+ BoilerOutletNode,
+ this->plantLoc);
 
             if ((this->BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
                 BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
@@ -847,8 +850,11 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
             } else {
                 this->BoilerMassFlowRate = 0.0;
             }
-            PlantUtilities::SetComponentFlowRate(
-                state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+            PlantUtilities::SetComponentFlowRate(                state,
+ this->BoilerMassFlowRate,
+ BoilerInletNode,
+ BoilerOutletNode,
+ this->plantLoc);
 
         } // End of Constant/Variable Flow If Block
 

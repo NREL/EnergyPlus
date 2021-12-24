@@ -1136,10 +1136,7 @@ namespace WaterToAirHeatPumpSimple {
                                              simpleWatertoAirHP.WaterMassFlowRate,
                                              simpleWatertoAirHP.WaterInletNodeNum,
                                              simpleWatertoAirHP.WaterOutletNodeNum,
-                                             simpleWatertoAirHP.plantLoc.loopNum,
-                                             simpleWatertoAirHP.plantLoc.loopSideNum,
-                                             simpleWatertoAirHP.plantLoc.branchNum,
-                                             simpleWatertoAirHP.plantLoc.compNum);
+                                             simpleWatertoAirHP.plantLoc);
 
         simpleWatertoAirHP.InletAirDBTemp = state.dataLoopNodes->Node(AirInletNode).Temp;
         simpleWatertoAirHP.InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
@@ -2418,10 +2415,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  simpleWatertoAirHP.WaterMassFlowRate,
                                                  simpleWatertoAirHP.WaterInletNodeNum,
                                                  simpleWatertoAirHP.WaterOutletNodeNum,
-                                                 simpleWatertoAirHP.plantLoc.loopNum,
-                                                 simpleWatertoAirHP.plantLoc.loopSideNum,
-                                                 simpleWatertoAirHP.plantLoc.branchNum,
-                                                 simpleWatertoAirHP.plantLoc.compNum);
+                                                 simpleWatertoAirHP.plantLoc);
             if (simpleWatertoAirHP.WaterMassFlowRate > 0.0) {
                 simpleWatertoAirHP.OutletWaterTemp = state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp +
                                                      simpleWatertoAirHP.QSource / (simpleWatertoAirHP.WaterMassFlowRate * CpWater);
@@ -2436,10 +2430,7 @@ namespace WaterToAirHeatPumpSimple {
                                                          simpleWatertoAirHP.WaterMassFlowRate,
                                                          simpleWatertoAirHP.WaterInletNodeNum,
                                                          simpleWatertoAirHP.WaterOutletNodeNum,
-                                                         simpleWatertoAirHP.plantLoc.loopNum,
-                                                         simpleWatertoAirHP.plantLoc.loopSideNum,
-                                                         simpleWatertoAirHP.plantLoc.branchNum,
-                                                         simpleWatertoAirHP.plantLoc.compNum);
+                                                         simpleWatertoAirHP.plantLoc);
                 } else {
                     simpleWatertoAirHP.WaterMassFlowRate = state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate;
                 }
@@ -2635,10 +2626,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  simpleWatertoAirHP.WaterMassFlowRate,
                                                  simpleWatertoAirHP.WaterInletNodeNum,
                                                  simpleWatertoAirHP.WaterOutletNodeNum,
-                                                 simpleWatertoAirHP.plantLoc.loopNum,
-                                                 simpleWatertoAirHP.plantLoc.loopSideNum,
-                                                 simpleWatertoAirHP.plantLoc.branchNum,
-                                                 simpleWatertoAirHP.plantLoc.compNum);
+                                                 simpleWatertoAirHP.plantLoc);
             if (simpleWatertoAirHP.WaterMassFlowRate > 0.0) {
                 simpleWatertoAirHP.OutletWaterTemp = state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp -
                                                      simpleWatertoAirHP.QSource / (simpleWatertoAirHP.WaterMassFlowRate * CpWater);
@@ -2653,10 +2641,7 @@ namespace WaterToAirHeatPumpSimple {
                                                          simpleWatertoAirHP.WaterMassFlowRate,
                                                          simpleWatertoAirHP.WaterInletNodeNum,
                                                          simpleWatertoAirHP.WaterOutletNodeNum,
-                                                         simpleWatertoAirHP.plantLoc.loopNum,
-                                                         simpleWatertoAirHP.plantLoc.loopSideNum,
-                                                         simpleWatertoAirHP.plantLoc.branchNum,
-                                                         simpleWatertoAirHP.plantLoc.compNum);
+                                                         simpleWatertoAirHP.plantLoc);
                 } else {
                     simpleWatertoAirHP.WaterMassFlowRate = state.dataWaterToAirHeatPumpSimple->SourceSideMassFlowRate;
                 }

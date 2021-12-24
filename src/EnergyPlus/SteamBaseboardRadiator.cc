@@ -239,10 +239,7 @@ namespace SteamBaseboardRadiator {
                                      mdot,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.loopNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.branchNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.compNum);
+                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc);
                 CalcSteamBaseboard(state, BaseboardNum, PowerMet);
             }
 

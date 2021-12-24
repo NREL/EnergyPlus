@@ -856,18 +856,12 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                              this->reportLoadSideMassFlowRate,
                              this->LoadSideInletNodeNum,
                              this->LoadSideOutletNodeNum,
-                             this->LoadPlantLoc.loopNum,
-                             this->LoadPlantLoc.loopSideNum,
-                             this->LoadPlantLoc.branchNum,
-                             this->LoadPlantLoc.compNum);
+                             this->LoadPlantLoc);
         SetComponentFlowRate(state,
                              this->reportSourceSideMassFlowRate,
                              this->SourceSideInletNodeNum,
                              this->SourceSideOutletNodeNum,
-                             this->SourcePlantLoc.loopNum,
-                             this->SourcePlantLoc.loopSideNum,
-                             this->SourcePlantLoc.branchNum,
-                             this->SourcePlantLoc.compNum);
+                             this->SourcePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadPlantLoc.loopNum,
                                                     this->LoadPlantLoc.loopSideNum,
@@ -888,18 +882,12 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                              this->reportLoadSideMassFlowRate,
                              this->LoadSideInletNodeNum,
                              this->LoadSideOutletNodeNum,
-                             this->LoadPlantLoc.loopNum,
-                             this->LoadPlantLoc.loopSideNum,
-                             this->LoadPlantLoc.branchNum,
-                             this->LoadPlantLoc.compNum);
+                             this->LoadPlantLoc);
         SetComponentFlowRate(state,
                              this->reportSourceSideMassFlowRate,
                              this->SourceSideInletNodeNum,
                              this->SourceSideOutletNodeNum,
-                             this->SourcePlantLoc.loopNum,
-                             this->SourcePlantLoc.loopSideNum,
-                             this->SourcePlantLoc.branchNum,
-                             this->SourcePlantLoc.compNum);
+                             this->SourcePlantLoc);
         // if there's no flowin one, turn the entire "heat pump off"
         if (this->reportLoadSideMassFlowRate <= 0.0 || this->reportSourceSideMassFlowRate <= 0.0) {
 
@@ -911,18 +899,12 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                  this->reportLoadSideMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
-                                 this->LoadPlantLoc.loopNum,
-                                 this->LoadPlantLoc.loopSideNum,
-                                 this->LoadPlantLoc.branchNum,
-                                 this->LoadPlantLoc.compNum);
+                                 this->LoadPlantLoc);
             SetComponentFlowRate(state,
                                  this->reportSourceSideMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
-                                 this->SourcePlantLoc.loopNum,
-                                 this->SourcePlantLoc.loopSideNum,
-                                 this->SourcePlantLoc.branchNum,
-                                 this->SourcePlantLoc.compNum);
+                                 this->SourcePlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->LoadPlantLoc.loopNum,
                                                         this->LoadPlantLoc.loopSideNum,

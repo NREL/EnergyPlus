@@ -564,7 +564,7 @@ namespace WaterThermalTanks {
         bool UseSideSeries;
         int UseSideAvailSchedNum;    // use side availability schedule
         Real64 UseSideLoadRequested; // hold MyLoad request from plant management.
-        PlantLocation UseSide;
+        PlantLocation UseSidePlantLoc;
         int SourceInletNode;                                         // Inlet node for the source side; hot water from supply
         Real64 SourceInletTemp;                                      // Source side inlet temperature (C)
         int SourceOutletNode;                                        // Outlet node for the source side; colder tank water
@@ -579,7 +579,7 @@ namespace WaterThermalTanks {
         int SourceSidePlantSizNum;                                   // index in plant sizing that the source side is on
         bool SourceSideSeries;
         int SourceSideAvailSchedNum; // source side availability schedule.
-        PlantLocation SrcSide;
+        PlantLocation SrcSidePlantLoc;
         SourceSideControl SourceSideControlMode; // flag for how source side flow is controlled
         int SourceSideAltSetpointSchedNum;       // schedule of alternate temperature setpoint values
         Real64 SizingRecoveryTime;               // sizing parameter for autosizing indirect water heaters (hr)

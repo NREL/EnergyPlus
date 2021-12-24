@@ -3373,10 +3373,7 @@ namespace DesiccantDehumidifiers {
                                          MaxHotWaterFlow,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).plantLoc.loopNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.loopSideNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.branchNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.compNum);
+                                         DesicDehum(DesicDehumNum).plantLoc);
                     RegenCoilActual = RegenCoilLoad;
                     // simulate the regenerator hot water heating coil
                     SimulateWaterCoilComponents(state,
@@ -3450,10 +3447,7 @@ namespace DesiccantDehumidifiers {
                                          mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).plantLoc.loopNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.loopSideNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.branchNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.compNum);
+                                         DesicDehum(DesicDehumNum).plantLoc);
                     // simulate the regenerator steam heating coil
                     SimulateSteamCoilComponents(state,
                                                 DesicDehum(DesicDehumNum).RegenCoilName,
@@ -3479,10 +3473,7 @@ namespace DesiccantDehumidifiers {
                                          mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).plantLoc.loopNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.loopSideNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.branchNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.compNum);
+                                         DesicDehum(DesicDehumNum).plantLoc);
                     RegenCoilActual = RegenCoilLoad;
                     // simulate the regenerator hot water heating coil
                     SimulateWaterCoilComponents(state,
@@ -3496,10 +3487,7 @@ namespace DesiccantDehumidifiers {
                                          mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).plantLoc.loopNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.loopSideNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.branchNum,
-                                         DesicDehum(DesicDehumNum).plantLoc.compNum);
+                                         DesicDehum(DesicDehumNum).plantLoc);
                     // simulate the regenerator steam heating coil
                     SimulateSteamCoilComponents(state,
                                                 DesicDehum(DesicDehumNum).RegenCoilName,
@@ -3557,10 +3545,7 @@ namespace DesiccantDehumidifiers {
                              mdot,
                              state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilControlNode,
                              state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilOutletNode,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).plantLoc.loopNum,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).plantLoc.loopSideNum,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).plantLoc.branchNum,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).plantLoc.compNum);
+                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).plantLoc);
 
         // simulate the hot water regenerator heating coil
         SimulateWaterCoilComponents(state,

@@ -982,17 +982,17 @@ namespace PlantChillers {
             mdot = this->EvapMassFlowRateMax;
             mdotCond = this->CondMassFlowRateMax;
         }
-        PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CWPlantLoc.branchNum, this->CWPlantLoc.compNum);
+        PlantUtilities::SetComponentFlowRate(            state,
+ mdot,
+ this->EvapInletNodeNum,
+ this->EvapOutletNodeNum,
+ this->CWPlantLoc);
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             PlantUtilities::SetComponentFlowRate(state,
                                                  mdotCond,
                                                  this->CondInletNodeNum,
                                                  this->CondOutletNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
         }
 
         // Initialize heat recovery flow rates at node
@@ -1007,10 +1007,7 @@ namespace PlantChillers {
                                                  thisMdot,
                                                  this->HeatRecInletNodeNum,
                                                  this->HeatRecOutletNodeNum,
-                                                 this->HRPlantLoc.loopNum,
-                                                 this->HRPlantLoc.loopSideNum,
-                                                 this->HRPlantLoc.branchNum,
-                                                 this->HRPlantLoc.compNum);
+                                                 this->HRPlantLoc);
         }
 
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
@@ -1377,10 +1374,7 @@ namespace PlantChillers {
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 if (state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum)
@@ -1395,10 +1389,7 @@ namespace PlantChillers {
                                                          this->CondMassFlowRate,
                                                          this->CondInletNodeNum,
                                                          this->CondOutletNodeNum,
-                                                         this->CDPlantLoc.loopNum,
-                                                         this->CDPlantLoc.loopSideNum,
-                                                         this->CDPlantLoc.branchNum,
-                                                         this->CDPlantLoc.compNum);
+                                                         this->CDPlantLoc);
                 }
             }
 
@@ -1419,10 +1410,7 @@ namespace PlantChillers {
                                                  this->CondMassFlowRate,
                                                  this->CondInletNodeNum,
                                                  this->CondOutletNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->CWPlantLoc.loopNum,
                                                         this->CWPlantLoc.loopSideNum,
@@ -1592,10 +1580,7 @@ namespace PlantChillers {
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
                 // Evaluate delta temp based on actual flow rate
                 Real64 EvapDeltaTemp(0.0);
                 if (this->EvapMassFlowRate != 0.0) {
@@ -1630,10 +1615,7 @@ namespace PlantChillers {
                                                          this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                     if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme ==
@@ -1650,10 +1632,7 @@ namespace PlantChillers {
                                                          this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                     // No deltaT since component is not running
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
@@ -1683,10 +1662,7 @@ namespace PlantChillers {
                                                  this->EvapMassFlowRate,
                                                  this->EvapInletNodeNum,
                                                  this->EvapOutletNodeNum,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
 
             //       Some other component set the flow to 0. No reason to continue with calculations.
             if (this->EvapMassFlowRate == 0.0) {
@@ -3046,17 +3022,17 @@ namespace PlantChillers {
             mdotCond = 0.0;
         }
 
-        PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CWPlantLoc.branchNum, this->CWPlantLoc.compNum);
+        PlantUtilities::SetComponentFlowRate(            state,
+ mdot,
+ this->EvapInletNodeNum,
+ this->EvapOutletNodeNum,
+ this->CWPlantLoc);
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             PlantUtilities::SetComponentFlowRate(state,
                                                  mdotCond,
                                                  this->CondInletNodeNum,
                                                  this->CondOutletNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
         }
 
         // Initialize heat recovery flow rates at node
@@ -3072,10 +3048,7 @@ namespace PlantChillers {
                                                  mdot,
                                                  this->HeatRecInletNodeNum,
                                                  this->HeatRecOutletNodeNum,
-                                                 this->HRPlantLoc.loopNum,
-                                                 this->HRPlantLoc.loopSideNum,
-                                                 this->HRPlantLoc.branchNum,
-                                                 this->HRPlantLoc.compNum);
+                                                 this->HRPlantLoc);
         }
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             this->BasinHeaterPower = 0.0;
@@ -3481,10 +3454,7 @@ namespace PlantChillers {
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
             }
 
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -3500,10 +3470,7 @@ namespace PlantChillers {
                                                          this->CondMassFlowRate,
                                                          this->CondInletNodeNum,
                                                          this->CondOutletNodeNum,
-                                                         this->CDPlantLoc.loopNum,
-                                                         this->CDPlantLoc.loopSideNum,
-                                                         this->CDPlantLoc.branchNum,
-                                                         this->CDPlantLoc.compNum);
+                                                         this->CDPlantLoc);
                 }
             }
 
@@ -3559,10 +3526,7 @@ namespace PlantChillers {
                                                  this->CondMassFlowRate,
                                                  this->CondInletNodeNum,
                                                  this->CondOutletNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->CWPlantLoc.loopNum,
                                                         this->CWPlantLoc.loopSideNum,
@@ -3668,10 +3632,7 @@ namespace PlantChillers {
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
                 // Evaluate delta temp based on actual flow rate
                 Real64 EvapDeltaTemp(0.0);
                 if (this->EvapMassFlowRate != 0.0) {
@@ -3705,10 +3666,7 @@ namespace PlantChillers {
                                                          this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                     if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme ==
@@ -3723,10 +3681,7 @@ namespace PlantChillers {
                                                          this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                     // No deltaT since component is not running
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
@@ -3758,10 +3713,7 @@ namespace PlantChillers {
                                                  this->EvapMassFlowRate,
                                                  this->EvapInletNodeNum,
                                                  this->EvapOutletNodeNum,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
             // Some other component set the flow to 0. No reason to continue with calculations.
             if (this->EvapMassFlowRate == 0.0) {
                 MyLoad = 0.0;
@@ -5058,17 +5010,17 @@ namespace PlantChillers {
             mdotCond = 0.0;
         }
 
-        PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CWPlantLoc.branchNum, this->CWPlantLoc.compNum);
+        PlantUtilities::SetComponentFlowRate(            state,
+ mdot,
+ this->EvapInletNodeNum,
+ this->EvapOutletNodeNum,
+ this->CWPlantLoc);
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             PlantUtilities::SetComponentFlowRate(state,
                                                  mdotCond,
                                                  this->CondInletNodeNum,
                                                  this->CondOutletNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
         }
 
         // Initialize heat recovery flow rates at node
@@ -5084,10 +5036,7 @@ namespace PlantChillers {
                                                  mdot,
                                                  this->HeatRecInletNodeNum,
                                                  this->HeatRecOutletNodeNum,
-                                                 this->HRPlantLoc.loopNum,
-                                                 this->HRPlantLoc.loopSideNum,
-                                                 this->HRPlantLoc.branchNum,
-                                                 this->HRPlantLoc.compNum);
+                                                 this->HRPlantLoc);
         }
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
             this->BasinHeaterPower = 0.0;
@@ -5527,10 +5476,7 @@ namespace PlantChillers {
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 if (state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum)
@@ -5545,10 +5491,7 @@ namespace PlantChillers {
                                                          this->CondMassFlowRate,
                                                          this->CondInletNodeNum,
                                                          this->CondOutletNodeNum,
-                                                         this->CDPlantLoc.loopNum,
-                                                         this->CDPlantLoc.loopSideNum,
-                                                         this->CDPlantLoc.branchNum,
-                                                         this->CDPlantLoc.compNum);
+                                                         this->CDPlantLoc);
                 }
             }
 
@@ -5604,10 +5547,7 @@ namespace PlantChillers {
                                                  this->CondMassFlowRate,
                                                  this->CondInletNodeNum,
                                                  this->CondOutletNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->CWPlantLoc.loopNum,
                                                         this->CWPlantLoc.loopSideNum,
@@ -5706,10 +5646,7 @@ namespace PlantChillers {
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
                 // Evaluate delta temp based on actual flow rate
                 if (this->EvapMassFlowRate != 0.0) {
                     EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
@@ -5739,10 +5676,7 @@ namespace PlantChillers {
                                                          this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                     if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme ==
@@ -5757,10 +5691,7 @@ namespace PlantChillers {
                                                          this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                     // No deltaT since component is not running
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
@@ -5789,10 +5720,7 @@ namespace PlantChillers {
                                                  this->EvapMassFlowRate,
                                                  this->EvapInletNodeNum,
                                                  this->EvapOutletNodeNum,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
             //       Some other component set the flow to 0. No reason to continue with calculations.
             if (this->EvapMassFlowRate == 0.0) {
                 MyLoad = 0.0;
@@ -6838,17 +6766,17 @@ namespace PlantChillers {
             mdotCond = 0.0;
         }
 
-        PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CWPlantLoc.branchNum, this->CWPlantLoc.compNum);
+        PlantUtilities::SetComponentFlowRate(            state,
+ mdot,
+ this->EvapInletNodeNum,
+ this->EvapOutletNodeNum,
+ this->CWPlantLoc);
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             PlantUtilities::SetComponentFlowRate(state,
                                                  mdotCond,
                                                  this->CondInletNodeNum,
                                                  this->CondOutletNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
         }
 
         if (this->CondenserType == DataPlant::CondenserType::EvapCooled) {
@@ -7211,10 +7139,7 @@ namespace PlantChillers {
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
             }
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
                 if (state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum)
@@ -7229,10 +7154,7 @@ namespace PlantChillers {
                                                          this->CondMassFlowRate,
                                                          this->CondInletNodeNum,
                                                          this->CondOutletNodeNum,
-                                                         this->CDPlantLoc.loopNum,
-                                                         this->CDPlantLoc.loopSideNum,
-                                                         this->CDPlantLoc.branchNum,
-                                                         this->CDPlantLoc.compNum);
+                                                         this->CDPlantLoc);
                 }
             }
 
@@ -7322,10 +7244,7 @@ namespace PlantChillers {
                                                  this->CondMassFlowRate,
                                                  this->CondInletNodeNum,
                                                  this->CondOutletNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->CWPlantLoc.loopNum,
                                                         this->CWPlantLoc.loopSideNum,
@@ -7364,10 +7283,7 @@ namespace PlantChillers {
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
                 // Evaluate delta temp based on actual flow rate
                 if (this->EvapMassFlowRate != 0.0) {
                     EvapDeltaTemp = this->QEvaporator / this->EvapMassFlowRate / Cp;
@@ -7399,10 +7315,7 @@ namespace PlantChillers {
                                                          this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                     if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                         this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint;
                     } else if (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme ==
@@ -7417,10 +7330,7 @@ namespace PlantChillers {
                                                          this->EvapMassFlowRate,
                                                          this->EvapInletNodeNum,
                                                          this->EvapOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                     // No deltaT since component is not running
                     this->EvapOutletTemp = state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp;
                 }
@@ -7449,10 +7359,7 @@ namespace PlantChillers {
                                                  this->EvapMassFlowRate,
                                                  this->EvapInletNodeNum,
                                                  this->EvapOutletNodeNum,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
             //   Some other component set the flow to 0. No reason to continue with calculations.
             if (this->EvapMassFlowRate == 0.0) {
                 MyLoad = 0.0;

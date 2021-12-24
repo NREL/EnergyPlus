@@ -846,20 +846,14 @@ namespace ICEngineElectricGenerator {
                                                      mdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc.loopNum,
-                                                     this->HRPlantLoc.loopSideNum,
-                                                     this->HRPlantLoc.branchNum,
-                                                     this->HRPlantLoc.compNum);
+                                                     this->HRPlantLoc);
 
             } else {
                 PlantUtilities::SetComponentFlowRate(state,
                                                      this->HeatRecMdotActual,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc.loopNum,
-                                                     this->HRPlantLoc.loopSideNum,
-                                                     this->HRPlantLoc.branchNum,
-                                                     this->HRPlantLoc.compNum);
+                                                     this->HRPlantLoc);
             }
         }
     }

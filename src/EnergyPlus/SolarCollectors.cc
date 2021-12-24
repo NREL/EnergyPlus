@@ -1019,10 +1019,7 @@ namespace SolarCollectors {
                                              this->MassFlowRate,
                                              this->InletNode,
                                              this->OutletNode,
-                                             this->plantLoc.loopNum,
-                                             this->plantLoc.loopSideNum,
-                                             this->plantLoc.branchNum,
-                                             this->plantLoc.compNum);
+                                             this->plantLoc);
 
         if (this->InitICS) {
 

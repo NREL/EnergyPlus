@@ -2189,10 +2189,7 @@ namespace PlantPipingSystemsManager {
                                              thisCircuit->CurCircuitFlowRate,
                                              InletNodeNum,
                                              OutletNodeNum,
-                                             thisCircuit->plantLoc.loopNum,
-                                             thisCircuit->plantLoc.loopSideNum,
-                                             thisCircuit->plantLoc.branchNum,
-                                             thisCircuit->plantLoc.compNum);
+                                             thisCircuit->plantLoc);
     }
 
     void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit *thisCircuit)

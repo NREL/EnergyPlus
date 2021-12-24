@@ -2664,10 +2664,7 @@ namespace UserDefinedComponents {
                                              this->Loop(LoopNum).MassFlowRateRequest,
                                              this->Loop(LoopNum).InletNodeNum,
                                              this->Loop(LoopNum).OutletNodeNum,
-                                             this->Loop(LoopNum).plantLoc.loopNum,
-                                             this->Loop(LoopNum).plantLoc.loopSideNum,
-                                             this->Loop(LoopNum).plantLoc.branchNum,
-                                             this->Loop(LoopNum).plantLoc.compNum);
+                                             this->Loop(LoopNum).plantLoc);
 
         if (this->Air.OutletNodeNum > 0) {
             state.dataLoopNodes->Node(this->Air.OutletNodeNum).Temp = this->Air.OutletTemp;
@@ -2775,10 +2772,7 @@ namespace UserDefinedComponents {
                                                  this->Loop.MassFlowRateRequest,
                                                  this->Loop.InletNodeNum,
                                                  this->Loop.OutletNodeNum,
-                                                 this->Loop.plantLoc.loopNum,
-                                                 this->Loop.plantLoc.loopSideNum,
-                                                 this->Loop.plantLoc.branchNum,
-                                                 this->Loop.plantLoc.compNum);
+                                                 this->Loop.plantLoc);
             PlantUtilities::SafeCopyPlantNode(state, this->Loop.InletNodeNum, this->Loop.OutletNodeNum);
             // unload Actuators to node data structure
             state.dataLoopNodes->Node(this->Loop.OutletNodeNum).Temp = this->Loop.OutletTemp;
@@ -2830,10 +2824,7 @@ namespace UserDefinedComponents {
                                                      this->Loop(loop).MassFlowRateRequest,
                                                      this->Loop(loop).InletNodeNum,
                                                      this->Loop(loop).OutletNodeNum,
-                                                     this->Loop(loop).plantLoc.loopNum,
-                                                     this->Loop(loop).plantLoc.loopSideNum,
-                                                     this->Loop(loop).plantLoc.branchNum,
-                                                     this->Loop(loop).plantLoc.compNum);
+                                                     this->Loop(loop).plantLoc);
                 PlantUtilities::SafeCopyPlantNode(state, this->Loop(loop).InletNodeNum, this->Loop(loop).OutletNodeNum);
                 // unload Actuators to node data structure
                 state.dataLoopNodes->Node(this->Loop(loop).OutletNodeNum).Temp = this->Loop(loop).OutletTemp;
@@ -2882,10 +2873,7 @@ namespace UserDefinedComponents {
                                                      this->Loop(loop).MassFlowRateRequest,
                                                      this->Loop(loop).InletNodeNum,
                                                      this->Loop(loop).OutletNodeNum,
-                                                     this->Loop(loop).plantLoc.loopNum,
-                                                     this->Loop(loop).plantLoc.loopSideNum,
-                                                     this->Loop(loop).plantLoc.branchNum,
-                                                     this->Loop(loop).plantLoc.compNum);
+                                                     this->Loop(loop).plantLoc);
                 PlantUtilities::SafeCopyPlantNode(state, this->Loop(loop).InletNodeNum, this->Loop(loop).OutletNodeNum);
                 // unload Actuators to node data structure
                 state.dataLoopNodes->Node(this->Loop(loop).OutletNodeNum).Temp = this->Loop(loop).OutletTemp;

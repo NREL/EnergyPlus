@@ -3210,7 +3210,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     Tank.SetPointTemp = 55.0;
 
     // Source side is in the demand side of the plant loop
-    Tank.SrcSide.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
+    Tank.SrcSidePlantLoc.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
     Tank.SavedSourceOutletTemp = 60.0;
     rho = GetDensityGlycol(*state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
 

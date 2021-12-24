@@ -902,11 +902,17 @@ void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
         mdotGen = this->GenMassFlowRateMax;
     }
 
-    PlantUtilities::SetComponentFlowRate(
-        state, mdotEvap, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CWPlantLoc.branchNum, this->CWPlantLoc.compNum);
+    PlantUtilities::SetComponentFlowRate(        state,
+ mdotEvap,
+ this->EvapInletNodeNum,
+ this->EvapOutletNodeNum,
+ this->CWPlantLoc);
 
-    PlantUtilities::SetComponentFlowRate(
-        state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->CDPlantLoc.branchNum, this->CDPlantLoc.compNum);
+    PlantUtilities::SetComponentFlowRate(        state,
+ mdotCond,
+ this->CondInletNodeNum,
+ this->CondOutletNodeNum,
+ this->CDPlantLoc);
 
     if (this->GeneratorInletNodeNum > 0) {
 
@@ -914,10 +920,7 @@ void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
                                              mdotGen,
                                              this->GeneratorInletNodeNum,
                                              this->GeneratorOutletNodeNum,
-                                             this->GenPlantLoc.loopNum,
-                                             this->GenPlantLoc.loopSideNum,
-                                             this->GenPlantLoc.branchNum,
-                                             this->GenPlantLoc.compNum);
+                                             this->GenPlantLoc);
     }
 }
 
@@ -1537,10 +1540,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                      this->EvapMassFlowRate,
                                                      this->EvapInletNodeNum,
                                                      this->EvapOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
                 {
                     auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
@@ -1757,10 +1757,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                  GenMassFlowRate,
                                                  this->GeneratorInletNodeNum,
                                                  this->GeneratorOutletNodeNum,
-                                                 this->GenPlantLoc.loopNum,
-                                                 this->GenPlantLoc.loopSideNum,
-                                                 this->GenPlantLoc.branchNum,
-                                                 this->GenPlantLoc.compNum);
+                                                 this->GenPlantLoc);
 
             if (GenMassFlowRate <= 0.0) {
                 this->GenOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp;
@@ -1801,10 +1798,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
                                                  this->SteamMassFlowRate,
                                                  this->GeneratorInletNodeNum,
                                                  this->GeneratorOutletNodeNum,
-                                                 this->GenPlantLoc.loopNum,
-                                                 this->GenPlantLoc.loopSideNum,
-                                                 this->GenPlantLoc.branchNum,
-                                                 this->GenPlantLoc.compNum);
+                                                 this->GenPlantLoc);
 
             if (this->SteamMassFlowRate <= 0.0) {
                 this->GenOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp;

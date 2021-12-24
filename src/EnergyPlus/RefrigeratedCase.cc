@@ -10749,10 +10749,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("SimRefrigCondenser");
     int PlantInletNode(0);
     int PlantOutletNode(0);
-    int PlantLoopIndex(0);
-    DataPlant::LoopSideLocation PlantLoopSideIndex(DataPlant::LoopSideLocation::Invalid);
-    int PlantBranchIndex(0);
-    int PlantCompIndex(0);
+    PlantLocation PlantLoc{};
 
     InitRefrigerationPlantConnections(state);
 
@@ -10762,10 +10759,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
     // set variables depending upon system type
     PlantInletNode = this->InletNode;
     PlantOutletNode = this->OutletNode;
-    PlantLoopIndex = this->plantLoc.loopNum;
-    PlantLoopSideIndex = this->plantLoc.loopSideNum;
-    PlantBranchIndex = this->plantLoc.branchNum;
-    PlantCompIndex = this->plantLoc.compNum;
+    PlantLoc = this->plantLoc;
 
     state.dataRefrigCase->TotalCondenserHeat = this->CondLoad;
     TypeName = "Refrigeration:Condenser:WaterCooled";
@@ -10776,14 +10770,14 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
 
     // get cooling fluid properties
     Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(PlantLoopIndex).FluidName,
+                                                   state.dataPlnt->PlantLoop(PlantLoc.loopNum).FluidName,
                                                    this->InletTemp,
-                                                   state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(PlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(PlantLoopIndex).FluidName,
+                                                       state.dataPlnt->PlantLoop(PlantLoc.loopNum).FluidName,
                                                        this->InletTemp,
-                                                       state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(PlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
     if (this->FlowType == CndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
@@ -10830,7 +10824,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
     } // on flow type
     // check against plant, might get changed.
     PlantUtilities::SetComponentFlowRate(
-        state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
+        state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoc);
 
     this->VolFlowRate = this->MassFlowRate / rho;
 
@@ -10914,10 +10908,7 @@ void RefrigRackData::simulate(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("SimRefrigCondenser");
     int PlantInletNode(0);
     int PlantOutletNode(0);
-    int PlantLoopIndex(0);
-    DataPlant::LoopSideLocation PlantLoopSideIndex(DataPlant::LoopSideLocation::Invalid);
-    int PlantBranchIndex(0);
-    int PlantCompIndex(0);
+    PlantLocation PlantLoc{};
 
     InitRefrigerationPlantConnections(state);
 
@@ -10927,10 +10918,7 @@ void RefrigRackData::simulate(EnergyPlusData &state,
     // set variables depending upon system type
     PlantInletNode = this->InletNode;
     PlantOutletNode = this->OutletNode;
-    PlantLoopIndex = this->plantLoc.loopNum;
-    PlantLoopSideIndex = this->plantLoc.loopSideNum;
-    PlantBranchIndex = this->plantLoc.branchNum;
-    PlantCompIndex = this->plantLoc.compNum;
+    PlantLoc = this->plantLoc;
 
     state.dataRefrigCase->TotalCondenserHeat =
         state.dataHeatBal->HeatReclaimRefrigeratedRack(this->MyIdx).AvailCapacity - this->LaggedUsedWaterHeater - this->LaggedUsedHVACCoil;
@@ -10942,14 +10930,14 @@ void RefrigRackData::simulate(EnergyPlusData &state,
 
     // get cooling fluid properties
     Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(PlantLoopIndex).FluidName,
+                                                   state.dataPlnt->PlantLoop(PlantLoc.loopNum).FluidName,
                                                    this->InletTemp,
-                                                   state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(PlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(PlantLoopIndex).FluidName,
+                                                       state.dataPlnt->PlantLoop(PlantLoc.loopNum).FluidName,
                                                        this->InletTemp,
-                                                       state.dataPlnt->PlantLoop(PlantLoopIndex).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(PlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
     if (this->FlowType == CndsrFlowType::VariableFlow && state.dataRefrigCase->TotalCondenserHeat > 0.0) {
@@ -10995,7 +10983,7 @@ void RefrigRackData::simulate(EnergyPlusData &state,
     } // on flow type
     // check against plant, might get changed.
     PlantUtilities::SetComponentFlowRate(
-        state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoopIndex, PlantLoopSideIndex, PlantBranchIndex, PlantCompIndex);
+        state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoc);
 
     this->VolFlowRate = this->MassFlowRate / rho;
 
@@ -15660,10 +15648,7 @@ void ZeroHVACValues(EnergyPlusData &state)
                                                      MassFlowRate,
                                                      RefrigRack(RackNum).InletNode,
                                                      RefrigRack(RackNum).OutletNode,
-                                                     RefrigRack(RackNum).plantLoc.loopNum,
-                                                     RefrigRack(RackNum).plantLoc.loopSideNum,
-                                                     RefrigRack(RackNum).plantLoc.branchNum,
-                                                     RefrigRack(RackNum).plantLoc.compNum);
+                                                     RefrigRack(RackNum).plantLoc);
             }
             if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if (RefrigRack(RackNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
@@ -15684,10 +15669,7 @@ void ZeroHVACValues(EnergyPlusData &state)
                                                      MassFlowRate,
                                                      Condenser(CondID).InletNode,
                                                      Condenser(CondID).OutletNode,
-                                                     Condenser(CondID).plantLoc.loopNum,
-                                                     Condenser(CondID).plantLoc.loopSideNum,
-                                                     Condenser(CondID).plantLoc.branchNum,
-                                                     Condenser(CondID).plantLoc.compNum);
+                                                     Condenser(CondID).plantLoc);
             }
             if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if (Condenser(CondID).EvapWaterSupplyMode == WaterSupply::FromTank) {

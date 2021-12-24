@@ -2125,10 +2125,7 @@ namespace CondenserLoopTowers {
                                              this->WaterMassFlowRate,
                                              this->WaterInletNodeNum,
                                              this->WaterOutletNodeNum,
-                                             this->plantLoc.loopNum,
-                                             this->plantLoc.loopSideNum,
-                                             this->plantLoc.branchNum,
-                                             this->plantLoc.compNum);
+                                             this->plantLoc);
 
         // Added for fluid bypass. 8/2008
         this->BypassFraction = 0.0;

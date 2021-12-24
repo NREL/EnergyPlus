@@ -307,8 +307,11 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     }
 
     // get actual mass flow to use, hold in MassFlowRate variable
-    PlantUtilities::SetComponentFlowRate(
-        state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+    PlantUtilities::SetComponentFlowRate(        state,
+ TempPlantMassFlow,
+ this->InletNodeNum,
+ this->OutletNodeNum,
+ this->plantLoc);
 
     this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
     this->MassFlowRate = TempPlantMassFlow;

@@ -837,10 +837,7 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
                                          this->WaterMassFlowRate,
                                          this->WaterInletNodeNum,
                                          this->WaterOutletNodeNum,
-                                         this->plantLoc.loopNum,
-                                         this->plantLoc.loopSideNum,
-                                         this->plantLoc.branchNum,
-                                         this->plantLoc.compNum);
+                                         this->plantLoc);
 }
 
 void FluidCoolerspecs::size(EnergyPlusData &state)

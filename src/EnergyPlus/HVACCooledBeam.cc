@@ -954,19 +954,13 @@ namespace HVACCooledBeam {
                              MaxColdWaterFlow,
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
-                             CoolBeam(CBNum).CWPlantLoc.loopNum,
-                             CoolBeam(CBNum).CWPlantLoc.loopSideNum,
-                             CoolBeam(CBNum).CWPlantLoc.branchNum,
-                             CoolBeam(CBNum).CWPlantLoc.compNum);
+                             CoolBeam(CBNum).CWPlantLoc);
         MinColdWaterFlow = 0.0;
         SetComponentFlowRate(state,
                              MinColdWaterFlow,
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
-                             CoolBeam(CBNum).CWPlantLoc.loopNum,
-                             CoolBeam(CBNum).CWPlantLoc.loopSideNum,
-                             CoolBeam(CBNum).CWPlantLoc.branchNum,
-                             CoolBeam(CBNum).CWPlantLoc.compNum);
+                             CoolBeam(CBNum).CWPlantLoc);
 
         if (GetCurrentScheduleValue(state, CoolBeam(CBNum).SchedPtr) <= 0.0) UnitOn = false;
         if (MaxColdWaterFlow <= SmallMassFlow) UnitOn = false;
@@ -1098,10 +1092,7 @@ namespace HVACCooledBeam {
                              mdot,
                              CoolBeam(CBNum).CWInNode,
                              CoolBeam(CBNum).CWOutNode,
-                             CoolBeam(CBNum).CWPlantLoc.loopNum,
-                             CoolBeam(CBNum).CWPlantLoc.loopSideNum,
-                             CoolBeam(CBNum).CWPlantLoc.branchNum,
-                             CoolBeam(CBNum).CWPlantLoc.compNum);
+                             CoolBeam(CBNum).CWPlantLoc);
 
         CWFlowPerBeam = mdot / CoolBeam(CBNum).NumBeams;
         TWIn = CoolBeam(CBNum).TWIn;

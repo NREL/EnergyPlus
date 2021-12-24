@@ -1055,8 +1055,11 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
         ((this->InHeatingMode) || (this->InCoolingMode))) { // combining oneTimeInit and plantScanInit could cause a diff here
         mdot = this->DesCondMassFlowRate;
 
-        PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->CDPlantLoc.branchNum, this->CDPlantLoc.compNum);
+        PlantUtilities::SetComponentFlowRate(            state,
+ mdot,
+ this->CondReturnNodeNum,
+ this->CondSupplyNodeNum,
+ this->CDPlantLoc);
 
     } else {
         mdot = 0.0;
@@ -1065,10 +1068,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
                                                  mdot,
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
         }
     }
 }
@@ -1612,10 +1612,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                  lCondWaterMassFlowRate,
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
         }
         lFractionOfPeriodRunning = min(1.0, max(lHeatPartLoadRatio, lCoolPartLoadRatio) / lMinPartLoadRat);
 
@@ -1641,10 +1638,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                  lCondWaterMassFlowRate,
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
-                                                 this->CDPlantLoc.loopNum,
-                                                 this->CDPlantLoc.loopSideNum,
-                                                 this->CDPlantLoc.branchNum,
-                                                 this->CDPlantLoc.compNum);
+                                                 this->CDPlantLoc);
         } else {
             // air cooled
             state.dataLoopNodes->Node(lCondReturnNodeNum).Temp = state.dataLoopNodes->Node(lCondReturnNodeNum).OutAirDryBulb;
@@ -1656,10 +1650,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                      lCondWaterMassFlowRate,
                                                      this->CondReturnNodeNum,
                                                      this->CondSupplyNodeNum,
-                                                     this->CDPlantLoc.loopNum,
-                                                     this->CDPlantLoc.loopSideNum,
-                                                     this->CDPlantLoc.branchNum,
-                                                     this->CDPlantLoc.compNum);
+                                                     this->CDPlantLoc);
             }
         }
 
@@ -1693,10 +1684,7 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                          lChillWaterMassFlowRate,
                                                          this->ChillReturnNodeNum,
                                                          this->ChillSupplyNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
                 } else {
                     lChillWaterMassFlowRate = 0.0;
                     ShowRecurringWarningErrorAtEnd(state,
@@ -2038,10 +2026,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
                                                          lHotWaterMassFlowRate,
                                                          this->HeatReturnNodeNum,
                                                          this->HeatSupplyNodeNum,
-                                                         this->HWPlantLoc.loopNum,
-                                                         this->HWPlantLoc.loopSideNum,
-                                                         this->HWPlantLoc.branchNum,
-                                                         this->HWPlantLoc.compNum);
+                                                         this->HWPlantLoc);
 
                 } else {
                     lHotWaterMassFlowRate = 0.0;

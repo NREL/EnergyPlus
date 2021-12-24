@@ -1043,8 +1043,11 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
     if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode))) {
         mdot = this->DesCondMassFlowRate;
 
-        PlantUtilities::SetComponentFlowRate(
-            state, mdot, this->CondReturnNodeNum, this->CondSupplyNodeNum, this->CDplantLoc.loopNum, this->CDplantLoc.loopSideNum, this->CDplantLoc.branchNum, this->CDplantLoc.compNum);
+        PlantUtilities::SetComponentFlowRate(            state,
+ mdot,
+ this->CondReturnNodeNum,
+ this->CondSupplyNodeNum,
+ this->CDplantLoc);
 
     } else {
         mdot = 0.0;
@@ -1053,10 +1056,7 @@ void GasAbsorberSpecs::initialize(EnergyPlusData &state)
                                                  mdot,
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
-                                                 this->CDplantLoc.loopNum,
-                                                 this->CDplantLoc.loopSideNum,
-                                                 this->CDplantLoc.branchNum,
-                                                 this->CDplantLoc.compNum);
+                                                 this->CDplantLoc);
         }
     }
 }
@@ -1573,10 +1573,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                  lCondWaterMassFlowRate,
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
-                                                 this->CDplantLoc.loopNum,
-                                                 this->CDplantLoc.loopSideNum,
-                                                 this->CDplantLoc.branchNum,
-                                                 this->CDplantLoc.compNum);
+                                                 this->CDplantLoc);
         }
         // Commenting this could cause diffs - ChillDeltaTemp = 0.0;
         lFractionOfPeriodRunning = min(1.0, max(lHeatPartLoadRatio, lCoolPartLoadRatio) / lMinPartLoadRat);
@@ -1602,10 +1599,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                  lCondWaterMassFlowRate,
                                                  this->CondReturnNodeNum,
                                                  this->CondSupplyNodeNum,
-                                                 this->CDplantLoc.loopNum,
-                                                 this->CDplantLoc.loopSideNum,
-                                                 this->CDplantLoc.branchNum,
-                                                 this->CDplantLoc.compNum);
+                                                 this->CDplantLoc);
         } else {
             // air cooled
             state.dataLoopNodes->Node(lCondReturnNodeNum).Temp = state.dataLoopNodes->Node(lCondReturnNodeNum).OutAirDryBulb;
@@ -1617,10 +1611,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                      lCondWaterMassFlowRate,
                                                      this->CondReturnNodeNum,
                                                      this->CondSupplyNodeNum,
-                                                     this->CDplantLoc.loopNum,
-                                                     this->CDplantLoc.loopSideNum,
-                                                     this->CDplantLoc.branchNum,
-                                                     this->CDplantLoc.compNum);
+                                                     this->CDplantLoc);
             }
         }
 
@@ -1654,10 +1645,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
                                                          lChillWaterMassFlowRate,
                                                          this->ChillReturnNodeNum,
                                                          this->ChillSupplyNodeNum,
-                                                         this->CWplantLoc.loopNum,
-                                                         this->CWplantLoc.loopSideNum,
-                                                         this->CWplantLoc.branchNum,
-                                                         this->CWplantLoc.compNum);
+                                                         this->CWplantLoc);
                     // Commenting this could cause diffs - lChillSupplyTemp = ChillSupplySetPointTemp;
                 } else {
                     lChillWaterMassFlowRate = 0.0;
@@ -1941,10 +1929,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
                                                          lHotWaterMassFlowRate,
                                                          this->HeatReturnNodeNum,
                                                          this->HeatSupplyNodeNum,
-                                                         this->HWplantLoc.loopNum,
-                                                         this->HWplantLoc.loopSideNum,
-                                                         this->HWplantLoc.branchNum,
-                                                         this->HWplantLoc.compNum);
+                                                         this->HWplantLoc);
 
                 } else {
                     lHotWaterMassFlowRate = 0.0;

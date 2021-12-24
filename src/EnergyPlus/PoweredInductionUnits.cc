@@ -1948,10 +1948,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                                  mdot,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopSideNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.branchNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.compNum);
+                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
 
             SimulateWaterCoilComponents(
                 state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
@@ -2272,10 +2269,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                                  mdot,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopSideNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.branchNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.compNum);
+                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
             SimulateWaterCoilComponents(
                 state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
         } else {

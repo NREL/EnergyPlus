@@ -2694,10 +2694,7 @@ namespace HVACMultiSpeedHeatPump {
                                  MdotHR,
                                  MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum,
                                  MSHeatPump(MSHeatPumpNum).HeatRecOutletNodeNum,
-                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum,
-                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopSideNum,
-                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc.branchNum,
-                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc.compNum);
+                                 MSHeatPump(MSHeatPumpNum).HRPlantLoc);
         }
 
         // get operating capacity of water and steam coil
@@ -2710,10 +2707,7 @@ namespace HVACMultiSpeedHeatPump {
                                      mdot,
                                      MSHeatPump(MSHeatPumpNum).CoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).CoilOutletNode,
-                                     MSHeatPump(MSHeatPumpNum).plantLoc.loopNum,
-                                     MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum,
-                                     MSHeatPump(MSHeatPumpNum).plantLoc.branchNum,
-                                     MSHeatPump(MSHeatPumpNum).plantLoc.compNum);
+                                     MSHeatPump(MSHeatPumpNum).plantLoc);
                 //     simulate water coil to find operating capacity
                 SimulateWaterCoilComponents(
                     state, MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).HeatCoilNum, QActual);
@@ -2728,10 +2722,7 @@ namespace HVACMultiSpeedHeatPump {
                                      mdot,
                                      MSHeatPump(MSHeatPumpNum).CoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).CoilOutletNode,
-                                     MSHeatPump(MSHeatPumpNum).plantLoc.loopNum,
-                                     MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum,
-                                     MSHeatPump(MSHeatPumpNum).plantLoc.branchNum,
-                                     MSHeatPump(MSHeatPumpNum).plantLoc.compNum);
+                                     MSHeatPump(MSHeatPumpNum).plantLoc);
 
                 //     simulate steam coil to find operating capacity
                 SimulateSteamCoilComponents(state,
@@ -2750,10 +2741,7 @@ namespace HVACMultiSpeedHeatPump {
                                      mdot,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
-                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum);
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc);
                 //     simulate water coil to find operating capacity
                 SimulateWaterCoilComponents(
                     state, MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum, QActual);
@@ -2770,10 +2758,7 @@ namespace HVACMultiSpeedHeatPump {
                                      mdot,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilControlNode,
                                      MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode,
-                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum,
-                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum);
+                                     MSHeatPump(MSHeatPumpNum).SuppPlantLoc);
 
                 //     simulate steam coil to find operating capacity
                 SimulateSteamCoilComponents(state,
@@ -4672,10 +4657,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 SteamCoilHeatingLoad;
         int CoilControlNode;
         int CoilOutletNode;
-        int LoopNum;
-        DataPlant::LoopSideLocation LoopSide;
-        int BranchNum;
-        int CompNum;
+        PlantLocation plantLoc{};
 
         QCoilActual = 0.0;
 
@@ -4688,10 +4670,7 @@ namespace HVACMultiSpeedHeatPump {
             MaxCoilFluidFlow = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
             CoilControlNode = MSHeatPump(MSHeatPumpNum).CoilControlNode;
             CoilOutletNode = MSHeatPump(MSHeatPumpNum).CoilOutletNode;
-            LoopNum = MSHeatPump(MSHeatPumpNum).plantLoc.loopNum;
-            LoopSide = MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum;
-            BranchNum = MSHeatPump(MSHeatPumpNum).plantLoc.branchNum;
-            CompNum = MSHeatPump(MSHeatPumpNum).plantLoc.compNum;
+            plantLoc = MSHeatPump(MSHeatPumpNum).plantLoc;
         } else {
             HeatCoilType = MSHeatPump(MSHeatPumpNum).SuppHeatCoilType;
             state.dataHVACMultiSpdHP->HeatCoilName = MSHeatPump(MSHeatPumpNum).SuppHeatCoilName;
@@ -4699,16 +4678,10 @@ namespace HVACMultiSpeedHeatPump {
             MaxCoilFluidFlow = MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow;
             CoilControlNode = MSHeatPump(MSHeatPumpNum).SuppCoilControlNode;
             CoilOutletNode = MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode;
-            LoopNum = MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum;
-            LoopSide = MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum;
-            BranchNum = MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum;
-            CompNum = MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum;
+            plantLoc = MSHeatPump(MSHeatPumpNum).SuppPlantLoc;
         }
 
-        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.loopNum = LoopNum;
-        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.loopSideNum = LoopSide;
-        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.branchNum = BranchNum;
-        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.compNum = CompNum;
+        MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc = plantLoc;
         MSHeatPump(MSHeatPumpNum).HotWaterCoilControlNode = CoilControlNode;
         MSHeatPump(MSHeatPumpNum).HotWaterCoilOutletNode = CoilOutletNode;
         MSHeatPump(MSHeatPumpNum).HotWaterCoilName = state.dataHVACMultiSpdHP->HeatCoilName;
@@ -4724,12 +4697,12 @@ namespace HVACMultiSpeedHeatPump {
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     if (present(PartLoadFrac)) {
                         MaxHotWaterFlow = MaxCoilFluidFlow * PartLoadFrac;
-                        SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                        SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
                         SimulateWaterCoilComponents(
                             state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                     } else {
                         MaxHotWaterFlow = MaxCoilFluidFlow;
-                        SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                        SetComponentFlowRate(state, MaxHotWaterFlow, CoilControlNode, CoilOutletNode, plantLoc);
                         SimulateWaterCoilComponents(
                             state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                         if (QCoilActual > (HeatingLoad + SmallLoad)) {
@@ -4794,7 +4767,7 @@ namespace HVACMultiSpeedHeatPump {
                         mdot = MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow;
                         SteamCoilHeatingLoad = HeatingLoad;
                     }
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
                     // simulate steam supplemental heating coil
                     SimulateSteamCoilComponents(
                         state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, SteamCoilHeatingLoad, QCoilActual, FanMode);
@@ -4810,11 +4783,11 @@ namespace HVACMultiSpeedHeatPump {
                         state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     mdot = 0.0;
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
                     SimulateWaterCoilComponents(state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                     mdot = 0.0;
-                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
+                    SetComponentFlowRate(state, mdot, CoilControlNode, CoilOutletNode, plantLoc);
                     // simulate the steam supplemental heating coil
                     SimulateSteamCoilComponents(
                         state, state.dataHVACMultiSpdHP->HeatCoilName, FirstHVACIteration, HeatCoilNum, HeatingLoad, QCoilActual, FanMode);
@@ -4883,10 +4856,7 @@ namespace HVACMultiSpeedHeatPump {
                              mdot,
                              state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilControlNode,
                              state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilOutletNode,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.loopNum,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.loopSideNum,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.branchNum,
-                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc.compNum);
+                             state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterPlantLoc);
         // simulate the hot water supplemental heating coil
         SimulateWaterCoilComponents(state,
                                     state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HotWaterCoilName,

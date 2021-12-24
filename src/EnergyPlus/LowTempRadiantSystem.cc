@@ -2488,10 +2488,7 @@ namespace LowTempRadiantSystem {
                                          mdot,
                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode,
                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode,
-                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum,
-                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopSideNum,
-                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.branchNum,
-                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.compNum);
+                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc);
                 }
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingSystem) {
                     mdot = 0.0;
@@ -2499,10 +2496,7 @@ namespace LowTempRadiantSystem {
                                          mdot,
                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode,
                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode,
-                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum,
-                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopSideNum,
-                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.branchNum,
-                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.compNum);
+                                         state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc);
                 }
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).OperatingMode != NotOperating && FirstHVACIteration)
                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).updateOperatingModeHistory(state);
@@ -2531,10 +2525,7 @@ namespace LowTempRadiantSystem {
                                              state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterMassFlowRate,
                                              state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode,
                                              state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode,
-                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum,
-                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopSideNum,
-                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.branchNum,
-                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.compNum);
+                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc);
                 }
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).CoolingSystem) {
                     if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).VolFlowSchedPtr > 0) {
@@ -2556,10 +2547,7 @@ namespace LowTempRadiantSystem {
                                              state.dataLowTempRadSys->CFloRadSys(RadSysNum).ChWaterMassFlowRate,
                                              state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode,
                                              state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode,
-                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum,
-                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopSideNum,
-                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.branchNum,
-                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.compNum);
+                                             state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc);
                 }
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).OperatingMode != NotOperating && FirstHVACIteration)
                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).updateOperatingModeHistory(state);
@@ -3603,8 +3591,11 @@ namespace LowTempRadiantSystem {
             }
             if (this->HeatingSystem) {
                 mdot = 0.0;
-                SetComponentFlowRate(
-                    state, mdot, this->HotWaterInNode, this->HotWaterOutNode, this->HWplantLoc.loopNum, this->HWplantLoc.loopSideNum, this->HWplantLoc.branchNum, this->HWplantLoc.compNum);
+                SetComponentFlowRate(                    state,
+ mdot,
+ this->HotWaterInNode,
+ this->HotWaterOutNode,
+ this->HWplantLoc);
             }
             if (this->CoolingSystem) {
                 mdot = 0.0;
@@ -3612,10 +3603,7 @@ namespace LowTempRadiantSystem {
                                      mdot,
                                      this->ColdWaterInNode,
                                      this->ColdWaterOutNode,
-                                     this->CWPlantLoc.loopNum,
-                                     this->CWPlantLoc.loopSideNum,
-                                     this->CWPlantLoc.branchNum,
-                                     this->CWPlantLoc.compNum);
+                                     this->CWPlantLoc);
             }
         } else { // Unit might be on-->this section is intended to control the water mass flow rate being
             // sent to the radiant system
@@ -3684,10 +3672,7 @@ namespace LowTempRadiantSystem {
                                          ActWaterFlow,
                                          this->HotWaterInNode,
                                          this->HotWaterOutNode,
-                                         this->HWplantLoc.loopNum,
-                                         this->HWplantLoc.loopSideNum,
-                                         this->HWplantLoc.branchNum,
-                                         this->HWplantLoc.compNum);
+                                         this->HWplantLoc);
                 } else { // not heating system
                     SysRunning = false;
                 }
@@ -3697,10 +3682,7 @@ namespace LowTempRadiantSystem {
                                          ActWaterFlow,
                                          this->ColdWaterInNode,
                                          this->ColdWaterOutNode,
-                                         this->CWPlantLoc.loopNum,
-                                         this->CWPlantLoc.loopSideNum,
-                                         this->CWPlantLoc.branchNum,
-                                         this->CWPlantLoc.compNum);
+                                         this->CWPlantLoc);
                 } else { // not cooling system
                     SysRunning = false;
                 }
@@ -3947,20 +3929,14 @@ namespace LowTempRadiantSystem {
                                              WaterMassFlow,
                                              this->HotWaterInNode,
                                              this->HotWaterOutNode,
-                                             this->HWplantLoc.loopNum,
-                                             this->HWplantLoc.loopSideNum,
-                                             this->HWplantLoc.branchNum,
-                                             this->HWplantLoc.compNum);
+                                             this->HWplantLoc);
 
                     } else if (this->OperatingMode == CoolingMode) {
                         SetComponentFlowRate(state,
                                              WaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
-                                             this->CWPlantLoc.loopNum,
-                                             this->CWPlantLoc.loopSideNum,
-                                             this->CWPlantLoc.branchNum,
-                                             this->CWPlantLoc.compNum);
+                                             this->CWPlantLoc);
                     }
                     this->WaterMassFlowRate = WaterMassFlow;
                     this->OperatingMode = NotOperating;
@@ -3996,10 +3972,7 @@ namespace LowTempRadiantSystem {
                                              WaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
-                                             this->CWPlantLoc.loopNum,
-                                             this->CWPlantLoc.loopSideNum,
-                                             this->CWPlantLoc.branchNum,
-                                             this->CWPlantLoc.compNum);
+                                             this->CWPlantLoc);
                         this->WaterMassFlowRate = WaterMassFlow;
                         for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                             SurfNum2 = this->SurfacePtr(RadSurfNum3);
@@ -4077,10 +4050,7 @@ namespace LowTempRadiantSystem {
                                          WaterMassFlow,
                                          this->ColdWaterInNode,
                                          this->ColdWaterOutNode,
-                                         this->CWPlantLoc.loopNum,
-                                         this->CWPlantLoc.loopSideNum,
-                                         this->CWPlantLoc.branchNum,
-                                         this->CWPlantLoc.compNum);
+                                         this->CWPlantLoc);
                     this->WaterMassFlowRate = WaterMassFlow;
                     for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                         SurfNum2 = this->SurfacePtr(RadSurfNum3);
@@ -4114,10 +4084,7 @@ namespace LowTempRadiantSystem {
                                              SysWaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
-                                             this->CWPlantLoc.loopNum,
-                                             this->CWPlantLoc.loopSideNum,
-                                             this->CWPlantLoc.branchNum,
-                                             this->CWPlantLoc.compNum);
+                                             this->CWPlantLoc);
                         this->WaterMassFlowRate = SysWaterMassFlow;
 
                         // Go through all of the surfaces again with the new flow rate...
@@ -4177,10 +4144,7 @@ namespace LowTempRadiantSystem {
                                                      WaterMassFlow,
                                                      this->ColdWaterInNode,
                                                      this->ColdWaterOutNode,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
                                 this->WaterMassFlowRate = WaterMassFlow;
                                 for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                                     SurfNum2 = this->SurfacePtr(RadSurfNum3);
@@ -4460,15 +4424,15 @@ namespace LowTempRadiantSystem {
                                      mdot,
                                      this->ColdWaterInNode,
                                      this->ColdWaterOutNode,
-                                     this->CWPlantLoc.loopNum,
-                                     this->CWPlantLoc.loopSideNum,
-                                     this->CWPlantLoc.branchNum,
-                                     this->CWPlantLoc.compNum);
+                                     this->CWPlantLoc);
             }
             if (this->HWplantLoc.loopNum > 0) {
                 mdot = 0.0;
-                SetComponentFlowRate(
-                    state, mdot, this->HotWaterInNode, this->HotWaterOutNode, this->HWplantLoc.loopNum, this->HWplantLoc.loopSideNum, this->HWplantLoc.branchNum, this->HWplantLoc.compNum);
+                SetComponentFlowRate(                    state,
+ mdot,
+ this->HotWaterInNode,
+ this->HotWaterOutNode,
+ this->HWplantLoc);
             }
         } else { // (SysRunning) so simulate the system...
 
@@ -4502,10 +4466,7 @@ namespace LowTempRadiantSystem {
                                          mdot,
                                          this->ColdWaterInNode,
                                          this->ColdWaterOutNode,
-                                         this->CWPlantLoc.loopNum,
-                                         this->CWPlantLoc.loopSideNum,
-                                         this->CWPlantLoc.branchNum,
-                                         this->CWPlantLoc.compNum);
+                                         this->CWPlantLoc);
                 }
                 LoopInNode = this->HotWaterInNode;
                 SysWaterInTemp = Node(LoopInNode).Temp;
@@ -4614,10 +4575,7 @@ namespace LowTempRadiantSystem {
                                          mdot,
                                          this->HotWaterInNode,
                                          this->HotWaterOutNode,
-                                         this->HWplantLoc.loopNum,
-                                         this->HWplantLoc.loopSideNum,
-                                         this->HWplantLoc.branchNum,
-                                         this->HWplantLoc.compNum);
+                                         this->HWplantLoc);
                 }
                 LoopInNode = this->ColdWaterInNode;
                 SysWaterInTemp = Node(LoopInNode).Temp;
@@ -5105,19 +5063,13 @@ namespace LowTempRadiantSystem {
                                              WaterMassFlow,
                                              this->HotWaterInNode,
                                              this->HotWaterOutNode,
-                                             this->HWplantLoc.loopNum,
-                                             this->HWplantLoc.loopSideNum,
-                                             this->HWplantLoc.branchNum,
-                                             this->HWplantLoc.compNum);
+                                             this->HWplantLoc);
                     } else if (this->OperatingMode == CoolingMode) {
                         SetComponentFlowRate(state,
                                              WaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
-                                             this->CWPlantLoc.loopNum,
-                                             this->CWPlantLoc.loopSideNum,
-                                             this->CWPlantLoc.branchNum,
-                                             this->CWPlantLoc.compNum);
+                                             this->CWPlantLoc);
                     }
                     this->WaterMassFlowRate = WaterMassFlow;
                     this->OperatingMode = NotOperating;
@@ -5151,10 +5103,7 @@ namespace LowTempRadiantSystem {
                                              WaterMassFlow,
                                              this->ColdWaterInNode,
                                              this->ColdWaterOutNode,
-                                             this->CWPlantLoc.loopNum,
-                                             this->CWPlantLoc.loopSideNum,
-                                             this->CWPlantLoc.branchNum,
-                                             this->CWPlantLoc.compNum);
+                                             this->CWPlantLoc);
                         this->WaterMassFlowRate = WaterMassFlow;
                         for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                             SurfNum2 = this->SurfacePtr(RadSurfNum3);
@@ -5221,10 +5170,7 @@ namespace LowTempRadiantSystem {
                                                  WaterMassFlow,
                                                  this->ColdWaterInNode,
                                                  this->ColdWaterOutNode,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
                             this->WaterMassFlowRate = WaterMassFlow;
                             for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                                 SurfNum2 = this->SurfacePtr(RadSurfNum3);

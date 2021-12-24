@@ -693,10 +693,7 @@ namespace BoilerSteam {
                                                  this->BoilerMassFlowRate,
                                                  this->BoilerInletNodeNum,
                                                  this->BoilerOutletNodeNum,
-                                                 this->plantLoc.loopNum,
-                                                 this->plantLoc.loopSideNum,
-                                                 this->plantLoc.branchNum,
-                                                 this->plantLoc.compNum);
+                                                 this->plantLoc);
 
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
@@ -775,10 +772,7 @@ namespace BoilerSteam {
                                                      this->BoilerMassFlowRate,
                                                      this->BoilerInletNodeNum,
                                                      this->BoilerOutletNodeNum,
-                                                     this->plantLoc.loopNum,
-                                                     this->plantLoc.loopSideNum,
-                                                     this->plantLoc.branchNum,
-                                                     this->plantLoc.compNum);
+                                                     this->plantLoc);
             }
 
             // Checks Boiler Load on the basis of the machine limits.
@@ -798,10 +792,7 @@ namespace BoilerSteam {
                                                          this->BoilerMassFlowRate,
                                                          this->BoilerInletNodeNum,
                                                          this->BoilerOutletNodeNum,
-                                                         this->plantLoc.loopNum,
-                                                         this->plantLoc.loopSideNum,
-                                                         this->plantLoc.branchNum,
-                                                         this->plantLoc.compNum);
+                                                         this->plantLoc);
                 } else {
                     this->BoilerLoad = 0.0;
                     this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;

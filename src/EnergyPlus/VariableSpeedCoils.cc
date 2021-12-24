@@ -4337,10 +4337,7 @@ namespace VariableSpeedCoils {
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate,
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum,
                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterOutletNodeNum,
-                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.loopNum,
-                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.loopSideNum,
-                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.branchNum,
-                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc.compNum);
+                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).plantLoc);
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletWaterEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;

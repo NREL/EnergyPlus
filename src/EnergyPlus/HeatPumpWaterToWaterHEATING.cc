@@ -594,19 +594,13 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                              this->LoadSideWaterMassFlowRate,
                              this->LoadSideInletNodeNum,
                              this->LoadSideOutletNodeNum,
-                             this->LoadPlantLoc.loopNum,
-                             this->LoadPlantLoc.loopSideNum,
-                             this->LoadPlantLoc.branchNum,
-                             this->LoadPlantLoc.compNum);
+                             this->LoadPlantLoc);
         this->SourceSideWaterMassFlowRate = 0.0;
         SetComponentFlowRate(state,
                              this->SourceSideWaterMassFlowRate,
                              this->SourceSideInletNodeNum,
                              this->SourceSideOutletNodeNum,
-                             this->SourcePlantLoc.loopNum,
-                             this->SourcePlantLoc.loopSideNum,
-                             this->SourcePlantLoc.branchNum,
-                             this->SourcePlantLoc.compNum);
+                             this->SourcePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadPlantLoc.loopNum,
                                                     this->LoadPlantLoc.loopSideNum,
@@ -628,20 +622,14 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                              this->LoadSideWaterMassFlowRate,
                              this->LoadSideInletNodeNum,
                              this->LoadSideOutletNodeNum,
-                             this->LoadPlantLoc.loopNum,
-                             this->LoadPlantLoc.loopSideNum,
-                             this->LoadPlantLoc.branchNum,
-                             this->LoadPlantLoc.compNum);
+                             this->LoadPlantLoc);
 
         this->SourceSideWaterMassFlowRate = this->SourceSideDesignMassFlow;
         SetComponentFlowRate(state,
                              this->SourceSideWaterMassFlowRate,
                              this->SourceSideInletNodeNum,
                              this->SourceSideOutletNodeNum,
-                             this->SourcePlantLoc.loopNum,
-                             this->SourcePlantLoc.loopSideNum,
-                             this->SourcePlantLoc.branchNum,
-                             this->SourcePlantLoc.compNum);
+                             this->SourcePlantLoc);
         // if there's no flow, turn the "heat pump off"
         if (this->LoadSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance ||
             this->SourceSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -650,19 +638,13 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                  this->LoadSideWaterMassFlowRate,
                                  this->LoadSideInletNodeNum,
                                  this->LoadSideOutletNodeNum,
-                                 this->LoadPlantLoc.loopNum,
-                                 this->LoadPlantLoc.loopSideNum,
-                                 this->LoadPlantLoc.branchNum,
-                                 this->LoadPlantLoc.compNum);
+                                 this->LoadPlantLoc);
             this->SourceSideWaterMassFlowRate = 0.0;
             SetComponentFlowRate(state,
                                  this->SourceSideWaterMassFlowRate,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
-                                 this->SourcePlantLoc.loopNum,
-                                 this->SourcePlantLoc.loopSideNum,
-                                 this->SourcePlantLoc.branchNum,
-                                 this->SourcePlantLoc.compNum);
+                                 this->SourcePlantLoc);
             PlantUtilities::PullCompInterconnectTrigger(state,
                                                         this->LoadPlantLoc.loopNum,
                                                         this->LoadPlantLoc.loopSideNum,

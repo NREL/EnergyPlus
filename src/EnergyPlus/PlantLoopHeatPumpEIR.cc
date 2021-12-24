@@ -87,10 +87,10 @@ void EIRPlantLoopHeatPump::simulate(
 
     if (this->waterSource) {
         this->setOperatingFlowRatesWSHP(state);
-        if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
+        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
-                                                                this->sourceSideLocation.loopNum,
-                                                                this->sourceSideLocation.loopSideNum,
+                                                                this->sourceSidePlantLoc.loopNum,
+                                                                this->sourceSidePlantLoc.loopSideNum,
                                                                 this->EIRHPType,
                                                                 this->sourceSideNodes.inlet,
                                                                 this->sourceSideNodes.outlet,
@@ -118,10 +118,10 @@ void EIRPlantLoopHeatPump::simulate(
 
 Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
 {
-    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
-    auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSideLocation.loopSideNum);
-    auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSideLocation.branchNum);
-    auto &thisLoadComp = thisLoadBranch.Comp(this->loadSideLocation.compNum);
+    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
+    auto &thisLoadLoopSide = thisLoadPlantLoop.LoopSide(this->loadSidePlantLoc.loopSideNum);
+    auto &thisLoadBranch = thisLoadLoopSide.Branch(this->loadSidePlantLoc.branchNum);
+    auto &thisLoadComp = thisLoadBranch.Comp(this->loadSidePlantLoc.compNum);
     if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
         if (thisLoadComp.CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) {
             // there will be a valid set-point on outlet
@@ -166,26 +166,20 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
                                              this->loadSideMassFlowRate,
                                              this->loadSideNodes.inlet,
                                              this->loadSideNodes.outlet,
-                                             this->loadSideLocation.loopNum,
-                                             this->loadSideLocation.loopSideNum,
-                                             this->loadSideLocation.branchNum,
-                                             this->loadSideLocation.compNum);
+                                             this->loadSidePlantLoc);
         PlantUtilities::SetComponentFlowRate(state,
                                              this->sourceSideMassFlowRate,
                                              this->sourceSideNodes.inlet,
                                              this->sourceSideNodes.outlet,
-                                             this->sourceSideLocation.loopNum,
-                                             this->sourceSideLocation.loopSideNum,
-                                             this->sourceSideLocation.branchNum,
-                                             this->sourceSideLocation.compNum);
+                                             this->sourceSidePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->loadSideLocation.loopNum,
-                                                    this->loadSideLocation.loopSideNum,
-                                                    this->loadSideLocation.branchNum,
-                                                    this->loadSideLocation.compNum,
+                                                    this->loadSidePlantLoc.loopNum,
+                                                    this->loadSidePlantLoc.loopSideNum,
+                                                    this->loadSidePlantLoc.branchNum,
+                                                    this->loadSidePlantLoc.compNum,
                                                     this->condMassFlowRateTriggerIndex,
-                                                    this->sourceSideLocation.loopNum,
-                                                    this->sourceSideLocation.loopSideNum,
+                                                    this->sourceSidePlantLoc.loopNum,
+                                                    this->sourceSidePlantLoc.loopSideNum,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->sourceSideMassFlowRate);
         // Set flows if the heat pump is running
@@ -196,18 +190,12 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
                                              this->loadSideMassFlowRate,
                                              this->loadSideNodes.inlet,
                                              this->loadSideNodes.outlet,
-                                             this->loadSideLocation.loopNum,
-                                             this->loadSideLocation.loopSideNum,
-                                             this->loadSideLocation.branchNum,
-                                             this->loadSideLocation.compNum);
+                                             this->loadSidePlantLoc);
         PlantUtilities::SetComponentFlowRate(state,
                                              this->sourceSideMassFlowRate,
                                              this->sourceSideNodes.inlet,
                                              this->sourceSideNodes.outlet,
-                                             this->sourceSideLocation.loopNum,
-                                             this->sourceSideLocation.loopSideNum,
-                                             this->sourceSideLocation.branchNum,
-                                             this->sourceSideLocation.compNum);
+                                             this->sourceSidePlantLoc);
 
         // if there's no flow in one, try to turn the entire heat pump off
         if (this->loadSideMassFlowRate <= 0.0 || this->sourceSideMassFlowRate <= 0.0) {
@@ -218,27 +206,21 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
                                                  this->loadSideMassFlowRate,
                                                  this->loadSideNodes.inlet,
                                                  this->loadSideNodes.outlet,
-                                                 this->loadSideLocation.loopNum,
-                                                 this->loadSideLocation.loopSideNum,
-                                                 this->loadSideLocation.branchNum,
-                                                 this->loadSideLocation.compNum);
+                                                 this->loadSidePlantLoc);
             PlantUtilities::SetComponentFlowRate(state,
                                                  this->sourceSideMassFlowRate,
                                                  this->sourceSideNodes.inlet,
                                                  this->sourceSideNodes.outlet,
-                                                 this->sourceSideLocation.loopNum,
-                                                 this->sourceSideLocation.loopSideNum,
-                                                 this->sourceSideLocation.branchNum,
-                                                 this->sourceSideLocation.compNum);
+                                                 this->sourceSidePlantLoc);
         }
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->loadSideLocation.loopNum,
-                                                    this->loadSideLocation.loopSideNum,
-                                                    this->loadSideLocation.branchNum,
-                                                    this->loadSideLocation.compNum,
+                                                    this->loadSidePlantLoc.loopNum,
+                                                    this->loadSidePlantLoc.loopSideNum,
+                                                    this->loadSidePlantLoc.branchNum,
+                                                    this->loadSidePlantLoc.compNum,
                                                     this->condMassFlowRateTriggerIndex,
-                                                    this->sourceSideLocation.loopNum,
-                                                    this->sourceSideLocation.loopSideNum,
+                                                    this->sourceSidePlantLoc.loopNum,
+                                                    this->sourceSidePlantLoc.loopSideNum,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->sourceSideMassFlowRate);
     }
@@ -253,10 +235,7 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
                                              this->loadSideMassFlowRate,
                                              this->loadSideNodes.inlet,
                                              this->loadSideNodes.outlet,
-                                             this->loadSideLocation.loopNum,
-                                             this->loadSideLocation.loopSideNum,
-                                             this->loadSideLocation.branchNum,
-                                             this->loadSideLocation.compNum);
+                                             this->loadSidePlantLoc);
         // Set flows if the heat pump is running
     } else { // the heat pump must run
         this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
@@ -265,10 +244,7 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
                                              this->loadSideMassFlowRate,
                                              this->loadSideNodes.inlet,
                                              this->loadSideNodes.outlet,
-                                             this->loadSideLocation.loopNum,
-                                             this->loadSideLocation.loopSideNum,
-                                             this->loadSideLocation.branchNum,
-                                             this->loadSideLocation.compNum);
+                                             this->loadSidePlantLoc);
 
         // if there's no flow in one, try to turn the entire heat pump off
         if (this->loadSideMassFlowRate <= 0.0) {
@@ -279,10 +255,7 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
                                                  this->loadSideMassFlowRate,
                                                  this->loadSideNodes.inlet,
                                                  this->loadSideNodes.outlet,
-                                                 this->loadSideLocation.loopNum,
-                                                 this->loadSideLocation.loopSideNum,
-                                                 this->loadSideLocation.branchNum,
-                                                 this->loadSideLocation.compNum);
+                                                 this->loadSidePlantLoc);
         }
     }
 }
@@ -313,7 +286,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
 
     // evaluate the actual current operating load side heat transfer rate
-    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
+    auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
     Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
                                                            thisLoadPlantLoop.FluidName,
                                                            state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
@@ -361,18 +334,18 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 
     if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
         Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::InitConvTemp,
-                                                       state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                        routineName);
         this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
         PlantUtilities::InitComponentNodes(state, 0.0, this->loadSideDesignMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet);
 
         if (this->waterSource) {
             rho = FluidProperties::GetDensityGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidName,
+                                                    state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum).FluidName,
                                                     DataGlobalConstants::InitConvTemp,
-                                                    state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
+                                                    state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum).FluidIndex,
                                                     routineName);
             this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
             PlantUtilities::InitComponentNodes(
@@ -392,7 +365,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 void EIRPlantLoopHeatPump::getDesignCapacities(
     EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
 {
-    if (calledFromLocation.loopNum == this->loadSideLocation.loopNum) {
+    if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
         this->sizeLoadSide(state);
         if (this->waterSource) {
             this->sizeSrcSideWSHP(state);
@@ -431,17 +404,17 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
     }
 
     Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                         state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                         state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                          loadSideInitTemp,
-                                                         state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                         state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                          "EIRPlantLoopHeatPump::size()");
     Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                             state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                             state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                              loadSideInitTemp,
-                                                             state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                              "EIRPlantLoopHeatPump::size()");
 
-    int pltLoadSizNum = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).PlantSizNum;
+    int pltLoadSizNum = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).PlantSizNum;
     if (pltLoadSizNum > 0) {
         // this first IF block is really just about calculating the local tmpCapacity and tmpLoadVolFlow values
         // these represent what the unit would size those to, whether it is doing auto-sizing or not
@@ -612,14 +585,14 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
     }
 
     Real64 const rhoSrc = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                             sourceSideInitTemp,
-                                                            state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                             "EIRPlantLoopHeatPump::size()");
     Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                                 sourceSideInitTemp,
-                                                                state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidIndex,
                                                                 "EIRPlantLoopHeatPump::size()");
 
     // To start we need to override the calculated load side flow
@@ -627,7 +600,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
     if (!this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
     // calculate an auto-sized value for source design flow regardless of whether it was auto-sized or not
-    int plantSourceSizingIndex = state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).PlantSizNum;
+    int plantSourceSizingIndex = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum).PlantSizNum;
     if (plantSourceSizingIndex > 0) {
         // to get the source flow, we first must calculate the required heat impact on the source side
         // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP
@@ -1186,7 +1159,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         // find this component on the plant
         bool thisErrFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(
-            state, this->name, this->EIRHPType, this->loadSideLocation, thisErrFlag, _, _, _, this->loadSideNodes.inlet, _);
+            state, this->name, this->EIRHPType, this->loadSidePlantLoc, thisErrFlag, _, _, _, this->loadSideNodes.inlet, _);
 
         if (thisErrFlag) {
             ShowSevereError(state,
@@ -1196,7 +1169,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                    this->name));
             ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
             errFlag = true;
-        } else if (this->loadSideLocation.loopSideNum != DataPlant::LoopSideLocation::Supply) { // only check if !thisErrFlag
+        } else if (this->loadSidePlantLoc.loopSideNum != DataPlant::LoopSideLocation::Supply) { // only check if !thisErrFlag
             ShowSevereError(state,
                             format("{}: Invalid connections for {} name = \"{}\"",
                                    routineName,
@@ -1209,7 +1182,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         thisErrFlag = false;
         if (this->waterSource) {
             PlantUtilities::ScanPlantLoopsForObject(
-                state, this->name, this->EIRHPType, this->sourceSideLocation, thisErrFlag, _, _, _, this->sourceSideNodes.inlet, _);
+                state, this->name, this->EIRHPType, this->sourceSidePlantLoc, thisErrFlag, _, _, _, this->sourceSideNodes.inlet, _);
 
             if (thisErrFlag) {
                 ShowSevereError(state,
@@ -1219,7 +1192,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                        this->name));
                 ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
                 errFlag = true;
-            } else if (this->sourceSideLocation.loopSideNum != DataPlant::LoopSideLocation::Demand) { // only check if !thisErrFlag
+            } else if (this->sourceSidePlantLoc.loopSideNum != DataPlant::LoopSideLocation::Demand) { // only check if !thisErrFlag
                 ShowSevereError(state,
                                 format("{}: Invalid connections for {} name = \"{}\"",
                                        routineName,
@@ -1230,7 +1203,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
             }
 
             // make sure it is not the same loop on both sides.
-            if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
+            if (this->loadSidePlantLoc.loopNum == this->sourceSidePlantLoc.loopNum) { // user is being too tricky, don't allow
                 ShowSevereError(state,
                                 format("{}: Invalid connections for {} name = \"{}\"",
                                        routineName,
@@ -1241,10 +1214,10 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
             } else {
 
                 PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                              this->loadSideLocation.loopNum,
-                                                              this->loadSideLocation.loopSideNum,
-                                                              this->sourceSideLocation.loopNum,
-                                                              this->sourceSideLocation.loopSideNum,
+                                                              this->loadSidePlantLoc.loopNum,
+                                                              this->loadSidePlantLoc.loopSideNum,
+                                                              this->sourceSidePlantLoc.loopNum,
+                                                              this->sourceSidePlantLoc.loopSideNum,
                                                               this->EIRHPType,
                                                               true);
             }

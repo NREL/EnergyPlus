@@ -5480,10 +5480,7 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
                                      mdot,
                                      this->ReheatControlNode,
                                      this->ReheatCoilOutletNode,
-                                     this->HWplantLoc.loopNum,
-                                     this->HWplantLoc.loopSideNum,
-                                     this->HWplantLoc.branchNum,
-                                     this->HWplantLoc.compNum);
+                                     this->HWplantLoc);
             }
 
             SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
@@ -5494,10 +5491,7 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
                                      mdot,
                                      this->ReheatControlNode,
                                      this->ReheatCoilOutletNode,
-                                     this->HWplantLoc.loopNum,
-                                     this->HWplantLoc.loopSideNum,
-                                     this->HWplantLoc.branchNum,
-                                     this->HWplantLoc.compNum);
+                                     this->HWplantLoc);
             }
             SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, HCoilReq);
         } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING

@@ -1251,40 +1251,28 @@ namespace HVACSingleDuctInduc {
                              MaxHotWaterFlow,
                              HotControlNode,
                              HWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopSideNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.branchNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.compNum);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc);
 
         MinHotWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinHotWaterFlow;
         SetComponentFlowRate(state,
                              MinHotWaterFlow,
                              HotControlNode,
                              HWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopSideNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.branchNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.compNum);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc);
 
         MaxColdWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxColdWaterFlow;
         SetComponentFlowRate(state,
                              MaxColdWaterFlow,
                              ColdControlNode,
                              CWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopSideNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.branchNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.compNum);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
 
         MinColdWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinColdWaterFlow;
         SetComponentFlowRate(state,
                              MinColdWaterFlow,
                              ColdControlNode,
                              CWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopSideNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.branchNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.compNum);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
 
         if (GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) <= 0.0) UnitOn = false;
         if (PriAirMassFlow <= SmallMassFlow) UnitOn = false;
@@ -1509,10 +1497,7 @@ namespace HVACSingleDuctInduc {
                              mdotHW,
                              HotControlNode,
                              HWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopSideNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.branchNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.compNum);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc);
 
         //  Node(HotControlNode)%MassFlowRate = HWFlow
 
@@ -1521,10 +1506,7 @@ namespace HVACSingleDuctInduc {
                              mdotCW,
                              ColdControlNode,
                              CWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopSideNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.branchNum,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.compNum);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
         //  Node(ColdControlNode)%MassFlowRate = CWFlow
 
         SimulateWaterCoilComponents(

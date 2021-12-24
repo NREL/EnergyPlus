@@ -1968,10 +1968,7 @@ namespace HVACUnitaryBypassVAV {
                                                      mdot,
                                                      CBVAV(CBVAVNum).CoilControlNode,
                                                      CBVAV(CBVAVNum).CoilOutletNode,
-                                                     CBVAV(CBVAVNum).plantLoc.loopNum,
-                                                     CBVAV(CBVAVNum).plantLoc.loopSideNum,
-                                                     CBVAV(CBVAVNum).plantLoc.branchNum,
-                                                     CBVAV(CBVAVNum).plantLoc.compNum);
+                                                     CBVAV(CBVAVNum).plantLoc);
 
                 //     simulate water coil to find operating capacity
                 WaterCoils::SimulateWaterCoilComponents(
@@ -1989,10 +1986,7 @@ namespace HVACUnitaryBypassVAV {
                                                      mdot,
                                                      CBVAV(CBVAVNum).CoilControlNode,
                                                      CBVAV(CBVAVNum).CoilOutletNode,
-                                                     CBVAV(CBVAVNum).plantLoc.loopNum,
-                                                     CBVAV(CBVAVNum).plantLoc.loopSideNum,
-                                                     CBVAV(CBVAVNum).plantLoc.branchNum,
-                                                     CBVAV(CBVAVNum).plantLoc.compNum);
+                                                     CBVAV(CBVAVNum).plantLoc);
 
                 //     simulate steam coil to find operating capacity
                 SteamCoils::SimulateSteamCoilComponents(state,
@@ -4194,10 +4188,7 @@ namespace HVACUnitaryBypassVAV {
                                                          MaxHotWaterFlow,
                                                          CBVAV(CBVAVNum).CoilControlNode,
                                                          CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).plantLoc.loopNum,
-                                                         CBVAV(CBVAVNum).plantLoc.loopSideNum,
-                                                         CBVAV(CBVAVNum).plantLoc.branchNum,
-                                                         CBVAV(CBVAVNum).plantLoc.compNum);
+                                                         CBVAV(CBVAVNum).plantLoc);
                     WaterCoils::SimulateWaterCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                     if (QCoilActual > (HeatCoilLoad + DataHVACGlobals::SmallLoad)) {
@@ -4261,10 +4252,7 @@ namespace HVACUnitaryBypassVAV {
                                                          mdot,
                                                          CBVAV(CBVAVNum).CoilControlNode,
                                                          CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).plantLoc.loopNum,
-                                                         CBVAV(CBVAVNum).plantLoc.loopSideNum,
-                                                         CBVAV(CBVAVNum).plantLoc.branchNum,
-                                                         CBVAV(CBVAVNum).plantLoc.compNum);
+                                                         CBVAV(CBVAVNum).plantLoc);
 
                     // simulate the steam heating coil
                     SteamCoils::SimulateSteamCoilComponents(
@@ -4289,10 +4277,7 @@ namespace HVACUnitaryBypassVAV {
                                                          mdot,
                                                          CBVAV(CBVAVNum).CoilControlNode,
                                                          CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).plantLoc.loopNum,
-                                                         CBVAV(CBVAVNum).plantLoc.loopSideNum,
-                                                         CBVAV(CBVAVNum).plantLoc.branchNum,
-                                                         CBVAV(CBVAVNum).plantLoc.compNum);
+                                                         CBVAV(CBVAVNum).plantLoc);
                     QCoilActual = HeatCoilLoad;
                     // simulate the hot water heating coil
                     WaterCoils::SimulateWaterCoilComponents(
@@ -4303,10 +4288,7 @@ namespace HVACUnitaryBypassVAV {
                                                          mdot,
                                                          CBVAV(CBVAVNum).CoilControlNode,
                                                          CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).plantLoc.loopNum,
-                                                         CBVAV(CBVAVNum).plantLoc.loopSideNum,
-                                                         CBVAV(CBVAVNum).plantLoc.branchNum,
-                                                         CBVAV(CBVAVNum).plantLoc.compNum);
+                                                         CBVAV(CBVAVNum).plantLoc);
                     // simulate the steam heating coil
                     SteamCoils::SimulateSteamCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
@@ -4347,10 +4329,7 @@ namespace HVACUnitaryBypassVAV {
                                              mdot,
                                              CBVAV(CBVAVNum).CoilControlNode,
                                              CBVAV(CBVAVNum).CoilOutletNode,
-                                             CBVAV(CBVAVNum).plantLoc.loopNum,
-                                             CBVAV(CBVAVNum).plantLoc.loopSideNum,
-                                             CBVAV(CBVAVNum).plantLoc.branchNum,
-                                             CBVAV(CBVAVNum).plantLoc.compNum);
+                                             CBVAV(CBVAVNum).plantLoc);
 
         // simulate the hot water supplemental heating coil
         WaterCoils::SimulateWaterCoilComponents(

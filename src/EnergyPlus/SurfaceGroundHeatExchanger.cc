@@ -547,8 +547,11 @@ namespace SurfaceGroundHeatExchanger {
         DesignFlow =
             RegulateCondenserCompFlowReqOp(state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->DesignMassFlowRate);
 
-        SetComponentFlowRate(
-            state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+        SetComponentFlowRate(            state,
+ DesignFlow,
+ this->InletNodeNum,
+ this->OutletNodeNum,
+ this->plantLoc);
 
         // get the current flow rate - module variable
         state.dataSurfaceGroundHeatExchangers->FlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;

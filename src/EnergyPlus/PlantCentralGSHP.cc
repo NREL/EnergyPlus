@@ -1804,20 +1804,23 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
         }
     }
 
-    PlantUtilities::SetComponentFlowRate(
-        state, mdotCHW, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CWPlantLoc.branchNum, this->CWPlantLoc.compNum);
+    PlantUtilities::SetComponentFlowRate(        state,
+ mdotCHW,
+ this->CHWInletNodeNum,
+ this->CHWOutletNodeNum,
+ this->CWPlantLoc);
 
-    PlantUtilities::SetComponentFlowRate(
-        state, mdotHW, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc.loopNum, this->HWPlantLoc.loopSideNum, this->HWPlantLoc.branchNum, this->HWPlantLoc.compNum);
+    PlantUtilities::SetComponentFlowRate(        state,
+ mdotHW,
+ this->HWInletNodeNum,
+ this->HWOutletNodeNum,
+ this->HWPlantLoc);
 
     PlantUtilities::SetComponentFlowRate(state,
                                          mdotGLHE,
                                          this->GLHEInletNodeNum,
                                          this->GLHEOutletNodeNum,
-                                         this->GLHEPlantLoc.loopNum,
-                                         this->GLHEPlantLoc.loopSideNum,
-                                         this->GLHEPlantLoc.branchNum,
-                                         this->GLHEPlantLoc.compNum);
+                                         this->GLHEPlantLoc);
 }
 
 void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
@@ -3002,28 +3005,19 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                  CHWInletMassFlowRate,
                                                  this->CHWInletNodeNum,
                                                  this->CHWOutletNodeNum,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
 
             PlantUtilities::SetComponentFlowRate(state,
                                                  HWInletMassFlowRate,
                                                  this->HWInletNodeNum,
                                                  this->HWOutletNodeNum,
-                                                 this->HWPlantLoc.loopNum,
-                                                 this->HWPlantLoc.loopSideNum,
-                                                 this->HWPlantLoc.branchNum,
-                                                 this->HWPlantLoc.compNum);
+                                                 this->HWPlantLoc);
 
             PlantUtilities::SetComponentFlowRate(state,
                                                  GLHEInletMassFlowRate,
                                                  this->GLHEInletNodeNum,
                                                  this->GLHEOutletNodeNum,
-                                                 this->GLHEPlantLoc.loopNum,
-                                                 this->GLHEPlantLoc.loopSideNum,
-                                                 this->GLHEPlantLoc.branchNum,
-                                                 this->GLHEPlantLoc.compNum);
+                                                 this->GLHEPlantLoc);
 
         } // End of cooling
 
@@ -3335,28 +3329,19 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                      CHWInletMassFlowRate,
                                                      this->CHWInletNodeNum,
                                                      this->CHWOutletNodeNum,
-                                                     this->CWPlantLoc.loopNum,
-                                                     this->CWPlantLoc.loopSideNum,
-                                                     this->CWPlantLoc.branchNum,
-                                                     this->CWPlantLoc.compNum);
+                                                     this->CWPlantLoc);
 
                 PlantUtilities::SetComponentFlowRate(state,
                                                      HWInletMassFlowRate,
                                                      this->HWInletNodeNum,
                                                      this->HWOutletNodeNum,
-                                                     this->HWPlantLoc.loopNum,
-                                                     this->HWPlantLoc.loopSideNum,
-                                                     this->HWPlantLoc.branchNum,
-                                                     this->HWPlantLoc.compNum);
+                                                     this->HWPlantLoc);
 
                 PlantUtilities::SetComponentFlowRate(state,
                                                      GLHEInletMassFlowRate,
                                                      this->GLHEInletNodeNum,
                                                      this->GLHEOutletNodeNum,
-                                                     this->GLHEPlantLoc.loopNum,
-                                                     this->GLHEPlantLoc.loopSideNum,
-                                                     this->GLHEPlantLoc.branchNum,
-                                                     this->GLHEPlantLoc.compNum);
+                                                     this->GLHEPlantLoc);
 
                 // Local variables
                 this->Report.CHWInletTemp = CHWInletTemp;
@@ -3450,28 +3435,19 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                                                          CHWInletMassFlowRate,
                                                          this->CHWInletNodeNum,
                                                          this->CHWOutletNodeNum,
-                                                         this->CWPlantLoc.loopNum,
-                                                         this->CWPlantLoc.loopSideNum,
-                                                         this->CWPlantLoc.branchNum,
-                                                         this->CWPlantLoc.compNum);
+                                                         this->CWPlantLoc);
 
                     PlantUtilities::SetComponentFlowRate(state,
                                                          HWInletMassFlowRate,
                                                          this->HWInletNodeNum,
                                                          this->HWOutletNodeNum,
-                                                         this->HWPlantLoc.loopNum,
-                                                         this->HWPlantLoc.loopSideNum,
-                                                         this->HWPlantLoc.branchNum,
-                                                         this->HWPlantLoc.compNum);
+                                                         this->HWPlantLoc);
 
                     PlantUtilities::SetComponentFlowRate(state,
                                                          GLHEInletMassFlowRate,
                                                          this->GLHEInletNodeNum,
                                                          this->GLHEOutletNodeNum,
-                                                         this->GLHEPlantLoc.loopNum,
-                                                         this->GLHEPlantLoc.loopSideNum,
-                                                         this->GLHEPlantLoc.branchNum,
-                                                         this->GLHEPlantLoc.compNum);
+                                                         this->GLHEPlantLoc);
                 }
 
             } // Heating loop calculation

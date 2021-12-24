@@ -1163,10 +1163,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                              DesiredMassFlowRate,
                                              this->HeatRecInletNodeNum,
                                              this->HeatRecOutletNodeNum,
-                                             this->HRPlantLoc.loopNum,
-                                             this->HRPlantLoc.loopSideNum,
-                                             this->HRPlantLoc.branchNum,
-                                             this->HRPlantLoc.compNum);
+                                             this->HRPlantLoc);
     } else { // not FirstHVACIteration
         if (!RunFlag) {
             state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate =
@@ -1185,29 +1182,20 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                                                      DesiredMassFlowRate,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc.loopNum,
-                                                     this->HRPlantLoc.loopSideNum,
-                                                     this->HRPlantLoc.branchNum,
-                                                     this->HRPlantLoc.compNum);
+                                                     this->HRPlantLoc);
             } else {
                 PlantUtilities::SetComponentFlowRate(state,
                                                      this->HeatRecMdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc.loopNum,
-                                                     this->HRPlantLoc.loopSideNum,
-                                                     this->HRPlantLoc.branchNum,
-                                                     this->HRPlantLoc.compNum);
+                                                     this->HRPlantLoc);
             }
         } else if (RunFlag && (!this->InternalFlowControl)) {
             PlantUtilities::SetComponentFlowRate(state,
                                                  this->HeatRecMdot,
                                                  this->HeatRecInletNodeNum,
                                                  this->HeatRecOutletNodeNum,
-                                                 this->HRPlantLoc.loopNum,
-                                                 this->HRPlantLoc.loopSideNum,
-                                                 this->HRPlantLoc.branchNum,
-                                                 this->HRPlantLoc.compNum);
+                                                 this->HRPlantLoc);
         }
     }
 }

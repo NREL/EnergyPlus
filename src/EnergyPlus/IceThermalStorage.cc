@@ -374,10 +374,7 @@ namespace IceThermalStorage {
                                                  mdot,
                                                  this->PlantInNodeNum,
                                                  this->PlantOutNodeNum,
-                                                 this->plantLoc.loopNum,
-                                                 this->plantLoc.loopSideNum,
-                                                 this->plantLoc.branchNum,
-                                                 this->plantLoc.compNum);
+                                                 this->plantLoc);
 
             this->BypassMassFlowRate = mdot;
             this->TankMassFlowRate = 0.0;
@@ -400,10 +397,7 @@ namespace IceThermalStorage {
                                                      mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
-                                                     this->plantLoc.loopNum,
-                                                     this->plantLoc.loopSideNum,
-                                                     this->plantLoc.branchNum,
-                                                     this->plantLoc.compNum);
+                                                     this->plantLoc);
 
                 this->BypassMassFlowRate = mdot;
                 this->TankMassFlowRate = 0.0;
@@ -416,10 +410,7 @@ namespace IceThermalStorage {
                                                      mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
-                                                     this->plantLoc.loopNum,
-                                                     this->plantLoc.loopSideNum,
-                                                     this->plantLoc.branchNum,
-                                                     this->plantLoc.compNum);
+                                                     this->plantLoc);
 
                 // We are in charging mode, the temperatures are low enough to charge
                 // the tank, and we have some charging left to do.
@@ -555,10 +546,7 @@ namespace IceThermalStorage {
                                                      mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
-                                                     this->plantLoc.loopNum,
-                                                     this->plantLoc.loopSideNum,
-                                                     this->plantLoc.branchNum,
-                                                     this->plantLoc.compNum);
+                                                     this->plantLoc);
 
                 this->BypassMassFlowRate = mdot;
                 this->TankMassFlowRate = 0.0;
@@ -572,10 +560,7 @@ namespace IceThermalStorage {
                                                      mdot,
                                                      this->PlantInNodeNum,
                                                      this->PlantOutNodeNum,
-                                                     this->plantLoc.loopNum,
-                                                     this->plantLoc.loopSideNum,
-                                                     this->plantLoc.branchNum,
-                                                     this->plantLoc.compNum);
+                                                     this->plantLoc);
 
                 // We are in discharging mode, the temperatures are high enough to discharge
                 // the tank, and we have some discharging left to do.
@@ -1507,10 +1492,7 @@ namespace IceThermalStorage {
                                              this->ITSMassFlowRate,
                                              this->PltInletNodeNum,
                                              this->PltOutletNodeNum,
-                                             this->plantLoc.loopNum,
-                                             this->plantLoc.loopSideNum,
-                                             this->plantLoc.branchNum,
-                                             this->plantLoc.compNum);
+                                             this->plantLoc);
 
         this->ITSInletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp; //[C]
         this->ITSOutletTemp = this->ITSInletTemp;                                   //[C]
@@ -1542,10 +1524,7 @@ namespace IceThermalStorage {
                                              this->ITSMassFlowRate,
                                              this->PltInletNodeNum,
                                              this->PltOutletNodeNum,
-                                             this->plantLoc.loopNum,
-                                             this->plantLoc.loopSideNum,
-                                             this->plantLoc.branchNum,
-                                             this->plantLoc.compNum);
+                                             this->plantLoc);
 
         this->ITSInletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp; //[C]
         this->ITSOutletTemp = this->ITSInletTemp;                                   //[C]
@@ -1750,10 +1729,7 @@ namespace IceThermalStorage {
                                              this->ITSMassFlowRate,
                                              this->PltInletNodeNum,
                                              this->PltOutletNodeNum,
-                                             this->plantLoc.loopNum,
-                                             this->plantLoc.loopSideNum,
-                                             this->plantLoc.branchNum,
-                                             this->plantLoc.compNum);
+                                             this->plantLoc);
 
         // Qice is calculate input U which is within boundary between Umin and Umax.
         Real64 Qice = Uact * this->ITSNomCap / TimeInterval;

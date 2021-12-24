@@ -1391,10 +1391,7 @@ namespace WaterUse {
                                                          this->HotMassFlowRate,
                                                          this->InletNode,
                                                          this->OutletNode,
-                                                         this->plantLoc.loopNum,
-                                                         this->plantLoc.loopSideNum,
-                                                         this->plantLoc.branchNum,
-                                                         this->plantLoc.compNum);
+                                                         this->plantLoc);
 
                 } else {
                     Real64 DesiredHotWaterMassFlow = this->HotMassFlowRate;
@@ -1402,10 +1399,7 @@ namespace WaterUse {
                                                          DesiredHotWaterMassFlow,
                                                          this->InletNode,
                                                          this->OutletNode,
-                                                         this->plantLoc.loopNum,
-                                                         this->plantLoc.loopSideNum,
-                                                         this->plantLoc.branchNum,
-                                                         this->plantLoc.compNum);
+                                                         this->plantLoc);
                     // readjust if more than actual available mass flow rate determined by the demand side manager
                     if ((this->HotMassFlowRate != DesiredHotWaterMassFlow) && (this->HotMassFlowRate > 0.0)) { // plant didn't give what was asked for
 

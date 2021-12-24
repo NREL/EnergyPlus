@@ -3494,10 +3494,7 @@ namespace FuelCellElectricGenerator {
                                                  mdot,
                                                  this->ExhaustHX.WaterInNode,
                                                  this->ExhaustHX.WaterOutNode,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
 
             this->ExhaustHX.WaterMassFlowRate = mdot;
             this->ExhaustHX.WaterInletTemp = state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp;
@@ -3508,10 +3505,7 @@ namespace FuelCellElectricGenerator {
                                                  this->ExhaustHX.WaterMassFlowRate,
                                                  this->ExhaustHX.WaterInNode,
                                                  this->ExhaustHX.WaterOutNode,
-                                                 this->CWPlantLoc.loopNum,
-                                                 this->CWPlantLoc.loopSideNum,
-                                                 this->CWPlantLoc.branchNum,
-                                                 this->CWPlantLoc.compNum);
+                                                 this->CWPlantLoc);
 
             this->ExhaustHX.WaterInletTemp = state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp;
         }

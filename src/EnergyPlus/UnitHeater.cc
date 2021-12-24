@@ -1544,10 +1544,7 @@ namespace UnitHeater {
                                          mdot,
                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                 }
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
                     mdot = 0.0; // try to turn off
@@ -1556,10 +1553,7 @@ namespace UnitHeater {
                                          mdot,
                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                 }
                 CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, QUnitOut);
 
@@ -1577,10 +1571,7 @@ namespace UnitHeater {
                                              mdot,
                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                     }
                     if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
                         mdot = 0.0; // try to turn off
@@ -1589,10 +1580,7 @@ namespace UnitHeater {
                                              mdot,
                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                     }
                     CalcUnitHeaterComponents(state, UnitHeatNum, FirstHVACIteration, QUnitOut);
 
@@ -1611,10 +1599,7 @@ namespace UnitHeater {
                                                  mdot,
                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                         }
                     }
                     if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type == HCoilType::SteamCoil) {
@@ -1624,10 +1609,7 @@ namespace UnitHeater {
                                                  mdot,
                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
                                                  state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                         }
                     }
 
@@ -1933,10 +1915,7 @@ namespace UnitHeater {
                                      mdot,
                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                 SimulateWaterCoilComponents(state,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                             FirstHVACIteration,
@@ -1964,10 +1943,7 @@ namespace UnitHeater {
                                      mdot,
                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotControlNode,
                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum,
-                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum,
-                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum);
+                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                 SimulateSteamCoilComponents(state,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                             FirstHVACIteration,

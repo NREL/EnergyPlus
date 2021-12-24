@@ -639,8 +639,11 @@ namespace PhotovoltaicThermalCollectors {
                     this->MassFlowRate = 0.0;
                 }
 
-                PlantUtilities::SetComponentFlowRate(
-                    state, this->MassFlowRate, InletNode, OutletNode, this->WPlantLoc.loopNum, this->WPlantLoc.loopSideNum, this->WPlantLoc.branchNum, this->WPlantLoc.compNum);
+                PlantUtilities::SetComponentFlowRate(                    state,
+ this->MassFlowRate,
+ InletNode,
+ OutletNode,
+ this->WPlantLoc);
             } else if (SELECT_CASE_var == WorkingFluidEnum::AIR) {
                 this->MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             }

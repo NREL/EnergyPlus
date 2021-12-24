@@ -3118,8 +3118,11 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     this->massFlowRate =
         RegulateCondenserCompFlowReqOp(state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->designMassFlow);
 
-    SetComponentFlowRate(
-        state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+    SetComponentFlowRate(        state,
+ this->massFlowRate,
+ this->inletNodeNum,
+ this->outletNodeNum,
+ this->plantLoc);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;
@@ -3202,8 +3205,11 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     this->massFlowRate =
         RegulateCondenserCompFlowReqOp(state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->designMassFlow);
 
-    SetComponentFlowRate(
-        state, this->massFlowRate, this->inletNodeNum, this->outletNodeNum, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum);
+    SetComponentFlowRate(        state,
+ this->massFlowRate,
+ this->inletNodeNum,
+ this->outletNodeNum,
+ this->plantLoc);
 
     // Reset local environment init flag
     if (!state.dataGlobal->BeginEnvrnFlag) this->myEnvrnFlag = true;

@@ -119,10 +119,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
                           Real64 &CompFlow,      // [kg/s]
                           int const InletNode,   // component's inlet node index in node structure
                           int const OutletNode,  // component's outlet node index in node structure
-                          int const LoopNum,     // plant loop index for PlantLoop structure
-                          const DataPlant::LoopSideLocation LoopSideNum, // Loop side index for PlantLoop structure
-                          int const BranchIndex, // branch index for PlantLoop
-                          int const CompIndex    // component index for PlantLoop
+                          PlantLocation const plantLoc // component location for PlantLoop
 )
 {
 
@@ -135,7 +132,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // General purpose worker routine to set flows for a component model
 
-    if (LoopNum == 0) { // protect from hard crash below
+    if (plantLoc.loopNum == 0) { // protect from hard crash below
         if (InletNode > 0) {
             ShowSevereError(state,
                             "SetComponentFlowRate: trapped plant loop index = 0, check component with inlet node named=" +
@@ -149,8 +146,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
     }
 
     Real64 const MdotOldRequest = state.dataLoopNodes->Node(InletNode).MassFlowRateRequest;
-    auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
-    auto &comp(loop_side.Branch(BranchIndex).Comp(CompIndex));
+    auto &loop_side(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum));
+    auto &comp(loop_side.Branch(plantLoc.branchNum).Comp(plantLoc.compNum));
 
     if (comp.CurOpSchemeType == DataPlant::OpScheme::Demand) {
         // store flow request on inlet node
@@ -187,7 +184,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
 
     // Set loop flow rate
     if (loop_side.FlowLock == DataPlant::FlowLock::Unlocked) {
-        if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
+        if (state.dataPlnt->PlantLoop(plantLoc.loopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
             state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
             state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
         } else { // bound the flow by Min/Max available and hardware limits
@@ -203,8 +200,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 // action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent)
                 bool EMSLoadOverride = false;
 
-                for (int CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
-                    auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
+                for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
+                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
                     int const CompInletNodeNum = thisComp.NodeNumIn;
                     auto &thisInletNode(state.dataLoopNodes->Node(CompInletNodeNum));
                     SeriesBranchHighFlowRequest = max(thisInletNode.MassFlowRateRequest, SeriesBranchHighFlowRequest);
@@ -232,8 +229,8 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 if (CompFlow < DataBranchAirLoopPlant::MassFlowTolerance) CompFlow = 0.0;
                 state.dataLoopNodes->Node(OutletNode).MassFlowRate = CompFlow;
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-                for (int CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
-                    auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
+                for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
+                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
                     int const CompInletNodeNum = thisComp.NodeNumIn;
                     int const CompOutletNodeNum = thisComp.NodeNumOut;
                     state.dataLoopNodes->Node(CompInletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
@@ -253,9 +250,9 @@ void SetComponentFlowRate(EnergyPlusData &state,
                 // action here means EMS will not impact the FlowLock == FlowLocked condition (which should still show EMS intent)
                 bool EMSLoadOverride = false;
 
-                for (int CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
+                for (int CompNum = 1; CompNum <= loop_side.Branch(plantLoc.branchNum).TotalComponents; ++CompNum) {
                     // check to see if any component on branch uses EMS On/Off Supervisory control to shut down flow
-                    auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
+                    auto &thisComp(loop_side.Branch(plantLoc.branchNum).Comp(CompNum));
                     if (thisComp.EMSLoadOverrideOn && thisComp.EMSLoadOverrideValue == 0.0) EMSLoadOverride = true;
                 }
 
