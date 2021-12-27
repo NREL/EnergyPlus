@@ -1439,7 +1439,7 @@ void GetIHPInput(EnergyPlusData &state)
                                state.dataLoopNodes->NodeID(InNode),
                                CurrentModuleObject,
                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
-                               "Inlet",
+                               DataLoopNode::NodeConnectionType::Inlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
                                ErrorsFound);
@@ -1448,7 +1448,7 @@ void GetIHPInput(EnergyPlusData &state)
                                state.dataLoopNodes->NodeID(OutNode),
                                CurrentModuleObject,
                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Cooling Coil",
-                               "Outlet",
+                               DataLoopNode::NodeConnectionType::Outlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
                                ErrorsFound);
@@ -1465,7 +1465,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1474,7 +1474,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1500,7 +1500,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1509,7 +1509,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1535,7 +1535,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1544,7 +1544,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1573,7 +1573,7 @@ void GetIHPInput(EnergyPlusData &state)
                                state.dataLoopNodes->NodeID(InNode),
                                CurrentModuleObject,
                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
-                               "Inlet",
+                               DataLoopNode::NodeConnectionType::Inlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
                                ErrorsFound);
@@ -1582,7 +1582,7 @@ void GetIHPInput(EnergyPlusData &state)
                                state.dataLoopNodes->NodeID(OutNode),
                                CurrentModuleObject,
                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Heating Coil",
-                               "Outlet",
+                               DataLoopNode::NodeConnectionType::Outlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
                                ErrorsFound);
@@ -1599,7 +1599,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1608,7 +1608,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1634,7 +1634,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1643,7 +1643,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1678,7 +1678,7 @@ void GetIHPInput(EnergyPlusData &state)
                                state.dataLoopNodes->NodeID(InNode),
                                CurrentModuleObject,
                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
-                               "Inlet",
+                               DataLoopNode::NodeConnectionType::Inlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
                                ErrorsFound);
@@ -1687,7 +1687,7 @@ void GetIHPInput(EnergyPlusData &state)
                                state.dataLoopNodes->NodeID(InNode),
                                CurrentModuleObject,
                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Water Coil",
-                               "Outlet",
+                               DataLoopNode::NodeConnectionType::Outlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
                                ErrorsFound);
@@ -1704,7 +1704,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1713,7 +1713,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1730,7 +1730,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1739,7 +1739,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1765,7 +1765,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1774,7 +1774,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1800,7 +1800,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1809,7 +1809,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Secondary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1854,7 +1854,7 @@ void GetIHPInput(EnergyPlusData &state)
                                state.dataLoopNodes->NodeID(InNode),
                                CurrentModuleObject,
                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
-                               "Inlet",
+                               DataLoopNode::NodeConnectionType::Inlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
                                ErrorsFound);
@@ -1863,7 +1863,7 @@ void GetIHPInput(EnergyPlusData &state)
                                state.dataLoopNodes->NodeID(InNode),
                                CurrentModuleObject,
                                state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).Name + " Outdoor Coil",
-                               "Outlet",
+                               DataLoopNode::NodeConnectionType::Outlet,
                                NodeInputManager::CompFluidStream::Primary,
                                ObjectIsNotParent,
                                ErrorsFound);
@@ -1880,7 +1880,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1889,7 +1889,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1906,7 +1906,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1915,7 +1915,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1944,7 +1944,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    InNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);
@@ -1953,7 +1953,7 @@ void GetIHPInput(EnergyPlusData &state)
                                    OutNodeName,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilType,
                                    state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName,
-                                   "Internal",
+                                   DataLoopNode::NodeConnectionType::Internal,
                                    NodeInputManager::CompFluidStream::Primary,
                                    ObjectIsNotParent,
                                    ErrorsFound);

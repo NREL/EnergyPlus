@@ -2066,11 +2066,11 @@ namespace SimulationManager {
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType,
+                  DataLoopNode::ValidConnectionTypes[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
             // Build ParentNodeLists
-            if (UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType, "Inlet") ||
-                UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType, "Outlet")) {
+            if ((state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::NodeConnectionType::Inlet) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::NodeConnectionType::Outlet)) {
                 bool ParentComponentFound = false;
                 for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
                     if (state.dataBranchNodeConnections->ParentNodeList(Loop1).CType !=
@@ -2079,16 +2079,17 @@ namespace SimulationManager {
                             state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName)
                         continue;
                     ParentComponentFound = true;
-                    {
-                        auto const SELECT_CASE_var(
-                            UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
-                        if (SELECT_CASE_var == "INLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName =
-                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
-                        } else if (SELECT_CASE_var == "OUTLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName =
-                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
-                        }
+
+                    switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
+                    case DataLoopNode::NodeConnectionType::Inlet:
+                        state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName =
+                            state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                        break;
+                    case DataLoopNode::NodeConnectionType::Outlet:
+                        state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName =
+                            state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                    default:
+                        break;
                     }
                 }
                 if (!ParentComponentFound) {
@@ -2097,16 +2098,18 @@ namespace SimulationManager {
                         state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType;
                     state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CName =
                         state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
-                    {
-                        auto const SELECT_CASE_var(
-                            UtilityRoutines::MakeUPPERCase(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType));
-                        if (SELECT_CASE_var == "INLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName =
-                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
-                        } else if (SELECT_CASE_var == "OUTLET") {
-                            state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName =
-                                state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
-                        }
+
+                    switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
+                    case DataLoopNode::NodeConnectionType::Inlet:
+                        state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName =
+                            state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                        break;
+                    case DataLoopNode::NodeConnectionType::Outlet:
+                        state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName =
+                            state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
+                        break;
+                    default:
+                        break;
                     }
                 }
             }
@@ -2126,7 +2129,7 @@ namespace SimulationManager {
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType,
+                  DataLoopNode::ValidConnectionTypes[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
         }
 
@@ -2161,7 +2164,7 @@ namespace SimulationManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reports on the node connections in various parts of the
-        // HVAC systen: Component Sets, Air Loop, Plant and Condenser Loop, Supply and
+        // HVAC system: Component Sets, Air Loop, Plant and Condenser Loop, Supply and
         // return air paths, controlled zones.
         // This information should be useful in diagnosing node connection input errors.
 

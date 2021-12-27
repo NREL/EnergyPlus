@@ -68,29 +68,27 @@ namespace DataBranchNodeConnections {
 namespace BranchNodeConnections {
 
     void RegisterNodeConnection(EnergyPlusData &state,
-                                int NodeNumber,                                // Number for this Node
-                                std::string_view const NodeName,               // Name of this Node
-                                std::string_view const ObjectType,             // Type of object this Node is connected to (e.g. Chiller:Electric)
-                                std::string_view const ObjectName,             // Name of object this Node is connected to (e.g. MyChiller)
-                                std::string_view const ConnectionType,         // Connection Type for this Node (must be valid)
-                                NodeInputManager::CompFluidStream FluidStream, // Count on Fluid Streams
-                                bool IsParent,                                 // True when node is a parent node
-                                bool &errFlag,                                 // Will be True if errors already detected or if errors found here
-                                Optional_string_const InputFieldName = _       // Input Field Name
+                                int NodeNumber,                    // Number for this Node
+                                std::string_view const NodeName,   // Name of this Node
+                                std::string_view const ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+                                std::string_view const ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+                                DataLoopNode::NodeConnectionType const ConnectionType, // Connection Type for this Node (must be valid)
+                                NodeInputManager::CompFluidStream FluidStream,         // Count on Fluid Streams
+                                bool IsParent,                                         // True when node is a parent node
+                                bool &errFlag,                           // Will be True if errors already detected or if errors found here
+                                Optional_string_const InputFieldName = _ // Input Field Name
     );
 
     void OverrideNodeConnectionType(EnergyPlusData &state,
-                                    int NodeNumber,                                // Number for this Node
-                                    std::string const &NodeName,                   // Name of this Node
-                                    std::string const &ObjectType,                 // Type of object this Node is connected to (e.g. Chiller:Electric)
-                                    std::string const &ObjectName,                 // Name of object this Node is connected to (e.g. MyChiller)
-                                    std::string const &ConnectionType,             // Connection Type for this Node (must be valid)
-                                    NodeInputManager::CompFluidStream FluidStream, // Count on Fluid Streams
-                                    bool IsParent,                                 // True when node is a parent node
-                                    bool &errFlag                                  // Will be True if errors already detected or if errors found here
+                                    int NodeNumber,                // Number for this Node
+                                    std::string const &NodeName,   // Name of this Node
+                                    std::string const &ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
+                                    std::string const &ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
+                                    DataLoopNode::NodeConnectionType const &ConnectionType, // Connection Type for this Node (must be valid)
+                                    NodeInputManager::CompFluidStream FluidStream,          // Count on Fluid Streams
+                                    bool IsParent,                                          // True when node is a parent node
+                                    bool &errFlag // Will be True if errors already detected or if errors found here
     );
-
-    bool IsValidConnectionType(std::string_view ConnectionType);
 
     void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -162,7 +160,7 @@ namespace BranchNodeConnections {
 
     void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetNodeConnectionType(EnergyPlusData &state, int NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
+    void GetNodeConnectionType(EnergyPlusData &state, int NodeNumber, Array1D<DataLoopNode::NodeConnectionType> &NodeConnectType, bool &errFlag);
 
     void FindAllNodeNumbersInList(int WhichNumber,
                                   Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,

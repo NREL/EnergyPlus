@@ -122,6 +122,23 @@ namespace DataLoopNode {
                                                                                                                      "OutsideAirReference",
                                                                                                                      "InducedAir"};
 
+    constexpr static std::array<std::string_view, static_cast<int>(NodeConnectionType::Num)> ValidConnectionTypesUC = {"BLANK",
+                                                                                                                       "INLET",
+                                                                                                                       "OUTLET",
+                                                                                                                       "INTERNAL",
+                                                                                                                       "ZONENODE",
+                                                                                                                       "SENSOR",
+                                                                                                                       "ACTUATOR",
+                                                                                                                       "OUTDOORAIR",
+                                                                                                                       "RELIEFAIR",
+                                                                                                                       "ZONEINLET",
+                                                                                                                       "ZONERETURN",
+                                                                                                                       "ZONEEXHAUST",
+                                                                                                                       "SETPOINT",
+                                                                                                                       "ELECTRIC",
+                                                                                                                       "OUTSIDEAIRREFERENCE",
+                                                                                                                       "INDUCEDAIR"};
+
     // Types
     struct NodeData
     {

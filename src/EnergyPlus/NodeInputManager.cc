@@ -118,7 +118,7 @@ void GetNodeNums(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ThisOne; // Indicator for this Name
-    std::string ConnectionType;
+    DataLoopNode::NodeConnectionType ConnectionType;
     int Loop;
     NodeInputManager::CompFluidStream FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
 
@@ -176,12 +176,17 @@ void GetNodeNums(EnergyPlusData &state,
     // Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
     FluidStreamNum = NodeFluidStream;
     for (Loop = 1; Loop <= NumNodes; ++Loop) {
-        auto nodeConnType(static_cast<int>(nodeConnectionType));
-        if (nodeConnType >= 1 && nodeConnType < static_cast<int>(NodeConnectionType::Num)) {
-            ConnectionType = DataLoopNode::ValidConnectionTypes[nodeConnType];
-        } else {
-            ConnectionType = format("{}-unknown", nodeConnectionType);
+
+        switch (nodeConnectionType) {
+        case DataLoopNode::NodeConnectionType::Num:
+        case DataLoopNode::NodeConnectionType::Invalid:
+            ConnectionType = NodeConnectionType::Invalid;
+            break;
+        default:
+            ConnectionType = nodeConnectionType;
+            break;
         }
+
         // If requested, assign NodeFluidStream to the first node and increment the fluid stream number
         // for each remaining node in the list
         if (present(IncrementFluidStream)) {
