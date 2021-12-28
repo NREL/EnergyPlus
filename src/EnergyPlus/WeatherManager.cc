@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FileSystem.hh>
@@ -2292,6 +2293,22 @@ namespace WeatherManager {
         if (state.dataEnvrn->EMSBeamSolarRadOverrideOn) state.dataEnvrn->BeamSolarRad = state.dataEnvrn->EMSBeamSolarRadOverrideValue;
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
+        if (state.dataEnvrn->RunPeriodEnvironment) {
+            int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1] += state.dataEnvrn->LiquidPrecipitation * 1000.0;
+            if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
+                state.dataWaterData->RainFall.numRainyHoursInWeather[month - 1] += 1;
+            }
+            // fixme: debug print
+//            if (state.dataEnvrn->LiquidPrecipitation > 0) {
+//                fmt::print("{} {}-{} rain: ts={}, month={}\n",
+//                           state.dataEnvrn->CurMnDy,
+//                           state.dataGlobal->HourOfDay,
+//                           state.dataGlobal->TimeStep,
+//                           state.dataEnvrn->LiquidPrecipitation * 1000.0,
+//                           state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1]);
+//            }
+        }
         state.dataEnvrn->TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         state.dataEnvrn->OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
 

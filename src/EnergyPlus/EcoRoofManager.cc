@@ -453,6 +453,7 @@ namespace EcoRoofManager {
             state.dataEcoRoofMgr->CumET = 0.0;
             state.dataEcoRoofMgr->CumPrecip = 0.0;
             state.dataEcoRoofMgr->CumIrrigation = 0.0;
+            state.dataEcoRoofMgr->MonthlyIrrigation.dimension(12, 0.0);
             state.dataEcoRoofMgr->CurrentRunoff = 0.0;
             state.dataEcoRoofMgr->CurrentET = 0.0;
             state.dataEcoRoofMgr->CurrentPrecipitation = 0.0;
@@ -921,7 +922,7 @@ namespace EcoRoofManager {
                 state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
             }
         } else {
-            if (state.dataEnvrn->LiquidPrecipitation > 0) {
+            if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
                 ShowWarningMessage(state,
                                    "Please be aware that precipitation depth in the .epw weather file is used in the RoofIrrigation calculation as "
                                    "the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. "
@@ -935,6 +936,9 @@ namespace EcoRoofManager {
             Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth; // x (m) evenly put into top layer
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
+                // aggregate to monthly for reporting
+                int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+                state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
             }
         }
 
@@ -950,11 +954,18 @@ namespace EcoRoofManager {
             // Smart schedule only irrigates when scheduled AND the soil is less than 40% saturated
             state.dataEcoRoofMgr->CurrentIrrigation = state.dataWaterData->Irrigation.ScheduledAmount; // units of m
             state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
+        } else {
+            // no schedule, irrigation is just the rain amount
+            state.dataEcoRoofMgr->CurrentIrrigation = state.dataEcoRoofMgr->CurrentPrecipitation; // units of m
+            state.dataWaterData->Irrigation.ActualAmount = state.dataEcoRoofMgr->CurrentIrrigation;
         }
 
         Moisture += state.dataEcoRoofMgr->CurrentIrrigation / state.dataEcoRoofMgr->TopDepth; // irrigation in (m)/timestep put into top layer
         if (!state.dataGlobal->WarmupFlag) {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
+            // aggregate to monthly for reporting
+            int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+            state.dataEcoRoofMgr->MonthlyIrrigation[month - 1] += state.dataWaterData->Irrigation.ActualAmount * 1000.0;
         }
 
         // Note: If soil top layer gets a massive influx of rain &/or irrigation some of

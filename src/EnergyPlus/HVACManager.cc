@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -283,6 +284,13 @@ void ManageHVAC(EnergyPlusData &state)
         }
     }
 
+    // init rain water accumulators
+    if (state.dataGlobal->BeginSimFlag) {
+        state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol.dimension(12, 0.0);
+        state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr.dimension(12, 0.0);
+        state.dataWaterData->RainFall.MonthlyTotalPrecInWeather.dimension(12, 0.0);
+        state.dataWaterData->RainFall.numRainyHoursInWeather.dimension(12, 0);
+    }
     ManageWaterInits(state);
 
     // Only simulate once per zone timestep; must be after SimHVAC

@@ -98,6 +98,7 @@ struct EcoRoofManagerData : BaseGlobalStruct
     Real64 CumET;     // Cumulative evapotranspiration from soil and plants (m)
     Real64 CumPrecip;
     Real64 CumIrrigation; // Cumulative irrigation, updated each time step (m) mult by roof area to get volume
+    Array1D<Real64> MonthlyIrrigation;
     Real64 CurrentRunoff;
     Real64 CurrentET;
     Real64 CurrentPrecipitation; // units of (m) per timestep

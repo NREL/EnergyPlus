@@ -212,6 +212,7 @@ namespace DataWater {
         Real64 HorizArea; // area of surfaces in the vertical normal direction
         Real64 VdotAvail;
         Real64 VolCollected;
+        Array1D<Real64> VolCollectedMonthly;
         Real64 MeanHeight;
 
         // Default Constructor
@@ -267,6 +268,10 @@ namespace DataWater {
         // calculated and from elsewhere.
         Real64 CurrentRate;
         Real64 CurrentAmount;
+        Array1D<Real64> MonthlyTotalPrecInRainCol; // Monthly total rain in rain collector
+        Array1D<Real64> MonthlyTotalPrecInRoofIrr; // Monthly total rain in roof irrigation
+        Array1D<Real64> MonthlyTotalPrecInWeather; // Monthly total rain in weather file
+        Array1D<int> numRainyHoursInWeather;   // Monthly number of rainy hours
 
         // Default Constructor
         SiteRainFallDataStruct()

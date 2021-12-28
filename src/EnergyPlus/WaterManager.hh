@@ -112,6 +112,8 @@ namespace WaterManager {
 
     void UpdateWaterManager(EnergyPlusData &state);
 
+    void ReportRainfall(EnergyPlusData &state);
+
 } // namespace WaterManager
 
 struct WaterManagerData : BaseGlobalStruct

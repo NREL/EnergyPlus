@@ -61,8 +61,10 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -458,6 +460,7 @@ namespace WaterManager {
                     state.dataWaterData->RainCollector(Item).NumCollectSurfs = NumAlphas - alphaOffset;
                     state.dataWaterData->RainCollector(Item).SurfName.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
                     state.dataWaterData->RainCollector(Item).SurfID.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
+                    state.dataWaterData->RainCollector(Item).VolCollectedMonthly.dimension(12, 0.0);
                     for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
                         state.dataWaterData->RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
                         state.dataWaterData->RainCollector(Item).SurfID(SurfNum) =
@@ -952,19 +955,42 @@ namespace WaterManager {
             }
             state.dataWaterData->RainFall.CurrentRate = schedRate * ScaleFactor / DataGlobalConstants::SecInHour; // convert to m/s
             state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
-        // when there's no site:precipitation but non-zero epw precipitation, uset the epw precipitation as the CurrentRate
         } else {
             // placeholder: add EP checks for out of range precipitation value later -- yujie
-            if (state.dataEnvrn->LiquidPrecipitation > 0) {
+            // when there's no site:precipitation but non-zero epw precipitation, uset the epw precipitation as the CurrentRate
+            if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
                 ShowWarningMessage(state, "Please be aware that precipitation depth in the .epw weather file is used in the RainCollector calculation as the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
-                state.dataWaterData->RainFall.CurrentRate = state.dataEnvrn->LiquidPrecipitation / DataGlobalConstants::SecInHour;
+                // LiquidPrecipitation is for a certain timestep in an hour, the rate = depth / seconds in a timestep
+                state.dataWaterData->RainFall.CurrentRate = state.dataEnvrn->LiquidPrecipitation / (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
+                // fixme: debug print
+//                fmt::print("{} {}-{} prec amount: dep={}, rate={}\n",
+//                           state.dataEnvrn->CurMnDy,
+//                           state.dataGlobal->HourOfDay,
+//                           state.dataGlobal->TimeStep,
+//                           state.dataEnvrn->LiquidPrecipitation,
+//                           state.dataWaterData->RainFall.CurrentRate);
             // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
             } else if (state.dataEnvrn->IsRain) {
                 ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
                 state.dataWaterData->RainFall.CurrentRate = (1.5 / 1000.0) / DataGlobalConstants::SecInHour;
             }
-            state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
+            // rain depth in an HVAC system loop
+            state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / (state.dataGlobal->NumOfTimeStepInHour * state.dataHVACGlobal->NumOfSysTimeSteps));
         }
+        int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+        // change unit back to mm in the reporting in monthly rain amount used in rain collector
+        state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+        // fixme: debug print
+//        if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
+//            fmt::print("{} {}-{} rain fall amount for month {}: dep={}, cur={}, acc={:.5f}\n",
+//                       state.dataEnvrn->CurMnDy,
+//                       state.dataGlobal->HourOfDay,
+//                       state.dataGlobal->TimeStep,
+//                       month - 1,
+//                       state.dataEnvrn->LiquidPrecipitation,
+//                       state.dataWaterData->RainFall.CurrentAmount,
+//                       state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1]);
+//        }
     }
 
     void UpdateIrrigation(EnergyPlusData &state)
@@ -995,6 +1021,10 @@ namespace WaterManager {
             schedRate = GetCurrentScheduleValue(state, state.dataWaterData->Irrigation.IrrSchedID); // m/hr
             state.dataWaterData->Irrigation.ScheduledAmount =
                 schedRate * (TimeStepSys * DataGlobalConstants::SecInHour) / DataGlobalConstants::SecInHour; // convert to m/timestep
+            // fixme: debug print
+//            if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
+//                fmt::print("liquid precip > 0");
+//            }
         }
     }
 
@@ -1479,6 +1509,16 @@ namespace WaterManager {
 
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
+            int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+            // fixme: check memory
+            state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] += state.dataWaterData->RainCollector(RainColNum).VolCollected;
+            // fixme: debug print
+//            fmt::print("{} {}-{} rain water collected for {}: {}\n",
+//                       state.dataEnvrn->CurMnDy,
+//                       state.dataGlobal->HourOfDay,
+//                       state.dataGlobal->TimeStep,
+//                       RainColNum,
+//                       state.dataWaterData->RainCollector(RainColNum).VolCollected);
         }
     }
 
@@ -1637,6 +1677,23 @@ namespace WaterManager {
             state.dataWaterData->GroundwaterWell(WellNum).VolDelivered = 0.0;
             state.dataWaterData->GroundwaterWell(WellNum).PumpPower = 0.0;
             state.dataWaterData->GroundwaterWell(WellNum).PumpEnergy = 0.0;
+        }
+    }
+
+    void ReportRainfall(EnergyPlusData &state)
+    {
+        Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
+        for (int i = 0; i < 12; i++) {
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalPrecInWeather, Months[i], state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[i]);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalHrRain, Months[i], state.dataWaterData->RainFall.numRainyHoursInWeather[i]);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalPrecInRainCol, Months[i], state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[i]);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalPrecInRoofIrr, Months[i], state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[i]);
+            Real64 accVolCollectedMonthly = 0.0;
+            for (int Item = 1; Item <= state.dataWaterData->NumRainCollectors; Item++) {
+                accVolCollectedMonthly += state.dataWaterData->RainCollector(Item).VolCollectedMonthly[i];
+            }
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalRainCol, Months[i], accVolCollectedMonthly);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalIrrDep, Months[i], state.dataEcoRoofMgr->MonthlyIrrigation[i]);
         }
     }
 

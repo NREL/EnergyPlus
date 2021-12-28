@@ -125,6 +125,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterManager.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZonePlenum.hh>
@@ -5237,6 +5238,7 @@ void WriteTabularReports(EnergyPlusData &state)
 
     FillWeatherPredefinedEntries(state);
     FillRemainingPredefinedEntries(state);
+    WaterManager::ReportRainfall(state);
     auto &ort(state.dataOutRptTab);
 
     // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
@@ -5916,13 +5918,14 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         substr.erase(remove_if(substr.begin(), substr.end(), isspace), substr.end());
                         result.push_back(substr);
                     }
-                    int monthlyTotalPrec [12];
-                    int annualTotalPrec = 0;
+                    int monthlyTotalPrecFromStat [12];
+                    int annualTotalPrecFromStat = 0;
                     for (int i = 0; i < 12; i++) {
-                        monthlyTotalPrec[i] = std::stoi(result[i + 2]);
-                        annualTotalPrec += monthlyTotalPrec[i];
+                        monthlyTotalPrecFromStat[i] = std::stoi(result[i + 2]);
+                        // fixme: add to monthly data structure
+                        annualTotalPrecFromStat += monthlyTotalPrecFromStat[i];
                     }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Annual Total Precipitation [mm]", annualTotalPrec);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Annual Total Precipitation [mm]", annualTotalPrecFromStat);
                     // fixme: store the monthly data in some data structure
                 } else if (SELECT_CASE_var == StatLineType::maxHourlyPrec) { //   - Highest hourly precipitation in each month
                     // Split string by \t into substrings and remove the space in each substring

@@ -206,6 +206,14 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDDhumTyp = 0;
     int pdchDDwindSp = 0;
     int pdchDDwindDr = 0;
+    int pdstMonthlyPrec = 0;
+    int pdchMonthlyTotalPrecInWeather = 0;
+    int pdchMonthlyTotalHrRain = 0;
+    int pdchMonthlyTotalPrecInIrr = 0;
+    int pdchMonthlyTotalPrecInRainCol = 0;
+    int pdchMonthlyTotalPrecInRoofIrr = 0;
+    int pdchMonthlyTotalIrrDep = 0;
+    int pdchMonthlyTotalRainCol = 0;
     int pdstWthr = 0;
     int pdchWthrVal = 0;
 
@@ -1212,6 +1220,14 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchDDhumTyp = 0;
         this->pdchDDwindSp = 0;
         this->pdchDDwindDr = 0;
+        // this->monthlyPrec = 0;
+        this->pdchMonthlyTotalPrecInWeather = 0;
+        this->pdchMonthlyTotalHrRain = 0;
+        this->pdchMonthlyTotalPrecInIrr = 0;
+        this->pdchMonthlyTotalPrecInRainCol = 0;
+        this->pdchMonthlyTotalPrecInRoofIrr = 0;
+        this->pdchMonthlyTotalIrrDep = 0;
+        this->pdchMonthlyTotalRainCol = 0;
         this->pdstWthr = 0;
         this->pdchWthrVal = 0;
         this->pdrEquip = 0;
