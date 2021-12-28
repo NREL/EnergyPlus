@@ -557,6 +557,6 @@
 
   Output:Variable,*,CondFD Phase Change Node Specific Heat 5,hourly;
 
-  Output:Variable,*,CondFD Heat Source Power After Layer 4,hourly;
+  Output:Variable,*,CondFD EMS Heat Source Power After Layer 4,hourly;
 
-  Output:Variable,*,CondFD Heat Source Energy After Layer 4,hourly;
+  Output:Variable,*,CondFD EMS Heat Source Energy After Layer 4,hourly;

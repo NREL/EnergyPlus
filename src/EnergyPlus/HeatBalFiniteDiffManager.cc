@@ -832,8 +832,10 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).condNodeReport.allocate(TotNodes + 1);
             SurfaceFD(Surf).specHeatNodeReport.allocate(TotNodes + 1);
             SurfaceFD(Surf).heatSourceFluxMaterialActuators.allocate(TotLayers - 1);
-            SurfaceFD(Surf).heatSourceFluxLayerReport.allocate(TotLayers - 1);
-            SurfaceFD(Surf).heatSourceFluxEnergyLayerReport.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceInternalFluxLayerReport.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceInternalFluxEnergyLayerReport.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceEMSFluxLayerReport.allocate(TotLayers - 1);
+            SurfaceFD(Surf).heatSourceEMSFluxEnergyLayerReport.allocate(TotLayers - 1);
 
             // Initialize the allocated arrays.
             SurfaceFD(Surf).T = TempInitValue;
@@ -862,8 +864,10 @@ namespace HeatBalFiniteDiffManager {
             SurfaceFD(Surf).PhaseChangeTemperatureReverse = 50;
             SurfaceFD(Surf).condNodeReport = 0.0;
             SurfaceFD(Surf).specHeatNodeReport = 0.0;
-            SurfaceFD(Surf).heatSourceFluxLayerReport = 0.0;
-            SurfaceFD(Surf).heatSourceFluxEnergyLayerReport = 0.0;
+            SurfaceFD(Surf).heatSourceInternalFluxLayerReport = 0.0;
+            SurfaceFD(Surf).heatSourceInternalFluxEnergyLayerReport = 0.0;
+            SurfaceFD(Surf).heatSourceEMSFluxLayerReport = 0.0;
+            SurfaceFD(Surf).heatSourceEMSFluxEnergyLayerReport = 0.0;
 
             // Setup EMS data
             for (int lay = 1; lay <= TotLayers; ++lay) {
@@ -896,52 +900,74 @@ namespace HeatBalFiniteDiffManager {
 
             // Setup EMS Material Actuators for Conductivity and Specific Heat
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-            for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
-                EnergyPlus::SetupEMSActuator(state,
-                                             "CondFD Surface Material Layer",
-                                             SurfaceFD(SurfNum).condMaterialActuators(lay).actuatorName,
-                                             "Thermal Conductivity",
-                                             "[W/m-K]",
-                                             SurfaceFD(SurfNum).condMaterialActuators(lay).isActuated,
-                                             SurfaceFD(SurfNum).condMaterialActuators(lay).actuatedValue);
-                EnergyPlus::SetupEMSActuator(state,
-                                             "CondFD Surface Material Layer",
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(lay).actuatorName,
-                                             "Specific Heat",
-                                             "[J/kg-C]",
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(lay).isActuated,
-                                             SurfaceFD(SurfNum).specHeatMaterialActuators(lay).actuatedValue);
-            }
 
-            // Setup EMS Actuator and Output Variables for Heat Flux
+            // Setup internal heat source output variables
             // Only setup for layers 1 to N-1
             for (int lay = 1; lay < state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
-                EnergyPlus::SetupEMSActuator(state,
-                                             "CondFD Surface Material Layer",
-                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).actuatorName,
-                                             "Heat Flux",
-                                             "[W/m2]",
-                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).isActuated,
-                                             SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).actuatedValue);
                 SetupOutputVariable(state,
-                                    format("CondFD Heat Source Power After Layer {}", lay),
+                                    format("CondFD Internal Heat Source Power After Layer {}", lay),
                                     OutputProcessor::Unit::W,
-                                    SurfaceFD(SurfNum).heatSourceFluxLayerReport(lay),
+                                    SurfaceFD(SurfNum).heatSourceInternalFluxLayerReport(lay),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
-                                    format("CondFD Heat Source Energy After Layer {}", lay),
+                                    format("CondFD Internal Heat Source Energy After Layer {}", lay),
                                     OutputProcessor::Unit::J,
-                                    SurfaceFD(SurfNum).heatSourceFluxEnergyLayerReport(lay),
+                                    SurfaceFD(SurfNum).heatSourceInternalFluxEnergyLayerReport(lay),
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    state.dataSurface->Surface(SurfNum).Name,
-                                    _,
-                                    "Electricity",
-                                    "Heating",
-                                    _,
-                                    "Building");
+                                    state.dataSurface->Surface(SurfNum).Name);
+            }
+
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                for (int lay = 1; lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+                    EnergyPlus::SetupEMSActuator(state,
+                                                 "CondFD Surface Material Layer",
+                                                 SurfaceFD(SurfNum).condMaterialActuators(lay).actuatorName,
+                                                 "Thermal Conductivity",
+                                                 "[W/m-K]",
+                                                 SurfaceFD(SurfNum).condMaterialActuators(lay).isActuated,
+                                                 SurfaceFD(SurfNum).condMaterialActuators(lay).actuatedValue);
+                    EnergyPlus::SetupEMSActuator(state,
+                                                 "CondFD Surface Material Layer",
+                                                 SurfaceFD(SurfNum).specHeatMaterialActuators(lay).actuatorName,
+                                                 "Specific Heat",
+                                                 "[J/kg-C]",
+                                                 SurfaceFD(SurfNum).specHeatMaterialActuators(lay).isActuated,
+                                                 SurfaceFD(SurfNum).specHeatMaterialActuators(lay).actuatedValue);
+                }
+
+                // Setup EMS Actuator and Output Variables for Heat Flux
+                // Only setup for layers 1 to N-1
+                for (int lay = 1; lay < state.dataConstruction->Construct(ConstrNum).TotLayers; ++lay) {
+                    EnergyPlus::SetupEMSActuator(state,
+                                                 "CondFD Surface Material Layer",
+                                                 SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).actuatorName,
+                                                 "Heat Flux",
+                                                 "[W/m2]",
+                                                 SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).isActuated,
+                                                 SurfaceFD(SurfNum).heatSourceFluxMaterialActuators(lay).actuatedValue);
+                    SetupOutputVariable(state,
+                                        format("CondFD EMS Heat Source Power After Layer {}", lay),
+                                        OutputProcessor::Unit::W,
+                                        SurfaceFD(SurfNum).heatSourceEMSFluxLayerReport(lay),
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::State,
+                                        state.dataSurface->Surface(SurfNum).Name);
+                    SetupOutputVariable(state,
+                                        format("CondFD EMS Heat Source Energy After Layer {}", lay),
+                                        OutputProcessor::Unit::J,
+                                        SurfaceFD(SurfNum).heatSourceEMSFluxEnergyLayerReport(lay),
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataSurface->Surface(SurfNum).Name,
+                                        _,
+                                        "Electricity",
+                                        "Heating",
+                                        _,
+                                        "Building");
+                }
             }
 
             TotNodes = ConstructFD(state.dataSurface->Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
@@ -1938,6 +1964,13 @@ namespace HeatBalFiniteDiffManager {
                     QSSFlux = (state.dataHeatBalFanSys->QRadSysSource(Surf) + state.dataHeatBalFanSys->QPVSysSource(Surf)) / surface.Area;
                 }
 
+                // update report variables
+                auto &surfFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf);
+
+                // only includes internal heat source
+                surfFD.heatSourceInternalFluxLayerReport(Lay) = QSSFlux * surface.Area;
+                surfFD.heatSourceInternalFluxEnergyLayerReport(Lay) = QSSFlux * surface.Area * state.dataGlobal->TimeStepZoneSec;
+
                 // Add EMS actuated value
                 if (heatFluxActuator.isActuated) {
                     Real64 actuatedVal = heatFluxActuator.actuatedValue;
@@ -1950,9 +1983,10 @@ namespace HeatBalFiniteDiffManager {
                     }
 
                     // Update report variables
-                    auto &surfFD = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf);
-                    surfFD.heatSourceFluxLayerReport(Lay) = QSSFlux * surface.Area;
-                    surfFD.heatSourceFluxEnergyLayerReport(Lay) = QSSFlux * surface.Area * state.dataGlobal->TimeStepZoneSec;
+                    // Only includes the EMS values
+                    surfFD.heatSourceEMSFluxLayerReport(Lay) = heatFluxActuator.actuatedValue * surface.Area;
+                    surfFD.heatSourceEMSFluxEnergyLayerReport(Lay) =
+                        heatFluxActuator.actuatedValue * surface.Area * state.dataGlobal->TimeStepZoneSec;
                 }
 
                 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

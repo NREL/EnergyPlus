@@ -114,3 +114,28 @@ Several actuators, called ``CondFD Surface Material Layer,'' are available with 
     \item ``Specific Heat''. Has units of [J/kg-C]. Controls the specific heat for the specified material layer within a given surfaced. Actuator is named as described previously.
     \item ``Heat Flux''. Has units of [W/m2]. Controls the surface heat flux for the specified material layer within a given surface. The source is added directly after the material layer referenced and is not available for the final material layer. I.e. it must be inserted between two materal layers. Actuator is named as described previously. The actuator uses the same mechanism as the ``ConductionProperty:InternalHeatSource'' object, and is additive to the results computed by this object, if present. Actuator can only be used to add energy (i.e. positive numbers only), and the energy used is added to the electric heating sub-meter.
 \end{itemize}
+
+\subsubsection{Conduction Finite Difference Outputs}
+
+\begin{itemize}
+  \item Zone,Average,CondFD Phase Change Node Conductivity [W/m-K]
+  \item Zone,Average,CondFD Phase Change Node Specific Heat [J/kg-K]
+  \item Zone,Average,CondFD EMS Heat Source Power After Layer N [W]
+  \item Zone,Average,CondFD EMS Heat Source Energy After Layer N [J]
+\end{itemize}
+
+\paragraph{CondFD Phase Change Node Conductivity}
+
+This output reports thermal conductivity at the node level.
+
+\paragraph{CondFD Phase Change Node Specific Heat}
+
+This output reports specific heat at the node level.
+
+\paragraph{CondFD EMS Heat Source Power After Layer N}
+
+This output reports the heat power added after material layer N
+
+\paragraph{CondFD EMS Heat Source Energy After Layer N}
+
+This output reports the heat energy added after material layer N
