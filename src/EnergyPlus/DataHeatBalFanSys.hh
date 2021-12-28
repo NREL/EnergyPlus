@@ -72,13 +72,14 @@ namespace DataHeatBalFanSys {
 
     enum class PredictorCorrectorCtrl
     {
-        Unassigned = -1,
+        Invalid = -1,
         GetZoneSetPoints,
         PredictStep,
         CorrectStep,
         RevertZoneTimestepHistories,
         PushZoneTimestepHistories,
-        PushSystemTimestepHistories
+        PushSystemTimestepHistories,
+        Num
     };
 
     struct ZoneComfortControlsFangerData

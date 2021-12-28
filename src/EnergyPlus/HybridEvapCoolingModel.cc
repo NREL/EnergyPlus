@@ -1046,6 +1046,8 @@ namespace HybridEvapCoolingModel {
             case SYSTEMOUTPUTS::MIXED_AIR_HR:
                 value = thisOperatingSettings.Mixed_Air_W * thisOperatingSettings.ScaledSupply_Air_Mass_Flow_Rate;
                 break;
+            default:
+                assert(false);
             }
             Real64 part_run = thisOperatingSettings.Runtime_Fraction;
             averagedVal = averagedVal + value * part_run;

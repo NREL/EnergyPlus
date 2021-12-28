@@ -1367,7 +1367,7 @@ void therm1d(EnergyPlusData &state,
     // Simon: This is set to zero until it is resolved what to do with modifier
     ShadeHcModifiedOut = 0.0;
     CSMFlag = 0;
-    CalcOutcome = CalculationOutcome::Unknown;
+    CalcOutcome = CalculationOutcome::Invalid;
     curTempCorrection = 0;
     AchievedErrorTolerance = 0.0;
     curDifference = 0.0;
@@ -1920,7 +1920,7 @@ void therm1d(EnergyPlusData &state,
                 vfreevent);
     }
 
-    if (CalcOutcome == CalculationOutcome::Unknown) {
+    if (CalcOutcome == CalculationOutcome::Invalid) {
         ErrorMessage = "Tarcog failed to converge";
         nperr = 2; // error 2: failed to converge...
     }

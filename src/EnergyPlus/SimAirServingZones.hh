@@ -77,7 +77,7 @@ namespace SimAirServingZones {
     // component types addressed by this module
     enum class CompType
     {
-        Unassigned = -1,
+        Invalid = -1,
         OAMixer_Num,
         Fan_Simple_CV,
         Fan_Simple_VAV,
@@ -110,7 +110,8 @@ namespace SimAirServingZones {
         ZoneVRFasAirLoopEquip,
         PVT_AirBased,
         VRFTerminalUnit,
-        CoilSystemWater
+        CoilSystemWater,
+        Num
     };
 
     void ManageAirLoops(EnergyPlusData &state,
@@ -162,9 +163,9 @@ namespace SimAirServingZones {
                              int AirLoopNum,              // Primary air loop number
                              int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
                              HVACSystemData *CompPointer, // equipment actual pointer
-                             int const &airLoopNum,       // index to AirloopHVAC
-                             int const &branchNum,        // index to AirloopHVAC branch
-                             int const &compNum           // index to AirloopHVAC branch component
+                             int airLoopNum,              // index to AirloopHVAC
+                             int branchNum,               // index to AirloopHVAC branch
+                             int compNum                  // index to AirloopHVAC branch component
     );
 
     void UpdateBranchConnections(EnergyPlusData &state,

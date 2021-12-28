@@ -86,8 +86,8 @@ Array1D_string const cOAFlowMethodTypes(NumOAFlowMethods,
 //  using user input system flow rates.
 //  before applying user input sys flow rates.
 
-Real64 TermUnitSizingData::applyTermUnitSizingCoolFlow(Real64 const &coolFlowWithOA, // Cooling flow rate with MinOA limit applied
-                                                       Real64 const &coolFlowNoOA    // Cooling flow rate without MinOA limit applied
+Real64 TermUnitSizingData::applyTermUnitSizingCoolFlow(Real64 const coolFlowWithOA, // Cooling flow rate with MinOA limit applied
+                                                       Real64 const coolFlowNoOA    // Cooling flow rate without MinOA limit applied
 )
 {
     // Apply DesignSpecification:AirTerminal:Sizing to cooling flow (could be vol flow or mass flow)
@@ -101,8 +101,8 @@ Real64 TermUnitSizingData::applyTermUnitSizingCoolFlow(Real64 const &coolFlowWit
     return adjustedFlow;
 }
 
-Real64 TermUnitSizingData::applyTermUnitSizingHeatFlow(Real64 const &heatFlowWithOA, // Heating flow rate with MinOA limit applied
-                                                       Real64 const &heatFlowNoOA    // Heating flow rate without MinOA limit applied
+Real64 TermUnitSizingData::applyTermUnitSizingHeatFlow(Real64 const heatFlowWithOA, // Heating flow rate with MinOA limit applied
+                                                       Real64 const heatFlowNoOA    // Heating flow rate without MinOA limit applied
 )
 {
     // Apply DesignSpecification:AirTerminal:Sizing to heating flow (could be vol flow or mass flow)
@@ -316,7 +316,7 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataWaterCoilSizCoolDeltaT = 0.0;
     state.dataSize->DataWaterCoilSizHeatDeltaT = 0.0;
     state.dataSize->DataNomCapInpMeth = false;
-    state.dataSize->DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
+    state.dataSize->DataFanPlacement = ZoneFanPlacement::NotSet;
     state.dataSize->DataDXSpeedNum = 0;
     state.dataSize->DataCoilSizingAirInTemp = 0.0;
     state.dataSize->DataCoilSizingAirInHumRat = 0.0;

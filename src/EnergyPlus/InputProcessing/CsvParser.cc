@@ -267,7 +267,7 @@ void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
 //        case Token::STRING: {
 //            return parse_string(csv, index);
 //        }
-//        case Token::NUMBER: {
+//        case Token::Num: {
 //            return parse_number(csv, index);
 //        }
 //        case Token::FILE_END:

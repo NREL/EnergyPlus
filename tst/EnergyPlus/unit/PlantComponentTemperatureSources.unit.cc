@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     // We can check that GetInput happened properly here
     EXPECT_EQ(1u, state->dataPlantCompTempSrc->WaterSource.size());
     auto &waterSource1 = state->dataPlantCompTempSrc->WaterSource(1);
-    EXPECT_TRUE(compare_enums(PlantComponentTemperatureSources::iTempSpecType::Constant, waterSource1.TempSpecType));
+    EXPECT_TRUE(compare_enums(PlantComponentTemperatureSources::TempSpecType::Constant, waterSource1.tempSpecType));
     EXPECT_EQ(1, waterSource1.InletNodeNum);
     EXPECT_EQ(2, waterSource1.OutletNodeNum);
 

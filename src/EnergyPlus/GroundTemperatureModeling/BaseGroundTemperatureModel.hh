@@ -60,14 +60,15 @@ struct EnergyPlusData;
 
 enum class GroundTempObjType
 {
-    Unassigned = -1,
+    Invalid = -1,
     KusudaGroundTemp,
     FiniteDiffGroundTemp,
     SiteBuildingSurfaceGroundTemp,
     SiteShallowGroundTemp,
     SiteDeepGroundTemp,
     SiteFCFactorMethodGroundTemp,
-    XingGroundTemp
+    XingGroundTemp,
+    Num
 };
 
 // Base class
@@ -86,7 +87,7 @@ public:
     BaseGroundTempsModel &operator=(BaseGroundTempsModel &&) = delete;
 
     // Default Constructor
-    BaseGroundTempsModel() : objectType(GroundTempObjType::Unassigned), errorsFound(false)
+    BaseGroundTempsModel() : objectType(GroundTempObjType::Invalid), errorsFound(false)
     {
     }
 

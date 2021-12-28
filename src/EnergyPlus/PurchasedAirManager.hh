@@ -66,11 +66,12 @@ namespace PurchasedAirManager {
     // Heating and Cooling Limit type parameters
     enum class LimitType
     {
-        Unassigned,
+        Invalid = -1,
         NoLimit,
         LimitFlowRate,
         LimitCapacity,
-        LimitFlowRateAndCapacity
+        LimitFlowRateAndCapacity,
+        Num
     };
     constexpr const char *cLimitType(LimitType l)
     {
@@ -91,47 +92,53 @@ namespace PurchasedAirManager {
     // Dehumidification and Humidification control type parameters
     enum class HumControl
     {
-        Unassigned,
+        Invalid = -1,
         None,
         ConstantSensibleHeatRatio,
         Humidistat,
         ConstantSupplyHumidityRatio,
+        Num
     };
 
     // Demand controlled ventilation type parameters
     enum class DCV
     {
-        Unassigned,
-        NoDCV,
+        Invalid = -1,
+        None,
         OccupancySchedule,
-        CO2SetPoint
+        CO2SetPoint,
+        Num
     };
 
     // Outdoor air economizer type parameters
     enum class Econ
     {
-        Unassigned,
+        Invalid = -1,
         NoEconomizer,
         DifferentialDryBulb,
-        DifferentialEnthalpy
+        DifferentialEnthalpy,
+        Num
     };
 
     // Heat recovery type parameters
     enum class HeatRecovery
     {
-        Unassigned,
-        NoHeatRecovery,
+        Invalid = -1,
+        None,
         Sensible,
-        Enthalpy
+        Enthalpy,
+        Num
     };
 
     // Operating mode parameters
     enum class OpMode
     {
+        Invalid = -1,
         Off,
         Heat,
         Cool,
-        DeadBand
+        DeadBand,
+        Num
     };
 
     struct ZonePurchasedAir
@@ -139,7 +146,7 @@ namespace PurchasedAirManager {
         // Members
         std::string cObjectName;     // Name of the object from IDD
         std::string Name;            // Name or identifier of this piece of equipment
-        std::string AvailSched;      // System availablity schedule
+        std::string AvailSched;      // System availability schedule
         int AvailSchedPtr;           // Index to system availability schedule
         int ZoneSupplyAirNodeNum;    // Node number of zone supply air node for purchased air
         int ZoneExhaustAirNodeNum;   // Node number of zone exhaust air node for purchased air
@@ -276,27 +283,27 @@ namespace PurchasedAirManager {
         ZonePurchasedAir()
             : AvailSchedPtr(0), ZoneSupplyAirNodeNum(0), ZoneExhaustAirNodeNum(0), PlenumExhaustAirNodeNum(0), ReturnPlenumIndex(0),
               PurchAirArrayIndex(0), ZoneRecircAirNodeNum(0), MaxHeatSuppAirTemp(0.0), MinCoolSuppAirTemp(0.0), MaxHeatSuppAirHumRat(0.0),
-              MinCoolSuppAirHumRat(0.0), HeatingLimit(LimitType::Unassigned), MaxHeatVolFlowRate(0.0), MaxHeatSensCap(0.0),
-              CoolingLimit(LimitType::Unassigned), MaxCoolVolFlowRate(0.0), MaxCoolTotCap(0.0), HeatSchedPtr(0), CoolSchedPtr(0),
-              DehumidCtrlType(HumControl::Unassigned), CoolSHR(0.0), HumidCtrlType(HumControl::Unassigned), OARequirementsPtr(0),
-              DCVType(DCV::Unassigned), EconomizerType(Econ::Unassigned), OutdoorAir(false), OutdoorAirNodeNum(0),
-              HtRecType(HeatRecovery::Unassigned), HtRecSenEff(0.0), HtRecLatEff(0.0), OAFlowFracSchPtr(0), MaxHeatMassFlowRate(0.0),
-              MaxCoolMassFlowRate(0.0), EMSOverrideMdotOn(false), EMSValueMassFlowRate(0.0), EMSOverrideOAMdotOn(false), EMSValueOAMassFlowRate(0.0),
-              EMSOverrideSupplyTempOn(false), EMSValueSupplyTemp(0.0), EMSOverrideSupplyHumRatOn(false), EMSValueSupplyHumRat(0.0),
-              MinOAMassFlowRate(0.0), OutdoorAirMassFlowRate(0.0), OutdoorAirVolFlowRateStdRho(0.0), SupplyAirMassFlowRate(0.0),
-              SupplyAirVolFlowRateStdRho(0.0), HtRecSenOutput(0.0), HtRecLatOutput(0.0), OASenOutput(0.0), OALatOutput(0.0), SenOutputToZone(0.0),
-              LatOutputToZone(0.0), SenCoilLoad(0.0), LatCoilLoad(0.0), OAFlowMaxCoolOutputError(0), OAFlowMaxHeatOutputError(0),
-              SaturationOutputError(0), OAFlowMaxCoolOutputIndex(0), OAFlowMaxHeatOutputIndex(0), SaturationOutputIndex(0), AvailStatus(0),
-              CoolErrIndex(0), HeatErrIndex(0), SenHeatEnergy(0.0), LatHeatEnergy(0.0), TotHeatEnergy(0.0), SenCoolEnergy(0.0), LatCoolEnergy(0.0),
-              TotCoolEnergy(0.0), ZoneSenHeatEnergy(0.0), ZoneLatHeatEnergy(0.0), ZoneTotHeatEnergy(0.0), ZoneSenCoolEnergy(0.0),
-              ZoneLatCoolEnergy(0.0), ZoneTotCoolEnergy(0.0), OASenHeatEnergy(0.0), OALatHeatEnergy(0.0), OATotHeatEnergy(0.0), OASenCoolEnergy(0.0),
-              OALatCoolEnergy(0.0), OATotCoolEnergy(0.0), HtRecSenHeatEnergy(0.0), HtRecLatHeatEnergy(0.0), HtRecTotHeatEnergy(0.0),
-              HtRecSenCoolEnergy(0.0), HtRecLatCoolEnergy(0.0), HtRecTotCoolEnergy(0.0), SenHeatRate(0.0), LatHeatRate(0.0), TotHeatRate(0.0),
-              SenCoolRate(0.0), LatCoolRate(0.0), TotCoolRate(0.0), ZoneSenHeatRate(0.0), ZoneLatHeatRate(0.0), ZoneTotHeatRate(0.0),
-              ZoneSenCoolRate(0.0), ZoneLatCoolRate(0.0), ZoneTotCoolRate(0.0), OASenHeatRate(0.0), OALatHeatRate(0.0), OATotHeatRate(0.0),
-              OASenCoolRate(0.0), OALatCoolRate(0.0), OATotCoolRate(0.0), HtRecSenHeatRate(0.0), HtRecLatHeatRate(0.0), HtRecTotHeatRate(0.0),
-              HtRecSenCoolRate(0.0), HtRecLatCoolRate(0.0), HtRecTotCoolRate(0.0), TimeEconoActive(0.0), TimeHtRecActive(0.0), ZonePtr(0),
-              HVACSizingIndex(0), SupplyTemp(0.0), SupplyHumRat(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0)
+              MinCoolSuppAirHumRat(0.0), HeatingLimit(LimitType::Invalid), MaxHeatVolFlowRate(0.0), MaxHeatSensCap(0.0),
+              CoolingLimit(LimitType::Invalid), MaxCoolVolFlowRate(0.0), MaxCoolTotCap(0.0), HeatSchedPtr(0), CoolSchedPtr(0),
+              DehumidCtrlType(HumControl::Invalid), CoolSHR(0.0), HumidCtrlType(HumControl::Invalid), OARequirementsPtr(0), DCVType(DCV::Invalid),
+              EconomizerType(Econ::Invalid), OutdoorAir(false), OutdoorAirNodeNum(0), HtRecType(HeatRecovery::Invalid), HtRecSenEff(0.0),
+              HtRecLatEff(0.0), OAFlowFracSchPtr(0), MaxHeatMassFlowRate(0.0), MaxCoolMassFlowRate(0.0), EMSOverrideMdotOn(false),
+              EMSValueMassFlowRate(0.0), EMSOverrideOAMdotOn(false), EMSValueOAMassFlowRate(0.0), EMSOverrideSupplyTempOn(false),
+              EMSValueSupplyTemp(0.0), EMSOverrideSupplyHumRatOn(false), EMSValueSupplyHumRat(0.0), MinOAMassFlowRate(0.0),
+              OutdoorAirMassFlowRate(0.0), OutdoorAirVolFlowRateStdRho(0.0), SupplyAirMassFlowRate(0.0), SupplyAirVolFlowRateStdRho(0.0),
+              HtRecSenOutput(0.0), HtRecLatOutput(0.0), OASenOutput(0.0), OALatOutput(0.0), SenOutputToZone(0.0), LatOutputToZone(0.0),
+              SenCoilLoad(0.0), LatCoilLoad(0.0), OAFlowMaxCoolOutputError(0), OAFlowMaxHeatOutputError(0), SaturationOutputError(0),
+              OAFlowMaxCoolOutputIndex(0), OAFlowMaxHeatOutputIndex(0), SaturationOutputIndex(0), AvailStatus(0), CoolErrIndex(0), HeatErrIndex(0),
+              SenHeatEnergy(0.0), LatHeatEnergy(0.0), TotHeatEnergy(0.0), SenCoolEnergy(0.0), LatCoolEnergy(0.0), TotCoolEnergy(0.0),
+              ZoneSenHeatEnergy(0.0), ZoneLatHeatEnergy(0.0), ZoneTotHeatEnergy(0.0), ZoneSenCoolEnergy(0.0), ZoneLatCoolEnergy(0.0),
+              ZoneTotCoolEnergy(0.0), OASenHeatEnergy(0.0), OALatHeatEnergy(0.0), OATotHeatEnergy(0.0), OASenCoolEnergy(0.0), OALatCoolEnergy(0.0),
+              OATotCoolEnergy(0.0), HtRecSenHeatEnergy(0.0), HtRecLatHeatEnergy(0.0), HtRecTotHeatEnergy(0.0), HtRecSenCoolEnergy(0.0),
+              HtRecLatCoolEnergy(0.0), HtRecTotCoolEnergy(0.0), SenHeatRate(0.0), LatHeatRate(0.0), TotHeatRate(0.0), SenCoolRate(0.0),
+              LatCoolRate(0.0), TotCoolRate(0.0), ZoneSenHeatRate(0.0), ZoneLatHeatRate(0.0), ZoneTotHeatRate(0.0), ZoneSenCoolRate(0.0),
+              ZoneLatCoolRate(0.0), ZoneTotCoolRate(0.0), OASenHeatRate(0.0), OALatHeatRate(0.0), OATotHeatRate(0.0), OASenCoolRate(0.0),
+              OALatCoolRate(0.0), OATotCoolRate(0.0), HtRecSenHeatRate(0.0), HtRecLatHeatRate(0.0), HtRecTotHeatRate(0.0), HtRecSenCoolRate(0.0),
+              HtRecLatCoolRate(0.0), HtRecTotCoolRate(0.0), TimeEconoActive(0.0), TimeHtRecActive(0.0), ZonePtr(0), HVACSizingIndex(0),
+              SupplyTemp(0.0), SupplyHumRat(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0)
         {
         }
     };
@@ -382,7 +389,7 @@ namespace PurchasedAirManager {
 
     Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);
 
-    bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int const &ReturnPlenumIndex);
+    bool CheckPurchasedAirForReturnPlenum(EnergyPlusData &state, int ReturnPlenumIndex);
 
     void InitializePlenumArrays(EnergyPlusData &state, int PurchAirNum);
 

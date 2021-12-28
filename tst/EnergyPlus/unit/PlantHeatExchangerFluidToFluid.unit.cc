@@ -2306,7 +2306,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataLoopNodes->Node(4).MassFlowRateMax = 2.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.InletTemp = 19.0;
 
-    state->dataPlantHXFluidToFluid->FluidHX(1).ControlMode = PlantHeatExchangerFluidToFluid::iCtrlType::CoolingDifferentialOnOff;
+    state->dataPlantHXFluidToFluid->FluidHX(1).controlMode = PlantHeatExchangerFluidToFluid::ControlType::CoolingDifferentialOnOff;
     state->dataPlantHXFluidToFluid->FluidHX(1).MinOperationTemp = 10.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).MaxOperationTemp = 30.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).Name = "Test HX";
@@ -2408,7 +2408,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataLoopNodes->Node(4).MassFlowRateMax = 2.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.InletTemp = 19.0;
 
-    state->dataPlantHXFluidToFluid->FluidHX(1).ControlMode = PlantHeatExchangerFluidToFluid::iCtrlType::CoolingSetPointOnOffWithComponentOverride;
+    state->dataPlantHXFluidToFluid->FluidHX(1).controlMode = PlantHeatExchangerFluidToFluid::ControlType::CoolingSetPointOnOffWithComponentOverride;
     state->dataPlantHXFluidToFluid->FluidHX(1).MinOperationTemp = 10.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).MaxOperationTemp = 30.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).Name = "Test HX";
@@ -2459,7 +2459,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.inletNodeNum;
 
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.MassFlowRateMax = 2.0;
-    state->dataPlantHXFluidToFluid->FluidHX(1).ControlSignalTemp = PlantHeatExchangerFluidToFluid::iCtrlTemp::DryBulbTemperature;
+    state->dataPlantHXFluidToFluid->FluidHX(1).ControlSignalTemp = PlantHeatExchangerFluidToFluid::CtrlTempType::DryBulbTemperature;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.inletNodeNum = 5;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.loopNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.loopSideNum = 2;

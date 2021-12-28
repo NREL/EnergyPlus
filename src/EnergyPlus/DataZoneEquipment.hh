@@ -78,32 +78,32 @@ namespace DataZoneEquipment {
     // MODULE PARAMETER DEFINITIONS:
     enum class AirNodeType
     {
-        Unassigned = -1,
+        Invalid = -1,
         PathInlet,
         CompInlet,
         Intermediate,
         Outlet,
-        NUM
+        Num
     };
 
     enum class AirLoopHVAC
     {
-        Unassigned = -1,
+        Invalid = -1,
         ZoneSplitter,
         ZoneSupplyPlenum,
         ZoneMixer,
         ZoneReturnPlenum,
-        NUM
+        Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::NUM)> AirLoopHVACTypeNamesCC = {
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::Num)> AirLoopHVACTypeNamesCC = {
         "AirLoopHVAC:ZoneSplitter", "AirLoopHVAC:SupplyPlenum", "AirLoopHVAC:ZoneMixer", "AirLoopHVAC:ReturnPlenum"};
 
     // Start zone equip objects
     // list units that are valid for zone system availability managers first
     enum ZoneEquip
     {
-        Unassigned = -1,
+        Invalid = -1,
         FanCoil4Pipe = 1,
         PkgTermHPAirToAir,
         PkgTermACAirToAir,
@@ -135,7 +135,7 @@ namespace DataZoneEquipment {
         UserDefinedZoneHVACForcedAir,
         CoolingPanel,
         ZoneUnitarySys,
-        NUM
+        Num
     };
 
     constexpr int NumValidSysAvailZoneComponents(14);
@@ -144,27 +144,30 @@ namespace DataZoneEquipment {
     // Per Person Ventilation Rate Mode
     enum class PerPersonVentRateMode
     {
-        Unassgined = -1,
+        Invalid = -1,
         DCVByCurrentLevel,
         ByDesignLevel,
-        NUM
+        Num
     };
 
     enum class LoadDist
     {
+        Invalid = -1,
         SequentialLoading,
         UniformLoading,
         UniformPLRLoading,
         SequentialUniformPLRLoading,
-        NUM
+        Num
     };
 
-    enum class iLightReturnExhaustConfig : int
+    enum class LightReturnExhaustConfig : int
     {
+        Invalid = -1,
         NoExhast = 0, // No exhaust node
         Single = 1,   // One to one configuration
         Multi = 2,    // Multiple return node referred
-        Shared = 3    // Shared exhaust node
+        Shared = 3,   // Shared exhaust node
+        Num
     };
 
     struct EquipMeterData
@@ -174,7 +177,7 @@ namespace DataZoneEquipment {
         OutputProcessor::Unit ReportVarUnits;
         DataGlobalConstants::ResourceType ResourceType;
         std::string EndUse;
-        SystemReports::iEndUseType EndUse_CompMode;
+        SystemReports::EndUseType EndUse_CompMode;
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
@@ -184,9 +187,8 @@ namespace DataZoneEquipment {
         // Default Constructor
         EquipMeterData()
             : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
-              EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
-              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(OutputProcessor::VariableType::NotFound),
-              CurMeterReading(0.0)
+              EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0), ReportVarIndexType(OutputProcessor::TimeStepType::Zone),
+              ReportVarType(OutputProcessor::VariableType::NotFound), CurMeterReading(0.0)
         {
         }
     };
@@ -301,7 +303,7 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeExhaustNodeNum; // Exhaust node number flow to a corrsponding return node due to light heat gain
         // Array1D_int SharedExhaustNode;        // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the
         // exhaust node value
-        Array1D<iLightReturnExhaustConfig>
+        Array1D<LightReturnExhaustConfig>
             SharedExhaustNode; // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)

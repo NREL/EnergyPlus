@@ -62,9 +62,10 @@ namespace HVACCooledBeam {
 
     enum class CooledBeamType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Passive,
-        Active
+        Active,
+        Num
     };
 
     Real64 constexpr NomMassFlowPerBeam(0.07); // nominal water mass flow rate per beam [kg/s]
@@ -134,7 +135,7 @@ namespace HVACCooledBeam {
 
         // Default Constructor
         CoolBeamData()
-            : UnitType_Num(0), CBType(CooledBeamType::Unassigned), SchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), MaxCoolWaterVolFlow(0.0),
+            : UnitType_Num(0), CBType(CooledBeamType::Invalid), SchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), MaxCoolWaterVolFlow(0.0),
               MaxCoolWaterMassFlow(0.0), AirInNode(0), AirOutNode(0), CWInNode(0), CWOutNode(0), ADUNum(0), NumBeams(0.0), BeamLength(0.0),
               DesInletWaterTemp(0.0), DesOutletWaterTemp(0.0), CoilArea(0.0), a(0.0), n1(0.0), n2(0.0), n3(0.0), a0(0.0), K1(0.0), n(0.0), Kin(0.0),
               InDiam(0.0), TWIn(0.0), TWOut(0.0), EnthWaterOut(0.0), BeamFlow(0.0), CoolWaterMassFlow(0.0), BeamCoolingEnergy(0.0),

@@ -73,15 +73,15 @@ namespace HeatBalFiniteDiffManager {
 
     enum class CondFDScheme
     {
-        Unassigned = -1,
+        Invalid = -1,
         CrankNicholsonSecondOrder, // original CondFD scheme.  semi implicit, second order in time
         FullyImplicitFirstOrder,   // fully implicit scheme, first order in time.
-        NUM
+        Num
     };
 
-    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesCC = {"CrankNicholsonSecondOrder",
+    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::Num)> CondFDSchemeTypeNamesCC = {"CrankNicholsonSecondOrder",
                                                                                                                   "FullyImplicitFirstOrder"};
-    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::NUM)> CondFDSchemeTypeNamesUC = {"CRANKNICHOLSONSECONDORDER",
+    static constexpr std::array<std::string_view, static_cast<int>(CondFDScheme::Num)> CondFDSchemeTypeNamesUC = {"CRANKNICHOLSONSECONDORDER",
                                                                                                                   "FULLYIMPLICITFIRSTORDER"};
 
     struct ConstructionDataFD

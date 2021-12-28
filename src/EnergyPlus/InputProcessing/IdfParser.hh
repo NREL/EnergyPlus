@@ -91,7 +91,7 @@ public:
         COMMA = 3,
         SEMICOLON = 4,
         STRING = 5,
-        NUMBER = 6
+        Num = 6
     };
 
 private:

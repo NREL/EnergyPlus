@@ -65,7 +65,7 @@ struct HeatingWaterDesAirInletTempSizer : BaseSizer
     }
     ~HeatingWaterDesAirInletTempSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 };
 
 } // namespace EnergyPlus

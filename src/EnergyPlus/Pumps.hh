@@ -70,24 +70,27 @@ namespace Pumps {
 
     enum class PumpControlType
     {
-        Unassigned,
+        Invalid = -1,
         Continuous,   // Pump control type (pump always running)
         Intermittent, // Pump control type (pump runs only when there is a demand)
+        Num
     };
 
     enum class ControlTypeVFD
     {
-        Unassigned,
+        Invalid = -1,
         VFDManual,    // VFD control type (Scheduled RPM)
         VFDAutomatic, // VFD control type (Variable RPM according to flow request)
+        Num
     };
 
     enum class PumpBankControlSeq
     {
-        Unassigned,
+        Invalid = -1,
         OptimalScheme,    // Control sequencing for pump bank
         SequentialScheme, // Control sequencing for pump bank
         UserDefined,      // Control sequencing for pump bank
+        Num
     };
 
     extern std::string const cPump_VarSpeed;
@@ -98,18 +101,21 @@ namespace Pumps {
 
     enum class PumpType : int
     {
-        Unassigned = -1,
+        Invalid = -1,
         VarSpeed = 0,
         ConSpeed = 1,
         Cond = 2,
         Bank_VarSpeed = 3,
-        Bank_ConSpeed = 4
+        Bank_ConSpeed = 4,
+        Num
     };
 
     enum class PowerSizingMethod
     {
-        sizePowerPerFlow,
-        sizePowerPerFlowPerPressure
+        Invalid = -1,
+        SizePowerPerFlow,
+        SizePowerPerFlowPerPressure,
+        Num
     };
 
     struct PumpVFDControlData
@@ -134,7 +140,7 @@ namespace Pumps {
         // Default Constructor
         PumpVFDControlData()
             : ManualRPMSchedIndex(0), LowerPsetSchedIndex(0), UpperPsetSchedIndex(0), MinRPMSchedIndex(0), MaxRPMSchedIndex(0),
-              VFDControlType(ControlTypeVFD::Unassigned), MaxRPM(0.0), MinRPM(0.0), PumpActualRPM(0.0)
+              VFDControlType(ControlTypeVFD::Invalid), MaxRPM(0.0), MinRPM(0.0), PumpActualRPM(0.0)
         {
         }
     };
@@ -208,13 +214,13 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-            : pumpType(PumpType::Unassigned), TypeOf_Num(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0), BranchNum(0),
-              CompNum(0), PumpControl(PumpControlType::Unassigned), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0),
-              SequencingScheme(PumpBankControlSeq::Unassigned), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0),
+            : pumpType(PumpType::Invalid), TypeOf_Num(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+              PumpControl(PumpControlType::Invalid), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0),
+              SequencingScheme(PumpBankControlSeq::Invalid), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0),
               MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false),
               EMSMassFlowValue(0.0), NomSteamVolFlowRate(0.0), NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0),
               minVolFlowRateWasAutosized(false), MassFlowRateMin(0.0), NomPumpHead(0.0), EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0),
-              NomPowerUse(0.0), NomPowerUseWasAutoSized(false), powerSizingMethod(PowerSizingMethod::sizePowerPerFlowPerPressure),
+              NomPowerUse(0.0), NomPowerUseWasAutoSized(false), powerSizingMethod(PowerSizingMethod::SizePowerPerFlowPerPressure),
               powerPerFlowScalingFactor(348701.1),            // 22 W/gpm
               powerPerFlowPerPressureScalingFactor(1 / 0.78), // legacy impeller efficiency
               MotorEffic(0.0), PumpEffic(0.0), FracMotorLossToFluid(0.0), Energy(0.0), Power(0.0), PartLoadCoef(4, 0.0), PressureCurve_Index(0),

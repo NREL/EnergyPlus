@@ -72,9 +72,10 @@ namespace HVACInterfaceManager {
 
     enum class FlowType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Constant,
-        Variable
+        Variable,
+        Num
     };
 
     struct CommonPipeData
@@ -104,10 +105,10 @@ namespace HVACInterfaceManager {
 
         // Default Constructor
         CommonPipeData()
-            : CommonPipeType(DataPlant::CommonPipeType::No), SupplySideInletPumpType(FlowType::Unassigned),
-              DemandSideInletPumpType(FlowType::Unassigned), FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0),
-              SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0), PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0),
-              SecInletSetPoint(0.0), PriInletControlled(false), SecInletControlled(false), PriFlowRequest(0.0)
+            : CommonPipeType(DataPlant::CommonPipeType::No), SupplySideInletPumpType(FlowType::Invalid), DemandSideInletPumpType(FlowType::Invalid),
+              FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0), SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0),
+              PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0), SecInletSetPoint(0.0), PriInletControlled(false),
+              SecInletControlled(false), PriFlowRequest(0.0)
         {
         }
     };
@@ -116,7 +117,7 @@ namespace HVACInterfaceManager {
 
     void UpdateHVACInterface(EnergyPlusData &state,
                              int AirLoopNum, // airloop number for which air loop this is
-                             DataConvergParams::iCalledFrom CalledFrom,
+                             DataConvergParams::CalledFrom CalledFrom,
                              int OutletNode,          // Node number for the outlet of the side of the loop just simulated
                              int InletNode,           // Node number for the inlet of the side that needs the outlet node data
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated

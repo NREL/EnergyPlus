@@ -100,7 +100,7 @@ struct EquipListCompData
 
     // Default Constructor
     EquipListCompData()
-        : CtrlType(DataPlant::CtrlType::Unassigned), LoopNumPtr(0), LoopSideNumPtr(0), BranchNumPtr(0), CompNumPtr(0), SetPointFlowRate(0.0),
+        : CtrlType(DataPlant::CtrlType::Invalid), LoopNumPtr(0), LoopSideNumPtr(0), BranchNumPtr(0), CompNumPtr(0), SetPointFlowRate(0.0),
           DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
     {
     }
@@ -145,7 +145,7 @@ struct OperationData
 
     // Default Constructor
     OperationData()
-        : Type(DataPlant::OpScheme::Unassigned), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0),
+        : Type(DataPlant::OpScheme::Invalid), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0),
           ReferenceNodeNumber(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1),
           EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
     {

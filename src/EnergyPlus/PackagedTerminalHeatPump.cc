@@ -378,7 +378,7 @@ void SimPTUnit(EnergyPlusData &state,
 
     if (!state.dataPTHP->PTUnit(PTUnitNum).useVSCoilModel) {
         // report variables
-        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
             state.dataPTHP->PTUnit(PTUnitNum).CompPartLoadRatio = PartLoadFrac;
         } else {
             state.dataPTHP->PTUnit(PTUnitNum).CompPartLoadRatio = state.dataPTHP->SaveCompressorPLR;
@@ -614,7 +614,7 @@ void GetPTUnit(EnergyPlusData &state)
             state, state.dataPTHP->PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         state.dataPTHP->PTUnit(PTUnitNum).Name = Alphas(1);
         state.dataPTHP->PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
-        state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTHPUnit;
+        state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = PTHPType::PTHPUnit;
         state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir;
         if (lAlphaBlanks(2)) {
             state.dataPTHP->PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -634,7 +634,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).AirOutNode = GetOnlySingleNode(state,
@@ -644,7 +644,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
@@ -1348,25 +1348,25 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         if (NumAlphas < 19) {
-            state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+            state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
         } else if (!lAlphaBlanks(19)) {
             if (UtilityRoutines::SameString(Alphas(19), "SingleZoneVAV")) {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::CCM_ASHRAE;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::CCM_ASHRAE;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = true;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = true;
             } else if (UtilityRoutines::SameString(Alphas(19), "None")) {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             } else {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             }
         } else {
-            state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+            state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
         }
@@ -1394,13 +1394,13 @@ void GetPTUnit(EnergyPlusData &state)
         //                              UseCompressorOffFlow = operate at value specified by user
         //   AirFlowControl only valid if fan opmode = ContFanCycCoil
         if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOnFlow;
+            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = AirflowCtrlMode::UseCompressorOnFlow;
         } else {
-            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOffFlow;
+            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = AirflowCtrlMode::UseCompressorOffFlow;
         }
 
         //   Initialize last mode of compressor operation
-        state.dataPTHP->PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).LastMode = CompMode::HeatingMode;
 
         if (UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).FanType, "Fan:OnOff") ||
             UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume") ||
@@ -1481,7 +1481,7 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         // check for specific input requirements for SZVAV model
-        if (state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).controlType == PTHPCtrlType::CCM_ASHRAE) {
 
             // MaxNoCoolHeatAirVolFlow should be greater than 0
             if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0) {
@@ -1565,7 +1565,7 @@ void GetPTUnit(EnergyPlusData &state)
                       CompSetSupHeatInlet,
                       CompSetSupHeatOutlet);
 
-        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTHPUnit) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTHPUnit) {
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                 // Add heating coil water inlet node as actuator node for coil
                 TempNodeNum = GetOnlySingleNode(state,
@@ -1575,7 +1575,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                 // Add heating coil steam inlet node as actualtor node for coil
@@ -1586,7 +1586,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             }
         }
@@ -1639,7 +1639,7 @@ void GetPTUnit(EnergyPlusData &state)
             state, state.dataPTHP->PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         state.dataPTHP->PTUnit(PTUnitNum).Name = Alphas(1);
         state.dataPTHP->PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
-        state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTACUnit;
+        state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = PTHPType::PTACUnit;
         state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
         if (lAlphaBlanks(2)) {
             state.dataPTHP->PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -1659,7 +1659,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).AirOutNode = GetOnlySingleNode(state,
@@ -1669,7 +1669,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
@@ -2287,25 +2287,25 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         if (NumAlphas < 17) {
-            state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+            state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
         } else if (!lAlphaBlanks(17)) {
             if (UtilityRoutines::SameString(Alphas(17), "SingleZoneVAV")) {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::CCM_ASHRAE;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::CCM_ASHRAE;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = true;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = true;
             } else if (UtilityRoutines::SameString(Alphas(17), "None")) {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             } else {
-                state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+                state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
                 state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
             }
         } else {
-            state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+            state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
             state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
         }
@@ -2325,13 +2325,13 @@ void GetPTUnit(EnergyPlusData &state)
         //                              UseCompressorOffFlow = operate at value specified by user
         //   AirFlowControl only valid if fan opmode = ContFanCycCoil
         if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOnFlow;
+            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = AirflowCtrlMode::UseCompressorOnFlow;
         } else {
-            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOffFlow;
+            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = AirflowCtrlMode::UseCompressorOffFlow;
         }
 
         //   Initialize last mode of compressor operation
-        state.dataPTHP->PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).LastMode = CompMode::HeatingMode;
 
         if (UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).FanType, "Fan:OnOff") ||
             UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).FanType, "Fan:ConstantVolume") ||
@@ -2402,7 +2402,7 @@ void GetPTUnit(EnergyPlusData &state)
         }
 
         // check for specific input requirements for ASHRAE90.1 model
-        if (state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).controlType == PTHPCtrlType::CCM_ASHRAE) {
 
             // MaxNoCoolHeatAirVolFlow should be greater than 0
             if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0) {
@@ -2477,7 +2477,7 @@ void GetPTUnit(EnergyPlusData &state)
                       state.dataLoopNodes->NodeID(HeatCoilInletNodeNum),
                       state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
 
-        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                 // Add heating coil water inlet node as actuator node for coil
                 TempNodeNum = GetOnlySingleNode(state,
@@ -2487,7 +2487,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                 // Add heating coil steam inlet node as actualtor node for coil
@@ -2498,7 +2498,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             }
         }
@@ -2556,7 +2556,7 @@ void GetPTUnit(EnergyPlusData &state)
             state, state.dataPTHP->PTUnitUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         state.dataPTHP->PTUnit(PTUnitNum).Name = Alphas(1);
         state.dataPTHP->PTUnit(PTUnitNum).UnitType = CurrentModuleObject;
-        state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = iPTHPType::PTWSHPUnit;
+        state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num = PTHPType::PTWSHPUnit;
         state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType = DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir;
         if (lAlphaBlanks(2)) {
             state.dataPTHP->PTUnit(PTUnitNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -2577,7 +2577,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).AirOutNode = GetOnlySingleNode(state,
@@ -2587,7 +2587,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsParent);
 
         state.dataPTHP->PTUnit(PTUnitNum).OAMixType = Alphas(5);
@@ -2965,7 +2965,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                    Alphas(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                    ObjectIsNotParent);
             // need better verification.
             if (!CheckOutAirNodeNumber(state, state.dataPTHP->PTUnit(PTUnitNum).CondenserNodeNum)) {
@@ -3302,7 +3302,7 @@ void GetPTUnit(EnergyPlusData &state)
                       CompSetSupHeatInlet,
                       CompSetSupHeatOutlet);
 
-        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTWSHPUnit) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTWSHPUnit) {
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                 // Add heating coil water inlet node as actuator node for coil
                 TempNodeNum = GetOnlySingleNode(state,
@@ -3312,7 +3312,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                 // Add heating coil steam inlet node as actualtor node for coil
@@ -3323,7 +3323,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
                                                 DataLoopNode::NodeConnectionType::Actuator,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             }
         }
@@ -3394,9 +3394,9 @@ void GetPTUnit(EnergyPlusData &state)
 
         //   AirFlowControl only valid if fan opmode = ContFanCycCoil
         if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOnFlow;
+            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = AirflowCtrlMode::UseCompressorOnFlow;
         } else {
-            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = iAirflowCtrlMode::UseCompressorOffFlow;
+            state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl = AirflowCtrlMode::UseCompressorOffFlow;
         }
 
         if (OANodeNums(1) > 0) {
@@ -3541,7 +3541,7 @@ void GetPTUnit(EnergyPlusData &state)
         state.dataPTHP->PTUnit(PTUnitNum).MaxOATSupHeat = Numbers(12);
 
         // WSHP not yet included in ASHRAE90.1 model
-        state.dataPTHP->PTUnit(PTUnitNum).ControlType = iCtrlType::None;
+        state.dataPTHP->PTUnit(PTUnitNum).controlType = PTHPCtrlType::None;
         state.dataPTHP->PTUnit(PTUnitNum).simASHRAEModel = false;
         state.dataPTHP->PTUnit(PTUnitNum).validASHRAECoolCoil = false;
         state.dataPTHP->PTUnit(PTUnitNum).validASHRAEHeatCoil = false;
@@ -3938,7 +3938,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
@@ -3946,7 +3946,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
@@ -3954,7 +3954,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
@@ -3962,7 +3962,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
         } else {
@@ -3971,7 +3971,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType_Num > 0) {
@@ -3979,7 +3979,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num > 0) {
@@ -3987,7 +3987,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num > 0) {
@@ -3995,7 +3995,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          state.dataPTHP->PTUnit(PTUnitNum).FanIndex);
             }
         }
@@ -4614,7 +4614,7 @@ void InitPTUnit(EnergyPlusData &state,
             state.dataLoopNodes->Node(state.dataPTHP->PTUnit(PTUnitNum).AirReliefNode).MassFlowRateMinAvail = 0.0;
         }
         MyEnvrnFlag(PTUnitNum) = false;
-        state.dataPTHP->PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).LastMode = CompMode::HeatingMode;
 
         //   set fluid-side hardware limits
         if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode > 0) {
@@ -5059,20 +5059,20 @@ void SetOnOffMassFlowRate(EnergyPlusData &state,
             state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow;
             state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).HeatingSpeedRatio;
             state.dataPTHP->OACompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirMassFlow;
-            state.dataPTHP->PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
+            state.dataPTHP->PTUnit(PTUnitNum).LastMode = CompMode::HeatingMode;
         } else if (state.dataPTHP->CoolingLoad) {
             state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirMassFlow;
             state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).CoolingSpeedRatio;
             state.dataPTHP->OACompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirMassFlow;
-            state.dataPTHP->PTUnit(PTUnitNum).LastMode = iCompMode::CoolingMode;
+            state.dataPTHP->PTUnit(PTUnitNum).LastMode = CompMode::CoolingMode;
         } else {
             state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirMassFlow;
             state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).NoHeatCoolSpeedRatio;
             state.dataPTHP->OACompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).NoCoolHeatOutAirMassFlow;
         }
 
-        if (state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl == iAirflowCtrlMode::UseCompressorOnFlow) {
-            if (state.dataPTHP->PTUnit(PTUnitNum).LastMode == iCompMode::HeatingMode) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl == AirflowCtrlMode::UseCompressorOnFlow) {
+            if (state.dataPTHP->PTUnit(PTUnitNum).LastMode == CompMode::HeatingMode) {
                 state.dataPTHP->CompOffMassFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirMassFlow;
                 state.dataPTHP->CompOffFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).HeatingSpeedRatio;
                 state.dataPTHP->OACompOffMassFlow = state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirMassFlow;
@@ -5208,15 +5208,15 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
     CompName = state.dataPTHP->PTUnit(PTUnitNum).Name;
     state.dataSize->DataZoneNumber = state.dataPTHP->PTUnit(PTUnitNum).ZonePtr;
     if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+        state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
     } else {
-        state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+        state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
     }
     state.dataSize->DataFanIndex = state.dataPTHP->PTUnit(PTUnitNum).FanIndex;
     if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
     } else if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
     }
 
     if (state.dataSize->CurZoneEqNum > 0) {
@@ -5533,7 +5533,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
             if (state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir ||
                 state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == AutoSize &&
-                    state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
+                    state.dataPTHP->PTUnit(PTUnitNum).controlType == PTHPCtrlType::CCM_ASHRAE) {
                     SizingMethod = AutoCalculateSizing;
                     state.dataSize->DataConstantUsedForSizing =
                         max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
@@ -5832,7 +5832,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
         }
     }
 
-    if (state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
+    if (state.dataPTHP->PTUnit(PTUnitNum).controlType == PTHPCtrlType::CCM_ASHRAE) {
 
         SizingDesRunThisZone = false;
         state.dataSize->DataZoneUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum;
@@ -6013,7 +6013,7 @@ void ControlPTUnitOutput(EnergyPlusData &state,
                 PartLoadFrac = 1.0;
                 return;
             }
-            if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+            if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
                 ErrorToler = 0.001;
             } else {
                 ErrorToler = state.dataPTHP->PTUnit(PTUnitNum).CoolConvergenceTol; // Error tolerance for convergence from input deck
@@ -6333,7 +6333,7 @@ void CalcPTUnit(EnergyPlusData &state,
     if (state.dataPTHP->CoolingLoad && OutsideDryBulbTemp > state.dataPTHP->PTUnit(PTUnitNum).MinOATCompressorCooling) {
         {
             auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-            if ((SELECT_CASE_var == iPTHPType::PTACUnit) || (SELECT_CASE_var == iPTHPType::PTHPUnit)) {
+            if ((SELECT_CASE_var == PTHPType::PTACUnit) || (SELECT_CASE_var == PTHPType::PTHPUnit)) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
@@ -6354,7 +6354,7 @@ void CalcPTUnit(EnergyPlusData &state,
                               OnOffAirFlowRatio);
                 }
                 state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum);
-            } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
+            } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
                 HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                 SimWatertoAirHPSimple(state,
                                       std::string(),
@@ -6377,7 +6377,7 @@ void CalcPTUnit(EnergyPlusData &state,
     } else { // cooling coil is off
         {
             auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-            if ((SELECT_CASE_var == iPTHPType::PTACUnit) || (SELECT_CASE_var == iPTHPType::PTHPUnit)) {
+            if ((SELECT_CASE_var == PTHPType::PTACUnit) || (SELECT_CASE_var == PTHPType::PTHPUnit)) {
                 if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
@@ -6397,7 +6397,7 @@ void CalcPTUnit(EnergyPlusData &state,
                               dZero,
                               OnOffAirFlowRatio);
                 }
-            } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
+            } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
                 SimWatertoAirHPSimple(state,
                                       std::string(),
                                       state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
@@ -6416,7 +6416,7 @@ void CalcPTUnit(EnergyPlusData &state,
         }
     }
     if (state.dataPTHP->HeatingLoad && OutsideDryBulbTemp > state.dataPTHP->PTUnit(PTUnitNum).MinOATCompressorHeating) {
-        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
             QCoilReq = state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                 state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
@@ -6477,7 +6477,7 @@ void CalcPTUnit(EnergyPlusData &state,
         } else {
             {
                 auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-                if (SELECT_CASE_var == iPTHPType::PTHPUnit) {
+                if (SELECT_CASE_var == PTHPType::PTHPUnit) {
                     SimDXCoil(state,
                               state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                               On,
@@ -6487,7 +6487,7 @@ void CalcPTUnit(EnergyPlusData &state,
                               PartLoadFrac,
                               OnOffAirFlowRatio);
                     state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum);
-                } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
+                } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
                     HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                     SimWatertoAirHPSimple(state,
                                           std::string(),
@@ -6510,7 +6510,7 @@ void CalcPTUnit(EnergyPlusData &state,
         }
     } else {
         //   heating coil is off
-        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
             QCoilReq = 0.0;
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                 state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
@@ -6555,7 +6555,7 @@ void CalcPTUnit(EnergyPlusData &state,
         } else {
             {
                 auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-                if (SELECT_CASE_var == iPTHPType::PTHPUnit) {
+                if (SELECT_CASE_var == PTHPType::PTHPUnit) {
                     SimDXCoil(state,
                               state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                               Off,
@@ -6564,7 +6564,7 @@ void CalcPTUnit(EnergyPlusData &state,
                               state.dataPTHP->PTUnit(PTUnitNum).OpMode,
                               dZero,
                               OnOffAirFlowRatio);
-                } else if (SELECT_CASE_var == iPTHPType::PTWSHPUnit) {
+                } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
                     SimWatertoAirHPSimple(state,
                                           std::string(),
                                           state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
@@ -7649,19 +7649,19 @@ void SimVariableSpeedHP(EnergyPlusData &state,
     // Set latent load for heating
     if (state.dataPTHP->HeatingLoad) {
         TotalZoneLatentLoad = 0.0;
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = CompMode::HeatingMode;
         // Set latent load for cooling and no sensible load condition
     } else {
         TotalZoneLatentLoad = QLatReq;
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = CompMode::CoolingMode;
     }
 
     if (state.dataPTHP->HeatingLoad) {
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = CompMode::HeatingMode;
     } else if (state.dataPTHP->CoolingLoad) {
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = CompMode::CoolingMode;
     } else {
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Unassigned;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = CompMode::Invalid;
     }
 
     // set the on/off flags
@@ -7696,7 +7696,7 @@ void SimVariableSpeedHP(EnergyPlusData &state,
                       SupHeaterLoad,
                       HXUnitOn);
 
-    if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+    if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
         state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
     } else {
         if (SpeedNum > 1) {
@@ -7859,13 +7859,13 @@ void ControlVSHPOutput(EnergyPlusData &state,
     // Get full load result
     PartLoadFrac = 1.0;
     SpeedRatio = 1.0;
-    if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) {
-        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+    if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == CompMode::HeatingMode) {
+        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
             SpeedNum = state.dataPTHP->PTUnit(PTUnitNum).NumOfSpeedCooling;
         } else {
             SpeedNum = state.dataPTHP->PTUnit(PTUnitNum).NumOfSpeedHeating;
         }
-    } else if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) {
+    } else if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == CompMode::CoolingMode) {
         SpeedNum = state.dataPTHP->PTUnit(PTUnitNum).NumOfSpeedCooling;
     } else {
         SpeedNum = 1;
@@ -8605,7 +8605,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                               OnOffAirFlowRatio);
     }
 
-    if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num != iPTHPType::PTACUnit) { // PTHP
+    if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num != PTHPType::PTACUnit) { // PTHP
         if (state.dataPTHP->HeatingLoad) {
             SimVariableSpeedCoils(state,
                                   std::string(),
@@ -8642,7 +8642,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
         }
     } else { // PTAC
         if (state.dataPTHP->HeatingLoad) {
-            if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+            if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
                 QCoilReq = state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                 if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                     state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
@@ -8699,7 +8699,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
             }
         } else {
             //   heating coil is off
-            if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
+            if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
                 QCoilReq = 0.0;
                 if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                     state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
@@ -9008,7 +9008,7 @@ void SetVSHPAirFlow(EnergyPlusData &state,
         state.dataPTHP->CompOffFlowRatio = 0.0;
     }
 
-    if (state.dataPTHP->HeatingLoad && (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit)) {
+    if (state.dataPTHP->HeatingLoad && (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit)) {
         state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(state.dataPTHP->PTUnit(PTUnitNum).NumOfSpeedCooling);
         state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).MSCoolingSpeedRatio(state.dataPTHP->PTUnit(PTUnitNum).NumOfSpeedCooling);
         MSHPMassFlowRateLow = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(state.dataPTHP->PTUnit(PTUnitNum).NumOfSpeedCooling);
@@ -9036,7 +9036,7 @@ void SetVSHPAirFlow(EnergyPlusData &state,
                     MSHPMassFlowRateLow = state.dataPTHP->PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum - 1);
                     MSHPMassFlowRateHigh = state.dataPTHP->PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
                 }
-            } else if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) {
+            } else if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == CompMode::CoolingMode) {
                 if (SpeedNum == 1) {
                     state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(SpeedNum);
                     state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).MSCoolingSpeedRatio(SpeedNum);
@@ -9055,11 +9055,11 @@ void SetVSHPAirFlow(EnergyPlusData &state,
 
         // Set up fan flow rate during compressor off time
         if (state.dataPTHP->PTUnit(PTUnitNum).OpMode == ContFanCycCoil && present(SpeedNum)) {
-            if (state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl == iAirflowCtrlMode::UseCompressorOnFlow && state.dataPTHP->CompOnMassFlow > 0.0) {
+            if (state.dataPTHP->PTUnit(PTUnitNum).AirFlowControl == AirflowCtrlMode::UseCompressorOnFlow && state.dataPTHP->CompOnMassFlow > 0.0) {
                 if (SpeedNum == 1) { // LOWEST SPEED USE IDLE FLOW
                     state.dataPTHP->CompOffMassFlow = state.dataPTHP->PTUnit(PTUnitNum).IdleMassFlowRate;
                     state.dataPTHP->CompOffFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).IdleSpeedRatio;
-                } else if (state.dataPTHP->PTUnit(PTUnitNum).LastMode == iCompMode::HeatingMode) {
+                } else if (state.dataPTHP->PTUnit(PTUnitNum).LastMode == CompMode::HeatingMode) {
                     state.dataPTHP->CompOffMassFlow = state.dataPTHP->PTUnit(PTUnitNum).HeatMassFlowRate(SpeedNum);
                     state.dataPTHP->CompOffFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).MSHeatingSpeedRatio(SpeedNum);
                 } else {
@@ -9161,26 +9161,25 @@ void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
     // INITIALIZE FIXED SPEED FIRST, AND OVER-WRITE USING MUL-SPEED
 
     if (state.dataPTHP->CoolingLoad) {
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::CoolingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = CompMode::CoolingMode;
     } else if (state.dataPTHP->HeatingLoad) {
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::HeatingMode;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = CompMode::HeatingMode;
     } else {
-        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = iCompMode::Unassigned;
+        state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode = CompMode::Invalid;
     }
 
     // Set the inlet node mass flow rate
     if (state.dataPTHP->PTUnit(PTUnitNum).OpMode == ContFanCycCoil) {
         // constant fan mode
-        if ((state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) &&
-            !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
+        if ((state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == CompMode::HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).HeatMassFlowRate(1);
             state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
-            state.dataPTHP->PTUnit(PTUnitNum).LastMode = iCompMode::HeatingMode;
-        } else if ((state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) &&
+            state.dataPTHP->PTUnit(PTUnitNum).LastMode = CompMode::HeatingMode;
+        } else if ((state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == CompMode::CoolingMode) &&
                    !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(1);
             state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
-            state.dataPTHP->PTUnit(PTUnitNum).LastMode = iCompMode::CoolingMode;
+            state.dataPTHP->PTUnit(PTUnitNum).LastMode = CompMode::CoolingMode;
         } else {
             state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).IdleMassFlowRate;
             state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).IdleSpeedRatio;
@@ -9189,11 +9188,10 @@ void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
         state.dataPTHP->CompOffFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).IdleSpeedRatio;
     } else {
         // cycling fan mode
-        if ((state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == iCompMode::HeatingMode) &&
-            !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
+        if ((state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == CompMode::HeatingMode) && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).HeatMassFlowRate(1);
             state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).MSHeatingSpeedRatio(1);
-        } else if ((state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == iCompMode::CoolingMode) &&
+        } else if ((state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode == CompMode::CoolingMode) &&
                    !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
             state.dataPTHP->CompOnMassFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolMassFlowRate(1);
             state.dataPTHP->CompOnFlowRatio = state.dataPTHP->PTUnit(PTUnitNum).MSCoolingSpeedRatio(1);
@@ -9212,7 +9210,7 @@ void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state,
             state.dataLoopNodes->Node(InNode).MassFlowRate = state.dataPTHP->CompOnMassFlow;
             PartLoadRatio = 0.0;
         } else {
-            if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode != iCompMode::Unassigned) {
+            if (state.dataPTHP->PTUnit(PTUnitNum).HeatCoolMode != CompMode::Invalid) {
                 PartLoadRatio = 1.0;
             } else {
                 PartLoadRatio = 0.0;

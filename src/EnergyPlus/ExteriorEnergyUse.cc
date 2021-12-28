@@ -309,7 +309,7 @@ namespace ExteriorEnergyUse {
                                                 state.dataIPShortCut->cAlphaFieldNames(2),
                                                 state.dataIPShortCut->cAlphaArgs(2));
             if (state.dataExteriorEnergyUse->ExteriorEquipment(state.dataExteriorEnergyUse->NumExteriorEqs).FuelType ==
-                ExteriorEnergyUse::ExteriorFuelUsage::Unknown) {
+                ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + cCurrentModuleObject + ": " + state.dataIPShortCut->cAlphaFieldNames(2) +
@@ -550,7 +550,7 @@ namespace ExteriorEnergyUse {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::Unknown;
+        FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::Invalid;
         FuelTypeString = "";
 
         // Select the correct Number for the associated ascii name for the fuel type
