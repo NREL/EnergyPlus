@@ -4998,36 +4998,45 @@ void InitSetPointManagers(EnergyPlusData &state)
             for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
                 NodeNum = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
                 // Initialize scheduled setpoints
-                {
-                    auto const SELECT_CASE_var(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode);
-                    if (SELECT_CASE_var == CtrlVarType::Temp) {
-                        state.dataLoopNodes->Node(NodeNum).TempSetPoint =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MaxTemp) {
-                        state.dataLoopNodes->Node(NodeNum).TempSetPointHi =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MinTemp) {
-                        state.dataLoopNodes->Node(NodeNum).TempSetPointLo =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::HumRat) {
-                        state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) {
-                        state.dataLoopNodes->Node(NodeNum).HumRatMax =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) {
-                        state.dataLoopNodes->Node(NodeNum).HumRatMin =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MassFlow) {
-                        state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MaxMassFlow) {
-                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMax =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    } else if (SELECT_CASE_var == CtrlVarType::MinMassFlow) {
-                        state.dataLoopNodes->Node(NodeNum).MassFlowRateMin =
-                            GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
-                    }
+                switch (state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+                case CtrlVarType::Temp: {
+                    state.dataLoopNodes->Node(NodeNum).TempSetPoint =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MaxTemp: {
+                    state.dataLoopNodes->Node(NodeNum).TempSetPointHi =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MinTemp: {
+                    state.dataLoopNodes->Node(NodeNum).TempSetPointLo =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::HumRat: {
+                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MaxHumRat: {
+                    state.dataLoopNodes->Node(NodeNum).HumRatMax =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MinHumRat: {
+                    state.dataLoopNodes->Node(NodeNum).HumRatMin =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MassFlow: {
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MaxMassFlow: {
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMax =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                case CtrlVarType::MinMassFlow: {
+                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMin =
+                        GetCurrentScheduleValue(state, state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SchedPtr);
+                } break;
+                default:
+                    break;
                 }
             }
         }
@@ -6338,32 +6347,36 @@ void DefineOAPretreatSetPointManager::calculate(EnergyPlusData &state)
     ReturnInNode = this->ReturnInNode;
     HumiditySetPoint = false;
 
-    {
-        auto const SELECT_CASE_var(this->CtrlTypeMode);
-        if (SELECT_CASE_var == CtrlVarType::Temp) { // 'Temperature'
-            RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).TempSetPoint;
-            ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).Temp;
-            MinSetPoint = this->MinSetTemp;
-            MaxSetPoint = this->MaxSetTemp;
-        } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) { // 'HUMRATMAX'
-            RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatMax;
-            ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
-            MinSetPoint = this->MinSetHumRat;
-            MaxSetPoint = this->MaxSetHumRat;
-            HumiditySetPoint = true;
-        } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) { // 'HUMRATMIN'
-            RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatMin;
-            ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
-            MinSetPoint = this->MinSetHumRat;
-            MaxSetPoint = this->MaxSetHumRat;
-            HumiditySetPoint = true;
-        } else if (SELECT_CASE_var == CtrlVarType::HumRat) { // 'HumidityRatio'
-            RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatSetPoint;
-            ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
-            MinSetPoint = this->MinSetHumRat;
-            MaxSetPoint = this->MaxSetHumRat;
-            HumiditySetPoint = true;
-        }
+    switch (this->CtrlTypeMode) {
+    case CtrlVarType::Temp: { // 'Temperature'
+        RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).TempSetPoint;
+        ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).Temp;
+        MinSetPoint = this->MinSetTemp;
+        MaxSetPoint = this->MaxSetTemp;
+    } break;
+    case CtrlVarType::MaxHumRat: { // 'HUMRATMAX'
+        RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatMax;
+        ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
+        MinSetPoint = this->MinSetHumRat;
+        MaxSetPoint = this->MaxSetHumRat;
+        HumiditySetPoint = true;
+    } break;
+    case CtrlVarType::MinHumRat: { // 'HUMRATMIN'
+        RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatMin;
+        ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
+        MinSetPoint = this->MinSetHumRat;
+        MaxSetPoint = this->MaxSetHumRat;
+        HumiditySetPoint = true;
+    } break;
+    case CtrlVarType::HumRat: { // 'HumidityRatio'
+        RefNodeSetPoint = state.dataLoopNodes->Node(RefNode).HumRatSetPoint;
+        ReturnInValue = state.dataLoopNodes->Node(ReturnInNode).HumRat;
+        MinSetPoint = this->MinSetHumRat;
+        MaxSetPoint = this->MaxSetHumRat;
+        HumiditySetPoint = true;
+    } break;
+    default:
+        break;
     }
 
     if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
@@ -6376,19 +6389,21 @@ void DefineOAPretreatSetPointManager::calculate(EnergyPlusData &state)
                 ShowFatalError(state, "Missing reference setpoint.");
             } else {
                 bool LocalSetPointCheckFailed = false;
-                {
-                    auto const SELECT_CASE_var(this->CtrlTypeMode);
-                    if (SELECT_CASE_var == CtrlVarType::Temp) { // 'Temperature'
-                        CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::TemperatureSetPoint, LocalSetPointCheckFailed);
-                    } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) { // 'HUMRATMAX'
-                        CheckIfNodeSetPointManagedByEMS(
-                            state, RefNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
-                    } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) { // 'HUMRATMIN'
-                        CheckIfNodeSetPointManagedByEMS(
-                            state, RefNode, EMSManager::SPControlType::HumidityRatioMinSetPoint, LocalSetPointCheckFailed);
-                    } else if (SELECT_CASE_var == CtrlVarType::HumRat) { // 'HumidityRatio'
-                        CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioSetPoint, LocalSetPointCheckFailed);
-                    }
+                switch (this->CtrlTypeMode) {
+                case CtrlVarType::Temp: { // 'Temperature'
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::TemperatureSetPoint, LocalSetPointCheckFailed);
+                } break;
+                case CtrlVarType::MaxHumRat: { // 'HUMRATMAX'
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
+                } break;
+                case CtrlVarType::MinHumRat: { // 'HUMRATMIN'
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioMinSetPoint, LocalSetPointCheckFailed);
+                } break;
+                case CtrlVarType::HumRat: { // 'HumidityRatio'
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::HumidityRatioSetPoint, LocalSetPointCheckFailed);
+                } break;
+                default:
+                    break;
                 }
                 if (LocalSetPointCheckFailed) {
                     ShowSevereError(state,
@@ -7228,13 +7243,15 @@ void DefineFollowOATempSetPointManager::calculate(EnergyPlusData &state)
     MaxSetPoint = this->MaxSetTemp;
     MinSetPoint = this->MinSetTemp;
 
-    {
-        auto const SELECT_CASE_var(this->RefTypeMode);
-        if (SELECT_CASE_var == ReferenceTempType::WetBulb) {
-            this->SetPt = state.dataEnvrn->OutWetBulbTemp + this->Offset;
-        } else if (SELECT_CASE_var == ReferenceTempType::DryBulb) {
-            this->SetPt = state.dataEnvrn->OutDryBulbTemp + this->Offset;
-        }
+    switch (this->RefTypeMode) {
+    case ReferenceTempType::WetBulb: {
+        this->SetPt = state.dataEnvrn->OutWetBulbTemp + this->Offset;
+    } break;
+    case ReferenceTempType::DryBulb: {
+        this->SetPt = state.dataEnvrn->OutDryBulbTemp + this->Offset;
+    } break;
+    default:
+        break;
     }
 
     // Apply maximum and minimum values
@@ -7295,15 +7312,17 @@ void DefineFollowSysNodeTempSetPointManager::calculate(EnergyPlusData &state)
 
     RefNode = this->RefNodeNum;
 
-    {
-        auto const SELECT_CASE_var(this->RefTypeMode);
-        if (SELECT_CASE_var == ReferenceTempType::WetBulb) {
-            if (allocated(state.dataLoopNodes->MoreNodeInfo)) {
-                RefNodeTemp = state.dataLoopNodes->MoreNodeInfo(RefNode).WetBulbTemp;
-            }
-        } else if (SELECT_CASE_var == ReferenceTempType::DryBulb) {
-            RefNodeTemp = state.dataLoopNodes->Node(RefNode).Temp;
+    switch (this->RefTypeMode) {
+    case ReferenceTempType::WetBulb: {
+        if (allocated(state.dataLoopNodes->MoreNodeInfo)) {
+            RefNodeTemp = state.dataLoopNodes->MoreNodeInfo(RefNode).WetBulbTemp;
         }
+    } break;
+    case ReferenceTempType::DryBulb: {
+        RefNodeTemp = state.dataLoopNodes->Node(RefNode).Temp;
+    } break;
+    default:
+        break;
     }
 
     this->SetPt = RefNodeTemp + this->Offset;
@@ -7338,17 +7357,21 @@ void DefineGroundTempSetPointManager::calculate(EnergyPlusData &state)
     MaxSetPoint = this->MaxSetTemp;
     MinSetPoint = this->MinSetTemp;
 
-    {
-        auto const SELECT_CASE_var(this->RefTypeMode);
-        if (SELECT_CASE_var == ReferenceGroundTempObjectType::BuildingSurface) {
-            this->SetPt = state.dataEnvrn->GroundTemp + this->Offset;
-        } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::Shallow) {
-            this->SetPt = state.dataEnvrn->GroundTemp_Surface + this->Offset;
-        } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::Deep) {
-            this->SetPt = state.dataEnvrn->GroundTemp_Deep + this->Offset;
-        } else if (SELECT_CASE_var == ReferenceGroundTempObjectType::FCFactorMethod) {
-            this->SetPt = state.dataEnvrn->GroundTempFC + this->Offset;
-        }
+    switch (this->RefTypeMode) {
+    case ReferenceGroundTempObjectType::BuildingSurface: {
+        this->SetPt = state.dataEnvrn->GroundTemp + this->Offset;
+    } break;
+    case ReferenceGroundTempObjectType::Shallow: {
+        this->SetPt = state.dataEnvrn->GroundTemp_Surface + this->Offset;
+    } break;
+    case ReferenceGroundTempObjectType::Deep: {
+        this->SetPt = state.dataEnvrn->GroundTemp_Deep + this->Offset;
+    } break;
+    case ReferenceGroundTempObjectType::FCFactorMethod: {
+        this->SetPt = state.dataEnvrn->GroundTempFC + this->Offset;
+    } break;
+    default:
+        break;
     }
 
     // Apply maximum and minimum values
@@ -8183,28 +8206,37 @@ void UpdateSetPointManagers(EnergyPlusData &state)
             // setpoints from this setpoint manager
             NodeNum = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-            {
-                auto const SELECT_CASE_var(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode);
+            switch (state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
                 // set the setpoint depending on the type of variable being controlled
-                if (SELECT_CASE_var == CtrlVarType::Temp) {
-                    state.dataLoopNodes->Node(NodeNum).TempSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MaxTemp) {
-                    state.dataLoopNodes->Node(NodeNum).TempSetPointHi = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MinTemp) {
-                    state.dataLoopNodes->Node(NodeNum).TempSetPointLo = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::HumRat) {
-                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) {
-                    state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) {
-                    state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MassFlow) {
-                    state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MaxMassFlow) {
-                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMax = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                } else if (SELECT_CASE_var == CtrlVarType::MinMassFlow) {
-                    state.dataLoopNodes->Node(NodeNum).MassFlowRateMin = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
-                }
+            case CtrlVarType::Temp: {
+                state.dataLoopNodes->Node(NodeNum).TempSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MaxTemp: {
+                state.dataLoopNodes->Node(NodeNum).TempSetPointHi = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MinTemp: {
+                state.dataLoopNodes->Node(NodeNum).TempSetPointLo = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::HumRat: {
+                state.dataLoopNodes->Node(NodeNum).HumRatSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MaxHumRat: {
+                state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MinHumRat: {
+                state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MassFlow: {
+                state.dataLoopNodes->Node(NodeNum).MassFlowRateSetPoint = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MaxMassFlow: {
+                state.dataLoopNodes->Node(NodeNum).MassFlowRateMax = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            case CtrlVarType::MinMassFlow: {
+                state.dataLoopNodes->Node(NodeNum).MassFlowRateMin = state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).SetPt;
+            } break;
+            default:
+                break;
             }
 
         } // nodes in list
@@ -8702,21 +8734,23 @@ void UpdateOAPretreatSetPoints(EnergyPlusData &state)
             // setpoints from this setpoint manager
             NodeNum = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex); // Get the node number
 
-            {
-                auto const SELECT_CASE_var(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode);
-                if (SELECT_CASE_var == CtrlVarType::Temp) { // 'Temperature'
-                    state.dataLoopNodes->Node(NodeNum).TempSetPoint =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == CtrlVarType::MaxHumRat) {                   // 'MaximumHumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatMax =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == CtrlVarType::MinHumRat) {                   // 'MinimumHumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatMin =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                } else if (SELECT_CASE_var == CtrlVarType::HumRat) {                      // 'HumidityRatio'
-                    state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
-                        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
-                }
+            switch (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode) {
+            case CtrlVarType::Temp: { // 'Temperature'
+                state.dataLoopNodes->Node(NodeNum).TempSetPoint =
+                    state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+            } break;
+            case CtrlVarType::MaxHumRat: { // 'MaximumHumidityRatio'
+                state.dataLoopNodes->Node(NodeNum).HumRatMax = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+            } break;
+            case CtrlVarType::MinHumRat: { // 'MinimumHumidityRatio'
+                state.dataLoopNodes->Node(NodeNum).HumRatMin = state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+            } break;
+            case CtrlVarType::HumRat: { // 'HumidityRatio'
+                state.dataLoopNodes->Node(NodeNum).HumRatSetPoint =
+                    state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).SetPt; // Set the setpoint
+            } break;
+            default:
+                break;
             }
         }
     }
