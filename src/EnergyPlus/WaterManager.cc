@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -1684,16 +1685,33 @@ namespace WaterManager {
     {
         Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
         for (int i = 0; i < 12; i++) {
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalPrecInWeather, Months[i], state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[i]);
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalHrRain, Months[i], state.dataWaterData->RainFall.numRainyHoursInWeather[i]);
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalPrecInRainCol, Months[i], state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[i]);
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalPrecInRoofIrr, Months[i], state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[i]);
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchMonthlyTotalPrecInWeather,
+                                                     Months[i],
+                                                     state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[i]);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchMonthlyTotalHrRain, Months[i], state.dataWaterData->RainFall.numRainyHoursInWeather[i]);
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchMonthlyTotalPrecInRainCol,
+                                                     Months[i],
+                                                     state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[i]);
             Real64 accVolCollectedMonthly = 0.0;
             for (int Item = 1; Item <= state.dataWaterData->NumRainCollectors; Item++) {
                 accVolCollectedMonthly += state.dataWaterData->RainCollector(Item).VolCollectedMonthly[i];
             }
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalRainCol, Months[i], accVolCollectedMonthly);
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalIrrDep, Months[i], state.dataEcoRoofMgr->MonthlyIrrigation[i]);
+        }
+        // check whether there are eco roofs
+        bool ecoroofFlag = false;
+        for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
+            ecoroofFlag = (state.dataConstruction->Construct(ConstrNum).TypeIsEcoRoof) || ecoroofFlag;
+        }
+        // report ecoroof
+        if (ecoroofFlag) {
+            for (int i = 0; i < 12; i++) {
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalPrecInRoofIrr, Months[i], state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[i]);
+                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalIrrDep, Months[i], state.dataEcoRoofMgr->MonthlyIrrigation[i]);
+            }
         }
     }
 
