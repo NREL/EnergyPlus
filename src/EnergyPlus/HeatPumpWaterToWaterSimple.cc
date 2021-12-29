@@ -862,7 +862,10 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                              this->SourceSideInletNodeNum,
                              this->SourceSideOutletNodeNum,
                              this->SourcePlantLoc);
-        PlantUtilities::PullCompInterconnectTrigger(state,                                                   this->LoadPlantLoc,                                                    this->CondMassFlowIndex,                                                    this->SourcePlantLoc, // IS THIS RIGHT?
+        PlantUtilities::PullCompInterconnectTrigger(state,
+                                                    this->LoadPlantLoc,
+                                                    this->CondMassFlowIndex,
+                                                    this->SourcePlantLoc, // IS THIS RIGHT?
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->reportSourceSideMassFlowRate);
         // Set flows if the heat pump is running

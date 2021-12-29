@@ -85,10 +85,7 @@ namespace PlantUtilities {
 
     Real64
     RegulateCondenserCompFlowReqOp(EnergyPlusData &state,
-                                          int LoopNum,
-                                          DataPlant::LoopSideLocation LoopSideNum,
-                                          int BranchNum,
-                                          int CompNum,
+                                          PlantLocation plantLoc,
                                           Real64 TentativeFlowRequest);
 
     bool AnyPlantSplitterMixerLacksContinuity(EnergyPlusData &state);

@@ -2118,8 +2118,7 @@ namespace CondenserLoopTowers {
             this->AirWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
-        this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
-            state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
+        this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state,this->plantLoc, this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
 
         PlantUtilities::SetComponentFlowRate(state,
                                              this->WaterMassFlowRate,

@@ -403,8 +403,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
 }
 
 Real64 RegulateCondenserCompFlowReqOp(
-    EnergyPlusData &state, int const LoopNum,
-                                      const DataPlant::LoopSideLocation LoopSideNum, int const BranchNum, int const CompNum, Real64 const TentativeFlowRequest)
+    EnergyPlusData &state, PlantLocation const plantLoc, Real64 const TentativeFlowRequest)
 {
 
     // FUNCTION INFORMATION:
@@ -441,9 +440,9 @@ Real64 RegulateCondenserCompFlowReqOp(
     Real64 CompCurLoad;
     bool CompRunFlag;
 
-    CompCurLoad = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad;
-    CompRunFlag = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).ON;
-    auto CompOpScheme = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType;
+    CompCurLoad = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum).MyLoad;
+    CompRunFlag = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum).ON;
+    auto CompOpScheme = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum).CurOpSchemeType;
 
     if (CompRunFlag) {
 

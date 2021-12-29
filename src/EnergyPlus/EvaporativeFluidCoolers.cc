@@ -1243,10 +1243,7 @@ namespace EvaporativeFluidCoolers {
 
         this->WaterMassFlowRate =
             PlantUtilities::RegulateCondenserCompFlowReqOp(state,
-                                                           this->plantLoc.loopNum,
-                                                           this->plantLoc.loopSideNum,
-                                                           this->plantLoc.branchNum,
-                                                           this->plantLoc.compNum,
+                                                           this->plantLoc,
                                                            this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier);
 
         PlantUtilities::SetComponentFlowRate(state,

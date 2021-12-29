@@ -826,11 +826,7 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
         this->AirWetBulb = state.dataEnvrn->OutWetBulbTemp;
     }
 
-    this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state,
-                                                                             this->plantLoc.loopNum,
-                                                                             this->plantLoc.loopSideNum,
-                                                                             this->plantLoc.branchNum,
-                                                                             this->plantLoc.compNum,
+    this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state,                                                                             this->plantLoc,
                                                                              this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier);
 
     PlantUtilities::SetComponentFlowRate(state,

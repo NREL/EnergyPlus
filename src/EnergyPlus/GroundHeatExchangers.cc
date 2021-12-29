@@ -3116,7 +3116,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     this->tempGround /= 5;
 
     this->massFlowRate =
-        RegulateCondenserCompFlowReqOp(state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->designMassFlow);
+        RegulateCondenserCompFlowReqOp(state,this->plantLoc, this->designMassFlow);
 
     SetComponentFlowRate(        state,
  this->massFlowRate,
@@ -3203,7 +3203,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     this->tempGround = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
     this->massFlowRate =
-        RegulateCondenserCompFlowReqOp(state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->designMassFlow);
+        RegulateCondenserCompFlowReqOp(state,this->plantLoc, this->designMassFlow);
 
     SetComponentFlowRate(        state,
  this->massFlowRate,

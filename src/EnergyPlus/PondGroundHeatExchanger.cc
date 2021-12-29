@@ -428,8 +428,7 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
     this->PondTemp = this->BulkTemperature;
 
     // Hypothetical design flow rate
-    Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(
-        state, this->plantLoc.loopNum, this->plantLoc.loopSideNum, this->plantLoc.branchNum, this->plantLoc.compNum, this->DesignMassFlowRate);
+    Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(state,this->plantLoc, this->DesignMassFlowRate);
 
     PlantUtilities::SetComponentFlowRate(        state,
  DesignFlow,
