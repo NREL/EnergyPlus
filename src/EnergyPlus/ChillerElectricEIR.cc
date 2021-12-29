@@ -1900,14 +1900,7 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
                                              this->CondInletNodeNum,
                                              this->CondOutletNodeNum,
                                              this->CDPlantLoc);
-        PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->CWPlantLoc.loopNum,
-                                                    this->CWPlantLoc.loopSideNum,
-                                                    this->CWPlantLoc.branchNum,
-                                                    this->CWPlantLoc.compNum,
-                                                    this->CondMassFlowIndex,
-                                                    this->CDPlantLoc.loopNum,
-                                                    this->CDPlantLoc.loopSideNum,
+        PlantUtilities::PullCompInterconnectTrigger(state,                                                   this->CWPlantLoc,                                                    this->CondMassFlowIndex,                                                    this->CDPlantLoc,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->CondMassFlowRate);
 

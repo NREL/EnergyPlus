@@ -862,14 +862,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                              this->SourceSideInletNodeNum,
                              this->SourceSideOutletNodeNum,
                              this->SourcePlantLoc);
-        PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->LoadPlantLoc.loopNum,
-                                                    this->LoadPlantLoc.loopSideNum,
-                                                    this->LoadPlantLoc.branchNum,
-                                                    this->LoadPlantLoc.compNum,
-                                                    this->CondMassFlowIndex,
-                                                    this->SourcePlantLoc.loopNum,
-                                                    this->LoadPlantLoc.loopSideNum, // IS THIS RIGHT?
+        PlantUtilities::PullCompInterconnectTrigger(state,                                                   this->LoadPlantLoc,                                                    this->CondMassFlowIndex,                                                    this->SourcePlantLoc, // IS THIS RIGHT?
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->reportSourceSideMassFlowRate);
         // Set flows if the heat pump is running
@@ -905,26 +898,12 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
                                  this->SourceSideInletNodeNum,
                                  this->SourceSideOutletNodeNum,
                                  this->SourcePlantLoc);
-            PlantUtilities::PullCompInterconnectTrigger(state,
-                                                        this->LoadPlantLoc.loopNum,
-                                                        this->LoadPlantLoc.loopSideNum,
-                                                        this->LoadPlantLoc.branchNum,
-                                                        this->LoadPlantLoc.compNum,
-                                                        this->CondMassFlowIndex,
-                                                        this->SourcePlantLoc.loopNum,
-                                                        this->LoadPlantLoc.loopSideNum,
+            PlantUtilities::PullCompInterconnectTrigger(state,                                                       this->LoadPlantLoc,                                                        this->CondMassFlowIndex,                                                        this->SourcePlantLoc,
                                                         DataPlant::CriteriaType::MassFlowRate,
                                                         this->reportSourceSideMassFlowRate);
             return;
         }
-        PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->LoadPlantLoc.loopNum,
-                                                    this->LoadPlantLoc.loopSideNum,
-                                                    this->LoadPlantLoc.branchNum,
-                                                    this->LoadPlantLoc.compNum,
-                                                    this->CondMassFlowIndex,
-                                                    this->SourcePlantLoc.loopNum,
-                                                    this->LoadPlantLoc.loopSideNum,
+        PlantUtilities::PullCompInterconnectTrigger(state,                                                   this->LoadPlantLoc,                                                    this->CondMassFlowIndex,                                                    this->SourcePlantLoc,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->reportSourceSideMassFlowRate);
     }

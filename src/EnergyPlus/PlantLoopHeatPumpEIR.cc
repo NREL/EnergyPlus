@@ -173,13 +173,9 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
                                              this->sourceSideNodes.outlet,
                                              this->sourceSidePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->loadSidePlantLoc.loopNum,
-                                                    this->loadSidePlantLoc.loopSideNum,
-                                                    this->loadSidePlantLoc.branchNum,
-                                                    this->loadSidePlantLoc.compNum,
+                                                    this->loadSidePlantLoc,
                                                     this->condMassFlowRateTriggerIndex,
-                                                    this->sourceSidePlantLoc.loopNum,
-                                                    this->sourceSidePlantLoc.loopSideNum,
+                                                    this->sourceSidePlantLoc,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->sourceSideMassFlowRate);
         // Set flows if the heat pump is running
@@ -214,13 +210,9 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
                                                  this->sourceSidePlantLoc);
         }
         PlantUtilities::PullCompInterconnectTrigger(state,
-                                                    this->loadSidePlantLoc.loopNum,
-                                                    this->loadSidePlantLoc.loopSideNum,
-                                                    this->loadSidePlantLoc.branchNum,
-                                                    this->loadSidePlantLoc.compNum,
+                                                    this->loadSidePlantLoc,
                                                     this->condMassFlowRateTriggerIndex,
-                                                    this->sourceSidePlantLoc.loopNum,
-                                                    this->sourceSidePlantLoc.loopSideNum,
+                                                    this->sourceSidePlantLoc,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->sourceSideMassFlowRate);
     }

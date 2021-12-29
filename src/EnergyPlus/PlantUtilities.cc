@@ -853,13 +853,9 @@ void ResetAllPlantInterConnectFlags(EnergyPlusData &state)
 }
 
 void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                 const int LoopNum,                          // component's loop index
-                                 const DataPlant::LoopSideLocation LoopSide,                         // component's loop side number
-                                 const int BranchNum,                        // Component's branch number
-                                 const int CompNum,                          // Component's comp number
+                                 const PlantLocation plantLoc, // Component Location
                                  int &UniqueCriteriaCheckIndex,              // An integer given to this particular check
-                                 const int ConnectedLoopNum,                 // Component's interconnected loop number
-                                 const DataPlant::LoopSideLocation ConnectedLoopSide,                // Component's interconnected loop side number
+                                 const PlantLocation ConnectedPlantLoc,                // Interconnected Component's Location
                                  const DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
                                  const Real64 CriteriaValue                  // The value of the criteria check to evaluate
 )
@@ -903,14 +899,14 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
         state.dataPlantUtilities->CriteriaChecks.redimension(CurrentNumChecksStored);
 
         // Store the unique name and location
-        state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompLoopNum = LoopNum;
-        state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompLoopSideNum = LoopSide;
-        state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompBranchNum = BranchNum;
-        state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompCompNum = CompNum;
+        state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompLoopNum = plantLoc.loopNum;
+        state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompLoopSideNum = plantLoc.loopSideNum;
+        state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompBranchNum = plantLoc.branchNum;
+        state.dataPlantUtilities->CriteriaChecks(CurrentNumChecksStored).CallingCompCompNum = plantLoc.compNum;
 
         // Since this was the first pass, it is safe to assume something has changed!
         // Therefore we'll set the sim flag to true
-        state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
+        state.dataPlnt->PlantLoop(ConnectedPlantLoc.loopNum).LoopSide(ConnectedPlantLoc.loopSideNum).SimLoopSideNeeded = true;
 
         // Make sure we return the proper value of index
         UniqueCriteriaCheckIndex = CurrentNumChecksStored;
@@ -924,8 +920,8 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
         CurCriteria = state.dataPlantUtilities->CriteriaChecks(UniqueCriteriaCheckIndex);
 
         // Check to make sure we didn't reuse the index in multiple components
-        if (CurCriteria.CallingCompLoopNum != LoopNum || CurCriteria.CallingCompLoopSideNum != LoopSide ||
-            CurCriteria.CallingCompBranchNum != BranchNum || CurCriteria.CallingCompCompNum != CompNum) {
+        if (CurCriteria.CallingCompLoopNum != plantLoc.loopNum || CurCriteria.CallingCompLoopSideNum != plantLoc.loopSideNum ||
+            CurCriteria.CallingCompBranchNum != plantLoc.branchNum || CurCriteria.CallingCompCompNum != plantLoc.compNum) {
             // Diagnostic fatal: component does not properly utilize unique indexing
         }
 
@@ -934,17 +930,17 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
             auto const SELECT_CASE_var(CriteriaType);
             if (SELECT_CASE_var == DataPlant::CriteriaType::MassFlowRate) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_MassFlowRate) {
-                    state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
+                    state.dataPlnt->PlantLoop(ConnectedPlantLoc.loopNum).LoopSide(ConnectedPlantLoc.loopSideNum).SimLoopSideNeeded = true;
                 }
 
             } else if (SELECT_CASE_var == DataPlant::CriteriaType::Temperature) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_Temperature) {
-                    state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
+                    state.dataPlnt->PlantLoop(ConnectedPlantLoc.loopNum).LoopSide(ConnectedPlantLoc.loopSideNum).SimLoopSideNeeded = true;
                 }
 
             } else if (SELECT_CASE_var == DataPlant::CriteriaType::HeatTransferRate) {
                 if (std::abs(CurCriteria.ThisCriteriaCheckValue - CriteriaValue) > CriteriaDelta_HeatTransferRate) {
-                    state.dataPlnt->PlantLoop(ConnectedLoopNum).LoopSide(ConnectedLoopSide).SimLoopSideNeeded = true;
+                    state.dataPlnt->PlantLoop(ConnectedPlantLoc.loopNum).LoopSide(ConnectedPlantLoc.loopSideNum).SimLoopSideNeeded = true;
                 }
 
             } else {

@@ -255,8 +255,10 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     // each one will need a single loop side, but no branches are checked or anything like that
     int thisLoopNum = 1, thisBranchNum = 1, thisCompNum = 1;
     DataPlant::LoopSideLocation thisLoopSideNum = DataPlant::LoopSideLocation::Demand;
+    PlantLocation plantLoc {thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum};
     int connectedLoopNum = 2;
     DataPlant::LoopSideLocation connectedLoopSideNum = DataPlant::LoopSideLocation::Demand;
+    PlantLocation connectedPlantLoc {connectedLoopNum, connectedLoopSideNum, 0, 0};
     int criteriaCheckIndex1 = 0, criteriaCheckIndex2 = 0, criteriaCheckIndex3 = 0;
     Real64 criteriaValue1 = 0.0, criteriaValue2 = 0.0, criteriaValue3 = 0.0;
 
@@ -266,13 +268,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     // the first time we call each criteria check, we should just get an index back and it should trigger the connected loop
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex1,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_EQ(1, criteriaCheckIndex1);
@@ -280,13 +278,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
 
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex2,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_EQ(2, criteriaCheckIndex2);
@@ -294,13 +288,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
 
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex3,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_EQ(3, criteriaCheckIndex3);
@@ -312,13 +302,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     criteriaValue1 = 2.718;
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex1,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -326,13 +312,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     criteriaValue2 = 2.718;
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex2,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -340,13 +322,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     criteriaValue3 = 2.718;
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex3,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -354,39 +332,27 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     // call it with the same nonzero value here, and it should *not* trigger the sim flag
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex1,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex2,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex3,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
@@ -395,13 +361,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     criteriaValue1 += DataPlant::CriteriaDelta_MassFlowRate / 2.0;
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex1,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
@@ -409,13 +371,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     criteriaValue2 += DataPlant::CriteriaDelta_Temperature / 2.0;
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex2,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
@@ -423,13 +381,9 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
     criteriaValue3 += DataPlant::CriteriaDelta_HeatTransferRate / 2.0;
     connectedLoopSide.SimLoopSideNeeded = false;
     PlantUtilities::PullCompInterconnectTrigger(*state,
-                                                thisLoopNum,
-                                                thisLoopSideNum,
-                                                thisBranchNum,
-                                                thisCompNum,
+                                                plantLoc,
                                                 criteriaCheckIndex3,
-                                                connectedLoopNum,
-                                                connectedLoopSideNum,
+                                                connectedPlantLoc,
                                                 DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);

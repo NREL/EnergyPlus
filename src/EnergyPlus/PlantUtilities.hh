@@ -105,13 +105,9 @@ namespace PlantUtilities {
     void ResetAllPlantInterConnectFlags(EnergyPlusData &state);
 
     void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                     const int LoopNum,                          // component's loop index
-                                     const DataPlant::LoopSideLocation LoopSide,                         // component's loop side number
-                                     const int BranchNum,                        // Component's branch number
-                                     const int CompNum,                          // Component's comp number
+                                     const PlantLocation plantLoc, // Component Location
                                      int &UniqueCriteriaCheckIndex,        // An integer given to this particular check
-                                     const int ConnectedLoopNum,                 // Component's interconnected loop number
-                                     const DataPlant::LoopSideLocation ConnectedLoopSide,                // Component's interconnected loop side number
+                                     const PlantLocation ConnectedPlantLoc,                // Interconnected Component's Location
                                      const DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
                                      const Real64 CriteriaValue                  // The value of the criteria check to evaluate
     );

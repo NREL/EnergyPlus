@@ -1921,36 +1921,15 @@ namespace HWBaseboardRadiator {
             return;
         }
 
-        PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.branchNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.compNum,
-                                    HWBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
+        PullCompInterconnectTrigger(state,                                   HWBaseboard(BaseboardNum).plantLoc,                                    HWBaseboard(BaseboardNum).BBLoadReSimIndex,                                    HWBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::HeatTransferRate,
                                     HWBaseboard(BaseboardNum).Power);
 
-        PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.branchNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.compNum,
-                                    HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
+        PullCompInterconnectTrigger(state,                                   HWBaseboard(BaseboardNum).plantLoc,                                    HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,                                    HWBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
-        PullCompInterconnectTrigger(state,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.branchNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.compNum,
-                                    HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                    HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
+        PullCompInterconnectTrigger(state,                                   HWBaseboard(BaseboardNum).plantLoc,                                    HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,                                    HWBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::Temperature,
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }
