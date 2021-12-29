@@ -200,6 +200,11 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
     Real64 Qsoil = 0;
     state->dataHVACGlobal->TimeStepSys = 0.25;
 
+    // init rain water irrigation data structure
+    state->dataEnvrn->CurMnDy = "01/01";
+    state->dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr.dimension(12, 0.0);
+    state->dataEcoRoofMgr->MonthlyIrrigation.dimension(12, 0.0);
+
     // With site:precipitation schedule
     state->dataEnvrn->LiquidPrecipitation = 0.005; // unit m
     WaterManager::GetWaterManagerInput(*state);

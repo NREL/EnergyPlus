@@ -81,6 +81,9 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
+    state->dataEnvrn->CurMnDy = "01/02";
+    state->dataWaterData->RainFall.MonthlyTotalPrecInRainCol.dimension(12, 0.0);
+
     WaterManager::UpdatePrecipitation(*state);
 
     Real64 ExpectedNomAnnualRain = 0.80771;
@@ -111,6 +114,9 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput(*state);
+    state->dataEnvrn->CurMnDy = "01/02";
+    state->dataWaterData->RainFall.MonthlyTotalPrecInRainCol.dimension(12, 0.0);
+    state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 2.0;
 
     state->dataEnvrn->LiquidPrecipitation = 0.5;
@@ -122,7 +128,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     state->dataEnvrn->LiquidPrecipitation = 0.5;
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
     WaterManager::UpdatePrecipitation(*state);
-    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / 3600);
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / (3600 / state->dataGlobal->NumOfTimeStepInHour));
 
     // without site:precipitation, "LiquidPrecipitation" is also missing, but rain flag is on
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
@@ -130,7 +136,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     state->dataEnvrn->IsRain = true;
     WaterManager::UpdatePrecipitation(*state);
     // default 1.5mm rain depth is used
-    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, (1.5 / 1000.0) / 3600);
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, (1.5 / 1000.0) / (3600 / state->dataGlobal->NumOfTimeStepInHour));
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
@@ -154,6 +160,8 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
+    state->dataEnvrn->CurMnDy = "01/02";
+    state->dataWaterData->RainFall.MonthlyTotalPrecInRainCol.dimension(12, 0.0);
     WaterManager::UpdatePrecipitation(*state);
 
     Real64 NomAnnualRain = state->dataWaterData->RainFall.NomAnnualRain;
