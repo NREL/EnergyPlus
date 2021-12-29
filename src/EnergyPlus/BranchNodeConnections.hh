@@ -84,9 +84,9 @@ namespace BranchNodeConnections {
                                     std::string const &NodeName,   // Name of this Node
                                     std::string const &ObjectType, // Type of object this Node is connected to (e.g. Chiller:Electric)
                                     std::string const &ObjectName, // Name of object this Node is connected to (e.g. MyChiller)
-                                    DataLoopNode::NodeConnectionType const &ConnectionType, // Connection Type for this Node (must be valid)
-                                    NodeInputManager::CompFluidStream FluidStream,          // Count on Fluid Streams
-                                    bool IsParent,                                          // True when node is a parent node
+                                    DataLoopNode::NodeConnectionType const ConnectionType, // Connection Type for this Node (must be valid)
+                                    NodeInputManager::CompFluidStream FluidStream,         // Count on Fluid Streams
+                                    bool IsParent,                                         // True when node is a parent node
                                     bool &errFlag // Will be True if errors already detected or if errors found here
     );
 

@@ -2066,7 +2066,7 @@ namespace SimulationManager {
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  DataLoopNode::ValidConnectionTypes[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
+                  DataLoopNode::NodeConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
             // Build ParentNodeLists
             if ((state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::NodeConnectionType::Inlet) ||
@@ -2129,7 +2129,7 @@ namespace SimulationManager {
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  DataLoopNode::ValidConnectionTypes[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
+                  DataLoopNode::NodeConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
         }
 

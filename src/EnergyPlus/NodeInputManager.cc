@@ -153,8 +153,8 @@ void GetNodeNums(EnergyPlusData &state,
                             state,
                             "Existing Fluid type=" +
                                 format("{}",
-                                       DataLoopNode::ValidNodeFluidTypes[static_cast<int>(state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType)]) +
-                                ", Requested Fluid Type=" + format("{}", DataLoopNode::ValidNodeFluidTypes[static_cast<int>(nodeFluidType)]));
+                                       DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType)]) +
+                                ", Requested Fluid Type=" + format("{}", DataLoopNode::NodeFluidTypeNames[static_cast<int>(nodeFluidType)]));
                         ErrorsFound = true;
                     }
                 }
@@ -502,7 +502,7 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
                   " Node,{},{},{},{}\n",
                   NumNode,
                   NodeID(NumNode),
-                  DataLoopNode::ValidNodeFluidTypes[static_cast<int>(Node(NumNode).FluidType)],
+                  DataLoopNode::NodeFluidTypeNames[static_cast<int>(Node(NumNode).FluidType)],
                   state.dataNodeInputMgr->NodeRef(NumNode));
             if (state.dataNodeInputMgr->NodeRef(NumNode) == 0) ++Count0;
         }
@@ -520,7 +520,7 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
                       " Suspicious Node,{},{},{},{}\n",
                       NumNode,
                       NodeID(NumNode),
-                      DataLoopNode::ValidNodeFluidTypes[static_cast<int>(Node(NumNode).FluidType)],
+                      DataLoopNode::NodeFluidTypeNames[static_cast<int>(Node(NumNode).FluidType)],
                       state.dataNodeInputMgr->NodeRef(NumNode));
             }
         }
@@ -705,8 +705,8 @@ int AssignNodeNumber(EnergyPlusData &state,
                     ShowContinueError(
                         state,
                         "Existing Fluid type=" +
-                            format("{}", DataLoopNode::ValidNodeFluidTypes[static_cast<int>(state.dataLoopNodes->Node(NumNode).FluidType)]) +
-                            ", Requested Fluid Type=" + format("{}", DataLoopNode::ValidNodeFluidTypes[static_cast<int>(nodeFluidType)]));
+                            format("{}", DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NumNode).FluidType)]) +
+                            ", Requested Fluid Type=" + format("{}", DataLoopNode::NodeFluidTypeNames[static_cast<int>(nodeFluidType)]));
                     ErrorsFound = true;
                 }
             }
@@ -822,7 +822,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
     if (NumNodes > 0) {
         auto nodeConnType(static_cast<int>(nodeConnectionType));
         if (nodeConnType >= 1 && nodeConnType < static_cast<int>(NodeConnectionType::Num)) {
-            ConnectionType = DataLoopNode::ValidConnectionTypes[nodeConnType];
+            ConnectionType = DataLoopNode::NodeConnectionTypeNames[nodeConnType];
         } else {
             ConnectionType = format("{}-unknown", nodeConnectionType);
         }

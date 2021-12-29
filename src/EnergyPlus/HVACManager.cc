@@ -591,7 +591,7 @@ void ManageHVAC(EnergyPlusData &state)
                       state.dataLoopNodes->Node(NodeNum).Press,
                       state.dataLoopNodes->Node(NodeNum).Enthalpy,
                       state.dataLoopNodes->Node(NodeNum).HumRat,
-                      DataLoopNode::ValidNodeFluidTypes[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)]);
+                      DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)]);
             }
         }
     }

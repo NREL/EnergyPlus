@@ -102,42 +102,45 @@ namespace DataLoopNode {
     constexpr bool IncrementFluidStreamYes(true);
 
     // Valid Fluid Types for Nodes
-    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> ValidNodeFluidTypes = {
+    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> NodeFluidTypeNames = {
         "blank", "Air", "Water", "Steam", "Electric"};
 
-    constexpr static std::array<std::string_view, static_cast<int>(NodeConnectionType::Num)> ValidConnectionTypes = {"blank",
-                                                                                                                     "Inlet",
-                                                                                                                     "Outlet",
-                                                                                                                     "Internal",
-                                                                                                                     "ZoneNode",
-                                                                                                                     "Sensor",
-                                                                                                                     "Actuator",
-                                                                                                                     "OutdoorAir",
-                                                                                                                     "ReliefAir",
-                                                                                                                     "ZoneInlet",
-                                                                                                                     "ZoneReturn",
-                                                                                                                     "ZoneExhaust",
-                                                                                                                     "Setpoint",
-                                                                                                                     "Electric",
-                                                                                                                     "OutsideAirReference",
-                                                                                                                     "InducedAir"};
+    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> NodeFluidTypeNamesUC = {
+        "BLANK", "AIR", "WATER", "STEAM", "ELECTRIC"};
 
-    constexpr static std::array<std::string_view, static_cast<int>(NodeConnectionType::Num)> ValidConnectionTypesUC = {"BLANK",
-                                                                                                                       "INLET",
-                                                                                                                       "OUTLET",
-                                                                                                                       "INTERNAL",
-                                                                                                                       "ZONENODE",
-                                                                                                                       "SENSOR",
-                                                                                                                       "ACTUATOR",
-                                                                                                                       "OUTDOORAIR",
-                                                                                                                       "RELIEFAIR",
-                                                                                                                       "ZONEINLET",
-                                                                                                                       "ZONERETURN",
-                                                                                                                       "ZONEEXHAUST",
-                                                                                                                       "SETPOINT",
-                                                                                                                       "ELECTRIC",
-                                                                                                                       "OUTSIDEAIRREFERENCE",
-                                                                                                                       "INDUCEDAIR"};
+    constexpr static std::array<std::string_view, static_cast<int>(NodeConnectionType::Num)> NodeConnectionTypeNames = {"blank",
+                                                                                                                        "Inlet",
+                                                                                                                        "Outlet",
+                                                                                                                        "Internal",
+                                                                                                                        "ZoneNode",
+                                                                                                                        "Sensor",
+                                                                                                                        "Actuator",
+                                                                                                                        "OutdoorAir",
+                                                                                                                        "ReliefAir",
+                                                                                                                        "ZoneInlet",
+                                                                                                                        "ZoneReturn",
+                                                                                                                        "ZoneExhaust",
+                                                                                                                        "Setpoint",
+                                                                                                                        "Electric",
+                                                                                                                        "OutsideAirReference",
+                                                                                                                        "InducedAir"};
+
+    constexpr static std::array<std::string_view, static_cast<int>(NodeConnectionType::Num)> NodeConnectionTypeNamesUC = {"BLANK",
+                                                                                                                          "INLET",
+                                                                                                                          "OUTLET",
+                                                                                                                          "INTERNAL",
+                                                                                                                          "ZONENODE",
+                                                                                                                          "SENSOR",
+                                                                                                                          "ACTUATOR",
+                                                                                                                          "OUTDOORAIR",
+                                                                                                                          "RELIEFAIR",
+                                                                                                                          "ZONEINLET",
+                                                                                                                          "ZONERETURN",
+                                                                                                                          "ZONEEXHAUST",
+                                                                                                                          "SETPOINT",
+                                                                                                                          "ELECTRIC",
+                                                                                                                          "OUTSIDEAIRREFERENCE",
+                                                                                                                          "INDUCEDAIR"};
 
     // Types
     struct NodeData
