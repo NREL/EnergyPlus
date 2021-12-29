@@ -973,7 +973,7 @@ namespace WaterManager {
             // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
             } else if (state.dataEnvrn->IsRain) {
                 ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
-                state.dataWaterData->RainFall.CurrentRate = (1.5 / 1000.0) / DataGlobalConstants::SecInHour;
+                state.dataWaterData->RainFall.CurrentRate = (1.5 / 1000.0) / (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
             }
             // rain depth in an HVAC system loop
             state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / (state.dataGlobal->NumOfTimeStepInHour * state.dataHVACGlobal->NumOfSysTimeSteps));
