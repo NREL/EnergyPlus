@@ -5972,11 +5972,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             PlantUtilities::ScanPlantLoopsForObject(
                 state, this->Name, this->WaterThermalTankType, this->SrcSidePlantLoc, errFlag, _, _, _, this->SourceInletNode, _);
             if (this->UseInletNode > 0) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                              this->UseSidePlantLoc.loopNum,
-                                                              this->UseSidePlantLoc.loopSideNum,
-                                                              this->SrcSidePlantLoc.loopNum,
-                                                              this->SrcSidePlantLoc.loopSideNum,
+                PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                              this->UseSidePlantLoc,                                                              this->SrcSidePlantLoc,
                                                               this->WaterThermalTankType,
                                                               true);
             }

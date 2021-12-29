@@ -814,11 +814,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
 
     PlantUtilities::ScanPlantLoopsForObject(
         state, this->Name, DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
-    PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                  this->CWPlantLoc.loopNum,
-                                                  this->CWPlantLoc.loopSideNum,
-                                                  this->CDPlantLoc.loopNum,
-                                                  this->CDPlantLoc.loopSideNum,
+    PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                  this->CWPlantLoc,                                                  this->CDPlantLoc,
                                                   DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                   true);
 
@@ -833,21 +829,13 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->GeneratorInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWPlantLoc.loopNum,
-                                                      this->CWPlantLoc.loopSideNum,
-                                                      this->GenPlantLoc.loopNum,
-                                                      this->GenPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->GenPlantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       true);
     }
 
     if ((this->CondInletNodeNum > 0) && (this->GeneratorInletNodeNum > 0)) {
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CDPlantLoc.loopNum,
-                                                      this->CDPlantLoc.loopSideNum,
-                                                      this->GenPlantLoc.loopNum,
-                                                      this->GenPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CDPlantLoc,                                                      this->GenPlantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       false);
     }

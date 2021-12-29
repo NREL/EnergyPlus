@@ -1205,11 +1205,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                 errFlag = true;
             } else {
 
-                PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                              this->loadSidePlantLoc.loopNum,
-                                                              this->loadSidePlantLoc.loopSideNum,
-                                                              this->sourceSidePlantLoc.loopNum,
-                                                              this->sourceSidePlantLoc.loopSideNum,
+                PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                              this->loadSidePlantLoc,                                                              this->sourceSidePlantLoc,
                                                               this->EIRHPType,
                                                               true);
             }

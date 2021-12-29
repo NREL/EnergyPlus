@@ -862,27 +862,15 @@ void ExhaustAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         if (errFlag) {
             ShowFatalError(state, "InitExhaustAbsorber: Program terminated due to previous condition(s).");
         }
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWPlantLoc.loopNum,
-                                                      this->CWPlantLoc.loopSideNum,
-                                                      this->CDPlantLoc.loopNum,
-                                                      this->CDPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->CDPlantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                       true);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->HWPlantLoc.loopNum,
-                                                      this->HWPlantLoc.loopSideNum,
-                                                      this->CDPlantLoc.loopNum,
-                                                      this->CDPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->HWPlantLoc,                                                      this->CDPlantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                       true);
     }
 
-    PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                  this->CWPlantLoc.loopNum,
-                                                  this->CWPlantLoc.loopSideNum,
-                                                  this->HWPlantLoc.loopNum,
-                                                  this->HWPlantLoc.loopSideNum,
+    PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                  this->CWPlantLoc,                                                  this->HWPlantLoc,
                                                   DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                   true);
 

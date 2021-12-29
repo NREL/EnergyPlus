@@ -916,11 +916,7 @@ void ReformulatedEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->CondInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWPlantLoc.loopNum,
-                                                      this->CWPlantLoc.loopSideNum,
-                                                      this->CDPlantLoc.loopNum,
-                                                      this->CDPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->CDPlantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR,
                                                       true);
     }
@@ -935,21 +931,13 @@ void ReformulatedEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->HeatRecInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWPlantLoc.loopNum,
-                                                      this->CWPlantLoc.loopSideNum,
-                                                      this->HRPlantLoc.loopNum,
-                                                      this->HRPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->HRPlantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR,
                                                       true);
     }
 
     if ((this->CondenserType != DataPlant::CondenserType::AirCooled) && (this->HeatRecActive)) {
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CDPlantLoc.loopNum,
-                                                      this->CDPlantLoc.loopSideNum,
-                                                      this->HRPlantLoc.loopNum,
-                                                      this->HRPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CDPlantLoc,                                                      this->HRPlantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_ElectricReformEIR,
                                                       false);
     }

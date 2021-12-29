@@ -866,24 +866,15 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         if (errFlag) {
             ShowFatalError(state, "InitGasAbsorber: Program terminated due to previous condition(s).");
         }
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWplantLoc.loopNum,
-                                                      this->CWplantLoc.loopSideNum,
-                                                      this->CDplantLoc.loopNum,
-                                                      this->CDplantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWplantLoc,                                                      this->CDplantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                       true);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->HWplantLoc.loopNum,
-                                                      this->HWplantLoc.loopSideNum,
-                                                      this->CDplantLoc.loopNum,
-                                                      this->CDplantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->HWplantLoc,                                                      this->CDplantLoc,
                                                       DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                       true);
     }
 
-    PlantUtilities::InterConnectTwoPlantLoopSides(
-        state, this->CWplantLoc.loopNum, this->CWplantLoc.loopSideNum, this->HWplantLoc.loopNum, this->HWplantLoc.loopSideNum, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
+    PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWplantLoc, this->HWplantLoc, DataPlant::PlantEquipmentType::Chiller_DFAbsorption, true);
 
     // check if outlet node of chilled water side has a setpoint.
     if ((state.dataLoopNodes->Node(this->ChillSupplyNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&

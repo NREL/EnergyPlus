@@ -162,8 +162,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
             ShowFatalError(state, "InitGshp: Program terminated due to previous condition(s).");
         }
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->LoadPlantLoc.loopNum, this->LoadPlantLoc.loopSideNum, this->SourcePlantLoc.loopNum, this->SourcePlantLoc.loopSideNum, this->WWHPPlantTypeOfNum, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state, this->LoadPlantLoc, this->SourcePlantLoc, this->WWHPPlantTypeOfNum, true);
         this->plantScanFlag = false;
     }
 }

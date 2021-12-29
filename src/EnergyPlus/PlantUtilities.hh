@@ -145,10 +145,8 @@ namespace PlantUtilities {
                                                      bool FirstHVACIteration);
 
     void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
-                                       int Loop1Num,
-                                       DataPlant::LoopSideLocation Loop1LoopSideNum,
-                                       int Loop2Num,
-                                       DataPlant::LoopSideLocation Loop2LoopSideNum,
+                                       PlantLocation Loop1PlantLoc,
+                                       PlantLocation Loop2PlantLoc,
                                        DataPlant::PlantEquipmentType ComponentType,
                                        bool Loop1DemandsOnLoop2);
 

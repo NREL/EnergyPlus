@@ -1575,27 +1575,15 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->GLHEInletNodeNum,
                                                 _);
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWPlantLoc.loopNum,
-                                                      this->CWPlantLoc.loopSideNum,
-                                                      this->GLHEPlantLoc.loopNum,
-                                                      this->GLHEPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->GLHEPlantLoc,
                                                       DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                       true);
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->HWPlantLoc.loopNum,
-                                                      this->HWPlantLoc.loopSideNum,
-                                                      this->GLHEPlantLoc.loopNum,
-                                                      this->GLHEPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->HWPlantLoc,                                                      this->GLHEPlantLoc,
                                                       DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                       true);
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                      this->CWPlantLoc.loopNum,
-                                                      this->CWPlantLoc.loopSideNum,
-                                                      this->HWPlantLoc.loopNum,
-                                                      this->HWPlantLoc.loopSideNum,
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->HWPlantLoc,
                                                       DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                       true);
 

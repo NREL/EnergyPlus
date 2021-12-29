@@ -1190,10 +1190,8 @@ void UpdateAbsorberChillerComponentGeneratorSide(EnergyPlusData &state,
 }
 
 void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
-                                   int const Loop1Num,
-                                   const DataPlant::LoopSideLocation Loop1LoopSideNum,
-                                   int const Loop2Num,
-                                   const DataPlant::LoopSideLocation Loop2LoopSideNum,
+                                   PlantLocation const Loop1PlantLoc,
+                                   PlantLocation const Loop2PlantLoc,
                                    DataPlant::PlantEquipmentType ComponentType,
                                    bool const Loop1DemandsOnLoop2)
 {
@@ -1210,7 +1208,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
     // Using/Aliasing
     using DataPlant::ConnectedLoopData;
 
-    if (Loop1Num == 0 || Loop1LoopSideNum == DataPlant::LoopSideLocation::Invalid || Loop2Num == 0 || Loop2LoopSideNum == DataPlant::LoopSideLocation::Invalid) {
+    if (Loop1PlantLoc.loopNum == 0 || Loop1PlantLoc.loopSideNum == DataPlant::LoopSideLocation::Invalid || Loop2PlantLoc.loopNum == 0 || Loop2PlantLoc.loopSideNum == DataPlant::LoopSideLocation::Invalid) {
         return; // Associated ScanPlantLoopsForObject couldn't find the component in the the plant loop structure...
     }           // This is a Fatal error condition
 
@@ -1218,7 +1216,7 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
 
     int TotalConnected;
 
-    auto &loop_side_1(state.dataPlnt->PlantLoop(Loop1Num).LoopSide(Loop1LoopSideNum));
+    auto &loop_side_1(state.dataPlnt->PlantLoop(Loop1PlantLoc.loopNum).LoopSide(Loop1PlantLoc.loopSideNum));
     auto &connected_1(loop_side_1.Connected);
     if (allocated(connected_1)) {
         TotalConnected = ++loop_side_1.TotalConnected;
@@ -1227,12 +1225,12 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
         TotalConnected = loop_side_1.TotalConnected = 1;
         connected_1.allocate(1);
     }
-    connected_1(TotalConnected).LoopNum = Loop2Num;
-    connected_1(TotalConnected).LoopSideNum = Loop2LoopSideNum;
+    connected_1(TotalConnected).LoopNum = Loop2PlantLoc.loopNum;
+    connected_1(TotalConnected).LoopSideNum = Loop2PlantLoc.loopSideNum;
     connected_1(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(ComponentType);
     connected_1(TotalConnected).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
 
-    auto &loop_side_2(state.dataPlnt->PlantLoop(Loop2Num).LoopSide(Loop2LoopSideNum));
+    auto &loop_side_2(state.dataPlnt->PlantLoop(Loop2PlantLoc.loopNum).LoopSide(Loop2PlantLoc.loopSideNum));
     auto &connected_2(loop_side_2.Connected);
     if (allocated(connected_2)) {
         TotalConnected = ++loop_side_2.TotalConnected;
@@ -1241,8 +1239,8 @@ void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
         TotalConnected = loop_side_2.TotalConnected = 1;
         connected_2.allocate(1);
     }
-    connected_2(TotalConnected).LoopNum = Loop1Num;
-    connected_2(TotalConnected).LoopSideNum = Loop1LoopSideNum;
+    connected_2(TotalConnected).LoopNum = Loop1PlantLoc.loopNum;
+    connected_2(TotalConnected).LoopSideNum = Loop1PlantLoc.loopSideNum;
     connected_2(TotalConnected).ConnectorTypeOf_Num = static_cast<int>(ComponentType);
     connected_2(TotalConnected).LoopDemandsOnRemote = Loop2DemandsOnLoop1;
 }

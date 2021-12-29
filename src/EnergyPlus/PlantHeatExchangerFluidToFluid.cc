@@ -2165,10 +2165,8 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         } else {
 
             PlantUtilities::InterConnectTwoPlantLoopSides(state,
-                                                          this->SupplySideLoop.loopNum,
-                                                          this->SupplySideLoop.loopSideNum,
-                                                          this->DemandSideLoop.loopNum,
-                                                          this->DemandSideLoop.loopSideNum,
+                                                          this->SupplySideLoop,
+                                                          this->DemandSideLoop,
                                                           DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg,
                                                           true);
         }

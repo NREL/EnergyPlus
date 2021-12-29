@@ -2036,20 +2036,17 @@ namespace PlantChillers {
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, this->ChillerType, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->ChillerType, true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWPlantLoc, this->CDPlantLoc, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, this->ChillerType, this->HRPlantLoc, errFlag, _, _, _, this->HeatRecInletNodeNum, _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWPlantLoc, this->HRPlantLoc, this->ChillerType, true);
             }
 
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
                 this->HeatRecActive) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, false);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CDPlantLoc, this->HRPlantLoc, this->ChillerType, false);
             }
 
             if (errFlag) {
@@ -4107,20 +4104,17 @@ namespace PlantChillers {
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, this->ChillerType, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->ChillerType, true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWPlantLoc, this->CDPlantLoc, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, this->ChillerType, this->HRPlantLoc, errFlag, _, _, _, this->HeatRecInletNodeNum, _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWPlantLoc, this->HRPlantLoc, this->ChillerType, true);
             }
 
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
                 this->HeatRecActive) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, false);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CDPlantLoc, this->HRPlantLoc, this->ChillerType, false);
             }
             if (errFlag) {
                 ShowFatalError(state, "InitEngineDrivenChiller: Program terminated due to previous condition(s).");
@@ -6085,20 +6079,17 @@ namespace PlantChillers {
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, this->ChillerType, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->ChillerType, true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWPlantLoc, this->CDPlantLoc, this->ChillerType, true);
             }
             if (this->HeatRecActive) {
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, this->ChillerType, this->HRPlantLoc, errFlag, _, _, _, this->HeatRecInletNodeNum, _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWPlantLoc, this->HRPlantLoc, this->ChillerType, true);
             }
 
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled &&
                 this->HeatRecActive) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->HRPlantLoc.loopNum, this->HRPlantLoc.loopSideNum, this->ChillerType, false);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CDPlantLoc, this->HRPlantLoc, this->ChillerType, false);
             }
             if (errFlag) {
                 ShowFatalError(state, "InitGTChiller: Program terminated due to previous condition(s).");
@@ -7539,8 +7530,7 @@ namespace PlantChillers {
             if (this->CondenserType != DataPlant::CondenserType::AirCooled && this->CondenserType != DataPlant::CondenserType::EvapCooled) {
                 PlantUtilities::ScanPlantLoopsForObject(
                     state, this->Name, this->ChillerType, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
-                PlantUtilities::InterConnectTwoPlantLoopSides(
-                    state, this->CWPlantLoc.loopNum, this->CWPlantLoc.loopSideNum, this->CDPlantLoc.loopNum, this->CDPlantLoc.loopSideNum, this->ChillerType, true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWPlantLoc, this->CDPlantLoc, this->ChillerType, true);
             }
 
             if (errFlag) {

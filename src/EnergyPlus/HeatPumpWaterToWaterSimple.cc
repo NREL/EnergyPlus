@@ -755,8 +755,7 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->WWHPType, this->LoadPlantLoc, errFlag, _, _, _, this->LoadSideInletNodeNum, _);
 
         if (!errFlag) {
-            PlantUtilities::InterConnectTwoPlantLoopSides(
-                state, this->LoadPlantLoc.loopNum, this->LoadPlantLoc.loopSideNum, this->SourcePlantLoc.loopNum, this->SourcePlantLoc.loopSideNum, this->WWHPType, true);
+            PlantUtilities::InterConnectTwoPlantLoopSides(state, this->LoadPlantLoc, this->SourcePlantLoc, this->WWHPType, true);
         }
 
         if (errFlag) {
