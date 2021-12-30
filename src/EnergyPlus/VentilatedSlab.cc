@@ -3279,9 +3279,7 @@ namespace VentilatedSlab {
                                               _,
                                               _,
                                               _,
-                                              state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum,
-                                              state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopSideNum,
-                                              state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.branchNum);
+                                              state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc);
 
                         } else if ((SELECT_CASE_var == Heating_GasCoilType) || (SELECT_CASE_var == Heating_ElectricCoilType) ||
                                    (SELECT_CASE_var == Heating_SteamCoilType)) {
@@ -3543,9 +3541,7 @@ namespace VentilatedSlab {
                                       _,
                                       _,
                                       _,
-                                      state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum,
-                                      state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopSideNum,
-                                      state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.branchNum);
+                                      state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc);
                 }
 
             } // ...end of HEATING/COOLING IF-THEN block

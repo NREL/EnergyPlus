@@ -217,9 +217,7 @@ namespace SteamBaseboardRadiator {
                                           _,
                                           _,
                                           _,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.loopNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.branchNum);
+                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc);
                     } else {
                         ShowSevereError(state,
                                         "SimSteamBaseboard: Errors in Baseboard=" +

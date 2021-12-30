@@ -73,7 +73,6 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
@@ -1649,9 +1648,7 @@ namespace UnitHeater {
                                       _,
                                       _,
                                       _,
-                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum,
-                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum,
-                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum);
+                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc);
                     break;
                 }
                 case HCoilType::Electric:

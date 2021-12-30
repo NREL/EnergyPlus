@@ -145,8 +145,7 @@ namespace DataPlant {
 
             // Pass the loop information via the HVAC interface manager
             HVACInterfaceManager::UpdatePlantLoopInterface(state,
-                                                           this->plantLoc.loopNum,
-                                                           this->plantLoc.loopSideNum,
+                                                           this->plantLoc,
                                                            thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut,
                                                            thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn,
                                                            ReSimOtherSideNeeded,
@@ -159,8 +158,7 @@ namespace DataPlant {
 
             // Pass the loop information via the HVAC interface manager (only the flow)
             HVACInterfaceManager::UpdatePlantLoopInterface(state,
-                                                           this->plantLoc.loopNum,
-                                                           this->plantLoc.loopSideNum,
+                                                           this->plantLoc,
                                                            thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut,
                                                            thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn,
                                                            ReSimOtherSideNeeded,

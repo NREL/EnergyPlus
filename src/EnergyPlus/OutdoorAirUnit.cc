@@ -2291,9 +2291,7 @@ namespace OutdoorAirUnit {
                                       _,
                                       2,
                                       SimCompNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.loopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.loopSideNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.branchNum);
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc);
                 }
             } break;
             case CompType::SteamCoil_AirHeat: { // 'Coil:Heating:Steam'
@@ -2356,9 +2354,7 @@ namespace OutdoorAirUnit {
                                       _,
                                       1,
                                       SimCompNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.loopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.loopSideNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.branchNum);
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc);
                 }
             } break;
             case CompType::WaterCoil_DetailedCool: { // 'Coil:Cooling:Water:DetailedGeometry'
@@ -2405,9 +2401,7 @@ namespace OutdoorAirUnit {
                                       _,
                                       1,
                                       SimCompNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.loopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.loopSideNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.branchNum);
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc);
                 }
             } break;
             case CompType::WaterCoil_CoolingHXAsst: { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
@@ -2450,9 +2444,7 @@ namespace OutdoorAirUnit {
                                       _,
                                       1,
                                       SimCompNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.loopNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.loopSideNum,
-                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc.branchNum);
+                                      OutAirUnit(OAUnitNum).OAEquip(EquipNum).plantLoc);
                 }
             } break;
             case CompType::DXSystem: { // CoilSystem:Cooling:DX  old 'CompType:UnitaryCoolOnly'

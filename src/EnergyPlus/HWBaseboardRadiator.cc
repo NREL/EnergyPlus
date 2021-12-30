@@ -231,9 +231,7 @@ namespace HWBaseboardRadiator {
                                       _,
                                       _,
                                       _,
-                                      HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                      HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                                      HWBaseboard(BaseboardNum).plantLoc.branchNum);
+                                      HWBaseboard(BaseboardNum).plantLoc);
                 } else {
                     ShowSevereError(state, "SimBaseboard: Errors in Baseboard=" + HWBaseboard(BaseboardNum).EquipID);
                     ShowContinueError(state, format("Invalid or unimplemented equipment type={}", HWBaseboard(BaseboardNum).EquipType));
@@ -1527,12 +1525,7 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = 0.0;
             QBBRadSource(BaseboardNum) = 0.0;
             HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy;
-            SetActuatedBranchFlowRate(state,
-                                      WaterMassFlowRate,
-                                      HWBaseboard(BaseboardNum).WaterInletNode,
-                                      HWBaseboard(BaseboardNum).plantLoc.loopNum,
-                                      HWBaseboard(BaseboardNum).plantLoc.loopSideNum,
-                                      HWBaseboard(BaseboardNum).plantLoc.branchNum,
+            SetActuatedBranchFlowRate(state,                                      WaterMassFlowRate,                                      HWBaseboard(BaseboardNum).WaterInletNode,                                      HWBaseboard(BaseboardNum).plantLoc,
                                       false);
         }
 

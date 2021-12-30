@@ -2177,17 +2177,13 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
             PlantUtilities::ScanPlantLoopsForNodeNum(state,
                                                      RoutineName,
                                                      this->OtherCompSupplySideLoop.inletNodeNum,
-                                                     this->OtherCompSupplySideLoop.loopNum,
-                                                     this->OtherCompSupplySideLoop.loopSideNum,
-                                                     this->OtherCompSupplySideLoop.branchNum,
+                                                     this->OtherCompSupplySideLoop,
                                                      this->OtherCompSupplySideLoop.compNum);
 
             PlantUtilities::ScanPlantLoopsForNodeNum(state,
                                                      RoutineName,
                                                      this->OtherCompDemandSideLoop.inletNodeNum,
-                                                     this->OtherCompDemandSideLoop.loopNum,
-                                                     this->OtherCompDemandSideLoop.loopSideNum,
-                                                     this->OtherCompDemandSideLoop.branchNum,
+                                                     this->OtherCompDemandSideLoop,
                                                      this->OtherCompDemandSideLoop.compNum);
 
             // revise how loads served category for other controlled equipment

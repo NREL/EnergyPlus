@@ -179,23 +179,13 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).WaterMassFlowRate = 0.0;
             // init hot water flow rate to zero
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state,
-                                      DummyMdot,
-                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.loopNum,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.loopSideNum,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.branchNum,
+            SetActuatedBranchFlowRate(state,                                      DummyMdot,                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,                                      baseboard->Baseboard(BaseboardNum).plantLoc,
                                       false);
 
         } else {
             // init hot water flow rate to zero
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state,
-                                      DummyMdot,
-                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.loopNum,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.loopSideNum,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.branchNum,
+            SetActuatedBranchFlowRate(state,                                      DummyMdot,                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,                                      baseboard->Baseboard(BaseboardNum).plantLoc,
                                       true);
 
             // On the first HVAC iteration the system values are given to the controller, but after that
@@ -225,9 +215,7 @@ namespace BaseboardRadiator {
                               _,
                               _,
                               _,
-                              baseboard->Baseboard(BaseboardNum).plantLoc.loopNum,
-                              baseboard->Baseboard(BaseboardNum).plantLoc.loopSideNum,
-                              baseboard->Baseboard(BaseboardNum).plantLoc.branchNum);
+                              baseboard->Baseboard(BaseboardNum).plantLoc);
 
             PowerMet = baseboard->Baseboard(BaseboardNum).Power;
         }
@@ -1176,12 +1164,7 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).WaterOutletEnthalpy = baseboard->Baseboard(BaseboardNum).WaterInletEnthalpy;
             WaterMassFlowRate = 0.0;
 
-            SetActuatedBranchFlowRate(state,
-                                      WaterMassFlowRate,
-                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.loopNum,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.loopSideNum,
-                                      baseboard->Baseboard(BaseboardNum).plantLoc.branchNum,
+            SetActuatedBranchFlowRate(state,                                      WaterMassFlowRate,                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,                                      baseboard->Baseboard(BaseboardNum).plantLoc,
                                       false);
             AirMassFlowRate = 0.0;
         }

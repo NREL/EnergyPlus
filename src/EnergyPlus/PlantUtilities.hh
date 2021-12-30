@@ -77,9 +77,7 @@ namespace PlantUtilities {
     void SetActuatedBranchFlowRate(EnergyPlusData &state,
                                    Real64 &CompFlow,
                                    int ActuatedNode,
-                                   int LoopNum,
-                                   DataPlant::LoopSideLocation LoopSideNum,
-                                   int BranchNum,
+                                   PlantLocation plantLoc,
                                    bool ResetMode // flag to indicate if this is a real flow set, or a reset flow setting.
     );
 
@@ -188,9 +186,7 @@ namespace PlantUtilities {
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                                   std::string_view const CallerName, // really used for error messages
                                   int NodeNum,                       // index in Node structure of node to be scanned
-                                  int &LoopNum,                      // return value for plant loop
-                                  DataPlant::LoopSideLocation &LoopSideNum,                  // return value for plant loop side
-                                  int &BranchNum,
+                                  PlantLocation &pLantLoc,           // return value for location
                                   Optional_int CompNum = _);
 
     bool AnyPlantLoopSidesNeedSim(EnergyPlusData &state);

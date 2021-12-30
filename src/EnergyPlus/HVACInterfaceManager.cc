@@ -392,8 +392,7 @@ void rshift1(Array1D<Real64> &a)
 }
 
 void UpdatePlantLoopInterface(EnergyPlusData &state,
-                              int const LoopNum,                // The 'inlet/outlet node' loop number
-                              DataPlant::LoopSideLocation const ThisLoopSideNum,        // The 'outlet node' LoopSide number
+                              PlantLocation const plantLoc,     // The 'outlet node' Location
                               int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                               int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                               bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
@@ -437,7 +436,10 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     Real64 MixedOutletTemp;
     int ThisLoopSideInletNode;
 
+    int LoopNum = plantLoc.loopNum;
+    DataPlant::LoopSideLocation ThisLoopSideNum = plantLoc.loopSideNum;
     auto &convergence(state.dataConvergeParams->PlantConvergence(LoopNum));
+
 
     // reset out of tolerance flags
     convergence.PlantMassFlowNotConverged = false;
@@ -462,7 +464,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     auto &flow_supply_to_demand_tol(convergence.PlantFlowSupplyToDemandTolValue);
     if (CommonPipeType == DataPlant::CommonPipeType::Single || CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
         // update the temperature
-        UpdateCommonPipe(state, LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
+        UpdateCommonPipe(state, plantLoc, CommonPipeType, MixedOutletTemp);
         state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
         TankOutletTemp = MixedOutletTemp;
         if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
@@ -696,7 +698,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
 }
 
 void UpdateCommonPipe(
-    EnergyPlusData &state, int const LoopNum, DataPlant::LoopSideLocation const TankInletLoopSide, DataPlant::CommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
+    EnergyPlusData &state, PlantLocation const TankInletPlantLoc, DataPlant::CommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
@@ -738,7 +740,6 @@ void UpdateCommonPipe(
     static constexpr std::string_view RoutineName("UpdateCommonPipe");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation TankOutletLoopSide;    // inlet loopsidenumber
     int TankInletNode;         // inlet loop side outlet node
     int TankOutletNode;        // inlet loop side outlet node
     Real64 TankInletTemp;      // temporary variable
@@ -755,7 +756,9 @@ void UpdateCommonPipe(
     Real64 TankAverageTemp;
 
     // find tank inlet and outlet nodes
-    TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
+    auto LoopNum = TankInletPlantLoc.loopNum;
+    auto TankInletLoopSide = TankInletPlantLoc.loopSideNum;
+    auto TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletPlantLoc.loopSideNum)]; // Outlet loopside
     TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
     TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
 
@@ -828,8 +831,9 @@ void UpdateCommonPipe(
         ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
         // 2-way (controlled) common pipe simulation
     } else if (CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
+        PlantLocation TankOutletPlantLoc = {LoopNum, TankOutletLoopSide, 0, 0};
 
-        ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
+        ManageTwoWayCommonPipe(state, TankOutletPlantLoc, TankAverageTemp);
         MixedOutletTemp = state.dataLoopNodes->Node(TankOutletNode).Temp;
     }
 
@@ -975,7 +979,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     }
 }
 
-void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant::LoopSideLocation const LoopSide, Real64 const TankOutletTemp)
+void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const plantLoc, Real64 const TankOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1037,22 +1041,22 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
     }
 
     // fill local node indexes
-    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
-    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut;
-    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
-    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
+    NodeNumPriIn = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
+    NodeNumPriOut = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut;
+    NodeNumSecIn = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
+    NodeNumSecOut = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
     // begin environment inits
-    if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
-        PlantCommonPipe(LoopNum).PriToSecFlow = 0.0;
-        PlantCommonPipe(LoopNum).SecToPriFlow = 0.0;
-        PlantCommonPipe(LoopNum).PriCPLegFlow = 0.0;
-        PlantCommonPipe(LoopNum).SecCPLegFlow = 0.0;
-        MyEnvrnFlag(LoopNum) = false;
+    if (MyEnvrnFlag(plantLoc.loopNum) && state.dataGlobal->BeginEnvrnFlag) {
+        PlantCommonPipe(plantLoc.loopNum).PriToSecFlow = 0.0;
+        PlantCommonPipe(plantLoc.loopNum).SecToPriFlow = 0.0;
+        PlantCommonPipe(plantLoc.loopNum).PriCPLegFlow = 0.0;
+        PlantCommonPipe(plantLoc.loopNum).SecCPLegFlow = 0.0;
+        MyEnvrnFlag(plantLoc.loopNum) = false;
     }
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag(LoopNum) = true;
+        MyEnvrnFlag(plantLoc.loopNum) = true;
     }
 
     // every time inits
@@ -1061,41 +1065,41 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
     TempCPSecondaryCntrlSetPoint = state.dataLoopNodes->Node(NodeNumSecIn).TempSetPoint;
 
     // 6 unknowns follow, fill with current values
-    MdotPriToSec = PlantCommonPipe(LoopNum).PriToSecFlow;
-    MdotPriRCLeg = PlantCommonPipe(LoopNum).PriCPLegFlow;
-    MdotSecRCLeg = PlantCommonPipe(LoopNum).SecCPLegFlow;
+    MdotPriToSec = PlantCommonPipe(plantLoc.loopNum).PriToSecFlow;
+    MdotPriRCLeg = PlantCommonPipe(plantLoc.loopNum).PriCPLegFlow;
+    MdotSecRCLeg = PlantCommonPipe(plantLoc.loopNum).SecCPLegFlow;
     TempSecInlet = state.dataLoopNodes->Node(NodeNumSecIn).Temp;
     TempPriInlet = state.dataLoopNodes->Node(NodeNumPriIn).Temp;
     MdotPri = state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate; // may or may not be an unknown, If variable speed primary side, then unknown
 
-    if (LoopSide == DataPlant::LoopSideLocation::Supply) {
+    if (plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
         TempSecOutTankOut = TankOutletTemp;
-        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).LoopSideInlet_TankTemp;
+        TempPriOutTankOut = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Demand).LoopSideInlet_TankTemp;
     } else {
         TempPriOutTankOut = TankOutletTemp;
-        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).LoopSideInlet_TankTemp;
+        TempSecOutTankOut = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).LoopSideInlet_TankTemp;
     }
 
     // determine current case
     // which side is being updated
     // commonpipe control point is the inlet of one of the half loops
     CurCallingCase = 0;
-    if (LoopSide == DataPlant::LoopSideLocation::Supply) { // update primary inlet
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
-            !state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+    if (plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) { // update primary inlet
+        if (state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
+            !state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
             CurCallingCase = SupplyLedPrimaryInletUpdate;
 
-        } else if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
-                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+        } else if (!state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
+                   state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
             CurCallingCase = DemandLedPrimaryInletUpdate;
         }
     } else { // update secondary inlet
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
-            !state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+        if (state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
+            !state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
             CurCallingCase = SupplyLedSecondaryInletUpdate;
 
-        } else if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
-                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+        } else if (!state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
+                   state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
             CurCallingCase = DemandLedSecondaryInletUpdate;
         }
     }
@@ -1132,7 +1136,7 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
                 }
 
                 // eq. 3
-                if ((PlantCommonPipe(LoopNum).SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == SupplyLedPrimaryInletUpdate)) {
+                if ((PlantCommonPipe(plantLoc.loopNum).SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == SupplyLedPrimaryInletUpdate)) {
                     // MdotPri is a variable to be calculated and flow request needs to be made
                     if (std::abs(TempCPPrimaryCntrlSetPoint) > DeltaTempTol) {
 
@@ -1142,7 +1146,7 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
                     } else {
                         MdotPri = MdotSec;
                     }
-                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, DataPlant::LoopSideLocation::Supply, 1, false);
+                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0}, false);
                 }
 
                 // eq. 2
@@ -1174,7 +1178,7 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
                 }
 
                 // eq. 3
-                if ((PlantCommonPipe(LoopNum).SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == DemandLedPrimaryInletUpdate)) {
+                if ((PlantCommonPipe(plantLoc.loopNum).SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == DemandLedPrimaryInletUpdate)) {
                     // MdotPri is a variable to be calculated and flow request made
                     if (std::abs(TempPriOutTankOut - TempPriInlet) > DeltaTempTol) {
                         MdotPri = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempPriInlet);
@@ -1182,7 +1186,7 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
                     } else {
                         MdotPri = MdotSec;
                     }
-                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, DataPlant::LoopSideLocation::Supply, 1, false);
+                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0}, false);
                 }
 
                 // eq. 4
@@ -1207,10 +1211,10 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
     }
 
     // update
-    PlantCommonPipe(LoopNum).PriToSecFlow = MdotPriToSec;
-    PlantCommonPipe(LoopNum).SecToPriFlow = MdotPriToSec;
-    PlantCommonPipe(LoopNum).PriCPLegFlow = MdotPriRCLeg;
-    PlantCommonPipe(LoopNum).SecCPLegFlow = MdotSecRCLeg;
+    PlantCommonPipe(plantLoc.loopNum).PriToSecFlow = MdotPriToSec;
+    PlantCommonPipe(plantLoc.loopNum).SecToPriFlow = MdotPriToSec;
+    PlantCommonPipe(plantLoc.loopNum).PriCPLegFlow = MdotPriRCLeg;
+    PlantCommonPipe(plantLoc.loopNum).SecCPLegFlow = MdotSecRCLeg;
     state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
     state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
 }

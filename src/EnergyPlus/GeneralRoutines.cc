@@ -129,9 +129,7 @@ void ControlCompOutput(EnergyPlusData &state,
                        Optional<Real64 const> AirMassFlow,    // air mass flow rate
                        Optional_int_const Action,             // 1=reverse; 2=normal
                        Optional_int_const EquipIndex,         // Identifier for equipment of Outdoor Air Unit "ONLY"
-                       Optional_int_const LoopNum,            // for plant components, plant loop index
-                       DataPlant::LoopSideLocation LoopSide,           // for plant components, plant loop side index
-                       Optional_int_const BranchIndex,        // for plant components, plant branch index
+                       PlantLocation plantLoc,                // for plant components, Location
                        Optional_int_const ControlledZoneIndex // controlled zone index for the zone containing the component
 )
 {
@@ -297,13 +295,11 @@ void ControlCompOutput(EnergyPlusData &state,
                     ZoneController.CalculatedSetPoint = ZoneInterHalf.MaxFlow; // CR7253
                 }
                 // Set the Actuated node MassFlowRate with zero value
-                if (present(LoopNum)) { // this is a plant component
+                if (plantLoc.loopNum) { // this is a plant component
                     SetActuatedBranchFlowRate(state,
                                               ZoneController.CalculatedSetPoint,
                                               ActuatedNode,
-                                              LoopNum,
-                                              LoopSide,
-                                              BranchIndex,
+                                              plantLoc,
                                               false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
                 } else {                              // assume not a plant component
                     state.dataLoopNodes->Node(ActuatedNode).MassFlowRate = ZoneController.CalculatedSetPoint;
@@ -407,13 +403,11 @@ void ControlCompOutput(EnergyPlusData &state,
         }
 
         // Set the Actuated node MassFlowRate with the new value
-        if (present(LoopNum)) { // this is a plant component
+        if (plantLoc.loopNum) { // this is a plant component
             SetActuatedBranchFlowRate(state,
                                       ZoneController.CalculatedSetPoint,
                                       ActuatedNode,
-                                      LoopNum,
-                                      LoopSide,
-                                      BranchIndex,
+                                      plantLoc,
                                       false); // Autodesk:OPTIONAL LoopSide, BranchIndex used without PRESENT check
         } else {                              // assume not a plant component, leave alone
             state.dataLoopNodes->Node(ActuatedNode).MassFlowRate = ZoneController.CalculatedSetPoint;

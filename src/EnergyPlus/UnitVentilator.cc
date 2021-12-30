@@ -3385,9 +3385,7 @@ namespace UnitVentilator {
                                                   _,
                                                   _,
                                                   _,
-                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum,
-                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum,
-                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum);
+                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc);
 
                             } else if ((SELECT_CASE_var == Heating_GasCoilType) || (SELECT_CASE_var == Heating_ElectricCoilType) ||
                                        (SELECT_CASE_var == Heating_SteamCoilType)) {
@@ -3620,9 +3618,7 @@ namespace UnitVentilator {
                                           _,
                                           _,
                                           _,
-                                          state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopNum,
-                                          state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopSideNum,
-                                          state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.branchNum);
+                                          state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc);
 
                     } // end from IF (OpMode .EQ. CycFanCycCoil) THEN
                 }

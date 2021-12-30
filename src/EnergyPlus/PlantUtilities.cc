@@ -286,9 +286,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
 void SetActuatedBranchFlowRate(EnergyPlusData &state,
                                Real64 &CompFlow,
                                int const ActuatedNode,
-                               int const LoopNum,
-                               const DataPlant::LoopSideLocation LoopSideNum,
-                               int const BranchNum,
+                               PlantLocation const plantLoc,
                                bool const ResetMode // flag to indicate if this is a real flow set, or a reset flow setting.
 )
 {
@@ -309,18 +307,18 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
     // Set flow on node and branch while honoring constraints on actuated node
 
     auto &a_node(state.dataLoopNodes->Node(ActuatedNode));
-    if (LoopNum == 0 || LoopSideNum == DataPlant::LoopSideLocation::Invalid) {
+    if (plantLoc.loopNum == 0 || plantLoc.loopSideNum == DataPlant::LoopSideLocation::Invalid) {
         // early in simulation before plant loops are setup and found
         a_node.MassFlowRate = CompFlow;
         return;
     }
 
-    auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
+    auto &loop_side(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum));
 
     // store original flow
     Real64 const MdotOldRequest = a_node.MassFlowRateRequest;
     a_node.MassFlowRateRequest = CompFlow;
-    if (LoopNum > 0 && LoopSideNum != DataPlant::LoopSideLocation::Invalid && (!ResetMode)) {
+    if (plantLoc.loopNum > 0 && plantLoc.loopSideNum != DataPlant::LoopSideLocation::Invalid && (!ResetMode)) {
         if ((MdotOldRequest > 0.0) && (CompFlow > 0.0)) { // sure that not coming back from a no flow reset
             if ((std::abs(MdotOldRequest - a_node.MassFlowRateRequest) > DataBranchAirLoopPlant::MassFlowTolerance) &&
                 (loop_side.FlowLock == DataPlant::FlowLock::Unlocked)) {
@@ -330,10 +328,10 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
     }
     // Set loop flow rate
 
-    if (LoopNum > 0 && LoopSideNum != DataPlant::LoopSideLocation::Invalid) {
-        auto const &branch(loop_side.Branch(BranchNum));
+    if (plantLoc.loopNum > 0 && plantLoc.loopSideNum != DataPlant::LoopSideLocation::Invalid) {
+        auto const &branch(loop_side.Branch(plantLoc.branchNum));
         if (loop_side.FlowLock == DataPlant::FlowLock::Unlocked) {
-            if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
+            if (state.dataPlnt->PlantLoop(plantLoc.loopNum).MaxVolFlowRate == DataSizing::AutoSize) { // still haven't sized the plant loop
                 a_node.MassFlowRate = CompFlow;
             } else { // bound the flow by Min/Max available across entire branch
 
@@ -1741,9 +1739,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
 void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                               std::string_view const CallerName, // really used for error messages
                               int const NodeNum,                 // index in Node structure of node to be scanned
-                              int &LoopNum,                      // return value for plant loop
-                              DataPlant::LoopSideLocation &LoopSideNum,                  // return value for plant loop side
-                              int &BranchNum,
+                              PlantLocation &pLantLoc,           // return value for location
                               Optional_int CompNum)
 {
 
@@ -1785,9 +1781,9 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                     if (NodeNum == this_comp.NodeNumIn) {
                         FoundNode = true;
                         ++inFoundCount;
-                        LoopNum = LoopCtr;
-                        LoopSideNum = LoopSideCtr;
-                        BranchNum = BranchCtr;
+                        pLantLoc.loopNum = LoopCtr;
+                        pLantLoc.loopSideNum = LoopSideCtr;
+                        pLantLoc.branchNum = BranchCtr;
                         if (present(CompNum)) {
                             CompNum = CompCtr;
                         }
@@ -1795,9 +1791,9 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
 
                     if (NodeNum == this_comp.NodeNumOut) {
                         ++outFoundCount;
-                        LoopNum = LoopCtr;
-                        LoopSideNum = LoopSideCtr;
-                        BranchNum = BranchCtr;
+                        pLantLoc.loopNum = LoopCtr;
+                        pLantLoc.loopSideNum = LoopSideCtr;
+                        pLantLoc.branchNum = BranchCtr;
                     }
                 }
             }
@@ -1935,13 +1931,10 @@ int MyPlantSizingIndex(EnergyPlusData &state,
     // Return value
     int MyPltSizNum; // returned plant sizing index
 
-    int MyPltLoopNum;
-    int PlantLoopNum;
-    DataPlant::LoopSideLocation DummyLoopSideNum{DataPlant::LoopSideLocation::Invalid};
-    int DummyBranchNum;
+    int MyPltLoopNum{};
+    PlantLocation DummyPlantLoc{};
     bool PrintErrorFlag;
 
-    MyPltLoopNum = 0;
     MyPltSizNum = 0;
     if (present(SupressErrors)) {
         PrintErrorFlag = SupressErrors;
@@ -1949,10 +1942,10 @@ int MyPlantSizingIndex(EnergyPlusData &state,
         PrintErrorFlag = true;
     }
 
-    ScanPlantLoopsForNodeNum(state, "MyPlantSizingIndex", NodeNumIn, PlantLoopNum, DummyLoopSideNum, DummyBranchNum);
+    ScanPlantLoopsForNodeNum(state, "MyPlantSizingIndex", NodeNumIn, DummyPlantLoc);
 
-    if (PlantLoopNum > 0) {
-        MyPltLoopNum = PlantLoopNum;
+    if (DummyPlantLoc.loopNum > 0) {
+        MyPltLoopNum = DummyPlantLoc.loopNum;
     } else {
         MyPltLoopNum = 0;
     }

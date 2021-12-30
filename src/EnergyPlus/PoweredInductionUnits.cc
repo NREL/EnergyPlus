@@ -1971,9 +1971,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                               _,
                               _,
                               _,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopSideNum,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.branchNum);
+                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
         }
         break;
     }
@@ -2291,9 +2289,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                               _,
                               _,
                               _,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopSideNum,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.branchNum);
+                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
         }
         break;
     }
