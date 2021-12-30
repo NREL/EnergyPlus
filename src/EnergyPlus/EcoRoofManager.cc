@@ -824,8 +824,6 @@ namespace EcoRoofManager {
         Real64 AvgMoisture; // Average soil moisture over depth of ecoroof media
         int index1;
 
-        auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-
         // NOTE:  As Energyplus calls the energy balance manager (and hence CalcEcoroof)
         // once for each surface within each zone that has an ecoroof
         // --- the CALCECOROOF routine is called multiple times within each time step
@@ -927,11 +925,11 @@ namespace EcoRoofManager {
                                    "Please be aware that precipitation depth in the .epw weather file is used in the RoofIrrigation calculation as "
                                    "the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. "
                                    "Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
-                state.dataEcoRoofMgr->CurrentPrecipitation = state.dataEnvrn->LiquidPrecipitation * TimeStepSys; //  units of m
+                state.dataEcoRoofMgr->CurrentPrecipitation = state.dataEnvrn->LiquidPrecipitation; //  units of m
                 // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
             } else if (state.dataEnvrn->IsRain) {
                 ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
-                state.dataEcoRoofMgr->CurrentPrecipitation = (1.5 / 1000.0) * TimeStepSys; //  units of m
+                state.dataEcoRoofMgr->CurrentPrecipitation = (1.5 / 1000.0); //  units of m
             }
             Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth; // x (m) evenly put into top layer
             if (!state.dataGlobal->WarmupFlag) {
