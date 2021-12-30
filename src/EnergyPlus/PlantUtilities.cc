@@ -286,7 +286,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
 void SetActuatedBranchFlowRate(EnergyPlusData &state,
                                Real64 &CompFlow,
                                int const ActuatedNode,
-                               PlantLocation const plantLoc,
+                               PlantLocation const &plantLoc,
                                bool const ResetMode // flag to indicate if this is a real flow set, or a reset flow setting.
 )
 {

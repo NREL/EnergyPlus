@@ -1146,7 +1146,8 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const plantLoc,
                     } else {
                         MdotPri = MdotSec;
                     }
-                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0}, false);
+                    PlantLocation thisPlantLoc =  {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0};
+                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, thisPlantLoc, false);
                 }
 
                 // eq. 2
@@ -1186,7 +1187,8 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const plantLoc,
                     } else {
                         MdotPri = MdotSec;
                     }
-                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0}, false);
+                    PlantLocation thisPlantLoc = {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0};
+                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, thisPlantLoc, false);
                 }
 
                 // eq. 4

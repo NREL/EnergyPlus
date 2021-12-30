@@ -77,7 +77,7 @@ namespace PlantUtilities {
     void SetActuatedBranchFlowRate(EnergyPlusData &state,
                                    Real64 &CompFlow,
                                    int ActuatedNode,
-                                   PlantLocation plantLoc,
+                                   PlantLocation const &plantLoc,
                                    bool ResetMode // flag to indicate if this is a real flow set, or a reset flow setting.
     );
 
