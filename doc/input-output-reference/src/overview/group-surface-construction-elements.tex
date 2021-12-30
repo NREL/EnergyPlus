@@ -751,7 +751,7 @@ This outputs the current phase classification for the node.  The values for this
 \item
 1 = freezing
 \item
-2 = crystallized 
+2 = crystallized
 \end{itemize}
 
 \paragraph{CondFD Phase Change Previous State {[]}}\label{condfd-phase-change-previous-state}
@@ -4133,7 +4133,7 @@ representation will be used to calculate the temperature.  Currently,
 EnergyPlus uses seven nodes in the direction perpendicular to the main
 direction of heat transfer.  In this case, 0.0 represents the first node and
 1.0 represents the seventh or last node in the perpendicular direction.  So,
-this field will be used to determine which node in the direction pendicular to
+this field will be used to determine which node in the direction perpendicular to
 the main direction of heat transfer to use and there are five other nodes
 (second, third, fourth, fifth, and sixth) that are possible locations.  For
 example, if the user enters a value of 0.167, the second node will be used.
@@ -4148,6 +4148,8 @@ EnergyPlus Engineering Reference.
 \begin{itemize}
 \item  Zone,Average,Surface Internal Source Location Temperature [C]
 \item  Zone,Average,Surface Internal User Specified Location Temperature [C]
+\item  Zone,Average,CondFD Internal Heat Source Power After Layer N [W]
+\item  Zone,Average,CondFD Internal Heat Source Energy After Layer N [J]
 \end{itemize}
 
 \paragraph{Surface Internal Source Location Temperature {[}C{]}}\label{surface-internal-source-location-temperature-c}
@@ -4157,6 +4159,14 @@ This output is the temperature within the surface at the location of the source/
 \paragraph{Surface Internal User Specified Location Temperature {[}C{]}}\label{surface-internal-user—specified-location-temperature-c}
 
 This output is the temperature within the surface at the location requested by the user.
+
+\paragraph{CondFD Internal Heat Source Power After Layer}
+
+This output is the heat power added after material layer N from the \hyperref[constructioninternalsource]{ConstructionProperty:InternalHeatSource} object. Only valid for the CondFD solution algorithm.
+
+\paragraph{CondFD Internal Heat Source Energy After Layer}
+
+This output is the heat energy added after material layer N from the \hyperref[constructioninternalsource]{ConstructionProperty:InternalHeatSource} object. Only valid for the CondFD solution algorithm.
 
 \subsection{Construction:AirBoundary}\label{constructionairboundary}
 

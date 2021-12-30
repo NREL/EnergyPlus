@@ -90,7 +90,7 @@
 
   Version,22.1;
 
-  Timestep,4;
+  Timestep,60;
 
   Building,
     Simple One Zone (Wireframe DXF),  !- Name
@@ -122,7 +122,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -268,12 +268,42 @@
     0.5,                     !- Solar Absorptance
     0.1;                     !- Visible Absorptance
 
+  Material,
+    Drywall 0.25 in. lay-1,  !- Name
+    Rough,                   !- Roughness
+    0.00635,                 !- Thickness {m}
+    0.1602906,               !- Conductivity {W/m-K}
+    801,                     !- Density {kg/m3}
+    837.4,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.5,                     !- Solar Absorptance
+    0.1;                     !- Visible Absorptance
+
+  Material,
+    Drywall 0.25 in. lay-2,  !- Name
+    Rough,                   !- Roughness
+    0.00635,                 !- Thickness {m}
+    0.1602906,               !- Conductivity {W/m-K}
+    801,                     !- Density {kg/m3}
+    837.4,                   !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.5,                     !- Solar Absorptance
+    0.1;                     !- Visible Absorptance
+
   Construction,
     WallExtInsFin1,          !- Name
     Vinyl&#44 Light,         !- Outside Layer
     WallSheathing,           !- Layer 2
     WallStudAndCavityk1,     !- Layer 3
     Drywall 0.5 in.;         !- Layer 4
+
+  Construction,
+    WallExtInsFin2,          !- Name
+    Vinyl&#44 Light,         !- Outside Layer
+    WallSheathing,           !- Layer 2
+    WallStudAndCavityk1,     !- Layer 3
+    Drywall 0.25 in. lay-1,  !- Layer 4
+    Drywall 0.25 in. lay-2;  !- Layer 5
 
   Construction,
     FLOOR,                   !- Name
@@ -359,7 +389,7 @@
   BuildingSurface:Detailed,
     Zn001:Wall004,           !- Name
     Wall,                    !- Surface Type
-    WallExtInsFin1,          !- Construction Name
+    WallExtInsFin2,          !- Construction Name
     ZONE ONE,                !- Zone Name
     ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
@@ -505,6 +535,8 @@
 
   Output:Variable,*,CondFD Phase Change Node Temperature 5,hourly;
 
+  Output:Variable,*,CondFD Phase Change Node Temperature 6,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Conductivity 1,hourly;
 
   Output:Variable,*,CondFD Phase Change Node Conductivity 2,hourly;
@@ -525,3 +557,6 @@
 
   Output:Variable,*,CondFD Phase Change Node Specific Heat 5,hourly;
 
+  Output:Variable,*,CondFD EMS Heat Source Power After Layer 4,hourly;
+
+  Output:Variable,*,CondFD EMS Heat Source Energy After Layer 4,hourly;
