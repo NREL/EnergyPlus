@@ -1721,6 +1721,10 @@ namespace DataPlant {
             for (int CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter) {
 
                 auto &this_comp(branch.Comp(CompCounter));
+                PlantLocation this_plantLoc = {this->plantLoc.loopNum,
+                                               this->plantLoc.loopSideNum,
+                                               BranchCounter,
+                                               CompCounter};
                 auto const CurOpSchemeType(this_comp.CurOpSchemeType);
 
                 switch (CurOpSchemeType) {
@@ -1737,10 +1741,7 @@ namespace DataPlant {
                     break;
                 case DataPlant::OpScheme::CompSetPtBased:
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state,
-                                                                        this->plantLoc.loopNum,
-                                                                        this->plantLoc.loopSideNum,
-                                                                        BranchCounter,
-                                                                        CompCounter,
+                                                                        this_plantLoc,
                                                                         LoadToLoopSetPoint,
                                                                         LoadToLoopSetPointThatWasntMet,
                                                                         FirstHVACIteration,
@@ -1755,10 +1756,7 @@ namespace DataPlant {
                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).OpScheme(OpSchemePtr).EMSIntVarLoopDemandRate = InitialDemandToLoopSetPoint;
                     }
                     PlantCondLoopOperation::ManagePlantLoadDistribution(state,
-                                                                        this->plantLoc.loopNum,
-                                                                        this->plantLoc.loopSideNum,
-                                                                        BranchCounter,
-                                                                        CompCounter,
+                                                                        this_plantLoc,
                                                                         UpdatedDemandToLoopSetPoint,
                                                                         LoadToLoopSetPointThatWasntMet,
                                                                         FirstHVACIteration,
@@ -1813,6 +1811,10 @@ namespace DataPlant {
             int const StartingComponent = branch.lastComponentSimulated + 1;
             int const EndingComponent = branch.TotalComponents;
             for (int CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter) {
+                PlantLocation this_plantLoc = {this->plantLoc.loopNum,
+                                               this->plantLoc.loopSideNum,
+                                               BranchCounter,
+                                               CompCounter};
 
                 auto const CurOpSchemeType(branch.Comp(CompCounter).CurOpSchemeType);
 
@@ -1840,10 +1842,7 @@ namespace DataPlant {
                 case OpScheme::CoolingRB: {              //~ load range based
                     if (!LoadDistributionWasPerformed) { //~ Still need to distribute load among load range based components
                         PlantCondLoopOperation::ManagePlantLoadDistribution(state,
-                                                                            this->plantLoc.loopNum,
-                                                                            this->plantLoc.loopSideNum,
-                                                                            BranchCounter,
-                                                                            CompCounter,
+                                                                            this_plantLoc,
                                                                             LoadToLoopSetPoint,
                                                                             LoadToLoopSetPointThatWasntMet,
                                                                             FirstHVACIteration,

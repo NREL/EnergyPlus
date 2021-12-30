@@ -105,10 +105,7 @@ using DataHVACGlobals::SmallLoad;
 using FluidProperties::GetSpecificHeatGlycol;
 
 void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                 int const LoopNum,     // PlantLoop data structure loop counter
-                                 const LoopSideLocation LoopSideNum, // PlantLoop data structure LoopSide counter
-                                 int const BranchNum,   // PlantLoop data structure branch counter
-                                 int const CompNum,     // PlantLoop data structure component counter
+                                 PlantLocation const plantLoc,     // PlantLoop data structure Location struct
                                  Real64 &LoopDemand,
                                  Real64 &RemLoopDemand,
                                  bool const FirstHVACIteration,
@@ -157,22 +154,22 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
 
     // Shut down equipment and return if so instructed by LoopShutDownFlag
     if (LoopShutDownFlag) {
-        TurnOffLoopEquipment(state, LoopNum);
+        TurnOffLoopEquipment(state, plantLoc.loopNum);
         return;
     }
 
     // Return if there are no loop operation schemes available
-    if (!std::any_of(state.dataPlnt->PlantLoop(LoopNum).OpScheme.begin(),
-                     state.dataPlnt->PlantLoop(LoopNum).OpScheme.end(),
+    if (!std::any_of(state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme.begin(),
+                     state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme.end(),
                      [](DataPlant::OperationData const &e) { return e.Available; }))
         return;
 
     // set up references
-    auto &loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
-    auto &this_component(loop_side.Branch(BranchNum).Comp(CompNum));
+    auto &loop_side(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum));
+    auto &this_component(loop_side.Branch(plantLoc.branchNum).Comp(plantLoc.compNum));
 
     // Implement EMS control commands
-    ActivateEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, LoopShutDownFlag);
+    ActivateEMSControls(state, plantLoc.loopNum, plantLoc.loopSideNum, plantLoc.branchNum, plantLoc.compNum, LoopShutDownFlag);
 
     // Schedules are checked and CurOpScheme updated on FirstHVACIteration in InitLoadDistribution
     // Here we just load CurOpScheme to a local variable
@@ -182,10 +179,10 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     // set local variables from data structure
     NumEquipLists = this_component.OpScheme(CurCompLevelOpNum).NumEquipLists;
     CurSchemePtr = this_component.OpScheme(CurCompLevelOpNum).OpSchemePtr;
-    DataPlant::OpScheme CurSchemeType = state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).Type;
+    DataPlant::OpScheme CurSchemeType = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(CurSchemePtr).Type;
 
     // another reference
-    auto &this_op_scheme(state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr));
+    auto &this_op_scheme(state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(CurSchemePtr));
 
     // Load the 'range variable' according to the type of control scheme specified
     switch (CurSchemeType) {
@@ -240,13 +237,13 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     case OpScheme::DryBulbTDB:
     case OpScheme::WetBulbTDB:
     case OpScheme::DewPointTDB: {
-        RangeVariable = FindRangeVariable(state, LoopNum, CurSchemePtr, CurSchemeType);
+        RangeVariable = FindRangeVariable(state, plantLoc.loopNum, CurSchemePtr, CurSchemeType);
         break;
     }
     default: {
         // No controls specified.  This is a fatal error
         ShowFatalError(state,
-                       "Invalid Operation Scheme Type Requested=" + state.dataPlnt->PlantLoop(LoopNum).OpScheme(CurSchemePtr).TypeOf +
+                       "Invalid Operation Scheme Type Requested=" + state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(CurSchemePtr).TypeOf +
                            ", in ManagePlantLoadDistribution");
     }
     }
@@ -260,13 +257,13 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     }
     case OpScheme::CompSetPtBased: {
         // check for EMS Control
-        TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
-        FindCompSPLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum);
+        TurnOnPlantLoopPipes(state, plantLoc.loopNum, plantLoc.loopSideNum);
+        FindCompSPLoad(state, plantLoc.loopNum, plantLoc.loopSideNum, plantLoc.branchNum, plantLoc.compNum, CurCompLevelOpNum);
         break;
     }
     case OpScheme::EMS: {
-        TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
-        DistributeUserDefinedPlantLoad(state, LoopNum, LoopSideNum, BranchNum, CompNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
+        TurnOnPlantLoopPipes(state, plantLoc.loopNum, plantLoc.loopSideNum);
+        DistributeUserDefinedPlantLoad(state, plantLoc.loopNum, plantLoc.loopSideNum, plantLoc.branchNum, plantLoc.compNum, CurCompLevelOpNum, CurSchemePtr, LoopDemand, RemLoopDemand);
         break;
     }
     default: { // it's a range based control type with multiple equipment lists
@@ -307,8 +304,8 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
                 }
             }
             if (this_op_scheme.EquipList(ListPtr).NumComps > 0) {
-                TurnOnPlantLoopPipes(state, LoopNum, LoopSideNum);
-                DistributePlantLoad(state, LoopNum, LoopSideNum, CurSchemePtr, ListPtr, LoopDemand, RemLoopDemand);
+                TurnOnPlantLoopPipes(state, plantLoc.loopNum, plantLoc.loopSideNum);
+                DistributePlantLoad(state, plantLoc.loopNum, plantLoc.loopSideNum, CurSchemePtr, ListPtr, LoopDemand, RemLoopDemand);
                 LoadDistributionWasPerformed = true;
             }
         }

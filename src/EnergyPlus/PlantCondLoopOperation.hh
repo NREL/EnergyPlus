@@ -60,10 +60,7 @@ namespace EnergyPlus {
 namespace PlantCondLoopOperation {
 
     void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                     int const LoopNum,     // PlantLoop data structure loop counter
-                                     const DataPlant::LoopSideLocation LoopSideNum, // PlantLoop data structure LoopSide counter
-                                     int const BranchNum,   // PlantLoop data structure branch counter
-                                     int const CompNum,     // PlantLoop data structure component counter
+                                     PlantLocation plantLoc,     // PlantLoop data structure Location struct
                                      Real64 &LoopDemand,
                                      Real64 &RemLoopDemand,
                                      bool const FirstHVACIteration,
