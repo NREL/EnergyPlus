@@ -105,7 +105,7 @@ using DataHVACGlobals::SmallLoad;
 using FluidProperties::GetSpecificHeatGlycol;
 
 void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                 PlantLocation const plantLoc,     // PlantLoop data structure Location struct
+                                 PlantLocation const &plantLoc,     // PlantLoop data structure Location struct
                                  Real64 &LoopDemand,
                                  Real64 &RemLoopDemand,
                                  bool const FirstHVACIteration,
