@@ -119,7 +119,7 @@ void SetComponentFlowRate(EnergyPlusData &state,
                           Real64 &CompFlow,      // [kg/s]
                           int const InletNode,   // component's inlet node index in node structure
                           int const OutletNode,  // component's outlet node index in node structure
-                          PlantLocation const plantLoc // component location for PlantLoop
+                          PlantLocation const &plantLoc // component location for PlantLoop
 )
 {
 
@@ -401,7 +401,7 @@ void SetActuatedBranchFlowRate(EnergyPlusData &state,
 }
 
 Real64 RegulateCondenserCompFlowReqOp(
-    EnergyPlusData &state, PlantLocation const plantLoc, Real64 const TentativeFlowRequest)
+    EnergyPlusData &state, PlantLocation const &plantLoc, Real64 const TentativeFlowRequest)
 {
 
     // FUNCTION INFORMATION:
@@ -850,9 +850,9 @@ void ResetAllPlantInterConnectFlags(EnergyPlusData &state)
 }
 
 void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                 const PlantLocation plantLoc, // Component Location
+                                 const PlantLocation &plantLoc, // Component Location
                                  int &UniqueCriteriaCheckIndex,              // An integer given to this particular check
-                                 const PlantLocation ConnectedPlantLoc,                // Interconnected Component's Location
+                                 const PlantLocation &ConnectedPlantLoc,                // Interconnected Component's Location
                                  const DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
                                  const Real64 CriteriaValue                  // The value of the criteria check to evaluate
 )
@@ -1188,8 +1188,8 @@ void UpdateAbsorberChillerComponentGeneratorSide(EnergyPlusData &state,
 }
 
 void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
-                                   PlantLocation const Loop1PlantLoc,
-                                   PlantLocation const Loop2PlantLoc,
+                                   PlantLocation const &Loop1PlantLoc,
+                                   PlantLocation const &Loop2PlantLoc,
                                    DataPlant::PlantEquipmentType ComponentType,
                                    bool const Loop1DemandsOnLoop2)
 {

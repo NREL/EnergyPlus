@@ -71,7 +71,7 @@ namespace PlantUtilities {
                               Real64 &CompFlow, // [kg/s]
                               int InletNode,    // component's inlet node index in node structure
                               int OutletNode,   // component's outlet node index in node structure
-                              PlantLocation plantLoc // component location for PlantLoop
+                              PlantLocation const &plantLoc // component location for PlantLoop
     );
 
     void SetActuatedBranchFlowRate(EnergyPlusData &state,
@@ -83,7 +83,7 @@ namespace PlantUtilities {
 
     Real64
     RegulateCondenserCompFlowReqOp(EnergyPlusData &state,
-                                          PlantLocation plantLoc,
+                                          PlantLocation const &plantLoc,
                                           Real64 TentativeFlowRequest);
 
     bool AnyPlantSplitterMixerLacksContinuity(EnergyPlusData &state);
@@ -100,9 +100,9 @@ namespace PlantUtilities {
     void ResetAllPlantInterConnectFlags(EnergyPlusData &state);
 
     void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                     const PlantLocation plantLoc, // Component Location
+                                     const PlantLocation &plantLoc, // Component Location
                                      int &UniqueCriteriaCheckIndex,        // An integer given to this particular check
-                                     const PlantLocation ConnectedPlantLoc,                // Interconnected Component's Location
+                                     const PlantLocation &ConnectedPlantLoc,                // Interconnected Component's Location
                                      const DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
                                      const Real64 CriteriaValue                  // The value of the criteria check to evaluate
     );
@@ -143,8 +143,8 @@ namespace PlantUtilities {
                                                      bool FirstHVACIteration);
 
     void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
-                                       PlantLocation Loop1PlantLoc,
-                                       PlantLocation Loop2PlantLoc,
+                                       PlantLocation const &Loop1PlantLoc,
+                                       PlantLocation const &Loop2PlantLoc,
                                        DataPlant::PlantEquipmentType ComponentType,
                                        bool Loop1DemandsOnLoop2);
 
