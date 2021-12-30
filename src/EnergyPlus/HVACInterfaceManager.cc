@@ -392,7 +392,7 @@ void rshift1(Array1D<Real64> &a)
 }
 
 void UpdatePlantLoopInterface(EnergyPlusData &state,
-                              PlantLocation const plantLoc,     // The 'outlet node' Location
+                              PlantLocation const &plantLoc,     // The 'outlet node' Location
                               int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                               int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                               bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
@@ -698,7 +698,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
 }
 
 void UpdateCommonPipe(
-    EnergyPlusData &state, PlantLocation const TankInletPlantLoc, DataPlant::CommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
+    EnergyPlusData &state, PlantLocation const &TankInletPlantLoc, DataPlant::CommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
@@ -979,7 +979,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     }
 }
 
-void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const plantLoc, Real64 const TankOutletTemp)
+void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc, Real64 const TankOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
