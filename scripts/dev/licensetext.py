@@ -62,7 +62,7 @@ import re
 #
 # The previous year that is in the license. It should be a string
 #
-_previous_year = '2020'
+_previous_year = '2021'
 #
 # From file "EnergyPlus License DRAFT 112015 100 fixed.txt"
 #
@@ -145,7 +145,7 @@ def merge_paragraphs(text):
         else:
             current += ' ' + line[2:].lstrip()
     lines.append(current.lstrip())
-    return '\n'.join(lines)+'\n'
+    return '\n'.join(lines) + '\n'
 
 
 def pythonize(text, line_limit=79, toolname='unspecified', message=error):
@@ -169,7 +169,7 @@ def pythonize(text, line_limit=79, toolname='unspecified', message=error):
     limit = line_limit - 6
     for i, pg in enumerate(paragraphs[3:7]):
         sublines = textwrap.wrap(pg[4:], width=limit)
-        lines.append((' (%d) ' % (i+1)) + sublines[0])
+        lines.append((' (%d) ' % (i + 1)) + sublines[0])
         for el in sublines[1:]:
             lines.append('     ' + el)
         lines.append('')
@@ -201,7 +201,7 @@ def previous():
     lines[2] = '// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge'
     lines.insert(3, '// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other')
     lines[4] = '// contributors. All rights reserved.'
-    txt = '\n'.join(lines)+'\n'
+    txt = '\n'.join(lines) + '\n'
     return txt
 
 
@@ -233,7 +233,7 @@ def current():
     lines[2] = '// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge'
     lines.insert(3, '// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other')
     lines[4] = '// contributors. All rights reserved.'
-    txt = '\n'.join(lines)+'\n'
+    txt = '\n'.join(lines) + '\n'
     return txt
 
 
@@ -255,8 +255,8 @@ def check_license(filename, possible, correct, offset=0,
     if possible == correct:
         return True
     try:
-        possibleYear = possible[offset+31:offset+35]
-        correctYear = correct[offset+31:offset+35]
+        possibleYear = possible[offset + 31:offset + 35]
+        correctYear = correct[offset + 31:offset + 35]
     except IndexError:
         message({'tool': toolname,
                  'filename': filename,
@@ -275,7 +275,7 @@ def check_license(filename, possible, correct, offset=0,
                      'line': 1,
                      'messagetype': 'error',
                      'message': 'License year is incorrect'})
-            corrected = possible[:offset+31]+correctYear+possible[offset+35:]
+            corrected = possible[:offset + 31] + correctYear + possible[offset + 35:]
             if corrected == correct:
                 return False
     except:
@@ -308,7 +308,7 @@ class FileVisitor:
     def files(self, path, exclude_patterns=None):
         results = []
         for ext in self.extensions:
-            results.extend(glob.glob(path+'**/*.'+ext, recursive=True))
+            results.extend(glob.glob(path + '**/*.' + ext, recursive=True))
         if exclude_patterns is not None:
             for pattern in exclude_patterns:
                 matcher = re.compile(pattern)
@@ -378,7 +378,7 @@ class Checker(FileVisitor):
             n = txt.count(self.text)
             if n == 0:
                 lines = txt.splitlines()[:self.n]
-                shortened = '\n'.join(lines)+'\n'
+                shortened = '\n'.join(lines) + '\n'
                 success = check_license(filepath, shortened, self.text,
                                         offset=self.offset,
                                         toolname=self.toolname, message=error)
@@ -455,10 +455,10 @@ class Replacer(FileVisitor):
         txt = ['Replaced text in the following files']
         for file in self.replaced:
             remaining.remove(file)
-            txt.append('\t'+file)
+            txt.append('\t' + file)
         txt.append('No changes made to the following files')
         for file in remaining:
-            txt.append('\t'+file)
+            txt.append('\t' + file)
         return self.summary() + '\n\n' + '\n'.join(txt)
 
 

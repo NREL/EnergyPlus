@@ -107,12 +107,12 @@ current = licensetext.current()
 previous = licensetext.previous()
 
 # Create LICENSE.txt
-licensetxt = licensetext.mergeParagraphs(current)
+licensetxt = licensetext.merge_paragraphs(current)
 
 if not dryrun:
     print('Writing out LICENSE.txt')
     filename = "LICENSE.txt"
-    fp = open(filename,'w')
+    fp = open(filename, 'w')
     fp.write(licensetxt)
     fp.close()
 else:
