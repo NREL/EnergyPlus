@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -409,8 +409,8 @@ class Checker(FileVisitor):
 
 
 class Replacer(FileVisitor):
-    def __init__(self, oldtext, newtext, dryrun=True):
-        super().__init__()
+    def __init__(self, oldtext, newtext, extensions=None, dryrun=True):
+        super().__init__(extensions=extensions)
         self.oldtxt = oldtext
         self.newtxt = newtext
         self.dryrun = dryrun

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -99,10 +99,11 @@ dryrun = True
 #
 # Directories to check
 #
-dirs = ["./src/EnergyPlus/",
-        "./tst/EnergyPlus/unit/"]
+cpp_dirs = ["./src/EnergyPlus/",
+            "./tst/EnergyPlus/unit/"]
+python_dirs = ["./"]
 
-# Get the current text
+# Get the C++ current text
 current = licensetext.current()
 previous = licensetext.previous()
 
@@ -118,11 +119,30 @@ if not dryrun:
 else:
     print('Skipping writing out LICENSE.txt')
 
-# Create Replacer object
+# Create C++ Replacer object
 replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
 
-# Check files
-for base in dirs:
+# Check C++ files
+for base in cpp_dirs:
     replacer.visit(base)
 
+print('\nC++ Summary')
+print(replacer.summary())
+
+# Get the Python current text
+current = licensetext.current_python()
+previous = licensetext.previous_python()
+
+# Create Python Replacer object
+replacer = licensetext.Replacer(previous, current, extensions=['py'],
+                                dryrun=dryrun)
+
+# Check Python files
+patterns = [r'.*third_party.*', r'^\.(\\|/)build.*',
+            r'^\.(\\|/)bin.*', r'.*readthedocs.*',
+            r'.*venv.*', r'.*cmake-build-.*']
+for base in python_dirs:
+    replacer.visit(base, exclude_patterns=patterns)
+
+print('\nPython Summary')
 print(replacer.summary())
