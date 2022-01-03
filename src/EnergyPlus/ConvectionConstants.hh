@@ -147,10 +147,10 @@ int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
 enum class OutConvClass
 {
     Invalid = -1,
-    WindwardVertWall,
-    LeewardVertWall,
-    RoofStable,
-    RoofUnstable,
+    WindwardVertWall = 101,
+    LeewardVertWall = 102,
+    RoofStable = 103,
+    RoofUnstable = 104,
     Num
 };
 
