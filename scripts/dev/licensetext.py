@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -58,11 +58,12 @@ import textwrap
 import json
 import glob
 import re
+import sys
 
 #
 # The previous year that is in the license. It should be a string
 #
-_previous_year = '2020'
+_previous_year = '2021'
 #
 # From file "EnergyPlus License DRAFT 112015 100 fixed.txt"
 #
@@ -127,11 +128,25 @@ _original = """// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of 
 // in binary and source code form.
 """
 
+# This is probably not awesome, but it gets it done for now
+error_output = sys.stdout
 
-def error(dictionary):
-    '''Default method for output of JSON-style messages for decent_ci.'''
-    print(json.dumps(dictionary))
+def error_json(dictionary):
+    '''Function for output of JSON-style messages for decent_ci.'''
+    error_output.write(json.dumps(dictionary) + '\n')
 
+def error_for_humans(dictionary):
+    '''Function for output of more human friendly messages.'''
+    tool = dictionary.get('tool', 'UNKNOWN')
+    mesg = dictionary.get('message', 'An unknown error has occurred')
+    if 'file' in dictionary and 'line' in dictionary:
+        error_output.write('%s(%s, line %d): %s\n' % (tool, dictionary['file'],
+                                                      dictionary['line'], mesg))
+    else:
+        error_output.write('%s(%s, line %d): %s\n' % (tool, mesg))
+
+# This is also probably not awesome, but same deal
+report_error = error_json
 
 def merge_paragraphs(text):
     '''Merge license text lines into a single line per paragraph.'''
@@ -145,10 +160,11 @@ def merge_paragraphs(text):
         else:
             current += ' ' + line[2:].lstrip()
     lines.append(current.lstrip())
-    return '\n'.join(lines)+'\n'
+    return '\n'.join(lines) + '\n'
 
 
-def pythonize(text, line_limit=79, toolname='unspecified', message=error):
+def pythonize(text, line_limit=79, toolname='unspecified',
+              message=report_error):
     '''Convert the C++ comment text into Python comments'''
     paragraphs = [el for el in merge_paragraphs(text).splitlines() if el != '']
     if len(paragraphs) != 8 or line_limit < 7:
@@ -169,7 +185,7 @@ def pythonize(text, line_limit=79, toolname='unspecified', message=error):
     limit = line_limit - 6
     for i, pg in enumerate(paragraphs[3:7]):
         sublines = textwrap.wrap(pg[4:], width=limit)
-        lines.append((' (%d) ' % (i+1)) + sublines[0])
+        lines.append((' (%d) ' % (i + 1)) + sublines[0])
         for el in sublines[1:]:
             lines.append('     ' + el)
         lines.append('')
@@ -177,7 +193,7 @@ def pythonize(text, line_limit=79, toolname='unspecified', message=error):
     limit = line_limit - 2
     lines.extend([' ' + el for el in textwrap.wrap(paragraphs[7],
                                                    width=limit)])
-    return '#' + '\n#'.join(lines)
+    return '#' + '\n#'.join(lines) + '\n'
 
 
 def previous():
@@ -201,7 +217,7 @@ def previous():
     lines[2] = '// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge'
     lines.insert(3, '// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other')
     lines[4] = '// contributors. All rights reserved.'
-    txt = '\n'.join(lines)+'\n'
+    txt = '\n'.join(lines) + '\n'
     return txt
 
 
@@ -233,7 +249,7 @@ def current():
     lines[2] = '// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge'
     lines.insert(3, '// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other')
     lines[4] = '// contributors. All rights reserved.'
-    txt = '\n'.join(lines)+'\n'
+    txt = '\n'.join(lines) + '\n'
     return txt
 
 
@@ -250,13 +266,13 @@ def original():
 
 
 def check_license(filename, possible, correct, offset=0,
-                  toolname='unspecified', message=error):
+                  toolname='unspecified', message=report_error):
     '''Check for a few of the usual issues with the license'''
     if possible == correct:
         return True
     try:
-        possibleYear = possible[offset+31:offset+35]
-        correctYear = correct[offset+31:offset+35]
+        possibleYear = possible[offset + 31:offset + 35]
+        correctYear = correct[offset + 31:offset + 35]
     except IndexError:
         message({'tool': toolname,
                  'filename': filename,
@@ -267,17 +283,21 @@ def check_license(filename, possible, correct, offset=0,
                      'License text cannot be matched, check entire license'})
         return False
     try:
+        # The original behavior was to report year differences and then possibly
+        # report overall differences. Switch that around a bit so there are no
+        # double reports. Now report incorrect license year only if that is all
+        # that is wrong.
         int(possibleYear)
-        if possibleYear != correctYear:
+        corrected = possible[:offset + 31] + correctYear + possible[offset + 35:]
+        if corrected == correct:
             message({'tool': toolname,
                      'filename': filename,
                      'file': filename,
                      'line': 1,
                      'messagetype': 'error',
                      'message': 'License year is incorrect'})
-            corrected = possible[:offset+31]+correctYear+possible[offset+35:]
-            if corrected == correct:
-                return False
+            corrected = possible[:offset + 31] + correctYear + possible[offset + 35:]
+            return False
     except:
         message({'tool': toolname,
                  'filename': filename,
@@ -292,8 +312,7 @@ def check_license(filename, possible, correct, offset=0,
              'file': filename,
              'line': 1,
              'messagetype': 'error',
-             'message':
-                 'Non-year differences in license text, check entire license'})
+             'message': 'Differences in license text, check entire license'})
     return False
 
 
@@ -308,15 +327,11 @@ class FileVisitor:
     def files(self, path, exclude_patterns=None):
         results = []
         for ext in self.extensions:
-            results.extend(glob.glob(path+'**/*.'+ext, recursive=True))
+            results.extend(glob.glob(path + '**/*.' + ext, recursive=True))
         if exclude_patterns is not None:
             for pattern in exclude_patterns:
                 matcher = re.compile(pattern)
-                # original = results[:]
                 results = [el for el in results if not matcher.match(el)]
-                # for file in original:
-                #    if not file in results:
-                #        print('Skipping ' + file)
         return results
 
     def visit_file(self, filepath):
@@ -367,7 +382,7 @@ class Checker(FileVisitor):
                       'line': line_number,
                       'messagetype': 'error',
                       'message': mesg}
-        print(json.dumps(dictionary))
+        report_error(dictionary)
 
     def visit_file(self, filepath):
         txt = self.readtext(filepath)
@@ -378,10 +393,11 @@ class Checker(FileVisitor):
             n = txt.count(self.text)
             if n == 0:
                 lines = txt.splitlines()[:self.n]
-                shortened = '\n'.join(lines)+'\n'
+                shortened = '\n'.join(lines) + '\n'
                 success = check_license(filepath, shortened, self.text,
                                         offset=self.offset,
-                                        toolname=self.toolname, message=error)
+                                        toolname=self.toolname,
+                                        message=report_error)
                 return success
             else:
                 if n > 1:
@@ -409,8 +425,8 @@ class Checker(FileVisitor):
 
 
 class Replacer(FileVisitor):
-    def __init__(self, oldtext, newtext, dryrun=True):
-        super().__init__()
+    def __init__(self, oldtext, newtext, extensions=None, dryrun=True):
+        super().__init__(extensions=extensions)
         self.oldtxt = oldtext
         self.newtxt = newtext
         self.dryrun = dryrun
@@ -455,10 +471,10 @@ class Replacer(FileVisitor):
         txt = ['Replaced text in the following files']
         for file in self.replaced:
             remaining.remove(file)
-            txt.append('\t'+file)
+            txt.append('\t' + file)
         txt.append('No changes made to the following files')
         for file in remaining:
-            txt.append('\t'+file)
+            txt.append('\t' + file)
         return self.summary() + '\n\n' + '\n'.join(txt)
 
 

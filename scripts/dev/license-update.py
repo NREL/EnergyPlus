@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -56,11 +56,12 @@
 #
 # Use this script to update the license text
 #
-# Directions: First, check that the "dryrun" parameter below is set to True.
-# This will run the script and check the files but will not actually make any
-# changes. There are large number of files, so it's best to make sure that
-# everything makes sense before actually making the change. Next, execute the
-# script from the root of the EnergyPlus source tree:
+# Directions: These directions assume you're working on a branch. First, check
+# that the "dryrun" parameter below is set to True. This will run the script
+# and check the files but will not actually make any changes. There are large
+# number of files, so it's best to make sure that everything makes sense before
+# actually making the change. Next, execute the script from the root of the
+# EnergyPlus source tree:
 #
 #   $> python ./scripts/dev/license-update.py
 #   Skipping writing out LICENSE.txt
@@ -88,8 +89,13 @@
 #   Checked 809 files
 #   Replaced text in 809 files
 #
-# Finally, change the "dryrun" parameter back to "True".
+# Finally, change the "dryrun" parameter back to "True". Commit your changes
+# and you're done.
 #
+# Keep in mind that this was originally written to handle C++ alone within the
+# context of decent_ci. Python support came much later, so there are some
+# things (like how files and exclusions are handled) that are a little less
+# than uniform.
 
 import licensetext
 
@@ -99,30 +105,50 @@ dryrun = True
 #
 # Directories to check
 #
-dirs = ["./src/EnergyPlus/",
-        "./tst/EnergyPlus/unit/"]
+cpp_dirs = ["./src/EnergyPlus/",
+            "./tst/EnergyPlus/unit/"]
+python_dirs = ["./"]
 
-# Get the current text
+# Get the C++ current text
 current = licensetext.current()
 previous = licensetext.previous()
 
 # Create LICENSE.txt
-licensetxt = licensetext.mergeParagraphs(current)
+licensetxt = licensetext.merge_paragraphs(current)
 
 if not dryrun:
     print('Writing out LICENSE.txt')
     filename = "LICENSE.txt"
-    fp = open(filename,'w')
+    fp = open(filename, 'w')
     fp.write(licensetxt)
     fp.close()
 else:
     print('Skipping writing out LICENSE.txt')
 
-# Create Replacer object
+# Create C++ Replacer object
 replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
 
-# Check files
-for base in dirs:
+# Check C++ files
+for base in cpp_dirs:
     replacer.visit(base)
 
+print('\nC++ Summary')
+print(replacer.summary())
+
+# Get the Python current text
+current = licensetext.current_python()
+previous = licensetext.previous_python()
+
+# Create Python Replacer object
+replacer = licensetext.Replacer(previous, current, extensions=['py'],
+                                dryrun=dryrun)
+
+# Check Python files
+patterns = [r'.*third_party.*', r'^\.(\\|/)build.*',
+            r'^\.(\\|/)bin.*', r'.*readthedocs.*',
+            r'.*venv.*', r'.*cmake-build-.*']
+for base in python_dirs:
+    replacer.visit(base, exclude_patterns=patterns)
+
+print('\nPython Summary')
 print(replacer.summary())
