@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -150,8 +150,15 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Real64> PhaseChangeTemperatureReverse;
         Array1D<MaterialActuatorData> condMaterialActuators;
         Array1D<MaterialActuatorData> specHeatMaterialActuators;
+        Array1D<MaterialActuatorData> heatSourceFluxMaterialActuators;
         Array1D<Real64> condNodeReport;
         Array1D<Real64> specHeatNodeReport;
+        // Includes the internal heat source
+        Array1D<Real64> heatSourceInternalFluxLayerReport;
+        Array1D<Real64> heatSourceInternalFluxEnergyLayerReport;
+        // Includes the EMS heat source
+        Array1D<Real64> heatSourceEMSFluxLayerReport;
+        Array1D<Real64> heatSourceEMSFluxEnergyLayerReport;
 
         // Default Constructor
         SurfaceDataFD()
