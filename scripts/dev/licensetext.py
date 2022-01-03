@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -193,7 +193,7 @@ def pythonize(text, line_limit=79, toolname='unspecified',
     limit = line_limit - 2
     lines.extend([' ' + el for el in textwrap.wrap(paragraphs[7],
                                                    width=limit)])
-    return '#' + '\n#'.join(lines)
+    return '#' + '\n#'.join(lines) + '\n'
 
 
 def previous():
@@ -283,8 +283,13 @@ def check_license(filename, possible, correct, offset=0,
                      'License text cannot be matched, check entire license'})
         return False
     try:
+        # The original behavior was to report year differences and then possibly
+        # report overall differences. Switch that around a bit so there are no
+        # double reports. Now report incorrect license year only if that is all
+        # that is wrong.
         int(possibleYear)
-        if possibleYear != correctYear:
+        corrected = possible[:offset + 31] + correctYear + possible[offset + 35:]
+        if corrected == correct:
             message({'tool': toolname,
                      'filename': filename,
                      'file': filename,
@@ -292,8 +297,7 @@ def check_license(filename, possible, correct, offset=0,
                      'messagetype': 'error',
                      'message': 'License year is incorrect'})
             corrected = possible[:offset + 31] + correctYear + possible[offset + 35:]
-            if corrected == correct:
-                return False
+            return False
     except:
         message({'tool': toolname,
                  'filename': filename,
@@ -308,8 +312,7 @@ def check_license(filename, possible, correct, offset=0,
              'file': filename,
              'line': 1,
              'messagetype': 'error',
-             'message':
-                 'Non-year differences in license text, check entire license'})
+             'message': 'Differences in license text, check entire license'})
     return False
 
 
