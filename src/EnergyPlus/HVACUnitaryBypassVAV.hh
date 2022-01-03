@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,25 +78,30 @@ namespace HVACUnitaryBypassVAV {
 
     enum class DehumidControl // Dehumidification control modes (DehumidControlMode) for Multimode units only
     {
+        // TODO: enum check
+        Invalid = -1,
         None,
         Multimode,
-        CoolReheat
+        CoolReheat,
+        Num
     };
 
     enum class PriorityCtrlMode // Priority control mode (prioritized thermostat signal)
     {
-        Unassigned,
+        Invalid = -1,
         CoolingPriority, // Controls CBVAV system based on cooling priority
         HeatingPriority, // Controls CBVAV system based on heating priority
         ZonePriority,    // Controls CBVAV system based on number of zones priority
-        LoadPriority     // Controls CBVAV system based on total load priority
+        LoadPriority,    // Controls CBVAV system based on total load priority
+        Num
     };
 
     enum class AirFlowCtrlMode // Airflow control for contant fan mode
     {
-        Unassigned,
-        UseCompressorOnFlow, // Set compressor OFF air flow rate equal to compressor ON air flow rate
-        UseCompressorOffFlow // Set compressor OFF air flow rate equal to user defined value
+        Invalid = -1,
+        UseCompressorOnFlow,  // Set compressor OFF air flow rate equal to compressor ON air flow rate
+        UseCompressorOffFlow, // Set compressor OFF air flow rate equal to user defined value
+        Num
     };
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -277,9 +282,9 @@ namespace HVACUnitaryBypassVAV {
               TotHeatEnergyRate(0.0), TotHeatEnergy(0.0), TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0),
               SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0),
               ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0), LastMode(0),
-              AirFlowControl(AirFlowCtrlMode::Unassigned), CompPartLoadFrac(0.0), AirLoopNumber(0), NumControlledZones(0),
-              PriorityControl(PriorityCtrlMode::Unassigned), NumZonesCooled(0), NumZonesHeated(0), PLRMaxIter(0), PLRMaxIterIndex(0),
-              DXCoilInletNode(0), DXCoilOutletNode(0), HeatingCoilInletNode(0), HeatingCoilOutletNode(0), FanInletNodeNum(0), OutletTempSetPoint(0.0),
+              AirFlowControl(AirFlowCtrlMode::Invalid), CompPartLoadFrac(0.0), AirLoopNumber(0), NumControlledZones(0),
+              PriorityControl(PriorityCtrlMode::Invalid), NumZonesCooled(0), NumZonesHeated(0), PLRMaxIter(0), PLRMaxIterIndex(0), DXCoilInletNode(0),
+              DXCoilOutletNode(0), HeatingCoilInletNode(0), HeatingCoilOutletNode(0), FanInletNodeNum(0), OutletTempSetPoint(0.0),
               CoilTempSetPoint(0.0), HeatCoolMode(0), BypassMassFlowRate(0.0), DehumidificationMode(0), DehumidControlType(DehumidControl::None),
               HumRatMaxCheck(true), DXIterationExceeded(0), DXIterationExceededIndex(0), DXIterationFailed(0), DXIterationFailedIndex(0),
               DXCyclingIterationExceeded(0), DXCyclingIterationExceededIndex(0), DXCyclingIterationFailed(0), DXCyclingIterationFailedIndex(0),

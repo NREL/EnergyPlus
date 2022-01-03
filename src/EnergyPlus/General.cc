@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -427,7 +427,7 @@ void ProcessDateString(EnergyPlusData &state,
     int TokenWeekday{};
 
     FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
-    DateType = WeatherManager::DateType::InvalidDate;
+    DateType = WeatherManager::DateType::Invalid;
     if (!errFlag) {
         // Entered single number, do inverse JDay
         if (FstNum == 0) {
@@ -512,7 +512,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     TokenDay = 0;
     TokenMonth = 0;
     TokenWeekday = 0;
-    DateType = WeatherManager::DateType::InvalidDate;
+    DateType = WeatherManager::DateType::Invalid;
     if (present(TokenYear)) TokenYear = 0;
     // Take out separator characters, other extraneous stuff
 
@@ -658,7 +658,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     }
 
     if (InternalError) {
-        DateType = WeatherManager::DateType::InvalidDate;
+        DateType = WeatherManager::DateType::Invalid;
         ErrorsFound = true;
     }
 }
@@ -876,9 +876,9 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
 
 // returns the Julian date for the first, second, etc. day of week for a given month
 int nthDayOfWeekOfMonth(EnergyPlusData &state,
-                        int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
-                        int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
-                        int const &monthNumber // January = 1
+                        int const dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+                        int const nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
+                        int const monthNumber // January = 1
 )
 {
     // J. Glazer - August 2017
@@ -1087,7 +1087,7 @@ int DetermineMinuteForReporting(EnergyPlusData &state, OutputProcessor::TimeStep
     Real64 ActualTimeE; // End of current interval (HVAC time step)
     int ActualTimeHrS;
 
-    if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
         ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
         ActualTimeE = ActualTimeS + TimeStepSys;
         ActualTimeHrS = int(ActualTimeS);

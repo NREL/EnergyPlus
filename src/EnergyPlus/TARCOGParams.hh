@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,24 +67,26 @@ int constexpr maxlay3(maxlay2 + 1); // maximum number of ? (maxlay2+1)
 //  Layer types:
 enum class TARCOGLayerType : int
 {
-    UNASSSIGNED = -1,
-    SPECULAR = 0,
-    VENETBLIND_HORIZ = 1,
-    WOVSHADE = 2,
-    PERFORATED = 3,
-    DIFFSHADE = 4,
-    BSDF = 5,
-    VENETBLIND_VERT = 6
+    Invalid = -1,
+    SPECULAR,
+    VENETBLIND_HORIZ,
+    WOVSHADE,
+    PERFORATED,
+    DIFFSHADE,
+    BSDF,
+    VENETBLIND_VERT,
+    Num
 };
 
 //  Thermal models:
 enum class TARCOGThermalModel : int
 {
-    UNASSIGNED = -1,
-    ISO15099 = 0,
-    SCW = 1,
-    CSM = 2,
-    CSM_WithSDThickness = 3
+    Invalid = -1,
+    ISO15099,
+    SCW,
+    CSM,
+    CSM_WithSDThickness,
+    Num
 };
 
 int constexpr YES_SupportPillar = 1;
@@ -92,35 +94,34 @@ int constexpr YES_SupportPillar = 1;
 // Deflection parameters
 enum class DeflectionCalculation : int
 {
-    UNASSIGNED = -1,
-    NONE = 0,
-    TEMPERATURE = 1,
-    GAP_WIDTHS = 2
+    Invalid = -1,
+    NONE,
+    TEMPERATURE,
+    GAP_WIDTHS,
+    Num
 };
 
 // definition of parameters for deflection sum.  These parameters define maximum number of loop to which sum
-// will perform. By equation, these numbers will go to infinite and some test showed that going to nmax and mmax
+// will perform. By equation, these numbers will go to infinite and some test showed that going to NMax and MMax
 // values would produce enough precision
-enum class DeflectionParameters : int
-{
-    mmax = 5, // top m value for which "deflection sum" will be calculated
-    nmax = 5  // top n value for which "deflection sum" will be calculated
-};
 
-//  CalcForcedVentilation flag:
-//  0 = Skip forced ventilation calc
-//  1 = Allow forced ventilation calc
-enum class CalcForcedVentilation : int
+constexpr int MMax = 5; // top m value for which "deflection sum" will be calculated
+constexpr int NMax = 5; // top n value for which "deflection sum" will be calculated
+
+enum class CalcForcedVentilation
 {
-    skip = 0,
-    allow = 1
+    Invalid = -1,
+    Skip,
+    Allow,
+    Num
 };
 
 //  Calculation outcome
 enum class CalculationOutcome
 {
-    Unknown,
-    OK
+    Invalid = -1,
+    OK,
+    Num
 };
 
 int constexpr NumOfIterations(100);

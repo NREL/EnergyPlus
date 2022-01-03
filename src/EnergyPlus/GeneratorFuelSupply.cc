@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -171,7 +171,7 @@ namespace GeneratorFuelSupply {
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                         ObjectIsNotParent);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
@@ -195,9 +195,9 @@ namespace GeneratorFuelSupply {
                     e.CompPowerLossFactor = NumArray(1);
 
                 if (UtilityRoutines::SameString(AlphArray(6), "GaseousConstituents")) {
-                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::fuelModeGaseousConstituents;
+                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::GaseousConstituents;
                 } else if (UtilityRoutines::SameString(AlphArray(6), "LiquidGeneric")) {
-                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::fuelModeGenericLiquid;
+                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::GenericLiquid;
                 } else {
                     ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(6) + " = " + AlphArray(6));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
@@ -209,7 +209,7 @@ namespace GeneratorFuelSupply {
                 state.dataGenerator->FuelSupply(FuelSupNum).MW = NumArray(4);
                 state.dataGenerator->FuelSupply(FuelSupNum).eCO2 = NumArray(5);
 
-                if (state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGaseousConstituents) {
+                if (state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode == DataGenerators::FuelMode::GaseousConstituents) {
                     state.dataGenerator->NumFuelConstit = NumArray(6);
                     state.dataGenerator->FuelSupply(FuelSupNum).NumConstituents = state.dataGenerator->NumFuelConstit;
 
@@ -598,7 +598,7 @@ namespace GeneratorFuelSupply {
         state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A6 = -0.29663086e+05;
         state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A7 = 0.17289993e+02;
 
-        if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGaseousConstituents) {
+        if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::GaseousConstituents) {
             // now calculate LHV of fuel for entire simulation
 
             // sum over each constituent
@@ -686,7 +686,7 @@ namespace GeneratorFuelSupply {
             state.dataGenerator->FuelSupply(FuelSupplyNum).LHVJperkg =
                 state.dataGenerator->FuelSupply(FuelSupplyNum).LHV * 1000000.0 / state.dataGenerator->FuelSupply(FuelSupplyNum).MW;
 
-        } else if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGenericLiquid) {
+        } else if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::GenericLiquid) {
             state.dataGenerator->FuelSupply(FuelSupplyNum).LHV = state.dataGenerator->FuelSupply(FuelSupplyNum).LHVliquid *
                                                                  state.dataGenerator->FuelSupply(FuelSupplyNum).MW /
                                                                  1000000.0; // J/kg * g/mol (k/1000) (k/10000)

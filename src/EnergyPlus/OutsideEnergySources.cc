@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -211,7 +211,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -221,7 +221,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,7 +88,7 @@ namespace DataHeatBalance {
     // derived type (see below):
     enum class MaterialGroup
     {
-        Unassigned = -1,
+        Invalid = -1,
         RegularMaterial,
         Air,
         Shade,
@@ -107,17 +107,19 @@ namespace DataHeatBalance {
         DrapeEquivalentLayer,
         BlindEquivalentLayer,
         ScreenEquivalentLayer,
-        GapEquivalentLayer
+        GapEquivalentLayer,
+        Num
     };
 
     // Parameters for Interior and Exterior Solar Distribution
     enum class Shadowing
     {
-        Unassigned = -1,
-        MinimalShadowing,     // all incoming solar hits floor, no exterior shadowing except reveals
+        Invalid = -1,
+        Minimal,              // all incoming solar hits floor, no exterior shadowing except reveals
         FullExterior,         // all incoming solar hits floor, full exterior shadowing
         FullInteriorExterior, // full interior solar distribution, full exterior solar shadowing
-        FullExteriorWithRefl  // all incoming solar hits floor, full exterior shadowing and reflections
+        FullExteriorWithRefl, // all incoming solar hits floor, full exterior shadowing and reflections
+        Num
     };
 
     // Parameters to indicate the zone type for use with the Zone derived
@@ -131,135 +133,135 @@ namespace DataHeatBalance {
     // Parameters for Sky Radiance Distribution
     enum class SkyRadDistribution
     {
-        Unassigned = -1,
+        Invalid = -1,
         Isotropic,
         Anisotropic,
-        NUM
+        Num
     };
 
     // Parameters for ZoneAirSolutionAlgo
     enum class SolutionAlgo
     {
-        Unassigned = -1,
+        Invalid = -1,
         ThirdOrder,
         AnalyticalSolution,
         EulerMethod,
-        NUM
+        Num
     };
 
     // Parameter for MRT calculation type
     enum class CalcMRT
     {
-        Unassigned = -1,
+        Invalid = -1,
         ZoneAveraged,
         SurfaceWeighted,
         AngleFactor,
-        NUM
+        Num
     };
 
     // Parameters for Ventilation
     enum class VentilationType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Natural,
         Intake,
         Exhaust,
         Balanced,
-        NUM
+        Num
     };
 
     // Parameters for hybrid ventilation using Ventilation and Mixing objects
     enum class HybridCtrlType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Indiv,
         Close,
         Global,
-        NUM
+        Num
     };
 
     // System type, detailed refrigeration or refrigerated case rack
     enum class RefrigSystemType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Detailed,
         Rack,
-        NUM
+        Num
     };
 
     // Refrigeration condenser type
     enum class RefrigCondenserType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Air,
         Evap,
         Water,
         Cascade,
         WaterHeater,
-        NUM
+        Num
     };
 
     // Parameters for type of infiltration model
     enum class InfiltrationModelType
     {
-        Unassigned = -1,
+        Invalid = -1,
         DesignFlowRate,
         ShermanGrimsrud,
         AIM2,
-        NUM
+        Num
     };
 
     // Parameters for type of ventilation model
     enum class VentilationModelType
     {
-        Unassigned = -1,
+        Invalid = -1,
         DesignFlowRate,
         WindAndStack,
-        NUM
+        Num
     };
 
     // Parameters for type of zone air balance model
     enum class AirBalance
     {
-        Unassigned = -1,
+        Invalid = -1,
         None,
         Quadrature,
-        NUM
+        Num
     };
 
     // Parameter for source zone air flow mass balance infiltration treatment
     enum class InfiltrationFlow
     {
-        Unassigned = -1,
+        Invalid = -1,
         No,
         Add,
         Adjust,
-        NUM
+        Num
     };
 
     enum class InfiltrationZoneType
     {
-        Unassigned = -1,
+        Invalid = -1,
         MixingSourceZonesOnly,
         AllZones,
-        NUM
+        Num
     };
 
     // zone air flow balancing method
     enum class AdjustmentType
     {
-        Unassigned = -1,
+        Invalid = -1,
         AdjustMixingOnly,
         AdjustReturnOnly,
         AdjustMixingThenReturn,
         AdjustReturnThenMixing,
         NoAdjustReturnAndMixing,
-        NUM
+        Num
     };
 
     enum class IntGainType
     {
-        Unassigned = -1,
+        Invalid = -1,
         People,
         Lights,
         ElectricEquipment,
@@ -314,30 +316,30 @@ namespace DataHeatBalance {
         SecHeatingDXCoilMultiSpeed,
         ElectricLoadCenterConverter,
         FanSystemModel,
-        NUM
+        Num
     };
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::NUM)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::Num)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::Num)> InfiltrationFlowTypeNamesUC = {
         "NONE", "ADDINFILTRATIONFLOW", "ADJUSTINFILTRATIONFLOW"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::NUM)> InfiltrationFlowTypeNamesCC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::Num)> InfiltrationFlowTypeNamesCC = {
         "None", "AddInfiltrationFlow", "AdjustInfiltrationFlow"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::Num)> InfiltrationZoneTypeNamesUC = {
         "MIXINGSOURCEZONESONLY", "ALLZONES"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::NUM)> InfiltrationZoneTypeNamesCC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationZoneType::Num)> InfiltrationZoneTypeNamesCC = {
         "MixingSourceZonesOnly", "AllZones"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::Num)> AdjustmentTypeNamesUC = {
         "ADJUSTMIXINGONLY", "ADJUSTRETURNONLY", "ADJUSTMIXINGTHENRETURN", "ADJUSTRETURNTHENMIXING", "NONE"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::NUM)> AdjustmentTypeNamesCC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AdjustmentType::Num)> AdjustmentTypeNamesCC = {
         "AdjustMixingOnly", "AdjustReturnOnly", "AdjustMixingThenReturn", "AdjustReturnThenMixing", "None"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesUC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::Num)> IntGainTypeNamesUC = {
         "PEOPLE",
         "LIGHTS",
         "ELECTRICEQUIPMENT",
@@ -393,7 +395,7 @@ namespace DataHeatBalance {
         "ELECTRICLOADCENTER:STORAGE:CONVERTER",
         "FAN:SYSTEMMODEL"};
 
-    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::NUM)> IntGainTypeNamesCC = {
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::Num)> IntGainTypeNamesCC = {
         "People",
         "Lights",
         "ElectricEquipment",
@@ -863,7 +865,7 @@ namespace DataHeatBalance {
               FractionRadiant(0.0), FractionConvected(0.0), NomMinNumberPeople(0.0), NomMaxNumberPeople(0.0), WorkEffPtr(-1), ClothingPtr(-1),
               ClothingMethodPtr(-1), ClothingType(-1), AirVelocityPtr(-1), AnkleAirVelocityPtr(-1), Fanger(false), Pierce(false), KSU(false),
               AdaptiveASH55(false), AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false),
-              MRTCalcType(DataHeatBalance::CalcMRT::Unassigned), SurfacePtr(-1), AngleFactorListPtr(-1), UserSpecSensFrac(0.0), Show55Warning(false),
+              MRTCalcType(DataHeatBalance::CalcMRT::Invalid), SurfacePtr(-1), AngleFactorListPtr(-1), UserSpecSensFrac(0.0), Show55Warning(false),
               CO2RateFactor(0.0), NumOcc(0.0), TemperatureInZone(0.0), RelativeHumidityInZone(0.0), RadGainRate(0.0), ConGainRate(0.0),
               SenGainRate(0.0), LatGainRate(0.0), TotGainRate(0.0), CO2GainRate(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0),
               LatGainEnergy(0.0), TotGainEnergy(0.0), AirVelErrIndex(0), TimeNotMetASH5580(0.0), TimeNotMetASH5590(0.0), TimeNotMetCEN15251CatI(0.0),
@@ -970,7 +972,7 @@ namespace DataHeatBalance {
               FractionRadiant(0.0), FractionLost(0.0), FractionConvected(0.0), CO2DesignRate(0.0), CO2RateFactor(0.0), NomMinDesignLevel(0.0),
               NomMaxDesignLevel(0.0), ManageDemand(false), DemandLimit(0.0), Power(0.0), RadGainRate(0.0), ConGainRate(0.0), LatGainRate(0.0),
               LostRate(0.0), TotGainRate(0.0), CO2GainRate(0.0), Consumption(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), LatGainEnergy(0.0),
-              LostEnergy(0.0), TotGainEnergy(0.0), OtherEquipFuelType(ExteriorEnergyUse::ExteriorFuelUsage::Unknown)
+              LostEnergy(0.0), TotGainEnergy(0.0), OtherEquipFuelType(ExteriorEnergyUse::ExteriorFuelUsage::Invalid)
         {
         }
     };
@@ -1163,13 +1165,13 @@ namespace DataHeatBalance {
 
         // Default Constructor
         InfiltrationData()
-            : ZonePtr(0), SchedPtr(0), ModelType(InfiltrationModelType::Unassigned), DesignLevel(0.0), ConstantTermCoef(0.0),
-              TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0),
-              BasicWindCoefficient(0.0), FlowCoefficient(0.0), AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0),
-              ShelterFactor(0.0), EMSOverrideOn(false), EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0),
-              MassFlowRate(0.0), MCpI_temp(0.0), InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0),
-              InfilTotalGain(0.0), InfilTotalLoss(0.0), InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0),
-              InfilVdotStdDensity(0.0), InfilMdot(0.0), InfilMass(0.0), InfilAirChangeRate(0.0)
+            : ZonePtr(0), SchedPtr(0), ModelType(InfiltrationModelType::Invalid), DesignLevel(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0),
+              VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0), BasicWindCoefficient(0.0),
+              FlowCoefficient(0.0), AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0),
+              EMSOverrideOn(false), EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0),
+              MCpI_temp(0.0), InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilLatentGain(0.0), InfilLatentLoss(0.0), InfilTotalGain(0.0),
+              InfilTotalLoss(0.0), InfilVolumeCurDensity(0.0), InfilVolumeStdDensity(0.0), InfilVdotCurDensity(0.0), InfilVdotStdDensity(0.0),
+              InfilMdot(0.0), InfilMass(0.0), InfilAirChangeRate(0.0)
         {
         }
     };
@@ -1223,12 +1225,12 @@ namespace DataHeatBalance {
 
         // Default Constructor
         VentilationData()
-            : ZonePtr(0), SchedPtr(0), ModelType(VentilationModelType::Unassigned), DesignLevel(0.0), EMSSimpleVentOn(false),
-              EMSimpleVentFlowRate(0.0), MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(VentilationType::Natural), FanPressure(0.0),
-              FanEfficiency(0.0), FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0),
-              VelocitySQTermCoef(0.0), MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0),
-              MinIndoorTempSchedPtr(0), MaxIndoorTempSchedPtr(0), DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0),
-              IndoorTempErrCount(0), OutdoorTempErrCount(0), IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
+            : ZonePtr(0), SchedPtr(0), ModelType(VentilationModelType::Invalid), DesignLevel(0.0), EMSSimpleVentOn(false), EMSimpleVentFlowRate(0.0),
+              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(VentilationType::Natural), FanPressure(0.0), FanEfficiency(0.0),
+              FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0),
+              MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0),
+              MaxIndoorTempSchedPtr(0), DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0),
+              OutdoorTempErrCount(0), IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
               HybridControlMasterNum(0), HybridControlMasterStatus(false), QuadratureSum(false), OABalancePtr(0), OpenArea(0.0), OpenAreaSchedPtr(0),
               OpenEff(0.0), EffAngle(0.0), DH(0.0), DiscCoef(0.0)
         {
@@ -1334,7 +1336,7 @@ namespace DataHeatBalance {
         // Default Constructor
         ZoneAirMassFlowConservation()
             : EnforceZoneMassBalance(false), ZoneFlowAdjustment(AdjustmentType::NoAdjustReturnAndMixing), InfiltrationTreatment(InfiltrationFlow::No),
-              InfiltrationForZones(InfiltrationZoneType::Unassigned), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
+              InfiltrationForZones(InfiltrationZoneType::Invalid), AdjustZoneMixingFlow(false), AdjustZoneInfiltrationFlow(false)
         {
         }
     };
@@ -1395,7 +1397,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompType(IntGainType::Unassigned), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0),
+            : CompType(IntGainType::Invalid), spaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0),
               PtrReturnAirConvGainRate(nullptr), ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0),
               PtrLatentGainRate(nullptr), LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0),
               PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0),
@@ -1575,7 +1577,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         WindowBlindProperties()
-            : MaterialNumber(0), SlatOrientation(DataWindowEquivalentLayer::Orientation::Unassigned),
+            : MaterialNumber(0), SlatOrientation(DataWindowEquivalentLayer::Orientation::Invalid),
               SlatAngleType(DataWindowEquivalentLayer::AngleType::Fixed), SlatWidth(0.0), SlatSeparation(0.0), SlatThickness(0.0), SlatCrown(0.0),
               SlatAngle(0.0), MinSlatAngle(0.0), MaxSlatAngle(0.0), SlatConductivity(0.0), SlatTransSolBeamDiff(0.0), SlatFrontReflSolBeamDiff(0.0),
               SlatBackReflSolBeamDiff(0.0), SlatTransSolDiffDiff(0.0), SlatFrontReflSolDiffDiff(0.0), SlatBackReflSolDiffDiff(0.0),
@@ -2228,9 +2230,9 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
     int DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
     int DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
-    DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                  // Solar Distribution Algorithm
-    int InsideSurfIterations = 0;                                                                             // Counts inside surface iterations
-    DataSurfaces::iHeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
+    DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                // Solar Distribution Algorithm
+    int InsideSurfIterations = 0;                                                                           // Counts inside surface iterations
+    DataSurfaces::HeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
     // Flags for HeatTransfer Algorithms Used
     bool AllCTF = true;                  // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
     bool AnyCTF = false;                 // CTF used
@@ -2540,7 +2542,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
         this->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
         this->InsideSurfIterations = 0;
-        this->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
+        this->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
         this->AllCTF = true;
         this->AnyCTF = false;
         this->AnyEMPD = false;

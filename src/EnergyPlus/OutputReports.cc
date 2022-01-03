@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -447,9 +447,9 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
             auto curcolorno = ColorNo::DaylSensor1;
             std::string refPtType;
-            if (thisDaylightControl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
+            if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
                 refPtType = "DEDayRefPt";
-            } else if (thisDaylightControl.DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
+            } else if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
                 refPtType = "DayRefPt";
             }
 
@@ -956,7 +956,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
 
     //  Do all detached shading surfaces first
     int surfcount = 0;
-    ColorNo colorindex = ColorNo::Unassigned;
+    ColorNo colorindex = ColorNo::Invalid;
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
         if (state.dataSurface->Surface(surf).HeatTransSurf) continue;
@@ -1152,7 +1152,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
 
     //  Do all detached shading surfaces first
     int surfcount = 0;
-    ColorNo colorindex = ColorNo::Unassigned;
+    ColorNo colorindex = ColorNo::Invalid;
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
         std::string ShadeType;
 

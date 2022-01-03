@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -293,9 +293,9 @@ namespace SteamBaseboardRadiator {
         int constexpr MinDistribSurfaces(1);            // Minimum number of surfaces that a baseboard heater can radiate to
         int constexpr iHeatCAPMAlphaNum(2);             // get input index to steam baseboard Radiator system heating capacity sizing method
         int constexpr iHeatDesignCapacityNumericNum(1); // get input index to steam baseboard Radiator system electric heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
             1); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             2); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -555,7 +555,7 @@ namespace SteamBaseboardRadiator {
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
 
             // Get outlet node number
@@ -567,7 +567,7 @@ namespace SteamBaseboardRadiator {
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state,
                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,

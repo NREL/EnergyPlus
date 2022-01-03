@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1144,7 +1144,7 @@ namespace DaylightingDevices {
             Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
             // Calculate total TDD transmittance for given angle
-            trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam);
+            trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam);
 
             FluxInc += P * SINI * dPH;
             FluxTrans += trans * P * SINI * dPH;
@@ -1213,7 +1213,7 @@ namespace DaylightingDevices {
                 Real64 COSI = CosPhi * std::cos(TH - Theta); // Cosine of the incident angle
 
                 // Calculate total TDD transmittance for given angle
-                Real64 trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam); // Total beam solar transmittance of TDD
+                Real64 trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam); // Total beam solar transmittance of TDD
 
                 FluxInc += COSI * dTH;
                 FluxTrans += trans * COSI * dTH;
@@ -1276,7 +1276,7 @@ namespace DaylightingDevices {
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::Minimal) {
             IsoSkyRad = state.dataSolarShading->SurfMultIsoSky(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioIsoSky(DomeSurf);
             HorizonRad = state.dataSolarShading->SurfMultHorizonZenith(DomeSurf) * state.dataSolarShading->SurfDifShdgRatioHoriz(DomeSurf);
         } else {
@@ -1288,7 +1288,7 @@ namespace DaylightingDevices {
                          state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, DomeSurf);
 
         AnisoSkyTDDMult = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso * IsoSkyRad +
-                          TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam) * CircumSolarRad +
+                          TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam) * CircumSolarRad +
                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon * HorizonRad;
 
         if (state.dataSolarShading->SurfAnisoSkyMult(DomeSurf) > 0.0) {
@@ -1301,9 +1301,9 @@ namespace DaylightingDevices {
     }
 
     Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,                                   // TDD pipe object number
-                    Real64 const COSI,                                   // Cosine of the incident angle
-                    DataDaylightingDevices::iRadType const RadiationType // Radiation type flag
+                    int const PipeNum,                                  // TDD pipe object number
+                    Real64 const COSI,                                  // Cosine of the incident angle
+                    DataDaylightingDevices::RadType const RadiationType // Radiation type flag
     )
     {
 
@@ -1358,24 +1358,24 @@ namespace DaylightingDevices {
         {
             auto const SELECT_CASE_var(RadiationType);
 
-            if (SELECT_CASE_var == DataDaylightingDevices::iRadType::VisibleBeam) {
+            if (SELECT_CASE_var == DataDaylightingDevices::RadType::VisibleBeam) {
                 transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransVisBeamCoef);
                 transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam);
                 transDiff = state.dataConstruction->Construct(constDiff).TransDiffVis; // May want to change to POLYF also!
 
                 TransTDD = transDome * transPipe * transDiff;
 
-            } else if (SELECT_CASE_var == DataDaylightingDevices::iRadType::SolarBeam) {
+            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarBeam) {
                 transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransSolBeamCoef);
                 transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam);
                 transDiff = state.dataConstruction->Construct(constDiff).TransDiff; // May want to change to POLYF also!
 
                 TransTDD = transDome * transPipe * transDiff;
 
-            } else if (SELECT_CASE_var == DataDaylightingDevices::iRadType::SolarAniso) {
+            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarAniso) {
                 TransTDD = CalcTDDTransSolAniso(state, PipeNum, COSI);
 
-            } else if (SELECT_CASE_var == DataDaylightingDevices::iRadType::SolarIso) {
+            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarIso) {
                 TransTDD = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso;
             }
         }

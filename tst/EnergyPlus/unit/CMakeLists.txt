@@ -181,6 +181,7 @@ set(test_src
     PlantManager.unit.cc
     PlantPipingSystemsManager.unit.cc
     PlantUtilities.unit.cc
+    PollutionModule.unit.cc
     PoweredInductionUnits.unit.cc
     Psychrometrics.unit.cc
     Pumps.unit.cc

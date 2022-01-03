@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -492,7 +492,7 @@ namespace Furnaces {
                     }
 
                     // Simulate furnace reheat coil if a humidistat is used or if the reheat coil is present
-                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat ||
+                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat ||
                         state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
                         SuppHeatingCoilFlag = true; // if truee simulates supplemental heating coil
                         CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
@@ -610,7 +610,7 @@ namespace Furnaces {
 
                     // Simulate furnace reheat coil if a humidistat is present, the dehumidification type of coolreheat and
                     // reheat coil load exists
-                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat &&
+                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
                         ReheatCoilLoad > 0.0) {
                         SuppHeatingCoilFlag = true; // if truee simulates supplemental heating coil
                         CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
@@ -713,7 +713,7 @@ namespace Furnaces {
                                               state.dataFurnaces->Furnace(FurnaceNum).FanIndex,
                                               state.dataFurnaces->FanSpeedRatio);
                     }
-                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat &&
+                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
                         ReheatCoilLoad > 0.0) {
                         SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
                         CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
@@ -1064,7 +1064,7 @@ namespace Furnaces {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
                                                                                              Alphas(4),
@@ -1073,7 +1073,7 @@ namespace Furnaces {
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -1684,7 +1684,7 @@ namespace Furnaces {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
                                                                                              Alphas(4),
@@ -1693,7 +1693,7 @@ namespace Furnaces {
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -2269,7 +2269,7 @@ namespace Furnaces {
                 UtilityRoutines::SameString(Alphas(14), "CoolReheat")) {
                 AirNodeFound = false;
                 if (UtilityRoutines::SameString(Alphas(14), "Multimode")) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_Multimode;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::Multimode;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = true;
                     if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num != CoilDX_CoolingHXAssisted) {
                         ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
@@ -2280,15 +2280,15 @@ namespace Furnaces {
                                               "Dehumidification control type is assumed to be None since a reheat coil has not been specified and "
                                               "the simulation continues.");
                             state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
-                            state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_None;
+                            state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::None;
                         } else {
                             ShowContinueError(state, "Dehumidification control type is assumed to be CoolReheat and the simulation continues.");
-                            state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_CoolReheat;
+                            state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::CoolReheat;
                         }
                     }
                 }
                 if (UtilityRoutines::SameString(Alphas(14), "CoolReheat")) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_CoolReheat;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::CoolReheat;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = true;
                     if (lAlphaBlanks(15)) {
                         ShowWarningError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -2296,11 +2296,11 @@ namespace Furnaces {
                                           "Dehumidification control type is assumed to be None since a reheat coil has not been specified and the "
                                           "simulation continues.");
                         state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_None;
+                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::None;
                     }
                 }
                 if (UtilityRoutines::SameString(Alphas(14), "None")) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_None;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::None;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat) {
@@ -2327,12 +2327,12 @@ namespace Furnaces {
             //       Check placement of cooling coil with respect to fan placement and dehumidification control type
             if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == BlowThru) {
                 if (FanOutletNode == HeatingCoilInletNode &&
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num != DehumidificationControlMode::DehumidControl_CoolReheat) {
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num != DehumidificationControlMode::CoolReheat) {
                     state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream = false;
                 }
             } else {
                 if (HeatingCoilOutletNode == CoolingCoilInletNode &&
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num != DehumidificationControlMode::DehumidControl_CoolReheat) {
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num != DehumidificationControlMode::CoolReheat) {
                     state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilUpstream = false;
                 }
             }
@@ -2560,7 +2560,7 @@ namespace Furnaces {
                         ErrorsFound = true;
                     }
                     if ((state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                         state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) ||
+                         state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) ||
                         ReheatCoilInletNode > 0) {
                         if (HeatingCoilOutletNode != ReheatCoilInletNode) {
                             ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
@@ -2693,7 +2693,7 @@ namespace Furnaces {
                         ErrorsFound = true;
                     }
                     if ((state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                         state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) ||
+                         state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) ||
                         ReheatCoilInletNode > 0) {
                         if (FanOutletNode != ReheatCoilInletNode) {
                             ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));
@@ -3048,7 +3048,7 @@ namespace Furnaces {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
 
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
@@ -3058,7 +3058,7 @@ namespace Furnaces {
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -3658,7 +3658,7 @@ namespace Furnaces {
                 UtilityRoutines::SameString(Alphas(16), "CoolReheat")) {
                 AirNodeFound = false;
                 if (UtilityRoutines::SameString(Alphas(16), "Multimode")) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_Multimode;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::Multimode;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = true;
                     if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num != CoilDX_CoolingHXAssisted) {
                         ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
@@ -3668,11 +3668,11 @@ namespace Furnaces {
                     }
                 }
                 if (UtilityRoutines::SameString(Alphas(16), "CoolReheat")) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_CoolReheat;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::CoolReheat;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = true;
                 }
                 if (UtilityRoutines::SameString(Alphas(16), "None")) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_None;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::None;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat) {
@@ -3696,7 +3696,7 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_None;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::None;
                 }
             }
 
@@ -4062,7 +4062,7 @@ namespace Furnaces {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
 
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
@@ -4072,7 +4072,7 @@ namespace Furnaces {
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -4522,7 +4522,7 @@ namespace Furnaces {
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent);
                 // need better verification.
                 if (!CheckOutAirNodeNumber(state, state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum)) {
@@ -4560,7 +4560,7 @@ namespace Furnaces {
             if (UtilityRoutines::SameString(Alphas(17), "None") || UtilityRoutines::SameString(Alphas(17), "CoolReheat")) {
                 AirNodeFound = false;
                 if (UtilityRoutines::SameString(Alphas(17), "CoolReheat")) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_CoolReheat;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::CoolReheat;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = true;
                     if (lAlphaBlanks(17)) {
                         ShowWarningError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -4568,11 +4568,11 @@ namespace Furnaces {
                                           "Dehumidification control type is assumed to be None since a supplemental reheat coil has not been "
                                           "specified and the simulation continues.");
                         state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_None;
+                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::None;
                     }
                 }
                 if (UtilityRoutines::SameString(Alphas(17), "None")) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_None;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::None;
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
                 }
                 if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat) {
@@ -4596,7 +4596,7 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat = false;
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::DehumidControl_None;
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num = DehumidificationControlMode::None;
                 }
             }
 
@@ -5848,8 +5848,7 @@ namespace Furnaces {
             (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_WaterToAir &&
              (state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == WatertoAir_Simple ||
               state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType == WatertoAir_VarSpeedEquationFit))) {
-            if (MoistureLoad < 0.0 &&
-                state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) {
+            if (MoistureLoad < 0.0 && state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                 state.dataFurnaces->HPDehumidificationLoadFlag = true;
                 state.dataFurnaces->HeatingLoad = false;
                 state.dataFurnaces->CoolingLoad = true;
@@ -6448,7 +6447,7 @@ namespace Furnaces {
                 if (state.dataFurnaces->HeatingLoad) {
                     //       IF a heating and moisture load exists, operate at the cooling mass flow rate ELSE operate at the heating flow rate
                     if (MoistureLoad < 0.0 && state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) {
+                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                         state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
                         state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
                     } else {
@@ -6466,7 +6465,7 @@ namespace Furnaces {
                     //     If the user has set the off mass flow rate to 0, set according to the last operating mode.
                 } else {
                     if (MoistureLoad < 0.0 && state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) {
+                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                         state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
                         state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
                     } else {
@@ -6490,8 +6489,7 @@ namespace Furnaces {
                 if (state.dataFurnaces->Furnace(FurnaceNum).AirFlowControl == AirFlowControlConstFan::UseCompressorOnFlow) {
                     if (state.dataFurnaces->Furnace(FurnaceNum).LastMode == Furnaces::ModeOfOperation::HeatingMode) {
                         if (MoistureLoad < 0.0 && state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                            state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num ==
-                                DehumidificationControlMode::DehumidControl_CoolReheat) {
+                            state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                             state.dataFurnaces->CompOffMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
                             state.dataFurnaces->CompOffFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
                         } else {
@@ -6511,10 +6509,10 @@ namespace Furnaces {
                 //     cycling fan mode
                 if (state.dataFurnaces->HeatingLoad ||
                     (state.dataFurnaces->Furnace(FurnaceNum).Humidistat && MoistureLoad < 0.0 &&
-                     state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat)) {
+                     state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat)) {
 
                     if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat && MoistureLoad < 0.0 &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) {
+                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                         state.dataFurnaces->CompOnMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow;
                         state.dataFurnaces->CompOnFlowRatio = state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio;
                         state.dataFurnaces->Furnace(FurnaceNum).LastMode = Furnaces::ModeOfOperation::CoolingMode;
@@ -6601,19 +6599,19 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
             state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
         } else {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
             state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
         }
         if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == BlowThru) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
         } else if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DrawThru) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
         }
 
         if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
@@ -6933,7 +6931,7 @@ namespace Furnaces {
                     // if reheat needed for humidity control, make sure supplemental heating is at least as big
                     // as the cooling capacity
                     if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) {
+                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                         state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
                             max(state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity,
                                 state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity);
@@ -6945,7 +6943,7 @@ namespace Furnaces {
                 } else {
 
                     if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) {
+                        state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                         state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity =
                             state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity;
                     } else {
@@ -7952,7 +7950,7 @@ namespace Furnaces {
             // Setback flag is used to avoid continued RH control when Tstat is setback (RH should float down)
             if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0 && state.dataFurnaces->CoolingLoad) ||
                 (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                 state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat &&
+                 state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
                  (SystemMoistureLoad < 0.0 || (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad &&
                                                !state.dataZoneEnergyDemand->Setback(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum))))) {
 
@@ -7963,8 +7961,8 @@ namespace Furnaces {
                 //           For dehumidification control option Multimode, the system is operated first with the HX off.
                 //           If the moisture load is not met, the HX will then be turned on and the system is re-simulated.
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat ||
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_None) {
+                if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat ||
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::None) {
                     HXUnitOn = true;
                 } else {
                     HXUnitOn = false;
@@ -7983,7 +7981,7 @@ namespace Furnaces {
                 //     Air flow rate is set according to max of cooling and heating PLR if heating and latent load exists.
                 if (OpMode == CycFanCycCoil && state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio > 0.0 &&
                     state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat &&
+                    state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
                     (SystemMoistureLoad < 0.0 || (SystemMoistureLoad >= 0.0 && HeatingLatentOutput > SystemMoistureLoad &&
                                                   !state.dataZoneEnergyDemand->Setback(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)))) {
                     CoolingHeatingPLRRatio = min(1.0, PartLoadRatio / state.dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio);
@@ -8172,18 +8170,18 @@ namespace Furnaces {
                     //       IF this furnace uses MultiMode control AND there is a moisture load AND the moisture load met by the furnace in
                     //       cooling only mode above is sufficient to meet the moisture demand OR there is no sensible load (PLR=0 from above)
                     //       then set LatentPartLoadRatio to 0 (no additional dehumidification is required).
-                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_Multimode &&
+                    if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode &&
                         ((SystemMoistureLoad < 0.0 && TempLatentOutput < SystemMoistureLoad) || PartLoadRatio == 0.0)) {
                         LatentPartLoadRatio = 0.0;
                         //       ELSE calculate a new PLR for valid dehumidification control types if a moisture load exists.
-                    } else if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num != DehumidificationControlMode::DehumidControl_None &&
+                    } else if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num != DehumidificationControlMode::None &&
                                (SystemMoistureLoad < 0.0 ||
                                 (SystemMoistureLoad >= 0.0 && TempLatentOutput > SystemMoistureLoad &&
                                  !state.dataZoneEnergyDemand->Setback(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum)))) {
 
                         //         IF the furnace uses dehumidification control MultiMode, turn on the HX and calculate the latent output with
                         //         the HX ON to compare to the moisture load predicted by the humidistat.
-                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_Multimode) {
+                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                             HXUnitOn = true;
                             state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace;
                             // Set fan part-load fraction equal to 1 while getting full load result
@@ -8235,9 +8233,9 @@ namespace Furnaces {
                         }
 
                         //         check bounds on latent output prior to iteration using RegulaFalsi
-                        if (TempLatentOutput > SystemMoistureLoad || (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num ==
-                                                                          DehumidificationControlMode::DehumidControl_Multimode &&
-                                                                      TempCoolOutput > CoolCoilLoad)) {
+                        if (TempLatentOutput > SystemMoistureLoad ||
+                            (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode &&
+                             TempCoolOutput > CoolCoilLoad)) {
                             LatentPartLoadRatio = 1.0;
                         } else if (NoLatentOutput < SystemMoistureLoad || HeatingLatentOutput < SystemMoistureLoad) {
                             LatentPartLoadRatio = 0.0;
@@ -8252,16 +8250,14 @@ namespace Furnaces {
                             Par[2] = double(OpMode);
                             Par[3] = double(CompOp);
                             //           Multimode always controls to meet the SENSIBLE load (however, HXUnitOn is now TRUE)
-                            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num ==
-                                DehumidificationControlMode::DehumidControl_Multimode) {
+                            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                                 Par[4] = CoolCoilLoad;
                             } else {
                                 Par[4] = SystemMoistureLoad;
                             }
                             Par[5] = 1.0; // FLAG, 0.0 if heating load, 1.0 if cooling or moisture load
                             //           Multimode always controls to meet the SENSIBLE load (however, HXUnitOn is now TRUE)
-                            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num ==
-                                DehumidificationControlMode::DehumidControl_Multimode) {
+                            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                                 Par[6] = 1.0; // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                             } else {
                                 Par[6] = 0.0;
@@ -8492,8 +8488,7 @@ namespace Furnaces {
                     if (LatentPartLoadRatio > PartLoadRatio && state.dataFurnaces->Furnace(FurnaceNum).Humidistat) {
                         //         For dehumidification mode CoolReheat, compare the Sensible and Latent PLR values, if latentPLR is greater
                         //         than PLR (sensible), then overcooling is required and reheat will be activated using the HumControl flag.
-                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num ==
-                            DehumidificationControlMode::DehumidControl_CoolReheat) {
+                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                             PartLoadRatio = LatentPartLoadRatio;
                             HumControl = true;
                         }
@@ -8501,7 +8496,7 @@ namespace Furnaces {
                         //         greater than PLR (sensible), then use the latent PLR to control the unit.
                         //         For MultiMode control, the latent PLR is found by enabling the HX and calculating a PLR required to meet the
                         //         sensible load. Overcooling is not required, and reheat will not be activated using the HumControl flag.
-                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_Multimode) {
+                        if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::Multimode) {
                             PartLoadRatio = LatentPartLoadRatio;
                         }
                     }
@@ -9436,8 +9431,7 @@ namespace Furnaces {
                     state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //   Simulate the supplemental heating coil
-            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat &&
-                ReheatCoilLoad > 0.0) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
                 SuppHeatingCoilFlag = true;
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
             } else {
@@ -9521,8 +9515,7 @@ namespace Furnaces {
                     state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //     Simulate the supplemental heating coil
-            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat &&
-                ReheatCoilLoad > 0.0) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
                 SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
             } else {
@@ -9671,7 +9664,7 @@ namespace Furnaces {
                 SimulateFanComponents(
                     state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
-            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat ||
+            if (state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat ||
                 state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
                 SuppHeatingCoilFlag = true; // if truee simulates supplemental heating coil
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, FanOpMode, QActual);
@@ -10759,7 +10752,7 @@ namespace Furnaces {
         //     Calculate the reheat coil output
         if ((GetCurrentScheduleValue(state, state.dataFurnaces->Furnace(FurnaceNum).SchedPtr) > 0.0) &&
             (state.dataFurnaces->Furnace(FurnaceNum).Humidistat &&
-             state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat &&
+             state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::CoolReheat &&
              (QLatReq < 0.0))) { // if a Humidistat is installed and dehumdification control type is CoolReheat
             CalcVarSpeedHeatPump(state,
                                  FurnaceNum,

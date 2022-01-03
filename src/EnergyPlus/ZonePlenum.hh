@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -183,11 +183,11 @@ namespace ZonePlenum {
 
     void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
-    int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
+    int GetReturnPlenumIndex(EnergyPlusData &state, int ExNodeNum);
 
-    void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
+    void GetReturnPlenumName(EnergyPlusData &state, int ReturnPlenumIndex, std::string &ReturnPlenumName);
 
-    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum);
+    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int InNodeNum);
 
     bool ValidateInducedNode(EnergyPlusData &state, int const InduceNodeNum, int const NumReturnNodes, Array1D<int> const &ReturnNode);
 

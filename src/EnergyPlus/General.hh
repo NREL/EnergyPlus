@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -376,9 +376,9 @@ namespace General {
     std::string CreateSysTimeIntervalString(EnergyPlusData &state);
 
     int nthDayOfWeekOfMonth(EnergyPlusData &state,
-                            int const &dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
-                            int const &nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
-                            int const &monthNumber // January = 1
+                            int dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
+                            int nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
+                            int monthNumber // January = 1
     );
 
     Real64 SafeDivide(Real64 a, Real64 b);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,16 +67,19 @@ namespace DataLoopNode {
 
     enum class NodeFluidType
     {
-        blank,
+        Invalid = -1,
+        Blank,
         Air,
         Water,
         Steam,
-        Electric
+        Electric,
+        Num
     };
 
     enum class NodeConnectionType
     {
-        blank,
+        Invalid = -1,
+        Blank,
         Inlet,
         Outlet,
         Internal,
@@ -91,7 +94,8 @@ namespace DataLoopNode {
         SetPoint,
         Electric,
         OutsideAirReference,
-        InducedAir
+        InducedAir,
+        Num
     };
 
     constexpr int NumValidConnectionTypes(15);
@@ -107,7 +111,7 @@ namespace DataLoopNode {
     constexpr const char *ValidNodeFluidTypes(NodeFluidType const NodeFluidType) // Valid Fluid Types for Nodes
     {
         switch (NodeFluidType) {
-        case NodeFluidType::blank:
+        case NodeFluidType::Blank:
             return "blank";
 
         case NodeFluidType::Air:
@@ -243,7 +247,7 @@ namespace DataLoopNode {
 
         // Default Constructor
         NodeData()
-            : FluidType(NodeFluidType::blank), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue),
+            : FluidType(NodeFluidType::Blank), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue),
               TempLastTimestep(0.0), MassFlowRateRequest(0.0), MassFlowRate(0.0), MassFlowRateMin(0.0), MassFlowRateMax(SensedNodeFlagValue),
               MassFlowRateMinAvail(0.0), MassFlowRateMaxAvail(0.0), MassFlowRateSetPoint(0.0), Quality(0.0), Press(0.0), Enthalpy(0.0),
               EnthalpyLastTimestep(0.0), HumRat(0.0), HumRatMin(SensedNodeFlagValue), HumRatMax(SensedNodeFlagValue),
@@ -390,7 +394,7 @@ struct LoopNodeData : BaseGlobalStruct
     Array1D_string NodeID;
     Array1D<DataLoopNode::NodeData> Node; // dim to num nodes in SimHVAC
     DataLoopNode::NodeData DefaultNodeValues = {
-        DataLoopNode::NodeFluidType::blank,
+        DataLoopNode::NodeFluidType::Blank,
         0,
         0.0,
         0.0,
@@ -458,7 +462,7 @@ struct LoopNodeData : BaseGlobalStruct
         this->NumofMixers = 0;
         this->NodeID.deallocate();
         this->Node.deallocate();
-        this->DefaultNodeValues = DataLoopNode::NodeData(DataLoopNode::NodeFluidType::blank,
+        this->DefaultNodeValues = DataLoopNode::NodeData(DataLoopNode::NodeFluidType::Blank,
                                                          0,
                                                          0.0,
                                                          0.0,

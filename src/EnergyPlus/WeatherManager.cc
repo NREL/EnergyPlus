@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -6140,14 +6140,14 @@ namespace WeatherManager {
                 state.dataWeatherManager->SpecialDays(Count).WeekDay = 0;
                 state.dataWeatherManager->SpecialDays(Count).CompDate = PMonth * 32 + PDay;
                 state.dataWeatherManager->SpecialDays(Count).WthrFile = false;
-            } else if (dateType != DateType::InvalidDate) {
+            } else if (dateType != DateType::Invalid) {
                 state.dataWeatherManager->SpecialDays(Count).DateType = dateType;
                 state.dataWeatherManager->SpecialDays(Count).Month = PMonth;
                 state.dataWeatherManager->SpecialDays(Count).Day = PDay;
                 state.dataWeatherManager->SpecialDays(Count).WeekDay = PWeekDay;
                 state.dataWeatherManager->SpecialDays(Count).CompDate = 0;
                 state.dataWeatherManager->SpecialDays(Count).WthrFile = false;
-            } else if (dateType == DateType::InvalidDate) {
+            } else if (dateType == DateType::Invalid) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + ": " + AlphArray(1) + " Invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
@@ -6291,7 +6291,7 @@ namespace WeatherManager {
                                            state.dataWeatherManager->IDFDST.StWeekDay,
                                            state.dataWeatherManager->IDFDST.StDateType,
                                            ErrorsFound);
-                if (state.dataWeatherManager->IDFDST.StDateType == DateType::InvalidDate) {
+                if (state.dataWeatherManager->IDFDST.StDateType == DateType::Invalid) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                         state.dataIPShortCut->cAlphaArgs(1));
@@ -6304,7 +6304,7 @@ namespace WeatherManager {
                                            state.dataWeatherManager->IDFDST.EnWeekDay,
                                            state.dataWeatherManager->IDFDST.EnDateType,
                                            ErrorsFound);
-                if (state.dataWeatherManager->IDFDST.EnDateType == DateType::InvalidDate) {
+                if (state.dataWeatherManager->IDFDST.EnDateType == DateType::Invalid) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' +
                                         state.dataIPShortCut->cAlphaArgs(2));
@@ -8409,7 +8409,7 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).StartDay = PDay;
@@ -8425,7 +8425,7 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
@@ -8439,7 +8439,7 @@ namespace WeatherManager {
                         Line.erase(0, Pos + 1);
                     } else { // Pos=0, probably last one
                         General::ProcessDateString(state, Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
@@ -8619,7 +8619,7 @@ namespace WeatherManager {
                         // call ProcessDateString with local bool (unused)
                         bool errflag1;
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             // ErrorsFound is still false after ProcessDateString
                             if (PMonth == 0 && PDay == 0) {
                                 state.dataWeatherManager->EPWDaylightSaving = false;
@@ -8642,7 +8642,7 @@ namespace WeatherManager {
                     } else if (i == 3) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (state.dataWeatherManager->EPWDaylightSaving) {
-                            if (dateType != DateType::InvalidDate) {
+                            if (dateType != DateType::Invalid) {
                                 state.dataWeatherManager->EPWDST.EnDateType = dateType;
                                 state.dataWeatherManager->EPWDST.EnMon = PMonth;
                                 state.dataWeatherManager->EPWDST.EnDay = PDay;
@@ -8686,7 +8686,7 @@ namespace WeatherManager {
                                     state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
-                                } else if (dateType != DateType::InvalidDate) {
+                                } else if (dateType != DateType::Invalid) {
                                     state.dataWeatherManager->SpecialDays(CurCount).DateType = dateType;
                                     state.dataWeatherManager->SpecialDays(CurCount).Month = PMonth;
                                     state.dataWeatherManager->SpecialDays(CurCount).Day = PDay;
@@ -8695,7 +8695,7 @@ namespace WeatherManager {
                                     state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
-                                } else if (dateType == DateType::InvalidDate) {
+                                } else if (dateType == DateType::Invalid) {
                                     ShowSevereError(state, "Invalid SpecialDay Date Field(WeatherFile)=" + Line.substr(0, Pos));
                                     ErrorsFound = true;
                                 }

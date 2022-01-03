@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1037,7 +1037,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
                                       AlphArray(1),
                                       DataLoopNode::NodeFluidType::Water,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      NodeInputManager::compFluidStream::Primary,
+                                      NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 // For DO Loop below -- Check for lower limit > upper limit.(invalid)
                 for (ListNum = 1; ListNum <= NumEquipLists; ++ListNum) {
@@ -1412,7 +1412,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
                                           DataLoopNode::NodeConnectionType::Sensor,
-                                          NodeInputManager::compFluidStream::Primary,
+                                          NodeInputManager::CompFluidStream::Primary,
                                           ObjectIsNotParent);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName =
                         state.dataIPShortCut->cAlphaArgs(CompNumA);
@@ -1424,7 +1424,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
                                           DataLoopNode::NodeConnectionType::Sensor,
-                                          NodeInputManager::compFluidStream::Primary,
+                                          NodeInputManager::CompFluidStream::Primary,
                                           ObjectIsNotParent);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate =
                         state.dataIPShortCut->rNumericArgs(CompNumN);
@@ -1546,7 +1546,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                 CheckIfNodeSetPointManagedByEMS(
                                     state,
                                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                    EMSManager::SPControlType::iTemperatureSetPoint,
+                                    EMSManager::SPControlType::TemperatureSetPoint,
                                     NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
                                     ShowSevereError(state,
@@ -1599,7 +1599,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
+                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,
@@ -1650,12 +1650,12 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                        EMSManager::SPControlType::TemperatureMinSetPoint,
                                         NodeEMSSetPointMissing);
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureMaxSetPoint,
+                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,
@@ -1708,7 +1708,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::iTemperatureMinSetPoint,
+                                        EMSManager::SPControlType::TemperatureMinSetPoint,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,

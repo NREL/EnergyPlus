@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -612,7 +612,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Internal,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).OASysInletNodeNum =
@@ -623,7 +623,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Inlet,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).OAMixOAInNodeNum = NodeInputManager::GetOnlySingleNode(*state,
@@ -633,7 +633,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                            "SZRHtest",
                                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                                            DataLoopNode::NodeConnectionType::Internal,
-                                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                                            DataLoopNode::ObjectIsNotParent,
                                                                                                            "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -650,7 +650,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Inlet,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
@@ -665,7 +665,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Internal,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
 
@@ -677,7 +677,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Internal,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
 
@@ -695,7 +695,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                           "SZRHspmTest",
                                                           DataLoopNode::NodeFluidType::Air,
                                                           DataLoopNode::NodeConnectionType::ZoneNode,
-                                                          NodeInputManager::compFluidStream::Primary,
+                                                          NodeInputManager::CompFluidStream::Primary,
                                                           DataLoopNode::ObjectIsNotParent,
                                                           "Test zone node");
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneAirNode;
@@ -706,7 +706,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                             "SZRHspmTest",
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::NodeConnectionType::ZoneInlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent,
                                                             "Test zone inlet node");
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = zoneInletNode;
@@ -1281,8 +1281,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
 
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
-    EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "MAXIMUMTEMPERATURE");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MaxTemp));
+    EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).ctrlVarType, "MAXIMUMTEMPERATURE");
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::MaxTemp));
     EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir));
     EXPECT_EQ(80.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
     EXPECT_EQ(-17.778, state->dataSetPointManager->OutAirSetPtMgr(1).OutLow1);
@@ -1337,8 +1337,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
 
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
-    EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "MINIMUMTEMPERATURE");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MinTemp));
+    EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).ctrlVarType, "MINIMUMTEMPERATURE");
+    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::MinTemp));
     EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir));
     EXPECT_EQ(80.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
     EXPECT_EQ(-17.778, state->dataSetPointManager->OutAirSetPtMgr(1).OutLow1);

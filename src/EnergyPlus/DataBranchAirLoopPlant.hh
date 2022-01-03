@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,21 +66,22 @@ namespace DataBranchAirLoopPlant {
     // Pressure Curve Type: None, pressure, or generic curve (if generic it will be a positive value which is the curve manager index)
     enum class PressureCurveType
     {
-        Unassigned = -2,
-        Error = -1,
-        None = 0,
-        Pressure = 1,
-        Generic = 2
+        Invalid = -1,
+        None,
+        Pressure,
+        Generic,
+        Num
     };
 
     // Parameters for flow Control Types for branch flow resolution inside splitter/mixers
-    enum class ControlTypeEnum
+    enum class ControlType
     {
-        Unknown,
+        Invalid = -1,
         Active,
         Passive,
         SeriesActive,
-        Bypass
+        Bypass,
+        Num
     };
 
     // Types

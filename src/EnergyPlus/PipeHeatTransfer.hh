@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,13 +77,15 @@ namespace PipeHeatTransfer {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    enum class iEnvrnPtr
+    enum class EnvrnPtr
     {
+        Invalid = -1,
         None,
         ZoneEnv,
         ScheduleEnv,
         OutsideAirEnv,
         GroundEnv,
+        Num
     };
 
     constexpr int PreviousTimeIndex(1);
@@ -114,7 +116,7 @@ namespace PipeHeatTransfer {
         DataPlant::PlantEquipmentType Type; // Type of pipe
         // derived data
         int ConstructionNum; // construction ref number
-        iEnvrnPtr EnvironmentPtr;
+        EnvrnPtr EnvironmentPtr;
         int EnvrSchedPtr;              // pointer to schedule used to set environmental temp
         int EnvrVelSchedPtr;           // pointer to schedule used to set environmental temp
         int EnvrZonePtr;               // pointer to zone number used to set environmental temp
@@ -198,14 +200,14 @@ namespace PipeHeatTransfer {
         // Default Constructor
         PipeHTData()
             : Length(0.0), PipeID(0.0), InletNodeNum(0), OutletNodeNum(0), Type(DataPlant::PlantEquipmentType::Invalid), ConstructionNum(0),
-              EnvironmentPtr(iEnvrnPtr::None), EnvrSchedPtr(0), EnvrVelSchedPtr(0), EnvrZonePtr(0), EnvrAirNodeNum(0), NumSections(0),
+              EnvironmentPtr(EnvrnPtr::None), EnvrSchedPtr(0), EnvrVelSchedPtr(0), EnvrZonePtr(0), EnvrAirNodeNum(0), NumSections(0),
               FluidSpecHeat(0.0), FluidDensity(0.0), MaxFlowRate(0.0), InsideArea(0.0), OutsideArea(0.0), SectionArea(0.0), PipeHeatCapacity(0.0),
               PipeOD(0.0), PipeCp(0.0), PipeDensity(0.0), PipeConductivity(0.0), InsulationOD(0.0), InsulationCp(0.0), InsulationDensity(0.0),
               InsulationConductivity(0.0), InsulationThickness(0.0), InsulationResistance(0.0), CurrentSimTime(0.0), PreviousSimTime(0.0),
               NumDepthNodes(0), PipeNodeDepth(0), PipeNodeWidth(0), PipeDepth(0.0), DomainDepth(0.0), dSregular(0.0), OutdoorConvCoef(0.0),
               SoilMaterialNum(0), MonthOfMinSurfTemp(0), MinSurfTemp(0.0), SoilDensity(0.0), SoilDepth(0.0), SoilCp(0.0), SoilConductivity(0.0),
-              SoilRoughness(DataSurfaces::SurfaceRoughness::Unassigned), SoilThermAbs(0.0), SoilSolarAbs(0.0), CoefA1(0.0), CoefA2(0.0),
-              FourierDS(0.0), SoilDiffusivity(0.0), SoilDiffusivityPerDay(0.0), BeginSimInit(true), BeginSimEnvrn(true), FirstHVACupdateFlag(true),
+              SoilRoughness(DataSurfaces::SurfaceRoughness::Invalid), SoilThermAbs(0.0), SoilSolarAbs(0.0), CoefA1(0.0), CoefA2(0.0), FourierDS(0.0),
+              SoilDiffusivity(0.0), SoilDiffusivityPerDay(0.0), BeginSimInit(true), BeginSimEnvrn(true), FirstHVACupdateFlag(true),
               BeginEnvrnupdateFlag(true), SolarExposed(true), SumTK(0.0), ZoneHeatGainRate(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               CheckEquipName(true), FluidInletTemp(0.0), FluidOutletTemp(0.0), MassFlowRate(0.0), FluidHeatLossRate(0.0), FluidHeatLossEnergy(0.0),
               PipeInletTemp(0.0), PipeOutletTemp(0.0), EnvironmentHeatLossRate(0.0), EnvHeatLossEnergy(0.0), VolumeFlowRate(0.0)

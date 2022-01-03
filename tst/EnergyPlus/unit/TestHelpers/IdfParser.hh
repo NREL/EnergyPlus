@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,7 @@ namespace EnergyPlus {
 // in the outer vector and a vector of each field is stored in the inner vector. This is a naive data structure for now since it works for
 // the original purpose. Could use a map, unordered_map, a new struct, or the IDFRecords data structure in the future.
 // This should not be used outside of the EnergyPlusFixture.
-// This parser was created to facilite searching an IDF snippet before it is run through the E+ InputProcessor.
+// This parser was created to facilitate searching an IDF snippet before it is run through the E+ InputProcessor.
 class IdfParser
 {
 public:
@@ -69,12 +69,13 @@ public:
 
     enum class Token : size_t
     {
-        NONE = 0,
-        END = 1,
-        EXCLAMATION = 2,
-        COMMA = 3,
-        SEMICOLON = 4,
-        STRING = 5
+        NONE,
+        END,
+        EXCLAMATION,
+        COMMA,
+        SEMICOLON,
+        STRING,
+        Num
     };
 
 private:

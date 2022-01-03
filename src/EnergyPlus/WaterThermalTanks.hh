@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,19 +71,18 @@ namespace WaterThermalTanks {
 
     enum class WTTAmbientTemp
     {
-        Unassigned = -1,
+        Invalid = -1,
         Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
         TempZone,   // tank is located in a zone or HPWH inlet air is zone air only
         OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
         ZoneAndOA,  // applicable to HPWH only, inlet air is mixture of OA and zone air
         Num,
-        TankNum = Num - 1 // Since WTTAmbientTemp::ZoneAndOA is not applicable to Tank
     };
 
     constexpr std::array<std::string_view, static_cast<int>(WTTAmbientTemp::Num)> HPWHAmbientTempNamesUC{
         "SCHEDULE", "ZONEAIRONLY", "OUTDOORAIRONLY", "ZONEANDOUTDOORAIR"};
 
-    constexpr std::array<std::string_view, static_cast<int>(WTTAmbientTemp::TankNum)> TankAmbientTempNamesUC{
+    constexpr std::array<std::string_view, static_cast<int>(WTTAmbientTemp::Num) - 1> TankAmbientTempNamesUC{
         "SCHEDULE",
         "ZONE",
         "OUTDOORS",
@@ -91,7 +90,7 @@ namespace WaterThermalTanks {
 
     enum class CrankcaseHeaterControlTemp
     {
-        Unassigned = -1,
+        Invalid = -1,
         Schedule, // temperature controlling compressor crankcase heater is scheduled
         Zone,     // temperature controlling compressor crankcase heater is zone air
         Outdoors, // temperature controlling compressor crankcase heater is outdoor air
@@ -106,7 +105,7 @@ namespace WaterThermalTanks {
 
     enum class TankShape
     {
-        Unassigned = -1,
+        Invalid = -1,
         VertCylinder,  // tank shape is a vertical cylinder
         HorizCylinder, // tank shape is a horizontal cylinder
         Other,         // tank shape has an arbitrary perimeter shape
@@ -121,7 +120,7 @@ namespace WaterThermalTanks {
 
     enum class HeaterControlMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         Cycle,
         Modulate,
         Num
@@ -131,7 +130,7 @@ namespace WaterThermalTanks {
 
     enum class PriorityControlMode // For Stratified Water Heaters, this controls how the two heating elements work together
     {
-        Unassigned = -1,
+        Invalid = -1,
         MasterSlave,  // water heater only, master-slave priority control of heater elements
         Simultaneous, // water heater only, simultaneous control of heater elements
         Num
@@ -141,7 +140,7 @@ namespace WaterThermalTanks {
 
     enum class InletPositionMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         Fixed,   // water heater only, inlet water always enters at the user-specified height
         Seeking, // water heater only, inlet water seeks out the node with the closest temperature
         Num
@@ -152,7 +151,7 @@ namespace WaterThermalTanks {
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
     enum class ReclaimHeatObjectType
     {
-        Unassigned = -1,
+        Invalid = -1,
         CompressorRackRefrigeratedCase, // reclaim heating source is refrigerated case compressor rack
         DXCooling,                      // reclaim heating source is DX cooling coil
         DXMultiSpeed,                   // reclaim heating source is DX multispeed coil
@@ -165,7 +164,7 @@ namespace WaterThermalTanks {
 
     enum class WaterHeaterSide
     {
-        Unassigned = -1,
+        Invalid = -1,
         Use,    // Indicates Use side of water heater
         Source, // Indicates Source side of water heater
         Num
@@ -173,7 +172,7 @@ namespace WaterThermalTanks {
 
     enum class SizingMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         PeakDraw,
         ResidentialMin,
         PerPerson,
@@ -185,7 +184,7 @@ namespace WaterThermalTanks {
 
     enum class SourceSideControl
     {
-        Unassigned = -1,
+        Invalid = -1,
         StorageTank,
         IndirectHeatPrimarySetpoint,
         IndirectHeatAltSetpoint,
@@ -197,7 +196,7 @@ namespace WaterThermalTanks {
 
     enum class FlowMode
     {
-        Unassigned = -1,
+        Invalid = -1,
         PassingFlowThru,
         MaybeRequestingFlow,
         ThrottlingFlow,
@@ -206,7 +205,7 @@ namespace WaterThermalTanks {
 
     enum class Fuel
     {
-        Unassigned = -1,
+        Invalid = -1,
         Electricity,
         NaturalGas,
         Diesel,
@@ -314,7 +313,7 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         WaterHeaterSizingData()
-            : DesignMode(SizingMode::Unassigned), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
+            : DesignMode(SizingMode::Invalid), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
               NumberOfBathrooms(0.0), TankCapacityPerPerson(0.0), RecoveryCapacityPerPerson(0.0), TankCapacityPerArea(0.0),
               RecoveryCapacityPerArea(0.0), NumberOfUnits(0.0), TankCapacityPerUnit(0.0), RecoveryCapacityPerUnit(0.0),
               TankCapacityPerCollectorArea(0.0), HeightAspectRatio(0.0), PeakDemand(0.0), PeakNumberOfPeople(0.0), TotalFloorArea(0.0),
@@ -517,67 +516,67 @@ namespace WaterThermalTanks {
         Real64 Mass;                                        // Total mass of fluid in the tank (kg)
         Real64 TimeElapsed;                                 // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
-        WTTAmbientTemp AmbientTempIndicator;                          // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
-        int AmbientTempSchedule;                                      // Schedule index pointer
-        int AmbientTempZone;                                          // Number of ambient zone around tank
-        int AmbientTempOutsideAirNode;                                // Number of outside air node
-        Real64 AmbientTemp;                                           // Ambient temperature around tank (C)
-        Real64 AmbientZoneGain;                                       // Internal gain to zone from tank losses (W)
-        Real64 LossCoeff;                                             // Overall tank heat loss coefficient, UA (W/K)
-        Real64 OffCycLossCoeff;                                       // Off-cycle overall tank heat loss coefficient, UA (W/K)
-        Real64 OffCycLossFracToZone;                                  // Fraction of off-cycle losses added to zone
-        Real64 OnCycLossCoeff;                                        // On-cycle overall tank heat loss coefficient, UA (W/K)
-        Real64 OnCycLossFracToZone;                                   // Fraction of on-cycle losses added to zone
-        int Mode;                                                     // Indicator for current operating mode
-        int SavedMode;                                                // Mode indicator saved from previous time step
-        HeaterControlMode ControlType;                                // Indicator for Heater Control type
-        PriorityControlMode StratifiedControlMode;                    // Indicator for Stratified Water Heaters Priority Control Type
-        Fuel FuelType;                                                // Fuel type
-        Real64 MaxCapacity;                                           // Maximum capacity of auxiliary heater 1 (W)
-        bool MaxCapacityWasAutoSized;                                 // true if heater 1 capacity was autosized on input
-        Real64 MinCapacity;                                           // Minimum capacity of auxiliary heater 1 (W)
-        Real64 Efficiency;                                            // Thermal efficiency of auxiliary heater 1 ()
-        int PLFCurve;                                                 // Part load factor curve as a function of part load ratio
-        int SetPointTempSchedule;                                     // Schedule index pointer
-        Real64 SetPointTemp;                                          // Setpoint temperature of auxiliary heater 1 (C)
-        Real64 DeadBandDeltaTemp;                                     // Deadband temperature difference of auxiliary heater 1 (deltaC)
-        Real64 TankTempLimit;                                         // Maximum tank temperature limit before venting (C)
-        Real64 IgnitionDelay;                                         // Time delay before heater is allowed to turn on (s)
-        Real64 OffCycParaLoad;                                        // Rate for off-cycle parasitic load (W)
-        Fuel OffCycParaFuelType;                                      // Fuel type for off-cycle parasitic load
-        Real64 OffCycParaFracToTank;                                  // Fraction of off-cycle parasitic energy ending up in tank (W)
-        Real64 OnCycParaLoad;                                         // Rate for on-cycle parasitic load (W)
-        Fuel OnCycParaFuelType;                                       // Fuel type for on-cycle parasitic load
-        Real64 OnCycParaFracToTank;                                   // Fraction of on-cycle parasitic energy ending up in tank (W)
-        DataPlant::FlowLock UseCurrentFlowLock;                       // current flow lock setting on use side
-        int UseInletNode;                                             // Inlet node on the use side; colder water returning to a hottank
-        Real64 UseInletTemp;                                          // Use side inlet temperature (C)
-        int UseOutletNode;                                            // Outlet node on the use side; hot tank water
-        Real64 UseOutletTemp;                                         // Use side outlet temperature (C)
-        Real64 UseMassFlowRate;                                       // Mass flow rate on the use side (kg/s)
-        Real64 UseEffectiveness;                                      // Heat transfer effectiveness on use side ()
-        Real64 PlantUseMassFlowRateMax;                               // Plant demand-side max flow request on use side (kg/s)
-        Real64 SavedUseOutletTemp;                                    // Use side outlet temp saved for demand-side flow control (C)
-        Real64 UseDesignVolFlowRate;                                  // Use side plant volume flow rate (input data, autosizable) m3/s
-        bool UseDesignVolFlowRateWasAutoSized;                        // true if use flow rate was autosize on input
-        DataBranchAirLoopPlant::ControlTypeEnum UseBranchControlType; // Use side plant branch control type e.g active, passive, bypass
-        int UseSidePlantSizNum;                                       // index in plant sizing that the use side is on
+        WTTAmbientTemp AmbientTempIndicator;                      // Indicator for ambient tank losses (SCHEDULE, ZONE, EXTERIOR)
+        int AmbientTempSchedule;                                  // Schedule index pointer
+        int AmbientTempZone;                                      // Number of ambient zone around tank
+        int AmbientTempOutsideAirNode;                            // Number of outside air node
+        Real64 AmbientTemp;                                       // Ambient temperature around tank (C)
+        Real64 AmbientZoneGain;                                   // Internal gain to zone from tank losses (W)
+        Real64 LossCoeff;                                         // Overall tank heat loss coefficient, UA (W/K)
+        Real64 OffCycLossCoeff;                                   // Off-cycle overall tank heat loss coefficient, UA (W/K)
+        Real64 OffCycLossFracToZone;                              // Fraction of off-cycle losses added to zone
+        Real64 OnCycLossCoeff;                                    // On-cycle overall tank heat loss coefficient, UA (W/K)
+        Real64 OnCycLossFracToZone;                               // Fraction of on-cycle losses added to zone
+        int Mode;                                                 // Indicator for current operating mode
+        int SavedMode;                                            // Mode indicator saved from previous time step
+        HeaterControlMode ControlType;                            // Indicator for Heater Control type
+        PriorityControlMode StratifiedControlMode;                // Indicator for Stratified Water Heaters Priority Control Type
+        Fuel FuelType;                                            // Fuel type
+        Real64 MaxCapacity;                                       // Maximum capacity of auxiliary heater 1 (W)
+        bool MaxCapacityWasAutoSized;                             // true if heater 1 capacity was autosized on input
+        Real64 MinCapacity;                                       // Minimum capacity of auxiliary heater 1 (W)
+        Real64 Efficiency;                                        // Thermal efficiency of auxiliary heater 1 ()
+        int PLFCurve;                                             // Part load factor curve as a function of part load ratio
+        int SetPointTempSchedule;                                 // Schedule index pointer
+        Real64 SetPointTemp;                                      // Setpoint temperature of auxiliary heater 1 (C)
+        Real64 DeadBandDeltaTemp;                                 // Deadband temperature difference of auxiliary heater 1 (deltaC)
+        Real64 TankTempLimit;                                     // Maximum tank temperature limit before venting (C)
+        Real64 IgnitionDelay;                                     // Time delay before heater is allowed to turn on (s)
+        Real64 OffCycParaLoad;                                    // Rate for off-cycle parasitic load (W)
+        Fuel OffCycParaFuelType;                                  // Fuel type for off-cycle parasitic load
+        Real64 OffCycParaFracToTank;                              // Fraction of off-cycle parasitic energy ending up in tank (W)
+        Real64 OnCycParaLoad;                                     // Rate for on-cycle parasitic load (W)
+        Fuel OnCycParaFuelType;                                   // Fuel type for on-cycle parasitic load
+        Real64 OnCycParaFracToTank;                               // Fraction of on-cycle parasitic energy ending up in tank (W)
+        DataPlant::FlowLock UseCurrentFlowLock;                   // current flow lock setting on use side
+        int UseInletNode;                                         // Inlet node on the use side; colder water returning to a hottank
+        Real64 UseInletTemp;                                      // Use side inlet temperature (C)
+        int UseOutletNode;                                        // Outlet node on the use side; hot tank water
+        Real64 UseOutletTemp;                                     // Use side outlet temperature (C)
+        Real64 UseMassFlowRate;                                   // Mass flow rate on the use side (kg/s)
+        Real64 UseEffectiveness;                                  // Heat transfer effectiveness on use side ()
+        Real64 PlantUseMassFlowRateMax;                           // Plant demand-side max flow request on use side (kg/s)
+        Real64 SavedUseOutletTemp;                                // Use side outlet temp saved for demand-side flow control (C)
+        Real64 UseDesignVolFlowRate;                              // Use side plant volume flow rate (input data, autosizable) m3/s
+        bool UseDesignVolFlowRateWasAutoSized;                    // true if use flow rate was autosize on input
+        DataBranchAirLoopPlant::ControlType UseBranchControlType; // Use side plant branch control type e.g active, passive, bypass
+        int UseSidePlantSizNum;                                   // index in plant sizing that the use side is on
         bool UseSideSeries;
         int UseSideAvailSchedNum;    // use side availability schedule
         Real64 UseSideLoadRequested; // hold MyLoad request from plant management.
         PlantLocation UseSide;
-        int SourceInletNode;                                             // Inlet node for the source side; hot water from supply
-        Real64 SourceInletTemp;                                          // Source side inlet temperature (C)
-        int SourceOutletNode;                                            // Outlet node for the source side; colder tank water
-        Real64 SourceOutletTemp;                                         // Source side outlet temperature (C)
-        Real64 SourceMassFlowRate;                                       // Mass flow rate on the source side (kg/s)
-        Real64 SourceEffectiveness;                                      // Heat transfer effectiveness on source side ()
-        Real64 PlantSourceMassFlowRateMax;                               // Plant demand-side max flow request on source side (kg/s)
-        Real64 SavedSourceOutletTemp;                                    // Source side outlet temp saved for demand-side flow control (C)
-        Real64 SourceDesignVolFlowRate;                                  // Source side plant volume flow rate (input, autosizable) m3/s
-        bool SourceDesignVolFlowRateWasAutoSized;                        // true if source flow rate was autosize on input
-        DataBranchAirLoopPlant::ControlTypeEnum SourceBranchControlType; // source side plant branch control type e.g active, passive, bypass
-        int SourceSidePlantSizNum;                                       // index in plant sizing that the source side is on
+        int SourceInletNode;                                         // Inlet node for the source side; hot water from supply
+        Real64 SourceInletTemp;                                      // Source side inlet temperature (C)
+        int SourceOutletNode;                                        // Outlet node for the source side; colder tank water
+        Real64 SourceOutletTemp;                                     // Source side outlet temperature (C)
+        Real64 SourceMassFlowRate;                                   // Mass flow rate on the source side (kg/s)
+        Real64 SourceEffectiveness;                                  // Heat transfer effectiveness on source side ()
+        Real64 PlantSourceMassFlowRateMax;                           // Plant demand-side max flow request on source side (kg/s)
+        Real64 SavedSourceOutletTemp;                                // Source side outlet temp saved for demand-side flow control (C)
+        Real64 SourceDesignVolFlowRate;                              // Source side plant volume flow rate (input, autosizable) m3/s
+        bool SourceDesignVolFlowRateWasAutoSized;                    // true if source flow rate was autosize on input
+        DataBranchAirLoopPlant::ControlType SourceBranchControlType; // source side plant branch control type e.g active, passive, bypass
+        int SourceSidePlantSizNum;                                   // index in plant sizing that the source side is on
         bool SourceSideSeries;
         int SourceSideAvailSchedNum; // source side availability schedule.
         PlantLocation SrcSide;
@@ -713,16 +712,16 @@ namespace WaterThermalTanks {
               VolumeWasAutoSized(false), Mass(0.0), TimeElapsed(0.0), AmbientTempIndicator(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0),
               AmbientTempZone(0), AmbientTempOutsideAirNode(0), AmbientTemp(0.0), AmbientZoneGain(0.0), LossCoeff(0.0), OffCycLossCoeff(0.0),
               OffCycLossFracToZone(0.0), OnCycLossCoeff(0.0), OnCycLossFracToZone(0.0), Mode(0), SavedMode(0), ControlType(HeaterControlMode::Cycle),
-              StratifiedControlMode(PriorityControlMode::Unassigned), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0),
+              StratifiedControlMode(PriorityControlMode::Invalid), MaxCapacity(0.0), MaxCapacityWasAutoSized(false), MinCapacity(0.0),
               Efficiency(0.0), PLFCurve(0), SetPointTempSchedule(0), SetPointTemp(0.0), DeadBandDeltaTemp(0.0), TankTempLimit(0.0),
               IgnitionDelay(0.0), OffCycParaLoad(0.0), OffCycParaFracToTank(0.0), OnCycParaLoad(0.0), OnCycParaFracToTank(0.0),
               UseCurrentFlowLock(DataPlant::FlowLock::Unlocked), UseInletNode(0), UseInletTemp(0.0), UseOutletNode(0), UseOutletTemp(0.0),
               UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0), SavedUseOutletTemp(0.0), UseDesignVolFlowRate(0.0),
-              UseDesignVolFlowRateWasAutoSized(false), UseBranchControlType(DataBranchAirLoopPlant::ControlTypeEnum::Passive), UseSidePlantSizNum(0),
+              UseDesignVolFlowRateWasAutoSized(false), UseBranchControlType(DataBranchAirLoopPlant::ControlType::Passive), UseSidePlantSizNum(0),
               UseSideSeries(true), UseSideAvailSchedNum(0), UseSideLoadRequested(0.0), SourceInletNode(0), SourceInletTemp(0.0), SourceOutletNode(0),
               SourceOutletTemp(0.0), SourceMassFlowRate(0.0), SourceEffectiveness(0.0), PlantSourceMassFlowRateMax(0.0), SavedSourceOutletTemp(0.0),
               SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false),
-              SourceBranchControlType(DataBranchAirLoopPlant::ControlTypeEnum::Passive), SourceSidePlantSizNum(0), SourceSideSeries(true),
+              SourceBranchControlType(DataBranchAirLoopPlant::ControlType::Passive), SourceSidePlantSizNum(0), SourceSideSeries(true),
               SourceSideAvailSchedNum(0), SourceSideControlMode(SourceSideControl::IndirectHeatAltSetpoint), SourceSideAltSetpointSchedNum(0),
               SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0), FlowRateSchedule(0), UseInletTempSchedule(0),
               TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0), HeightWasAutoSized(false), Perimeter(0.0),
@@ -807,7 +806,7 @@ namespace WaterThermalTanks {
                                       WaterHeaterSide WaterThermalTankSide,
                                       int PlantLoopSide,
                                       bool PlumbedInSeries, // !unused1208
-                                      DataBranchAirLoopPlant::ControlTypeEnum BranchControlType,
+                                      DataBranchAirLoopPlant::ControlType BranchControlType,
                                       Real64 OutletTemp,
                                       Real64 DeadBandTemp,
                                       Real64 SetPointTemp);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -186,7 +186,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
-    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:Reheat", state->dataSingleDuct->sd_airterminal(1).SysType); // AT SD VAV Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:Reheat", state->dataSingleDuct->sd_airterminal(1).sysType); // AT SD VAV Reheat Type
     EXPECT_EQ("REHEAT ZONE 1", state->dataSingleDuct->sd_airterminal(1).SysName);                                // AT SD VAV Reheat Name
     EXPECT_GT(state->dataSingleDuct->sd_airterminal(1).ReheatControlNode, 0); // none zero integer node index is expected
 }
@@ -406,7 +406,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
 
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", state->dataSingleDuct->sd_airterminal(1).SysType); // AT SD VAV HeatCool Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", state->dataSingleDuct->sd_airterminal(1).sysType); // AT SD VAV HeatCool Reheat Type
     EXPECT_EQ("ZONE 1 VAV SYSTEM", state->dataSingleDuct->sd_airterminal(1).SysName);                             // AT SD VAV HeatCool Reheat Name
     EXPECT_EQ("COIL:HEATING:ELECTRIC", state->dataSingleDuct->sd_airterminal(1).ReheatComp);                      // Reheat Coil Type
     EXPECT_EQ("REHEAT COIL ZONE 1", state->dataSingleDuct->sd_airterminal(1).ReheatName);                         // Reheat Coil Name
@@ -530,7 +530,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
     GetSysInput(*state);
 
     EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
-              state->dataSingleDuct->sd_airterminal(1).SysType);                          // AT SD VAV HeatCool Reheat Type
+              state->dataSingleDuct->sd_airterminal(1).sysType);                          // AT SD VAV HeatCool Reheat Type
     EXPECT_EQ("SPACE1-1 VAV REHEAT", state->dataSingleDuct->sd_airterminal(1).SysName);   // AT SD VAV HeatCool Reheat Name
     EXPECT_EQ("COIL:HEATING:WATER", state->dataSingleDuct->sd_airterminal(1).ReheatComp); // Reheat Coil Type
     EXPECT_EQ("SPACE1-1 ZONE COIL", state->dataSingleDuct->sd_airterminal(1).ReheatName); // Reheat Coil Name
@@ -891,35 +891,35 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVAirTerminals_GetInputs)
     SingleDuct::GetSysInput(*state);
 
     // VAV Reheat get input test
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat", state->dataSingleDuct->sd_airterminal(1).SysType); // VAV Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat", state->dataSingleDuct->sd_airterminal(1).sysType); // VAV Reheat Type
     EXPECT_EQ("VAV REHEAT AT", state->dataSingleDuct->sd_airterminal(1).SysName);                     // VAV Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(1).ZoneTurndownMinAirFracSchExist);             // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(1).ZoneTurndownMinAirFrac, 1.0);                  // initialized to 1.0
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFracDes, 0.3);                       // design minimum flow fraction
 
     // VAV change over bypass reheat get input test
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", state->dataSingleDuct->sd_airterminal(2).SysType); // VAV HeatCool Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", state->dataSingleDuct->sd_airterminal(2).sysType); // VAV HeatCool Reheat Type
     EXPECT_EQ("VAV CBP GAS REHEAT AT", state->dataSingleDuct->sd_airterminal(2).SysName);                         // VAV HeatCool Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(2).ZoneTurndownMinAirFracSchExist);                         // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(2).ZoneTurndownMinAirFrac, 1.0);                              // initialized to 1.0
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFracDes, 0.20);                                  // design minimum flow fraction
 
     // VAV No reheat get input test
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:NoReheat", state->dataSingleDuct->sd_airterminal(3).SysType); // VAV No Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:NoReheat", state->dataSingleDuct->sd_airterminal(3).sysType); // VAV No Reheat Type
     EXPECT_EQ("VAV NO REHEAT AT", state->dataSingleDuct->sd_airterminal(3).SysName);                    // VAV No Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(3).ZoneTurndownMinAirFracSchExist);               // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(3).ZoneTurndownMinAirFrac, 1.0);                    // initialized to 1.0
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(3).ZoneMinAirFracDes, 0.25);                        // design minimum flow fraction
 
     // VAV change over bypass no reheat get input test
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat", state->dataSingleDuct->sd_airterminal(4).SysType); // VAV HeatCool NoReheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat", state->dataSingleDuct->sd_airterminal(4).sysType); // VAV HeatCool NoReheat Type
     EXPECT_EQ("VAV CBP NOREHEAT AT", state->dataSingleDuct->sd_airterminal(4).SysName);                             // VAV HeatCool NoReheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(4).ZoneTurndownMinAirFracSchExist);                           // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(4).ZoneTurndownMinAirFrac, 1.0);                                // initialized to 1.0
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(4).ZoneMinAirFracDes, 0.15);                                    // design minimum flow fraction
 
     // VAV reheat variable speed fan get input test
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", state->dataSingleDuct->sd_airterminal(5).SysType); // VAV Reheat VSFan Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", state->dataSingleDuct->sd_airterminal(5).sysType); // VAV Reheat VSFan Type
     EXPECT_EQ("VAV REHEAT VS FAN", state->dataSingleDuct->sd_airterminal(5).SysName);                                  // VAV Reheat VSFan Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(5).ZoneTurndownMinAirFracSchExist);                              // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(5).ZoneTurndownMinAirFrac, 1.0);                                   // initialized to 1.0
@@ -1041,7 +1041,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     // check VAV reheat air terminal inputs
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat", state->dataSingleDuct->sd_airterminal(SysNum).SysType); // VAV Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat", state->dataSingleDuct->sd_airterminal(SysNum).sysType); // VAV Reheat Type
     EXPECT_EQ("VAV REHEAT AT", state->dataSingleDuct->sd_airterminal(SysNum).SysName);                     // VAV Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist);             // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac, 1.0);                  // initialized to 1.0
@@ -1250,7 +1250,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     // check VAV reheat air terminal inputs
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", state->dataSingleDuct->sd_airterminal(SysNum).SysType); // VAV Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", state->dataSingleDuct->sd_airterminal(SysNum).sysType); // VAV Reheat Type
     EXPECT_EQ("VAV REHEAT VS FAN AT", state->dataSingleDuct->sd_airterminal(SysNum).SysName);                               // VAV Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist);                              // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac, 1.0);                                   // initialized to 1.0
@@ -1426,7 +1426,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     // check VAV heatcool reheat air terminal inputs
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", state->dataSingleDuct->sd_airterminal(SysNum).SysType); // VAV HeatCool Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", state->dataSingleDuct->sd_airterminal(SysNum).sysType); // VAV HeatCool Reheat Type
     EXPECT_EQ("VAV CBP GAS REHEAT AT", state->dataSingleDuct->sd_airterminal(SysNum).SysName);                         // VAV HeatCool Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist);                         // turndown schdule exists
     EXPECT_EQ(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFrac, 1.0);                              // initialized to 1.0
@@ -1617,7 +1617,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     auto &thisAirTerminalOutlet = state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet;
 
     // check VAV reheat VS Fan air terminal inputs
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", thisAirTerminal.SysType);
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", thisAirTerminal.sysType);
     EXPECT_EQ("VAV RHT VS FAN AIRTERM", thisAirTerminal.SysName);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisAirTerminal.ReheatComp);
     EXPECT_EQ("ZONE 1 REHEAT COIL", thisAirTerminal.ReheatName);
@@ -1760,7 +1760,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
 
     EXPECT_TRUE(compare_err_stream(""));
     // check VAV heatcool reheat air terminal inputs
-    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", thisHeatCoolAT.SysType); // VAV HeatCool Reheat Type
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat", thisHeatCoolAT.sysType); // VAV HeatCool Reheat Type
     EXPECT_EQ("VAV CBP GAS REHEAT AT", thisHeatCoolAT.SysName);                         // VAV HeatCool Reheat Name
     EXPECT_EQ(thisHeatCoolAT.MaxAirVolFlowRate, 1.0);                                   // input from VAV HeatCool reheat air terminal
     ;

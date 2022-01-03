@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -396,7 +396,7 @@ namespace FanCoilUnits {
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsParent); // air input node
 
             FanCoil(FanCoilNum).AirOutNode = GetOnlySingleNode(state,
@@ -406,7 +406,7 @@ namespace FanCoilUnits {
                                                                Alphas(1),
                                                                DataLoopNode::NodeFluidType::Air,
                                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                               NodeInputManager::compFluidStream::Primary,
+                                                               NodeInputManager::CompFluidStream::Primary,
                                                                ObjectIsParent); // air outlet node
 
             FanCoil(FanCoilNum).OAMixType = Alphas(7);
@@ -1074,26 +1074,26 @@ namespace FanCoilUnits {
                                                                                          FanCoil(FanCoilNum).CCoilName,
                                                                                          FanCoil(FanCoilNum).CCoilType,
                                                                                          FanCoil(FanCoilNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          FanCoil(FanCoilNum).FanIndex);
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          FanCoil(FanCoilNum).HCoilName,
                                                                                          FanCoil(FanCoilNum).HCoilType,
                                                                                          FanCoil(FanCoilNum).FanName,
-                                                                                         DataAirSystems::objectVectorOOFanSystemModel,
+                                                                                         DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          FanCoil(FanCoilNum).FanIndex);
             } else {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          FanCoil(FanCoilNum).CCoilName,
                                                                                          FanCoil(FanCoilNum).CCoilType,
                                                                                          FanCoil(FanCoilNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          FanCoil(FanCoilNum).FanIndex);
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          FanCoil(FanCoilNum).HCoilName,
                                                                                          FanCoil(FanCoilNum).HCoilType,
                                                                                          FanCoil(FanCoilNum).FanName,
-                                                                                         DataAirSystems::structArrayLegacyFanModels,
+                                                                                         DataAirSystems::StructArrayLegacyFanModels,
                                                                                          FanCoil(FanCoilNum).FanIndex);
             }
         }
@@ -1482,13 +1482,13 @@ namespace FanCoilUnits {
         CompName = FanCoil(FanCoilNum).Name;
         state.dataSize->DataZoneNumber = FanCoil(FanCoilNum).ControlZoneNum;
         if (FanCoil(FanCoilNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = FanCoil(FanCoilNum).FanIndex;
         // fan coil unit is always blow thru
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
         auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 

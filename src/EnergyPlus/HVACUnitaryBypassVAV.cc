@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -457,7 +457,7 @@ namespace HVACUnitaryBypassVAV {
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsParent);
 
             MixerInletNodeName = Alphas(5);
@@ -470,7 +470,7 @@ namespace HVACUnitaryBypassVAV {
                                                                              Alphas(1),
                                                                              DataLoopNode::NodeFluidType::Air,
                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsParent);
 
             CBVAV(CBVAVNum).SplitterOutletAirNode = NodeInputManager::GetOnlySingleNode(state,
@@ -480,7 +480,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Internal,
-                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                         DataLoopNode::ObjectIsParent);
 
             if (NumAlphas > 19 && !lAlphaBlanks(20)) {
@@ -491,7 +491,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               Alphas(1),
                                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                               DataLoopNode::NodeConnectionType::Internal,
-                                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                               DataLoopNode::ObjectIsParent);
                 CBVAV(CBVAVNum).PlenumMixerInletAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                               Alphas(20),
@@ -500,7 +500,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               Alphas(1) + "_PlenumMixerInlet",
                                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                               DataLoopNode::ObjectIsParent);
             }
 
@@ -526,7 +526,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                     Alphas(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Internal,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsParent);
 
             CBVAV(CBVAVNum).MixerInletAirNode = NodeInputManager::GetOnlySingleNode(state,
@@ -536,7 +536,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                     Alphas(1) + "_Mixer",
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsParent);
 
             CBVAV(CBVAVNum).SplitterOutletAirNode = NodeInputManager::GetOnlySingleNode(state,
@@ -546,7 +546,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                         Alphas(1) + "_Splitter",
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                         DataLoopNode::ObjectIsParent);
 
             CBVAV(CBVAVNum).OAMixType = Alphas(8);
@@ -1571,9 +1571,9 @@ namespace HVACUnitaryBypassVAV {
             // check for set point manager on outlet node of CBVAV
             CBVAV(CBVAVNum).OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(state,
                                                                                  OutNode,
-                                                                                 SetPointManager::iCtrlVarType::Temp,
+                                                                                 SetPointManager::CtrlVarType::Temp,
                                                                                  SetPointManager::SetPointManagerType::MixedAir,
-                                                                                 SetPointManager::CtrlNodeType::reference);
+                                                                                 SetPointManager::CtrlNodeType::Reference);
             state.dataHVACUnitaryBypassVAV->MySizeFlag(CBVAVNum) = false;
         }
 
@@ -1871,7 +1871,7 @@ namespace HVACUnitaryBypassVAV {
                         // need call to EMS to check node
                         EMSSetPointCheck = false;
                         EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, OutNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointCheck);
+                            state, OutNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointCheck);
                         bool foundControl = state.dataLoopNodes->NodeSetpointCheck(OutNode).needsSetpointChecking = false;
                         if (EMSSetPointCheck) {
                             // There is no plugin anyways, so we now we have a bad condition.
@@ -2051,15 +2051,15 @@ namespace HVACUnitaryBypassVAV {
         if (curSysNum > 0 && curOASysNum == 0) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanVecIndex = CBVAV(CBVAVNum).FanIndex;
-                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
             } else {
                 state.dataAirSystemsData->PrimaryAirSystems(curSysNum).SupFanNum = CBVAV(CBVAVNum).FanIndex;
-                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
             }
             if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::BlowThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
             } else if (CBVAV(CBVAVNum).FanPlace == DataHVACGlobals::DrawThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(curSysNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
             }
         }
 

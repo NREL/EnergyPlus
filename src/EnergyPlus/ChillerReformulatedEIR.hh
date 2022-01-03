@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,9 +67,10 @@ namespace ChillerReformulatedEIR {
 
     enum class PLR
     {
-        Unassigned,
+        Invalid = -1,
         LeavingCondenserWaterTemperature, // Type 1_LeavingCondenserWaterTemperature
-        Lift                              // Type 2_Lift
+        Lift,                             // Type 2_Lift
+        Num
     };
 
     struct ReformulatedEIRChillerSpecs : PlantComponent
@@ -218,16 +219,16 @@ namespace ChillerReformulatedEIR {
         Real64 EnergyHeatRecovery; // Energy recovered from water-cooled condenser [J]
         Real64 HeatRecInletTemp;   // Heat reclaim inlet temperature [C]
         Real64 HeatRecMassFlow;    // Heat reclaim mass flow rate [kg/s]
-        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlType EquipFlowCtrl;
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0),
-              RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
-              ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
-              CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
-              CondInletNodeNum(0), CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0),
-              TempRefCondIn(0.0), TempRefCondOut(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Invalid), PartLoadCurveType(PLR::Invalid), RefCap(0.0), RefCapWasAutoSized(false),
+              RefCOP(0.0), FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),
+              CondMassFlowRateMax(0.0), CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
+              CondOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0), TempRefCondIn(0.0),
+              TempRefCondOut(0.0), TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
               DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), SizFac(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
               HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
               HeatRecInletLimitSchedNum(0), ChillerCapFTIndex(0), ChillerEIRFTIndex(0), ChillerEIRFPLRIndex(0), ChillerCapFTError(0),
@@ -246,7 +247,7 @@ namespace ChillerReformulatedEIR {
               ChillerCapFT(0.0), HeatRecOutletTemp(0.0), QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0),
               CondOutletTemp(0.0), EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
               CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecMassFlow(0.0),
-              EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              EquipFlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid)
         {
         }
 

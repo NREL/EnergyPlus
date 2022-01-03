@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -330,7 +330,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                  Alphas(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
         state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                                   Alphas(7),
@@ -339,7 +339,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                   Alphas(1),
                                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                   DataLoopNode::ObjectIsNotParent);
         if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");
@@ -422,7 +422,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                           "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
         ErrorsFound = true;
         // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-    } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) {
+    } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) {
         ShowSevereError(state,
                         state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "

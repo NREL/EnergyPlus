@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown));
+            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Invalid));
         } else if (equip.Name == "OTHEREQ2") {
             ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse));
         }
@@ -660,7 +660,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
-    int numGainTypes = static_cast<int>(DataHeatBalance::IntGainType::NUM);
+    int numGainTypes = static_cast<int>(DataHeatBalance::IntGainType::Num);
     Array1D<Real64> convGains({0, numGainTypes - 1});
     convGains = 0.0;
     Real64 totConvGains = 0.0;

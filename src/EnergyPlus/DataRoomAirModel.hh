@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,15 +70,16 @@ namespace DataRoomAirModel {
     // Parameters to indicate room air model selected
     enum class RoomAirModel : int
     {
-        Unassigned = -1,
-        UserDefined,   // user defined patterns
-        Mixing,        // mixing air model
-        Mundt,         // Mundt nodal model
-        UCSDDV,        // UCSD Displacement Ventilation model
-        UCSDCV,        // UCSD-CV
-        UCSDUFI,       // UCSD UFAD interior zone model
-        UCSDUFE,       // UCSD UFAD exterior zone model
-        AirflowNetwork // RoomAirModel_AirflowNetwork interior zone model
+        Invalid = -1,
+        UserDefined,    // user defined patterns
+        Mixing,         // mixing air model
+        Mundt,          // Mundt nodal model
+        UCSDDV,         // UCSD Displacement Ventilation model
+        UCSDCV,         // UCSD-CV
+        UCSDUFI,        // UCSD UFAD interior zone model
+        UCSDUFE,        // UCSD UFAD exterior zone model
+        AirflowNetwork, // RoomAirModel_AirflowNetwork interior zone model
+        Num
     };
     constexpr const char *ChAirModel[] = {
         "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
@@ -86,15 +87,16 @@ namespace DataRoomAirModel {
     // Parameters to indicate air temperature coupling scheme
     enum class CouplingScheme : int
     {
-        Unassigned = -1,
+        Invalid = -1,
         Direct,
-        Indirect
+        Indirect,
+        Num
     };
 
     // Parameters to indicate type of air node, which is dependent on air models
     enum class AirNodeType
     {
-        Unassigned = -1,
+        Invalid = -1,
         InletAirNode,              // air node at inlet (for Mundt and Rees&Haves Models)
         FloorAirNode,              // air node at floor (for Mundt and Rees&Haves Models)
         ControlAirNode,            // air node at control point (for Mundt Model)
@@ -103,46 +105,51 @@ namespace DataRoomAirModel {
         ReturnAirNode,             // air node for return (for Mundt and Rees&Haves Models)
         AirflowNetworkRoomAirNode, // air node for airflow network based room air model
         PlumeAirNode,              // air node for plume load (for Rees&Haves Model)
-        RoomAirNode                // air node for vertical walls (for Rees&Haves Model)
+        RoomAirNode,               // air node for vertical walls (for Rees&Haves Model)
+        Num
     };
 
     // user-defined pattern two gradient interpolation modes
     enum class UserDefinedPatternMode
     {
-        Unassigned,
+        Invalid = -1,
         OutdoorDryBulbMode,  // by outdoor air bulb.
         SensibleCoolingMode, // by sensible cooling load
         SensibleHeatingMode, // by sensible heating load
         ZoneAirTempMode,     // by zone air temperature
-        DeltaOutdoorZone     // by difference between zone and outdoor
+        DeltaOutdoorZone,    // by difference between zone and outdoor
+        Num
     };
 
     // user defined temperature pattern types
     enum class UserDefinedPatternType
     {
-        Unassigned,
+        Invalid = -1,
         ConstGradTempPattern,  // constant gradient in vertical direction
         TwoGradInterpPattern,  // two gradient interpolation
         NonDimenHeightPattern, // non-dimensionalized height
-        SurfMapTempPattern     // arbitrary surface mappings
+        SurfMapTempPattern,    // arbitrary surface mappings
+        Num
     };
 
     // parameters to indicate diffuser type
     enum class Diffuser
     {
-        Unassigned,
+        Invalid = -1,
         Swirl,
         VarArea,
         DisplVent,
         LinBarGrille,
-        Custom
+        Custom,
+        Num
     };
 
     enum class Comfort
     {
-        VComfort_Invalid,
-        VComfort_Jet,
-        VComfort_Recirculation
+        Invalid = -1,
+        Jet,
+        Recirculation,
+        Num
     };
 
     struct AirModelData
@@ -178,7 +185,7 @@ namespace DataRoomAirModel {
         bool IsZone;               // TRUE if this node is zone node
 
         // Default Constructor
-        AirNodeData() : ZonePtr(0), ClassType(AirNodeType::Unassigned), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
+        AirNodeData() : ZonePtr(0), ClassType(AirNodeType::Invalid), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
         {
         }
     };
@@ -212,7 +219,7 @@ namespace DataRoomAirModel {
         // for comfort models
 
         // Default Constructor
-        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::VComfort_Invalid)
+        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::Invalid)
         {
         }
     };
@@ -283,8 +290,8 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFIData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0),
-              CalcTransHeight(false), A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Invalid), TransHeight(0.0), CalcTransHeight(false),
+              A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
         {
         }
     };
@@ -320,8 +327,8 @@ namespace DataRoomAirModel {
         // Default Constructor
         UFEData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0),
-              CalcTransHeight(false), A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Invalid), TransHeight(0.0), CalcTransHeight(false),
+              A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
         {
         }
     };
@@ -374,7 +381,7 @@ namespace DataRoomAirModel {
         // Default Constructor
         TwoVertGradInterpolPattern()
             : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0),
-              InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Unassigned), UpperBoundTempScale(0.0), LowerBoundTempScale(0.0),
+              InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Invalid), UpperBoundTempScale(0.0), LowerBoundTempScale(0.0),
               UpperBoundHeatRateScale(0.0), LowerBoundHeatRateScale(0.0)
         {
         }
@@ -407,8 +414,7 @@ namespace DataRoomAirModel {
         Real64 DeltaTexhaust;                    // (Texhaust - MAT) deg C
 
         // Default Constructor
-        TemperaturePatternStruct()
-            : PatrnID(0), PatternMode(UserDefinedPatternType::Unassigned), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
+        TemperaturePatternStruct() : PatrnID(0), PatternMode(UserDefinedPatternType::Invalid), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
         {
         }
     };
@@ -490,7 +496,7 @@ namespace DataRoomAirModel {
 
         // Default Constructor
         RoomAirflowNetworkNodeInternalGainsStruct()
-            : Type(DataHeatBalance::IntGainType::Unassigned), UseRoomAirModelTempForGains(false), FractionCheck(false)
+            : Type(DataHeatBalance::IntGainType::Invalid), UseRoomAirModelTempForGains(false), FractionCheck(false)
         {
         }
     };

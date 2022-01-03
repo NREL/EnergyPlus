@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,43 +74,47 @@ namespace PackagedTerminalHeatPump {
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // Last mode of operation
-    enum class iCompMode
+    enum class CompMode
     {
-        Unassigned,
+        Invalid = -1,
         CoolingMode, // last compressor operating mode was in cooling
         HeatingMode, // last compressor operating mode was in heating
+        Num
     };
 
     // Airflow control for constant fan mode
-    enum class iAirflowCtrlMode
+    enum class AirflowCtrlMode
     {
-        Unassigned,
+        Invalid = -1,
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+        Num
     };
 
     // Unit type
-    enum class iPTHPType
+    enum class PTHPType
     {
-        Unassigned,
+        Invalid = -1,
         PTHPUnit,   // equivalent to PackagedTerminal:HeatPump:AirToAir
         PTACUnit,   // equivalent to PackagedTerminal:AirConditioner
         PTWSHPUnit, // equivalent to WaterToAirHeatPump
+        Num
     };
 
     // control type
-    enum class iCtrlType
+    enum class PTHPCtrlType
     {
-        Unassigned,
+        Invalid = -1,
         None,       // no special capacity control
         CCM_ASHRAE, // capacity control based on ASHRAE Standard 90.1
+        Num
     };
 
     struct PTUnitData
     {
         // Members
         // input data
-        iPTHPType UnitType_Num;                     // parameter equivalent to type of unit
+        PTHPType UnitType_Num;                      // parameter equivalent to type of unit
         DataZoneEquipment::ZoneEquip ZoneEquipType; // Type of PT unit
         bool useVSCoilModel;                        // does PT use VS coil models
         int SchedPtr;                               // index number to availability schedule
@@ -190,43 +194,43 @@ namespace PackagedTerminalHeatPump {
         int ATMixerSecNode;      // secondary air inlet node number for the air terminal mixer
         int ATMixerOutNode;      // outlet air node number for the air terminal mixer
         // Report data
-        Real64 TotHeatEnergyRate;        // total heating output [W]
-        Real64 TotHeatEnergy;            // total heating output [J]
-        Real64 TotCoolEnergyRate;        // total cooling output [W]
-        Real64 TotCoolEnergy;            // total cooling output [J]
-        Real64 SensHeatEnergyRate;       // sensible heating output [W]
-        Real64 SensHeatEnergy;           // sensible heating output [J]
-        Real64 SensCoolEnergyRate;       // sensible cooling output [W]
-        Real64 SensCoolEnergy;           // sensible cooling output [J]
-        Real64 LatHeatEnergyRate;        // latent heating output [W]
-        Real64 LatHeatEnergy;            // latent heating output [J]
-        Real64 LatCoolEnergyRate;        // latent cooling output [W]
-        Real64 LatCoolEnergy;            // latent cooling output [J]
-        Real64 ElecPower;                // electricity consumed [W]
-        Real64 ElecConsumption;          // electricity consumed [J]
-        Real64 CompPartLoadRatio;        // compressor part-load ratio for time step
-        iCompMode LastMode;              // last mode of operation, coolingmode or heatingmode
-        iAirflowCtrlMode AirFlowControl; // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
-        iCtrlType ControlType;           // Setpoint, Load based or ASHRAE (SZVAV) control
-        bool validASHRAECoolCoil;        // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
-        bool validASHRAEHeatCoil;        // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
-        bool simASHRAEModel;             // flag denoting that ASHRAE model (SZVAV) should be used
-        Real64 CompPartLoadFrac;         // compressor part load ratio
-        int PlantCoilOutletNode;         // outlet node for water coil
-        int SuppCoilLoopNum;             // plant loop index for water heating coil
-        int SuppCoilLoopSide;            // plant loop side  index for water heating coil
-        int SuppCoilBranchNum;           // plant loop branch index for water heating coil
-        int SuppCoilCompNum;             // plant loop component index for water heating coil
-        Real64 MaxSuppCoilFluidFlow;     // water or steam mass flow rate supp. heating coil [kg/s]
-        int HotWaterCoilMaxIterIndex;    // Index to recurring warning message
-        int HotWaterCoilMaxIterIndex2;   // Index to recurring warning message
-        Real64 ActualFanVolFlowRate;     // Volumetric flow rate from fan object
-        Real64 HeatingSpeedRatio;        // Fan speed ratio in heating mode
-        Real64 CoolingSpeedRatio;        // Fan speed ratio in cooling mode
-        Real64 NoHeatCoolSpeedRatio;     // Fan speed ratio when no cooling or heating
+        Real64 TotHeatEnergyRate;       // total heating output [W]
+        Real64 TotHeatEnergy;           // total heating output [J]
+        Real64 TotCoolEnergyRate;       // total cooling output [W]
+        Real64 TotCoolEnergy;           // total cooling output [J]
+        Real64 SensHeatEnergyRate;      // sensible heating output [W]
+        Real64 SensHeatEnergy;          // sensible heating output [J]
+        Real64 SensCoolEnergyRate;      // sensible cooling output [W]
+        Real64 SensCoolEnergy;          // sensible cooling output [J]
+        Real64 LatHeatEnergyRate;       // latent heating output [W]
+        Real64 LatHeatEnergy;           // latent heating output [J]
+        Real64 LatCoolEnergyRate;       // latent cooling output [W]
+        Real64 LatCoolEnergy;           // latent cooling output [J]
+        Real64 ElecPower;               // electricity consumed [W]
+        Real64 ElecConsumption;         // electricity consumed [J]
+        Real64 CompPartLoadRatio;       // compressor part-load ratio for time step
+        CompMode LastMode;              // last mode of operation, coolingmode or heatingmode
+        AirflowCtrlMode AirFlowControl; // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
+        PTHPCtrlType controlType;       // Setpoint, Load based or ASHRAE (SZVAV) control
+        bool validASHRAECoolCoil;       // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
+        bool validASHRAEHeatCoil;       // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
+        bool simASHRAEModel;            // flag denoting that ASHRAE model (SZVAV) should be used
+        Real64 CompPartLoadFrac;        // compressor part load ratio
+        int PlantCoilOutletNode;        // outlet node for water coil
+        int SuppCoilLoopNum;            // plant loop index for water heating coil
+        int SuppCoilLoopSide;           // plant loop side  index for water heating coil
+        int SuppCoilBranchNum;          // plant loop branch index for water heating coil
+        int SuppCoilCompNum;            // plant loop component index for water heating coil
+        Real64 MaxSuppCoilFluidFlow;    // water or steam mass flow rate supp. heating coil [kg/s]
+        int HotWaterCoilMaxIterIndex;   // Index to recurring warning message
+        int HotWaterCoilMaxIterIndex2;  // Index to recurring warning message
+        Real64 ActualFanVolFlowRate;    // Volumetric flow rate from fan object
+        Real64 HeatingSpeedRatio;       // Fan speed ratio in heating mode
+        Real64 CoolingSpeedRatio;       // Fan speed ratio in cooling mode
+        Real64 NoHeatCoolSpeedRatio;    // Fan speed ratio when no cooling or heating
         int AvailStatus;
         // starting added varibles for variable speed water source heat pump, Bo Shen, ORNL, March 2012
-        iCompMode HeatCoolMode;              // System operating mode (0 = floating, 1 = cooling, 2 = heating)
+        CompMode HeatCoolMode;               // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         int NumOfSpeedCooling;               // The number of speeds for cooling
         int NumOfSpeedHeating;               // The number of speeds for heating
         Real64 IdleSpeedRatio;               // idle air fan ratio
@@ -292,7 +296,7 @@ namespace PackagedTerminalHeatPump {
 
         // Default Constructor
         PTUnitData()
-            : UnitType_Num(iPTHPType::Unassigned), ZoneEquipType(DataZoneEquipment::ZoneEquip::Unassigned), useVSCoilModel(false), SchedPtr(0),
+            : UnitType_Num(PTHPType::Invalid), ZoneEquipType(DataZoneEquipment::ZoneEquip::Invalid), useVSCoilModel(false), SchedPtr(0),
               MaxCoolAirVolFlow(0.0), MaxHeatAirVolFlow(0.0), MaxNoCoolHeatAirVolFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0),
               NoCoolHeatOutAirVolFlow(0.0), CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutsideAirNode(0),
               AirReliefNode(0), OAMixIndex(0), FanType_Num(0), FanIndex(0), FanSchedPtr(0), FanAvailSchedPtr(0), DXCoolCoilType_Num(0),
@@ -305,12 +309,12 @@ namespace PackagedTerminalHeatPump {
               ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), TotHeatEnergyRate(0.0), TotHeatEnergy(0.0),
               TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0),
               LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0),
-              CompPartLoadRatio(0.0), LastMode(iCompMode::Unassigned), AirFlowControl(iAirflowCtrlMode::Unassigned),
-              ControlType(iCtrlType::Unassigned), validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false),
-              CompPartLoadFrac(0.0), PlantCoilOutletNode(0), SuppCoilLoopNum(0), SuppCoilLoopSide(0), SuppCoilBranchNum(0), SuppCoilCompNum(0),
-              MaxSuppCoilFluidFlow(0.0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0),
-              CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(iCompMode::Unassigned), NumOfSpeedCooling(0),
-              NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
+              CompPartLoadRatio(0.0), LastMode(CompMode::Invalid), AirFlowControl(AirflowCtrlMode::Invalid), controlType(PTHPCtrlType::Invalid),
+              validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false), CompPartLoadFrac(0.0), PlantCoilOutletNode(0),
+              SuppCoilLoopNum(0), SuppCoilLoopSide(0), SuppCoilBranchNum(0), SuppCoilCompNum(0), MaxSuppCoilFluidFlow(0.0),
+              HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
+              NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(CompMode::Invalid), NumOfSpeedCooling(0), NumOfSpeedHeating(0),
+              IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
               HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
               CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
               MSHeatingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), MSCoolingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),

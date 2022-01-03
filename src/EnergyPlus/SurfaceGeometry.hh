@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -309,7 +309,7 @@ namespace SurfaceGeometry {
     DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
                                                                            std::vector<Vector> const &uniqVertices);
 
-    void insertVertexOnFace(DataVectorTypes::Face &face, int const &indexBefore, DataVectorTypes::Vector const &vertexToInsert);
+    void insertVertexOnFace(DataVectorTypes::Face &face, int indexBefore, DataVectorTypes::Vector const &vertexToInsert);
 
     bool areFloorAndCeilingSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
@@ -322,11 +322,11 @@ namespace SurfaceGeometry {
                               Real64 &oppositeWallArea,
                               Real64 &distanceBetweenOppositeWalls);
 
-    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 const &azimuth);
+    std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 azimuth);
 
-    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex);
+    int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int faceIndex);
 
-    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const &faceIndex, int const &opFaceIndex, Real64 &distanceBetween);
+    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int faceIndex, int opFaceIndex, Real64 &distanceBetween);
 
     bool isAlmostEqual3dPt(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
 
@@ -384,7 +384,7 @@ namespace SurfaceGeometry {
     void
     SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
                                     Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
-                                    SurfaceGeometry::enclosureType const &EnclosureType,                            // Radiant or Solar
+                                    SurfaceGeometry::enclosureType EnclosureType,                                   // Radiant or Solar
                                     bool &ErrorsFound);                                                             // Set to true if errors found
 
     void CheckConvexity(EnergyPlusData &state,

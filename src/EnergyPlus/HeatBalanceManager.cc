@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -689,7 +689,7 @@ namespace HeatBalanceManager {
             }
             // Solar Distribution
             if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || state.dataSysVars->lMinimalShadowing) {
-                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::MinimalShadowing;
+                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::Minimal;
                 AlphaName(3) = "MinimalShadowing";
                 state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIOR" || AlphaName(3) == "0") {
@@ -927,15 +927,15 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(AlphaName(1));
                 // The default is CTF
                 if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
 
                 } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::EMPD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::EMPD;
                     state.dataHeatBal->AnyEMPD = true;
                     state.dataHeatBal->AllCTF = false;
                 } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CondFD;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CondFD;
                     state.dataHeatBal->AnyCondFD = true;
                     state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -951,7 +951,7 @@ namespace HeatBalanceManager {
                     }
 
                 } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::HAMT;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::HAMT;
                     state.dataHeatBal->AnyHAMT = true;
                     state.dataHeatBal->AllCTF = false;
                     if (state.dataGlobal->NumOfTimeStepInHour < 20) {
@@ -970,7 +970,7 @@ namespace HeatBalanceManager {
                     }
 
                 } else {
-                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
+                    state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
                     state.dataHeatBal->AnyCTF = true;
                 }
             }
@@ -993,7 +993,7 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
+            state.dataHeatBal->OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF;
             state.dataHeatBal->AnyCTF = true;
             state.dataHeatBalSurf->MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
             state.dataHeatBalSurf->MaxSurfaceTempLimitBeforeFatal = state.dataHeatBalSurf->MaxSurfaceTempLimit * 2.5;
@@ -1219,7 +1219,7 @@ namespace HeatBalanceManager {
                                           BITF(AdjustmentType::AdjustMixingThenReturn) | BITF(AdjustmentType::AdjustReturnThenMixing))) {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                     }
-                    if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == AdjustmentType::Unassigned) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == AdjustmentType::Invalid) {
                         state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = AdjustmentType::NoAdjustReturnAndMixing;
                         AlphaName(1) = "None";
                         ShowWarningError(state,
@@ -1240,7 +1240,7 @@ namespace HeatBalanceManager {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
                             state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
-                    } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Unassigned) {
+                    } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Invalid) {
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
@@ -1262,7 +1262,7 @@ namespace HeatBalanceManager {
                         int FlowTypeNum = getEnumerationValue(InfiltrationZoneTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(3)));
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = static_cast<DataHeatBalance::InfiltrationZoneType>(FlowTypeNum);
                         AlphaName(3) = InfiltrationZoneTypeNamesCC[FlowTypeNum];
-                        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Unassigned) {
+                        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Invalid) {
                             state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = DataHeatBalance::InfiltrationZoneType::MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
                             ShowWarningError(state,
@@ -4395,7 +4395,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
 
         // Was it set?
-        if (state.dataMaterial->Material(MaterNum).Roughness == DataSurfaces::SurfaceRoughness::Unassigned) {
+        if (state.dataMaterial->Material(MaterNum).Roughness == DataSurfaces::SurfaceRoughness::Invalid) {
             ShowSevereError(state, "Material=" + state.dataMaterial->Material(MaterNum).Name + ",Illegal Roughness=" + Roughness);
             ErrorsFound = true;
         }
@@ -5259,7 +5259,7 @@ namespace HeatBalanceManager {
                                             state.dataIPShortCut->cAlphaArgs(1),
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Inlet,
-                                            NodeInputManager::compFluidStream::Primary,
+                                            NodeInputManager::CompFluidStream::Primary,
                                             ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                     ShowSevereError(state,
@@ -6496,14 +6496,14 @@ namespace HeatBalanceManager {
 
         if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DoOutputReporting) {
             CalcMoreNodeInfo(state);
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
                     state.dataHVACSizingSimMgr->hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
-            UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateTabularReports(state, OutputProcessor::TimeStepType::Zone);
             UpdateUtilityBills(state);
         } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && state.dataSysVars->ReportDuringWarmup) {
             if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
@@ -6541,7 +6541,7 @@ namespace HeatBalanceManager {
                 }
             }
             CalcMoreNodeInfo(state);
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
@@ -6549,7 +6549,7 @@ namespace HeatBalanceManager {
             }
 
         } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::Zone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                 if (state.dataHVACSizingSimMgr->hvacSizingSimulationManager)
@@ -7180,8 +7180,8 @@ namespace HeatBalanceManager {
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataHeatBal->TotMaterials; ++loop) {
                 state.dataMaterial->Material(loop).Name = "";
-                state.dataMaterial->Material(loop).Group = DataHeatBalance::MaterialGroup::Unassigned;
-                state.dataMaterial->Material(loop).Roughness = DataSurfaces::SurfaceRoughness::Unassigned;
+                state.dataMaterial->Material(loop).Group = DataHeatBalance::MaterialGroup::Invalid;
+                state.dataMaterial->Material(loop).Roughness = DataSurfaces::SurfaceRoughness::Invalid;
                 state.dataMaterial->Material(loop).Conductivity = 0.0;
                 state.dataMaterial->Material(loop).Density = 0.0;
                 state.dataMaterial->Material(loop).IsoMoistCap = 0.0;
