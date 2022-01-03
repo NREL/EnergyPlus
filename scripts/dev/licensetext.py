@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -58,6 +58,7 @@ import textwrap
 import json
 import glob
 import re
+import sys
 
 #
 # The previous year that is in the license. It should be a string
@@ -127,11 +128,25 @@ _original = """// EnergyPlus, Copyright (c) 1996-2015, The Board of Trustees of 
 // in binary and source code form.
 """
 
+# This is probably not awesome, but it gets it done for now
+error_output = sys.stdout
 
-def error(dictionary):
-    '''Default method for output of JSON-style messages for decent_ci.'''
-    print(json.dumps(dictionary))
+def error_json(dictionary):
+    '''Function for output of JSON-style messages for decent_ci.'''
+    error_output.write(json.dumps(dictionary) + '\n')
 
+def error_for_humans(dictionary):
+    '''Function for output of more human friendly messages.'''
+    tool = dictionary.get('tool', 'UNKNOWN')
+    mesg = dictionary.get('message', 'An unknown error has occurred')
+    if 'file' in dictionary and 'line' in dictionary:
+        error_output.write('%s(%s, line %d): %s\n' % (tool, dictionary['file'],
+                                                      dictionary['line'], mesg))
+    else:
+        error_output.write('%s(%s, line %d): %s\n' % (tool, mesg))
+
+# This is also probably not awesome, but same deal
+report_error = error_json
 
 def merge_paragraphs(text):
     '''Merge license text lines into a single line per paragraph.'''
@@ -148,7 +163,8 @@ def merge_paragraphs(text):
     return '\n'.join(lines) + '\n'
 
 
-def pythonize(text, line_limit=79, toolname='unspecified', message=error):
+def pythonize(text, line_limit=79, toolname='unspecified',
+              message=report_error):
     '''Convert the C++ comment text into Python comments'''
     paragraphs = [el for el in merge_paragraphs(text).splitlines() if el != '']
     if len(paragraphs) != 8 or line_limit < 7:
@@ -250,7 +266,7 @@ def original():
 
 
 def check_license(filename, possible, correct, offset=0,
-                  toolname='unspecified', message=error):
+                  toolname='unspecified', message=report_error):
     '''Check for a few of the usual issues with the license'''
     if possible == correct:
         return True
@@ -312,11 +328,7 @@ class FileVisitor:
         if exclude_patterns is not None:
             for pattern in exclude_patterns:
                 matcher = re.compile(pattern)
-                # original = results[:]
                 results = [el for el in results if not matcher.match(el)]
-                # for file in original:
-                #    if not file in results:
-                #        print('Skipping ' + file)
         return results
 
     def visit_file(self, filepath):
@@ -367,7 +379,7 @@ class Checker(FileVisitor):
                       'line': line_number,
                       'messagetype': 'error',
                       'message': mesg}
-        print(json.dumps(dictionary))
+        report_error(dictionary)
 
     def visit_file(self, filepath):
         txt = self.readtext(filepath)
@@ -381,7 +393,8 @@ class Checker(FileVisitor):
                 shortened = '\n'.join(lines) + '\n'
                 success = check_license(filepath, shortened, self.text,
                                         offset=self.offset,
-                                        toolname=self.toolname, message=error)
+                                        toolname=self.toolname,
+                                        message=report_error)
                 return success
             else:
                 if n > 1:

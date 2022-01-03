@@ -56,11 +56,12 @@
 #
 # Use this script to update the license text
 #
-# Directions: First, check that the "dryrun" parameter below is set to True.
-# This will run the script and check the files but will not actually make any
-# changes. There are large number of files, so it's best to make sure that
-# everything makes sense before actually making the change. Next, execute the
-# script from the root of the EnergyPlus source tree:
+# Directions: These directions assume you're working on a branch. First, check
+# that the "dryrun" parameter below is set to True. This will run the script
+# and check the files but will not actually make any changes. There are large
+# number of files, so it's best to make sure that everything makes sense before
+# actually making the change. Next, execute the script from the root of the
+# EnergyPlus source tree:
 #
 #   $> python ./scripts/dev/license-update.py
 #   Skipping writing out LICENSE.txt
@@ -88,8 +89,13 @@
 #   Checked 809 files
 #   Replaced text in 809 files
 #
-# Finally, change the "dryrun" parameter back to "True".
+# Finally, change the "dryrun" parameter back to "True". Commit your changes
+# and you're done.
 #
+# Keep in mind that this was originally written to handle C++ alone within the
+# context of decent_ci. Python support came much later, so there are some
+# things (like how files and exclusions are handled) that are a little less
+# than uniform.
 
 import licensetext
 

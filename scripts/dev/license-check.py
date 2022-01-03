@@ -59,6 +59,8 @@ import sys
 import os
 
 TOOL_NAME = 'license-check'
+# Switch to more human-friendly output
+licensetext.report_error = licensetext.error_for_humans
 
 #
 # Directories to check
