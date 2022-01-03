@@ -1019,7 +1019,7 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
 
     if (state.dataLoopNodes->Node(OutletNodeNum).Temp != ModelOutletTemp) DidAnythingChange = true;
 
-    // could also check heat rate agains McDeltaT from node data
+    // could also check heat rate against McDeltaT from node data
 
     if ((state.dataLoopNodes->Node(InletNodeNum).MassFlowRate == 0.0) && (ModelCondenserHeatRate > 0.0)) {
 
