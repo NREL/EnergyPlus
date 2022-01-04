@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -491,7 +491,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
 
         } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleCoolingMode) {
 
-            CoolLoad = state.dataHeatBal->SNLoadCoolRate(ZoneNum);
+            CoolLoad = state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum);
             if (CoolLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
                 Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
@@ -515,7 +515,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
 
         } else if (SELECT_CASE_var == DataRoomAirModel::UserDefinedPatternMode::SensibleHeatingMode) {
 
-            HeatLoad = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
+            HeatLoad = state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum);
             if (HeatLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
                 Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
@@ -655,7 +655,7 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
     Real64 FigureNDheightInZone;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const TolValue(0.0001);
+    Real64 constexpr TolValue(0.0001);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int thisZone;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -553,8 +553,8 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds)
     state->dataPowerInductionUnits->PIU.allocate(1);
     int PIUNum = 1;
     state->dataPowerInductionUnits->PIU(PIUNum).Name = "Series PIU";
-    state->dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
-    state->dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num = PoweredInductionUnits::iHCoilType::Electric;
+    state->dataPowerInductionUnits->PIU(PIUNum).UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
+    state->dataPowerInductionUnits->PIU(PIUNum).HCoilType = PoweredInductionUnits::HtgCoilType::Electric;
 
     // Go into all of the autosize blocks (aside from Heating/Steam coils)
     state->dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow = AutoSize;
@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     Real64 SecMassFlowAtPrimMax = thisSeriesAT.MaxTotAirMassFlow - PriMaxMassFlow;
 
     // Needs an airloop, assume 20% outdoor air
-    Real64 const AirLoopOAFraction = 0.20;
+    Real64 constexpr AirLoopOAFraction = 0.20;
     thisSeriesAT.AirLoopNum = 1;
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;

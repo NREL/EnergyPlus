@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,9 +60,9 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
         return 0.0;
     }
     Array1D<Real64> Par(4);
-    Real64 const Acc(0.0001); // Accuracy of result
-    int const MaxIte(500);    // Maximum number of iterations
-    int SolFla = 0;           // Flag of solver
+    Real64 constexpr Acc(0.0001); // Accuracy of result
+    int constexpr MaxIte(500);    // Maximum number of iterations
+    int SolFla = 0;               // Flag of solver
 
     this->preSize(state, _originalValue);
     if (this->curZoneEqNum > 0) {

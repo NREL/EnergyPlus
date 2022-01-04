@@ -60,5 +60,5 @@ If you are interested in contributing, please start there, but feel free to reac
 
 ## Building EnergyPlus
 
-A detailed description of compiling EnergyPlus on multiple platforms is available on the [wiki](https://github.com/NREL/EnergyPlus/wiki/BuildingEnergyPlus).
+A detailed description of compiling EnergyPlus on multiple platforms is available on the [wiki](https://github.com/NREL/EnergyPlus/wiki/Building-EnergyPlus).
 Also, as we are adapting to using Github Actions, the recipes for building EnergyPlus can be found in our [workflow files](https://github.com/NREL/EnergyPlus/tree/develop/.github/workflows).

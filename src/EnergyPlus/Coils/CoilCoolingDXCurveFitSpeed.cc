@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -452,10 +452,10 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
     Real64 inletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, inletNode.Temp, inletNode.HumRat, ambPressure);
     Real64 inletw = inletNode.HumRat;
 
-    int Counter = 0;              // iteration counter for dry coil condition
-    int const MaxIter(30);        // iteration limit
-    Real64 const Tolerance(0.01); // iteration convergence limit
-    Real64 RF = 0.4;              // relaxation factor for holding back changes in value during iteration
+    int Counter = 0;                  // iteration counter for dry coil condition
+    int constexpr MaxIter(30);        // iteration limit
+    Real64 constexpr Tolerance(0.01); // iteration convergence limit
+    Real64 RF = 0.4;                  // relaxation factor for holding back changes in value during iteration
     Real64 TotCap;
     Real64 SHR;
     while (true) {
@@ -584,7 +584,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
 {
 
     static constexpr std::string_view RoutineName("CalcBypassFactor: ");
-    Real64 const SmallDifferenceTest(0.00000001);
+    Real64 constexpr SmallDifferenceTest(0.00000001);
 
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
     Real64 calcCBF;
@@ -665,7 +665,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     Real64 adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(state, adp_tdb, DataEnvironment::StdPressureSeaLevel));
 
     int iter = 0;
-    int const maxIter(50);
+    int constexpr maxIter(50);
     Real64 errorLast = 100.0;
     Real64 deltaADPTemp = 5.0;
     Real64 tolerance = 1.0; // initial conditions for iteration

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,7 +87,7 @@ namespace EnergyPlus::HVACInterfaceManager {
 
 void UpdateHVACInterface(EnergyPlusData &state,
                          int const AirLoopNum, // airloop number for which air loop this is
-                         DataConvergParams::iCalledFrom const CalledFrom,
+                         DataConvergParams::CalledFrom const CalledFrom,
                          int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
                          int const InletNode,     // Node number for the inlet of the side that needs the outlet node data
                          bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
@@ -109,7 +109,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
     auto &TmpRealARR = state.dataHVACInterfaceMgr->TmpRealARR;
     Real64 DeltaEnergy;
 
-    if ((CalledFrom == DataConvergParams::iCalledFrom::AirSystemDemandSide) && (OutletNode == 0)) {
+    if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNode == 0)) {
         // Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(1) = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(1) = false;
@@ -148,7 +148,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         DataConvergParams::HVACCpApprox * ((state.dataLoopNodes->Node(OutletNode).MassFlowRate * state.dataLoopNodes->Node(OutletNode).Temp) -
                                            (state.dataLoopNodes->Node(InletNode).MassFlowRate * state.dataLoopNodes->Node(InletNode).Temp));
 
-    if ((CalledFrom == DataConvergParams::iCalledFrom::AirSystemDemandSide) && (OutletNode > 0)) {
+    if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNode > 0)) {
 
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(1) = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(1) = false;
@@ -216,7 +216,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-    } else if (CalledFrom == DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1) {
+    } else if (CalledFrom == DataConvergParams::CalledFrom::AirSystemSupplySideDeck1) {
 
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(2) = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(2) = false;
@@ -288,7 +288,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-    } else if (CalledFrom == DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2) {
+    } else if (CalledFrom == DataConvergParams::CalledFrom::AirSystemSupplySideDeck2) {
 
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(3) = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(3) = false;
@@ -397,7 +397,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
                               int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                               int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                               bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
-                              DataPlant::iCommonPipeType const CommonPipeType)
+                              DataPlant::CommonPipeType const CommonPipeType)
 {
 
     // SUBROUTINE INFORMATION:
@@ -460,7 +460,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     // update the temperatures and flow rates
     auto &flow_demand_to_supply_tol(convergence.PlantFlowDemandToSupplyTolValue);
     auto &flow_supply_to_demand_tol(convergence.PlantFlowSupplyToDemandTolValue);
-    if (CommonPipeType == DataPlant::iCommonPipeType::Single || CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
+    if (CommonPipeType == DataPlant::CommonPipeType::Single || CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
         // update the temperature
         UpdateCommonPipe(state, LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
         state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
@@ -592,7 +592,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
+    Real64 constexpr FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
     static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -696,7 +696,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const
 }
 
 void UpdateCommonPipe(
-    EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, DataPlant::iCommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
+    EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, DataPlant::CommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
@@ -825,10 +825,10 @@ void UpdateCommonPipe(
         }
     }
     // Common Pipe Simulation
-    if (CommonPipeType == DataPlant::iCommonPipeType::Single) {
+    if (CommonPipeType == DataPlant::CommonPipeType::Single) {
         ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
         // 2-way (controlled) common pipe simulation
-    } else if (CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
+    } else if (CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
 
         ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
         MixedOutletTemp = state.dataLoopNodes->Node(TankOutletNode).Temp;
@@ -1002,10 +1002,10 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const 
     using PlantUtilities::SetActuatedBranchFlowRate;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int const DemandLedPrimaryInletUpdate(101);
-    int const DemandLedSecondaryInletUpdate(102);
-    int const SupplyLedPrimaryInletUpdate(103);
-    int const SupplyLedSecondaryInletUpdate(104);
+    int constexpr DemandLedPrimaryInletUpdate(101);
+    int constexpr DemandLedSecondaryInletUpdate(102);
+    int constexpr SupplyLedPrimaryInletUpdate(103);
+    int constexpr SupplyLedSecondaryInletUpdate(104);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CurCallingCase;       // local temporary
@@ -1243,16 +1243,16 @@ void SetupCommonPipes(EnergyPlusData &state)
     for (CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
 
         // reference to easily lookup the first item once
-        auto &first_demand_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).TypeOf_Num);
-        auto &first_supply_component_typenum(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).TypeOf_Num);
+        auto &first_demand_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(DemandSide).Branch(1).Comp(1).Type);
+        auto &first_supply_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(SupplySide).Branch(1).Comp(1).Type);
 
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);
-            if (SELECT_CASE_var == DataPlant::iCommonPipeType::No) {
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::No;
+            if (SELECT_CASE_var == DataPlant::CommonPipeType::No) {
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::No;
 
-            } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::Single) { // Uncontrolled ('single') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::Single;
+            } else if (SELECT_CASE_var == DataPlant::CommonPipeType::Single) { // Uncontrolled ('single') common pipe
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::Single;
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
@@ -1275,7 +1275,7 @@ void SetupCommonPipes(EnergyPlusData &state)
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
-                if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
+                if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
                     // If/when the model supports variable-pumping primary, this can be removed.
                     ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
                     ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
@@ -1283,8 +1283,8 @@ void SetupCommonPipes(EnergyPlusData &state)
                     ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
                 }
 
-            } else if (SELECT_CASE_var == DataPlant::iCommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
+            } else if (SELECT_CASE_var == DataPlant::CommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
+                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::TwoWay;
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Primary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
@@ -1315,9 +1315,9 @@ void SetupCommonPipes(EnergyPlusData &state)
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
                 // check type of pump on supply side inlet
-                if (first_supply_component_typenum == TypeOf_PumpConstantSpeed) {
+                if (first_supply_component_type == PlantEquipmentType::PumpConstantSpeed) {
                     PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Constant;
-                } else if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
+                } else if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
                     PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Variable;
                     // If/when the model supports variable-pumping primary, this can be removed.
                     ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
@@ -1326,9 +1326,9 @@ void SetupCommonPipes(EnergyPlusData &state)
                     ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
                 }
                 // check type of pump on demand side inlet
-                if (first_demand_component_typenum == TypeOf_PumpConstantSpeed) {
+                if (first_demand_component_type == PlantEquipmentType::PumpConstantSpeed) {
                     PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Constant;
-                } else if (first_demand_component_typenum == TypeOf_PumpVariableSpeed) {
+                } else if (first_demand_component_type == PlantEquipmentType::PumpVariableSpeed) {
                     PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Variable;
                 }
             }

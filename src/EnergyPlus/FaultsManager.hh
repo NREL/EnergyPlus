@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -78,15 +79,16 @@ namespace FaultsManager {
     // Input methods for fouling coils
     enum class FouledCoil
     {
-        Unassigned = -1,
+        Invalid = -1,
         UARated,
-        FoulingFactor
+        FoulingFactor,
+        Num
     };
 
     // FaultTypeEnum
     enum class Fault
     {
-        Unassigned = -1,
+        Invalid = -1,
         TemperatureSensorOffset_OutdoorAir,
         HumiditySensorOffset_OutdoorAir,
         EnthalpySensorOffset_OutdoorAir,
@@ -102,7 +104,8 @@ namespace FaultsManager {
         TemperatureSensorOffset_CoilSupplyAir,
         Fouling_Boiler,
         Fouling_Chiller,
-        Fouling_EvapCooler
+        Fouling_EvapCooler,
+        Num
     };
 
     // Types of faults under Group Operational Faults in IDD
@@ -156,7 +159,7 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultProperties()
-            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(Fault::Unassigned), AvaiSchedPtr(0), SeveritySchedPtr(0),
+            : Name(""), FaultType(""), AvaiSchedule(""), SeveritySchedule(""), FaultTypeEnum(Fault::Invalid), AvaiSchedPtr(0), SeveritySchedPtr(0),
               Offset(0.0), Status(false)
         {
         }
@@ -218,8 +221,8 @@ namespace FaultsManager {
     struct FaultPropertiesFoulingCoil : public FaultProperties // Class for FaultModel:Fouling:Coil
     {
         // Members
-        std::string FouledCoilName;    // The fouled coil name
-        int FouledCoiledType;          // Type of coil that's fouled
+        std::string FouledCoilName;                   // The fouled coil name
+        DataPlant::PlantEquipmentType FouledCoilType; // Type of coil that's fouled
         int FouledCoilNum;             // The "FouledUARated" implies having to use the Coil's UA, which could be autosized, so have to use this index
         FouledCoil FoulingInputMethod; // Coil fouling input method
         Real64 UAFouled;               // Fouling coil UA under rating conditions
@@ -230,8 +233,8 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultPropertiesFoulingCoil()
-            : FouledCoilName(""), FouledCoiledType(0), FouledCoilNum(0), FoulingInputMethod(FouledCoil::Unassigned), UAFouled(0.0), Rfw(0.0),
-              Rfa(0.0), Aout(0.0), Aratio(0.0)
+            : FouledCoilName(""), FouledCoilType(DataPlant::PlantEquipmentType::Invalid), FouledCoilNum(0), FoulingInputMethod(FouledCoil::Invalid),
+              UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
         {
         }
 
@@ -239,7 +242,7 @@ namespace FaultsManager {
         virtual ~FaultPropertiesFoulingCoil() = default;
 
     public:
-        // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
+        // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfer coefficient) due to fouling in a coil
         // Real64 CalFaultyCoilFoulingFactor();
 
         // Calculate the Fault Fraction based on Availability and Severity Schedules

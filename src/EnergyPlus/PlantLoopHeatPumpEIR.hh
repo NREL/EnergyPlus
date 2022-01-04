@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,7 +81,7 @@ namespace EIRPlantLoopHeatPumps {
 
         // fixed configuration parameters
         std::string name;
-        int plantTypeOfNum = -1;
+        DataPlant::PlantEquipmentType EIRHPType = DataPlant::PlantEquipmentType::Invalid;
         std::string companionCoilName;
         EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
         Real64 sizingFactor = 1.0;
@@ -171,7 +171,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void resetReportingVariables();
 
-        static PlantComponent *factory(EnergyPlusData &state, int hp_type_of_num, const std::string &hp_name);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type_of_num, const std::string &hp_name);
 
         static void pairUpCompanionCoils(EnergyPlusData &state);
 

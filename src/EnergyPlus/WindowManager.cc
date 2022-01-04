@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2327,7 +2327,7 @@ namespace WindowManager {
 
             // Simon: Complex fenestration state works only with tarcog
             CalcComplexWindowThermal(
-                state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Unassigned);
+                state, SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Invalid);
 
             TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
             state.dataWindowManager->ngllayer =
@@ -2362,7 +2362,7 @@ namespace WindowManager {
         } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
 
             EQLWindowSurfaceHeatBalance(
-                state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Unassigned);
+                state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::Invalid);
             state.dataWindowManager->hcout = HextConvCoeff;
             // Required for report variables calculations.
             if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)
@@ -2626,11 +2626,11 @@ namespace WindowManager {
                     state.dataWindowManager->gap(IGap) = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
                 }
                 state.dataWindowManager->gnmix(IGap) = 1;
-                state.dataWindowManager->gwght(1, IGap) = GasWght(1);
+                state.dataWindowManager->gwght(1, IGap) = GasWght[0];
                 for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-                    state.dataWindowManager->gcon(ICoeff, 1, IGap) = GasCoeffsCon(ICoeff, 1);
-                    state.dataWindowManager->gvis(ICoeff, 1, IGap) = GasCoeffsVis(ICoeff, 1);
-                    state.dataWindowManager->gcp(ICoeff, 1, IGap) = GasCoeffsCp(ICoeff, 1);
+                    state.dataWindowManager->gcon(ICoeff, 1, IGap) = GasCoeffsCon[ICoeff - 1][0];
+                    state.dataWindowManager->gvis(ICoeff, 1, IGap) = GasCoeffsVis[ICoeff - 1][0];
+                    state.dataWindowManager->gcp(ICoeff, 1, IGap) = GasCoeffsCp[ICoeff - 1][0];
                 }
             }
 
@@ -2858,7 +2858,7 @@ namespace WindowManager {
 
         state.dataHeatBalSurf->SurfHAirExt(SurfNum) = rad_out_air_per_area / (Tsout - state.dataWindowManager->tout);
         state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
-        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
+        state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
     }
 
     //****************************************************************************
@@ -5059,8 +5059,8 @@ namespace WindowManager {
         // REFERENCES:
         // See Subr. WindowGasConductance
 
-        Real64 const pres(1.0e5);     // Gap gas pressure (Pa)
-        Real64 const gaslaw(8314.51); // Molar gas constant (J/kMol-K)
+        Real64 constexpr pres(1.0e5);     // Gap gas pressure (Pa)
+        Real64 constexpr gaslaw(8314.51); // Molar gas constant (J/kMol-K)
         Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
 
         int IMix; // Counters of gases in a mixture
@@ -7126,8 +7126,8 @@ namespace WindowManager {
         // Argument array dimensioning
         hgap.dim(5);
 
-        int const MaxIterations(100);  // Maximum allowed number of iterations
-        Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence
+        int constexpr MaxIterations(100);  // Maximum allowed number of iterations
+        Real64 constexpr errtemptol(0.02); // Tolerance on errtemp for convergence
         static constexpr std::string_view RoutineName("WindowTempsForNominalCond");
 
         int i;                  // Counter
@@ -7253,12 +7253,12 @@ namespace WindowManager {
         // This is a shortened form of StartingWindowTemps for use in calculating
         // the nominal center-of-glass U-value.
 
-        Real64 const hrad(5.3);           // Typical radiative conductance (W/m2-K)
-        Real64 const hcinStartValue(3.2); // Starting value for inside air film convective
+        Real64 constexpr hrad(5.3);           // Typical radiative conductance (W/m2-K)
+        Real64 constexpr hcinStartValue(3.2); // Starting value for inside air film convective
         //   conductance (estimated for typical double glazing
         //   using 1.31(dT**0.333), where dT =
         //   room air temp - inside surface temp = 14.2K)
-        Real64 const resgap(0.21); // Typical gap resistance (m2-K/W)
+        Real64 constexpr resgap(0.21); // Typical gap resistance (m2-K/W)
 
         int i;                      // Face counter
         Array1D<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of
@@ -7365,14 +7365,9 @@ namespace WindowManager {
             //                                      Write Descriptions
             print(state.files.eio,
                   "{}\n",
-                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},SHGC,"
+                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted) {W/m2-K},"
+                  "Convection Coefficient Adjustment Ratio,SHGC,"
                   "Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
-            // todo - hold off for bug fix release
-            //            print(state.files.eio,
-            //                  "{}\n",
-            //                  "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted)
-            //                  {W/m2-K}," "Convection Coefficient Adjustment Ratio,SHGC," "Solar Transmittance at Normal Incidence,Visible
-            //                  Transmittance at Normal Incidence");
             if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio,
                       "{}\n",
@@ -7464,8 +7459,8 @@ namespace WindowManager {
                 if (state.dataConstruction->Construct(ThisNum).WindowTypeBSDF) {
 
                     i = ThisNum;
-                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::winterCondition);
-                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::summerCondition);
+                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::Winter);
+                    CalcComplexWindowThermal(state, 0, i, TempVar, TempVar, TempVar, TempVar, DataBSDFWindow::Condition::Summer);
 
                     static constexpr std::string_view Format_800(" WindowConstruction:Complex,{},{},{},{:.3R},{:.3R}\n");
                     print(state.files.eio,
@@ -7539,22 +7534,11 @@ namespace WindowManager {
                               state.dataConstruction->Construct(ThisNum).TotLayers,
                               Roughness(static_cast<int>(state.dataConstruction->Construct(ThisNum).OutsideRoughness)),
                               NominalConductanceWinter,
+                              state.dataHeatBal->NominalUBeforeAdjusted(ThisNum),
+                              state.dataHeatBal->CoeffAdjRatio(ThisNum),
                               SHGCSummer,
                               TransSolNorm,
                               TransVisNorm);
-                        // todo
-                        //                        print(state.files.eio,
-                        //                              Format_700,
-                        //                              state.dataConstruction->Construct(ThisNum).Name,
-                        //                              ThisNum,
-                        //                              state.dataConstruction->Construct(ThisNum).TotLayers,
-                        //                              Roughness(static_cast<int>(state.dataConstruction->Construct(ThisNum).OutsideRoughness)),
-                        //                              NominalConductanceWinter,
-                        //                              state.dataHeatBal->NominalUBeforeAdjusted(ThisNum),
-                        //                              state.dataHeatBal->CoeffAdjRatio(ThisNum),
-                        //                              SHGCSummer,
-                        //                              TransSolNorm,
-                        //                              TransVisNorm);
                     }
                     //    Write(OutputFileConstrainParams, 705)  TRIM(Construct(ThisNum)%Name), SHGCSummer ,TransVisNorm
 
@@ -8009,8 +7993,8 @@ namespace WindowManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const M(18);
-        int const N(18);
+        int constexpr M(18);
+        int constexpr N(18);
 
         int SurfNum;     // Index to surface number
         int ScreenNum;   // Index to each screen used on exterior of window

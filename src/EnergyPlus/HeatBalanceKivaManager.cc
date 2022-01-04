@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -147,7 +147,7 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
     debugDir = ss.dir;
     plotNum = 0;
     double &l = ground.foundation.reductionLength2;
-    const double width = 6.0;
+    constexpr double width = 6.0;
     const double depth = ground.foundation.foundationDepth + width / 2.0;
     const double range = max(width, depth);
     ss.xRange = {l - range / 2.0, l + range / 2.0};
@@ -235,10 +235,10 @@ void KivaInstanceMap::setInitialBoundaryConditions(
     bcs->deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobalConstants::KelvinConv;
 
     // Estimate indoor temperature
-    static const Real64 defaultFlagTemp = -999; // default sets this below -999 at -9999 so uses value if entered
-    const Real64 standardTemp = 22;             // degC
-    Real64 assumedFloatingTemp = standardTemp;  // degC (somewhat arbitrary assumption--not knowing anything else
-                                                // about the building at this point)
+    constexpr Real64 defaultFlagTemp = -999;   // default sets this below -999 at -9999 so uses value if entered
+    constexpr Real64 standardTemp = 22;        // degC
+    Real64 assumedFloatingTemp = standardTemp; // degC (somewhat arbitrary assumption--not knowing anything else
+                                               // about the building at this point)
 
     Real64 Tin;
     if (zoneAssumedTemperature > defaultFlagTemp) {
@@ -290,8 +290,8 @@ void KivaInstanceMap::setInitialBoundaryConditions(
                 int coolSpSchId = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(schTypeId).CoolTempSchedIndex;
                 Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(state, heatSpSchId, hour, timestep);
                 Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(state, coolSpSchId, hour, timestep);
-                const Real64 heatBalanceTemp = 10.0; // (assumed) degC
-                const Real64 coolBalanceTemp = 15.0; // (assumed) degC
+                constexpr Real64 heatBalanceTemp = 10.0; // (assumed) degC
+                constexpr Real64 coolBalanceTemp = 15.0; // (assumed) degC
 
                 if (bcs->outdoorTemp < heatBalanceTemp) {
                     Tin = heatSetpoint + DataGlobalConstants::KelvinConv;
@@ -323,8 +323,8 @@ void KivaInstanceMap::setInitialBoundaryConditions(
             int coolSpSchId = state.dataZoneCtrls->StageControlledZone(zoneControlNum).CSBchedIndex;
             Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(state, heatSpSchId, hour, timestep);
             Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(state, coolSpSchId, hour, timestep);
-            const Real64 heatBalanceTemp = 10.0; // (assumed) degC
-            const Real64 coolBalanceTemp = 15.0; // (assumed) degC
+            constexpr Real64 heatBalanceTemp = 10.0; // (assumed) degC
+            constexpr Real64 coolBalanceTemp = 15.0; // (assumed) degC
             if (bcs->outdoorTemp < heatBalanceTemp) {
                 Tin = heatSetpoint + DataGlobalConstants::KelvinConv;
             } else if (bcs->outdoorTemp > coolBalanceTemp) {
@@ -472,7 +472,7 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
         // Use headers to know how to read data to memory (e.g., number of periods, number of intervals)
         int endcol = LineResult.data.size();
         if (endcol > 0) {
-            if (int(LineResult.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
+            if (int(LineResult.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
                 ShowSevereError(state, "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.");
                 ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                 ShowFatalError(state, "Program terminates due to previous condition.");

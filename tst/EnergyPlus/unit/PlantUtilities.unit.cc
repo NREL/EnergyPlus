@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,7 +102,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     // if the component's ON flag is false, then it should return zero flow request no matter the other values
     thisComponent.ON = false;
 
-    thisComponent.CurOpSchemeType = DataPlant::HeatingRBOpSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::HeatingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CoolingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(0.0, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::UncontrolledOpSchemeType; // NOT meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::Uncontrolled; // NOT meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -153,7 +153,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     // if the component's ON flag is true, then it needs to make decisions
     thisComponent.ON = true;
 
-    thisComponent.CurOpSchemeType = DataPlant::HeatingRBOpSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::HeatingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CoolingRB; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -177,7 +177,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType; // meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased; // meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -189,7 +189,7 @@ TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
     EXPECT_NEAR(flowRequest, returnedFlow, 0.00001);
 
-    thisComponent.CurOpSchemeType = DataPlant::UncontrolledOpSchemeType; // NOT meaningful load
+    thisComponent.CurOpSchemeType = DataPlant::OpScheme::Uncontrolled; // NOT meaningful load
 
     thisComponent.MyLoad = 0.0;
     returnedFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(*state, 1, 1, 1, 1, flowRequest);
@@ -274,7 +274,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex1,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::MassFlowRate,
+                                                DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_EQ(1, criteriaCheckIndex1);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex2,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::Temperature,
+                                                DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_EQ(2, criteriaCheckIndex2);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -302,7 +302,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex3,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::HeatTransferRate,
+                                                DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_EQ(3, criteriaCheckIndex3);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex1,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::MassFlowRate,
+                                                DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -334,7 +334,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex2,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::Temperature,
+                                                DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -348,7 +348,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex3,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::HeatTransferRate,
+                                                DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_TRUE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -362,7 +362,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex1,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::MassFlowRate,
+                                                DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -375,7 +375,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex2,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::Temperature,
+                                                DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -388,7 +388,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex3,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::HeatTransferRate,
+                                                DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -403,7 +403,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex1,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::MassFlowRate,
+                                                DataPlant::CriteriaType::MassFlowRate,
                                                 criteriaValue1);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -417,7 +417,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex2,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::Temperature,
+                                                DataPlant::CriteriaType::Temperature,
                                                 criteriaValue2);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 
@@ -431,7 +431,7 @@ TEST_F(EnergyPlusFixture, TestPullCompInterconnectTrigger)
                                                 criteriaCheckIndex3,
                                                 connectedLoopNum,
                                                 connectedLoopSideNum,
-                                                DataPlant::iCriteriaType::HeatTransferRate,
+                                                DataPlant::CriteriaType::HeatTransferRate,
                                                 criteriaValue3);
     EXPECT_FALSE(connectedLoopSide.SimLoopSideNeeded);
 }
@@ -464,8 +464,8 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     state->dataPlnt->PlantLoop(1).LoopSide(1).NodeNumOut = 2;
     auto &inNode = state->dataLoopNodes->Node(1);
     auto &outNode = state->dataLoopNodes->Node(2);
-    Real64 const roomTemp = 25.0;
-    Real64 const nonZeroFlow = 3.14;
+    Real64 constexpr roomTemp = 25.0;
+    Real64 constexpr nonZeroFlow = 3.14;
 
     // History terms should be allocated to 5 zeros
     EXPECT_EQ(5u, state->dataPlnt->PlantLoop(1).LoopSide(1).InletNode.TemperatureHistory.size());
@@ -547,7 +547,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "comp_name";
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Boiler_Simple;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::Boiler_Simple;
     state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 0; // just skip the supply side search
 
     int loopNum = 0, loopSideNum = 0, branchNum = 0, compNum = 0;
@@ -555,7 +555,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
 
     // test simple searching first
     PlantUtilities::ScanPlantLoopsForObject(
-        *state, "comp_name", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+        *state, "comp_name", DataPlant::PlantEquipmentType::Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_EQ(1, loopNum);
     EXPECT_EQ(1, loopSideNum);
     EXPECT_EQ(1, branchNum);
@@ -564,6 +564,6 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
 
     // then test to make sure errorFlag is passed by reference
     PlantUtilities::ScanPlantLoopsForObject(
-        *state, "comp_name_not_here", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+        *state, "comp_name_not_here", DataPlant::PlantEquipmentType::Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_TRUE(errorFlag);
 }

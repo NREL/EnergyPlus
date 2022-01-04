@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -300,7 +301,7 @@ namespace GroundHeatExchangers {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
 
         virtual Real64 getGFunc(Real64) = 0;
 
@@ -310,7 +311,7 @@ namespace GroundHeatExchangers {
 
         virtual void getAnnualTimeConstant() = 0;
 
-        virtual void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) = 0;
+        virtual void initEnvironment(EnergyPlusData &state, Real64 CurTime) = 0;
 
         void setupOutput(EnergyPlusData &state);
     };
@@ -320,6 +321,7 @@ namespace GroundHeatExchangers {
         Invalid = -1,
         UniformHeatFlux,
         UniformBoreholeWallTemp,
+        Num
     };
 
     struct GLHEVert : GLHEBase // LCOV_EXCL_LINE
@@ -357,11 +359,11 @@ namespace GroundHeatExchangers {
 
         static std::vector<Real64> distances(MyCartesian const &point_i, MyCartesian const &point_j);
 
-        Real64 calcResponse(std::vector<Real64> const &dists, Real64 const &currTime);
+        Real64 calcResponse(std::vector<Real64> const &dists, Real64 currTime);
 
-        Real64 integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
+        Real64 integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 currTime);
 
-        Real64 doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
+        Real64 doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 currTime);
 
         void calcShortTimestepGFunctions(EnergyPlusData &state);
 
@@ -403,7 +405,7 @@ namespace GroundHeatExchangers {
 
         void combineShortAndLongTimestepGFunctions();
 
-        void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime) override;
+        void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
 
@@ -472,7 +474,7 @@ namespace GroundHeatExchangers {
 
         void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) override;
 
-        void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) override;
+        void initEnvironment(EnergyPlusData &state, Real64 CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
 

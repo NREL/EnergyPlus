@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -86,7 +86,7 @@ namespace EnergyPlus::OutsideEnergySources {
 // PURPOSE OF THIS MODULE:
 // Module containing the routines dealing with the OutsideEnergySources
 
-PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, int objectType, std::string objectName)
+PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string_view objectName)
 {
     // Process the input data for outside energy sources if it hasn't been done already
     if (state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag) {
@@ -100,7 +100,7 @@ PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, int obj
         }
     }
     // If we didn't find it, fatal
-    ShowFatalError(state, "OutsideEnergySourceSpecsFactory: Error getting inputs for source named: " + objectName); // LCOV_EXCL_LINE
+    ShowFatalError(state, format("OutsideEnergySourceSpecsFactory: Error getting inputs for source named: {}", objectName)); // LCOV_EXCL_LINE
     // Shut up the compiler
     return nullptr; // LCOV_EXCL_LINE
 }
@@ -163,20 +163,20 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
 
         std::string reportVarPrefix;
         std::string nodeNames;
-        int typeOf;
+        DataPlant::PlantEquipmentType EnergyType;
         int thisIndex;
         if (EnergySourceNum <= NumDistrictUnitsHeat) {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictHeating";
             reportVarPrefix = "District Heating ";
             nodeNames = "Hot Water Nodes";
-            typeOf = DataPlant::TypeOf_PurchHotWater;
+            EnergyType = DataPlant::PlantEquipmentType::PurchHotWater;
             heatIndex++;
             thisIndex = heatIndex;
         } else {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictCooling";
             reportVarPrefix = "District Cooling ";
             nodeNames = "Chilled Water Nodes";
-            typeOf = DataPlant::TypeOf_PurchChilledWater;
+            EnergyType = DataPlant::PlantEquipmentType::PurchChilledWater;
             coolIndex++;
             thisIndex = coolIndex;
         }
@@ -211,7 +211,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -221,7 +221,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Primary,
+                                                NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -235,7 +235,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
         }
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyTransfer = 0.0;
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyRate = 0.0;
-        state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyType = typeOf;
+        state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyType = EnergyType;
         if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum =
                 ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
@@ -334,7 +334,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
 
     // Type name string variable to collapse the sizing for cooling and heating into one block
     std::string typeName;
-    if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+    if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         typeName = "Cooling";
     } else { // Heating
         typeName = "Heating";
@@ -428,9 +428,9 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
         MyLoad = sign(CurrentCap, MyLoad);
     }
 
-    if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+    if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         if (MyLoad > 0.0) MyLoad = 0.0;
-    } else if (this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
+    } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchHotWater) {
         if (MyLoad < 0.0) MyLoad = 0.0;
     }
 
@@ -480,12 +480,12 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
     std::string hotOrChilled = "Hot ";
     std::string reportVarPrefix = "District Heating ";
     std::string heatingOrCooling = "Heating";
-    std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
-    if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+    std::string_view typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::PurchHotWater)];
+    if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         hotOrChilled = "Chilled ";
         reportVarPrefix = "District Cooling ";
         heatingOrCooling = "Cooling";
-        typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
+        typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(DataPlant::PlantEquipmentType::PurchChilledWater)];
     }
     SetupOutputVariable(state,
                         reportVarPrefix + hotOrChilled + "Water Energy",

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,11 +155,11 @@ void GetSwimmingPool(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetSwimmingPool: "); // include trailing blank space
-    Real64 const MinCoverFactor(0.0);                                   // minimum value for cover factors
-    Real64 const MaxCoverFactor(1.0);                                   // maximum value for cover factors
-    Real64 const MinDepth(0.05);                                        // minimum average pool depth (to avoid obvious input errors)
-    Real64 const MaxDepth(10.0);                                        // maximum average pool depth (to avoid obvious input errors)
-    Real64 const MinPowerFactor(0.0);                                   // minimum power factor for miscellaneous equipment
+    Real64 constexpr MinCoverFactor(0.0);                               // minimum value for cover factors
+    Real64 constexpr MaxCoverFactor(1.0);                               // maximum value for cover factors
+    Real64 constexpr MinDepth(0.05);                                    // minimum average pool depth (to avoid obvious input errors)
+    Real64 constexpr MaxDepth(10.0);                                    // maximum average pool depth (to avoid obvious input errors)
+    Real64 constexpr MinPowerFactor(0.0);                               // minimum power factor for miscellaneous equipment
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound(false);         // Set to true if something goes wrong
@@ -330,7 +330,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                  Alphas(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
         state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                                   Alphas(7),
@@ -339,7 +339,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                   Alphas(1),
                                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                   DataLoopNode::ObjectIsNotParent);
         if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");
@@ -422,7 +422,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                           "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
         ErrorsFound = true;
         // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-    } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::CTF) {
+    } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) {
         ShowSevereError(state,
                         state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "
@@ -473,8 +473,8 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("InitSwimmingPool");
-    Real64 const MinActivityFactor = 0.0;  // Minimum value for activity factor
-    Real64 const MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
+    Real64 constexpr MinActivityFactor = 0.0;  // Minimum value for activity factor
+    Real64 constexpr MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 HeatGainPerPerson = ScheduleManager::GetCurrentScheduleValue(state, this->PeopleHeatGainSchedPtr);
@@ -823,7 +823,7 @@ void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
         if (this->WaterInletNode > 0) {
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
-                                                    DataPlant::TypeOf_SwimmingPool_Indoor,
+                                                    DataPlant::PlantEquipmentType::SwimmingPool_Indoor,
                                                     this->HWLoopNum,
                                                     this->HWLoopSide,
                                                     this->HWBranchNum,
@@ -884,7 +884,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     //        SurfTempInTmp( SurfNum ) = ( SurfCTFConstInPart( SurfNum ) + SurfQRadThermInAbs( SurfNum ) + SurfOpaqQRadSWInAbs( SurfNum ) + HConvIn(
     //        SurfNum
     //)
-    //* RefAirTemp( SurfNum ) + SurfNetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) +
+    //* RefAirTemp( SurfNum ) + SurfNetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * SurfQsrcHist( 1, SurfNum ) +
     // SurfQdotRadHVACInPerArea( SurfNum ) + IterDampConst * SurfTempInsOld(
     // SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TH11 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) + IterDampConst );
     //// Constant part of conduction eq (history terms) | LW radiation from internal sources | SW radiation from internal sources | Convection
@@ -987,7 +987,7 @@ void SwimmingPoolData::calcSwimmingPoolEvap(EnergyPlusData &state,
 )
 {
     static constexpr std::string_view RoutineName("CalcSwimmingPoolEvap");
-    Real64 const CFinHg(0.00029613); // Multiple pressure in Pa by this constant to get inches of Hg
+    Real64 constexpr CFinHg(0.00029613); // Multiple pressure in Pa by this constant to get inches of Hg
 
     // Evaporation calculation:
     // Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
@@ -1062,7 +1062,7 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
     // radiant systems.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
+    Real64 constexpr CloseEnough(0.01); // Some arbitrarily small value to avoid zeros and numbers that are almost the same
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     SwimmingPoolOn = false;
@@ -1175,7 +1175,7 @@ void ReportSwimmingPool(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("ReportSwimmingPool");
-    Real64 const MinDensity = 1.0; // to avoid a divide by zero
+    Real64 constexpr MinDensity = 1.0; // to avoid a divide by zero
 
     for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
 

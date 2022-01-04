@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2306,7 +2306,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataLoopNodes->Node(4).MassFlowRateMax = 2.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.InletTemp = 19.0;
 
-    state->dataPlantHXFluidToFluid->FluidHX(1).ControlMode = PlantHeatExchangerFluidToFluid::iCtrlType::CoolingDifferentialOnOff;
+    state->dataPlantHXFluidToFluid->FluidHX(1).controlMode = PlantHeatExchangerFluidToFluid::ControlType::CoolingDifferentialOnOff;
     state->dataPlantHXFluidToFluid->FluidHX(1).MinOperationTemp = 10.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).MaxOperationTemp = 30.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).Name = "Test HX";
@@ -2330,7 +2330,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantHXFluidToFluid->FluidHX(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.loopNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.loopSideNum = 1;
@@ -2341,7 +2341,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantHXFluidToFluid->FluidHX(1).Name;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.inletNodeNum;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.loopNum = 2;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.loopSideNum = 1;
@@ -2408,7 +2408,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataLoopNodes->Node(4).MassFlowRateMax = 2.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.InletTemp = 19.0;
 
-    state->dataPlantHXFluidToFluid->FluidHX(1).ControlMode = PlantHeatExchangerFluidToFluid::iCtrlType::CoolingSetPointOnOffWithComponentOverride;
+    state->dataPlantHXFluidToFluid->FluidHX(1).controlMode = PlantHeatExchangerFluidToFluid::ControlType::CoolingSetPointOnOffWithComponentOverride;
     state->dataPlantHXFluidToFluid->FluidHX(1).MinOperationTemp = 10.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).MaxOperationTemp = 30.0;
     state->dataPlantHXFluidToFluid->FluidHX(1).Name = "Test HX";
@@ -2448,18 +2448,18 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = state->dataPlantHXFluidToFluid->FluidHX(1).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum;
 
     state->dataPlnt->PlantLoop(2).Name = "HX demand side loop ";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = state->dataPlantHXFluidToFluid->FluidHX(1).Name;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.inletNodeNum;
 
     state->dataPlantHXFluidToFluid->FluidHX(1).DemandSideLoop.MassFlowRateMax = 2.0;
-    state->dataPlantHXFluidToFluid->FluidHX(1).ControlSignalTemp = PlantHeatExchangerFluidToFluid::iCtrlTemp::DryBulbTemperature;
+    state->dataPlantHXFluidToFluid->FluidHX(1).ControlSignalTemp = PlantHeatExchangerFluidToFluid::CtrlTempType::DryBulbTemperature;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.inletNodeNum = 5;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.loopNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.loopSideNum = 2;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -641,7 +641,7 @@ namespace HeatBalanceHAMTManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const adjdist(0.00005); // Allowable distance between two cells, also used as limit on cell length
+        Real64 constexpr adjdist(0.00005); // Allowable distance between two cells, also used as limit on cell length
         static constexpr std::string_view RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -675,7 +675,7 @@ namespace HeatBalanceHAMTManager {
         state.dataHeatBalHAMTMgr->TotCellsMax = 0;
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
             conid = state.dataSurface->Surface(sid).Construction;
             if (conid == 0) continue;
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
@@ -792,7 +792,7 @@ namespace HeatBalanceHAMTManager {
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
             // Boundary Cells
             runor = -0.02;
             // Air Convection Cell
@@ -938,7 +938,7 @@ namespace HeatBalanceHAMTManager {
         for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
             if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
             if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
-            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::HAMT) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::HAMT) continue;
             cells(state.dataHeatBalHAMTMgr->Extcell(sid)).origin(1) += cells(state.dataHeatBalHAMTMgr->Extcell(sid)).length(1) / 2.0;
             cells(state.dataHeatBalHAMTMgr->Intcell(sid)).origin(1) -= cells(state.dataHeatBalHAMTMgr->Intcell(sid)).length(1) / 2.0;
             cells(state.dataHeatBalHAMTMgr->Extcell(sid)).volume = 0.0;

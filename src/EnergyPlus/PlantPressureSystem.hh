@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,7 +65,7 @@ namespace PlantPressureSystem {
     void SimPressureDropSystem(EnergyPlusData &state,
                                int LoopNum,                        // Plant Loop to update pressure information
                                bool FirstHVACIteration,            // System flag
-                               DataPlant::iPressureCall CallType,  // Enumerated call type
+                               DataPlant::PressureCall CallType,   // Enumerated call type
                                Optional_int_const LoopSideNum = _, // Loop side num for specific branch simulation
                                Optional_int_const BranchNum = _    // Branch num for specific branch simulation
     );
