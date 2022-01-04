@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,9 +65,9 @@ struct EnergyPlusData;
 
 namespace PlantHeatExchangerFluidToFluid {
 
-    enum class iFluidHXType
+    enum class FluidHXType
     {
-        Unassigned,
+        Invalid = -1,
         CrossFlowBothUnMixed,
         CrossFlowBothMixed,
         CrossFlowSupplyLoopMixedDemandLoopUnMixed,
@@ -75,11 +75,12 @@ namespace PlantHeatExchangerFluidToFluid {
         CounterFlow,
         ParallelFlow,
         Ideal,
+        Num
     };
 
-    enum class iCtrlType
+    enum class ControlType
     {
-        Unassigned,
+        Invalid = -1,
         UncontrolledOn,
         OperationSchemeModulated,
         OperationSchemeOnOff,
@@ -92,20 +93,24 @@ namespace PlantHeatExchangerFluidToFluid {
         CoolingDifferentialOnOff,
         CoolingSetPointOnOffWithComponentOverride,
         TrackComponentOnOff,
+        Num
     };
 
-    enum class iCtrlTemp
+    enum class CtrlTempType
     {
-        Unassigned,
+        Invalid = -1,
         WetBulbTemperature,
         DryBulbTemperature,
         LoopTemperature,
+        Num
     };
 
-    enum class iHXAction
+    enum class HXAction
     {
+        Invalid = -1,
         HeatingSupplySideLoop,
         CoolingSupplySideLoop,
+        Num
     };
 
     struct PlantConnectionStruct : PlantLocation
@@ -150,20 +155,20 @@ namespace PlantHeatExchangerFluidToFluid {
         // Members
         std::string Name;
         int AvailSchedNum;
-        iFluidHXType HeatExchangeModelType;
+        FluidHXType HeatExchangeModelType;
         Real64 UA;
         bool UAWasAutoSized; // true is UA was autosized on input
-        iCtrlType ControlMode;
+        ControlType controlMode;
         int SetPointNodeNum;
         Real64 TempControlTol;
-        iCtrlTemp ControlSignalTemp;
+        CtrlTempType ControlSignalTemp;
         Real64 MinOperationTemp;
         Real64 MaxOperationTemp;
         PlantConnectionStruct DemandSideLoop; // plant connections and data for the side of HX connected to demand side
         PlantConnectionStruct SupplySideLoop;
         std::string HeatTransferMeteringEndUse;
         std::string ComponentUserName; // user name for control-associated  component
-        int ComponentTypeOfNum;
+        DataPlant::PlantEquipmentType ComponentType;
         PlantLocatorStruct OtherCompSupplySideLoop;
         PlantLocatorStruct OtherCompDemandSideLoop;
         Real64 SizingFactor;
@@ -181,11 +186,12 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Default Constructor
         HeatExchangerStruct()
-            : AvailSchedNum(0), HeatExchangeModelType(iFluidHXType::Unassigned), UA(0.0), UAWasAutoSized(false), ControlMode(iCtrlType::Unassigned),
-              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(iCtrlTemp::Unassigned), MinOperationTemp(-99999.0),
-              MaxOperationTemp(99999.0), ComponentTypeOfNum(0), SizingFactor(1.0), HeatTransferRate(0.0), HeatTransferEnergy(0.0), Effectiveness(0.0),
-              OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0), DmdSideModulatSolvNoConvergeErrorIndex(0),
-              DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0), MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
+            : AvailSchedNum(0), HeatExchangeModelType(FluidHXType::Invalid), UA(0.0), UAWasAutoSized(false), controlMode(ControlType::Invalid),
+              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(CtrlTempType::Invalid), MinOperationTemp(-99999.0),
+              MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
+              HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
+              DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
+              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 
@@ -212,7 +218,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void control(EnergyPlusData &state, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
 
-        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, iHXAction HXActionMode);
+        void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, HXAction HXActionMode);
 
         Real64 demandSideFlowResidual(EnergyPlusData &state,
                                       Real64 DmdSideMassFlowRate,

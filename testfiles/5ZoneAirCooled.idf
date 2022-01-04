@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.6;
+  Version,22.1;
 
   Building,
     Building,                !- Name
@@ -3498,4 +3498,6 @@
   Output:Surfaces:List,Details;
 
   Output:Surfaces:List,DecayCurvesFromComponentLoadsSummary;
+
+  Output:Surfaces:List,ViewFactorInfo;
 

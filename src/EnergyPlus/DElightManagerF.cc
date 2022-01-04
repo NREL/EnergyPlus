@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -237,8 +237,8 @@ namespace DElightManagerF {
         SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
-        for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
-            if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
+        for (auto &znDayl : state.dataDaylightingData->daylightControl) {
+            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
                 if (znDayl.TotalDaylRefPoints == 0) {
@@ -273,8 +273,8 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
-        for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
-            if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
+        for (auto &znDayl : state.dataDaylightingData->daylightControl) {
+            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
                 int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 

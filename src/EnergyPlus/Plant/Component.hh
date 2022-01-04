@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,43 +61,50 @@ struct EnergyPlusData;
 
 namespace DataPlant {
 
+    static constexpr std::array<bool, static_cast<int>(PlantEquipmentType::Num)> PlantEquipmentTypeIsPump = {
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, true,  true,  true,  true,  true,  false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+
     struct CompData
     {
         // Members
-        std::string TypeOf;                               // The 'keyWord' identifying  component type
-        int TypeOf_Num;                                   // Reference the "TypeOf" parameters in DataPlant
-        std::string Name;                                 // Component name
-        int CompNum;                                      // Component ID number
-        DataBranchAirLoopPlant::ControlTypeEnum FlowCtrl; // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
-        int FlowPriority;                                 // status for overall loop flow determination
-        bool ON;                                          // TRUE = designated component or operation scheme available
-        bool Available;                                   // TRUE = designated component or operation scheme available
-        std::string NodeNameIn;                           // Component inlet node name
-        std::string NodeNameOut;                          // Component outlet node name
-        int NodeNumIn;                                    // Component inlet node number
-        int NodeNumOut;                                   // Component outlet node number
-        Real64 MyLoad;                                    // Distributed Load
-        Real64 MaxLoad;                                   // Maximum load
-        Real64 MinLoad;                                   // Minimum Load
-        Real64 OptLoad;                                   // Optimal Load
-        Real64 SizFac;                                    // Sizing Fraction
-        int CurOpSchemeType;                              // updated pointer to
+        std::string TypeOf;                           // The 'keyWord' identifying  component type
+        DataPlant::PlantEquipmentType Type;           // Reference the "TypeOf" parameters in DataPlant
+        std::string Name;                             // Component name
+        int CompNum;                                  // Component ID number
+        DataBranchAirLoopPlant::ControlType FlowCtrl; // flow control for splitter/mixer (ACTIVE/PASSIVE/BYPASS)
+        LoopFlowStatus FlowPriority;                  // status for overall loop flow determination
+        bool ON;                                      // TRUE = designated component or operation scheme available
+        bool Available;                               // TRUE = designated component or operation scheme available
+        std::string NodeNameIn;                       // Component inlet node name
+        std::string NodeNameOut;                      // Component outlet node name
+        int NodeNumIn;                                // Component inlet node number
+        int NodeNumOut;                               // Component outlet node number
+        Real64 MyLoad;                                // Distributed Load
+        Real64 MaxLoad;                               // Maximum load
+        Real64 MinLoad;                               // Minimum Load
+        Real64 OptLoad;                               // Optimal Load
+        Real64 SizFac;                                // Sizing Fraction
+        DataPlant::OpScheme CurOpSchemeType;          // updated pointer to
         // Plant()%OpScheme(CurOpSchemeType)...
         int NumOpSchemes;      // number of schemes held in the pointer array
         int CurCompLevelOpNum; // pointer to the OpScheme array defined next
         // PlantLoop()%LoopSide()%Branch()%Comp()%OpScheme(curOpSchemePtr)
-        Array1D<OpSchemePtrData> OpScheme;                 // Pointers to component on lists
-        Real64 EquipDemand;                                // Component load request based on inlet temp and outlet SP
-        bool EMSLoadOverrideOn;                            // EMS is calling to override load dispatched to component
-        Real64 EMSLoadOverrideValue;                       // EMS value to use for load when overridden [W] always positive.
-        int HowLoadServed;                                 // nature of component in terms of how it can meet load
-        Real64 MinOutletTemp;                              // Component exit lower limit temperature
-        Real64 MaxOutletTemp;                              // Component exit upper limit temperature
-        bool FreeCoolCntrlShutDown;                        // true if component was shut down because of free cooling
-        Real64 FreeCoolCntrlMinCntrlTemp;                  // current control temp value for free cooling controls
-        DataPlant::iFreeCoolControlMode FreeCoolCntrlMode; // type of sensor used for free cooling controls
-        int FreeCoolCntrlNodeNum;                          // chiller condenser inlet node number for free cooling controls
-        int IndexInLoopSidePumps;                          // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
+        Array1D<OpSchemePtrData> OpScheme;                // Pointers to component on lists
+        Real64 EquipDemand;                               // Component load request based on inlet temp and outlet SP
+        bool EMSLoadOverrideOn;                           // EMS is calling to override load dispatched to component
+        Real64 EMSLoadOverrideValue;                      // EMS value to use for load when overridden [W] always positive.
+        DataPlant::HowMet HowLoadServed;                  // nature of component in terms of how it can meet load
+        Real64 MinOutletTemp;                             // Component exit lower limit temperature
+        Real64 MaxOutletTemp;                             // Component exit upper limit temperature
+        bool FreeCoolCntrlShutDown;                       // true if component was shut down because of free cooling
+        Real64 FreeCoolCntrlMinCntrlTemp;                 // current control temp value for free cooling controls
+        DataPlant::FreeCoolControlMode FreeCoolCntrlMode; // type of sensor used for free cooling controls
+        int FreeCoolCntrlNodeNum;                         // chiller condenser inlet node number for free cooling controls
+        int IndexInLoopSidePumps;                         // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
         Real64 TempDesCondIn;
         Real64 TempDesEvapOut;
         PlantComponent *compPtr;
@@ -105,12 +112,13 @@ namespace DataPlant {
 
         // Default Constructor
         CompData()
-            : TypeOf_Num(0), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown), FlowPriority(LoopFlowStatus_Unknown), ON(false),
-              Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0), MinLoad(0.0), OptLoad(0.0), SizFac(0.0),
-              CurOpSchemeType(UnknownStatusOpSchemeType), NumOpSchemes(0), CurCompLevelOpNum(0), EquipDemand(0.0), EMSLoadOverrideOn(false),
-              EMSLoadOverrideValue(0.0), HowLoadServed(HowMet_Unknown), MinOutletTemp(0.0), MaxOutletTemp(0.0), FreeCoolCntrlShutDown(false),
-              FreeCoolCntrlMinCntrlTemp(0.0), FreeCoolCntrlMode(DataPlant::iFreeCoolControlMode::Unassigned), FreeCoolCntrlNodeNum(0),
-              IndexInLoopSidePumps(0), TempDesCondIn(0.0), TempDesEvapOut(0.0), compPtr(nullptr)
+            : Type(DataPlant::PlantEquipmentType::Invalid), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid),
+              FlowPriority(LoopFlowStatus::Invalid), ON(false), Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0),
+              MinLoad(0.0), OptLoad(0.0), SizFac(0.0), CurOpSchemeType(DataPlant::OpScheme::Invalid), NumOpSchemes(0), CurCompLevelOpNum(0),
+              EquipDemand(0.0), EMSLoadOverrideOn(false), EMSLoadOverrideValue(0.0), HowLoadServed(DataPlant::HowMet::Invalid), MinOutletTemp(0.0),
+              MaxOutletTemp(0.0), FreeCoolCntrlShutDown(false), FreeCoolCntrlMinCntrlTemp(0.0),
+              FreeCoolCntrlMode(DataPlant::FreeCoolControlMode::Invalid), FreeCoolCntrlNodeNum(0), IndexInLoopSidePumps(0), TempDesCondIn(0.0),
+              TempDesEvapOut(0.0), compPtr(nullptr)
         {
         }
 
@@ -124,8 +132,6 @@ namespace DataPlant {
         //                from a the chilled water loop and does not call it sizing routine when called from the condenser loop.
 
         void simulate(EnergyPlusData &state, bool FirstHVACIteration);
-
-        bool isPump();
 
         void oneTimeInit(EnergyPlusData &state) const;
     };

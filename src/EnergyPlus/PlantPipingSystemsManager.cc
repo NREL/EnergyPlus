@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -138,7 +138,7 @@ namespace PlantPipingSystemsManager {
         state.dataGlobal->AnyBasementsInModel = (numBasementsCheck > 0);
     }
 
-    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] int objectType, std::string objectName)
+    PlantComponent *Circuit::factory(EnergyPlusData &state, [[maybe_unused]] DataPlant::PlantEquipmentType objectType, std::string objectName)
     {
         // Process the input data for circuits if it hasn't been done already
         if (state.dataPlantPipingSysMgr->GetInputFlag) {
@@ -771,7 +771,7 @@ namespace PlantPipingSystemsManager {
 
             // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
             std::vector<std::string> circuitNamesToFind;
-            int const NumAlphasBeforePipeCircOne = 10;
+            int constexpr NumAlphasBeforePipeCircOne = 10;
             for (int CircuitCtr = 1; CircuitCtr <= NumCircuitsInThisDomain; ++CircuitCtr) {
                 CurIndex = CircuitCtr + NumAlphasBeforePipeCircOne;
                 if (state.dataIPShortCut->lAlphaFieldBlanks(CurIndex)) {
@@ -1518,7 +1518,7 @@ namespace PlantPipingSystemsManager {
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
@@ -1539,7 +1539,7 @@ namespace PlantPipingSystemsManager {
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
@@ -1573,7 +1573,7 @@ namespace PlantPipingSystemsManager {
 
             // Need to loop once to store the names ahead of time because calling the segment factory will override cAlphaArgs
             std::vector<std::string> segmentNamesToFind;
-            int const NumAlphasBeforeSegmentOne = 3;
+            int constexpr NumAlphasBeforeSegmentOne = 3;
             for (int ThisCircuitPipeSegmentCounter = 1; ThisCircuitPipeSegmentCounter <= NumPipeSegments; ++ThisCircuitPipeSegmentCounter) {
                 CurIndex = ThisCircuitPipeSegmentCounter + NumAlphasBeforeSegmentOne;
                 if (state.dataIPShortCut->lAlphaFieldBlanks(CurIndex)) {
@@ -1656,7 +1656,7 @@ namespace PlantPipingSystemsManager {
                                                                            thisTrenchName,
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
                 CurIndex = 2;
@@ -1669,7 +1669,7 @@ namespace PlantPipingSystemsManager {
                                                                             thisTrenchName,
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
                 CurIndex = 3;
@@ -2106,11 +2106,11 @@ namespace PlantPipingSystemsManager {
         // Do any one-time initializations
         if (thisCircuit->NeedToFindOnPlantLoop) {
 
-            int TypeToLookFor;
+            DataPlant::PlantEquipmentType TypeToLookFor;
             if (thisCircuit->IsActuallyPartOfAHorizontalTrench) {
-                TypeToLookFor = DataPlant::TypeOf_GrndHtExchgHorizTrench;
+                TypeToLookFor = DataPlant::PlantEquipmentType::GrndHtExchgHorizTrench;
             } else {
-                TypeToLookFor = DataPlant::TypeOf_PipingSystemPipeCircuit;
+                TypeToLookFor = DataPlant::PlantEquipmentType::PipingSystemPipeCircuit;
             }
 
             bool errFlag = false;
@@ -2553,7 +2553,7 @@ namespace PlantPipingSystemsManager {
     }
 
     CartesianPipeCellInformation::CartesianPipeCellInformation(Real64 const GridCellWidth,
-                                                               RadialSizing const &PipeSizes,
+                                                               PlantPipingSystemsManager::RadialSizing const PipeSizes,
                                                                int const NumRadialNodes,
                                                                Real64 const CellDepth,
                                                                Real64 const InsulationThickness,
@@ -2760,7 +2760,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BasementCellFraction(0.001); // the fraction of domain extent to use for the basement cells
+        Real64 constexpr BasementCellFraction(0.001); // the fraction of domain extent to use for the basement cells
         // actual dimension shouldn't matter for calculation purposes
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3384,7 +3384,7 @@ namespace PlantPipingSystemsManager {
                     RectangleF XYRectangle = RectangleF(CellXMinValue, CellYMinValue, CellWidth, CellHeight);
 
                     //'determine cell type
-                    CellType cellType = CellType::Unknown;
+                    CellType cellType = CellType::Invalid;
 
                     //'if this is a pipe node, some flags are needed
                     bool pipeCell = false;
@@ -3567,7 +3567,7 @@ namespace PlantPipingSystemsManager {
                     case CellType::BasementCutaway:
                         ++NumCutawayBasementCells;
                         break;
-                    case CellType::Unknown:
+                    case CellType::Invalid:
                         cellType = CellType::GeneralField;
                         // fallthrough
                     default:
@@ -3895,6 +3895,8 @@ namespace PlantPipingSystemsManager {
                     SegmentOutletCellY = segment->PipeCellCoordinates.Y;
                     SegmentOutletCellZ = 0;
                     break;
+                default:
+                    assert(false);
                 }
                 if (!CircuitInletCellSet) {
                     CircuitInletCellX = SegmentInletCellX;
@@ -4188,7 +4190,7 @@ namespace PlantPipingSystemsManager {
                     case CellType::BasementCutaway:
                         // it's ok to not simulate this one
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -4246,16 +4248,16 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const AirDensity(1.22521);   // '[kg/m3]
-        Real64 const AirSpecificHeat(1003); // '[J/kg-K]
+        Real64 constexpr AirDensity(1.22521);   // '[kg/m3]
+        Real64 constexpr AirSpecificHeat(1003); // '[J/kg-K]
         // evapotranspiration parameters
-        Real64 const MeanSolarConstant(0.08196); // 1367 [W/m2], entered in [MJ/m2-minute]
-        Real64 const A_s(0.25);                  // ?
-        Real64 const B_s(0.5);                   // ?
-        Real64 const Absor_Corrected(0.77);
+        Real64 constexpr MeanSolarConstant(0.08196); // 1367 [W/m2], entered in [MJ/m2-minute]
+        Real64 constexpr A_s(0.25);                  // ?
+        Real64 constexpr B_s(0.5);                   // ?
+        Real64 constexpr Absor_Corrected(0.77);
         Real64 const Convert_Wm2_To_MJhrmin(3600.0 / 1000000.0);
         Real64 const Convert_MJhrmin_To_Wm2(1.0 / Convert_Wm2_To_MJhrmin);
-        Real64 const Rho_water(998.0); // [kg/m3]
+        Real64 constexpr Rho_water(998.0); // [kg/m3]
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 NeighborTemp = 0.0;
@@ -4754,7 +4756,7 @@ namespace PlantPipingSystemsManager {
         Real64 RunningSummation = 0.0;
         auto const &numSurfaces = static_cast<unsigned int>(this->BasementZone.WallSurfacePointers.size());
         for (auto &surfaceIndex : this->BasementZone.WallSurfacePointers) {
-            RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(surfaceIndex);
+            RunningSummation += state.dataHeatBalSurf->SurfQdotConvOutPerArea(surfaceIndex);
         }
         return -RunningSummation / numSurfaces; // heat flux is negative here
     }
@@ -4771,7 +4773,7 @@ namespace PlantPipingSystemsManager {
         Real64 RunningSummation = 0.0;
         auto const &numSurfaces = static_cast<unsigned int>(this->BasementZone.FloorSurfacePointers.size());
         for (auto &surfaceIndex : this->BasementZone.FloorSurfacePointers) {
-            RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(surfaceIndex);
+            RunningSummation += state.dataHeatBalSurf->SurfQdotConvOutPerArea(surfaceIndex);
         }
         return -RunningSummation / numSurfaces; // heat flux is negative here
     }
@@ -4786,7 +4788,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BigNumber(10000.0);
+        Real64 constexpr BigNumber(10000.0);
 
         // First the wall
         this->BasementWallTemp = this->GetAverageTempByType(state, CellType::BasementWall);
@@ -4817,7 +4819,7 @@ namespace PlantPipingSystemsManager {
         Real64 RunningSummation = 0.0;
         auto const &NumSurfaces = this->ZoneCoupledSurfaces.size();
         for (auto &z : this->ZoneCoupledSurfaces) {
-            RunningSummation += state.dataHeatBalSurf->QdotConvOutRepPerArea(z.IndexInSurfaceArray);
+            RunningSummation += state.dataHeatBalSurf->SurfQdotConvOutPerArea(z.IndexInSurfaceArray);
         }
         return -RunningSummation / NumSurfaces; // heat flux is negative here
     }
@@ -4832,7 +4834,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const BigNumber(10000.0);
+        Real64 constexpr BigNumber(10000.0);
 
         this->ZoneCoupledSurfaceTemp = this->GetAverageTempByType(state, CellType::ZoneGroundInterface);
         int OSCMIndex = this->ZoneCoupledOSCMIndex;
@@ -4905,6 +4907,8 @@ namespace PlantPipingSystemsManager {
         case Direction::PositiveZ:
             distance = (cell.depth() / 2.0);
             break;
+        default:
+            assert(false);
         }
 
         resistance = (distance / 2.0) / (cell.Properties.Conductivity * cell.normalArea(direction));
@@ -4937,7 +4941,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        Real64 const StagnantFluidConvCoeff(200.0);
+        Real64 constexpr StagnantFluidConvCoeff(200.0);
 
         // Setup circuit flow conditions -- convection coefficient
         int const CellX = thisCircuit->CircuitInletCell.X;
@@ -5581,7 +5585,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::BasementCutaway:
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -5689,7 +5693,7 @@ namespace PlantPipingSystemsManager {
                         break;
                     case CellType::BasementCutaway:
                         break;
-                    case CellType::Unknown:
+                    default:
                         assert(false);
                     }
                 }
@@ -5858,13 +5862,13 @@ namespace PlantPipingSystemsManager {
         Real64 const Theta_ice = Theta_liq;
 
         //'Cp (freezing) calculations
-        Real64 const rho_ice = 917.0;  //'Kg / m3
-        Real64 const rho_liq = 1000.0; //'kg / m3
+        Real64 constexpr rho_ice = 917.0;  //'Kg / m3
+        Real64 constexpr rho_liq = 1000.0; //'kg / m3
 
         //'from( " An improved model for predicting soil thermal conductivity from water content at room temperature, Fig 4" )
-        Real64 const CP_liq = 4180.0;    //'J / KgK
-        Real64 const CP_ice = 2066.0;    //'J / KgK
-        Real64 const Lat_fus = 334000.0; //'J / Kg
+        Real64 constexpr CP_liq = 4180.0;    //'J / KgK
+        Real64 constexpr CP_ice = 2066.0;    //'J / KgK
+        Real64 constexpr Lat_fus = 334000.0; //'J / Kg
         Real64 const Cp_transient = Lat_fus / 0.4 + (0.5 * CP_ice - (CP_liq + CP_ice) / 2.0 * 0.1) / 0.4;
 
         //'from( " Numerical and experimental investigation of melting and freezing processes in phase change material storage" )
@@ -5885,10 +5889,10 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         //'set some temperatures here for generalization -- these could be set in the input file
-        Real64 const frzAllIce = -0.5;
-        Real64 const frzIceTrans = -0.4;
-        Real64 const frzLiqTrans = -0.1;
-        Real64 const frzAllLiq = 0.0;
+        Real64 constexpr frzAllIce = -0.5;
+        Real64 constexpr frzIceTrans = -0.4;
+        Real64 constexpr frzLiqTrans = -0.1;
+        Real64 constexpr frzAllLiq = 0.0;
 
         //'calculate this cell's new Cp value based on the cell temperature
         if (CellTemp <= frzAllIce) { // totally frozen

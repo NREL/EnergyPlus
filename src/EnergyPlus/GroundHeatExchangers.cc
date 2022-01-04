@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,7 +124,7 @@ using namespace GroundTemperatureManager;
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
-constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
+static constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
 
@@ -152,7 +152,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                              this->name,
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             NodeInputManager::compFluidStream::Primary,
+                                                             NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
     // get outlet node num
@@ -163,7 +163,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                               this->name,
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
 
     this->available = true;
@@ -290,7 +290,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                              objName,
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             NodeInputManager::compFluidStream::Primary,
+                                                             NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
     // get outlet node num
@@ -302,7 +302,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                               objName,
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
     this->available = true;
     this->on = true;
@@ -821,19 +821,19 @@ void GLHEBase::simulate(EnergyPlusData &state,
 
 //******************************************************************************
 
-PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, std::string const &objectName)
+PlantComponent *GLHEBase::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName)
 {
     if (state.dataGroundHeatExchanger->GetInput) {
         GetGroundHeatExchangerInput(state);
         state.dataGroundHeatExchanger->GetInput = false;
     }
-    if (objectType == DataPlant::TypeOf_GrndHtExchgSystem) {
+    if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSystem) {
         for (auto &ghx : state.dataGroundHeatExchanger->verticalGLHE) {
             if (ghx.name == objectName) {
                 return &ghx;
             }
         }
-    } else if (objectType == DataPlant::TypeOf_GrndHtExchgSlinky) {
+    } else if (objectType == DataPlant::PlantEquipmentType::GrndHtExchgSlinky) {
         for (auto &ghx : state.dataGroundHeatExchanger->slinkyGLHE) {
             if (ghx.name == objectName) {
                 return &ghx;
@@ -876,7 +876,7 @@ std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian 
 
 //******************************************************************************
 
-Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &currTime)
+Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const currTime)
 {
     Real64 pointToPointResponse = erfc(dists[0] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[0];
     Real64 pointToReflectedResponse = erfc(dists[1] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[1];
@@ -886,7 +886,7 @@ Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &cu
 
 //******************************************************************************
 
-Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const currTime)
 {
 
     // This code could be optimized in a number of ways.
@@ -919,7 +919,7 @@ Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSi
 
 //******************************************************************************
 
-Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const currTime)
 {
 
     // Similar optimizations as discussed above could happen here
@@ -1024,7 +1024,7 @@ void GLHEVert::calcGFunctions(EnergyPlusData &state)
     this->combineShortAndLongTimestepGFunctions();
 
     // save data for later
-    if (!state.dataSysVars->DisableGLHECaching) {
+    if (state.files.outputControl.glhe && !state.dataSysVars->DisableGLHECaching) {
         myCacheData["Response Factors"]["time"] = std::vector<Real64>(this->myRespFactors->time.begin(), this->myRespFactors->time.end());
         myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(this->myRespFactors->LNTTS.begin(), this->myRespFactors->LNTTS.end());
         myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(this->myRespFactors->GFNC.begin(), this->myRespFactors->GFNC.end());
@@ -1111,11 +1111,13 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
     enum class CellType
     {
+        Invalid = -1,
         FLUID,
         CONVECTION,
         PIPE,
         GROUT,
-        SOIL
+        SOIL,
+        Num
     };
 
     struct Cell
@@ -1264,14 +1266,14 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
     }
 
     // set upper limit of time for the short time-step g-function calcs so there is some overlap
-    Real64 const lntts_max_for_short_timestep = -9.0;
+    Real64 constexpr lntts_max_for_short_timestep = -9.0;
     Real64 const t_s = pow_2(this->bhLength) / (9.0 * this->soil.diffusivity);
 
-    Real64 const time_step = 500;
+    Real64 constexpr time_step = 500;
     Real64 const time_max_for_short_timestep = exp(lntts_max_for_short_timestep) * t_s;
     Real64 total_time = 0;
 
-    Real64 const heat_flux = 40.4;
+    Real64 constexpr heat_flux = 40.4;
 
     // time step loop
     while (total_time < time_max_for_short_timestep) {
@@ -1438,7 +1440,7 @@ void GLHEVert::combineShortAndLongTimestepGFunctions()
 
 void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
 {
-    if (!state.dataSysVars->DisableGLHECaching) {
+    if (state.files.outputControl.glhe && !state.dataSysVars->DisableGLHECaching) {
         makeThisGLHECacheStruct();
         readCacheFileAndCompareWithThisGLHECache(state);
     }
@@ -1467,10 +1469,11 @@ void GLHEVert::makeThisGLHECacheStruct()
     d["Max Simulation Years"] = this->myRespFactors->maxSimYears;
     d["g-Function Calc Method"] = GroundHeatExchangers::GFuncCalcMethodsStrs[int(this->gFuncCalcMethod)];
 
+    auto &d_bh_data = d["BH Data"];
     int i = 0;
     for (auto &thisBH : this->myRespFactors->myBorholes) {
         ++i;
-        auto &d_bh = d["BH Data"][format("BH {}", i)];
+        auto &d_bh = d_bh_data[fmt::format("BH {}", i)];
         d_bh["X-Location"] = thisBH->xLoc;
         d_bh["Y-Location"] = thisBH->yLoc;
     }
@@ -1480,52 +1483,32 @@ void GLHEVert::makeThisGLHECacheStruct()
 
 void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
 {
-    // For convenience
-    using json = nlohmann::json;
 
-    if (!FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
+    if (!(state.files.outputControl.glhe && FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath))) {
         // if the file doesn't exist, there are no data to read
         return;
-    } else {
-        // file exists -- read data and load if possible
+    }
+    // file exists -- read data and load if possible
 
-        // open file
-        std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
+    auto const cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath);
 
-        // create empty json object
-        json json_in;
-
-        // read json_in data
-        try {
-            ifs >> json_in;
-            ifs.close();
-        } catch (...) {
-            if (!json_in.empty()) {
-                // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, state.dataStrGlobals->outputGLHEFilePath.string() + " contains invalid file format");
-            }
-            ifs.close();
-            return;
+    for (auto const &existing_data : cached_json) {
+        if (myCacheData["Phys Data"] == existing_data["Phys Data"]) {
+            myCacheData["Response Factors"] = existing_data["Response Factors"];
+            gFunctionsExist = true;
+            break;
         }
+    }
 
-        for (auto &existing_data : json_in) {
-            if (myCacheData["Phys Data"] == existing_data["Phys Data"]) {
-                myCacheData["Response Factors"] = existing_data["Response Factors"];
-                gFunctionsExist = true;
-                break;
-            }
-        }
+    if (gFunctionsExist) {
+        // Populate the time array
+        this->myRespFactors->time = Array1D<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
 
-        if (gFunctionsExist) {
-            // Populate the time array
-            this->myRespFactors->time = Array1D<Real64>(myCacheData["Response Factors"]["time"].get<std::vector<Real64>>());
+        // Populate the lntts array
+        this->myRespFactors->LNTTS = Array1D<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
 
-            // Populate the lntts array
-            this->myRespFactors->LNTTS = Array1D<Real64>(myCacheData["Response Factors"]["LNTTS"].get<std::vector<Real64>>());
-
-            // Populate the g-function array
-            this->myRespFactors->GFNC = Array1D<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
-        }
+        // Populate the g-function array
+        this->myRespFactors->GFNC = Array1D<Real64>(myCacheData["Response Factors"]["GFNC"].get<std::vector<Real64>>());
     }
 }
 
@@ -1541,7 +1524,7 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
     if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // file exists -- add data
         // open file
-        cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath, std::ios_base::in | std::ios_base::binary);
+        cached_json = FileSystem::readJSON(state.dataStrGlobals->outputGLHEFilePath);
 
         // add current data
         cached_json.emplace(fmt::format("GHLE {}", cached_json.size() + 1), myCacheData);
@@ -2819,7 +2802,7 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
     if (reynoldsNum < lower_limit) {
         nusseltNum = 4.01; // laminar mean(4.36, 3.66)
     } else if (lower_limit <= reynoldsNum && reynoldsNum < upper_limit) {
-        Real64 const nu_low = 4.01;                   // laminar
+        Real64 constexpr nu_low = 4.01;               // laminar
         Real64 const f = frictionFactor(reynoldsNum); // turbulent
         Real64 const prandtlNum = (cpFluid * fluidViscosity) / (kFluid);
         Real64 const nu_high = (f / 8) * (reynoldsNum - 1000) * prandtlNum / (1 + 12.7 * std::sqrt(f / 8) * (pow(prandtlNum, 2.0 / 3.0) - 1));
@@ -3144,7 +3127,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime)
+void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const CurTime)
 {
 
     constexpr const char *RoutineName("initEnvironment");
@@ -3177,13 +3160,23 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 void GLHEVert::oneTimeInit_new(EnergyPlusData &state)
 {
 
-    using DataPlant::TypeOf_GrndHtExchgSystem;
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(
-        state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    ScanPlantLoopsForObject(state,
+                            this->name,
+                            DataPlant::PlantEquipmentType::GrndHtExchgSystem,
+                            this->loopNum,
+                            this->loopSideNum,
+                            this->branchNum,
+                            this->compNum,
+                            errFlag,
+                            _,
+                            _,
+                            _,
+                            _,
+                            _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }
@@ -3231,7 +3224,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
+void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
 {
 
     constexpr const char *RoutineName("initEnvironment");
@@ -3263,13 +3256,23 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
 
 void GLHESlinky::oneTimeInit_new(EnergyPlusData &state)
 {
-    using DataPlant::TypeOf_GrndHtExchgSlinky;
     using PlantUtilities::ScanPlantLoopsForObject;
 
     // Locate the hx on the plant loops for later usage
     bool errFlag = false;
-    ScanPlantLoopsForObject(
-        state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+    ScanPlantLoopsForObject(state,
+                            this->name,
+                            DataPlant::PlantEquipmentType::GrndHtExchgSlinky,
+                            this->loopNum,
+                            this->loopSideNum,
+                            this->branchNum,
+                            this->compNum,
+                            errFlag,
+                            _,
+                            _,
+                            _,
+                            _,
+                            _);
     if (errFlag) {
         ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
     }

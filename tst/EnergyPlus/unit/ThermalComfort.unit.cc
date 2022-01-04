@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -1029,7 +1030,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->ZoneMRT(1) = RadTemp;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) =
         Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
-    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * ThermalComfort::ActLevelConv;
     state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
 
     // Test 1 - Air velocity = 0.15 m/s.
@@ -1597,6 +1598,38 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -5.5896341565108720, 0.001);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 100.0, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveCEN15251)
+{
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
+
+    // test the initialisation
+    state->dataEnvrn->DayOfYear = 1;
+    state->dataEnvrn->CurrentYearIsLeapYear = false;
+    CalcThermalComfortAdaptiveCEN15251(*state, true, true, 0.0);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageCEN, -1.3671408, 0.01);
+
+    // skip the first day
+    Array1D<Real64> HourlyDryBulbTemp = {
+        -4.8, -5.4, -5.7, -5.9, -6.1, -6.2, -7.2, -6.7, -6.7, -5.6, -5., -4.4, -5., -3.9, -5., -5., -6.7, -7.8, -9.4, -9.4, -9.4, -9.4, -7.8, -7.2,
+    };
+    state->dataGlobal->BeginDayFlag = true;
+    state->dataGlobal->BeginHourFlag = true;
+    for (int i = 1; i <= 24; i++) {
+        state->dataEnvrn->OutDryBulbTemp = HourlyDryBulbTemp(i);
+        CalcThermalComfortAdaptiveCEN15251(*state, false);
+        if (i == 1) {
+            state->dataGlobal->BeginDayFlag = false;
+        }
+    }
+
+    // test the second day
+    state->dataEnvrn->DayOfYear += 1;
+    state->dataGlobal->BeginDayFlag = true;
+    CalcThermalComfortAdaptiveCEN15251(*state, false);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageCEN, -2.3912126, 0.01);
+    state->dataGlobal->BeginDayFlag = false;
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_GetAngleFactorListTest)

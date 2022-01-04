@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -485,7 +485,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::Inlet,
-                              NodeInputManager::compFluidStream::Primary,
+                              NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode =
             GetOnlySingleNode(state,
@@ -495,7 +495,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::Outlet,
-                              NodeInputManager::compFluidStream::Primary,
+                              NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode =
             GetOnlySingleNode(state,
@@ -505,7 +505,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::Inlet,
-                              NodeInputManager::compFluidStream::Secondary,
+                              NodeInputManager::CompFluidStream::Secondary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode =
             GetOnlySingleNode(state,
@@ -515,7 +515,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::ReliefAir,
-                              NodeInputManager::compFluidStream::Secondary,
+                              NodeInputManager::CompFluidStream::Secondary,
                               ObjectIsParent);
 
         //   Check that supply air inlet node is an OA node
@@ -854,7 +854,7 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         thisOAController.Name = Alphas(1);
         thisOAController.ControllerType = CurrentModuleObject;
-        thisOAController.ControllerType_Num = MixedAir::iControllerType::ControllerStandAloneERV;
+        thisOAController.ControllerType_Num = MixedAir::MixedAirControllerType::ControllerStandAloneERV;
         WhichERV = UtilityRoutines::FindItemInList(Alphas(1), state.dataHVACStandAloneERV->StandAloneERV, &StandAloneERVData::ControllerName);
         if (WhichERV != 0) {
             AirFlowRate = state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow;
@@ -929,52 +929,52 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         // Changed by AMIT for new implementation of the controller:outside air
         if (Alphas(3) == "EXHAUSTAIRTEMPERATURELIMIT" && Alphas(4) == "EXHAUSTAIRENTHALPYLIMIT") {
-            thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulbAndEnthalpy;
+            thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulbAndEnthalpy;
         } else if (Alphas(3) == "EXHAUSTAIRTEMPERATURELIMIT" && Alphas(4) == "NOEXHAUSTAIRENTHALPYLIMIT") {
-            thisOAController.Econo = MixedAir::iEconoOp::DifferentialDryBulb;
+            thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb;
         } else if (Alphas(3) == "NOEXHAUSTAIRTEMPERATURELIMIT" && Alphas(4) == "EXHAUSTAIRENTHALPYLIMIT") {
-            thisOAController.Econo = MixedAir::iEconoOp::DifferentialEnthalpy;
+            thisOAController.Econo = MixedAir::EconoOp::DifferentialEnthalpy;
         } else if (Alphas(3) == "NOEXHAUSTAIRTEMPERATURELIMIT" && Alphas(4) == "NOEXHAUSTAIRENTHALPYLIMIT") {
             if ((!lNumericBlanks(1)) || (!lNumericBlanks(3)) || (!lNumericBlanks(4)) || (!lAlphaBlanks(2))) {
                 // This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
                 // ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-                thisOAController.Econo = MixedAir::iEconoOp::FixedDryBulb;
+                thisOAController.Econo = MixedAir::EconoOp::FixedDryBulb;
             }
         } else if ((!lAlphaBlanks(3)) && (!lAlphaBlanks(4))) {
             if ((lNumericBlanks(1)) && (lNumericBlanks(3)) && (lNumericBlanks(4)) && lAlphaBlanks(2)) {
                 ShowWarningError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
                 ShowContinueError(state, "... Invalid " + cAlphaFields(3) + cAlphaFields(4) + " = " + Alphas(3) + Alphas(4));
                 ShowContinueError(state, "... Assumed NO EXHAUST AIR TEMP LIMIT and NO EXHAUST AIR ENTHALPY LIMIT.");
-                thisOAController.Econo = MixedAir::iEconoOp::NoEconomizer;
+                thisOAController.Econo = MixedAir::EconoOp::NoEconomizer;
             } else {
                 // This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
                 // ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-                thisOAController.Econo = MixedAir::iEconoOp::FixedDryBulb;
+                thisOAController.Econo = MixedAir::EconoOp::FixedDryBulb;
             }
         } else if ((lAlphaBlanks(3)) && (!lAlphaBlanks(4))) {
             if ((lNumericBlanks(1)) && (lNumericBlanks(3)) && (lNumericBlanks(4)) && lAlphaBlanks(2)) {
                 ShowWarningError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
                 ShowContinueError(state, "... Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                 ShowContinueError(state, "... Assumed  NO EXHAUST AIR ENTHALPY LIMIT.");
-                thisOAController.Econo = MixedAir::iEconoOp::NoEconomizer;
+                thisOAController.Econo = MixedAir::EconoOp::NoEconomizer;
             } else {
                 // This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
                 // ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-                thisOAController.Econo = MixedAir::iEconoOp::FixedDryBulb;
+                thisOAController.Econo = MixedAir::EconoOp::FixedDryBulb;
             }
         } else if ((!lAlphaBlanks(3)) && (lAlphaBlanks(4))) {
             if ((lNumericBlanks(1)) && (lNumericBlanks(3)) && (lNumericBlanks(4)) && lAlphaBlanks(2)) {
                 ShowWarningError(state, CurrentModuleObject + " \"" + Alphas(1) + "\"");
                 ShowContinueError(state, "... Invalid " + cAlphaFields(3) + " = " + Alphas(3));
                 ShowContinueError(state, "... Assumed NO EXHAUST AIR TEMP LIMIT ");
-                thisOAController.Econo = MixedAir::iEconoOp::NoEconomizer;
+                thisOAController.Econo = MixedAir::EconoOp::NoEconomizer;
             } else {
                 // This means that any of the FIXED DRY BULB, FIXED ENTHALPY, FIXED DEW POINT AND DRY BULB OR
                 // ELECTRONIC ENTHALPY ECONOMIZER STRATEGY is present
-                thisOAController.Econo = MixedAir::iEconoOp::FixedDryBulb;
+                thisOAController.Econo = MixedAir::EconoOp::FixedDryBulb;
             }
         } else { // NO Economizer
-            thisOAController.Econo = MixedAir::iEconoOp::NoEconomizer;
+            thisOAController.Econo = MixedAir::EconoOp::NoEconomizer;
         }
 
         thisOAController.FixedMin = false;
@@ -1257,7 +1257,6 @@ void InitStandAloneERV(EnergyPlusData &state,
     // Uses the status flags to trigger initializations.
 
     using DataZoneEquipment::CheckZoneEquipmentList;
-    using DataZoneEquipment::ERVStandAlone_Num;
     using MixedAir::SimOAController;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1282,13 +1281,13 @@ void InitStandAloneERV(EnergyPlusData &state,
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
         if (state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum)) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).AvailManagerListName =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).AvailManagerListName =
                 state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).ZoneNum = ZoneNum;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).ZoneNum = ZoneNum;
             state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum) = false;
         }
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailStatus =
-            state.dataHVACGlobal->ZoneComp(ERVStandAlone_Num).ZoneCompAvailMgrs(StandAloneERVNum).AvailStatus;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ERVStandAlone).ZoneCompAvailMgrs(StandAloneERVNum).AvailStatus;
     }
 
     // need to check all units to see if they are on Zone Equipment List or issue warning

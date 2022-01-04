@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,107 +63,120 @@ namespace DataGenerators {
     // MODULE PARAMETER DEFINITIONS:
     enum class CurveMode
     {
-        Unassigned,
+        Invalid = -1,
         Normalized, // mode where efficiency curves are modifier curves
-        Direct      // mode where efficiency curves are direct
+        Direct,     // mode where efficiency curves are direct
+        Num
     };
 
     enum class SkinLoss
     {
-        Unassigned,
+        Invalid = -1,
         ConstantRate,
-        UADT,             // UAdelta T mode for skin losses
-        QuadraticFuelNdot // Quadratic function of fuel flow for skin losses
+        UADT,              // UAdelta T mode for skin losses
+        QuadraticFuelNdot, // Quadratic function of fuel flow for skin losses
+        Num
     };
 
     enum class AirSupRateMode
     {
-        Unassigned,
+        Invalid = -1,
         QuadraticFuncofNdot,  // function of fuel rate mode for air flow
         ConstantStoicsAirRat, // Constant air ratio in stoics with fuel constituents
-        QuadraticFuncofPel    // function of electric power mode
+        QuadraticFuncofPel,   // function of electric power mode
+        Num
     };
 
     enum class RecoverMode
     {
-        Unassigned,
+        Invalid = -1,
         NoRecoveryOnAirIntake,  // mode for controlling intake air heat recovery
         RecoverBurnInvertBatt,  // mode for controlling intake air heat recovery
         RecoverAuxiliaryBurner, // mode for controlling intake air heat recovery
         RecoverInverterBatt,    // mode for controlling intake air heat recovery
         RecoverInverter,        // mode for controlling intake air heat recovery
-        RecoverBattery          // mode for controlling intake air heat recovery
+        RecoverBattery,         // mode for controlling intake air heat recovery
+        Num
     };
 
     enum class ConstituentMode
     {
-        Unassigned,
+        Invalid = -1,
         RegularAir,
-        UserDefinedConstituents
+        UserDefinedConstituents,
+        Num
     };
 
     enum class FuelTemperatureMode
     {
-        Unassigned,
+        Invalid = -1,
         FuelInTempFromNode,
-        FuelInTempSchedule
+        FuelInTempSchedule,
+        Num
     };
 
     enum class WaterTemperatureMode
     {
-        Unassigned,
+        Invalid = -1,
         WaterInReformMains,
         WaterInReformAirNode,
         WaterInReformWaterNode,
-        WaterInReformSchedule
+        WaterInReformSchedule,
+        Num
     };
 
     enum class InverterEfficiencyMode
     {
-        Unassigned,
+        Invalid = -1,
         Constant,
-        Quadratic
+        Quadratic,
+        Num
     };
 
     enum class ExhaustGasHX
     {
-        Unassigned,
+        Invalid = -1,
         FixedEffectiveness,   // exhaust gas HX modeling mode
         LMTDempiricalUAeff,   // exhaust gas HX modeling mode
         LMTDfundementalUAeff, // exhaust gas HX modeling mode
-        Condensing            // exhaust gas HX modeling mode
+        Condensing,           // exhaust gas HX modeling mode
+        Num
     };
 
     enum class ElectricalStorage
     {
-        Unassigned,
-        SimpleEffConstraints,        // electrical storage modeling mode
-        LeadAcidBatterySaupe,        // electrical storage modeling mode
-        LeadAcidBatterManwellMcGowan // electrical storage modeling mode
+        Invalid = -1,
+        SimpleEffConstraints,         // electrical storage modeling mode
+        LeadAcidBatterySaupe,         // electrical storage modeling mode
+        LeadAcidBatterManwellMcGowan, // electrical storage modeling mode
+        Num
     };
 
     enum class LossDestination
     {
-        Unassigned,
+        Invalid = -1,
         SurroundingZone,
-        AirInletForFC
+        AirInletForFC,
+        Num
     };
 
     enum class OperatingMode
     {
-        Unassigned,
-        OpModeOff,     // CHP operating mode OFF
-        OpModeStandby, // CHP operating mode Stand By
-        OpModeWarmUp,  // CHP operating mode Warm Up or start up
-        OpModeNormal,  // CHP operating mode Normal
-        OpModeCoolDown // CHP operating mode Cool down or shut down
+        Invalid = -1,
+        OpModeOff,      // CHP operating mode OFF
+        OpModeStandby,  // CHP operating mode Stand By
+        OpModeWarmUp,   // CHP operating mode Warm Up or start up
+        OpModeNormal,   // CHP operating mode Normal
+        OpModeCoolDown, // CHP operating mode Cool down or shut down
+        Num
     };
 
     enum class FuelMode
     {
-        Unassigned,
-        fuelModeGaseousConstituents,
-        fuelModeGenericLiquid
+        Invalid = -1,
+        GaseousConstituents,
+        GenericLiquid,
+        Num
     };
 
     Real64 constexpr MinProductGasTemp(-100.0); // Minimum bound on search for product gas temps
@@ -171,9 +184,10 @@ namespace DataGenerators {
 
     enum class ThermodynamicMode
     {
-        Unassigned,
+        Invalid = -1,
         NISTShomate,
-        NASAPolynomial
+        NASAPolynomial,
+        Num
     };
 
     Real64 constexpr RinKJperMolpK(0.0083145); // R is ideal gas constant (kJ/mol-K)
@@ -214,9 +228,9 @@ namespace DataGenerators {
 
         // Default Constructor
         GeneratorFuelSupplyDataStruct()
-            : FuelTempMode(DataGenerators::FuelTemperatureMode::Unassigned), FuelTypeMode(DataGenerators::FuelMode::Unassigned), NodeNum(0),
-              SchedNum(0), CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0),
-              LHVJperkg(0.0), LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0), KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0),
+            : FuelTempMode(DataGenerators::FuelTemperatureMode::Invalid), FuelTypeMode(DataGenerators::FuelMode::Invalid), NodeNum(0), SchedNum(0),
+              CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0), LHVJperkg(0.0),
+              LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0), KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0),
               TfuelIntoFCPM(0.0), PfuelCompEl(0.0), QskinLoss(0.0), CO2ProductGasCoef(0.0), H2OProductGasCoef(0.0)
         {
         }
@@ -251,7 +265,7 @@ namespace DataGenerators {
 
         // Default Constructor
         GasPropertyDataStruct()
-            : StdRefMolarEnthOfForm(0.0), ThermoMode(DataGenerators::ThermodynamicMode::Unassigned), ShomateA(0.0), ShomateB(0.0), ShomateC(0.0),
+            : StdRefMolarEnthOfForm(0.0), ThermoMode(DataGenerators::ThermodynamicMode::Invalid), ShomateA(0.0), ShomateB(0.0), ShomateC(0.0),
               ShomateD(0.0), ShomateE(0.0), ShomateF(0.0), ShomateG(0.0), ShomateH(0.0), NumCarbons(0.0), NumHydrogens(0.0), NumOxygens(0.0),
               MolecularWeight(0.0), NASA_A1(0.0), NASA_A2(0.0), NASA_A3(0.0), NASA_A4(0.0), NASA_A5(0.0), NASA_A6(0.0), NASA_A7(0.0)
         {

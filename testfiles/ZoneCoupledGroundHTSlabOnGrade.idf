@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !- Use '!' comments if they need to be retained when using the IDFEditor.
 !- =========== ALL OBJECTS IN CLASS: VERSION ===========
-! SlabOnGradeWithInsulation.idf
+! ZoneCoupledGroundHTSlabOnGrade.idf
 ! Basic File Description:
 ! This input file exemplifies the use of the Site:GroundDomain:Slab
 ! object to perform the simulation of ground coupled heat transfer.
@@ -43,7 +43,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,9.6;
+  Version,22.1;
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown));
+            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Invalid));
         } else if (equip.Name == "OTHEREQ2") {
             ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse));
         }
@@ -660,23 +660,27 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
-    int numGainTypes = DataHeatBalance::NumZoneIntGainDeviceTypes;
-    Array1D<Real64> convGains;
-    convGains.allocate(numGainTypes);
+    int numGainTypes = static_cast<int>(DataHeatBalance::IntGainType::Num);
+    Array1D<Real64> convGains({0, numGainTypes - 1});
     convGains = 0.0;
     Real64 totConvGains = 0.0;
     Real64 expectedTotConvGains = 0.0;
 
-    for (int gainType = 1; gainType <= numGainTypes; ++gainType) {
+    for (int gainType = 0; gainType < numGainTypes; ++gainType) {
         convGains(gainType) = 100 * gainType;
         expectedTotConvGains += convGains(gainType);
-        SetupZoneInternalGain(*state, zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
+        SetupZoneInternalGain(*state,
+                              zoneNum,
+                              format(DataHeatBalance::IntGainTypeNamesCC[gainType]),
+                              "Gain",
+                              static_cast<DataHeatBalance::IntGainType>(gainType),
+                              &convGains(gainType));
     }
 
     InternalHeatGains::UpdateInternalGainValues(*state);
 
     // Check total of all convective gains
-    InternalHeatGains::SumAllInternalConvectionGains(*state, zoneNum, totConvGains);
+    totConvGains = InternalHeatGains::SumAllInternalConvectionGains(*state, zoneNum);
     EXPECT_EQ(totConvGains, expectedTotConvGains);
 
     // Check subtotals used in zone component loads
@@ -701,11 +705,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
                    state->dataOutRptTab->powerGenInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum);
 
     // Legitimate gain types excluded from this total
-    expectedTotConvGains -= convGains(DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide); // this is only used for CO2
     expectedTotConvGains -=
-        convGains(DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam); // this is only used for generic contaminants
-    expectedTotConvGains -=
-        convGains(DataHeatBalance::IntGainTypeOf_DaylightingDeviceTubular); // this is included in Fenestration Conduction - Sensible Instant
+        convGains(static_cast<int>(DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide)); // this is only used for CO2
+    expectedTotConvGains -= convGains(
+        static_cast<int>(DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam)); // this is only used for generic contaminants
+    expectedTotConvGains -= convGains(
+        static_cast<int>(DataHeatBalance::IntGainType::DaylightingDeviceTubular)); // this is included in Fenestration Conduction - Sensible Instant
 
     // ** NOTE: If this unit test fails, the likely cause is that a new internal gain type was added, but it was not added to one of the subtotal
     // types in InternalHeatGains::GatherComponentLoadsIntGain() this also means that the new type may be missing from other places that collect

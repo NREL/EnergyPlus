@@ -17,5 +17,8 @@ python3 "$REPO_ROOT"/scripts/dev/verify_cmake_dirs.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/find_included_cc_files.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/analyze_state.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/check_for_c_style_comments.py || EXIT_STATUS=$?
+python3 "$REPO_ROOT"/scripts/dev/check_constexpr.py || EXIT_STATUS=$?
+python3 "$REPO_ROOT"/scripts/dev/check_for_switch_case_parentheses.py || EXIT_STATUS=$?
+python3 "$REPO_ROOT"/scripts/dev/check_for_malformed_enums.py || EXIT_STATUS=$?
 
 exit $EXIT_STATUS

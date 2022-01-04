@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -70,9 +70,11 @@ namespace Boilers {
     // water temperature evaluation method
     enum class TempMode
     {
+        Invalid = -1,
         NOTSET,
         ENTERINGBOILERTEMP,
-        LEAVINGBOILERTEMP
+        LEAVINGBOILERTEMP,
+        Num
     };
 
     struct BoilerSpecs : PlantComponent
@@ -80,7 +82,7 @@ namespace Boilers {
         // Members
         std::string Name;                           // user identifier
         DataGlobalConstants::ResourceType FuelType; // resource type assignment
-        int TypeNum;                                // plant loop type identifier
+        DataPlant::PlantEquipmentType Type;         // plant loop type identifier
         int LoopNum;                                // plant loop connection
         int LoopSideNum;                            // plant loop side connection
         int BranchNum;                              // plant loop branch connection
@@ -139,16 +141,16 @@ namespace Boilers {
 
         // Default Constructor
         BoilerSpecs()
-            : FuelType(DataGlobalConstants::ResourceType::None), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false),
-              ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::Unassigned),
-              ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0),
-              MassFlowRate(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
-              OptPartLoadRat(0.0), OperPartLoadRat(0.0), CurveTempMode(TempMode::NOTSET), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0),
-              ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0),
-              IsThisSized(false), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true),
-              MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0),
-              BoilerEff(0.0), BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0),
-              BoilerFuelTypeForOutputVariable("")
+            : FuelType(DataGlobalConstants::ResourceType::None), Type(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0),
+              BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), VolFlowRate(0.0),
+              VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0),
+              MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0), CurveTempMode(TempMode::NOTSET),
+              EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0), EffCurveOutputIndex(0),
+              CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false), FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0),
+              FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0),
+              BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0), BoilerEff(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
+              BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
 
@@ -179,9 +181,9 @@ namespace Boilers {
         void SizeBoiler(EnergyPlusData &state);
 
         void CalcBoilerModel(EnergyPlusData &state,
-                             Real64 MyLoad,                                        // W - hot water demand to be met by boiler
-                             bool RunFlag,                                         // TRUE if boiler operating
-                             DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
+                             Real64 MyLoad,                                    // W - hot water demand to be met by boiler
+                             bool RunFlag,                                     // TRUE if boiler operating
+                             DataBranchAirLoopPlant::ControlType EquipFlowCtrl // Flow control mode for the equipment
         );
 
         void UpdateBoilerRecords(EnergyPlusData &state,

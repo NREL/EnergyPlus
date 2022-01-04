@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,21 +65,23 @@ struct EnergyPlusData;
 namespace HVACInterfaceManager {
 
     // Common Pipe Recirc Flow Directions
+    // can't change these to enum class since these are used in SetupOutputVariable()
     constexpr int NoRecircFlow(0);
     constexpr int PrimaryRecirc(1);   // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
     constexpr int SecondaryRecirc(2); // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet
 
     enum class FlowType
     {
-        Unassigned = -1,
+        Invalid = -1,
         Constant,
-        Variable
+        Variable,
+        Num
     };
 
     struct CommonPipeData
     {
         // Members
-        DataPlant::iCommonPipeType CommonPipeType; // type of common pipe used if any
+        DataPlant::CommonPipeType CommonPipeType; // type of common pipe used if any
         FlowType SupplySideInletPumpType;
         FlowType DemandSideInletPumpType;
         // Following report variables are used in uncontrolled common pipe
@@ -103,10 +105,10 @@ namespace HVACInterfaceManager {
 
         // Default Constructor
         CommonPipeData()
-            : CommonPipeType(DataPlant::iCommonPipeType::No), SupplySideInletPumpType(FlowType::Unassigned),
-              DemandSideInletPumpType(FlowType::Unassigned), FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0),
-              SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0), PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0),
-              SecInletSetPoint(0.0), PriInletControlled(false), SecInletControlled(false), PriFlowRequest(0.0)
+            : CommonPipeType(DataPlant::CommonPipeType::No), SupplySideInletPumpType(FlowType::Invalid), DemandSideInletPumpType(FlowType::Invalid),
+              FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0), SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0),
+              PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0), SecInletSetPoint(0.0), PriInletControlled(false),
+              SecInletControlled(false), PriFlowRequest(0.0)
         {
         }
     };
@@ -115,7 +117,7 @@ namespace HVACInterfaceManager {
 
     void UpdateHVACInterface(EnergyPlusData &state,
                              int AirLoopNum, // airloop number for which air loop this is
-                             DataConvergParams::iCalledFrom CalledFrom,
+                             DataConvergParams::CalledFrom CalledFrom,
                              int OutletNode,          // Node number for the outlet of the side of the loop just simulated
                              int InletNode,           // Node number for the inlet of the side that needs the outlet node data
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
@@ -129,14 +131,14 @@ namespace HVACInterfaceManager {
                                   int ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                                   int OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                                   bool &OutOfToleranceFlag,   // True when the other side of the loop need to be (re)simulated
-                                  DataPlant::iCommonPipeType CommonPipeType);
+                                  DataPlant::CommonPipeType CommonPipeType);
 
     //***************
 
     void UpdateHalfLoopInletTemp(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, Real64 &TankOutletTemp);
 
     void
-    UpdateCommonPipe(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, DataPlant::iCommonPipeType CommonPipeType, Real64 &MixedOutletTemp);
+    UpdateCommonPipe(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, DataPlant::CommonPipeType CommonPipeType, Real64 &MixedOutletTemp);
 
     void ManageSingleCommonPipe(EnergyPlusData &state,
                                 int LoopNum,            // plant loop number

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -104,10 +104,8 @@ void EnergyPlusFixture::SetUp()
     openOutputFiles(*state);
 
     this->err_stream = new std::ostringstream;
-    // this->json_stream = new std::ostringstream;
 
     state->files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
-    // state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::make_unique<RedirectCout>(m_cout_buffer);
@@ -165,15 +163,6 @@ std::vector<std::string> EnergyPlusFixture::read_lines_in_file(fs::path const &f
     }
     return lines;
 }
-
-// bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, bool reset_stream)
-// {
-//     auto const stream_str = this->json_stream->str();
-//     EXPECT_EQ(expected_string, stream_str);
-//     bool are_equal = (expected_string == stream_str);
-//     if (reset_stream) this->json_stream->str(std::string());
-//     return are_equal;
-// }
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
 {
@@ -237,13 +226,6 @@ bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, b
     if (reset_stream) state->files.dfs.open_as_stringstream();
     return are_equal;
 }
-
-// bool EnergyPlusFixture::has_json_output(bool reset_stream)
-// {
-//     auto const has_output = this->json_stream->str().size() > 0;
-//     if (reset_stream) this->json_stream->str(std::string());
-//     return has_output;
-// }
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
@@ -368,80 +350,6 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     }
 
     return successful_processing;
-}
-
-// bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
-//{
-//
-//    std::unique_ptr<std::istream> idd_stream;
-//    if (!idd.empty()) {
-//        idd_stream = std::make_unique<std::istringstream>(idd);
-//    } else {
-//        static auto const exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
-//        static auto idd_location = exeDirectoryPath / "Energy+.schema.epJSON";
-//        static auto file_exists = FileSystem::fileExists(idd_location);
-//
-//        if (!file_exists) {
-//            // Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-//            idd_location = FileSystem::getParentDirectoryPath(exeDirectoryPath) / "Energy+.schema.epJSON";
-//            file_exists = FileSystem::fileExists(idd_location);
-//        }
-//
-//        if (!file_exists) {
-//            EXPECT_TRUE(file_exists) << "Energy+.schema.epJSON does not exist at search location." << std::endl
-//                                     << "epJSON Schema search location: \"" << idd_location << "\"";
-//            errors_found = true;
-//            return errors_found;
-//        }
-//
-//        idd_stream = std::make_unique<std::ifstream>(idd_location, std::ios_base::in | std::ios_base::binary);
-//    }
-//
-//    if (!idd_stream->good()) {
-//        errors_found = true;
-//        return errors_found;
-//    }
-//
-//    state->dataInputProcessing->inputProcessor->schema = json::parse(*idd_stream);
-//
-//    return errors_found;
-//}
-
-bool EnergyPlusFixture::compare_idf([[maybe_unused]] std::string const &name,
-                                    [[maybe_unused]] int const num_alphas,
-                                    [[maybe_unused]] int const num_numbers,
-                                    [[maybe_unused]] std::vector<std::string> const &alphas,
-                                    [[maybe_unused]] std::vector<bool> const &alphas_blank,
-                                    [[maybe_unused]] std::vector<Real64> const &numbers,
-                                    [[maybe_unused]] std::vector<bool> const &numbers_blank)
-{
-    // using namespace InputProcessor;
-
-    // bool has_error = OverallErrorFlag;
-
-    // EXPECT_FALSE( OverallErrorFlag );
-
-    // auto index = FindItemInSortedList( name, ListOfObjects, NumObjectDefs );
-
-    // EXPECT_GT( index, 0 ) << "Could not find \"" << name << "\". Make sure to run process_idf first.";
-    // if ( index < 1 ) return false;
-
-    // index = iListOfObjects( index );
-    // index = ObjectStartRecord( index );
-
-    // EXPECT_EQ( name, IDFRecords( index ).Name );
-    // if ( name != IDFRecords( index ).Name ) has_error = true;
-    // EXPECT_EQ( num_alphas, IDFRecords( index ).NumAlphas );
-    // if ( num_alphas != IDFRecords( index ).NumAlphas ) has_error = true;
-    // EXPECT_EQ( num_numbers, IDFRecords( index ).NumNumbers );
-    // if ( num_numbers != IDFRecords( index ).NumNumbers ) has_error = true;
-    // if ( ! compare_containers( alphas, IDFRecords( index ).Alphas ) ) has_error = true;
-    // if ( ! compare_containers( alphas_blank, IDFRecords( index ).AlphBlank ) ) has_error = true;
-    // if ( ! compare_containers( numbers, IDFRecords( index ).Numbers ) ) has_error = true;
-    // if ( ! compare_containers( numbers_blank, IDFRecords( index ).NumBlank ) ) has_error = true;
-
-    // return ! has_error;
-    return false;
 }
 
 } // namespace EnergyPlus

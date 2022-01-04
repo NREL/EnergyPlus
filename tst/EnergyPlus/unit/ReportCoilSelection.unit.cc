@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -313,13 +313,13 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType.allocate(2);
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum.allocate(2);
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(1) = "Zone 2 Fan Coil";
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(1) = "ZoneHVAC:FourPipeFanCoil";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num(1) = DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::FanCoil4Pipe;
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(2) = "Zone 2 Unit Heater";
     state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(2) = "ZoneHVAC:UnitHeater";
-    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType_Num(2) = DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum(2) = DataZoneEquipment::ZoneEquip::UnitHeater;
 
     Real64 totGrossCap = 500.0;
     Real64 sensGrossCap = 500.0;
@@ -367,6 +367,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
                                                                                 RatedCoilEff);
 
     EXPECT_EQ(RatedCoilTotCap, c1->coilRatedTotCap);
+    EXPECT_NEAR(c1->coilCapFTIdealPeak, 1.0, 0.000001);
     EXPECT_EQ(RatedCoilSensCap, c1->coilRatedSensCap);
     EXPECT_EQ(RatedAirMassFlow, c1->ratedAirMassFlow);
     EXPECT_EQ(RatedCoilInDb, c1->ratedCoilInDb);
@@ -497,6 +498,11 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
                                                                                 DXFlowPerCapMaxRatio);
     EXPECT_EQ(entAirDryBulbTemp, c1->coilDesEntTemp);
 
+    state->dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(zoneNum, zoneHeatingLatentLoad);
+    // Expect non-zero because this is a heating coil
+    EXPECT_LT(0.0, zoneHeatingLatentLoad);
+    EXPECT_NEAR(zoneHeatingLatentLoad, c1->rmLatentAtPeak, 0.000001);
+
     entAirDryBulbTemp = 21.0; // change coil entering air temp
     state->dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(*state, coil1Name, coil1Type, entAirDryBulbTemp, curSysNum, curZoneEqNum);
     lvgAirDryBulbTemp = 30.0;
@@ -527,4 +533,274 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     EXPECT_EQ(RatedCoilInHumRat, c1->coilDesEntHumRat);
     EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesTemp, c1->coilDesLvgTemp);
     EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesHumRat, c1->coilDesLvgHumRat);
+
+    // test heating capacity with default CapFT
+    EXPECT_NEAR(RatedCoilTotCap * coilCapFunTempFac, c1->coilTotCapAtPeak, 0.000001);
+    EXPECT_NEAR(coilCapFunTempFac, 1.0, 0.000001);
+    EXPECT_NEAR(RatedCoilTotCap, c1->coilTotCapAtPeak, 0.000001);
+    // test heating capacity adjustment with a CapFT curve
+    coilCapFunTempFac = 1.15;
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(*state,
+                                                                                coil1Name,
+                                                                                coil1Type,
+                                                                                RatedCoilTotCap,
+                                                                                false,
+                                                                                curSysNum,
+                                                                                curZoneEqNum,
+                                                                                curOASysNum,
+                                                                                fanHeatGain,
+                                                                                coilCapFunTempFac,
+                                                                                DXFlowPerCapMinRatio,
+                                                                                DXFlowPerCapMaxRatio);
+    EXPECT_NEAR(RatedCoilTotCap * coilCapFunTempFac, c1->coilTotCapAtPeak, 0.000001);
+    EXPECT_LT(RatedCoilTotCap, c1->coilTotCapAtPeak);
+}
+
+TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoolingCoil)
+{
+    std::string coil1Name("Coil 1");          // user-defined name of the coil
+    std::string coil1Type("Coil:Cooling:DX"); // idf input object class name of coil
+
+    state->dataGlobal->NumOfZones = 3;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+    state->dataHeatBal->Zone(3).Name = "Zone 3";
+
+    int curSysNum = 0;
+    int curZoneEqNum = 2;
+    int curOASysNum = 0;
+    state->dataZoneEquip->ZoneEquipList.allocate(3);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).NumOfEquipTypes = 2;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum.allocate(2);
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(1) = "Zone 2 DX Eq";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(1) = "ZoneHVAC:WindowAirConditioner";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::WindowAC;
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipName(2) = "Zone 2 Unit Heater";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipType(2) = "ZoneHVAC:UnitHeater";
+    state->dataZoneEquip->ZoneEquipList(curZoneEqNum).EquipTypeEnum(2) = DataZoneEquipment::ZoneEquip::UnitHeater;
+
+    Real64 totGrossCap = 500.0;
+    Real64 sensGrossCap = 400.0;
+    Real64 airFlowRate = 0.11;
+    Real64 waterFlowRate = 0.0;
+
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilFinalSizes(
+        *state, coil1Name, coil1Type, totGrossCap, sensGrossCap, airFlowRate, waterFlowRate);
+    auto &c1(state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0]);
+    EXPECT_EQ(totGrossCap, c1->coilTotCapFinal);
+    EXPECT_EQ(sensGrossCap, c1->coilSensCapFinal);
+    EXPECT_EQ(airFlowRate, c1->coilRefAirVolFlowFinal);
+    EXPECT_EQ(waterFlowRate, c1->coilRefWaterVolFlowFinal);
+
+    Real64 RatedCoilTotCap = 400.0;
+    Real64 RatedCoilSensCap = 300.0;
+    Real64 RatedAirMassFlow = 0.001;
+    Real64 RatedCoilInDb = -999.0;
+    Real64 RatedCoilInHumRat = -999.0;
+    Real64 RatedCoilInWb = 20.0;
+    Real64 RatedCoilOutDb = -999.0;
+    Real64 RatedCoilOutHumRat = -999.0;
+    Real64 RatedCoilOutWb = 30.0;
+    Real64 RatedCoilOadbRef = 24.0;
+    Real64 RatedCoilOawbRef = 16.0;
+    Real64 RatedCoilBpFactor = 0.2;
+    Real64 RatedCoilEff = 0.8;
+
+    // First without setting coil inlet/outlet conditions
+    state->dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(*state,
+                                                                                coil1Name,
+                                                                                coil1Type,
+                                                                                RatedCoilTotCap,
+                                                                                RatedCoilSensCap,
+                                                                                RatedAirMassFlow,
+                                                                                RatedCoilInDb,
+                                                                                RatedCoilInHumRat,
+                                                                                RatedCoilInWb,
+                                                                                RatedCoilOutDb,
+                                                                                RatedCoilOutHumRat,
+                                                                                RatedCoilOutWb,
+                                                                                RatedCoilOadbRef,
+                                                                                RatedCoilOawbRef,
+                                                                                RatedCoilBpFactor,
+                                                                                RatedCoilEff);
+
+    EXPECT_EQ(RatedCoilTotCap, c1->coilRatedTotCap);
+    EXPECT_NEAR(c1->coilCapFTIdealPeak, 1.0, 0.000001);
+    EXPECT_EQ(RatedCoilSensCap, c1->coilRatedSensCap);
+    EXPECT_EQ(RatedAirMassFlow, c1->ratedAirMassFlow);
+    EXPECT_EQ(RatedCoilInDb, c1->ratedCoilInDb);
+    EXPECT_EQ(RatedCoilInWb, c1->ratedCoilInWb);
+    EXPECT_EQ(RatedCoilInHumRat, c1->ratedCoilInHumRat);
+    EXPECT_EQ(-999.0, c1->ratedCoilInEnth);
+    EXPECT_EQ(RatedCoilOutDb, c1->ratedCoilOutDb);
+    EXPECT_EQ(RatedCoilOutWb, c1->ratedCoilOutWb);
+    EXPECT_EQ(RatedCoilOutHumRat, c1->ratedCoilOutHumRat);
+    EXPECT_EQ(-999.0, c1->ratedCoilOutEnth);
+    EXPECT_EQ(RatedCoilEff, c1->ratedCoilEff);
+    EXPECT_EQ(RatedCoilBpFactor, c1->ratedCoilBpFactor);
+    EXPECT_EQ(RatedCoilOadbRef, c1->ratedCoilOadbRef);
+    EXPECT_EQ(RatedCoilOawbRef, c1->ratedCoilOawbRef);
+
+    // again with setting coil inlet/outlet conditions
+    RatedCoilInDb = 23.0;
+    RatedCoilInHumRat = 0.008;
+    RatedCoilOutDb = 12.0;
+    RatedCoilOutHumRat = 0.006;
+    state->dataRptCoilSelection->coilSelectionReportObj->setRatedCoilConditions(*state,
+                                                                                coil1Name,
+                                                                                coil1Type,
+                                                                                RatedCoilTotCap,
+                                                                                RatedCoilSensCap,
+                                                                                RatedAirMassFlow,
+                                                                                RatedCoilInDb,
+                                                                                RatedCoilInHumRat,
+                                                                                RatedCoilInWb,
+                                                                                RatedCoilOutDb,
+                                                                                RatedCoilOutHumRat,
+                                                                                RatedCoilOutWb,
+                                                                                RatedCoilOadbRef,
+                                                                                RatedCoilOawbRef,
+                                                                                RatedCoilBpFactor,
+                                                                                RatedCoilEff);
+    EXPECT_EQ(RatedCoilInDb, c1->ratedCoilInDb);
+    EXPECT_EQ(RatedCoilInHumRat, c1->ratedCoilInHumRat);
+    EXPECT_NEAR(43460.9, c1->ratedCoilInEnth, 0.1);
+    EXPECT_EQ(RatedCoilOutDb, c1->ratedCoilOutDb);
+    EXPECT_EQ(RatedCoilOutHumRat, c1->ratedCoilOutHumRat);
+    EXPECT_NEAR(27197.5, c1->ratedCoilOutEnth, 0.1);
+
+    Real64 entAirDryBulbTemp = 24.0;
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(*state, coil1Name, coil1Type, entAirDryBulbTemp, curSysNum, curZoneEqNum);
+    EXPECT_EQ(entAirDryBulbTemp, c1->coilDesEntTemp);
+    EXPECT_EQ(curSysNum, c1->airloopNum);
+    EXPECT_EQ(curZoneEqNum, c1->zoneEqNum);
+
+    Real64 entAirHumRat = 0.004;
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirHumRat(*state, coil1Name, coil1Type, entAirHumRat);
+    EXPECT_EQ(entAirHumRat, c1->coilDesEntHumRat);
+
+    Real64 lvgAirDryBulbTemp = 14.0;
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(*state, coil1Name, coil1Type, lvgAirDryBulbTemp);
+    EXPECT_EQ(lvgAirDryBulbTemp, c1->coilDesLvgTemp);
+
+    Real64 lvgAirHumRat = 0.005;
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirHumRat(*state, coil1Name, coil1Type, lvgAirHumRat);
+    EXPECT_EQ(lvgAirHumRat, c1->coilDesLvgHumRat);
+
+    int zoneNum = 1;
+    Real64 zoneCoolingLatentLoad = 1234.0;
+    state->dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(zoneNum, zoneCoolingLatentLoad);
+    // Expect zero because doZoneEqSetup isn't currently executed
+    EXPECT_EQ(0.0, c1->rmLatentAtPeak);
+
+    Real64 zoneHeatingLatentLoad = 4321.0;
+    state->dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(zoneNum, zoneHeatingLatentLoad);
+    // Expect zero because doZoneEqSetup isn't currently executed
+    EXPECT_EQ(0.0, c1->rmLatentAtPeak);
+
+    // Exercise report writing again
+    state->dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(*state);
+
+    // Test coil reporting
+    curZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName = state->dataHeatBal->Zone(1).Name;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(curZoneEqNum).CoolDesDay = "Cool Design Day";
+    state->dataSize->FinalZoneSizing(curZoneEqNum).DesCoolLoad = RatedCoilSensCap;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtCoolPeak = RatedCoilOutDb;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtCoolPeak = RatedCoilOutHumRat;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInTemp = 25.0;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInHumRat = 0.007;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).CoolDesTemp = 12.0;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).CoolDesHumRat = 0.007;
+
+    Real64 fanHeatGain = 1.3;
+    Real64 coilCapFunTempFac = 1.0;
+    Real64 DXFlowPerCapMinRatio = 0.00004;
+    Real64 DXFlowPerCapMaxRatio = 0.00006;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataSize->DataFlowUsedForSizing = airFlowRate / state->dataEnvrn->StdRhoAir;
+
+    // setCoilCoolingCapacity will not overwrite previously set temperature data
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilCoolingCapacity(*state,
+                                                                                coil1Name,
+                                                                                coil1Type,
+                                                                                RatedCoilTotCap,
+                                                                                false,
+                                                                                curSysNum,
+                                                                                curZoneEqNum,
+                                                                                curOASysNum,
+                                                                                fanHeatGain,
+                                                                                coilCapFunTempFac,
+                                                                                DXFlowPerCapMinRatio,
+                                                                                DXFlowPerCapMaxRatio);
+    EXPECT_EQ(entAirDryBulbTemp, c1->coilDesEntTemp);
+    EXPECT_EQ(entAirHumRat, c1->coilDesEntHumRat);
+    EXPECT_EQ(lvgAirDryBulbTemp, c1->coilDesLvgTemp);
+    EXPECT_EQ(lvgAirHumRat, c1->coilDesLvgHumRat);
+    Real64 CpMoistAir = Psychrometrics::PsyCpAirFnW(c1->coilDesEntHumRat);
+    EXPECT_EQ(CpMoistAir, c1->cpMoistAir);
+    EXPECT_NEAR(c1->fanHeatGainIdealPeak, fanHeatGain, 0.000001);
+
+    state->dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(zoneNum, zoneCoolingLatentLoad);
+    // Expect non-zero zone cooling latent load
+    EXPECT_EQ(zoneCoolingLatentLoad, c1->rmLatentAtPeak);
+
+    entAirDryBulbTemp = 21.0; // change coil entering air temp
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(*state, coil1Name, coil1Type, entAirDryBulbTemp, curSysNum, curZoneEqNum);
+    lvgAirDryBulbTemp = 12.0;
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(*state, coil1Name, coil1Type, lvgAirDryBulbTemp);
+    EXPECT_EQ(entAirDryBulbTemp, c1->coilDesEntTemp);
+    EXPECT_EQ(lvgAirDryBulbTemp, c1->coilDesLvgTemp);
+
+    // now reset entering/leaving air temps so that setCoilCoolingCapacity will initialize any uninitialized temperature data
+    // for example if setCoilEntAirTemp is not called
+    c1->coilDesEntTemp = -999.0;
+    c1->coilDesEntHumRat = -999.0;
+    c1->coilDesLvgTemp = -999.0;
+    c1->coilDesLvgHumRat = -999.0;
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilCoolingCapacity(*state,
+                                                                                coil1Name,
+                                                                                coil1Type,
+                                                                                RatedCoilTotCap,
+                                                                                false,
+                                                                                curSysNum,
+                                                                                curZoneEqNum,
+                                                                                curOASysNum,
+                                                                                fanHeatGain,
+                                                                                coilCapFunTempFac,
+                                                                                DXFlowPerCapMinRatio,
+                                                                                DXFlowPerCapMaxRatio);
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInTemp, c1->coilDesEntTemp);
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInHumRat, c1->coilDesEntHumRat);
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).CoolDesTemp, c1->coilDesLvgTemp);
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).CoolDesHumRat, c1->coilDesLvgHumRat);
+
+    // test cooling capacity with default CapFT = 1
+    EXPECT_NEAR(RatedCoilTotCap * coilCapFunTempFac, c1->coilTotCapAtPeak, 0.000001);
+    EXPECT_NEAR(coilCapFunTempFac, 1.0, 0.000001);
+    EXPECT_NEAR(RatedCoilTotCap, c1->coilTotCapAtPeak, 0.000001);
+
+    // test cooling capacity adjustment with a CapFT curve != 1
+    coilCapFunTempFac = 1.15;
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilCoolingCapacity(*state,
+                                                                                coil1Name,
+                                                                                coil1Type,
+                                                                                RatedCoilTotCap,
+                                                                                false,
+                                                                                curSysNum,
+                                                                                curZoneEqNum,
+                                                                                curOASysNum,
+                                                                                fanHeatGain,
+                                                                                coilCapFunTempFac,
+                                                                                DXFlowPerCapMinRatio,
+                                                                                DXFlowPerCapMaxRatio);
+    EXPECT_NEAR(RatedCoilTotCap * coilCapFunTempFac, c1->coilTotCapAtPeak, 0.000001);
+    EXPECT_LT(RatedCoilTotCap, c1->coilTotCapAtPeak);
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -344,7 +344,7 @@ namespace Photovoltaics {
                 }
             }
 
-            state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Unassigned;
+            state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Invalid;
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVSimplePerfObjectName)) {
                 state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Simple;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName)) {
@@ -366,7 +366,7 @@ namespace Photovoltaics {
             }
             state.dataPhotovoltaic->PVarray(PVnum).PerfObjName = state.dataIPShortCut->cAlphaArgs(4); // check later once perf objects are loaded
 
-            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Unassigned;
+            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Invalid;
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Decoupled")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Decoupled;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "DecoupledUllebergDynamic")) {
@@ -805,7 +805,7 @@ namespace Photovoltaics {
 
         ThisSurf = state.dataPhotovoltaic->PVarray(thisPV).SurfacePtr;
 
-        if (state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) > state.dataPhotovoltaic->MinIrradiance) {
+        if (state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) > DataPhotovoltaics::MinIrradiance) {
 
             // get efficiency
             {
@@ -948,7 +948,7 @@ namespace Photovoltaics {
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                     // from DataEnvironment via USE
 
         if (((state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam + state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse) >
-             state.dataPhotovoltaic->MinIrradiance) &&
+             DataPhotovoltaics::MinIrradiance) &&
             (RunFlag)) {
 
             // first determine PV cell temperatures depending on model
@@ -1235,11 +1235,11 @@ namespace Photovoltaics {
 
         using TranspiredCollector::GetUTSCTsColl;
 
-        Real64 const EPS(0.001);
-        Real64 const ERR(0.001);
-        Real64 const MinInsolation(30.0);
-        int const KMAX(100);
-        Real64 const EtaIni(0.10); // initial value of eta
+        Real64 constexpr EPS(0.001);
+        Real64 constexpr ERR(0.001);
+        Real64 constexpr MinInsolation(30.0);
+        int constexpr KMAX(100);
+        Real64 constexpr EtaIni(0.10); // initial value of eta
         Real64 DummyErr;
         Real64 ETA;
         Real64 Tambient;
@@ -1557,8 +1557,8 @@ namespace Photovoltaics {
         //       PRENTICE HALL, NEW JERSEY, 1992.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const DELTA(1.e-3);
-        Real64 const EPSILON(1.e-3);
+        Real64 constexpr DELTA(1.e-3);
+        Real64 constexpr EPSILON(1.e-3);
         static Real64 const RONE((std::sqrt(5.0) - 1.0) / 2.0);
         static Real64 const RTWO(RONE * RONE);
 
@@ -1899,7 +1899,7 @@ namespace Photovoltaics {
             Real64 const AM(1.0 / (std::cos(SolZen * DataGlobalConstants::DegToRadians) + 0.5057 * std::pow(96.08 - SolZen, -1.634)));
             AbsoluteAirMass = std::exp(-0.0001184 * Altitude) * AM;
         } else {
-            Real64 const AM(36.32); // evaluated above at SolZen = 89.9 issue #5528
+            Real64 constexpr AM(36.32); // evaluated above at SolZen = 89.9 issue #5528
             AbsoluteAirMass = std::exp(-0.0001184 * Altitude) * AM;
         }
 

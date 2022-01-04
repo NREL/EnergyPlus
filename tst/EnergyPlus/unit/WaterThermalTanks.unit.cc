@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,10 +80,10 @@ using namespace OutputReportPredefined;
 TEST_F(EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs)
 {
     Real64 DeltaT = 0.0;
-    Real64 const SourceInletTemp = 62.0;
-    Real64 const Cp = 4178.; // water, J/(kg * K)
-    Real64 const SetPointTemp = 60.0;
-    Real64 const SourceMassFlowRateOrig = 0.378529822165; // water, 6 gal/min
+    Real64 constexpr SourceInletTemp = 62.0;
+    Real64 constexpr Cp = 4178.; // water, J/(kg * K)
+    Real64 constexpr SetPointTemp = 60.0;
+    Real64 constexpr SourceMassFlowRateOrig = 0.378529822165; // water, 6 gal/min
     Real64 SourceMassFlowRate = SourceMassFlowRateOrig;
     Real64 Qheatpump = 0.0;
     Real64 Qsource = 0.0;
@@ -796,9 +796,9 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     // ValidateFuelType tests for WaterHeater:Stratified
     WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
-    EXPECT_EQ(Tank.FuelType, "Electricity");
-    EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
-    EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
+    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -1522,9 +1522,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     // ValidateFuelType tests for WaterHeater:Mixed
     WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-    EXPECT_EQ(Tank.FuelType, "Electricity");
-    EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
-    EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
+    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
@@ -1935,7 +1935,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 20.0 / 60.0;
     TimeStepSys = state->dataGlobal->TimeStepZone;
-    const int TankNum = 1;
+    constexpr int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     for (auto &node : Tank.Node) {
         node.Temp = 60.0;
@@ -2127,7 +2127,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
-    const int TankNum = 1;
+    constexpr int TankNum = 1;
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     Tank.SourceInletNode = 1;
     Tank.SourceOutletNode = 2;
@@ -2682,7 +2682,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));
     CoilBranch.TotalComponents = 1;
     CoilBranch.Comp.allocate(CompNum);
-    CoilBranch.Comp(CompNum).TypeOf_Num = 67;
+    CoilBranch.Comp(CompNum).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
     CoilBranch.Comp(CompNum).Name = "GSHP_COIL1";
 
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -4217,9 +4217,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_EQ(HPWHTank.FuelType, "Steam");
-        EXPECT_EQ(HPWHTank.OffCycParaFuelType, "Steam");
-        EXPECT_EQ(HPWHTank.OnCycParaFuelType, "Steam");
+        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, WaterThermalTanks::Fuel::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, WaterThermalTanks::Fuel::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, WaterThermalTanks::Fuel::Steam));
     }
 
     ++HPWaterHeaterNum;
@@ -5327,12 +5327,91 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
     result = Tank.PlantMassFlowRatesFunc(*state,
                                          inNodeNum,
                                          false,
-                                         EnergyPlus::WaterThermalTanks::SideEnum::Use,
+                                         EnergyPlus::WaterThermalTanks::WaterHeaterSide::Use,
                                          plantLoopSide,
                                          false,
-                                         DataBranchAirLoopPlant::ControlTypeEnum::Bypass,
+                                         DataBranchAirLoopPlant::ControlType::Bypass,
                                          outletTemp,
                                          deadbandTemp,
                                          setPtTemp);
     EXPECT_NEAR(result, expected, answerTolerance);
+}
+
+TEST_F(EnergyPlusFixture, setBackupElementCapacityTest)
+{
+    Real64 expectedAnswer;
+    Real64 allowedTolerance = 0.001;
+
+    // Test for #9001: Make sure BackupElementCapacity is reset when equal to DataSizing::Autosize which is -99999.0
+    // or a negative number because this results in negative electricity consumption.
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->WaterHeaterDesuperheater.allocate(1);
+    state->dataWaterThermalTanks->WaterThermalTank.allocate(1);
+
+    auto &HPWH = state->dataWaterThermalTanks->HPWaterHeater(1);
+    auto &DSup = state->dataWaterThermalTanks->WaterHeaterDesuperheater(1);
+    auto &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
+
+    HPWH.HPWHType = DataPlant::PlantEquipmentType::HeatPumpWtrHeaterPumped;
+
+    // Test 1: Heat Pump Hot Water Heater.  BackupHeaterCapacity is negative--should be reset to whatever the tank max capacity is.
+    Tank.HeatPumpNum = 1;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 100.0;
+    HPWH.BackupElementCapacity = DataSizing::AutoSize;
+    expectedAnswer = 100.0;
+    Tank.setBackupElementCapacity(*state);
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 2: Heat Pump Hot Water Heater.  BackupHeaterCapacity is positive--do not reset.
+    Tank.HeatPumpNum = 1;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 100.0;
+    HPWH.BackupElementCapacity = 50.0;
+    expectedAnswer = 50.0;
+    Tank.setBackupElementCapacity(*state);
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 3: Desuperheater.  BackupHeaterCapacity is negative--should be reset to whatever the tank max capacity is.
+    Tank.HeatPumpNum = 0;
+    Tank.DesuperheaterNum = 1;
+    Tank.MaxCapacity = 200.0;
+    DSup.BackupElementCapacity = DataSizing::AutoSize;
+    expectedAnswer = 200.0;
+    Tank.setBackupElementCapacity(*state);
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 4: Desuperheater.  BackupHeaterCapacity is positive--do not reset.
+    Tank.HeatPumpNum = 0;
+    Tank.DesuperheaterNum = 1;
+    Tank.MaxCapacity = 200.0;
+    DSup.BackupElementCapacity = 123.0;
+    expectedAnswer = 123.0;
+    Tank.setBackupElementCapacity(*state);
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 5: Not a Heat Pump Water Heater or Desuperheater.  Do not do anything.
+    Tank.HeatPumpNum = 0;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 200.0;
+    HPWH.BackupElementCapacity = 123.0;
+    DSup.BackupElementCapacity = -456.0;
+    Tank.setBackupElementCapacity(*state);
+    expectedAnswer = 123.0;
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+    expectedAnswer = -456.0;
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
+
+    // Test 6: Wrapped Heat Pump Water Heater.  Do not do anything.
+    HPWH.HPWHType = DataPlant::PlantEquipmentType::HeatPumpWtrHeaterWrapped;
+    Tank.HeatPumpNum = 1;
+    Tank.DesuperheaterNum = 0;
+    Tank.MaxCapacity = 200.0;
+    HPWH.BackupElementCapacity = 123.0;
+    DSup.BackupElementCapacity = -456.0;
+    Tank.setBackupElementCapacity(*state);
+    expectedAnswer = 123.0;
+    EXPECT_NEAR(HPWH.BackupElementCapacity, expectedAnswer, allowedTolerance);
+    expectedAnswer = -456.0;
+    EXPECT_NEAR(DSup.BackupElementCapacity, expectedAnswer, allowedTolerance);
 }

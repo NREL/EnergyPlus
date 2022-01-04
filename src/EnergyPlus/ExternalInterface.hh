@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,15 +76,19 @@ namespace ExternalInterface {
     // MODULE PARAMETER DEFINITIONS:
     int constexpr maxVar(100000);         // Maximum number of variables to be exchanged
     int constexpr maxErrMsgLength(10000); // Maximum error message length from xml schema validation
-    int constexpr indexSchedule(1);       // Index for schedule in inpVarTypes
-    int constexpr indexVariable(2);       // Index for variable in inpVarTypes
-    int constexpr indexActuator(3);       // Index for actuator in inpVarTypes
-    int constexpr fmiOK(0);               // fmiOK
-    int constexpr fmiWarning(1);          // fmiWarning
-    int constexpr fmiDiscard(2);          // fmiDiscard
-    int constexpr fmiError(3);            // fmiError
-    int constexpr fmiFatal(4);            // fmiPending
-    int constexpr fmiPending(5);          // fmiPending
+
+    // can't change these to enum class since these are used in getepvariables() in utilXml.c as arguments
+    int constexpr indexSchedule(1); // Index for schedule in inpVarTypes
+    int constexpr indexVariable(2); // Index for variable in inpVarTypes
+    int constexpr indexActuator(3); // Index for actuator in inpVarTypes
+
+    // used in fmistatus defined in hmiModelFunctions.h
+    int constexpr fmiOK(0);      // fmiOK
+    int constexpr fmiWarning(1); // fmiWarning
+    int constexpr fmiDiscard(2); // fmiDiscard
+    int constexpr fmiError(3);   // fmiError
+    int constexpr fmiFatal(4);   // fmiPending
+    int constexpr fmiPending(5); // fmiPending
 
     struct fmuInputVariableType
     {

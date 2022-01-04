@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1735,7 +1735,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_PipingSystemPipeCircuit;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PipingSystemPipeCircuit;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
@@ -1753,7 +1753,8 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
 
     // first call the factory, it will call GetInput
     bool initLoopEquip = true;
-    PlantComponent *thisCircuit = PlantPipingSystemsManager::Circuit::factory(*state, DataPlant::TypeOf_PipingSystemPipeCircuit, "MY PIPE CIRCUIT");
+    PlantComponent *thisCircuit =
+        PlantPipingSystemsManager::Circuit::factory(*state, DataPlant::PlantEquipmentType::PipingSystemPipeCircuit, "MY PIPE CIRCUIT");
 
     EXPECT_EQ(2u, state->dataPlantPipingSysMgr->domains.size());
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -161,12 +161,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
     GetSysInput(*state);
 
     EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:NoReheat",
-              state->dataSingleDuct->sd_airterminal(1).SysType);                    // AT SD constant volume no reheat object type
+              state->dataSingleDuct->sd_airterminal(1).sysType);                    // AT SD constant volume no reheat object type
     EXPECT_EQ("SDCVNOREHEATAT1", state->dataSingleDuct->sd_airterminal(1).SysName); // AT SD constant volume no reheat name
     EXPECT_EQ("AVAILSCHEDULE", state->dataSingleDuct->sd_airterminal(1).Schedule);  // AT SD constant volume no reheat availability schedule name
     EXPECT_EQ(0.50, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);    // maximum volume flow Rate
     ASSERT_TRUE(state->dataSingleDuct->sd_airterminal(1).NoOAFlowInputFromUser);    // no OA flow input from user
-    EXPECT_EQ(DataZoneEquipment::PerPersonDCVByCurrentLevel,
+    EXPECT_EQ(DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel,
               state->dataSingleDuct->sd_airterminal(1).OAPerPersonMode); // default value when A6 input field is blank
 }
 
@@ -242,7 +242,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     GetZoneAirLoopEquipment(*state);
     GetSysInput(*state);
     state->dataEnvrn->StdRhoAir = 1.0;
-    int const SysNum(1);
+    int constexpr SysNum(1);
     Real64 MassFlowRateMaxAvail = state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate * state->dataEnvrn->StdRhoAir;
     state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate = MassFlowRateMaxAvail;
     state->dataScheduleMgr->Schedule(state->dataSingleDuct->sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
@@ -330,7 +330,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    int const SysNum(1);
+    int constexpr SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
@@ -522,7 +522,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    int const SysNum(1);
+    int constexpr SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
@@ -705,7 +705,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    int const SysNum(1);
+    int constexpr SysNum(1);
     int const InletNode = state->dataSingleDuct->sd_airterminal(SysNum).InletNodeNum;
     int const ZonePtr = state->dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = state->dataZoneEquip->ZoneEquipConfig(ZonePtr).ZoneNode;
@@ -897,7 +897,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
-    int const SysNum(1);
+    int constexpr SysNum(1);
     auto &thisAirTerminal = state->dataSingleDuct->sd_airterminal(SysNum);
     auto &thisAirTerminalInlet = thisAirTerminal.sd_airterminalInlet;
     auto &thisAirTerminalOutlet = thisAirTerminal.sd_airterminalOutlet;
@@ -1073,8 +1073,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
-    int const AirDistUnitNum(1);
-    int const AirTerminalNum(1);
+    int constexpr AirDistUnitNum(1);
+    int constexpr AirTerminalNum(1);
 
     auto &thisAirTerminal(state->dataSingleDuct->sd_airterminal(AirTerminalNum));
 

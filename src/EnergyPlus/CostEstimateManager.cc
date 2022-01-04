@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -441,8 +441,7 @@ namespace CostEstimateManager {
                     } else {
                         ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                                state.dataDaylightingData->ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).totRefPts;
                         } else {
                             ShowSevereError(state,
                                             "ComponentCost:LineItem: \"" + state.dataCostEstimateManager->CostLineItem(Item).LineName +
@@ -889,12 +888,11 @@ namespace CostEstimateManager {
 
                     if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                         state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                            sum(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::TotalDaylRefPoints);
+                            sum(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::totRefPts);
                     } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                         ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                         if (ThisZoneID > 0) {
-                            state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                                state.dataDaylightingData->ZoneDaylight(ThisZoneID).TotalDaylRefPoints;
+                            state.dataCostEstimateManager->CostLineItem(Item).Qty = state.dataDaylightingData->ZoneDaylight(ThisZoneID).totRefPts;
                         }
                     }
 

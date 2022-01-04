@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -177,11 +177,13 @@ namespace DataSizing {
     constexpr int GlobalCoolingSizingFactorMode(103);
     constexpr int LoopComponentSizingFactorMode(104);
 
-    enum class zoneFanPlacement
+    enum class ZoneFanPlacement
     {
-        zoneFanPlaceNotSet,
-        zoneBlowThru,
-        zoneDrawThru
+        Invalid = -1,
+        NotSet,
+        BlowThru,
+        DrawThru,
+        Num
     };
 
     // Types
@@ -496,12 +498,12 @@ namespace DataSizing {
         {
         }
 
-        Real64 applyTermUnitSizingCoolFlow(Real64 const &coolFlowWithOA, // Cooling flow rate with MinOA limit applied
-                                           Real64 const &coolFlowNoOA    // Cooling flow rate without MinOA limit applied
+        Real64 applyTermUnitSizingCoolFlow(Real64 coolFlowWithOA, // Cooling flow rate with MinOA limit applied
+                                           Real64 coolFlowNoOA    // Cooling flow rate without MinOA limit applied
         );
 
-        Real64 applyTermUnitSizingHeatFlow(Real64 const &heatFlowWithOA, // Heating flow rate with MinOA limit applied
-                                           Real64 const &heatFlowNoOA    // Heating flow rate without MinOA limit applied
+        Real64 applyTermUnitSizingHeatFlow(Real64 heatFlowWithOA, // Heating flow rate with MinOA limit applied
+                                           Real64 heatFlowNoOA    // Heating flow rate without MinOA limit applied
         );
     };
 
@@ -959,7 +961,7 @@ namespace DataSizing {
         // Holds complete data for a single DesignSpecification:OutdoorAir object or
         // a list of indexes from a DesignSpecification:OutdoorAir:SpaceList object
         std::string Name;                     // Name of DesignSpecification:OutdoorAir or DesignSpecification:OutdoorAir:SpaceList object
-        int numDSOA = 1;                      // Number of DesignSpecification:OutdoorAir objects for this instance
+        int numDSOA = 0;                      // Number of DesignSpecification:OutdoorAir objects for this instance (zero if not a list)
         EPVector<int> dsoaIndexes;            // Indexes to DesignSpecification:OutdoorAir objects (if this is a DSOA:SpaceList object)
         EPVector<std::string> dsoaSpaceNames; // Names of spaces if this is a (if this is a DSOA:SpaceList object)
         EPVector<int> dsoaSpaceIndexes;       // Indexes to Spaces (if this is a DSOA:SpaceList object)
@@ -976,15 +978,7 @@ namespace DataSizing {
                                                    // SOAM_ProportionalControlSchOcc
         int CO2GainErrorCount = 0;                 // Counter when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         int CO2GainErrorIndex = 0; // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
-
-        Real64 calcOAFlowRate(EnergyPlusData &state,
-                              int const DSOAPtr,                  // Pointer to DesignSpecification:OutdoorAir object
-                              int const ActualZoneNum,            // Zone index
-                              bool const UseOccSchFlag,           // Zone occupancy schedule will be used instead of using total zone occupancy
-                              bool const UseMinOASchFlag,         // Use min OA schedule in DesignSpecification:OutdoorAir object
-                              bool const PerPersonNotSet = false, // when calculation should not include occupants (e.g., dual duct)
-                              bool const MaxOAVolFlowFlag = false // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
-        );
+        bool myEnvrnFlag = true;
 
         Real64 desFlowPerZoneArea(EnergyPlusData &state,
                                   int const actualZoneNum // Zone index
@@ -992,6 +986,15 @@ namespace DataSizing {
 
         Real64 desFlowPerZonePerson(EnergyPlusData &state,
                                     int const actualZoneNum // Zone index
+        );
+
+        Real64 calcOAFlowRate(EnergyPlusData &state,
+                              int ActualZoneNum,           // Zone index
+                              bool UseOccSchFlag,          // Zone occupancy schedule will be used instead of using total zone occupancy
+                              bool UseMinOASchFlag,        // Use min OA schedule in DesignSpecification:OutdoorAir object
+                              bool const PerPersonNotSet,  // when calculation should not include occupants (e.g., dual duct)
+                              bool const MaxOAVolFlowFlag, // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
+                              int const spaceNum = 0       // Space index (if applicable)
         );
     };
 
@@ -1028,6 +1031,15 @@ namespace DataSizing {
                          Real64 &DesFlow,      // returned design mass flow [kg/s]
                          Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
                          Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
+    );
+
+    Real64 calcDesignSpecificationOutdoorAir(EnergyPlusData &state,
+                                             int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+                                             int const ActualZoneNum,    // Zone index
+                                             bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
+                                             bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
+                                             bool const PerPersonNotSet = false, // when calculation should not include occupants (e.g., dual duct)
+                                             bool const MaxOAVolFlowFlag = false // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
     );
 
 } // namespace DataSizing
@@ -1139,7 +1151,7 @@ struct SizingData : BaseGlobalStruct
     bool DataNomCapInpMeth = false;                  // True if heating coil is sized by CoilPerfInpMeth == NomCa
     int DataFanEnumType = -1;                        // Fan type used during sizing
     int DataFanIndex = -1;                           // Fan index used during sizing
-    DataSizing::zoneFanPlacement DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet; // identifies location of fan wrt coil
+    DataSizing::ZoneFanPlacement DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
     EPVector<DataSizing::OARequirementsData> OARequirements;
     EPVector<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
@@ -1317,7 +1329,7 @@ struct SizingData : BaseGlobalStruct
         this->DataNomCapInpMeth = false;
         this->DataFanEnumType = -1;
         this->DataFanIndex = -1;
-        this->DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+        this->DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
         this->DataDXSpeedNum = 0;
         this->OARequirements.deallocate();
         this->ZoneAirDistribution.deallocate();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,7 +125,7 @@ void GshpPeCoolingSpecs::simulate(
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             this->SourceLoopNum,
                                                             this->SourceLoopSideNum,
-                                                            DataPlant::TypeOf_HPWaterEFCooling,
+                                                            DataPlant::PlantEquipmentType::HPWaterEFCooling,
                                                             this->SourceSideInletNodeNum,
                                                             this->SourceSideOutletNodeNum,
                                                             this->QSource,
@@ -156,7 +156,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_HPWaterPECooling,
+                                                DataPlant::PlantEquipmentType::HPWaterPECooling,
                                                 this->SourceLoopNum,
                                                 this->SourceLoopSideNum,
                                                 this->SourceBranchNum,
@@ -169,7 +169,7 @@ void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
                                                 _);
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_HPWaterPECooling,
+                                                DataPlant::PlantEquipmentType::HPWaterPECooling,
                                                 this->LoadLoopNum,
                                                 this->LoadLoopSideNum,
                                                 this->LoadBranchNum,
@@ -206,7 +206,6 @@ void GetGshpInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
-    using DataPlant::TypeOf_HPWaterPECooling;
     using FluidProperties::FindRefrigerant;
     using NodeInputManager::GetOnlySingleNode;
     using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -238,7 +237,7 @@ void GetGshpInput(EnergyPlusData &state)
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name = AlphArray(1);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).WWHPPlantTypeOfNum = TypeOf_HPWaterPECooling;
+        state.dataHPWaterToWaterClg->GSHP(GSHPNum).WWHPPlantTypeOfNum = DataPlant::PlantEquipmentType::HPWaterPECooling;
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).COP = NumArray(1);
         if (NumArray(1) == 0.0) {
@@ -332,7 +331,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                               AlphArray(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                                                              NodeInputManager::compFluidStream::Primary,
+                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                               ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(state,
@@ -342,7 +341,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                                AlphArray(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(state,
@@ -352,7 +351,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::compFluidStream::Secondary,
+                                                                                            NodeInputManager::CompFluidStream::Secondary,
                                                                                             ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(state,
@@ -362,7 +361,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::compFluidStream::Secondary,
+                                                                                             NodeInputManager::CompFluidStream::Secondary,
                                                                                              ObjectIsNotParent);
 
         // Test node sets
@@ -588,11 +587,11 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     //       RE-ENGINEERED  Mar2000
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const gamma(1.114); // Expnasion Coefficient
-    Real64 const HeatBalTol(0.0005);
-    Real64 const RelaxParam(0.6);
-    Real64 const SmallNum(1.0e-20);
-    int const IterationLimit(500);
+    Real64 constexpr gamma(1.114); // Expnasion Coefficient
+    Real64 constexpr HeatBalTol(0.0005);
+    Real64 constexpr RelaxParam(0.6);
+    Real64 constexpr SmallNum(1.0e-20);
+    int constexpr IterationLimit(500);
     static constexpr std::string_view RoutineName("CalcGshpModel");
     static constexpr std::string_view RoutineNameLoadSideRefridgTemp("CalcGSHPModel:LoadSideRefridgTemp");
     static constexpr std::string_view RoutineNameSourceSideRefridgTemp("CalcGSHPModel:SourceSideRefridgTemp");
@@ -678,7 +677,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
                                                     this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
         // now initialize simulation variables for "heat pump off"
         this->QLoad = 0.0;
@@ -743,7 +742,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                         this->CondMassFlowIndex,
                                                         this->SourceLoopNum,
                                                         this->LoadLoopSideNum,
-                                                        DataPlant::iCriteriaType::MassFlowRate,
+                                                        DataPlant::CriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             this->QLoad = 0.0;
             this->QSource = 0.0;
@@ -762,7 +761,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                                                     this->CondMassFlowIndex,
                                                     this->SourceLoopNum,
                                                     this->LoadLoopSideNum,
-                                                    DataPlant::iCriteriaType::MassFlowRate,
+                                                    DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
     }
 

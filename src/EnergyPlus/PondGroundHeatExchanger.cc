@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -221,7 +221,7 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
                                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             DataLoopNode::ObjectIsNotParent);
         if (state.dataPondGHE->PondGHE(Item).InletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
@@ -238,7 +238,7 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
                                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              DataLoopNode::ObjectIsNotParent);
         if (state.dataPondGHE->PondGHE(Item).OutletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
@@ -530,9 +530,9 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
 
     Real64 CalcTotalFLux; // function return variable
 
-    Real64 const PrandtlAir(0.71); // Prandtl number for air - assumed constant
-    Real64 const SchmidtAir(0.6);  // Schmidt number for air - assumed constant
-    Real64 const PondHeight(0.0);  // for now
+    Real64 constexpr PrandtlAir(0.71); // Prandtl number for air - assumed constant
+    Real64 constexpr SchmidtAir(0.6);  // Schmidt number for air - assumed constant
+    Real64 constexpr PondHeight(0.0);  // for now
 
     static constexpr std::string_view RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
 
@@ -637,9 +637,9 @@ Real64 PondGroundHeatExchangerData::CalcSolarFlux(EnergyPlusData &state) const
 
     Real64 CalcSolarFlux; // Function return variable
 
-    Real64 const WaterRefIndex(1.33); // refractive index of water
-    Real64 const AirRefIndex(1.0003); // refractive index of air
-    Real64 const PondExtCoef(0.3);    // extinction coefficient of water
+    Real64 constexpr WaterRefIndex(1.33); // refractive index of water
+    Real64 constexpr AirRefIndex(1.0003); // refractive index of air
+    Real64 constexpr PondExtCoef(0.3);    // extinction coefficient of water
 
     // check for sun up.
     if (!state.dataEnvrn->SunIsUp) {
@@ -706,8 +706,8 @@ Real64 PondGroundHeatExchangerData::CalcEffectiveness(EnergyPlusData &state,
 
     Real64 CalcEffectiveness; // Function return variable
 
-    Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
-    Real64 const GravConst(9.81);      // gravitational constant - should be fixed!
+    Real64 constexpr MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+    Real64 constexpr GravConst(9.81);      // gravitational constant - should be fixed!
     static constexpr std::string_view CalledFrom("PondGroundHeatExchanger:CalcEffectiveness");
 
     // evaluate properties at pipe fluid temperature for given pipe fluid
@@ -867,8 +867,8 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
 }
 void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
 {
-    Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
-    Real64 const PondHeight(0.0);     // for now
+    Real64 constexpr DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
+    Real64 constexpr PondHeight(0.0);     // for now
 
     static std::string const RoutineName("InitPondGroundHeatExchanger");
 
@@ -890,7 +890,7 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_GrndHtExchgPond,
+                                                DataPlant::PlantEquipmentType::GrndHtExchgPond,
                                                 this->LoopNum,
                                                 this->LoopSideNum,
                                                 this->BranchNum,

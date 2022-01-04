@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -69,50 +70,56 @@ namespace PoweredInductionUnits {
     // Data
     // MODULE PARAMETER DEFINITIONS
     // coil types in this module
-    enum class iHCoilType
+    enum class HtgCoilType
     {
-        Unassigned,
+        Invalid = -1,
         Gas,
         Electric,
         SimpleHeating,
         SteamAirHeating,
+        Num
     };
+
+    static constexpr std::array<std::string_view, static_cast<int>(HtgCoilType::Num)> HCoilNamesUC{
+        "COIL:HEATING:FUEL", "COIL:HEATING:ELECTRIC", "COIL:HEATING:WATER", "COIL:HEATING:STEAM"};
+
+    static constexpr std::array<std::string_view, static_cast<int>(HtgCoilType::Num)> HCoilNames{
+        "Coil:Heating:Fuel", "Coil:Heating:Electric", "Coil:Heating:Water", "Coil:Heating:Steam"};
 
     struct PowIndUnitData
     {
         // Members
         // input data
-        std::string Name;                                  // name of unit
-        std::string UnitType;                              // type of unit
-        DataDefineEquip::iZnAirLoopEquipType UnitType_Num; // index for type of unit
-        std::string Sched;                                 // availability schedule
-        int SchedPtr;                                      // index to schedule
-        Real64 MaxTotAirVolFlow;                           // m3/s  (series)
-        Real64 MaxTotAirMassFlow;                          // kg/s  (series)
-        Real64 MaxPriAirVolFlow;                           // m3/s
-        Real64 MaxPriAirMassFlow;                          // kg/s
-        Real64 MinPriAirFlowFrac;                          // minimum primary air flow fraction
-        Real64 MinPriAirMassFlow;                          // kg/s
-        Real64 PriDamperPosition;                          // primary air damper position
-        Real64 MaxSecAirVolFlow;                           // m3/s (parallel)
-        Real64 MaxSecAirMassFlow;                          // kg/s (parallel)
-        Real64 FanOnFlowFrac;                              // frac of primary air flow at which fan turns on (parallel)
-        Real64 FanOnAirMassFlow;                           // primary air mass flow rate at which fan turns on (parallel)
-        int PriAirInNode;                                  // unit primary air inlet node number
-        int SecAirInNode;                                  // unit secondary air inlet node number
-        int OutAirNode;                                    // unit air outlet node number
-        int HCoilInAirNode;                                // unit mixed air node number
+        std::string Name;                                 // name of unit
+        std::string UnitType;                             // type of unit
+        DataDefineEquip::ZnAirLoopEquipType UnitType_Num; // index for type of unit
+        std::string Sched;                                // availability schedule
+        int SchedPtr;                                     // index to schedule
+        Real64 MaxTotAirVolFlow;                          // m3/s  (series)
+        Real64 MaxTotAirMassFlow;                         // kg/s  (series)
+        Real64 MaxPriAirVolFlow;                          // m3/s
+        Real64 MaxPriAirMassFlow;                         // kg/s
+        Real64 MinPriAirFlowFrac;                         // minimum primary air flow fraction
+        Real64 MinPriAirMassFlow;                         // kg/s
+        Real64 PriDamperPosition;                         // primary air damper position
+        Real64 MaxSecAirVolFlow;                          // m3/s (parallel)
+        Real64 MaxSecAirMassFlow;                         // kg/s (parallel)
+        Real64 FanOnFlowFrac;                             // frac of primary air flow at which fan turns on (parallel)
+        Real64 FanOnAirMassFlow;                          // primary air mass flow rate at which fan turns on (parallel)
+        int PriAirInNode;                                 // unit primary air inlet node number
+        int SecAirInNode;                                 // unit secondary air inlet node number
+        int OutAirNode;                                   // unit air outlet node number
+        int HCoilInAirNode;                               // unit mixed air node number
         int ControlCompTypeNum;
         int CompErrIndex;
-        std::string MixerName;    // name of air mixer component
-        int Mixer_Num;            // index for type of mixer
-        std::string FanName;      // name of fan component
-        int Fan_Num;              // index for fan type
-        int Fan_Index;            // store index for this fan
-        int FanAvailSchedPtr;     // index to fan availability schedule
-        std::string HCoilType;    // type of heating coil component
-        iHCoilType HCoilType_Num; // index for heating coil type
-        int HCoil_PlantTypeNum;
+        std::string MixerName; // name of air mixer component
+        int Mixer_Num;         // index for type of mixer
+        std::string FanName;   // name of fan component
+        int Fan_Num;           // index for fan type
+        int Fan_Index;         // store index for this fan
+        int FanAvailSchedPtr;  // index to fan availability schedule
+        HtgCoilType HCoilType; // index for heating coil type
+        DataPlant::PlantEquipmentType HCoil_PlantType;
         std::string HCoil; // name of heating coil component
         int HCoil_Index;   // index to this heating coil
         int HCoil_FluidIndex;
@@ -145,14 +152,14 @@ namespace PoweredInductionUnits {
 
         // Default Constructor
         PowIndUnitData()
-            : UnitType_Num(DataDefineEquip::iZnAirLoopEquipType::Unassigned), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0),
+            : UnitType_Num(DataDefineEquip::ZnAirLoopEquipType::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0),
               MaxPriAirVolFlow(0.0), MaxPriAirMassFlow(0.0), MinPriAirFlowFrac(0.0), MinPriAirMassFlow(0.0), PriDamperPosition(0.0),
               MaxSecAirVolFlow(0.0), MaxSecAirMassFlow(0.0), FanOnFlowFrac(0.0), FanOnAirMassFlow(0.0), PriAirInNode(0), SecAirInNode(0),
               OutAirNode(0), HCoilInAirNode(0), ControlCompTypeNum(0), CompErrIndex(0), Mixer_Num(0), Fan_Num(0), Fan_Index(0), FanAvailSchedPtr(0),
-              HCoilType_Num(iHCoilType::Unassigned), HCoil_PlantTypeNum(0), HCoil_Index(0), HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0),
-              MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinHotSteamFlow(0.0),
-              MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0), HWLoopNum(0),
-              HWLoopSide(0), HWBranchNum(0), HWCompNum(0), ADUNum(0), InducesPlenumAir(false), HeatingRate(0.0), HeatingEnergy(0.0),
+              HCoilType(HtgCoilType::Invalid), HCoil_PlantType(DataPlant::PlantEquipmentType::Invalid), HCoil_Index(0), HCoil_FluidIndex(0),
+              MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0),
+              MinHotSteamFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
+              HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), ADUNum(0), InducesPlenumAir(false), HeatingRate(0.0), HeatingEnergy(0.0),
               SensCoolRate(0.0), SensCoolEnergy(0.0), CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
         {
         }

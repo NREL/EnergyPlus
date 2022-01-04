@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -269,7 +269,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).numberOfDevices = 1;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device.allocate(state->dataHeatBal->spaceIntGainDevices(1).numberOfDevices);
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompObjectName = "PEOPLE";
-    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompTypeOfNum = IntGainTypeOf_People;
+    state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).CompType = DataHeatBalance::IntGainType::People;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).ConvectGainRate = 300.0;
     state->dataHeatBal->spaceIntGainDevices(ZoneNum).device(1).LatentGainRate = 200.0;
 
@@ -278,8 +278,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataSurface->Surface(1).Area = 1.0;
     state->dataSurface->Surface(2).Area = 2.0;
 
-    state->dataSurface->Surface(1).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
-    state->dataSurface->Surface(2).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = HeatTransferModel::EMPD;
+    state->dataSurface->Surface(2).HeatTransferAlgorithm = HeatTransferModel::EMPD;
 
     state->dataSurface->SurfTAirRef = 0;
 

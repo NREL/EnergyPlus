@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -222,8 +222,8 @@ namespace PVWatts {
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
-        const int maxAlphas = 6;  // from idd
-        const int maxNumeric = 5; // from idd
+        constexpr int maxAlphas = 6;  // from idd
+        constexpr int maxNumeric = 5; // from idd
         cAlphaFieldNames.allocate(maxAlphas);
         cNumericFieldNames.allocate(maxNumeric);
         lNumericFieldBlanks.allocate(maxNumeric);

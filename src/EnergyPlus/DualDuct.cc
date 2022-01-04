@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -294,7 +294,7 @@ namespace DualDuct {
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsNotParent,
                                                                                             cAlphaFields(3));
                 state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum = GetOnlySingleNode(state,
@@ -304,7 +304,7 @@ namespace DualDuct {
                                                                                                  AlphArray(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  ObjectIsNotParent,
                                                                                                  cAlphaFields(4));
                 state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum = GetOnlySingleNode(state,
@@ -314,7 +314,7 @@ namespace DualDuct {
                                                                                                   AlphArray(1),
                                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                   ObjectIsNotParent,
                                                                                                   cAlphaFields(5));
 
@@ -455,7 +455,7 @@ namespace DualDuct {
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsNotParent,
                                                                                             cAlphaFields(3));
                 state.dataDualDuct->dd_airterminal(DDNum).HotAirInletNodeNum = GetOnlySingleNode(state,
@@ -465,7 +465,7 @@ namespace DualDuct {
                                                                                                  AlphArray(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  ObjectIsNotParent,
                                                                                                  cAlphaFields(4));
                 state.dataDualDuct->dd_airterminal(DDNum).ColdAirInletNodeNum = GetOnlySingleNode(state,
@@ -475,7 +475,7 @@ namespace DualDuct {
                                                                                                   AlphArray(1),
                                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                  NodeInputManager::compFluidStream::Primary,
+                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                   ObjectIsNotParent,
                                                                                                   cAlphaFields(5));
 
@@ -638,7 +638,7 @@ namespace DualDuct {
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsNotParent,
                                                                                             cAlphaFields(3));
                 state.dataDualDuct->dd_airterminal(DDNum).OAInletNodeNum = GetOnlySingleNode(state,
@@ -648,7 +648,7 @@ namespace DualDuct {
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent,
                                                                                              cAlphaFields(4));
 
@@ -660,7 +660,7 @@ namespace DualDuct {
                                                                                                         AlphArray(1),
                                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                                         ObjectIsNotParent,
                                                                                                         cAlphaFields(5));
                 } else {
@@ -1883,10 +1883,9 @@ namespace DualDuct {
         // METHODOLOGY EMPLOYED:
         // User input defines method used to calculate OA.
 
-        using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
-        bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+        bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
         Real64 OAVolumeFlowRate; // outside air volume flow rate (m3/s)
         Real64 OAMassFlow;       // outside air mass flow rate (kg/s)
@@ -1903,11 +1902,11 @@ namespace DualDuct {
             if (this->NoOAFlowInputFromUser) return;
             // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
             if (AirLoopOAFrac > 0.0) {
-                OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(state,
-                                                                     this->OARequirementsPtr,
-                                                                     this->ActualZoneNum,
-                                                                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
-                                                                     UseMinOASchFlag);
+                OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(state,
+                                                                                 this->OARequirementsPtr,
+                                                                                 this->ActualZoneNum,
+                                                                                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
+                                                                                 UseMinOASchFlag);
                 OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
                 // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
@@ -1939,14 +1938,13 @@ namespace DualDuct {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
+        bool constexpr UseMinOASchFlag(true); // Always use min OA schedule in calculations.
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1980,14 +1978,14 @@ namespace DualDuct {
             if (this->OAPerPersonMode == PerPersonMode::ModeNotSet) PerPersonNotSet = true;
         }
 
-        OAVolumeFlowRate =
-            CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
+        OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
+            state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet);
 
         OAMassFlow = OAVolumeFlowRate * state.dataEnvrn->StdRhoAir;
 
         if (present(MaxOAVolFlow)) {
-            OAVolumeFlowRate =
-                CalcDesignSpecificationOutdoorAir(state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, _, true);
+            OAVolumeFlowRate = DataSizing::calcDesignSpecificationOutdoorAir(
+                state, this->OARequirementsPtr, this->ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, false, true);
             MaxOAVolFlow = OAVolumeFlowRate;
         }
     }

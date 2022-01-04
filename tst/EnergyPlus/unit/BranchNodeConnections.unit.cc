@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -94,7 +94,7 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 {
     bool errFlag = false;
-    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", NodeInputManager::CompFluidStream::Primary, false, errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
@@ -106,10 +106,10 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
 {
     bool errFlag = false;
-    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
-    RegisterNodeConnection(*state, 2, "GoodNode", "Type2", "Object2", "Sensor", NodeInputManager::compFluidStream::Primary, false, errFlag);
-    RegisterNodeConnection(*state, 1, "BadNode", "Type3", "Object3", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
-    RegisterNodeConnection(*state, 2, "GoodNode", "Type4", "Object4", "Outlet", NodeInputManager::compFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", NodeInputManager::CompFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 2, "GoodNode", "Type2", "Object2", "Sensor", NodeInputManager::CompFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type3", "Object3", "ZoneNode", NodeInputManager::CompFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state, 2, "GoodNode", "Type4", "Object4", "Outlet", NodeInputManager::CompFluidStream::Primary, false, errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);

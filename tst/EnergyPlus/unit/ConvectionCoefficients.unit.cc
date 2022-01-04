@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
+#include <array>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BaseboardElectric.hh>
@@ -404,6 +405,440 @@ protected:
         return delimited_string(idf_lines);
     }
 };
+
+TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
+{
+
+    std::string const idf_objects = delimited_string({
+        "WindowMaterial:SimpleGlazingSystem,",
+        "NonRes Fixed Assembly Window,  !- Name",
+        "6.9000,                  !- U-Factor {W/m2-K}",
+        "0.39;                    !- Solar Heat Gain Coefficient",
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material:NoMass,",
+        "R31LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "5.456,                   !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+        "Construction,",
+        "ROOF31,                  !- Name",
+        "R31LAYER;                !- Outside Layer",
+        "Construction,",
+        "Window Non-res Fixed,    !- Name",
+        "NonRes Fixed Assembly Window;  !- Outside Layer",
+        "Zone,",
+        "ZONE ONE,                !- Name",
+        "0,                       !- Direction of Relative North {deg}",
+        "0,                       !- X Origin {m}",
+        "0,                       !- Y Origin {m}",
+        "0,                       !- Z Origin {m}",
+        "1,                       !- Type",
+        "1,                       !- Multiplier",
+        "autocalculate,           !- Ceiling Height {m}",
+        "autocalculate;           !- Volume {m3}",
+        "ScheduleTypeLimits,",
+        "Fraction,                !- Name",
+        "0.0,                     !- Lower Limit Value",
+        "1.0,                     !- Upper Limit Value",
+        "CONTINUOUS;              !- Numeric Type",
+        "GlobalGeometryRules,",
+        "UpperLeftCorner,         !- Starting Vertex Position",
+        "CounterClockWise,        !- Vertex Entry Direction",
+        "World;                   !- Coordinate System",
+        "FenestrationSurface:Detailed,",
+        "Zn001:Wall001:Win001,    !- Name",
+        "Window,                  !- Surface Type",
+        "Window Non-res Fixed,    !- Construction Name",
+        "Zn001:Wall001,           !- Building Surface Name",
+        ",                        !- Outside Boundary Condition Object",
+        "0.5000000,               !- View Factor to Ground",
+        ",                        !- Frame and Divider Name",
+        "1.0,                     !- Multiplier",
+        "4,                       !- Number of Vertices",
+        "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall001,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall002,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall003,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall004,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Flr001,            !- Name",
+        "Floor,                   !- Surface Type",
+        "FLOOR,                   !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Adiabatic,               !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "NoSun,                   !- Sun Exposure",
+        "NoWind,                  !- Wind Exposure",
+        "1.000000,                !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Roof001,           !- Name",
+        "Roof,                    !- Surface Type",
+        "ROOF31,                  !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0,                       !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+
+    Real64 HMovInsul = 1.0;
+    DataSurfaces::SurfaceRoughness RoughSurf = DataSurfaces::SurfaceRoughness::VerySmooth;
+    Real64 AbsThermSurf = 0.84;
+    Real64 TempExt = -20.0;
+    Real64 HExt;
+    Real64 HSky;
+    Real64 HGround;
+    Real64 HAir;
+
+    Real64 HExtAdj;
+    Real64 adjRatio = 2.0;
+
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(1);
+    // without adjust ratio
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(1) = 1.0;
+    InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExt, HSky, HGround, HAir);
+    // with adjust ratio
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(1) = adjRatio;
+    InitExteriorConvectionCoeff(*state, 1, HMovInsul, RoughSurf, AbsThermSurf, TempExt, HExtAdj, HSky, HGround, HAir);
+    // adjust ratio scales the returned exterior convection coefficient
+    EXPECT_EQ(HExtAdj, HExt * adjRatio);
+}
+
+TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
+{
+    std::string const idf_objects = delimited_string({
+        "WindowMaterial:SimpleGlazingSystem,",
+        "NonRes Fixed Assembly Window,  !- Name",
+        "6.9000,                  !- U-Factor {W/m2-K}",
+        "0.39;                    !- Solar Heat Gain Coefficient",
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material:NoMass,",
+        "R31LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "5.456,                   !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+        "Construction,",
+        "ROOF31,                  !- Name",
+        "R31LAYER;                !- Outside Layer",
+        "Construction,",
+        "Window Non-res Fixed,    !- Name",
+        "NonRes Fixed Assembly Window;  !- Outside Layer",
+        "Zone,",
+        "ZONE ONE,                !- Name",
+        "0,                       !- Direction of Relative North {deg}",
+        "0,                       !- X Origin {m}",
+        "0,                       !- Y Origin {m}",
+        "0,                       !- Z Origin {m}",
+        "1,                       !- Type",
+        "1,                       !- Multiplier",
+        "autocalculate,           !- Ceiling Height {m}",
+        "autocalculate;           !- Volume {m3}",
+        "ScheduleTypeLimits,",
+        "Fraction,                !- Name",
+        "0.0,                     !- Lower Limit Value",
+        "1.0,                     !- Upper Limit Value",
+        "CONTINUOUS;              !- Numeric Type",
+        "GlobalGeometryRules,",
+        "UpperLeftCorner,         !- Starting Vertex Position",
+        "CounterClockWise,        !- Vertex Entry Direction",
+        "World;                   !- Coordinate System",
+        "FenestrationSurface:Detailed,",
+        "Zn001:Wall001:Win001,    !- Name",
+        "Window,                  !- Surface Type",
+        "Window Non-res Fixed,    !- Construction Name",
+        "Zn001:Wall001,           !- Building Surface Name",
+        ",                        !- Outside Boundary Condition Object",
+        "0.5000000,               !- View Factor to Ground",
+        ",                        !- Frame and Divider Name",
+        "1.0,                     !- Multiplier",
+        "4,                       !- Number of Vertices",
+        "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+        "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+        "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall001,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall002,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall003,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Wall004,           !- Name",
+        "Wall,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0.5000000,               !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Flr001,            !- Name",
+        "Floor,                   !- Surface Type",
+        "FLOOR,                   !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Adiabatic,               !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "NoSun,                   !- Sun Exposure",
+        "NoWind,                  !- Wind Exposure",
+        "1.000000,                !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "BuildingSurface:Detailed,",
+        "Zn001:Roof001,           !- Name",
+        "Roof,                    !- Surface Type",
+        "ROOF31,                  !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        ",                        !- Space Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "0,                       !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}",
+        "0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}",
+        "15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}",
+        "15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(7, 1.0);
+
+    state->dataHeatBalSurf->SurfTempInTmp.dimension(7, 20.0);
+    state->dataHeatBalFanSys->MAT.dimension(1, 25.0);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.006);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(7);
+    state->dataHeatBalSurf->SurfHConvInt(7) = 0.0;
+
+    InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->SurfTempInTmp);
+    // exterior window interior surface convection coefficient without adjustment
+    Real64 hcin = state->dataHeatBalSurf->SurfHConvInt(7);
+    Real64 adjRatio = 2.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatio(7) = adjRatio;
+    InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->SurfTempInTmp);
+    // exterior window interior surface convection coefficient with adjustment
+    Real64 hcinAdj = state->dataHeatBalSurf->SurfHConvInt(7);
+    // adjustment ratio properly applied
+    EXPECT_EQ(hcinAdj, adjRatio * hcin);
+}
 
 TEST_F(ConvectionCoefficientsFixture, ConvectionCofficients)
 {
@@ -2195,4 +2630,211 @@ TEST_F(ConvectionCoefficientsFixture, TestSetAdaptiveConvectionAlgoCoefficient)
     algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
     expected_curve = UtilityRoutines::FindItemInList("NUSSELTJURGESDUPCURVE", state->dataConvectionCoefficient->HcOutsideUserCurve);
     ASSERT_EQ(algorithm_identifier, expected_curve);
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestCalcWindSurfaceTheta)
+{
+    // theta angle for surface orientations of 0-360 deg with 0-360 deg wind angles
+    static constexpr std::array<std::array<Real64, 13>, 13> expectedVals = {{{0, 30, 60, 90, 120, 150, 180, 150, 120, 90, 60, 30, 0},
+                                                                             {30, 0, 30, 60, 90, 120, 150, 180, 150, 120, 90, 60, 30},
+                                                                             {60, 30, 0, 30, 60, 90, 120, 150, 180, 150, 120, 90, 60},
+                                                                             {90, 60, 30, 0, 30, 60, 90, 120, 150, 180, 150, 120, 90},
+                                                                             {120, 90, 60, 30, 0, 30, 60, 90, 120, 150, 180, 150, 120},
+                                                                             {150, 120, 90, 60, 30, 0, 30, 60, 90, 120, 150, 180, 150},
+                                                                             {180, 150, 120, 90, 60, 30, 0, 30, 60, 90, 120, 150, 180},
+                                                                             {150, 180, 150, 120, 90, 60, 30, 0, 30, 60, 90, 120, 150},
+                                                                             {120, 150, 180, 150, 120, 90, 60, 30, 0, 30, 60, 90, 120},
+                                                                             {90, 120, 150, 180, 150, 120, 90, 60, 30, 0, 30, 60, 90},
+                                                                             {60, 90, 120, 150, 180, 150, 120, 90, 60, 30, 0, 30, 60},
+                                                                             {30, 60, 90, 120, 150, 180, 150, 120, 90, 60, 30, 0, 30},
+                                                                             {0, 30, 60, 90, 120, 150, 180, 150, 120, 90, 60, 30, 0}}};
+
+    static constexpr std::array<Real64, 13> angles = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360};
+
+    for (int idxWindDir = 0; idxWindDir < 13; idxWindDir++) {
+        Real64 windDir = angles[idxWindDir];
+        for (int idxSurfAz = 0; idxSurfAz < 13; idxSurfAz++) {
+            Real64 surfAz = angles[idxSurfAz];
+            Real64 expectedVal = expectedVals[idxWindDir][idxSurfAz];
+            Real64 actualVal = ConvectionCoefficients::CalcWindSurfaceTheta(windDir, surfAz);
+            EXPECT_EQ(expectedVal, actualVal);
+        }
+    }
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestEmmelVertical)
+{
+    // wind speeds
+    static constexpr std::array<Real64, 15> windSpeedAt10m{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+    // expected values
+    static constexpr std::array<Real64, 15> actualHcZeroDegTheta = {
+        5.150, 9.029, 12.539, 15.829, 18.965, 21.984, 24.907, 27.753, 30.531, 33.251, 35.919, 38.542, 41.124, 43.668, 46.178};
+
+    static constexpr std::array<Real64, 15> actualHcFortyFiveDegTheta = {
+        3.340, 5.978, 8.404, 10.702, 12.908, 15.045, 17.124, 19.157, 21.149, 23.107, 25.033, 26.931, 28.804, 30.654, 32.483};
+
+    static constexpr std::array<Real64, 15> actualHcNinetyDegTheta = {
+        4.780, 7.819, 10.427, 12.790, 14.986, 17.057, 19.030, 20.922, 22.747, 24.514, 26.231, 27.902, 29.534, 31.129, 32.692};
+
+    static constexpr std::array<Real64, 15> actualHcOneThirtyFiveDegTheta = {
+        4.050, 6.906, 9.437, 11.777, 13.985, 16.093, 18.121, 20.083, 21.990, 23.848, 25.664, 27.443, 29.187, 30.901, 32.587};
+
+    static constexpr std::array<Real64, 15> actualHcOneEightyDegTheta = {
+        3.540, 5.995, 8.159, 10.152, 12.029, 13.817, 15.534, 17.193, 18.803, 20.371, 21.901, 23.398, 24.866, 26.306, 27.723};
+
+    for (int idx = 0; idx < 15; idx++) {
+        Real64 windSpeed = windSpeedAt10m[idx];
+
+        // test at 0 deg theta
+        Real64 actualHc = actualHcZeroDegTheta[idx];
+        Real64 expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 0, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 45 deg theta
+        actualHc = actualHcFortyFiveDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 45, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 90 deg theta
+        actualHc = actualHcNinetyDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 90, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 135 deg theta
+        actualHc = actualHcOneThirtyFiveDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 135, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 180 deg theta
+        actualHc = actualHcOneEightyDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelVertical(windSpeed, 180, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+    }
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestEmmelRoof)
+{
+    // wind speeds
+    static constexpr std::array<Real64, 15> windSpeedAt10m{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+    // expected values
+    static constexpr std::array<Real64, 15> actualHcZeroDegTheta = {
+        5.110, 8.775, 12.039, 15.067, 17.932, 20.672, 23.313, 25.872, 28.362, 30.791, 33.167, 35.496, 37.783, 40.031, 42.245};
+
+    static constexpr std::array<Real64, 15> actualHcFortyFiveDegTheta = {
+        4.600, 7.954, 10.957, 13.753, 16.404, 18.945, 21.399, 23.779, 26.098, 28.363, 30.581, 32.758, 34.896, 37.000, 39.072};
+
+    static constexpr std::array<Real64, 15> actualHcNinetyDegTheta = {
+        3.670, 6.615, 9.337, 11.924, 14.414, 16.830, 19.187, 21.493, 23.756, 25.982, 28.174, 30.337, 32.473, 34.584, 36.673};
+
+    static constexpr std::array<Real64, 15> actualHcOneThirtyFiveDegTheta = {
+        4.600, 7.954, 10.957, 13.753, 16.404, 18.945, 21.399, 23.779, 26.098, 28.363, 30.581, 32.758, 34.896, 37.000, 39.072};
+
+    static constexpr std::array<Real64, 15> actualHcOneEightyDegTheta = {
+        5.110, 8.775, 12.039, 15.067, 17.932, 20.672, 23.313, 25.872, 28.362, 30.791, 33.167, 35.496, 37.783, 40.031, 42.245};
+
+    for (int idx = 0; idx < 15; idx++) {
+        Real64 windSpeed = windSpeedAt10m[idx];
+
+        // test at 0 deg theta
+        Real64 actualHc = actualHcZeroDegTheta[idx];
+        Real64 expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 0, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 45 deg theta
+        actualHc = actualHcFortyFiveDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 45, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 90 deg theta
+        actualHc = actualHcNinetyDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 90, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 135 deg theta
+        actualHc = actualHcOneThirtyFiveDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 135, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 180 deg theta
+        actualHc = actualHcOneEightyDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcEmmelRoof(windSpeed, 180, 0);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+    }
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestBlockenWindward)
+{
+    std::string const idf_objects = this->getIDFString();
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+
+    // wind speeds
+    static constexpr std::array<Real64, 15> windSpeedAt10m{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+    // expected values
+    static constexpr std::array<Real64, 15> actualHcZeroDegTheta = {
+        4.600, 8.525, 12.229, 15.798, 19.268, 22.663, 25.995, 29.276, 32.511, 35.707, 38.868, 41.998, 45.099, 48.174, 51.225};
+
+    static constexpr std::array<Real64, 15> actualHcTwentyTwoDegTheta = {
+        5.000, 8.706, 12.041, 15.157, 18.119, 20.965, 23.716, 26.390, 28.998, 31.548, 34.047, 36.502, 38.916, 41.293, 43.636};
+
+    static constexpr std::array<Real64, 15> actualHcFortyFiveTheta = {
+        4.600, 8.234, 11.575, 14.740, 17.778, 20.721, 23.585, 26.385, 29.129, 31.824, 34.477, 37.091, 39.671, 42.219, 44.738};
+
+    static constexpr std::array<Real64, 15> actualHcSixtySevenDegTheta = {
+        4.500, 7.889, 10.957, 13.832, 16.572, 19.209, 21.764, 24.250, 26.678, 29.054, 31.386, 33.678, 35.934, 38.157, 40.350};
+
+    static constexpr std::array<Real64, 15> emmelVertActualHcOneThirtyFiveDegTheta = {
+        4.050, 6.906, 9.437, 11.777, 13.985, 16.093, 18.121, 20.083, 21.990, 23.848, 25.664, 27.443, 29.187, 30.901, 32.587};
+
+    for (int idx = 0; idx < 15; idx++) {
+        Real64 windSpeed = windSpeedAt10m[idx];
+
+        // test at 0 deg theta
+        Real64 actualHc = actualHcZeroDegTheta[idx];
+        Real64 expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 0, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 22.5 deg theta
+        actualHc = actualHcTwentyTwoDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 22.5, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 45 deg theta
+        actualHc = actualHcFortyFiveTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 45, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 67.5 deg theta
+        actualHc = actualHcSixtySevenDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 67.5, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+
+        // test at 120 deg. should throw warnings and pick up the EmmelVertical correlation
+        actualHc = emmelVertActualHcOneThirtyFiveDegTheta[idx];
+        expectedHc = ConvectionCoefficients::CalcBlockenWindward(*state, windSpeed, 135, 0, 1);
+        ASSERT_NEAR(actualHc, expectedHc, 0.001);
+        ASSERT_EQ(state->dataConvectionCoefficient->CalcBlockenWindwardErrorIDX, 1);
+    }
 }

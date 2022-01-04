@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -275,7 +275,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 FileSystem::writeFile<FileSystem::FileTypes::EpJSON>(convertedIDF, epJSONClean);
             }
         } else {
-            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath, std::ios_base::in | std::ios_base::binary);
+            epJSON = FileSystem::readJSON(state.dataStrGlobals->inputFilePath);
         }
     } catch (const std::exception &e) {
         ShowSevereError(state, e.what());
@@ -349,38 +349,38 @@ bool InputProcessor::checkVersionMatch(EnergyPlusData &state)
 bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
 {
     bool errorsFound = false;
-    constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
-                                                                      "HVACTemplate:Zone:IdealLoadsAirSystem",
-                                                                      "HVACTemplate:Zone:BaseboardHeat",
-                                                                      "HVACTemplate:Zone:FanCoil",
-                                                                      "HVACTemplate:Zone:PTAC",
-                                                                      "HVACTemplate:Zone:PTHP",
-                                                                      "HVACTemplate:Zone:WaterToAirHeatPump",
-                                                                      "HVACTemplate:Zone:VRF",
-                                                                      "HVACTemplate:Zone:Unitary",
-                                                                      "HVACTemplate:Zone:VAV",
-                                                                      "HVACTemplate:Zone:VAV:FanPowered",
-                                                                      "HVACTemplate:Zone:VAV:HeatAndCool",
-                                                                      "HVACTemplate:Zone:ConstantVolume",
-                                                                      "HVACTemplate:Zone:DualDuct",
-                                                                      "HVACTemplate:System:VRF",
-                                                                      "HVACTemplate:System:Unitary",
-                                                                      "HVACTemplate:System:UnitaryHeatPump:AirToAir",
-                                                                      "HVACTemplate:System:UnitarySystem",
-                                                                      "HVACTemplate:System:VAV",
-                                                                      "HVACTemplate:System:PackagedVAV",
-                                                                      "HVACTemplate:System:ConstantVolume",
-                                                                      "HVACTemplate:System:DualDuct",
-                                                                      "HVACTemplate:System:DedicatedOutdoorAir",
-                                                                      "HVACTemplate:Plant:ChilledWaterLoop",
-                                                                      "HVACTemplate:Plant:Chiller",
-                                                                      "HVACTemplate:Plant:Chiller:ObjectReference",
-                                                                      "HVACTemplate:Plant:Tower",
-                                                                      "HVACTemplate:Plant:Tower:ObjectReference",
-                                                                      "HVACTemplate:Plant:HotWaterLoop",
-                                                                      "HVACTemplate:Plant:Boiler",
-                                                                      "HVACTemplate:Plant:Boiler:ObjectReference",
-                                                                      "HVACTemplate:Plant:MixedWaterLoop"};
+    static constexpr std::array<std::string_view, 32> hvacTemplateObjects = {"HVACTemplate:Thermostat",
+                                                                             "HVACTemplate:Zone:IdealLoadsAirSystem",
+                                                                             "HVACTemplate:Zone:BaseboardHeat",
+                                                                             "HVACTemplate:Zone:FanCoil",
+                                                                             "HVACTemplate:Zone:PTAC",
+                                                                             "HVACTemplate:Zone:PTHP",
+                                                                             "HVACTemplate:Zone:WaterToAirHeatPump",
+                                                                             "HVACTemplate:Zone:VRF",
+                                                                             "HVACTemplate:Zone:Unitary",
+                                                                             "HVACTemplate:Zone:VAV",
+                                                                             "HVACTemplate:Zone:VAV:FanPowered",
+                                                                             "HVACTemplate:Zone:VAV:HeatAndCool",
+                                                                             "HVACTemplate:Zone:ConstantVolume",
+                                                                             "HVACTemplate:Zone:DualDuct",
+                                                                             "HVACTemplate:System:VRF",
+                                                                             "HVACTemplate:System:Unitary",
+                                                                             "HVACTemplate:System:UnitaryHeatPump:AirToAir",
+                                                                             "HVACTemplate:System:UnitarySystem",
+                                                                             "HVACTemplate:System:VAV",
+                                                                             "HVACTemplate:System:PackagedVAV",
+                                                                             "HVACTemplate:System:ConstantVolume",
+                                                                             "HVACTemplate:System:DualDuct",
+                                                                             "HVACTemplate:System:DedicatedOutdoorAir",
+                                                                             "HVACTemplate:Plant:ChilledWaterLoop",
+                                                                             "HVACTemplate:Plant:Chiller",
+                                                                             "HVACTemplate:Plant:Chiller:ObjectReference",
+                                                                             "HVACTemplate:Plant:Tower",
+                                                                             "HVACTemplate:Plant:Tower:ObjectReference",
+                                                                             "HVACTemplate:Plant:HotWaterLoop",
+                                                                             "HVACTemplate:Plant:Boiler",
+                                                                             "HVACTemplate:Plant:Boiler:ObjectReference",
+                                                                             "HVACTemplate:Plant:MixedWaterLoop"};
 
     // For EnergyPlus, there is no option to convert or allow these objects
     bool objectFound = false;
@@ -399,32 +399,32 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         errorsFound = true;
     }
 
-    constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
-                                                                  "GroundHeatTransfer:Slab:Materials",
-                                                                  "GroundHeatTransfer:Slab:MatlProps",
-                                                                  "GroundHeatTransfer:Slab:BoundConds",
-                                                                  "GroundHeatTransfer:Slab:BldgProps",
-                                                                  "GroundHeatTransfer:Slab:Insulation",
-                                                                  "GroundHeatTransfer:Slab:EquivalentSlab",
-                                                                  "GroundHeatTransfer:Slab:AutoGrid",
-                                                                  "GroundHeatTransfer:Slab:ManualGrid",
-                                                                  "GroundHeatTransfer:Slab:XFACE",
-                                                                  "GroundHeatTransfer:Slab:YFACE",
-                                                                  "GroundHeatTransfer:Slab:ZFACE",
-                                                                  "GroundHeatTransfer:Basement:SimParameters",
-                                                                  "GroundHeatTransfer:Basement:MatlProps",
-                                                                  "GroundHeatTransfer:Basement:Insulation",
-                                                                  "GroundHeatTransfer:Basement:SurfaceProps",
-                                                                  "GroundHeatTransfer:Basement:BldgData",
-                                                                  "GroundHeatTransfer:Basement:Interior",
-                                                                  "GroundHeatTransfer:Basement:ComBldg",
-                                                                  "GroundHeatTransfer:Basement:EquivSlab",
-                                                                  "GroundHeatTransfer:Basement:EquivAutoGrid",
-                                                                  "GroundHeatTransfer:Basement:AutoGrid",
-                                                                  "GroundHeatTransfer:Basement:ManualGrid",
-                                                                  "GroundHeatTransfer:Basement:XFACE",
-                                                                  "GroundHeatTransfer:Basement:YFACE",
-                                                                  "GroundHeatTransfer:Basement:ZFACE"};
+    static constexpr std::array<std::string_view, 26> groundHTObjects = {"GroundHeatTransfer:Control",
+                                                                         "GroundHeatTransfer:Slab:Materials",
+                                                                         "GroundHeatTransfer:Slab:MatlProps",
+                                                                         "GroundHeatTransfer:Slab:BoundConds",
+                                                                         "GroundHeatTransfer:Slab:BldgProps",
+                                                                         "GroundHeatTransfer:Slab:Insulation",
+                                                                         "GroundHeatTransfer:Slab:EquivalentSlab",
+                                                                         "GroundHeatTransfer:Slab:AutoGrid",
+                                                                         "GroundHeatTransfer:Slab:ManualGrid",
+                                                                         "GroundHeatTransfer:Slab:XFACE",
+                                                                         "GroundHeatTransfer:Slab:YFACE",
+                                                                         "GroundHeatTransfer:Slab:ZFACE",
+                                                                         "GroundHeatTransfer:Basement:SimParameters",
+                                                                         "GroundHeatTransfer:Basement:MatlProps",
+                                                                         "GroundHeatTransfer:Basement:Insulation",
+                                                                         "GroundHeatTransfer:Basement:SurfaceProps",
+                                                                         "GroundHeatTransfer:Basement:BldgData",
+                                                                         "GroundHeatTransfer:Basement:Interior",
+                                                                         "GroundHeatTransfer:Basement:ComBldg",
+                                                                         "GroundHeatTransfer:Basement:EquivSlab",
+                                                                         "GroundHeatTransfer:Basement:EquivAutoGrid",
+                                                                         "GroundHeatTransfer:Basement:AutoGrid",
+                                                                         "GroundHeatTransfer:Basement:ManualGrid",
+                                                                         "GroundHeatTransfer:Basement:XFACE",
+                                                                         "GroundHeatTransfer:Basement:YFACE",
+                                                                         "GroundHeatTransfer:Basement:ZFACE"};
 
     objectFound = false;
     for (size_t count = 0; count < groundHTObjects.size(); ++count) {
@@ -441,7 +441,7 @@ bool InputProcessor::checkForUnsupportedObjects(EnergyPlusData &state)
         errorsFound = true;
     }
 
-    constexpr std::array<std::string_view, 4> parametricObjects = {
+    static constexpr std::array<std::string_view, 4> parametricObjects = {
         "Parametric:SetValueForRun", "Parametric:Logic", "Parametric:RunControl", "Parametric:FileNameSuffix"};
 
     objectFound = false;
@@ -573,7 +573,7 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
         auto const &default_val = find_default.value();
         if (default_val.is_string() && !default_val.get<std::string>().empty()) {
             // autosize and autocalculate
-            default_value = -99999;
+            default_value = DataGlobalConstants::AutoCalculate;
         } else if (default_val.is_number_integer()) {
             default_value = default_val.get<std::int64_t>();
         } else {
@@ -650,7 +650,7 @@ std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const
 Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     // Return the value of fieldName in ep_object as a Real64.
-    // If the field value is a string, then assum autosize and return -99999.
+    // If the field value is a string, then assum autosize and return DataGlobalConstants::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0.0
     auto const &schema_field_obj = schema_obj_props[fieldName];
     assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
@@ -670,7 +670,7 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
             if (is_empty) {
                 isDefaulted = findDefault(value, schema_field_obj);
             } else {
-                value = -99999; // autosize and autocalculate
+                value = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
             }
         }
     } else {
@@ -685,7 +685,7 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
 int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     // Return the value of fieldName in ep_object as an integer (rounded to nearest integer if the input value is real).
-    // If the field value is a string, then assume autosize or autocalulate and return -99999.
+    // If the field value is a string, then assume autosize or autocalulate and return DataGlobalConstants::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0
 
     auto const &schema_field_obj = schema_obj_props[fieldName];
@@ -707,7 +707,7 @@ int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_o
             if (is_empty) {
                 isDefaulted = findDefault(defaultValue, schema_field_obj);
             } else {
-                value = -99999; // autosize and autocalculate
+                value = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
             }
         }
     } else {
@@ -862,7 +862,7 @@ void InputProcessor::setObjectItemValue(EnergyPlusData &state,
                 if (is_empty) {
                     findDefault(Numbers(numeric_index), schema_field_obj);
                 } else {
-                    Numbers(numeric_index) = -99999; // autosize and autocalculate
+                    Numbers(numeric_index) = DataGlobalConstants::AutoCalculate; // autosize and autocalculate
                 }
                 if (is_NumBlank) NumBlank()(numeric_index) = is_empty;
             }

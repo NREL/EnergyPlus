@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -165,14 +165,14 @@ void ControlCompOutput(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     // Iteration maximum for reheat control
-    static int const MaxIter(25);
+    static int constexpr MaxIter(25);
     static Real64 const iter_fac(1.0 / std::pow(2, MaxIter - 3));
-    int const iReverseAction(1);
-    int const iNormalAction(2);
+    int constexpr iReverseAction(1);
+    int constexpr iNormalAction(2);
 
     // Note - order in routine must match order below
     //  Plus -- order in ListOfComponents array must be in sorted order.
-    int const NumComponents(11);
+    int constexpr NumComponents(11);
     static Array1D_string const ListOfComponents(NumComponents,
                                                  {"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
                                                   "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
@@ -619,7 +619,7 @@ bool BBConvergeCheck(int const SimCompNum, Real64 const MaxFlow, Real64 const Mi
     bool BBConvergeCheck;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static Real64 const BBIterLimit(0.00001);
+    static Real64 constexpr BBIterLimit(0.00001);
 
     if (SimCompNum != BBSteamRadConvNum && SimCompNum != BBWaterRadConvNum) {
         // For all zone equipment except radiant/convective baseboard (steam and water) units:
@@ -751,7 +751,7 @@ void CheckThisZoneForSizing(EnergyPlusData &state,
 }
 
 void ValidateComponent(EnergyPlusData &state,
-                       std::string const &CompType,  // Component Type (e.g. Chiller:Electric)
+                       std::string_view CompType,    // Component Type (e.g. Chiller:Electric)
                        std::string const &CompName,  // Component Name (e.g. Big Chiller)
                        bool &IsNotOK,                // .TRUE. if this component pair is invalid
                        std::string const &CallString // Context of this pair -- for error message
@@ -781,15 +781,15 @@ void ValidateComponent(EnergyPlusData &state,
 
     IsNotOK = false;
 
-    ItemNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, CompType, CompName);
+    ItemNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, std::string{CompType}, CompName);
 
     if (ItemNum < 0) {
-        ShowSevereError(state, "During " + CallString + " Input, Invalid Component Type input=" + CompType);
+        ShowSevereError(state, format("During {} Input, Invalid Component Type input={}", CallString, CompType));
         ShowContinueError(state, "Component name=" + CompName);
         IsNotOK = true;
     } else if (ItemNum == 0) {
         ShowSevereError(state, "During " + CallString + " Input, Invalid Component Name input=" + CompName);
-        ShowContinueError(state, "Component type=" + CompType);
+        ShowContinueError(state, format("Component type={}", CompType));
         IsNotOK = true;
     }
 }
@@ -887,10 +887,10 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     using Psychrometrics::PsyWFnTdbTwbPb;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const g(9.807);          // gravitational constant (m/s**2)
-    Real64 const nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
-    Real64 const k(0.0267);         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
-    Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
+    Real64 constexpr g(9.807);          // gravitational constant (m/s**2)
+    Real64 constexpr nu(15.66e-6);      // kinematic viscosity (m**2/s) for air at 300 K (Mills 1999 Heat Transfer)
+    Real64 constexpr k(0.0267);         // thermal conductivity (W/m K) for air at 300 K (Mills 1999 Heat Transfer)
+    Real64 constexpr Sigma(5.6697e-08); // Stefan-Boltzmann constant
     static constexpr std::string_view RoutineName("CalcPassiveExteriorBaffleGap");
     // INTERFACE BLOCK SPECIFICATIONS:
 
@@ -1133,7 +1133,7 @@ void PassiveGapNusseltNumber(Real64 const AspRat, // Aspect Ratio of Gap height 
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const Pr(0.71); // Prandtl number for air
+    Real64 constexpr Pr(0.71); // Prandtl number for air
 
     // INTERFACE BLOCK SPECIFICATIONS
 
@@ -1521,19 +1521,19 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, "#Nodes on Supply Air Path,{}\n", state.dataZoneEquip->SupplyAirPath(BCount).NumNodes);
             for (Count2 = 1; Count2 <= state.dataZoneEquip->SupplyAirPath(BCount).NumNodes; ++Count2) {
-                if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == PathInlet) {
+                if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::PathInlet) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Inlet Node,{},{},{}\n",
                           Count2,
                           state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
-                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == Intermediate) {
+                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::Intermediate) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Through Node,{},{},{}\n",
                           Count2,
                           state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
-                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == Outlet) {
+                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::Outlet) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Outlet Node,{},{},{}\n",
                           Count2,

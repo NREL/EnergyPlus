@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -84,7 +84,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_WaterSource;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::WaterSource;
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "FLUIDSOURCE";
     state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
 
@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
     // We can check that GetInput happened properly here
     EXPECT_EQ(1u, state->dataPlantCompTempSrc->WaterSource.size());
     auto &waterSource1 = state->dataPlantCompTempSrc->WaterSource(1);
-    EXPECT_TRUE(compare_enums(PlantComponentTemperatureSources::iTempSpecType::Constant, waterSource1.TempSpecType));
+    EXPECT_TRUE(compare_enums(PlantComponentTemperatureSources::TempSpecType::Constant, waterSource1.tempSpecType));
     EXPECT_EQ(1, waterSource1.InletNodeNum);
     EXPECT_EQ(2, waterSource1.OutletNodeNum);
 

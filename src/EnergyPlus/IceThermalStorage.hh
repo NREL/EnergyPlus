@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,28 +67,36 @@ namespace IceThermalStorage {
 
     enum class IceStorageType
     {
+        Invalid = -1,
         Simple,
-        Detailed
+        Detailed,
+        Num
     };
 
     enum class CurveVars
     {
+        Invalid = -1,
         FracChargedLMTD,
         FracDischargedLMTD,
         LMTDMassFlow,
-        LMTDFracCharged
+        LMTDFracCharged,
+        Num
     };
 
     enum class DetIce
     {
-        InsideMelt, // Inside melt system--charge starting with bare coil
-        OutsideMelt // Outside melt system--charge from existing ice layer on coil
+        Invalid = -1,
+        InsideMelt,  // Inside melt system--charge starting with bare coil
+        OutsideMelt, // Outside melt system--charge from existing ice layer on coil
+        Num
     };
 
     enum class ITSType
     {
+        Invalid = -1,
         IceOnCoilInternal,
-        IceOnCoilExternal
+        IceOnCoilExternal,
+        Num
     };
 
     struct SimpleIceStorageData : PlantComponent

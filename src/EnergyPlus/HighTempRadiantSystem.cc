@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -238,16 +238,17 @@ namespace HighTempRadiantSystem {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MaxCombustionEffic(1.00); // Limit the combustion efficiency to perfection
-        Real64 const MaxFraction(1.0);         // Limit the highest allowed fraction for heat transfer parts
-        Real64 const MinCombustionEffic(0.01); // Limit the minimum combustion efficiency
-        Real64 const MinFraction(0.0);         // Limit the lowest allowed fraction for heat transfer parts
-        Real64 const MinThrottlingRange(0.5);  // Smallest throttling range allowed in degrees Celsius
+        Real64 constexpr MaxCombustionEffic(1.00); // Limit the combustion efficiency to perfection
+        Real64 constexpr MaxFraction(1.0);         // Limit the highest allowed fraction for heat transfer parts
+        Real64 constexpr MinCombustionEffic(0.01); // Limit the minimum combustion efficiency
+        Real64 constexpr MinFraction(0.0);         // Limit the lowest allowed fraction for heat transfer parts
+        Real64 constexpr MinThrottlingRange(0.5);  // Smallest throttling range allowed in degrees Celsius
         //  INTEGER,          PARAMETER :: MaxDistribSurfaces = 20    ! Maximum number of surfaces that a radiant heater can radiate to
-        int const iHeatCAPMAlphaNum(4);                   // get input index to High Temperature Radiant system heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(1);       // get input index to High Temperature Radiant system heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatCAPMAlphaNum(4);             // get input index to High Temperature Radiant system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to High Temperature Radiant system heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
+            2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to High Temperature Radiant system heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1008,7 +1009,7 @@ namespace HighTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         float const TempConvToler(0.1f); // Temperature controller tries to converge to within 0.1C
-        int const MaxIterations(10);     // Maximum number of iterations to achieve temperature control
+        int constexpr MaxIterations(10); // Maximum number of iterations to achieve temperature control
         // (10 interval halvings achieves control to 0.1% of capacity)
         // These two parameters are intended to achieve reasonable control
         // without excessive run times.
@@ -1312,7 +1313,7 @@ namespace HighTempRadiantSystem {
         using DataHeatBalFanSys::MaxRadHeatFlux;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+        Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater

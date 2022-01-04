@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -128,8 +128,6 @@ public:
     int NumZoneInletNodes = 1;   // number of zone inlet nodes
     int NumZoneExhaustNodes = 1; // number of zone exhaust nodes
     bool ErrorsFound = false;
-    Real64 const CpWater = 4180.0;  // For estimating the expected result
-    Real64 const RhoWater = 1000.0; // For estimating the expected result
 
 protected:
     virtual void SetUp()
@@ -195,12 +193,12 @@ protected:
         state->dataSize->SysSizInput(1).AirLoopNum = 1;
         state->dataCurveManager->NumCurves = 10;
         state->dataCurveManager->PerfCurve.allocate(10);
-        state->dataCurveManager->PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(1).CurveType = CurveTypeEnum::Linear;
+        state->dataCurveManager->PerfCurve(1).InterpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(1).curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
         state->dataCurveManager->PerfCurve(1).CurveMax = 1.0;
-        state->dataCurveManager->PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-        state->dataCurveManager->PerfCurve(2).CurveType = CurveTypeEnum::Linear;
+        state->dataCurveManager->PerfCurve(2).InterpolationType = InterpType::EvaluateCurveToLimits;
+        state->dataCurveManager->PerfCurve(2).curveType = CurveType::Linear;
         state->dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
         state->dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
@@ -259,7 +257,7 @@ protected:
         int maxEquipCount1 = 1;
         thisZoneEqList.NumOfEquipTypes = maxEquipCount1;
         thisZoneEqList.EquipType.allocate(maxEquipCount1);
-        thisZoneEqList.EquipType_Num.allocate(maxEquipCount1);
+        thisZoneEqList.EquipTypeEnum.allocate(maxEquipCount1);
         thisZoneEqList.EquipName.allocate(maxEquipCount1);
         thisZoneEqList.EquipIndex.allocate(maxEquipCount1);
         thisZoneEqList.EquipIndex = 1;
@@ -270,7 +268,7 @@ protected:
         thisZoneEqList.EquipName(1) = "NO NAME";
         thisZoneEqList.CoolingPriority(1) = 1;
         thisZoneEqList.HeatingPriority(1) = 1;
-        thisZoneEqList.EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
+        thisZoneEqList.EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::ZoneUnitarySys;
 
         auto &finalZoneSizing(state->dataSize->FinalZoneSizing(zoneNum));
         finalZoneSizing.DesCoolVolFlow = 1.5;
@@ -363,7 +361,7 @@ protected:
         int condNodeNum = 1;
 
         VRFCond.VRFSystemTypeNum = 1;
-        VRFCond.VRFAlgorithmTypeNum = iAlgorithmType::SysCurve;
+        VRFCond.VRFAlgorithmTypeNum = AlgorithmType::SysCurve;
         VRFCond.SchedPtr = 1;
         VRFCond.CoolingCapacity = 10000.0;
         VRFCond.CoolingCOP = 3.0;
@@ -374,7 +372,7 @@ protected:
         VRFCond.ZoneTUListPtr = 1;
         VRFCond.MaxOATCooling = 40.0;
         VRFCond.MaxOATHeating = 30.0;
-        VRFCond.ThermostatPriority = iThermostatCtrlType::LoadPriority;
+        VRFCond.ThermostatPriority = ThermostatCtrlType::LoadPriority;
         state->dataHVACVarRefFlow->MaxCoolingCapacity.allocate(1);
         state->dataHVACVarRefFlow->MaxCoolingCapacity(1) = 1.0E20;
         state->dataHVACVarRefFlow->MaxHeatingCapacity.allocate(1);
@@ -2414,24 +2412,24 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         //   conditions. Compressor and OU hex performance are analysed for each mode.
 
         // Inputs_condition
-        Real64 const h_IU_evap_in = 225017; // enthalpy of IU evaporator at inlet [kJ/kg]
-        Real64 const h_comp_out = 432950;   // enthalpy of refrigerant at compressor outlet [kJ/kg]
-        Real64 const Q_c_TU_PL = 4972;      // IU evaporator load, including piping loss [W]
-        Real64 const Q_h_TU_PL = 9954;      // IU condenser load, including piping loss [W]
-        Real64 const Tdischarge = 36.37;    // VRF Compressor discharge refrigerant temperature [C]
-        Real64 Tsuction = 4.86;             // VRF compressor suction refrigerant temperature [C]
-        Real64 Te_update = 5;               // updated evaporating temperature, only updated when Tsuction is updated [C]
-        Real64 h_comp_in = 429529;          // enthalpy of refrigerant at compressor inlet [kJ/kg]
-        Real64 h_IU_PLc_out = 429529;       // enthalpy of refrigerant at the outlet of IU evaporator side main pipe [kJ/kg]
-        Real64 Pipe_Q_c = 0;                // IU evaporator side piping loss [W]
-        Real64 Q_c_OU;                      // OU evaporator load [W]
-        Real64 Q_h_OU;                      // OU condenser load [W]
-        Real64 m_ref_IU_evap;               // mass flow rate of Refrigerant through IU evaporators [kg/s]
-        Real64 m_ref_OU_evap;               // mass flow rate of Refrigerant through OU evaporator [kg/s]
-        Real64 m_ref_OU_cond;               // mass flow rate of Refrigerant through OU condenser [kg/s]
-        Real64 N_fan_OU;                    // outdoor unit fan power [W]
-        Real64 CompSpdActual;               // Actual compressor running speed [rps]
-        Real64 Ncomp;                       // compressor power [W]
+        Real64 constexpr h_IU_evap_in = 225017; // enthalpy of IU evaporator at inlet [kJ/kg]
+        Real64 constexpr h_comp_out = 432950;   // enthalpy of refrigerant at compressor outlet [kJ/kg]
+        Real64 constexpr Q_c_TU_PL = 4972;      // IU evaporator load, including piping loss [W]
+        Real64 constexpr Q_h_TU_PL = 9954;      // IU condenser load, including piping loss [W]
+        Real64 constexpr Tdischarge = 36.37;    // VRF Compressor discharge refrigerant temperature [C]
+        Real64 Tsuction = 4.86;                 // VRF compressor suction refrigerant temperature [C]
+        Real64 Te_update = 5;                   // updated evaporating temperature, only updated when Tsuction is updated [C]
+        Real64 h_comp_in = 429529;              // enthalpy of refrigerant at compressor inlet [kJ/kg]
+        Real64 h_IU_PLc_out = 429529;           // enthalpy of refrigerant at the outlet of IU evaporator side main pipe [kJ/kg]
+        Real64 Pipe_Q_c = 0;                    // IU evaporator side piping loss [W]
+        Real64 Q_c_OU;                          // OU evaporator load [W]
+        Real64 Q_h_OU;                          // OU condenser load [W]
+        Real64 m_ref_IU_evap;                   // mass flow rate of Refrigerant through IU evaporators [kg/s]
+        Real64 m_ref_OU_evap;                   // mass flow rate of Refrigerant through OU evaporator [kg/s]
+        Real64 m_ref_OU_cond;                   // mass flow rate of Refrigerant through OU condenser [kg/s]
+        Real64 N_fan_OU;                        // outdoor unit fan power [W]
+        Real64 CompSpdActual;                   // Actual compressor running speed [rps]
+        Real64 Ncomp;                           // compressor power [W]
 
         state->dataEnvrn->OutDryBulbTemp = 10.35;
 
@@ -2473,12 +2471,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         //   the difference between rated conditions and real conditions.
 
         // Inputs_condition
-        Real64 const h_comp_in_real = 429529; // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
-        Real64 const h_evap_in_real = 225016; // Enthalpy of refrigerant at the evaporator inlet at real conditions [kJ/kg]
-        Real64 const P_evap_real = 509784;    // Evaporative pressure at real conditions [Pa]
-        Real64 const T_comp_in_real = 0.65;   // Temperature of the refrigerant at the compressor inlet at real conditions [C]
-        Real64 const T_comp_in_rate = -5.35;  // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
-        Real64 const T_cond_out_rate = 31.38; // Temperature of the refrigerant at the condenser outlet at rated conditions [C]
+        Real64 constexpr h_comp_in_real = 429529; // Enthalpy of refrigerant at the compressor inlet at real conditions [kJ/kg]
+        Real64 constexpr h_evap_in_real = 225016; // Enthalpy of refrigerant at the evaporator inlet at real conditions [kJ/kg]
+        Real64 constexpr P_evap_real = 509784;    // Evaporative pressure at real conditions [Pa]
+        Real64 constexpr T_comp_in_real = 0.65;   // Temperature of the refrigerant at the compressor inlet at real conditions [C]
+        Real64 constexpr T_comp_in_rate = -5.35;  // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
+        Real64 constexpr T_cond_out_rate = 31.38; // Temperature of the refrigerant at the condenser outlet at rated conditions [C]
         Real64 C_cap_operation;
 
         // Run
@@ -2496,16 +2494,16 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
      {// a. Evaporator
 
       // Inputs_condition
-      Real64 const Q_req = 6971;        // Required capacity [W]
-    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 CompSpdActual;               // Actual compressor running speed [rps]
+      Real64 constexpr Q_req = 6971;        // Required capacity [W]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 CompSpdActual;                   // Actual compressor running speed [rps]
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
-        *state, Q_req, iHXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+        *state, Q_req, HXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(1295, CompSpdActual, 5);
@@ -2515,16 +2513,16 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     // b. Condenser
 
     // Inputs_condition
-    Real64 const Q_req = 6953;          // Required capacity [W]
-    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 CompSpdActual;               // Actual compressor running speed [rps]
+    Real64 constexpr Q_req = 6953;          // Required capacity [W]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 CompSpdActual;                   // Actual compressor running speed [rps]
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
-        *state, Q_req, iHXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+        *state, Q_req, HXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(950, CompSpdActual, 5);
@@ -2537,13 +2535,13 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     //   at given compressor speed and operational conditions.
 
     // Inputs_condition
-    Real64 const CompSpdActual = 1298;  // Actual compressor running speed [rps]
-    Real64 const T_suction = -13.35;    // Compressor suction temperature Te' [C]
-    Real64 const T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-    Real64 const h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-    Real64 const h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-    Real64 Q_c_tot;                     // Compressor evaporative capacity [W]
-    Real64 Ncomp;                       // Compressor power [W]
+    Real64 constexpr CompSpdActual = 1298;  // Actual compressor running speed [rps]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 Q_c_tot;                         // Compressor evaporative capacity [W]
+    Real64 Ncomp;                           // Compressor power [W]
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(*state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
@@ -2647,7 +2645,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     Tdischarge = 36;
 
     // Run
-    Q_h_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, iHXOpMode::CondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat);
+    Q_h_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, HXOpMode::CondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(27551, Q_h_OU, 10);
@@ -2664,7 +2662,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     Tsuction = -3;
 
     // Run
-    Q_c_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, iHXOpMode::EvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat);
+    Q_c_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, HXOpMode::EvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(24456, Q_c_OU, 10);
@@ -2684,7 +2682,7 @@ SC = 1;
 Tdischarge = 36;
 
 // Run
-m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
+m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, HXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
 
 // Test
 EXPECT_NEAR(3.6, m_air, 0.01);
@@ -2701,7 +2699,7 @@ EXPECT_NEAR(3.6, m_air, 0.01);
     Tsuction = -3;
 
     // Run
-    m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, iHXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
+    m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, HXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
 
     // Test
     EXPECT_NEAR(3.6, m_air, 0.01);
@@ -2723,7 +2721,7 @@ SC = 1;
 
 // Run
 state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
-    *state, iHXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
+    *state, HXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
 
 // Test
 EXPECT_NEAR(36, Tdischarge, 0.05);
@@ -2742,7 +2740,7 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
 
     // Run
     state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
-        *state, iHXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
+        *state, HXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
 
     // Test
     EXPECT_NEAR(-3, Tsuction, 0.05);
@@ -2766,7 +2764,7 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
 
         // Run
         SC = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
-            *state, iHXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+            *state, HXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
         // Test
         EXPECT_NEAR(1, SC, 0.01);
@@ -2784,7 +2782,7 @@ EXPECT_NEAR(36, Tdischarge, 0.05);
 
         // Run
         SH = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
-            *state, iHXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+            *state, HXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
         // Test
         EXPECT_NEAR(1, SH, 0.01);
@@ -2865,9 +2863,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Par(3) = CurveNum;
 
     // Inputs: parameters
-    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).curveType = CurveType::BiQuadratic;
     state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpType::EvaluateCurveToLimits;
     state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
     state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
     state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
@@ -4087,7 +4085,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     state->dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr = 0;
     state->dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex = 0;
-    state->dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority = iThermostatCtrlType::ThermostatOffsetPriority;
+    state->dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority = ThermostatCtrlType::ThermostatOffsetPriority;
 
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -8314,8 +8312,8 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->NumWaterCoils = 1;
     state->dataWaterCoils->WaterCoil.allocate(state->dataWaterCoils->NumWaterCoils);
     state->dataWaterCoils->WaterCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = WaterCoils::iCoilModel::HeatingSimple;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = WaterCoils::CoilModel::HeatingSimple;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
@@ -8360,7 +8358,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterSimpleHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataWaterCoils->CheckEquipName.dimension(state->dataWaterCoils->NumWaterCoils, true);
 
@@ -8431,7 +8429,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->NumSteamCoils = 1;
     state->dataSteamCoils->SteamCoil.allocate(state->dataSteamCoils->NumSteamCoils);
     state->dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
-    state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = state->dataSteamCoils->SteamCoil_AirHeating;
+    state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
     state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
     state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -8448,8 +8446,8 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).LoopSide = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
-    state->dataSteamCoils->SteamCoil(CoilNum).Coil_PlantTypeNum = DataPlant::TypeOf_CoilSteamAirHeating;
-    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state->dataSteamCoils->ZoneLoadControl;
+    state->dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
+    state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
     state->dataSteamCoils->GetSteamCoilsInputFlag = false;
     state->dataSteamCoils->CheckEquipName.dimension(state->dataSteamCoils->NumSteamCoils, true);
     state->dataSteamCoils->MySizeFlag.allocate(CoilNum);
@@ -8476,7 +8474,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataPlnt->PlantLoop(1).FluidName = "STEAM";
     state->dataPlnt->PlantLoop(1).FluidIndex = state->dataSteamCoils->SteamIndex;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataSteamCoils->SteamCoil(CoilNum).Name;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilSteamAirHeating;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum;
 
     state->dataGlobal->SysSizingCalc = true;

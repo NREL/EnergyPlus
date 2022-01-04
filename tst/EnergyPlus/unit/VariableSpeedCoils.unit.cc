@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2937,7 +2937,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
     int DXCoilNum = 1;
     int CompOp = 0;
-    int const SpeedCal = 1;
+    int constexpr SpeedCal = 1;
     Real64 RuntimeFrac = 1.0;
     Real64 SensLoad = 0.0;
     Real64 LatentLoad = 0.0;

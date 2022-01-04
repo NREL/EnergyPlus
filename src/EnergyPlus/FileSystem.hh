@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,6 +65,8 @@ namespace fs = std::experimental::filesystem;
 #error "no filesystem support"
 #endif
 
+#include <EnergyPlus/EnergyPlus.hh>
+
 // Add a custom formatter for fmt
 namespace fmt {
 template <> struct formatter<fs::path> : formatter<std::string>
@@ -91,7 +93,7 @@ namespace FileSystem {
 
     enum class FileTypes
     {
-        Unknown = -1,
+        Invalid = -1,
         // JSON types should go first,
         EpJSON,
         JSON,
@@ -113,18 +115,18 @@ namespace FileSystem {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt{
+    static constexpr std::array<std::string_view, static_cast<std::size_t>(FileTypes::Num)> FileTypesExt{
         "epJSON", "json", "glhe", "cbor", "msgpack", "ubjson", "bson", "idf", "imf", "csv", "tsv", "txt", "eso", "mtr"};
     static_assert(FileTypesExt.size() == static_cast<std::size_t>(FileTypes::Num), "Mismatched FileTypes enum and FileTypesExt array.");
     static_assert(!FileTypesExt.back().empty(), "Likely missing an enum from FileTypes in FileTypesExt array.");
 
     inline constexpr bool is_all_json_type(FileTypes t)
     {
-        return t > FileTypes::Unknown && t <= FileTypes::last_binary_json_type;
+        return t > FileTypes::Invalid && t <= FileTypes::last_binary_json_type;
     }
     inline constexpr bool is_json_type(FileTypes t)
     {
-        return t > FileTypes::Unknown && t <= FileTypes::last_json_type;
+        return t > FileTypes::Invalid && t <= FileTypes::last_json_type;
     }
     inline constexpr bool is_binary_json_type(FileTypes t)
     {
@@ -233,38 +235,50 @@ namespace FileSystem {
 
     template <FileTypes fileType> void writeFile(fs::path const &filePath, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(is_all_json_type(fileType) || is_flat_file_type(fileType), "Must be a valid file type");
 #ifdef _WIN32
         auto filePathStr = filePath.string();
         auto path = filePathStr.c_str();
 #else
         auto path = filePath.c_str();
 #endif
-        auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
-        f.print("{}", data);
+
+        if constexpr (is_json_type(fileType) || is_flat_file_type(fileType)) {
+            auto f = fmt::output_file(path, fmt::buffer_size = (2 << 17));
+            f.print("{}", data);
+        } else if constexpr (is_binary_json_type(fileType)) {
+            auto close_file = [](FILE *f) { fclose(f); };
+            auto holder = std::unique_ptr<FILE, decltype(close_file)>(fopen(path, "wb"), close_file);
+            if (!holder) {
+                throw FatalError(fmt::format("Could not open file: {}", path));
+            }
+
+            auto f = holder.get();
+            fmt::print(f, "{}", data);
+        }
     }
 
     template <FileTypes fileType> void writeFile(fmt::ostream &os, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(fileType > FileTypes::Invalid, "Must be a valid file type");
         os.print("{}", data);
     }
 
     template <FileTypes fileType> void writeFile(std::ostream &os, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(fileType > FileTypes::Invalid, "Must be a valid file type");
         fmt::print(os, "{}", data);
     }
 
     template <FileTypes fileType> void writeFile(FILE *f, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(fileType > FileTypes::Invalid, "Must be a valid file type");
         fmt::print(f, "{}", data);
     }
 
     template <class T, FileTypes fileType, typename = std::enable_if_t<enable_unique_ptr_v<T>>> void writeFile(T &os, const std::string_view data)
     {
-        static_assert(fileType > FileTypes::Unknown, "Must be a valid file type");
+        static_assert(fileType > FileTypes::Invalid, "Must be a valid file type");
         if (os) {
             writeFile<fileType>(*os, data);
         }

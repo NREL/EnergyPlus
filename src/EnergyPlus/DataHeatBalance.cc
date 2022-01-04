@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,151 +93,6 @@ using DataSurfaces::MaxSlatAngs;
 using namespace DataVectorTypes;
 using DataBSDFWindow::BSDFLayerAbsorpStruct;
 using DataBSDFWindow::BSDFWindowInputStruct;
-
-Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
-                                            {"PEOPLE",
-                                             "LIGHTS",
-                                             "ELECTRICEQUIPMENT",
-                                             "GASEQUIPMENT",
-                                             "HOTWATEREQUIPMENT",
-                                             "STEAMEQUIPMENT",
-                                             "OTHEREQUIPMENT",
-                                             "ZONEBASEBOARD:OUTDOORTEMPERATURECONTROLLED",
-                                             "ZONECONTAMINANTSOURCEANDSINK:CARBONDIOXIDE",
-                                             "WATERUSE:EQUIPMENT",
-                                             "DAYLIGHTINGDEVICE:TUBULAR",
-                                             "WATERHEATER:MIXED",
-                                             "WATERHEATER:STRATIFIED",
-                                             "THERMALSTORAGE:CHILLEDWATER:MIXED",
-                                             "THERMALSTORAGE:CHILLEDWATER:STRATIFIED",
-                                             "GENERATOR:FUELCELL",
-                                             "GENERATOR:MICROCHP",
-                                             "ELECTRICLOADCENTER:TRANSFORMER",
-                                             "ELECTRICLOADCENTER:INVERTER:SIMPLE",
-                                             "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER",
-                                             "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE",
-                                             "ELECTRICLOADCENTER:STORAGE:LIIONNMCBATTERY",
-                                             "ELECTRICLOADCENTER:STORAGE:BATTERY",
-                                             "ELECTRICLOADCENTER:STORAGE:SIMPLE",
-                                             "PIPE:INDOOR",
-                                             "REFRIGERATION:CASE",
-                                             "REFRIGERATION:COMPRESSORRACK",
-                                             "REFRIGERATION:SYSTEM:CONDENSER:AIRCOOLED",
-                                             "REFRIGERATION:TRANSCRITICALSYSTEM:GASCOOLER:AIRCOOLED",
-                                             "REFRIGERATION:SYSTEM:SUCTIONPIPE",
-                                             "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPEMT",
-                                             "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPELT",
-                                             "REFRIGERATION:SECONDARYSYSTEM:RECEIVER",
-                                             "REFRIGERATION:SECONDARYSYSTEM:PIPE",
-                                             "REFRIGERATION:WALKIN",
-                                             "PUMP:VARIABLESPEED",
-                                             "PUMP:CONSTANTSPEED",
-                                             "PUMP:VARIABLESPEED:CONDENSATE",
-                                             "HEADEREDPUMPS:VARIABLESPEED",
-                                             "HEADEREDPUMPS:CONSTANTSPEED",
-                                             "ZONECONTAMINANTSOURCEANDSINK:GENERICCONTAMINANT",
-                                             "PLANTCOMPONENT:USERDEFINED",
-                                             "COIL:USERDEFINED",
-                                             "ZONEHVAC:FORCEDAIR:USERDEFINED",
-                                             "AIRTERMINAL:SINGLEDUCT:USERDEFINED",
-                                             "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
-                                             "ELECTRICEQUIPMENT:ITE:AIRCOOLED",
-                                             "COIL:COOLING:DX:SINGLESPEED",
-                                             "COIL:HEATING:DX:SINGLESPEED",
-                                             "COIL:COOLING:DX:TWOSPEED",
-                                             "COIL:COOLING:DX:MULTISPEED",
-                                             "COIL:HEATING:DX:MULTISPEED",
-                                             "ELECTRICLOADCENTER:STORAGE:CONVERTER",
-                                             "FAN:SYSTEMMODEL"});
-
-Array1D_string const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
-                                              {"People",
-                                               "Lights",
-                                               "ElectricEquipment",
-                                               "GasEquipment",
-                                               "HotWaterEquipment",
-                                               "SteamEquipment",
-                                               "OtherEquipment",
-                                               "ZoneBaseboard:OutdoorTemperatureControlled",
-                                               "ZoneContaminantSourceAndSink:CarbonDioxide",
-                                               "WaterUse:Equipment",
-                                               "DaylightingDevice:Tubular",
-                                               "WaterHeater:Mixed",
-                                               "WaterHeater:Stratified",
-                                               "ThermalStorage:ChilledWater:Mixed",
-                                               "ThermalStorage:ChilledWater:Stratified",
-                                               "Generator:FuelCell",
-                                               "Generator:MicroCHP",
-                                               "ElectricLoadCenter:Transformer",
-                                               "ElectricLoadCenter:Inverter:Simple",
-                                               "ElectricLoadCenter:Inverter:FunctionOfPower",
-                                               "ElectricLoadCenter:Inverter:LookUpTable",
-                                               "ElectricLoadCenter:Storage:LiIonNMCBattery",
-                                               "ElectricLoadCenter:Storage:Battery",
-                                               "ElectricLoadCenter:Storage:Simple",
-                                               "Pipe:Indoor",
-                                               "Refrigeration:Case",
-                                               "Refrigeration:CompressorRack",
-                                               "Refrigeration:System:Condenser:AirCooled",
-                                               "Refrigeration:TranscriticalSystem:GasCooler:AirCooled",
-                                               "Refrigeration:System:SuctionPipe",
-                                               "Refrigeration:TranscriticalSystem:SuctionPipeMT",
-                                               "Refrigeration:TranscriticalSystem:SuctionPipeLT",
-                                               "Refrigeration:SecondarySystem:Receiver",
-                                               "Refrigeration:SecondarySystem:Pipe",
-                                               "Refrigeration:WalkIn",
-                                               "Pump:VariableSpeed",
-                                               "Pump:ConstantSpeed",
-                                               "Pump:VariableSpeed:Condensate",
-                                               "HeaderedPumps:VariableSpeed",
-                                               "HeaderedPumps:ConstantSpeed",
-                                               "ZoneContaminantSourceAndSink:GenericContaminant",
-                                               "PlantComponent:UserDefined",
-                                               "Coil:UserDefined",
-                                               "ZoneHVAC:ForcedAir:UserDefined",
-                                               "AirTerminal:SingleDuct:UserDefined",
-                                               "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
-                                               "ElectricEquipment:ITE:AirCooled",
-                                               "Coil:Cooling:DX:SingleSpeed",
-                                               "Coil:Heating:DX:SingleSpeed",
-                                               "Coil:Cooling:DX:TwoSpeed",
-                                               "Coil:Cooling:DX:MultiSpeed",
-                                               "Coil:Heating:DX:MultiSpeed",
-                                               "ElectricLoadCenter:Storage:Converter",
-                                               "Fan:SystemModel"});
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsCon(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0,
-         0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
-        {3, 10})); // Gas conductivity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsVis(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0,
-         0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
-        {3, 10})); // Gas viscosity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsCp(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.2324e-2, 0.0, 0.0, 0.0, 0.0,
-         0.0,      0.0,     0.0,     0.0,     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,       0.0, 0.0, 0.0, 0.0},
-        {3, 10})); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array1D<Real64> const GasWght(10, {28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas molecular weights for gases in a mixture
-
-// Gas specific heat ratios.  Used for gasses in low pressure
-Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
 // Functions
 
@@ -425,12 +280,14 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         case DataHeatBalance::MaterialGroup::GapEquivalentLayer:
             state.dataConstruction->Construct(ConstrNum).TypeIsWindow = true;
             break;
-        case DataHeatBalance::MaterialGroup::Unassigned:
+        case DataHeatBalance::MaterialGroup::Invalid:
         case DataHeatBalance::MaterialGroup::Air:
         case DataHeatBalance::MaterialGroup::RegularMaterial:
         case DataHeatBalance::MaterialGroup::EcoRoof:
         case DataHeatBalance::MaterialGroup::IRTMaterial:
             break; // Purposely not doing anything
+        default:
+            assert(false);
         }
     }
 
@@ -919,6 +776,9 @@ int AssignReverseConstructionNumber(EnergyPlusData &state,
         state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
         state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
         state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
+        state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
+        state.dataHeatBal->NominalUBeforeAdjusted(state.dataHeatBal->TotConstructs) = 0.0;
+        state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
         //  Put in new attributes
         NewConstrNum = state.dataHeatBal->TotConstructs;
         state.dataConstruction->Construct(NewConstrNum).IsUsed = true;
@@ -1112,7 +972,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // without Theta and Phi.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Small(1.E-9); // Small Number used to approximate zero
+    Real64 constexpr Small(1.E-9); // Small Number used to approximate zero
 
     // FUNCTION PARAMETER DEFINITIONS:
     int ScNum;                        // Index to screen data

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -405,9 +405,16 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
 PluginManager::PluginManager(EnergyPlusData &state)
 {
 #if LINK_WITH_PYTHON == 1
+    // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
+    Py_FrozenFlag = 1;
+
     // we'll need the program directory for a few things so get it once here at the top and sanitize it
-    fs::path programPath = FileSystem::getAbsolutePath(FileSystem::getProgramPath());
-    fs::path programDir = FileSystem::getParentDirectoryPath(programPath);
+    fs::path programDir;
+    if (state.dataGlobal->installRootOverride) {
+        programDir = state.dataStrGlobals->exeDirectoryPath;
+    } else {
+        programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+    }
     fs::path sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 
     // I think we need to set the python path before initializing the library

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -115,7 +115,7 @@ namespace HWBaseboardRadiator {
     // Use statements for data only modules
     // Using/Aliasing
     using DataHVACGlobals::SmallLoad;
-    using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
+
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     using FluidProperties::GetDensityGlycol;
@@ -213,7 +213,7 @@ namespace HWBaseboardRadiator {
             {
                 auto const SELECT_CASE_var(HWBaseboard(BaseboardNum).EquipType);
 
-                if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water) { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
+                if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water) { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
                     ControlCompOutput(state,
                                       HWBaseboard(BaseboardNum).EquipID,
                                       cCMO_BBRadiator_Water,
@@ -281,21 +281,21 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHWBaseboardInput:");
-        Real64 const MaxFraction(1.0);
-        Real64 const MinFraction(0.0);
-        Real64 const MaxWaterTempAvg(150.0);        // Maximum limit of average water temperature in degree C
-        Real64 const MinWaterTempAvg(20.0);         // Minimum limit of average water temperature in degree C
-        Real64 const HighWaterMassFlowRate(10.0);   // Maximum limit of water mass flow rate in kg/s
-        Real64 const LowWaterMassFlowRate(0.00001); // Minimum limit of water mass flow rate in kg/s
-        Real64 const MaxWaterFlowRate(10.0);        // Maximum limit of water volume flow rate in m3/s
-        Real64 const MinWaterFlowRate(0.00001);     // Minimum limit of water volume flow rate in m3/s
-        Real64 const WaterMassFlowDefault(0.063);   // Default water mass flow rate in kg/s
+        Real64 constexpr MaxFraction(1.0);
+        Real64 constexpr MinFraction(0.0);
+        Real64 constexpr MaxWaterTempAvg(150.0);        // Maximum limit of average water temperature in degree C
+        Real64 constexpr MinWaterTempAvg(20.0);         // Minimum limit of average water temperature in degree C
+        Real64 constexpr HighWaterMassFlowRate(10.0);   // Maximum limit of water mass flow rate in kg/s
+        Real64 constexpr LowWaterMassFlowRate(0.00001); // Minimum limit of water mass flow rate in kg/s
+        Real64 constexpr MaxWaterFlowRate(10.0);        // Maximum limit of water volume flow rate in m3/s
+        Real64 constexpr MinWaterFlowRate(0.00001);     // Minimum limit of water volume flow rate in m3/s
+        Real64 constexpr WaterMassFlowDefault(0.063);   // Default water mass flow rate in kg/s
         //    INTEGER, PARAMETER   :: MaxDistribSurfaces    = 20         ! Maximum number of surfaces that a baseboard heater can radiate to
-        int const MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
-        int const iHeatCAPMAlphaNum(2);                   // get input index to HW baseboard heating capacity sizing method
-        int const iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
+        int constexpr iHeatCAPMAlphaNum(2);                   // get input index to HW baseboard heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             2); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -492,7 +492,8 @@ namespace HWBaseboardRadiator {
                 state, cCMO_BBRadiator_Water, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
 
             HWBaseboard(BaseboardNum).EquipID = state.dataIPShortCut->cAlphaArgs(1); // Name of this baseboard
-            HWBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Water;   //'ZoneHVAC:Baseboard:RadiantConvective:Water'
+            HWBaseboard(BaseboardNum).EquipType =
+                DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
 
             HWBaseboard(BaseboardNum).designObjectName = state.dataIPShortCut->cAlphaArgs(2); // Name of the design object for this baseboard
             HWBaseboard(BaseboardNum).DesignObjectPtr =
@@ -522,7 +523,7 @@ namespace HWBaseboardRadiator {
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
             // Get outlet node number
@@ -533,7 +534,7 @@ namespace HWBaseboardRadiator {
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Water,
                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                           ObjectIsNotParent);
             TestCompSet(state,
                         cCMO_BBRadiator_Water,
@@ -657,7 +658,7 @@ namespace HWBaseboardRadiator {
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBWater_Num &&
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBWater &&
                         state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == HWBaseboard(BaseboardNum).EquipID) {
                         HWBaseboard(BaseboardNum).ZonePtr = ctrlZone;
                     }
@@ -867,8 +868,8 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Constant(0.0062); // Constant of linear equation for air mass flow rate
-        Real64 const Coeff(0.0000275); // Correlation coefficient to capacity
+        Real64 constexpr Constant(0.0062); // Constant of linear equation for air mass flow rate
+        Real64 constexpr Coeff(0.0000275); // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1077,10 +1078,10 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const AirInletTempStd(18.0); // I=B=R rating document
-        Real64 const CPAirStd(1005.0);      // Average specific heat of air at between 25C and 40C in J/kg-k
-        Real64 const Constant(0.0062);      // Constant of linear equation for air mass flow rate
-        Real64 const Coeff(0.0000275);      // Correlation coefficient to capacity
+        Real64 constexpr AirInletTempStd(18.0); // I=B=R rating document
+        Real64 constexpr CPAirStd(1005.0);      // Average specific heat of air at between 25C and 40C in J/kg-k
+        Real64 constexpr Constant(0.0062);      // Constant of linear equation for air mass flow rate
+        Real64 constexpr Coeff(0.0000275);      // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("SizeHWBaseboard");
         static constexpr std::string_view RoutineNameFull("BaseboardRadiatorWater:SizeHWBaseboard");
 
@@ -1417,7 +1418,7 @@ namespace HWBaseboardRadiator {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
+        Real64 constexpr MinFrac(0.0005); // Minimum fraction that delivers radiant heats to surfaces
         static constexpr std::string_view RoutineName("CalcHWBaseboard");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -1722,7 +1723,7 @@ namespace HWBaseboardRadiator {
         using DataHeatBalFanSys::MaxRadHeatFlux;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
+        Real64 constexpr SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
@@ -1884,8 +1885,7 @@ namespace HWBaseboardRadiator {
         // check input, provide comp index, call utility routines
 
         // Using/Aliasing
-        using DataPlant::ccSimPlantEquipTypes;
-        using DataPlant::TypeOf_Baseboard_Rad_Conv_Water;
+        using DataPlant::PlantEquipTypeNames;
 
         using PlantUtilities::PullCompInterconnectTrigger;
 
@@ -1921,13 +1921,13 @@ namespace HWBaseboardRadiator {
                                           BaseboardName,
                                           HWBaseboard(BaseboardNum).EquipID));
                 }
-                if (BaseboardTypeNum != TypeOf_Baseboard_Rad_Conv_Water) {
+                if (BaseboardTypeNum != static_cast<int>(DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Water)) {
                     ShowFatalError(state,
                                    format("UpdateHWBaseboardPlantConnection: Invalid CompIndex passed={}, baseboard name={}, stored baseboard Name "
                                           "for that index={}",
                                           BaseboardNum,
                                           BaseboardName,
-                                          ccSimPlantEquipTypes(BaseboardTypeNum)));
+                                          PlantEquipTypeNames[BaseboardTypeNum]));
                 }
             }
         }
@@ -1944,7 +1944,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBLoadReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::HeatTransferRate,
+                                    DataPlant::CriteriaType::HeatTransferRate,
                                     HWBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(state,
@@ -1955,7 +1955,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::MassFlowRate,
+                                    DataPlant::CriteriaType::MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
         PullCompInterconnectTrigger(state,
@@ -1966,7 +1966,7 @@ namespace HWBaseboardRadiator {
                                     HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
                                     HWBaseboard(BaseboardNum).LoopNum,
                                     HWBaseboard(BaseboardNum).LoopSideNum,
-                                    DataPlant::iCriteriaType::Temperature,
+                                    DataPlant::CriteriaType::Temperature,
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }
 

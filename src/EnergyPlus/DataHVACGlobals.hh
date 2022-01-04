@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -181,7 +181,7 @@ namespace DataHVACGlobals {
     int constexpr CoilVRF_FluidTCtrl_Cooling(33);
     int constexpr CoilVRF_FluidTCtrl_Heating(34);
     int constexpr CoilDX_Cooling(35);
-    //    int const CoilDX_SubcoolReheat(36);
+    //    int constexpr CoilDX_SubcoolReheat(36);
     int constexpr CoilDX_CurveFit_Speed(37);
 
     int constexpr coilNormalMode = 0;        // Normal operation mode

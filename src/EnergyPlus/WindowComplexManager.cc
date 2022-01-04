@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2126,7 +2126,7 @@ namespace WindowComplexManager {
 
         // Error tolerance is used to make small numbers equal to zero.  Due to precision of pi constant used in E+, performing
         // trigonometric operations on those constant will not cause absolutely accurate results
-        Real64 const ErrorTolerance(1.e-10);
+        Real64 constexpr ErrorTolerance(1.e-10);
 
         UnitVect = Vector(0.0, 0.0, 0.0);
 
@@ -2666,7 +2666,7 @@ namespace WindowComplexManager {
         int CalcSHGC(0);              // SHGC calculations are not necessary for E+ run
         int NumOfIterations(0);
 
-        DataComplexFenestration::GasCoeffs GasType; // locally used coefficent to point at correct gas type
+        int GasType; // locally used coefficient to point at correct gas type
         int ICoeff;
 
         std::string tarcogErrorMessage; // store error text from tarcog
@@ -2697,7 +2697,7 @@ namespace WindowComplexManager {
         CalcDeflection = TARCOGParams::DeflectionCalculation::NONE;
         CalcSHGC = 0;
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -2727,7 +2727,7 @@ namespace WindowComplexManager {
         isky = 3; // IR radiation is provided from external source
         iwd = 0;  // assume windward for now.  TODO compare surface normal with wind direction
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
             Real64 RefAirTemp = state.dataSurface->Surface(SurfNum).getInsideAirTemperature(state, SurfNum);
             tind = RefAirTemp + DataGlobalConstants::KelvinConv; // Inside air temperature
@@ -2838,13 +2838,13 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = DataComplexFenestration::GasCoeffs::Air;
-        wght(iprop(1, 1)) = GasWght(static_cast<int>(GasType));
-        gama(iprop(1, 1)) = GasSpecificHeatRatio(static_cast<int>(GasType));
+        GasType = static_cast<int>(DataComplexFenestration::GasCoeffs::Air);
+        wght(iprop(1, 1)) = GasWght[GasType - 1];
+        gama(iprop(1, 1)) = GasSpecificHeatRatio[GasType - 1];
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, static_cast<int>(GasType));
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, static_cast<int>(GasType));
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, static_cast<int>(GasType));
+            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon[ICoeff - 1][GasType - 1];
+            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis[ICoeff - 1][GasType - 1];
+            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp[ICoeff - 1][GasType - 1];
         }
 
         // Fill window layer properties needed for window layer heat balance calculation
@@ -2914,8 +2914,6 @@ namespace WindowComplexManager {
 
                 nmix(IGap + 1) = state.dataMaterial->Material(GasPointer).NumberOfGasesInMixture;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    // iprop(IGap+1, IMix) = dataMaterial.Material(LayPtr)%GasType(IMix)
-                    // iprop(IGap+1, IMix) = GetGasIndex(dataMaterial.Material(LayPtr)%GasWght(IMix))
                     frct(IMix, IGap + 1) = state.dataMaterial->Material(GasPointer).GasFract(IMix);
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
@@ -2945,7 +2943,7 @@ namespace WindowComplexManager {
 
         } // End of loop over glass, gap and blind/shade layers in a window construction
 
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             // now calculate correct areas for multipliers
             for (Lay = 1; Lay <= nlayer; ++Lay) {
                 if (LayerType(Lay) != TARCOGParams::TARCOGLayerType::SPECULAR) { // Layer is shading
@@ -2974,7 +2972,7 @@ namespace WindowComplexManager {
         // vector of absorbed solar energy fractions for each layer.
         asol = 0.0;
         // direct solar radiation
-        if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
                   state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
@@ -2992,7 +2990,7 @@ namespace WindowComplexManager {
 
             // Add contribution of IR from zone internal gains (lights, equipment and people). This is absorbed in zone-side layer and it
             // is assumed that nothing is transmitted through
-            asol(nlayer) += state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
+            asol(nlayer) += state.dataHeatBal->SurfQdotRadIntGainsInPerArea(SurfNum);
 
             presure = state.dataEnvrn->OutBaroPress;
 
@@ -3003,13 +3001,13 @@ namespace WindowComplexManager {
         }
 
         // Standard conditions run (winter and summer)
-        if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::Winter) {
             tind = 294.15;
             tout = 255.15;
             hcout = 26.0;
             wso = 5.5;
             dir = 0.0;
-        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Summer) {
             tind = 297.15;
             tout = 305.15;
             hcout = 15.0;
@@ -3019,7 +3017,7 @@ namespace WindowComplexManager {
         }
 
         // Common condition data
-        if (CalcCondition != DataBSDFWindow::Condition::Unassigned) {
+        if (CalcCondition != DataBSDFWindow::Condition::Invalid) {
             trmin = tind;
             outir = 0.0;
             tsky = tout;
@@ -3165,14 +3163,14 @@ namespace WindowComplexManager {
             ShowSevereError(state, "Window tarcog returned an error");
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
             ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
-            if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
+            if (CalcCondition == DataBSDFWindow::Condition::Invalid) {
                 ShowContinueError(state, "surface name = " + state.dataSurface->Surface(SurfNum).Name);
             }
             ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
             ShowFatalError(state, "halting because of error in tarcog");
-        } else if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Winter) {
             state.dataHeatBal->NominalU(ConstrNum) = ufactor;
-        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::Summer) {
             // tempInt = SurfaceWindow(SurfNum)%ComplexFen%CurrentState
             // tempReal = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffTrans
 
@@ -3195,7 +3193,7 @@ namespace WindowComplexManager {
             state.dataConstruction->Construct(ConstrNum).SummerSHGC = shgc;
 
             // Construct(SurfNum)%VisTransNorm = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffVisTrans
-        } else if (CalcCondition == DataBSDFWindow::Condition::Unassigned) { // expect converged results...
+        } else if (CalcCondition == DataBSDFWindow::Condition::Invalid) { // expect converged results...
             // Window heat balance solution has converged.
 
             state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
@@ -3243,9 +3241,7 @@ namespace WindowComplexManager {
                 ConvHeatGainFrZoneSideOfShade = ShadeArea * hcin * (theta(nglfacep) - tind);
                 state.dataSurface->SurfWinHeatGain(SurfNum) = state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatFlowNatural +
                                                               ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
-                state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
                 // store components for reporting
-                state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural; // result is in [W]
                 state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfShade;
                 state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
                 state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainShade;
@@ -3258,7 +3254,6 @@ namespace WindowComplexManager {
                 ConvHeatGainFrZoneSideOfGlass = state.dataSurface->Surface(SurfNum).Area * hcin * (theta(2 * nlayer) - tind);
                 state.dataSurface->SurfWinHeatGain(SurfNum) =
                     state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
-                state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
                 // store components for reporting
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
                 state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
@@ -3304,7 +3299,6 @@ namespace WindowComplexManager {
                     if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir) {
                         state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                         state.dataSurface->SurfWinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
-                        state.dataSurface->SurfWinHeatTransfer(SurfNum) += ConvHeatGainToZoneAir;
                     } else {
                         state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                     }
@@ -3334,13 +3328,10 @@ namespace WindowComplexManager {
             //  TransDiff = InterpSW(SurfaceWindow(SurfNum)%SwitchingFactor,Construct(ConstrNum)%TransDiff, &
             //                             Construct(ConstrNumSh)%TransDiff)
             // END IF
-            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) *
-                                                           state.dataSurface->Surface(SurfNum).Area * TransDiff;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) *
-                                                               state.dataSurface->Surface(SurfNum).Area * TransDiff;
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                 state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
                 TransDiff;
+            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
 
             if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {
                 state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) =

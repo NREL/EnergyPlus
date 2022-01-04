@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -132,6 +132,17 @@ namespace WindowManager {
     //***********************************************************************************
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
+    //    void updateSurfQdotRadOutRepHeatEmi(EnergyPlusData &state,
+    //                                    int const SurfNum,                // Surface number
+    //                                    Real64 const Tsout,               // temporary for result of outside surface temp in Kelvin
+    //                                    Real64 const rad_out_per_area,    // Total radiation emission rate per area
+    //                                    Real64 const rad_out_air_per_area // Radiation emission to air rate per area
+    //    );
+    //
+    //    void updateSurfQdotConvOutRep(EnergyPlusData &state,
+    //                              int const SurfNum, // Surface number
+    //                              Real64 const Tsout // temporary for result of outside surface temp in Kelvin
+    //    );
 
     void CalcWindowHeatBalance(EnergyPlusData &state,
                                int const SurfNum,          // Surface number
@@ -150,6 +161,42 @@ namespace WindowManager {
     //****************************************************************************
 
     void WindowHeatBalanceEquations(EnergyPlusData &state, int const SurfNum); // Surface number
+
+    //****************************************************************************
+
+    void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
+                                          int const nglasslayer,     // Number of glass layers
+                                          Array1D<Real64> const &hr, // Radiative conductance (W/m2-K)
+                                          Array1A<Real64> &hgap,     // Gap gas conductive conductance (W/m2-K)
+                                          Array2D<Real64> &Aface,    // Coefficient in equation Aface*thetas = Bface
+                                          Array1D<Real64> &Bface     // Coefficient in equation Aface*thetas = Bface
+    );
+
+    //****************************************************************************
+
+    void GetHeatBalanceEqCoefMatrix(EnergyPlusData &state,
+                                    int const SurfNum,
+                                    int const nglasslayer,
+                                    DataSurfaces::WinShadingType const ShadeFlag,
+                                    Real64 const sconsh,
+                                    Real64 const TauShIR,
+                                    Real64 const EpsShIR1,
+                                    Real64 const EpsShIR2,
+                                    Real64 const RhoShIR1,
+                                    Real64 const RhoShIR2,
+                                    Real64 const ShGlReflFacIR,
+                                    Real64 const RhoGlIR1,
+                                    Real64 const RhoGlIR2,
+                                    Real64 const hcv,             // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
+                                    Real64 const TGapNew,         // Current-iteration average air temp in airflow gap (K)
+                                    Real64 const TAirflowGapNew,  // Average air temp in airflow gap between glass panes (K)
+                                    Real64 const hcvAirflowGap,   // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
+                                    Array1A<Real64> const &hcvBG, // Convection coefficient from gap glass or shade to gap gas (W/m2-K)
+                                    Array1A<Real64> const &TGapNewBG,
+                                    Array1A<Real64> const &AbsRadShadeFace,
+                                    Array1D<Real64> const &hr,
+                                    Array2D<Real64> &Aface,
+                                    Array1D<Real64> &Bface);
 
     //****************************************************************************
 
@@ -340,11 +387,21 @@ namespace WindowManager {
                                int &errFlag                // Error flag
     );
 
+    void EvalNominalWindowCond(EnergyPlusData &state,
+                               Real64 const AbsBeamShadeNorm,     // Shade solar absorptance at normal incidence
+                               Array1D<Real64> const AbsBeamNorm, // Beam absorptance at normal incidence for each glass layer
+                               Array1D<Real64> const hgap,        // Conductive gap conductance [W/m2-K]
+                               Real64 &NominalConductance,        // Nominal center-of-glass conductance, including air films
+                               Real64 &SHGC,                      // Nominal center-of-glass solar heat gain coefficient for
+                               Real64 &TSolNorm                   // Overall beam solar transmittance at normal incidence
+    );
+
     //****************************************************************************
 
     void WindowTempsForNominalCond(EnergyPlusData &state,
-                                   int const ConstrNum, // Construction number
-                                   Array1A<Real64> hgap // Gap gas conductive conductance (W/m2-K)
+                                   int const ConstrNum,  // Construction number
+                                   Array1A<Real64> hgap, // Gap gas conductive conductance (W/m2-K)
+                                   Real64 const adjRatio // adjusment Ratio to hcin
     );
 
     //****************************************************************************
@@ -593,7 +650,6 @@ struct WindowManagerData : BaseGlobalStruct
     Array1D_int indx = Array1D_int(10);              // Vector of row permutations in LU decomposition
     Array2D<Real64> Aface = Array2D<Real64>(10, 10); // Coefficient in equation Aface*thetas = Bface
     Array1D<Real64> Bface = Array1D<Real64>(10);     // Coefficient in equation Aface*thetas = Bface
-    Array1D<Real64> hrprev = Array1D<Real64>(10);    // Value of hr from previous iteration
     Array1D<Real64> TGapNewBG = Array1D<Real64>(2);  // For between-glass shade/blind, average gas temp in gaps on either
     //  side of shade/blind (K)
     Array1D<Real64> hcvBG = Array1D<Real64>(2); // For between-glass shade/blind, convection coefficient from gap glass or

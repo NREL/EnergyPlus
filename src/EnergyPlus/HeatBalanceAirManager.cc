@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -260,14 +260,14 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const VentilTempLimit(100.0);                                        // degrees Celsius
-    Real64 const MixingTempLimit(100.0);                                        // degrees Celsius
-    Real64 const VentilWSLimit(40.0);                                           // m/s
+    Real64 constexpr VentilTempLimit(100.0);                                    // degrees Celsius
+    Real64 constexpr MixingTempLimit(100.0);                                    // degrees Celsius
+    Real64 constexpr VentilWSLimit(40.0);                                       // m/s
     static constexpr std::string_view RoutineName("GetSimpleAirModelInputs: "); // include trailing blank space
     // Refrigeration Door Mixing Protection types, factors used to moderate mixing flow.
-    Real64 const RefDoorNone(0.0);
-    Real64 const RefDoorAirCurtain(0.5);
-    Real64 const RefDoorStripCurtain(0.9);
+    Real64 constexpr RefDoorNone(0.0);
+    Real64 constexpr RefDoorAirCurtain(0.5);
+    Real64 constexpr RefDoorStripCurtain(0.9);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array2D<Real64> SVals1;
@@ -574,13 +574,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         {
-            auto const SELECT_CASE_var(cAlphaArgs(3)); // Aie balance method type character input-->convert to integer
-            if (SELECT_CASE_var == "QUADRATURE") {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalanceQuadrature;
-            } else if (SELECT_CASE_var == "NONE") {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
-            } else {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
+            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = static_cast<AirBalance>(
+                getEnumerationValue(DataHeatBalance::AirBalanceTypeNamesUC,
+                                    UtilityRoutines::MakeUPPERCase(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
+            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Invalid) {
+                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
                                  std::string{RoutineName} + cAlphaFieldNames(3) + " = " + cAlphaArgs(3) + " not valid choice for " +
                                      cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -622,8 +620,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
         ControlFlag = GetHybridVentilationControlStatus(state, state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr);
-        if (ControlFlag && state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalanceQuadrature) {
-            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
+        if (ControlFlag && state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
+            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
             ShowWarningError(state,
                              cCurrentModuleObject + " = " + state.dataHeatBal->ZoneAirBalance(Loop).Name + ": This Zone (" + cAlphaArgs(2) +
                                  ") is controlled by AvailabilityManager:HybridVentilation with Simple Airflow Control Type option.");
@@ -631,7 +629,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                               "Air balance method type QUADRATURE and Simple Airflow Control Type cannot co-exist. The NONE method is assigned");
         }
 
-        if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalanceQuadrature) {
+        if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
@@ -845,7 +843,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     if (errFlag) ErrorsFound = true;
                 }
 
-                state.dataHeatBal->Infiltration(Loop).ModelType = InfiltrationDesignFlowRate;
+                state.dataHeatBal->Infiltration(Loop).ModelType = DataHeatBalance::InfiltrationModelType::DesignFlowRate;
                 state.dataHeatBal->Infiltration(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataHeatBal->Infiltration(Loop).SchedPtr == 0) {
                     if (Item1 == 1) {
@@ -866,7 +864,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
                     for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                         if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                                 state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
                                 state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
                                 break;
@@ -1066,7 +1064,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
         state.dataHeatBal->Infiltration(InfiltCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Infiltration(InfiltCount).ModelType = InfiltrationShermanGrimsrud;
+        state.dataHeatBal->Infiltration(InfiltCount).ModelType = DataHeatBalance::InfiltrationModelType::ShermanGrimsrud;
         state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr == 0) {
             ShowSevereError(state,
@@ -1079,7 +1077,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
             for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
                         state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
                         break;
@@ -1134,7 +1132,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
         state.dataHeatBal->Infiltration(InfiltCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Infiltration(InfiltCount).ModelType = InfiltrationAIM2;
+        state.dataHeatBal->Infiltration(InfiltCount).ModelType = DataHeatBalance::InfiltrationModelType::AIM2;
         state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr == 0) {
             ShowSevereError(state,
@@ -1147,7 +1145,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
             for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
                         state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
                         break;
@@ -1499,7 +1497,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (state.dataHeatBal->Ventilation(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
                     for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                         if (state.dataHeatBal->Ventilation(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                                 state.dataHeatBal->Ventilation(Loop).QuadratureSum = true;
                                 state.dataHeatBal->Ventilation(Loop).OABalancePtr = i;
                                 break;
@@ -1508,7 +1506,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                state.dataHeatBal->Ventilation(Loop).ModelType = VentilationDesignFlowRate;
+                state.dataHeatBal->Ventilation(Loop).ModelType = DataHeatBalance::VentilationModelType::DesignFlowRate;
                 state.dataHeatBal->Ventilation(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataHeatBal->Ventilation(Loop).SchedPtr == 0) {
                     if (Item1 == 1) {
@@ -2172,7 +2170,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataHeatBal->Ventilation(VentiCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Ventilation(VentiCount).ModelType = VentilationWindAndStack;
+        state.dataHeatBal->Ventilation(VentiCount).ModelType = DataHeatBalance::VentilationModelType::WindAndStack;
 
         state.dataHeatBal->Ventilation(VentiCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr == 0) {
@@ -2186,7 +2184,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
             for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Ventilation(VentiCount).QuadratureSum = true;
                         state.dataHeatBal->Ventilation(VentiCount).OABalancePtr = i;
                         break;
@@ -4291,7 +4289,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if ((state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing &&
                  state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) &&
-                (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow)) {
+                (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No)) {
                 if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr == 0) {
                     ShowSevereError(
                         state, std::string{RoutineName} + ": Infiltration object is not defined for zone = " + state.dataHeatBal->Zone(ZoneNum).Name);
@@ -4340,8 +4338,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                     OutputProcessor::SOVStoreType::Average,
                                     state.dataHeatBal->Zone(ZoneNum).Name);
             }
-            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow) {
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType == AllZones ||
+            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No) {
+                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::AllZones ||
                     (state.dataHeatBal->MassConservation(ZoneNum).NumSourceZonesMixingObject > 0)) {
                     if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr > 0) {
                         SetupOutputVariable(state,
