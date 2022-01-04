@@ -179,7 +179,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
         ShowContinueError(state,
                           "Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
                               "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
-        ShowContinueError(state, "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
+        ShowContinueError(state, "This node was added as an OutdoorAir:Node and the simulation continues");
     }
 
     this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,

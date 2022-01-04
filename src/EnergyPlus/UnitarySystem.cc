@@ -12889,6 +12889,7 @@ namespace UnitarySystems {
                     }
                     if (this->m_CoolingSpeedNum == 0) this->m_CoolingSpeedNum = 1;
                     bool const singleMode = (this->m_SingleMode == 1);
+                    PartLoadFrac = 1.0;
                     for (int speedNum = this->m_CoolingSpeedNum; speedNum <= this->m_NumOfSpeedCooling; speedNum++) {
                         this->m_CoolingSpeedNum = speedNum;
                         state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
@@ -12896,18 +12897,21 @@ namespace UnitarySystems {
                         if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) break;
                     }
 
-                    std::array<Real64, 8> Par2 = {double(this->m_CoolingCoilIndex),
-                                                  DesOutTemp,
-                                                  // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
-                                                  // need to test what happens when Alt mode doesn't exist, or somehow test for it,
-                                                  // or fatal out in GetInput
-                                                  1.0, // DehumidMode
-                                                  double(FanOpMode),
-                                                  double(this->m_CoolingSpeedNum),
-                                                  1.0, //  this->m_CoolingSpeedRatio;
-                                                  0.0,
-                                                  0.0};
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                    // make sure outlet temp is below set point before calling SolveRoot
+                    if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) {
+                        std::array<Real64, 8> Par2 = {double(this->m_CoolingCoilIndex),
+                                                      DesOutTemp,
+                                                      // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
+                                                      // need to test what happens when Alt mode doesn't exist, or somehow test for it,
+                                                      // or fatal out in GetInput
+                                                      1.0, // DehumidMode
+                                                      double(FanOpMode),
+                                                      double(this->m_CoolingSpeedNum),
+                                                      1.0, //  this->m_CoolingSpeedRatio;
+                                                      0.0,
+                                                      0.0};
+                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                    }
                     if (this->m_CoolingSpeedNum == 1) {
                         this->m_CompPartLoadRatio = PartLoadFrac;
                         SpeedRatio = 0.0;

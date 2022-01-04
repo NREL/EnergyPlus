@@ -995,7 +995,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     EXPECT_NEAR(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.001);
     // system was not told to meet humidity ratio set point (since DesiredOutletHumRat = 1.0)
     EXPECT_GT(state->dataLoopNodes->Node(ControlNode).HumRat, state->dataLoopNodes->Node(ControlNode).HumRatMax);
-    // sensible load met by compressor speed 3
+    // sensible load met by compressor speed 1
     EXPECT_EQ(1, thisSys->m_CoolingSpeedNum);
 
     // test latent control
