@@ -110,7 +110,7 @@ When using these actuators, values should be set for all four types.~ This bound
 Several actuators, called ``CondFD Surface Material Layer,'' are available with actuated component control types for models that use the Conduction Finite Difference solution for conduction through surfaces. These are described below.
 
 \begin{itemize}
-    \item ``Thermal Conductivity''. Has units of [W/m-K]. Controls the thermal conductivity of the specified material layer within a given surface. Actuator is named from the surface name and material layer name combined with a colon ":". E.g. "SURFNAME:MATERIALLAYERNAME"
+    \item ``Thermal Conductivity''. Has units of [W/m-K]. Controls the thermal conductivity of the specified material layer within a given surface. Actuator is named from the surface name and material layer name combined with a colon ``:''. E.g. ``SURFNAME:MATERIALLAYERNAME''
     \item ``Specific Heat''. Has units of [J/kg-C]. Controls the specific heat for the specified material layer within a given surfaced. Actuator is named as described previously.
     \item ``Heat Flux''. Has units of [W/m2]. Controls the surface heat flux for the specified material layer within a given surface. The source is added directly after the material layer referenced and is not available for the final material layer. I.e. it must be inserted between two materal layers. Actuator is named as described previously. The actuator uses the same mechanism as the ``ConductionProperty:InternalHeatSource'' object, and is additive to the results computed by this object, if present. Actuator can only be used to add energy (i.e. positive numbers only), and the energy used is added to the electric heating sub-meter.
 \end{itemize}
