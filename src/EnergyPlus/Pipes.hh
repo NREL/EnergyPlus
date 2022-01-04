@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -72,24 +73,24 @@ namespace Pipes {
 
         // Members
         std::string Name;
-        int TypeOf;        // type of pipe
-        int InletNodeNum;  // Node number on the inlet side of the plant
-        int OutletNodeNum; // Node number on the inlet side of the plant
-        int LoopNum;       // Index of plant loop where this pipe resides
-        int LoopSide;      // Index of plant loop side where this pipe resides
-        int BranchIndex;   // Index of plant Branch index where this pipe resides
-        int CompIndex;     // Index of plant Comp index where this pipe resides
+        DataPlant::PlantEquipmentType Type; // type of pipe
+        int InletNodeNum;                   // Node number on the inlet side of the plant
+        int OutletNodeNum;                  // Node number on the inlet side of the plant
+        int LoopNum;                        // Index of plant loop where this pipe resides
+        int LoopSide;                       // Index of plant loop side where this pipe resides
+        int BranchIndex;                    // Index of plant Branch index where this pipe resides
+        int CompIndex;                      // Index of plant Comp index where this pipe resides
         bool CheckEquipName;
         bool EnvrnFlag;
 
         // Default Constructor
         LocalPipeData()
-            : TypeOf(0), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0), CheckEquipName(true),
-              EnvrnFlag(true)
+            : Type(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0),
+              CheckEquipName(true), EnvrnFlag(true)
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string const &objectName);
         void simulate([[maybe_unused]] EnergyPlusData &states,
                       const PlantLocation &calledFromLocation,
                       bool FirstHVACIteration,

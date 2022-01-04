@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -65,9 +66,10 @@ namespace HVACSingleDuctInduc {
 
     enum class SingleDuct_CV
     {
-        Unassigned = -1,
+        Invalid = -1,
         TwoPipeInduc,
-        FourPipeInduc
+        FourPipeInduc,
+        Num
     };
 
     struct IndUnitData
@@ -90,7 +92,7 @@ namespace HVACSingleDuctInduc {
         std::string HCoilType;      // type of heating coil component
         std::string HCoil;          // name of heating coil component
         int HCoil_Num;              // index to this coil
-        int HCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType HeatingCoilType;
         Real64 MaxVolHotWaterFlow; // m3/s (autosizable)
         Real64 MaxHotWaterFlow;    // kg/s
         Real64 MinVolHotWaterFlow; // m3/s
@@ -105,7 +107,7 @@ namespace HVACSingleDuctInduc {
         std::string CCoilType;     // type of cooling coil component
         std::string CCoil;         // name of cooling coil component
         int CCoil_Num;             // index to this coil
-        int CCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType CoolingCoilType;
         Real64 MaxVolColdWaterFlow; // m3/s (autosizable)
         Real64 MaxColdWaterFlow;    // kg/s
         Real64 MinVolColdWaterFlow; // m3/s
@@ -131,10 +133,11 @@ namespace HVACSingleDuctInduc {
 
         // Default Constructor
         IndUnitData()
-            : UnitType_Num(SingleDuct_CV::Unassigned), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0), InducRatio(2.5), PriAirInNode(0),
-              SecAirInNode(0), OutAirNode(0), HWControlNode(0), CWControlNode(0), HCoil_Num(0), HCoil_PlantTypeNum(0), MaxVolHotWaterFlow(0.0),
-              MaxHotWaterFlow(0.0), MinVolHotWaterFlow(0.0), MinHotWaterFlow(0.0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0),
-              HWCompNum(0), HWCoilFailNum1(0), HWCoilFailNum2(0), CCoil_Num(0), CCoil_PlantTypeNum(0), MaxVolColdWaterFlow(0.0),
+            : UnitType_Num(SingleDuct_CV::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0), InducRatio(2.5), PriAirInNode(0),
+              SecAirInNode(0), OutAirNode(0), HWControlNode(0), CWControlNode(0), HCoil_Num(0),
+              HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolHotWaterFlow(0.0), MaxHotWaterFlow(0.0), MinVolHotWaterFlow(0.0),
+              MinHotWaterFlow(0.0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), HWCoilFailNum1(0),
+              HWCoilFailNum2(0), CCoil_Num(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolColdWaterFlow(0.0),
               MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0),
               CWBranchNum(0), CWCompNum(0), CWCoilFailNum1(0), CWCoilFailNum2(0), Mixer_Num(0), MaxPriAirMassFlow(0.0), MaxSecAirMassFlow(0.0),
               ADUNum(0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)

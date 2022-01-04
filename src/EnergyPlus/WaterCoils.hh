@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,45 +72,46 @@ namespace WaterCoils {
     constexpr Real64 MinWaterMassFlowFrac = 0.000001;
     constexpr Real64 MinAirMassFlow = 0.001;
 
-    enum class iCoilModel
+    enum class CoilModel
     {
-        Unassigned,
+        Invalid = -1,
         HeatingSimple,
         CoolingSimple,
         CoolingDetailed,
+        Num
     };
 
     struct WaterCoilEquipConditions
     {
         // Members
-        std::string Name;                 // Name of the WaterCoil
-        std::string WaterCoilTypeA;       // Type of WaterCoil ie. Heating or Cooling
-        std::string WaterCoilModelA;      // Type of WaterCoil ie. Simple, Detailed, etc.
-        int WaterCoilType;                // Type of WaterCoil ie. Heating or Cooling
-        iCoilModel WaterCoilModel;        // Type of WaterCoil ie. Simple, Detailed, etc.
-        std::string Schedule;             // WaterCoil Operation Schedule
-        int SchedPtr;                     // Pointer to the correct schedule
-        bool RequestingAutoSize;          // True if this coil has appropriate autosize fields
-        Real64 InletAirMassFlowRate;      // MassFlow through the WaterCoil being Simulated [kg/s]
-        Real64 OutletAirMassFlowRate;     // MassFlow through the WaterCoil being Simulated[kg/s]
-        Real64 InletAirTemp;              // Inlet Air Temperature Operating Condition [C]
-        Real64 OutletAirTemp;             // Outlet Air Temperature Operating Condition [C]
-        Real64 InletAirHumRat;            // Inlet Air Humidity Ratio Operating Condition
-        Real64 OutletAirHumRat;           // Outlet Air Humidity Ratio Calculated Condition
-        Real64 InletAirEnthalpy;          // Inlet Air enthalpy [J/kg]
-        Real64 OutletAirEnthalpy;         // Outlet Air enthalpy [J/kg]
-        Real64 TotWaterCoilLoad;          // Total Load on the Coil [W]
-        Real64 SenWaterCoilLoad;          // Sensible Load on the Coil [W]
-        Real64 TotWaterHeatingCoilEnergy; // Total Heating Coil energy of the Coil [J]
-        Real64 TotWaterCoolingCoilEnergy; // Total Cooling Coil energy of the Coil [J]
-        Real64 SenWaterCoolingCoilEnergy; // Sensible Cooling Coil energy of the Coil [J]
-        Real64 DesWaterHeatingCoilRate;   // Design Heating Coil Rate used for sizing [W]
-        Real64 TotWaterHeatingCoilRate;   // Total Heating Coil Rate on the Coil [W]
-        Real64 DesWaterCoolingCoilRate;   // Design Cooling Coil Rate used for sizing [W]
-        Real64 TotWaterCoolingCoilRate;   // Total Cooling Coil Rate on the Coil [W]
-        Real64 SenWaterCoolingCoilRate;   // Sensible Cooling Coil Rate on the Coil [W]
-        Real64 UACoil;                    // WaterCoil UA Value
-        Real64 LeavingRelHum;             // Simple Coil Latent Model requires User input for leaving RH
+        std::string Name;                            // Name of the WaterCoil
+        std::string WaterCoilTypeA;                  // Type of WaterCoil ie. Heating or Cooling
+        std::string WaterCoilModelA;                 // Type of WaterCoil ie. Simple, Detailed, etc.
+        DataPlant::PlantEquipmentType WaterCoilType; // Type of WaterCoil ie. Heating or Cooling
+        CoilModel WaterCoilModel;                    // Type of WaterCoil ie. Simple, Detailed, etc.
+        std::string Schedule;                        // WaterCoil Operation Schedule
+        int SchedPtr;                                // Pointer to the correct schedule
+        bool RequestingAutoSize;                     // True if this coil has appropriate autosize fields
+        Real64 InletAirMassFlowRate;                 // MassFlow through the WaterCoil being Simulated [kg/s]
+        Real64 OutletAirMassFlowRate;                // MassFlow through the WaterCoil being Simulated[kg/s]
+        Real64 InletAirTemp;                         // Inlet Air Temperature Operating Condition [C]
+        Real64 OutletAirTemp;                        // Outlet Air Temperature Operating Condition [C]
+        Real64 InletAirHumRat;                       // Inlet Air Humidity Ratio Operating Condition
+        Real64 OutletAirHumRat;                      // Outlet Air Humidity Ratio Calculated Condition
+        Real64 InletAirEnthalpy;                     // Inlet Air enthalpy [J/kg]
+        Real64 OutletAirEnthalpy;                    // Outlet Air enthalpy [J/kg]
+        Real64 TotWaterCoilLoad;                     // Total Load on the Coil [W]
+        Real64 SenWaterCoilLoad;                     // Sensible Load on the Coil [W]
+        Real64 TotWaterHeatingCoilEnergy;            // Total Heating Coil energy of the Coil [J]
+        Real64 TotWaterCoolingCoilEnergy;            // Total Cooling Coil energy of the Coil [J]
+        Real64 SenWaterCoolingCoilEnergy;            // Sensible Cooling Coil energy of the Coil [J]
+        Real64 DesWaterHeatingCoilRate;              // Design Heating Coil Rate used for sizing [W]
+        Real64 TotWaterHeatingCoilRate;              // Total Heating Coil Rate on the Coil [W]
+        Real64 DesWaterCoolingCoilRate;              // Design Cooling Coil Rate used for sizing [W]
+        Real64 TotWaterCoolingCoilRate;              // Total Cooling Coil Rate on the Coil [W]
+        Real64 SenWaterCoolingCoilRate;              // Sensible Cooling Coil Rate on the Coil [W]
+        Real64 UACoil;                               // WaterCoil UA Value
+        Real64 LeavingRelHum;                        // Simple Coil Latent Model requires User input for leaving RH
         Real64 DesiredOutletTemp;
         Real64 DesiredOutletHumRat;
         Real64 InletWaterTemp;          // Inlet Water Temperature [C]
@@ -224,29 +225,29 @@ namespace WaterCoils {
 
         // Default Constructor
         WaterCoilEquipConditions()
-            : WaterCoilType(0), WaterCoilModel(iCoilModel::Unassigned), SchedPtr(0), RequestingAutoSize(false), InletAirMassFlowRate(0.0),
-              OutletAirMassFlowRate(0.0), InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0), InletAirEnthalpy(0.0),
-              OutletAirEnthalpy(0.0), TotWaterCoilLoad(0.0), SenWaterCoilLoad(0.0), TotWaterHeatingCoilEnergy(0.0), TotWaterCoolingCoilEnergy(0.0),
-              SenWaterCoolingCoilEnergy(0.0), DesWaterHeatingCoilRate(0.0), TotWaterHeatingCoilRate(0.0), DesWaterCoolingCoilRate(0.0),
-              TotWaterCoolingCoilRate(0.0), SenWaterCoolingCoilRate(0.0), UACoil(0.0), LeavingRelHum(0.0), DesiredOutletTemp(0.0),
-              DesiredOutletHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), InletWaterMassFlowRate(0.0), OutletWaterMassFlowRate(0.0),
-              MaxWaterVolFlowRate(0.0), MaxWaterMassFlowRate(0.0), InletWaterEnthalpy(0.0), OutletWaterEnthalpy(0.0), TubeOutsideSurfArea(0.0),
-              TotTubeInsideArea(0.0), FinSurfArea(0.0), MinAirFlowArea(0.0), CoilDepth(0.0), FinDiam(0.0), FinThickness(0.0), TubeInsideDiam(0.0),
-              TubeOutsideDiam(0.0), TubeThermConductivity(0.0), FinThermConductivity(0.0), FinSpacing(0.0), TubeDepthSpacing(0.0), NumOfTubeRows(0),
-              NumOfTubesPerRow(0), EffectiveFinDiam(0.0), TotCoilOutsideSurfArea(0.0), CoilEffectiveInsideDiam(0.0), GeometryCoef1(0.0),
-              GeometryCoef2(0.0), DryFinEfficncyCoef(5, 0.0), SatEnthlCurveConstCoef(0.0), SatEnthlCurveSlope(0.0), EnthVsTempCurveAppxSlope(0.0),
-              EnthVsTempCurveConst(0.0), MeanWaterTempSaved(0.0), InWaterTempSaved(0.0), OutWaterTempSaved(0.0), SurfAreaWetSaved(0.0),
-              SurfAreaWetFraction(0.0), DesInletWaterTemp(0.0), DesAirVolFlowRate(0.0), DesInletAirTemp(0.0), DesInletAirHumRat(0.0),
-              DesTotWaterCoilLoad(0.0), DesSenWaterCoilLoad(0.0), DesAirMassFlowRate(0.0), UACoilTotal(0.0), UACoilInternal(0.0), UACoilExternal(0.0),
-              UACoilInternalDes(0.0), UACoilExternalDes(0.0), DesOutletAirTemp(0.0), DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0),
-              HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0), UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0),
-              SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0), RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0),
-              LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0),
-              CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false),
-              FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
-              DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true),
-              AirLoopDOASFlag(false), heatRecoveryCoil(false)
+            : WaterCoilType(DataPlant::PlantEquipmentType::Invalid), WaterCoilModel(CoilModel::Invalid), SchedPtr(0), RequestingAutoSize(false),
+              InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0), InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0),
+              InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0), TotWaterCoilLoad(0.0), SenWaterCoilLoad(0.0), TotWaterHeatingCoilEnergy(0.0),
+              TotWaterCoolingCoilEnergy(0.0), SenWaterCoolingCoilEnergy(0.0), DesWaterHeatingCoilRate(0.0), TotWaterHeatingCoilRate(0.0),
+              DesWaterCoolingCoilRate(0.0), TotWaterCoolingCoilRate(0.0), SenWaterCoolingCoilRate(0.0), UACoil(0.0), LeavingRelHum(0.0),
+              DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), InletWaterMassFlowRate(0.0),
+              OutletWaterMassFlowRate(0.0), MaxWaterVolFlowRate(0.0), MaxWaterMassFlowRate(0.0), InletWaterEnthalpy(0.0), OutletWaterEnthalpy(0.0),
+              TubeOutsideSurfArea(0.0), TotTubeInsideArea(0.0), FinSurfArea(0.0), MinAirFlowArea(0.0), CoilDepth(0.0), FinDiam(0.0),
+              FinThickness(0.0), TubeInsideDiam(0.0), TubeOutsideDiam(0.0), TubeThermConductivity(0.0), FinThermConductivity(0.0), FinSpacing(0.0),
+              TubeDepthSpacing(0.0), NumOfTubeRows(0), NumOfTubesPerRow(0), EffectiveFinDiam(0.0), TotCoilOutsideSurfArea(0.0),
+              CoilEffectiveInsideDiam(0.0), GeometryCoef1(0.0), GeometryCoef2(0.0), DryFinEfficncyCoef(5, 0.0), SatEnthlCurveConstCoef(0.0),
+              SatEnthlCurveSlope(0.0), EnthVsTempCurveAppxSlope(0.0), EnthVsTempCurveConst(0.0), MeanWaterTempSaved(0.0), InWaterTempSaved(0.0),
+              OutWaterTempSaved(0.0), SurfAreaWetSaved(0.0), SurfAreaWetFraction(0.0), DesInletWaterTemp(0.0), DesAirVolFlowRate(0.0),
+              DesInletAirTemp(0.0), DesInletAirHumRat(0.0), DesTotWaterCoilLoad(0.0), DesSenWaterCoilLoad(0.0), DesAirMassFlowRate(0.0),
+              UACoilTotal(0.0), UACoilInternal(0.0), UACoilExternal(0.0), UACoilInternalDes(0.0), UACoilExternalDes(0.0), DesOutletAirTemp(0.0),
+              DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0), HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0),
+              UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0), SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0),
+              RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0), LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0),
+              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0),
+              WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
+              CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
+              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
+              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false), heatRecoveryCoil(false)
         {
         }
     };
@@ -433,37 +434,37 @@ namespace WaterCoils {
                                 int &CompIndex);
 
     Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
-                                   std::string const &CoilType, // must match coil types in this module
+                                   std::string_view CoilType,   // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     );
 
     int GetCoilInletNode(EnergyPlusData &state,
-                         std::string const &CoilType, // must match coil types in this module
+                         std::string_view CoilType,   // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
     int GetCoilOutletNode(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
     int GetCoilWaterInletNode(EnergyPlusData &state,
-                              std::string const &CoilType, // must match coil types in this module
+                              std::string_view CoilType,   // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     );
 
     int GetCoilWaterOutletNode(EnergyPlusData &state,
-                               std::string const &CoilType, // must match coil types in this module
+                               std::string_view CoilType,   // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
     void SetCoilDesFlow(EnergyPlusData &state,
-                        std::string const &CoilType, // must match coil types in this module
+                        std::string_view CoilType,   // must match coil types in this module
                         std::string const &CoilName, // must match coil names for the coil type
                         Real64 const CoilDesFlow,    // coil volumetric air flow rate [m3/s]
                         bool &ErrorsFound            // set to true if problem
@@ -476,15 +477,15 @@ namespace WaterCoils {
     );
 
     void CheckActuatorNode(EnergyPlusData &state,
-                           int const ActuatorNodeNum, // input actuator node number
-                           int &iNodeType,            // Cooling or Heating or 0
-                           bool &NodeNotFound         // true if matching water inlet node not found
+                           int const ActuatorNodeNum,                    // input actuator node number
+                           DataPlant::PlantEquipmentType &WaterCoilType, // Cooling or Heating or 0
+                           bool &NodeNotFound                            // true if matching water inlet node not found
     );
 
     void CheckForSensorAndSetPointNode(EnergyPlusData &state,
-                                       int const SensorNodeNum,                     // controller sensor node number
-                                       HVACControllers::iCtrl const &ControlledVar, // controlled variable type
-                                       bool &NodeNotFound                           // true if matching air outlet node not found
+                                       int const SensorNodeNum,                    // controller sensor node number
+                                       HVACControllers::CtrlVarType ControlledVar, // controlled variable type
+                                       bool &NodeNotFound                          // true if matching air outlet node not found
     );
 
     Real64 TdbFnHRhPb(EnergyPlusData &state,
@@ -501,7 +502,7 @@ namespace WaterCoils {
     Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum); // coil number, [-]
 
     int GetWaterCoilIndex(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
@@ -513,7 +514,7 @@ namespace WaterCoils {
     );
 
     void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
-                                             int const CoilTypeNum,
+                                             DataPlant::PlantEquipmentType const CoilType,
                                              std::string const &CoilName,
                                              int const EquipFlowCtrl, // Flow control mode for the equipment
                                              int const LoopNum,       // Plant loop index for where called from

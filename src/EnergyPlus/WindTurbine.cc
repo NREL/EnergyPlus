@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -199,11 +199,11 @@ namespace WindTurbine {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("Generator:WindTurbine");
-        Real64 const SysEffDefault(0.835); // Default value of overall system efficiency
-        Real64 const MaxTSR(12.0);         // Maximum tip speed ratio
-        Real64 const DefaultPC(0.25);      // Default power coefficient
-        Real64 const MaxPowerCoeff(0.59);  // Maximum power coefficient
-        Real64 const DefaultH(50.0);       // Default of height for local wind speed
+        Real64 constexpr SysEffDefault(0.835); // Default value of overall system efficiency
+        Real64 constexpr MaxTSR(12.0);         // Maximum tip speed ratio
+        Real64 constexpr DefaultPC(0.25);      // Default power coefficient
+        Real64 constexpr MaxPowerCoeff(0.59);  // Maximum power coefficient
+        Real64 constexpr DefaultH(50.0);       // Default of height for local wind speed
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
@@ -885,9 +885,9 @@ namespace WindTurbine {
         using Psychrometrics::PsyWFnTdbTwbPb;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        Real64 const MaxTheta(90.0);   // Maximum of theta
-        Real64 const MaxDegree(360.0); // Maximum limit of outdoor air wind speed in m/s
-        Real64 const SecInMin(60.0);
+        Real64 constexpr MaxTheta(90.0);   // Maximum of theta
+        Real64 constexpr MaxDegree(360.0); // Maximum limit of outdoor air wind speed in m/s
+        Real64 constexpr SecInMin(60.0);
 
         Real64 LocalWindSpeed;   // Ambient wind speed at the specific height in m/s
         Real64 RotorH;           // Height of the rotor in m

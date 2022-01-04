@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -170,12 +170,12 @@ namespace EnergyPlus::RootFinder {
 using namespace DataRootFinder;
 
 void SetupRootFinder(EnergyPlusData &state,
-                     RootFinderDataType &RootFinderData,       // Data used by root finding algorithm
-                     DataRootFinder::Slope const SlopeType,    // Either Slope::Increasing or Slope::Decreasing
-                     DataRootFinder::iMethod const MethodType, // Any of the iMethod<name> code but iMethodNone
-                     Real64 const TolX,                        // Relative tolerance for X variables
-                     Real64 const ATolX,                       // Absolute tolerance for X variables
-                     Real64 const ATolY                        // Absolute tolerance for Y variables
+                     RootFinderDataType &RootFinderData,                // Data used by root finding algorithm
+                     DataRootFinder::Slope const SlopeType,             // Either Slope::Increasing or Slope::Decreasing
+                     DataRootFinder::RootFinderMethod const MethodType, // Any of the iMethod<name> code but iMethodNone
+                     Real64 const TolX,                                 // Relative tolerance for X variables
+                     Real64 const ATolX,                                // Absolute tolerance for X variables
+                     Real64 const ATolY                                 // Absolute tolerance for Y variables
 )
 {
 
@@ -198,13 +198,14 @@ void SetupRootFinder(EnergyPlusData &state,
     RootFinderData.Controls.SlopeType = SlopeType;
 
     // Load solution method
-    if (MethodType != iMethod::Bisection && MethodType != iMethod::FalsePosition && MethodType != iMethod::Secant && MethodType != iMethod::Brent) {
+    if (MethodType != RootFinderMethod::Bisection && MethodType != RootFinderMethod::FalsePosition && MethodType != RootFinderMethod::Secant &&
+        MethodType != RootFinderMethod::Brent) {
 
         ShowSevereError(state, "SetupRootFinder: Invalid solution method specification. Valid choices are:");
-        ShowContinueError(state, format("SetupRootFinder: iMethodBisection={}", iMethod::Bisection));
-        ShowContinueError(state, format("SetupRootFinder: iMethodFalsePosition={}", iMethod::FalsePosition));
-        ShowContinueError(state, format("SetupRootFinder: iMethodSecant={}", iMethod::Secant));
-        ShowContinueError(state, format("SetupRootFinder: iMethodBrent={}", iMethod::Brent));
+        ShowContinueError(state, format("SetupRootFinder: iMethodBisection={}", RootFinderMethod::Bisection));
+        ShowContinueError(state, format("SetupRootFinder: iMethodFalsePosition={}", RootFinderMethod::FalsePosition));
+        ShowContinueError(state, format("SetupRootFinder: iMethodSecant={}", RootFinderMethod::Secant));
+        ShowContinueError(state, format("SetupRootFinder: iMethodBrent={}", RootFinderMethod::Brent));
         ShowFatalError(state, "SetupRootFinder: Preceding error causes program termination.");
     }
     RootFinderData.Controls.MethodType = MethodType;
@@ -286,8 +287,8 @@ void ResetRootFinder(RootFinderDataType &RootFinderData, // Data used by root fi
     RootFinderData.XCandidate = 0.0;
 
     // Reset default state
-    RootFinderData.StatusFlag = iStatus::None;
-    RootFinderData.CurrentMethodType = iMethod::None;
+    RootFinderData.StatusFlag = RootFinderStatus::None;
+    RootFinderData.CurrentMethodType = RootFinderMethod::None;
     RootFinderData.ConvergenceRate = -1.0;
 }
 
@@ -402,11 +403,11 @@ void IterateRootFinder(EnergyPlusData &state,
     // - CheckBracketRoundOff()
 
     // Reset status flag
-    RootFinderData.StatusFlag = iStatus::None;
+    RootFinderData.StatusFlag = RootFinderStatus::None;
 
     // Check that MinPoint%X <= X <= MaxPoint%X
     if (!CheckMinMaxRange(RootFinderData, X)) {
-        RootFinderData.StatusFlag = iStatus::ErrorRange;
+        RootFinderData.StatusFlag = RootFinderStatus::ErrorRange;
 
         // Fatal error: No need to continue iterating
         IsDoneFlag = true;
@@ -427,7 +428,7 @@ void IterateRootFinder(EnergyPlusData &state,
 
         // Check that min and max points are distinct
         if (RootFinderData.MinPoint.X == RootFinderData.MaxPoint.X) {
-            RootFinderData.StatusFlag = iStatus::OKMin;
+            RootFinderData.StatusFlag = RootFinderStatus::OKMin;
             RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
             // Solution found: No need to continue iterating
@@ -437,7 +438,7 @@ void IterateRootFinder(EnergyPlusData &state,
 
         if (RootFinderData.MinPoint.DefinedFlag) {
             if (CheckMinConstraint(state, RootFinderData)) {
-                RootFinderData.StatusFlag = iStatus::OKMin;
+                RootFinderData.StatusFlag = RootFinderStatus::OKMin;
                 RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
                 // Solution found: No need to continue iterating
@@ -448,7 +449,7 @@ void IterateRootFinder(EnergyPlusData &state,
 
         // Check singularity condition between min and max points
         if (!CheckNonSingularity(RootFinderData)) {
-            RootFinderData.StatusFlag = iStatus::ErrorSingular;
+            RootFinderData.StatusFlag = RootFinderStatus::ErrorSingular;
 
             // Fatal error: No need to continue iterating
             IsDoneFlag = true;
@@ -457,7 +458,7 @@ void IterateRootFinder(EnergyPlusData &state,
 
         // Check slope condition between min and max points
         if (!CheckSlope(state, RootFinderData)) {
-            RootFinderData.StatusFlag = iStatus::ErrorSlope;
+            RootFinderData.StatusFlag = RootFinderStatus::ErrorSlope;
 
             // Fatal error: No need to continue iterating
             IsDoneFlag = true;
@@ -473,7 +474,7 @@ void IterateRootFinder(EnergyPlusData &state,
     // in ManagerControllers()
     if (RootFinderData.MinPoint.DefinedFlag) {
         if (CheckMinConstraint(state, RootFinderData)) {
-            RootFinderData.StatusFlag = iStatus::OKMin;
+            RootFinderData.StatusFlag = RootFinderStatus::OKMin;
             RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
             // Solution found: No need to continue iterating
@@ -489,7 +490,7 @@ void IterateRootFinder(EnergyPlusData &state,
     if (RootFinderData.MaxPoint.DefinedFlag) {
         if (CheckMaxConstraint(state, RootFinderData)) {
 
-            RootFinderData.StatusFlag = iStatus::OKMax;
+            RootFinderData.StatusFlag = RootFinderStatus::OKMax;
             RootFinderData.XCandidate = RootFinderData.MaxPoint.X;
 
             // Solution found: No need to continue iterating
@@ -505,7 +506,7 @@ void IterateRootFinder(EnergyPlusData &state,
     // Check unconstrained convergence after we are sure that the candidate X value lies
     // within the allowed min/max range
     if (CheckRootFinderConvergence(RootFinderData, Y)) {
-        RootFinderData.StatusFlag = iStatus::OK;
+        RootFinderData.StatusFlag = RootFinderStatus::OK;
         RootFinderData.XCandidate = X;
 
         // Update root finder internal data with current iterate (X,Y)
@@ -521,7 +522,7 @@ void IterateRootFinder(EnergyPlusData &state,
     // - the distance between the lower and upper bounds is smaller than the user-specified
     //   tolerance for the X variables. (USING brackets from previous iteration)
     if (CheckBracketRoundOff(RootFinderData)) {
-        RootFinderData.StatusFlag = iStatus::OKRoundOff;
+        RootFinderData.StatusFlag = RootFinderStatus::OKRoundOff;
 
         // Solution found: No need to continue iterating
         IsDoneFlag = true;
@@ -540,7 +541,7 @@ void IterateRootFinder(EnergyPlusData &state,
 
     // Check that current iterate is within the current lower and upper points
     if (!CheckLowerUpperBracket(RootFinderData, X)) {
-        RootFinderData.StatusFlag = iStatus::ErrorBracket;
+        RootFinderData.StatusFlag = RootFinderStatus::ErrorBracket;
 
         // Fatal error: No need to continue iterating
         IsDoneFlag = true;
@@ -560,7 +561,7 @@ void IterateRootFinder(EnergyPlusData &state,
     IsDoneFlag = false;
 }
 
-iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
+RootFinderStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         Dimitri Curtil (LBNL)
@@ -576,17 +577,17 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
     // Only used internally for debugging.
 
     // Return value
-    iStatus CheckInternalConsistency;
+    RootFinderStatus CheckInternalConsistency;
 
     // Default initialization
-    CheckInternalConsistency = iStatus::None;
+    CheckInternalConsistency = RootFinderStatus::None;
 
     // Internal consistency check involving both support points
     if (RootFinderData.LowerPoint.DefinedFlag && RootFinderData.UpperPoint.DefinedFlag) {
 
         // Check that the existing lower and upper points do bracket the root
         if (RootFinderData.LowerPoint.X > RootFinderData.UpperPoint.X) {
-            CheckInternalConsistency = iStatus::ErrorRange;
+            CheckInternalConsistency = RootFinderStatus::ErrorRange;
             return CheckInternalConsistency;
         }
 
@@ -596,14 +597,14 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
             if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
                 // Y-value of lower point must be strictly smaller than Y-value of upper point
                 if (RootFinderData.LowerPoint.Y > RootFinderData.UpperPoint.Y) {
-                    CheckInternalConsistency = iStatus::WarningNonMonotonic;
+                    CheckInternalConsistency = RootFinderStatus::WarningNonMonotonic;
                     return CheckInternalConsistency;
                 }
 
             } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
                 // Y-value of lower point must be strictly larger than Y-value of upper point
                 if (RootFinderData.LowerPoint.Y < RootFinderData.UpperPoint.Y) {
-                    CheckInternalConsistency = iStatus::WarningNonMonotonic;
+                    CheckInternalConsistency = RootFinderStatus::WarningNonMonotonic;
                     return CheckInternalConsistency;
                 }
 
@@ -620,7 +621,7 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
         // Only check if the lower and upper points are distinct!
         if (RootFinderData.UpperPoint.X > RootFinderData.LowerPoint.X) {
             if (RootFinderData.UpperPoint.Y == RootFinderData.LowerPoint.Y) {
-                CheckInternalConsistency = iStatus::ErrorSingular;
+                CheckInternalConsistency = RootFinderStatus::ErrorSingular;
                 return CheckInternalConsistency;
             }
         }
@@ -632,13 +633,13 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
             if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
                 if (RootFinderData.MinPoint.Y >= 0.0) {
-                    CheckInternalConsistency = iStatus::OKMin;
+                    CheckInternalConsistency = RootFinderStatus::OKMin;
                     return CheckInternalConsistency;
                 }
 
             } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
                 if (RootFinderData.MinPoint.Y <= 0.0) {
-                    CheckInternalConsistency = iStatus::OKMin;
+                    CheckInternalConsistency = RootFinderStatus::OKMin;
                     return CheckInternalConsistency;
                 }
 
@@ -658,13 +659,13 @@ iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
             if (SELECT_CASE_var == DataRootFinder::Slope::Increasing) {
                 if (RootFinderData.MaxPoint.Y <= 0.0) {
-                    CheckInternalConsistency = iStatus::OKMax;
+                    CheckInternalConsistency = RootFinderStatus::OKMax;
                     return CheckInternalConsistency;
                 }
 
             } else if (SELECT_CASE_var == DataRootFinder::Slope::Decreasing) {
                 if (RootFinderData.MaxPoint.Y >= 0.0) {
-                    CheckInternalConsistency = iStatus::OKMax;
+                    CheckInternalConsistency = RootFinderStatus::OKMax;
                     return CheckInternalConsistency;
                 }
 
@@ -866,7 +867,7 @@ bool CheckNonSingularity(RootFinderDataType const &RootFinderData) // Data used 
     // Safety factor used to detect a singular residual function between the min and max
     // points.
     // NOTE: Requesting exactly the same value is obtained by setting SafetyFactor = 0.0
-    Real64 const SafetyFactor(0.1);
+    Real64 constexpr SafetyFactor(0.1);
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 DeltaY; // Difference between min and max Y-values
@@ -1125,9 +1126,9 @@ void UpdateBracket(EnergyPlusData &state,
                 } else {
                     if (X >= RootFinderData.LowerPoint.X) {
                         if (Y == RootFinderData.LowerPoint.Y) {
-                            RootFinderData.StatusFlag = iStatus::WarningSingular;
+                            RootFinderData.StatusFlag = RootFinderStatus::WarningSingular;
                         } else if (Y < RootFinderData.LowerPoint.Y) {
-                            RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
+                            RootFinderData.StatusFlag = RootFinderStatus::WarningNonMonotonic;
                         }
                         // Update lower point with current iterate
                         RootFinderData.LowerPoint.X = X;
@@ -1151,9 +1152,9 @@ void UpdateBracket(EnergyPlusData &state,
                 } else {
                     if (X <= RootFinderData.UpperPoint.X) {
                         if (Y == RootFinderData.UpperPoint.Y) {
-                            RootFinderData.StatusFlag = iStatus::WarningSingular;
+                            RootFinderData.StatusFlag = RootFinderStatus::WarningSingular;
                         } else if (Y > RootFinderData.UpperPoint.Y) {
-                            RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
+                            RootFinderData.StatusFlag = RootFinderStatus::WarningNonMonotonic;
                         }
                         // Update upper point with current iterate
                         RootFinderData.UpperPoint.X = X;
@@ -1180,9 +1181,9 @@ void UpdateBracket(EnergyPlusData &state,
                 } else {
                     if (X >= RootFinderData.LowerPoint.X) {
                         if (Y == RootFinderData.LowerPoint.Y) {
-                            RootFinderData.StatusFlag = iStatus::WarningSingular;
+                            RootFinderData.StatusFlag = RootFinderStatus::WarningSingular;
                         } else if (Y > RootFinderData.LowerPoint.Y) {
-                            RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
+                            RootFinderData.StatusFlag = RootFinderStatus::WarningNonMonotonic;
                         }
                         // Update lower point with current iterate
                         RootFinderData.LowerPoint.X = X;
@@ -1206,9 +1207,9 @@ void UpdateBracket(EnergyPlusData &state,
                 } else {
                     if (X <= RootFinderData.UpperPoint.X) {
                         if (Y == RootFinderData.UpperPoint.Y) {
-                            RootFinderData.StatusFlag = iStatus::WarningSingular;
+                            RootFinderData.StatusFlag = RootFinderStatus::WarningSingular;
                         } else if (Y < RootFinderData.UpperPoint.Y) {
-                            RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
+                            RootFinderData.StatusFlag = RootFinderStatus::WarningNonMonotonic;
                         }
                         // Update upper point with current iterate
                         RootFinderData.UpperPoint.X = X;
@@ -1427,7 +1428,7 @@ void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData
 
     // Detect the lower bracket
     if (!RootFinderData.LowerPoint.DefinedFlag) {
-        RootFinderData.CurrentMethodType = iMethod::Bracket;
+        RootFinderData.CurrentMethodType = RootFinderMethod::Bracket;
         // If we have 2 points already, try to detect lower point using the Secant formula
         if (BracketRoot(RootFinderData, XNext)) {
             RootFinderData.XCandidate = XNext;
@@ -1442,7 +1443,7 @@ void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData
 
         // Detect the upper bracket
     } else if (!RootFinderData.UpperPoint.DefinedFlag) {
-        RootFinderData.CurrentMethodType = iMethod::Bracket;
+        RootFinderData.CurrentMethodType = RootFinderMethod::Bracket;
         // If we have 2 points already, try to detect upper point using the Secant formula
         if (BracketRoot(RootFinderData, XNext)) {
             RootFinderData.XCandidate = XNext;
@@ -1464,11 +1465,11 @@ void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData
     } else {
         {
             auto const SELECT_CASE_var(RootFinderData.StatusFlag);
-            if (SELECT_CASE_var == iStatus::OKRoundOff) {
+            if (SELECT_CASE_var == RootFinderStatus::OKRoundOff) {
                 // Should never happen if we exit the root finder upon detecting round-off condition
                 RootFinderData.XCandidate = BisectionMethod(RootFinderData);
 
-            } else if ((SELECT_CASE_var == iStatus::WarningSingular) || (SELECT_CASE_var == iStatus::WarningNonMonotonic)) {
+            } else if ((SELECT_CASE_var == RootFinderStatus::WarningSingular) || (SELECT_CASE_var == RootFinderStatus::WarningNonMonotonic)) {
                 // Following local singularity or non-monotonicity warnings we attempt
                 // to recover with the false position method to avoid running into trouble
                 // because the latest iterate did nt produce any improvement compared to
@@ -1481,24 +1482,24 @@ void AdvanceRootFinder(EnergyPlusData &state, RootFinderDataType &RootFinderData
                 // for the root.
                 {
                     auto const SELECT_CASE_var1(RootFinderData.Controls.MethodType);
-                    if (SELECT_CASE_var1 == iMethod::Bisection) {
+                    if (SELECT_CASE_var1 == RootFinderMethod::Bisection) {
                         // Bisection method (aka interval halving)
                         RootFinderData.XCandidate = BisectionMethod(RootFinderData);
-                    } else if (SELECT_CASE_var1 == iMethod::FalsePosition) {
+                    } else if (SELECT_CASE_var1 == RootFinderMethod::FalsePosition) {
                         // False position method (aka regula falsi)
                         RootFinderData.XCandidate = FalsePositionMethod(RootFinderData);
-                    } else if (SELECT_CASE_var1 == iMethod::Secant) {
+                    } else if (SELECT_CASE_var1 == RootFinderMethod::Secant) {
                         // Secant method
                         RootFinderData.XCandidate = SecantMethod(RootFinderData);
-                    } else if (SELECT_CASE_var1 == iMethod::Brent) {
+                    } else if (SELECT_CASE_var1 == RootFinderMethod::Brent) {
                         // Brent method
                         RootFinderData.XCandidate = BrentMethod(RootFinderData);
                     } else {
                         ShowSevereError(state, "AdvanceRootFinder: Invalid solution method specification. Valid choices are:");
-                        ShowContinueError(state, format("AdvanceRootFinder: iMethodBisection={}", iMethod::Bisection));
-                        ShowContinueError(state, format("AdvanceRootFinder: iMethodFalsePosition={}", iMethod::FalsePosition));
-                        ShowContinueError(state, format("AdvanceRootFinder: iMethodSecant={}", iMethod::Secant));
-                        ShowContinueError(state, format("AdvanceRootFinder: iMethodBrent={}", iMethod::Brent));
+                        ShowContinueError(state, format("AdvanceRootFinder: iMethodBisection={}", RootFinderMethod::Bisection));
+                        ShowContinueError(state, format("AdvanceRootFinder: iMethodFalsePosition={}", RootFinderMethod::FalsePosition));
+                        ShowContinueError(state, format("AdvanceRootFinder: iMethodSecant={}", RootFinderMethod::Secant));
+                        ShowContinueError(state, format("AdvanceRootFinder: iMethodBrent={}", RootFinderMethod::Brent));
                         ShowFatalError(state, "AdvanceRootFinder: Preceding error causes program termination.");
                     }
                 }
@@ -1545,7 +1546,7 @@ bool BracketRoot(RootFinderDataType const &RootFinderData, // Data used by root 
     }
 
     // Should not use Secant method if the last 2 points produced a warning
-    if (RootFinderData.StatusFlag == iStatus::WarningSingular || RootFinderData.StatusFlag == iStatus::WarningNonMonotonic) {
+    if (RootFinderData.StatusFlag == RootFinderStatus::WarningSingular || RootFinderData.StatusFlag == RootFinderStatus::WarningNonMonotonic) {
         BracketRoot = false;
         return BracketRoot;
     }
@@ -1585,7 +1586,7 @@ Real64 BisectionMethod(RootFinderDataType &RootFinderData) // Data used by root 
     // Return value
     Real64 BisectionMethod;
 
-    RootFinderData.CurrentMethodType = iMethod::Bisection;
+    RootFinderData.CurrentMethodType = RootFinderMethod::Bisection;
     BisectionMethod = (RootFinderData.LowerPoint.X + RootFinderData.UpperPoint.X) / 2.0;
 
     return BisectionMethod;
@@ -1623,7 +1624,7 @@ Real64 FalsePositionMethod(RootFinderDataType &RootFinderData) // Data used by r
 
     if (Den != 0.0) {
         // False position method
-        RootFinderData.CurrentMethodType = iMethod::FalsePosition;
+        RootFinderData.CurrentMethodType = RootFinderMethod::FalsePosition;
         XCandidate = RootFinderData.LowerPoint.X - RootFinderData.LowerPoint.Y * Num / Den;
 
         // Check that new candidate is within range and brackets
@@ -1669,7 +1670,7 @@ Real64 SecantMethod(RootFinderDataType &RootFinderData) // Data used by root fin
     // Recover with false position
     if (SecantFormula(RootFinderData, XCandidate)) {
         // Secant method
-        RootFinderData.CurrentMethodType = iMethod::Secant;
+        RootFinderData.CurrentMethodType = RootFinderMethod::Secant;
 
         // Check that new candidate is within range and brackets
         if (!CheckRootFinderCandidate(RootFinderData, XCandidate)) {
@@ -1801,7 +1802,7 @@ Real64 BrentMethod(RootFinderDataType &RootFinderData) // Data used by root find
 
             // Only accept correction if it is small enough (75% of previous increment)
             if (std::abs(P) <= 0.75 * std::abs(Q * RootFinderData.Increment.X)) {
-                RootFinderData.CurrentMethodType = iMethod::Brent;
+                RootFinderData.CurrentMethodType = RootFinderMethod::Brent;
                 XCandidate = B + P / Q;
 
                 // Check that new candidate is within range and brackets
@@ -1968,27 +1969,27 @@ void WriteRootFinderStatus(InputOutputFile &File,                   // File unit
     //       RE-ENGINEERED  na
 
     auto const SELECT_CASE_var(RootFinderData.StatusFlag);
-    if (SELECT_CASE_var == iStatus::OK) {
+    if (SELECT_CASE_var == RootFinderStatus::OK) {
         print(File, "Found unconstrained root");
-    } else if (SELECT_CASE_var == iStatus::OKMin) {
+    } else if (SELECT_CASE_var == RootFinderStatus::OKMin) {
         print(File, "Found min constrained root");
-    } else if (SELECT_CASE_var == iStatus::OKMax) {
+    } else if (SELECT_CASE_var == RootFinderStatus::OKMax) {
         print(File, "Found max constrained root");
-    } else if (SELECT_CASE_var == iStatus::OKRoundOff) {
+    } else if (SELECT_CASE_var == RootFinderStatus::OKRoundOff) {
         print(File, "Detected round-off convergence in bracket");
 
-    } else if (SELECT_CASE_var == iStatus::WarningSingular) {
+    } else if (SELECT_CASE_var == RootFinderStatus::WarningSingular) {
         print(File, "Detected singularity warning");
-    } else if (SELECT_CASE_var == iStatus::WarningNonMonotonic) {
+    } else if (SELECT_CASE_var == RootFinderStatus::WarningNonMonotonic) {
         print(File, "Detected non-monotonicity warning");
 
-    } else if (SELECT_CASE_var == iStatus::ErrorRange) {
+    } else if (SELECT_CASE_var == RootFinderStatus::ErrorRange) {
         print(File, "Detected out-of-range error");
-    } else if (SELECT_CASE_var == iStatus::ErrorBracket) {
+    } else if (SELECT_CASE_var == RootFinderStatus::ErrorBracket) {
         print(File, "Detected bracket error");
-    } else if (SELECT_CASE_var == iStatus::ErrorSlope) {
+    } else if (SELECT_CASE_var == RootFinderStatus::ErrorSlope) {
         print(File, "Detected slope error");
-    } else if (SELECT_CASE_var == iStatus::ErrorSingular) {
+    } else if (SELECT_CASE_var == RootFinderStatus::ErrorSingular) {
         print(File, "Detected singularity error");
 
     } else {

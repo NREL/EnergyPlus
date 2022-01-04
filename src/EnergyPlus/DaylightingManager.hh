@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
-#include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
@@ -101,85 +100,81 @@ namespace DaylightingManager {
         int const daylightCtrlNum, // zero if called for map points
         int const iRefPoint,
         int const loopwin,
-        DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
-        Vector3<Real64> const &RREF,                  // Location of a reference point in absolute coordinate system
-        Vector3<Real64> const &VIEWVC,                // View vector in absolute coordinate system
+        DataDaylighting::CalledFor const CalledFrom, // indicate  which type of routine called this routine
+        Vector3<Real64> const &RREF,                 // Location of a reference point in absolute coordinate system
+        Vector3<Real64> const &VIEWVC,               // View vector in absolute coordinate system
         int &IWin,
         int &IWin2,
         int &NWX,
         int &NWY,
-        Vector3<Real64> &W2,                      // Second vertex of window
-        Vector3<Real64> &W3,                      // Third vertex of window
-        Vector3<Real64> &W21,                     // Vector from window vertex 2 to window vertex 1
-        Vector3<Real64> &W23,                     // Vector from window vertex 2 to window vertex 3
-        int &LSHCAL,                              // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
-        int &InShelfSurf,                         // Inside daylighting shelf surface number
-        int &ICtrl,                               // Window control counter
-        DataSurfaces::WinShadingType &ShType,     // Window shading type
-        int &BlNum,                               // Window blind number
-        Vector3<Real64> &WNORM2,                  // Unit vector normal to window
-        DataDaylighting::iExtWinType &ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
-        int &IConst,                              // Construction counter
-        Vector3<Real64> &RREF2,                   // Location of virtual reference point in absolute coordinate system
-        Real64 &DWX,                              // Horizontal dimension of window element (m)
-        Real64 &DWY,                              // Vertical dimension of window element (m)
-        Real64 &DAXY,                             // Area of window element
-        Vector3<Real64> &U2,                      // Second vertex of window for TDD:DOME (if exists)
-        Vector3<Real64> &U23,                     // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
-        Vector3<Real64> &U21,                     // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
-        Vector3<Real64> &VIEWVC2,                 // Virtual view vector in absolute coordinate system
-        bool &Rectangle,                          // True if window is rectangular
-        bool &Triangle,                           // True if window is triangular
-        Optional_int_const MapNum = _,
-        //        Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
-        Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
+        Vector3<Real64> &W2,                     // Second vertex of window
+        Vector3<Real64> &W3,                     // Third vertex of window
+        Vector3<Real64> &W21,                    // Vector from window vertex 2 to window vertex 1
+        Vector3<Real64> &W23,                    // Vector from window vertex 2 to window vertex 3
+        int &LSHCAL,                             // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
+        int &InShelfSurf,                        // Inside daylighting shelf surface number
+        int &ICtrl,                              // Window control counter
+        DataSurfaces::WinShadingType &ShType,    // Window shading type
+        int &BlNum,                              // Window blind number
+        Vector3<Real64> &WNORM2,                 // Unit vector normal to window
+        DataDaylighting::ExtWinType &ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+        int &IConst,                             // Construction counter
+        Vector3<Real64> &RREF2,                  // Location of virtual reference point in absolute coordinate system
+        Real64 &DWX,                             // Horizontal dimension of window element (m)
+        Real64 &DWY,                             // Vertical dimension of window element (m)
+        Real64 &DAXY,                            // Area of window element
+        Vector3<Real64> &U2,                     // Second vertex of window for TDD:DOME (if exists)
+        Vector3<Real64> &U23,                    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
+        Vector3<Real64> &U21,                    // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
+        Vector3<Real64> &VIEWVC2,                // Virtual view vector in absolute coordinate system
+        bool &Rectangle,                         // True if window is rectangular
+        bool &Triangle,                          // True if window is triangular
+        int const MapNum = 0);
 
     void FigureDayltgCoeffsAtPointsForWindowElements(
         EnergyPlusData &state,
         int const daylightCtrlNum, // Current daylighting control number (only used when called from RefPoint)
         int const iRefPoint,
         int const loopwin,
-        DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
-        int const WinEl,                              // Current window element number
+        DataDaylighting::CalledFor const CalledFrom, // indicate  which type of routine called this routine
+        int const WinEl,                             // Current window element number
         int const IWin,
         int const IWin2,
         int const iXelement,
         int const iYelement,
         Real64 &SkyObstructionMult,
-        Vector3<Real64> const &W2,                     // Second vertex of window
-        Vector3<Real64> const &W21,                    // Vector from window vertex 2 to window vertex 1
-        Vector3<Real64> const &W23,                    // Vector from window vertex 2 to window vertex 3
-        Vector3<Real64> const &RREF,                   // Location of a reference point in absolute coordinate system
-        int const NWYlim,                              // For triangle, largest NWY for a given IX
-        Vector3<Real64> const &VIEWVC2,                // Virtual view vector in absolute coordinate system
-        Real64 const DWX,                              // Horizontal dimension of window element (m)
-        Real64 const DWY,                              // Vertical dimension of window element (m)
-        Real64 const DAXY,                             // Area of window element
-        Vector3<Real64> const &U2,                     // Second vertex of window for TDD:DOME (if exists)
-        Vector3<Real64> const &U23,                    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
-        Vector3<Real64> const &U21,                    // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
-        Vector3<Real64> &RWIN,                         // Center of a window element for TDD:DOME (if exists) in abs coord sys
-        Vector3<Real64> &RWIN2,                        // Center of a window element for TDD:DOME (if exists) in abs coord sys
-        Vector3<Real64> &Ray,                          // Unit vector along ray from reference point to window element
-        Real64 &PHRAY,                                 // Altitude of ray from reference point to window element (radians)
-        int &LSHCAL,                                   // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
-        Real64 &COSB,                                  // Cosine of angle between window outward normal and ray from reference point to window element
-        Real64 &ObTrans,                               // Product of solar transmittances of exterior obstructions hit by ray
-        Real64 &TVISB,                                 // Visible transmittance of window for COSB angle of incidence (times light well
-        Real64 &DOMEGA,                                // Solid angle subtended by window element wrt reference point (steradians)
-        Real64 &THRAY,                                 // Azimuth of ray from reference point to window element (radians)
-        bool &hitIntObs,                               // True iff interior obstruction hit
-        bool &hitExtObs,                               // True iff ray from ref pt to ext win hits an exterior obstruction
-        Vector3<Real64> const &WNORM2,                 // Unit vector normal to window
-        DataDaylighting::iExtWinType const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
-        int const IConst,                              // Construction counter
-        Vector3<Real64> const &RREF2,                  // Location of virtual reference point in absolute coordinate system
+        Vector3<Real64> const &W2,                    // Second vertex of window
+        Vector3<Real64> const &W21,                   // Vector from window vertex 2 to window vertex 1
+        Vector3<Real64> const &W23,                   // Vector from window vertex 2 to window vertex 3
+        Vector3<Real64> const &RREF,                  // Location of a reference point in absolute coordinate system
+        int const NWYlim,                             // For triangle, largest NWY for a given IX
+        Vector3<Real64> const &VIEWVC2,               // Virtual view vector in absolute coordinate system
+        Real64 const DWX,                             // Horizontal dimension of window element (m)
+        Real64 const DWY,                             // Vertical dimension of window element (m)
+        Real64 const DAXY,                            // Area of window element
+        Vector3<Real64> const &U2,                    // Second vertex of window for TDD:DOME (if exists)
+        Vector3<Real64> const &U23,                   // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
+        Vector3<Real64> const &U21,                   // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
+        Vector3<Real64> &RWIN,                        // Center of a window element for TDD:DOME (if exists) in abs coord sys
+        Vector3<Real64> &RWIN2,                       // Center of a window element for TDD:DOME (if exists) in abs coord sys
+        Vector3<Real64> &Ray,                         // Unit vector along ray from reference point to window element
+        Real64 &PHRAY,                                // Altitude of ray from reference point to window element (radians)
+        int &LSHCAL,                                  // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
+        Real64 &COSB,                                 // Cosine of angle between window outward normal and ray from reference point to window element
+        Real64 &ObTrans,                              // Product of solar transmittances of exterior obstructions hit by ray
+        Real64 &TVISB,                                // Visible transmittance of window for COSB angle of incidence (times light well
+        Real64 &DOMEGA,                               // Solid angle subtended by window element wrt reference point (steradians)
+        Real64 &THRAY,                                // Azimuth of ray from reference point to window element (radians)
+        bool &hitIntObs,                              // True iff interior obstruction hit
+        bool &hitExtObs,                              // True iff ray from ref pt to ext win hits an exterior obstruction
+        Vector3<Real64> const &WNORM2,                // Unit vector normal to window
+        DataDaylighting::ExtWinType const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+        int const IConst,                             // Construction counter
+        Vector3<Real64> const &RREF2,                 // Location of virtual reference point in absolute coordinate system
         bool const Triangle,
         Real64 &TVISIntWin,     // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk, // Visible transmittance of int win at COSBIntWin for sun
-        Optional_int_const MapNum = _,
-        //        Optional< Real64 > MapWindowSolidAngAtRefPt = _, //Inactive
-        Optional<Real64> MapWindowSolidAngAtRefPtWtd = _);
+        int const MapNum = 0);
 
     void InitializeCFSDaylighting(EnergyPlusData &state,
                                   int const daylightCtrlNum,       // Current daylighting control number
@@ -189,8 +184,8 @@ namespace DaylightingManager {
                                   Vector3<Real64> const &RefPoint, // reference point coordinates
                                   int const NRefPts,               // Number of reference points
                                   int const iRefPoint,             // Reference points counter
-                                  DataDaylighting::iCalledFor const CalledFrom,
-                                  Optional_int_const MapNum = _);
+                                  DataDaylighting::CalledFor const CalledFrom,
+                                  int const MapNum = 0);
 
     void InitializeCFSStateData(EnergyPlusData &state,
                                 DataBSDFWindow::BSDFRefPoints &StateRefPoint,
@@ -210,9 +205,7 @@ namespace DaylightingManager {
                                 Real64 const DWX,
                                 Real64 const DWY,
                                 Vector3<Real64> const &WNorm, // unit vector from window (point towards outside)
-                                Real64 const WinElArea,
-                                DataDaylighting::iCalledFor const CalledFrom,
-                                Optional_int_const MapNum = _);
+                                Real64 const WinElArea);
 
     void AllocateForCFSRefPointsState(
         EnergyPlusData &state, DataBSDFWindow::BSDFRefPoints &StateRefPoint, int const NumOfWinEl, int const NBasis, int const NTrnBasis);
@@ -269,21 +262,20 @@ namespace DaylightingManager {
         Real64 const TVISB,   // Visible transmittance of window for COSB angle of incidence (times light well efficiency, if appropriate)
         Real64 const DOMEGA,  // Solid angle subtended by window element wrt reference point (steradians)
         int const ICtrl,      // Window control counter
-        DataSurfaces::WinShadingType const ShType,     // Window shading type
-        int const BlNum,                               // Window blind number
-        Real64 const THRAY,                            // Azimuth of ray from reference point to window element (radians)
-        Vector3<Real64> const &WNORM2,                 // Unit vector normal to window
-        DataDaylighting::iExtWinType const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
-        int const IConst,                              // Construction counter
-        Real64 const AZVIEW,                           // Azimuth of view vector in absolute coord system for glare calculation (radians)
-        Vector3<Real64> const &RREF2,                  // Location of virtual reference point in absolute coordinate system
-        bool const hitIntObs,                          // True iff interior obstruction hit
-        bool const hitExtObs,                          // True iff ray from ref pt to ext win hits an exterior obstruction
-        DataDaylighting::iCalledFor const CalledFrom,  // indicate  which type of routine called this routine
-        Real64 &TVISIntWin,                            // Visible transmittance of int win at COSBIntWin for light from ext win
-        Real64 &TVISIntWinDisk,                        // Visible transmittance of int win at COSBIntWin for sun
-        Optional_int_const MapNum = _,
-        Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
+        DataSurfaces::WinShadingType const ShType,    // Window shading type
+        int const BlNum,                              // Window blind number
+        Real64 const THRAY,                           // Azimuth of ray from reference point to window element (radians)
+        Vector3<Real64> const &WNORM2,                // Unit vector normal to window
+        DataDaylighting::ExtWinType const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+        int const IConst,                             // Construction counter
+        Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for glare calculation (radians)
+        Vector3<Real64> const &RREF2,                 // Location of virtual reference point in absolute coordinate system
+        bool const hitIntObs,                         // True iff interior obstruction hit
+        bool const hitExtObs,                         // True iff ray from ref pt to ext win hits an exterior obstruction
+        DataDaylighting::CalledFor const CalledFrom,  // indicate  which type of routine called this routine
+        Real64 &TVISIntWin,                           // Visible transmittance of int win at COSBIntWin for light from ext win
+        Real64 &TVISIntWinDisk,                       // Visible transmittance of int win at COSBIntWin for sun
+        int const MapNum = 0);
 
     void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
                                                 int const daylightCtrlNum, // Current daylighting control number
@@ -303,8 +295,6 @@ namespace DaylightingManager {
                                                 int const iHour,
                                                 int const IWin,
                                                 int const loopwin,
-                                                int const NWX,  // Number of window elements in x direction for dayltg calc
-                                                int const NWY,  // Number of window elements in y direction for dayltg calc
                                                 int const ICtrl // Window control counter
     );
 
@@ -368,6 +358,10 @@ namespace DaylightingManager {
                                     bool &hit                  // True iff ray hits an obstruction
     );
 
+    void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefirstTime);
+
+    void manageDaylighting(EnergyPlusData &state);
+
     void DayltgInteriorIllum(EnergyPlusData &state, int const daylightCtrlNum); // Daylighting:Controls number
 
     void DayltgInteriorTDDIllum(EnergyPlusData &state);
@@ -393,8 +387,8 @@ namespace DaylightingManager {
                                        Array2<Real64> &ElementLuminanceSky,      // sky related luminance at window element (exterior side)
                                        Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
                                        Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
-                                       DataDaylighting::iCalledFor const CalledFrom,
-                                       Optional_int_const MapNum = _);
+                                       DataDaylighting::CalledFor const CalledFrom,
+                                       int const MapNum = 0);
 
     void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
                                                       int const IWin,            // Window index
@@ -402,26 +396,25 @@ namespace DaylightingManager {
                                                       int const IHR,             // Hour of day
                                                       int const daylightCtrlNum, // Daylighting control number
                                                       int const iRefPoint,       // reference point counter
-                                                      DataDaylighting::iCalledFor const CalledFrom,
-                                                      Optional_int_const MapNum = _);
+                                                      DataDaylighting::CalledFor const CalledFrom,
+                                                      int const MapNum = 0);
 
     void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
                                               int const IWin,      // Window index
                                               int const WinEl,     // Current window element counter
                                               int const IHR,       // Hour of day
                                               int const iRefPoint, // reference point index
-                                              DataDaylighting::iCalledFor const CalledFrom,
-                                              Optional_int_const MapNum = _);
+                                              DataDaylighting::CalledFor const CalledFrom,
+                                              int const MapNum = 0);
 
     void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
                                                 int const iWin,  // Window index
                                                 int const iHour, // Hour of day
                                                 int const iRefPoint,
-                                                int const NumEl,                              // Total number of window elements
-                                                Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for
-                                                DataDaylighting::iCalledFor const CalledFrom, // indicate  which type of routine called this routine
-                                                Optional_int_const MapNum = _,
-                                                Optional<Real64 const> MapWindowSolidAngAtRefPtWtd = _);
+                                                int const NumEl,                             // Total number of window elements
+                                                Real64 const AZVIEW,                         // Azimuth of view vector in absolute coord system for
+                                                DataDaylighting::CalledFor const CalledFrom, // indicate  which type of routine called this routine
+                                                int const MapNum = 0);
 
     Real64 DayltgSkyLuminance(EnergyPlusData &state,
                               int const ISky,     // Sky type: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
@@ -643,8 +636,6 @@ struct DaylightingManagerData : BaseGlobalStruct
     Vector3<Real64> DayltgDirectSunDiskComplexFenestrationV;    // temporary vector
     Vector3<Real64> DayltgDirectSunDiskComplexFenestrationRWin; // Window center
     Vector2<Real64> DayltgInteriorMapIllumDFSUHR;               // Sun daylight factor for bare/shaded window
-    Vector2<Real64> DayltgInteriorMapIllumSFSUHR;               // Sun source luminance factor for bare/shaded window
-    Vector2<Real64> DayltgInteriorMapIllumBFSUHR;               // Sun background luminance factor for bare/shaded window
     Vector4<Real64> DayltgInteriorMapIllumHorIllSky;            // Horizontal illuminance for different sky types
     Vector3<Real64> CalcMinIntWinSolidAngsW1;                   // Window vertices
     Vector3<Real64> CalcMinIntWinSolidAngsW2;

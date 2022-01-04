@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,7 +125,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 {
     auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Sequential;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::Sequential;
 
     // Loop demand 550W
     DistributePlantLoadTest::ResetLoads();
@@ -290,7 +290,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
 {
     auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Uniform;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::Uniform;
 
     // Start with 5 components
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
@@ -406,7 +406,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
 {
     auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Optimal;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::Optimal;
 
     // Start with 5 components and smaller component 4
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
@@ -536,7 +536,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
 {
     auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::UniformPLR;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::UniformPLR;
 
     // Start with 5 components and smaller component 4
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
@@ -658,7 +658,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
 {
     auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::LoadingScheme::SequentialUniformPLR;
 
     // Start with 5 components and smaller component 4
     state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
@@ -861,8 +861,8 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
         int CompNum = 1;
         std::string compName = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
         EXPECT_EQ(compName, "CHILLER");
-        auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
-        EXPECT_TRUE(compare_enums(CtrlTypeNum, DataPlant::iCtrlType::CoolingOp));
+        auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType;
+        EXPECT_TRUE(compare_enums(CtrlTypeNum, DataPlant::CtrlType::CoolingOp));
     }
 
     {
@@ -871,17 +871,17 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
         // Ensure we have the right component (the TES tank)
         EXPECT_EQ(compName, "ICE THERMAL STORAGE");
 
-        auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType;
 
         // Could just test this, but want to improve reporting
-        // EXPECT_TRUE(compare_enums(CtrlTypeNum, PlantCondLoopOperation::DualOp));
+        // EXPECT_TRUE(compare_enums(CtrlType, PlantCondLoopOperation::DualOp));
 
         std::string ctrlType = "Unknown";
-        if (CtrlTypeNum == DataPlant::iCtrlType::CoolingOp) {
+        if (CtrlTypeNum == DataPlant::CtrlType::CoolingOp) {
             ctrlType = "CoolingOp";
-        } else if (CtrlTypeNum == DataPlant::iCtrlType::HeatingOp) {
+        } else if (CtrlTypeNum == DataPlant::CtrlType::HeatingOp) {
             ctrlType = "HeatingOp";
-        } else if (CtrlTypeNum == DataPlant::iCtrlType::DualOp) {
+        } else if (CtrlTypeNum == DataPlant::CtrlType::DualOp) {
             ctrlType = "DualOp";
         }
 

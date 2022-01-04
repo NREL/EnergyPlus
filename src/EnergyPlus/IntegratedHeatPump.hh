@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -67,6 +68,7 @@ namespace IntegratedHeatPump {
     // operation mode
     enum class IHPOperationMode : int
     {
+        Invalid = -1,
         IdleMode,
         SCMode,
         SHMode,
@@ -75,7 +77,8 @@ namespace IntegratedHeatPump {
         SCWHMatchWHMode,
         SCDWHMode,
         SHDWHElecHeatOffMode,
-        SHDWHElecHeatOnMode
+        SHDWHElecHeatOnMode,
+        Num
     };
 
     struct IntegratedHeatPumpData // variable speed coil
@@ -138,7 +141,7 @@ namespace IntegratedHeatPump {
         // limit of water volume before switching from SCDWH to SCWH
         Real64 TimeLimitSHDWH; // time limit before turning from SHDWH to electric heating
 
-        int WHtankType;
+        DataPlant::PlantEquipmentType WHtankType;
         std::string WHtankName;
         int WHtankID;
         int LoopNum;
@@ -212,10 +215,10 @@ namespace IntegratedHeatPump {
               SHDWHWHCoilIndex(0), AirCoolInletNodeNum(0), AirHeatInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               WaterTankoutNod(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1), TindoorOverCoolAllow(0.0),
               TambientOverCoolAllow(0.0), TindoorWHHighPriority(0.0), TambientWHHighPriority(0.0), WaterVolSCDWH(0.0), TimeLimitSHDWH(0.0),
-              WHtankType(0), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false), CurMode(IHPOperationMode::IdleMode),
-              ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0), HeatVolFlowScale(0), MaxHeatAirMassFlow(0),
-              MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false), IDFanID(0), IDFanPlace(0),
-              ODAirInletNodeNum(0),                                                                                   // oudoor coil inlet Nod
+              WHtankType(DataPlant::PlantEquipmentType::Invalid), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false),
+              CurMode(IHPOperationMode::IdleMode), ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0),
+              HeatVolFlowScale(0), MaxHeatAirMassFlow(0), MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false),
+              IDFanID(0), IDFanPlace(0), ODAirInletNodeNum(0),                                                        // oudoor coil inlet Nod
               ODAirOutletNodeNum(0),                                                                                  // oudoor coil outlet Nod
               TankSourceWaterMassFlowRate(0), AirFlowSavInWaterLoop(0), AirFlowSavInAirLoop(0), AirLoopFlowRate(0.0), // air loop mass flow rate
               TotalCoolingRate(0.0),                                                                                  // total cooling rate [w]

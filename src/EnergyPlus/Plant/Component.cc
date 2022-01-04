@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,22 +51,6 @@
 
 namespace EnergyPlus {
 namespace DataPlant {
-
-    bool CompData::isPump()
-    {
-        if (this->TypeOf_Num == DataPlant::TypeOf_PumpConstantSpeed) {
-            return true;
-        } else if (this->TypeOf_Num == DataPlant::TypeOf_PumpVariableSpeed) {
-            return true;
-        } else if (this->TypeOf_Num == DataPlant::TypeOf_PumpBankConstantSpeed) {
-            return true;
-        } else if (this->TypeOf_Num == DataPlant::TypeOf_PumpBankVariableSpeed) {
-            return true;
-        } else if (this->TypeOf_Num == DataPlant::TypeOf_PumpCondensate) {
-            return true;
-        }
-        return false;
-    }
 
     void CompData::initLoopEquip(EnergyPlusData &state, bool const GetCompSizFac)
     {

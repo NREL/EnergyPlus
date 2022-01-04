@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -564,7 +564,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsParent);
             CoolingCoilInletNodeNum = GetOnlySingleNode(state,
                                                         state.dataLoopNodes->NodeID(SupplyAirOutletNode),
@@ -573,7 +573,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Internal,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         ObjectIsParent);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -583,7 +583,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Internal,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsParent);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -593,7 +593,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsParent);
 
             // Add cooling coil to component sets array
@@ -808,7 +808,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsParent);
             CoolingCoilInletNodeNum = GetOnlySingleNode(state,
                                                         state.dataLoopNodes->NodeID(SupplyAirOutletNode),
@@ -817,7 +817,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Internal,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         ObjectIsParent);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -827,7 +827,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Internal,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsParent);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -837,7 +837,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsParent);
 
             // Add cooling coil to component sets array
@@ -947,7 +947,7 @@ namespace HVACHXAssistedCoolingCoil {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxIter(50); // Maximum number of iterations
+        int constexpr MaxIter(50); // Maximum number of iterations
 
         Real64 AirMassFlow;        // Inlet air mass flow rate
         Real64 Error;              // Error (exiting coil temp from last iteration minus current coil exiting temp)
@@ -1396,7 +1396,7 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     int GetCoilInletNode(EnergyPlusData &state,
-                         std::string const &CoilType, // must match coil types in this module
+                         std::string_view CoilType,   // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -1436,7 +1436,7 @@ namespace HVACHXAssistedCoolingCoil {
         if (WhichCoil != 0) {
             NodeNumber = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HXAssistedCoilInletNodeNum;
         } else {
-            ShowSevereError(state, "GetCoilInletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("GetCoilInletNode: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -1514,7 +1514,7 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     int GetCoilOutletNode(EnergyPlusData &state,
-                          std::string const &CoilType, // must match coil types in this module
+                          std::string_view CoilType,   // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -1554,7 +1554,7 @@ namespace HVACHXAssistedCoolingCoil {
         if (WhichCoil != 0) {
             NodeNumber = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HXAssistedCoilOutletNodeNum;
         } else {
-            ShowSevereError(state, "GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("GetCoilOutletNode: Could not find Coil, Type=\"{}\" Name=\"{}", CoilType, CoilName));
             ErrorsFound = true;
             NodeNumber = 0;
         }
@@ -1612,7 +1612,7 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     std::string GetHXDXCoilName(EnergyPlusData &state,
-                                std::string const &CoilType, // must match coil types in this module
+                                std::string_view CoilType,   // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -1652,7 +1652,7 @@ namespace HVACHXAssistedCoolingCoil {
         if (WhichCoil != 0) {
             DXCoilName = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName;
         } else {
-            ShowSevereError(state, "Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             DXCoilName = "";
         }
@@ -1806,7 +1806,7 @@ namespace HVACHXAssistedCoolingCoil {
     }
 
     Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
-                                   std::string const &CoilType, // must match coil types in this module
+                                   std::string_view CoilType,   // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     )
@@ -1854,22 +1854,19 @@ namespace HVACHXAssistedCoolingCoil {
                 }
             } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {
-                    MaxWaterFlowRate = GetWaterCoilMaxFlowRate(state,
-                                                               cAllCoilTypes(GetCoilObjectTypeNum(state, CoilType, CoilName, ErrorsFound)),
-                                                               GetHXDXCoilName(state, CoilType, CoilName, ErrorsFound),
-                                                               ErrorsFound);
+                    MaxWaterFlowRate = GetWaterCoilMaxFlowRate(state, CoilType, GetHXDXCoilName(state, CoilType, CoilName, ErrorsFound), ErrorsFound);
                 }
             } else {
                 WhichCoil = 0;
             }
 
             if (WhichCoil == 0) {
-                ShowSevereError(state, "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+                ShowSevereError(state, format("GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
                 ErrorsFound = true;
                 MaxWaterFlowRate = -1000.0;
             }
         } else {
-            ShowSevereError(state, "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
+            ShowSevereError(state, format("GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
             MaxWaterFlowRate = -1000.0;
         }

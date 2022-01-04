@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -236,7 +236,7 @@ namespace DataAirLoop {
         int OAControllerIndex;        // OA controller index in OAController
         Array1D_string ComponentName;
         Array1D_string ComponentType;
-        Array1D<SimAirServingZones::CompType> ComponentType_Num; // Parameterized (see above) Component Types this
+        Array1D<SimAirServingZones::CompType> ComponentTypeEnum; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
         std::vector<HVACSystemData *> compPointer;

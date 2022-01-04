@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,15 +68,15 @@ namespace OutsideEnergySources {
     {
 
         // Members
-        std::string Name;                // user identifier
-        Real64 NomCap = 0.0;             // design nominal capacity of district service
-        bool NomCapWasAutoSized = false; // ture if Nominal Capacity was autosize on input
-        int CapFractionSchedNum = 0;     // capacity modifier schedule number
-        int InletNodeNum = 0;            // Node number on the inlet side of the plant
-        int OutletNodeNum = 0;           // Node number on the inlet side of the plant
-        Real64 EnergyTransfer = 0.0;     // cooling energy provided in time step
-        Real64 EnergyRate = 0.0;         // cooling power
-        int EnergyType = 0;              // flag for district heating OR cooling
+        std::string Name;                                                                 // user identifier
+        Real64 NomCap = 0.0;                                                              // design nominal capacity of district service
+        bool NomCapWasAutoSized = false;                                                  // ture if Nominal Capacity was autosize on input
+        int CapFractionSchedNum = 0;                                                      // capacity modifier schedule number
+        int InletNodeNum = 0;                                                             // Node number on the inlet side of the plant
+        int OutletNodeNum = 0;                                                            // Node number on the inlet side of the plant
+        Real64 EnergyTransfer = 0.0;                                                      // cooling energy provided in time step
+        Real64 EnergyRate = 0.0;                                                          // cooling power
+        DataPlant::PlantEquipmentType EnergyType{DataPlant::PlantEquipmentType::Invalid}; // flag for district heating OR cooling
         // loop topology variables
         int LoopNum = 0;
         int LoopSideNum = 0;
@@ -93,7 +93,7 @@ namespace OutsideEnergySources {
 
         virtual ~OutsideEnergySourceSpecs() = default;
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType objectType, std::string_view objectName);
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,

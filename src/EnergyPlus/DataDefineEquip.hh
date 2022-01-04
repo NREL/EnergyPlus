@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,9 +66,9 @@ namespace DataDefineEquip {
     constexpr int MaxZoneAirComponents = 1;
 
     // Equipment Types covered by ZoneAirLoopEquipment:
-    enum class iZnAirLoopEquipType
+    enum class ZnAirLoopEquipType
     {
-        Unassigned,
+        Invalid = -1,
         DualDuctConstVolume,
         DualDuctVAV,
         SingleDuctVAVReheat,
@@ -86,6 +86,7 @@ namespace DataDefineEquip {
         SingleDuctUserDefined,
         SingleDuctATMixer,
         SingleDuctConstVolFourPipeBeam,
+        Num
     };
 
     struct ZoneAirEquip
@@ -96,7 +97,7 @@ namespace DataDefineEquip {
         int NumComponents;        // number of subcomponents (=1)
         int NumControls;          // number of controls (not used; =0)
         Array1D_string EquipType; // Pointer identifying type of subcomponent
-        Array1D<DataDefineEquip::iZnAirLoopEquipType> EquipType_Num;
+        Array1D<DataDefineEquip::ZnAirLoopEquipType> EquipTypeEnum;
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
         std::shared_ptr<AirTerminalUnit> airTerminalPtr;
         Array1D_string EquipName; // name of subcomponent
@@ -131,7 +132,7 @@ namespace DataDefineEquip {
         // Default Constructor
         ZoneAirEquip()
             : OutletNodeNum(0), NumComponents(0), NumControls(0), EquipType(MaxZoneAirComponents),
-              EquipType_Num(MaxZoneAirComponents, DataDefineEquip::iZnAirLoopEquipType::Unassigned), airTerminalPtr(nullptr),
+              EquipTypeEnum(MaxZoneAirComponents, DataDefineEquip::ZnAirLoopEquipType::Invalid), airTerminalPtr(nullptr),
               EquipName(MaxZoneAirComponents), EquipIndex(MaxZoneAirComponents, 0), AirTerminalSizingSpecIndex(0), TermUnitSizingNum(0),
               UpStreamLeakFrac(0.0), DownStreamLeakFrac(0.0), MassFlowRateUpStrLk(0.0), MassFlowRateDnStrLk(0.0), MassFlowRateTU(0.0),
               MassFlowRateZSup(0.0), MassFlowRateSup(0.0), MassFlowRatePlenInd(0.0), MaxAvailDelta(0.0), MinAvailDelta(0.0), InletNodeNum(0),

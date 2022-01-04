@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -244,7 +244,7 @@ namespace GeneratorDynamicsManager {
         Real64 MinPel;                          // working variabel for min allowed by transient constraint
         Real64 PelInput;                        // holds initial value of IN var
         Real64 Pel;
-        DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Unassigned);
+        DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Invalid);
         Real64 SchedVal;
         Real64 ElectLoadForThermalRequest;
         bool ConstrainedMaxP;           // true if request was altered because of max power limit

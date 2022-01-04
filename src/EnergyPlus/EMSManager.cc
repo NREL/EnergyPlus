@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1654,23 +1654,23 @@ namespace EMSManager {
 
         auto const SELECT_CASE_var(SetPointType);
 
-        if (SELECT_CASE_var == SPControlType::iTemperatureSetPoint) {
+        if (SELECT_CASE_var == SPControlType::TemperatureSetPoint) {
             cControlTypeName = "Temperature Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::iTemperatureMinSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::TemperatureMinSetPoint) {
             cControlTypeName = "Temperature Minimum Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::iTemperatureMaxSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::TemperatureMaxSetPoint) {
             cControlTypeName = "Temperature Maximum Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::iHumidityRatioSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::HumidityRatioSetPoint) {
             cControlTypeName = "Humidity Ratio Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::iHumidityRatioMinSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::HumidityRatioMinSetPoint) {
             cControlTypeName = "Humidity Ratio Minimum Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::iHumidityRatioMaxSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::HumidityRatioMaxSetPoint) {
             cControlTypeName = "Humidity Ratio Maximum Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::iMassFlowRateSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::MassFlowRateSetPoint) {
             cControlTypeName = "Mass Flow Rate Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::iMassFlowRateMinSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::MassFlowRateMinSetPoint) {
             cControlTypeName = "Mass Flow Rate Minimum Available Setpoint";
-        } else if (SELECT_CASE_var == SPControlType::iMassFlowRateMaxSetPoint) {
+        } else if (SELECT_CASE_var == SPControlType::MassFlowRateMaxSetPoint) {
             cControlTypeName = "Mass Flow Rate Maximum Available Setpoint";
         }
 
@@ -1756,23 +1756,23 @@ namespace EMSManager {
                 nodeSetpointCheck.needsSetpointChecking = true;
 
                 auto const SELECT_CASE_var(SetPointType);
-                if (SELECT_CASE_var == SPControlType::iTemperatureSetPoint) {
+                if (SELECT_CASE_var == SPControlType::TemperatureSetPoint) {
                     nodeSetpointCheck.checkTemperatureSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::iTemperatureMinSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::TemperatureMinSetPoint) {
                     nodeSetpointCheck.checkTemperatureMinSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::iTemperatureMaxSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::TemperatureMaxSetPoint) {
                     nodeSetpointCheck.checkTemperatureMaxSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::iHumidityRatioSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::HumidityRatioSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::iHumidityRatioMinSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::HumidityRatioMinSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioMinSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::iHumidityRatioMaxSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::HumidityRatioMaxSetPoint) {
                     nodeSetpointCheck.checkHumidityRatioMaxSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::iMassFlowRateSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::MassFlowRateSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::iMassFlowRateMinSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::MassFlowRateMinSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateMinSetPoint = true;
-                } else if (SELECT_CASE_var == SPControlType::iMassFlowRateMaxSetPoint) {
+                } else if (SELECT_CASE_var == SPControlType::MassFlowRateMaxSetPoint) {
                     nodeSetpointCheck.checkMassFlowRateMaxSetPoint = true;
                 }
             }
@@ -1804,39 +1804,38 @@ namespace EMSManager {
                 nodeSetpointCheck.needsSetpointChecking = false;
 
                 if (nodeSetpointCheck.checkTemperatureSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iTemperatureSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::TemperatureSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMinSetPoint) {
                     nodeSetpointCheck.needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iTemperatureMinSetPoint, true);
+                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::TemperatureMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkTemperatureMaxSetPoint) {
                     nodeSetpointCheck.needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iTemperatureMaxSetPoint, true);
+                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::TemperatureMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioSetPoint) {
                     nodeSetpointCheck.needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iHumidityRatioSetPoint, true);
+                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::HumidityRatioSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMinSetPoint) {
                     nodeSetpointCheck.needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iHumidityRatioMinSetPoint, true);
+                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::HumidityRatioMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkHumidityRatioMaxSetPoint) {
                     nodeSetpointCheck.needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iHumidityRatioMaxSetPoint, true);
+                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::HumidityRatioMaxSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateSetPoint) {
-                    nodeSetpointCheck.needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iMassFlowRateSetPoint, true);
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::MassFlowRateSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMinSetPoint) {
                     nodeSetpointCheck.needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iMassFlowRateMinSetPoint, true);
+                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::MassFlowRateMinSetPoint, true);
                 }
                 if (nodeSetpointCheck.checkMassFlowRateMaxSetPoint) {
                     nodeSetpointCheck.needsSetpointChecking |=
-                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::iMassFlowRateMaxSetPoint, true);
+                        !CheckIfNodeSetPointManaged(state, NodeNum, SPControlType::MassFlowRateMaxSetPoint, true);
                 }
 
                 if (nodeSetpointCheck.needsSetpointChecking) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,71 +76,98 @@ namespace DataZoneEquipment {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr int PathInlet(1);
-    constexpr int CompInlet(2);
-    constexpr int Intermediate(3);
-    constexpr int Outlet(4);
+    enum class AirNodeType
+    {
+        Invalid = -1,
+        PathInlet,
+        CompInlet,
+        Intermediate,
+        Outlet,
+        Num
+    };
 
-    constexpr int ZoneSplitter_Type(1);
-    constexpr int ZoneSupplyPlenum_Type(2);
-    constexpr int ZoneMixer_Type(3);
-    constexpr int ZoneReturnPlenum_Type(4);
+    enum class AirLoopHVAC
+    {
+        Invalid = -1,
+        ZoneSplitter,
+        ZoneSupplyPlenum,
+        ZoneMixer,
+        ZoneReturnPlenum,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVAC::Num)> AirLoopHVACTypeNamesCC = {
+        "AirLoopHVAC:ZoneSplitter", "AirLoopHVAC:SupplyPlenum", "AirLoopHVAC:ZoneMixer", "AirLoopHVAC:ReturnPlenum"};
 
     // Start zone equip objects
     // list units that are valid for zone system availability managers first
-    constexpr int FanCoil4Pipe_Num(1);
-    constexpr int PkgTermHPAirToAir_Num(2);
-    constexpr int PkgTermACAirToAir_Num(3);
-    constexpr int PkgTermHPWaterToAir_Num(4);
-    constexpr int WindowAC_Num(5);
-    constexpr int UnitHeater_Num(6);
-    constexpr int UnitVentilator_Num(7);
-    constexpr int ERVStandAlone_Num(8);
-    constexpr int VentilatedSlab_Num(9);
-    constexpr int OutdoorAirUnit_Num(10);
-    constexpr int VRFTerminalUnit_Num(11);
-    constexpr int PurchasedAir_Num(12);
-    constexpr int ZoneEvaporativeCoolerUnit_Num(13);
-    constexpr int ZoneHybridEvaporativeCooler_Num(14); // #14, last zone equipment type to use zone availability manager. The above list must not
-                                                       // change or NumValidSysAvailZoneComponents(14) must also change.
-    constexpr int AirDistUnit_Num(15);
-    constexpr int BBWaterConvective_Num(16);
-    constexpr int BBElectricConvective_Num(17);
-    constexpr int HiTempRadiant_Num(18);
-    constexpr int LoTempRadiant_Num(19);
-    constexpr int ZoneExhaustFan_Num(20);
-    constexpr int HeatXchngr_Num(21);
-    constexpr int HPWaterHeater_Num(22);
-    constexpr int BBWater_Num(23);
-    constexpr int ZoneDXDehumidifier_Num(24);
-    constexpr int BBSteam_Num(25);
-    constexpr int BBElectric_Num(26);
-    constexpr int RefrigerationAirChillerSet_Num(27);
-    constexpr int UserDefinedZoneHVACForcedAir_Num(28);
-    constexpr int CoolingPanel_Num(29);
-    constexpr int ZoneUnitarySys_Num(30);
-
-    // Per Person Ventilation Rate Mode
-    constexpr int PerPersonDCVByCurrentLevel(1);
-    constexpr int PerPersonByDesignLevel(2);
+    enum ZoneEquip
+    {
+        Invalid = -1,
+        FanCoil4Pipe = 1,
+        PkgTermHPAirToAir,
+        PkgTermACAirToAir,
+        PkgTermHPWaterToAir,
+        WindowAC,
+        UnitHeater,
+        UnitVentilator,
+        ERVStandAlone,
+        VentilatedSlab,
+        OutdoorAirUnit,
+        VRFTerminalUnit,
+        PurchasedAir,
+        ZoneEvaporativeCoolerUnit,
+        ZoneHybridEvaporativeCooler, // last zone equipment type to use zone availability manager. The above list must not change or
+                                     // NumValidSysAvailZoneComponents must also change.
+        AirDistUnit,
+        BBWaterConvective,
+        BBElectricConvective,
+        HiTempRadiant,
+        LoTempRadiant,
+        ZoneExhaustFan,
+        HeatXchngr,
+        HPWaterHeater,
+        BBWater,
+        ZoneDXDehumidifier,
+        BBSteam,
+        BBElectric,
+        RefrigerationAirChillerSet,
+        UserDefinedZoneHVACForcedAir,
+        CoolingPanel,
+        ZoneUnitarySys,
+        Num
+    };
 
     constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
 
+    // Per Person Ventilation Rate Mode
+    enum class PerPersonVentRateMode
+    {
+        Invalid = -1,
+        DCVByCurrentLevel,
+        ByDesignLevel,
+        Num
+    };
+
     enum class LoadDist
     {
+        Invalid = -1,
         SequentialLoading,
         UniformLoading,
         UniformPLRLoading,
-        SequentialUniformPLRLoading
+        SequentialUniformPLRLoading,
+        Num
     };
 
-    enum class iLightReturnExhaustConfig : int
+    enum class LightReturnExhaustConfig : int
     {
+        Invalid = -1,
         NoExhast = 0, // No exhaust node
         Single = 1,   // One to one configuration
         Multi = 2,    // Multiple return node referred
-        Shared = 3    // Shared exhaust node
+        Shared = 3,   // Shared exhaust node
+        Num
     };
 
     struct EquipMeterData
@@ -150,7 +177,7 @@ namespace DataZoneEquipment {
         OutputProcessor::Unit ReportVarUnits;
         DataGlobalConstants::ResourceType ResourceType;
         std::string EndUse;
-        SystemReports::iEndUseType EndUse_CompMode;
+        SystemReports::EndUseType EndUse_CompMode;
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
@@ -160,9 +187,8 @@ namespace DataZoneEquipment {
         // Default Constructor
         EquipMeterData()
             : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
-              EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
-              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(OutputProcessor::VariableType::NotFound),
-              CurMeterReading(0.0)
+              EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0), ReportVarIndexType(OutputProcessor::TimeStepType::Zone),
+              ReportVarType(OutputProcessor::VariableType::NotFound), CurMeterReading(0.0)
         {
         }
     };
@@ -189,7 +215,7 @@ namespace DataZoneEquipment {
 
         // Default Constructor
         SubSubEquipmentData()
-            : EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0.0), OpMode(0),
+            : EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0), OpMode(0),
               Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0), TotPlantSupplyPurch(0.0)
         {
         }
@@ -221,7 +247,7 @@ namespace DataZoneEquipment {
         // Default Constructor
         SubEquipmentData()
             : Parent(false), NumSubSubEquip(0), EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0),
-              ZoneEqToPlantPtr(0.0), OpMode(0), Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0),
+              ZoneEqToPlantPtr(0), OpMode(0), Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0),
               TotPlantSupplyPurch(0.0)
         {
         }
@@ -277,7 +303,7 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeExhaustNodeNum; // Exhaust node number flow to a corrsponding return node due to light heat gain
         // Array1D_int SharedExhaustNode;        // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the
         // exhaust node value
-        Array1D<iLightReturnExhaustConfig>
+        Array1D<LightReturnExhaustConfig>
             SharedExhaustNode; // Exhaust node number shared by return nodes 0 No exhaust; 1 No share; > 1 shared; -1 use the exhaust node value
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)
@@ -343,7 +369,7 @@ namespace DataZoneEquipment {
 
         // Default Constructor
         EquipmentData()
-            : Parent(false), NumSubEquip(0), ON(true), NumInlets(0), NumOutlets(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0.0),
+            : Parent(false), NumSubEquip(0), ON(true), NumInlets(0), NumOutlets(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0),
               TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0), TotPlantSupplyPurch(0.0), OpMode(0)
         {
         }
@@ -357,8 +383,8 @@ namespace DataZoneEquipment {
         int NumOfEquipTypes;                        // Number of items on this list
         int NumAvailHeatEquip;                      // Number of pieces of equipment available for heating
         int NumAvailCoolEquip;                      // Number of pieces of equipment available for cooling
-        Array1D_string EquipType;
-        Array1D_int EquipType_Num;
+        Array1D_string EquipType;                   // TODO: Convert this from string to enum and remove EquipTypeEnum below
+        Array1D<DataZoneEquipment::ZoneEquip> EquipTypeEnum;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
         std::vector<HVACSystemData *> compPointer;
@@ -406,8 +432,8 @@ namespace DataZoneEquipment {
         std::string Name;
         int NumOfComponents;
         int InletNodeNum;
-        Array1D_string ComponentType;
-        Array1D_int ComponentType_Num;
+        Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
+        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentTypeEnum;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
         Array1D_int SplitterIndex;
@@ -416,7 +442,7 @@ namespace DataZoneEquipment {
         Array1D_int OutletNode;
         int NumNodes;
         Array1D_int Node;
-        Array1D_int NodeType;
+        Array1D<DataZoneEquipment::AirNodeType> NodeType;
 
         // Default Constructor
         SupplyAir() : NumOfComponents(0), InletNodeNum(0), NumOutletNodes(0), NumNodes(0)
@@ -430,8 +456,8 @@ namespace DataZoneEquipment {
         std::string Name;
         int NumOfComponents;
         int OutletNodeNum;
-        Array1D_string ComponentType;
-        Array1D_int ComponentType_Num;
+        Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
+        Array1D<DataZoneEquipment::AirLoopHVAC> ComponentTypeEnum;
         Array1D_string ComponentName;
         Array1D_int ComponentIndex;
 
@@ -468,7 +494,7 @@ namespace DataZoneEquipment {
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 
-    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName);
+    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquip const ZoneEquipTypeNum, std::string const &EquipmentName);
 
     bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
 

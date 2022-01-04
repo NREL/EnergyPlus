@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataPTHP->PTUnit(1) = thisUnit;
     state->dataPTHP->PTUnit(1).simASHRAEModel = true;
     state->dataPTHP->PTUnit(1).MinOATCompressorCooling = -10.0;
-    state->dataPTHP->PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::iPTHPType::PTHPUnit;
+    state->dataPTHP->PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::PTHPType::PTHPUnit;
     state->dataPTHP->PTUnit(1).FanName = "TEST FAN";
     state->dataPTHP->PTUnit(1).FanType = "Fan:OnOff";
     state->dataPTHP->PTUnit(1).DXCoolCoilName = "COOLINGCOIL";
@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                         "PTUnit",
                                         DataLoopNode::NodeFluidType::Air,
                                         DataLoopNode::NodeConnectionType::Inlet,
-                                        NodeInputManager::compFluidStream::Primary,
+                                        NodeInputManager::CompFluidStream::Primary,
                                         DataLoopNode::ObjectIsNotParent);
 
     state->dataLoopNodes->Node(5).Temp = 24.0;
@@ -701,7 +701,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
     CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
+    CWLoop.LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
     CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
 

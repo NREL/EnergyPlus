@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -63,16 +64,17 @@ namespace FluidCoolers {
 
     enum class PerfInputMethod
     {
+        Invalid = -1,
         NOMINAL_CAPACITY,
-        U_FACTOR
+        U_FACTOR,
+        Num
     };
 
     struct FluidCoolerspecs : PlantComponent
     {
         // Members
-        std::string Name;            // User identifier
-        std::string FluidCoolerType; // Type of fluid cooler
-        int FluidCoolerType_Num;
+        std::string Name; // User identifier
+        DataPlant::PlantEquipmentType FluidCoolerType;
         PerfInputMethod PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
         bool ON;                                      // Simulate the machine at it's operating part load ratio
@@ -144,8 +146,8 @@ namespace FluidCoolers {
 
         // Default Constructor
         FluidCoolerspecs()
-            : FluidCoolerType_Num(0), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true), ON(true),
-              DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
+            : FluidCoolerType(DataPlant::PlantEquipmentType::Invalid), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true),
+              ON(true), DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
               HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedFluidCoolerUA(0.0),
               HighSpeedFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),
               LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0), LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0),
@@ -208,7 +210,7 @@ namespace FluidCoolers {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int typeOf, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, DataPlant::PlantEquipmentType typeOf, std::string const &objectName);
     };
 
     void GetFluidCoolerInput(EnergyPlusData &state);

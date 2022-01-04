@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -488,7 +488,7 @@ void GetAirPathData(EnergyPlusData &state)
                                                                                  Alphas(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
         if (!lAlphaBlanks(7)) {
             AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
@@ -498,7 +498,7 @@ void GetAirPathData(EnergyPlusData &state)
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsParent);
         } else {
             // If no return path, set this to zero to trigger special handling when calling UpdateHVACInterface
@@ -607,7 +607,7 @@ void GetAirPathData(EnergyPlusData &state)
                     CurrentModuleObject,
                     PrimaryAirSystems(AirSysNum).Name,
                     DataLoopNode::NodeConnectionType::Inlet,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
                     _,
                     cAlphaFields(8));
@@ -648,7 +648,7 @@ void GetAirPathData(EnergyPlusData &state)
                     CurrentModuleObject,
                     PrimaryAirSystems(AirSysNum).Name,
                     DataLoopNode::NodeConnectionType::Outlet,
-                    NodeInputManager::compFluidStream::Primary,
+                    NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
                     _,
                     cAlphaFields(9));
@@ -1583,41 +1583,41 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     ++SupAirPathNodeNum;
                     state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
                     if (CompNum == 1) {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = PathInlet;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = CompInlet;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::CompInlet;
                     }
                     for (SplitterOutNum = 1; SplitterOutNum <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes;
                          ++SplitterOutNum) {
                         ++SupAirPathNodeNum;
                         state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
                             state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = 0;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 } else if (PlenumNum > 0) {
                     ++SupAirPathNodeNum;
                     state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).InletNode;
                     if (CompNum == 1) {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = PathInlet;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = CompInlet;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::CompInlet;
                     }
                     for (PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
                         ++SupAirPathNodeNum;
                         state.dataSimAirServingZones->SupNode(SupAirPathNodeNum) =
                             state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
-                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = 0;
+                        state.dataSimAirServingZones->SupNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 }
             }
 
             // find the nodes that connect a splitter and a plenum
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == 0) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
                     for (SupNodeIndex2 = SupNodeIndex + 1; SupNodeIndex2 <= NumAllSupAirPathNodes; ++SupNodeIndex2) {
                         if ((state.dataSimAirServingZones->SupNode(SupNodeIndex) == state.dataSimAirServingZones->SupNode(SupNodeIndex2)) &&
-                            (state.dataSimAirServingZones->SupNodeType(SupNodeIndex2) == CompInlet)) {
-                            state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = Intermediate;
+                            (state.dataSimAirServingZones->SupNodeType(SupNodeIndex2) == DataZoneEquipment::AirNodeType::CompInlet)) {
+                            state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Intermediate;
                             break;
                         }
                     }
@@ -1626,10 +1626,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
             //  the rest of the nodes are outlet nodes and count the duplicated intermediate nodes
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == 0) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Invalid) {
                     ++NumSupAirPathOutNodes;
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = Outlet;
-                } else if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == Intermediate) {
+                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) = DataZoneEquipment::AirNodeType::Outlet;
+                } else if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate) {
                     ++NumSupAirPathIntNodes;
                 }
             }
@@ -1645,16 +1645,16 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
             // transfer data from the local SupNode array to the SupplyAirPath data structure
             for (SupNodeIndex = 1; SupNodeIndex <= NumAllSupAirPathNodes; ++SupNodeIndex) {
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == PathInlet ||
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == Intermediate ||
-                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == Outlet) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::PathInlet ||
+                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Intermediate ||
+                    state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Outlet) {
                     ++SupAirPathNodeNum;
                     // map the local node numbers to the HVAC (global) node numbers
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).Node(SupAirPathNodeNum) = state.dataSimAirServingZones->SupNode(SupNodeIndex);
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).NodeType(SupAirPathNodeNum) =
                         state.dataSimAirServingZones->SupNodeType(SupNodeIndex);
                 }
-                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == Outlet) {
+                if (state.dataSimAirServingZones->SupNodeType(SupNodeIndex) == DataZoneEquipment::AirNodeType::Outlet) {
                     ++SupAirPathOutNodeNum;
                     // map the outlet node number to the HVAC (global) node number
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) =
@@ -2014,8 +2014,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             RetFanIndex = 0;
             FoundOASys = false;
             PrimaryAirSystems(AirLoopNum).FanDesCoolLoad = 0.0;
-            fanModelTypeEnum supFanModelType = fanModelTypeNotYetSet;
-            fanModelTypeEnum retFanModelType = fanModelTypeNotYetSet;
+            FanModelType supFanModelType = FanModelType::Invalid;
+            FanModelType retFanModelType = FanModelType::Invalid;
 
             bool FoundCentralCoolCoil = false;
             for (BranchNum = 1; BranchNum <= PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
@@ -2040,7 +2040,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                                 SupFanIndex,
                                                 ErrorsFound,
                                                 ObjexxFCL::Optional_string_const());
-                                    supFanModelType = structArrayLegacyFanModels;
+                                    supFanModelType = StructArrayLegacyFanModels;
                                     goto EndOfAirLoop;
                                 }
                             } else {
@@ -2049,7 +2049,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                             RetFanIndex,
                                             ErrorsFound,
                                             ObjexxFCL::Optional_string_const());
-                                retFanModelType = structArrayLegacyFanModels;
+                                retFanModelType = StructArrayLegacyFanModels;
                             }
                         } else {
                             GetFanIndex(state,
@@ -2057,7 +2057,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                         SupFanIndex,
                                         ErrorsFound,
                                         ObjexxFCL::Optional_string_const());
-                            supFanModelType = structArrayLegacyFanModels;
+                            supFanModelType = StructArrayLegacyFanModels;
                             goto EndOfAirLoop;
                         }
                     }
@@ -2067,17 +2067,17 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 if (PrimaryAirSystems(AirLoopNum).Branch(BranchNum).DuctType != 3) {
                                     SupFanIndex =
                                         HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                                    supFanModelType = objectVectorOOFanSystemModel;
+                                    supFanModelType = ObjectVectorOOFanSystemModel;
                                     goto EndOfAirLoop;
                                 }
                             } else {
                                 RetFanIndex =
                                     HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                                retFanModelType = objectVectorOOFanSystemModel;
+                                retFanModelType = ObjectVectorOOFanSystemModel;
                             }
                         } else {
                             SupFanIndex = HVACFan::getFanObjectVectorIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
-                            supFanModelType = objectVectorOOFanSystemModel;
+                            supFanModelType = ObjectVectorOOFanSystemModel;
                             goto EndOfAirLoop;
                         }
                     }
@@ -2087,24 +2087,24 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             } // end of Branch loop
         EndOfAirLoop:;
 
-            if (supFanModelType == structArrayLegacyFanModels) {
+            if (supFanModelType == StructArrayLegacyFanModels) {
                 PrimaryAirSystems(AirLoopNum).SupFanNum = SupFanIndex;
-                PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum = structArrayLegacyFanModels;
-            } else if (supFanModelType == objectVectorOOFanSystemModel) {
+                PrimaryAirSystems(AirLoopNum).supFanModelType = StructArrayLegacyFanModels;
+            } else if (supFanModelType == ObjectVectorOOFanSystemModel) {
                 PrimaryAirSystems(AirLoopNum).supFanVecIndex = SupFanIndex;
-                PrimaryAirSystems(AirLoopNum).supFanModelTypeEnum = objectVectorOOFanSystemModel;
+                PrimaryAirSystems(AirLoopNum).supFanModelType = ObjectVectorOOFanSystemModel;
             }
             if (FoundCentralCoolCoil) { // parent systems with fan will need to set the fan placement
-                PrimaryAirSystems(AirLoopNum).supFanLocation = fanPlacement::DrawThru;
+                PrimaryAirSystems(AirLoopNum).supFanLocation = FanPlacement::DrawThru;
             } else {
-                PrimaryAirSystems(AirLoopNum).supFanLocation = fanPlacement::BlowThru;
+                PrimaryAirSystems(AirLoopNum).supFanLocation = FanPlacement::BlowThru;
             }
 
-            if (retFanModelType == structArrayLegacyFanModels) {
-                PrimaryAirSystems(AirLoopNum).retFanModelTypeEnum = structArrayLegacyFanModels;
+            if (retFanModelType == StructArrayLegacyFanModels) {
+                PrimaryAirSystems(AirLoopNum).retFanModelType = StructArrayLegacyFanModels;
                 PrimaryAirSystems(AirLoopNum).RetFanNum = RetFanIndex;
-            } else if (retFanModelType == objectVectorOOFanSystemModel) {
-                PrimaryAirSystems(AirLoopNum).retFanModelTypeEnum = objectVectorOOFanSystemModel;
+            } else if (retFanModelType == ObjectVectorOOFanSystemModel) {
+                PrimaryAirSystems(AirLoopNum).retFanModelType = ObjectVectorOOFanSystemModel;
                 PrimaryAirSystems(AirLoopNum).retFanVecIndex = RetFanIndex;
             }
         }
@@ -2402,8 +2402,8 @@ void ConnectReturnNodes(EnergyPlusData &state)
                 }
                 // Loop over components in return path and each component's inlet nodes
                 for (int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum) {
-                    int compType = thisRetPath.ComponentType_Num(compNum);
-                    if (compType == ZoneMixer_Type) {
+                    DataZoneEquipment::AirLoopHVAC compType = thisRetPath.ComponentTypeEnum(compNum);
+                    if (compType == DataZoneEquipment::AirLoopHVAC::ZoneMixer) {
                         auto const &thisMixer(state.dataMixerComponent->MixerCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisMixer.InletNode(inNode)) {
@@ -2412,7 +2412,7 @@ void ConnectReturnNodes(EnergyPlusData &state)
                                 break; // leave component inlet node loop
                             }
                         }
-                    } else if (compType == ZoneReturnPlenum_Type) {
+                    } else if (compType == DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum) {
                         auto const &thisPlenum(state.dataZonePlenum->ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisPlenum.InletNode(inNode)) {
@@ -2525,7 +2525,7 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
     int AirLoopPass;
     // Flag set by ResolveSysFlow; if TRUE, mass balance failed and there must be a second pass
     bool SysReSim;
-    DataConvergParams::iCalledFrom CalledFrom;
+    DataConvergParams::CalledFrom CalledFrom;
 
     auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
     auto &AirLoopControlInfo(state.dataAirLoop->AirLoopControlInfo);
@@ -2626,8 +2626,8 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
         // the zone equipment side, looping through all supply air paths for this
         // air loop.
         for (AirSysOutNum = 1; AirSysOutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
-            if (AirSysOutNum == 1) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1;
-            if (AirSysOutNum == 2) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2;
+            if (AirSysOutNum == 1) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck1;
+            if (AirSysOutNum == 2) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck2;
             UpdateHVACInterface(state,
                                 AirLoopNum,
                                 CalledFrom,
@@ -2701,8 +2701,8 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                 // the zone equipment side, looping through all supply air paths for this
                 // air loop.
                 for (AirSysOutNum = 1; AirSysOutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++AirSysOutNum) {
-                    if (AirSysOutNum == 1) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck1;
-                    if (AirSysOutNum == 2) CalledFrom = DataConvergParams::iCalledFrom::AirSystemSupplySideDeck2;
+                    if (AirSysOutNum == 1) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck1;
+                    if (AirSysOutNum == 2) CalledFrom = DataConvergParams::CalledFrom::AirSystemSupplySideDeck2;
                     UpdateHVACInterface(state,
                                         AirLoopNum,
                                         CalledFrom,
@@ -2911,7 +2911,7 @@ void SolveAirLoopControllers(
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     // Maximum iterations of an air system/controllers simulation sequence
-    int const MaxIter(50);
+    int constexpr MaxIter(50);
 
     // INTERFACE BLOCK DEFINITIONS: None
 
@@ -3497,9 +3497,9 @@ void SimAirLoopComponent(EnergyPlusData &state,
                          int const AirLoopNum,          // Primary air loop number
                          int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
                          HVACSystemData *CompPointer,   // equipment actual pointer
-                         int const &airLoopNum,         // index to AirloopHVAC
-                         int const &branchNum,          // index to AirloopHVAC branch
-                         int const &compNum             // index to AirloopHVAC branch component
+                         int const airLoopNum,          // index to AirloopHVAC
+                         int const branchNum,           // index to AirloopHVAC branch
+                         int const compNum              // index to AirloopHVAC branch component
 )
 {
 
@@ -3717,9 +3717,9 @@ void SimAirLoopComponent(EnergyPlusData &state,
             // Ducts
         } else if (SELECT_CASE_var == CompType::ZoneVRFasAirLoopEquip) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
             int ControlledZoneNum = 0;
-            int const OAUnitNumLocal = 0;
-            Real64 const OAUCoilOutTempLocal = 0.0;
-            bool const ZoneEquipment = false;
+            int constexpr OAUnitNumLocal = 0;
+            Real64 constexpr OAUCoilOutTempLocal = 0.0;
+            bool constexpr ZoneEquipment = false;
             Real64 sysOut = 0.0;
             Real64 latOut = 0.0;
             HVACVariableRefrigerantFlow::SimulateVRF(state,
@@ -7825,7 +7825,7 @@ bool CheckWaterCoilOnOASystem(EnergyPlusData &state, SimAirServingZones::CompTyp
     if (NumOASys > 0) {
         for (int OASysNum = 1; OASysNum <= NumOASys; ++OASysNum) {
             for (int OACompNum = 1; OACompNum <= OutsideAirSys(OASysNum).NumComponents; ++OACompNum) {
-                if ((CompTypeNum == OutsideAirSys(OASysNum).ComponentType_Num(OACompNum)) &&
+                if ((CompTypeNum == OutsideAirSys(OASysNum).ComponentTypeEnum(OACompNum)) &&
                     (UtilityRoutines::SameString(CompName, OutsideAirSys(OASysNum).ComponentName(OACompNum)))) {
                     return true;
                 }

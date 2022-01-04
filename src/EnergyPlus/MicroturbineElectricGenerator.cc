@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -448,7 +448,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -461,7 +461,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -726,7 +726,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Secondary,
+                                                    NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -749,7 +749,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    NodeInputManager::compFluidStream::Secondary,
+                                                    NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -1236,10 +1236,10 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Curve fits of performance data.
 
-    Real64 const KJtoJ(1000.0);          // Convert kilojoules to joules
-    int const MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
-    Real64 const AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
-    Real64 const RelaxFactor(0.7);       // Relaxation factor for iteration loop
+    Real64 constexpr KJtoJ(1000.0);          // Convert kilojoules to joules
+    int constexpr MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
+    Real64 constexpr AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
+    Real64 constexpr RelaxFactor(0.7);       // Relaxation factor for iteration loop
     static constexpr std::string_view RoutineName("CalcMTGeneratorModel");
 
     //   Load local variables from data structure (for code readability)
@@ -1975,7 +1975,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_Generator_MicroTurbine,
+                                                DataPlant::PlantEquipmentType::Generator_MicroTurbine,
                                                 this->HRLoopNum,
                                                 this->HRLoopSideNum,
                                                 this->HRBranchNum,
