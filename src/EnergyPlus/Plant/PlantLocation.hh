@@ -60,6 +60,19 @@ struct PlantLocation
     int branchNum;
     int compNum;
 
+    // Overload operator== for PlantLocation
+    friend bool operator==(PlantLocation const &lhsPlantLoc, PlantLocation const &rhsPlantLoc)
+    {
+        return ((lhsPlantLoc.loopNum == rhsPlantLoc.loopNum) && (lhsPlantLoc.loopSideNum == rhsPlantLoc.loopSideNum) &&
+                (lhsPlantLoc.branchNum == rhsPlantLoc.branchNum) && (lhsPlantLoc.compNum == rhsPlantLoc.compNum));
+    }
+
+    // Overload operator!= for PlantLocation
+    friend bool operator!=(PlantLocation const &lhsPlantLoc, PlantLocation const &rhsPlantLoc)
+    {
+        return !operator==(lhsPlantLoc, rhsPlantLoc);
+    }
+
     // Default Constructor
     PlantLocation() : loopNum(0), loopSideNum(DataPlant::LoopSideLocation::Invalid), branchNum(0), compNum(0)
     {
