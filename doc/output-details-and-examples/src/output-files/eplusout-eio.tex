@@ -168,6 +168,102 @@ Shadowing/Sun Position Calculations, AverageOverDaysInFrequency, 20, 15000, Suth
 
 This shows how many days between the re-calculation of solar position during a weather file simulation. While a smaller number of days will lead to a more accurate solar position estimation (solar position is important in shadowing as well as determining how much solar enters the space), it also increases the calculation time necessarily to complete the simulation. The default, re-calculating every 20 days, gives a good compromise. The allowable number of figures in a shadow overlap can be increased if necessary for the model. There are two calculation methods available: AverageOverDaysInFrequency (default) and DetailedTimestepIntegration.
 
+\subsection{Daylighting:Illuminance Maps}\label{daylighting-illuminace-maps}
+
+\begin{lstlisting}
+! <Daylighting:Illuminance Maps>,#Maps,Style
+Daylighting:Illuminance Maps,1,Comma
+\end{lstlisting}
+
+\subsubsection{Field: \#Maps}\label{field-number-maps}
+The number of illuminance maps (see \hyperref[eplusmap.ext]{eplusmap} and Output:IlluminanceMap).
+
+\subsubsection{Field: Style}\label{style-maps}
+The type of delimiter in the map output (comma, tab or fixed). See OutputControl:IlluminanceMap:Style.
+
+\subsection{Daylighting:Illuminance Maps:Detail}\label{daylighting-illuminace-maps-detail}
+
+\begin{lstlisting}
+! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points,YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}
+Daylighting:Illuminance Maps:Detail,MAP1,WEST ZONE,0.10,6.00,0.66,10,0.10,6.00,0.66,10,0.00
+\end{lstlisting}
+
+\subsubsection{Field: Name}\label{field-maps-name}
+The name of the illuminance map (see \hyperref[eplusmap.ext]{eplusmap} and Output:IlluminanceMap).
+
+\subsubsection{Field: Zone}\label{field-maps-zone}
+The name of the zone for the map.
+
+\subsubsection{Fields: XMin \{m\}, XMax \{m\}, Xinc \{m\}, \#X Points}\label{field-maps-xcoords}
+The X coordinate data: minimum, maximum, increment, and number of points.
+
+\subsubsection{Fields: YMin \{m\}, YMax \{m\}, Yinc \{m\}, \#Y Points}\label{field-maps-ycoords}
+The Y coordinate data: minimum, maximum, increment, and number of points.
+
+\subsubsection{Field: Z \{m\}}\label{field-maps-z}
+The Z coordinate (height) of the map points.
+
+\subsection{Enclosure/Window Adjacency Daylighting Counts}\label{daylighting-adjacency-counts}
+
+\begin{lstlisting}
+! <Enclosure/Window Adjacency Daylighting Counts>, Enclosure Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Enclosures
+Enclosure/Window Adjacency Daylighting Counts, WEST ZONE,1,0
+\end{lstlisting}
+
+\subsubsection{Field: Enclosure Name}\label{field-daylighting-counts-enclosurename}
+The name of the daylighting enclosure (which consists of one or more spaces).
+
+\subsubsection{Field: Number of Exterior Windows}\label{field-daylighting-counts-num-ext-windows}
+The number of exterior windows in the enclosure.
+
+\subsubsection{Field: Number of Exterior Windows in Adjacent Enclosures}\label{field-daylighting-counts-num-ext-windows-adj-encl}
+The number of exterior windows in adjacent enclosures. An adjacent enclosure is one that shares an interior window with this enclosure.
+
+
+\subsection{Enclosure/Window Adjacency Daylighting Matrix}\label{daylighting-adjacency-matrix}
+
+\begin{lstlisting}
+! <Enclosure/Window Adjacency Daylighting Matrix>, Enclosure Name, Number of Adjacent Enclosures with Windows,Adjacent Enclosure Names - 1st 100 (max)
+Enclosure/Window Adjacency Daylighting Matrix, WEST ZONE,0
+\end{lstlisting}
+
+\subsubsection{Field: Enclosure Name}\label{field-daylighting-matrix-enclosurename}
+The name of the daylighting enclosure (which consists of one or more spaces).
+
+\subsubsection{Field: Number of Adjacent Enclosures with Windows}\label{field-daylighting-matrix-num-adj-enclosures}
+The number of adjacent enclosures with windows in them.  An adjacent enclosure is one that shares an interior window with this enclosure.
+
+\subsubsection{Field: Adjacent Enclosure Names}\label{field-daylighting-matrix-adj-encl-names}
+The names of adjacent enclosures (up to the first 100).
+
+\subsection{Sky Daylight Factors}\label{sky-daylight-factors}
+
+\begin{lstlisting}
+! <Sky Daylight Factors>, Sky Type, MonthAndDay, Daylighting Control Name, Enclosure Name, Window Name, Reference Point, Daylight Factor
+ Sky Daylight Factors,Clear Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.1373
+ Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.1572
+ Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,7.6189E-002
+ Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,2.6123E-002
+\end{lstlisting}
+
+\subsubsection{Field: Sky Type}\label{field-sky-daylight-factors-sky-type}
+The sky type: Clear, ClearTurbid, Intermediate, or Overcast.
+
+\subsubsection{Field: MonthAndDay}\label{field-sky-daylight-factors-monthandday}
+The month and day in mm/dd format.
+
+\subsubsection{Field: Enclosure Nme}\label{field-sky-daylight-factors-encl-name}
+The name of the daylighting enclosure (which consists of one or more spaces).
+
+\subsubsection{Field: Window Name}\label{field-sky-daylight-factors-window-name}
+The name of an exterior window.
+
+\subsubsection{Field: Reference Point}\label{field-sky-daylight-factors-ref-point}
+The name of a daylighting reference point (see Daylighting:ReferencePoint).
+
+\subsubsection{Field: Daylight Factor}\label{field-sky-daylight-factors-factor}
+The bare-window daylight factor from this window to this reference point at noon. Daylight factors are reported only for the first time that they are calculated, so the values are for whatever state is active at the reported time for variables such as ground reflectance, shading surface transmittance schedules, storm window status, or screen status.
+
 \subsection{AirflowNetwork Model:Control}\label{airflownetwork-modelcontrol}
 
 ! \textless{}AirflowNetwork Model:Control\textgreater{}, No Multizone or Distribution/Multizone with Distribution/Multizone without Distribution/Multizone with Distribution only during Fan Operation
