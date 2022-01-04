@@ -147,12 +147,17 @@ int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
 enum class OutConvClass
 {
     Invalid = -1,
-    WindwardVertWall = 101,
-    LeewardVertWall = 102,
-    RoofStable = 103,
-    RoofUnstable = 104,
+    WindwardVertWall,
+    LeewardVertWall,
+    RoofStable,
+    RoofUnstable,
     Num
 };
+
+// Report Values for "Surface Outside Face Convection Classification Index"
+// note that Invalid (-1) is also reported but not included here
+// where used, that should be handled with a static_cast<int>(OutConvClass::Invalid)
+constexpr static std::array<int, static_cast<int>(OutConvClass::Num)> OutConvClassReportVals = {101, 102, 103, 104};
 
 enum class ConvSurfDeltaT
 {
@@ -238,6 +243,13 @@ enum class InConvClass
     E_Windows,             // flow regime E
     Num
 };
+
+// Report values for "Surface Inside Face Convection Classification Index"
+// note that Invalid (-1) is also reported but not included here
+// where used, that should be handled with a static_cast<int>(InConvClass::Invalid)
+constexpr static std::array<int, static_cast<int>(InConvClass::Num)> InConvClassReportVals = {
+    1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45};
 
 // Parameters to indicate user specified convection coefficients (for surface)
 enum class ConvCoefOverrideType
