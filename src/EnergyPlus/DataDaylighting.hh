@@ -256,17 +256,11 @@ namespace DataDaylighting {
         Array2D<Real64> MapRefPtAbsCoord; // X,Y,Z coordinates of all illuminance map reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
-        Array1D_bool MapRefPtInBounds;     // True when coordinates are in bounds of zone coordinates
-        Array1D<Real64> DaylIllumAtMapPt;  // Daylight illuminance at illuminance map points (lux)
-        Array1D<Real64> GlareIndexAtMapPt; // Glare index at illuminance map points
+        Array1D_bool MapRefPtInBounds;    // True when coordinates are in bounds of zone coordinates
+        Array1D<Real64> DaylIllumAtMapPt; // Daylight illuminance at illuminance map points (lux)
         // following Hr - report avg hr
-        Array1D<Real64> DaylIllumAtMapPtHr;      // Daylight illuminance at illuminance map points (lux)
-        Array1D<Real64> GlareIndexAtMapPtHr;     // Glare index at illuminance map points
-        Array2D<Real64> SolidAngAtMapPt;         // (Number of Zones, Total Map Reference Points)
-        Array2D<Real64> SolidAngAtMapPtWtd;      // (Number of Zones, Total Map Reference Points)
-        Array3D<Real64> IllumFromWinAtMapPt;     // (Number of Zones, 2, Total Map Reference Points)
-        Array3D<Real64> BackLumFromWinAtMapPt;   // (Number of Zones, 2, Total Map Reference Points)
-        Array3D<Real64> SourceLumFromWinAtMapPt; // (Number of Zones, 2, Total Map Reference Points)
+        Array1D<Real64> DaylIllumAtMapPtHr;  // Daylight illuminance at illuminance map points (lux)
+        Array3D<Real64> IllumFromWinAtMapPt; // (Number of Zones, 2, Total Map Reference Points)
         // Arguments (dimensions) for Dayl---Sky are:
         //  1: Sun position index / HourOfDay (1 to 24)
         //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
@@ -275,8 +269,6 @@ namespace DataDaylighting {
         //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
         //  5: Daylit window number (1 to NumOfDayltgExtWins)
         Array5D<Real64> DaylIllFacSky;
-        Array5D<Real64> DaylSourceFacSky;
-        Array5D<Real64> DaylBackFacSky;
         // Arguments (dimensions) for Dayl---Sun are:
         //  1: Sun position index / HourOfDay (1 to 24)
         //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
@@ -285,10 +277,6 @@ namespace DataDaylighting {
         //  4: Daylit window number (1 to NumOfDayltgExtWins)
         Array4D<Real64> DaylIllFacSun;
         Array4D<Real64> DaylIllFacSunDisk;
-        Array4D<Real64> DaylSourceFacSun;
-        Array4D<Real64> DaylSourceFacSunDisk;
-        Array4D<Real64> DaylBackFacSun;
-        Array4D<Real64> DaylBackFacSunDisk;
     };
 
     struct RefPointData
