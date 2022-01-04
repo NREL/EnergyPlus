@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1811,6 +1811,8 @@ namespace HeatBalFiniteDiffManager {
         // EMS Conductivity Override
         if (condActuator.isActuated) {
             kt = condActuator.actuatedValue;
+            ktA1 = kt;
+            ktA2 = kt;
         }
 
         // EMS Specific Heat Override
@@ -2017,6 +2019,22 @@ namespace HeatBalFiniteDiffManager {
                         }
                     }
 
+                    // EMS Conductivity 2 Override
+                    if (condActuator2.isActuated) {
+                        kt2 = condActuator1.actuatedValue;
+                    }
+
+                    // EMS Specific Heat 2 Override
+                    if (specHeatActuator2.isActuated) {
+                        Cp2 = specHeatActuator1.actuatedValue;
+                    }
+
+                    // Update EMS internal variables
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
+
                     // R layer first, then PCM or regular layer
                     Real64 const Delt_Delx2(Delt * Delx2);
                     Real64 const Cp2_fac(Cp2 * pow_2(Delx2) * RhoS2 * Rlayer);
@@ -2061,26 +2079,16 @@ namespace HeatBalFiniteDiffManager {
                         kt1 = condActuator1.actuatedValue;
                     }
 
-                    // EMS Conductivity 2 Override
-                    if (condActuator2.isActuated) {
-                        kt2 = condActuator2.actuatedValue;
-                    }
-
                     // EMS Specific Heat 1 Override
                     if (specHeatActuator1.isActuated) {
                         Cp1 = specHeatActuator1.actuatedValue;
                     }
 
-                    // EMS Specific Heat 2 Override
-                    if (specHeatActuator2.isActuated) {
-                        Cp2 = specHeatActuator2.actuatedValue;
-                    }
-
                     // Update EMS internal variables
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i) = kt1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i) = Cp1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i + 1) = kt2;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i + 1) = Cp2;
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
 
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Cp1_fac(Cp1 * pow_2(Delx1) * RhoS1 * Rlayer2);
@@ -2178,10 +2186,10 @@ namespace HeatBalFiniteDiffManager {
                     }
 
                     // Update EMS internal variables
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i) = kt1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i) = Cp1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i + 1) = kt2;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i + 1) = Cp2;
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
 
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Delt_Delx2(Delt * Delx2);
