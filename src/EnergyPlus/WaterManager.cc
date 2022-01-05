@@ -1700,15 +1700,20 @@ namespace WaterManager {
                                                      state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[i]);
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchMonthlyTotalHrRain, Months[i], state.dataWaterData->RainFall.numRainyHoursInWeather[i]);
-            OutputReportPredefined::PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchMonthlyTotalPrecInRainCol,
-                                                     Months[i],
-                                                     state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[i]);
-            Real64 accVolCollectedMonthly = 0.0;
-            for (int Item = 1; Item <= state.dataWaterData->NumRainCollectors; Item++) {
-                accVolCollectedMonthly += state.dataWaterData->RainCollector(Item).VolCollectedMonthly[i];
+        }
+        if (state.dataWaterData->NumWaterStorageTanks > 0) {
+            for (int i = 0; i < 12; i++) {
+                OutputReportPredefined::PreDefTableEntry(state,
+                                                         state.dataOutRptPredefined->pdchMonthlyTotalPrecInRainCol,
+                                                         Months[i],
+                                                         state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[i]);
+                Real64 accVolCollectedMonthly = 0.0;
+                for (int Item = 1; Item <= state.dataWaterData->NumRainCollectors; Item++) {
+                    accVolCollectedMonthly += state.dataWaterData->RainCollector(Item).VolCollectedMonthly[i];
+                }
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchMonthlyTotalRainCol, Months[i], accVolCollectedMonthly);
             }
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalRainCol, Months[i], accVolCollectedMonthly);
         }
         // check whether there are eco roofs
         bool ecoroofFlag = false;
@@ -1718,8 +1723,12 @@ namespace WaterManager {
         // report ecoroof
         if (ecoroofFlag) {
             for (int i = 0; i < 12; i++) {
-                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalPrecInRoofIrr, Months[i], state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[i]);
-                OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMonthlyTotalIrrDep, Months[i], state.dataEcoRoofMgr->MonthlyIrrigation[i]);
+                OutputReportPredefined::PreDefTableEntry(state,
+                                                         state.dataOutRptPredefined->pdchMonthlyTotalPrecInRoofIrr,
+                                                         Months[i],
+                                                         state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[i]);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, state.dataOutRptPredefined->pdchMonthlyTotalIrrDep, Months[i], state.dataEcoRoofMgr->MonthlyIrrigation[i]);
             }
         }
     }
