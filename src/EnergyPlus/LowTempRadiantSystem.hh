@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -204,14 +205,14 @@ namespace LowTempRadiantSystem {
         int HotWaterInNode = 0;      // hot water inlet node
         int HotWaterOutNode = 0;     // hot water outlet node
         int HWLoopNum = 0;
-        int HWLoopSide = 0;
+        DataPlant::LoopSideLocation HWLoopSide = DataPlant::LoopSideLocation::Invalid;
         int HWBranchNum = 0;
         int HWCompNum = 0;
         bool CoolingSystem = false; // .TRUE. when the system is able to cool (parameters are valid)
         int ColdWaterInNode = 0;    // cold water inlet node
         int ColdWaterOutNode = 0;   // cold water outlet node
         int CWLoopNum = 0;
-        int CWLoopSide = 0;
+        DataPlant::LoopSideLocation CWLoopSide = DataPlant::LoopSideLocation::Invalid;
         int CWBranchNum = 0;
         int CWCompNum = 0;
         int GlycolIndex = 0;             // Index to Glycol (Water) Properties

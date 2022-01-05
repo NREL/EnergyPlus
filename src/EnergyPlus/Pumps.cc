@@ -1440,7 +1440,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     Real64 mdotMax; // local fluid mass flow rate maximum
     Real64 mdotMin; // local fluid mass flow rate minimum
     int plloopnum;
-    int lsnum;
+    DataPlant::LoopSideLocation lsnum;
     int brnum;
     int cpnum;
 
@@ -1469,7 +1469,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
         lsnum = state.dataPumps->PumpEquip(PumpNum).LoopSideNum;
         brnum = state.dataPumps->PumpEquip(PumpNum).BranchNum;
         cpnum = state.dataPumps->PumpEquip(PumpNum).CompNum;
-        if (plloopnum > 0 && lsnum > 0 && brnum > 0 && cpnum > 0) {
+        if (plloopnum > 0 && lsnum != DataPlant::LoopSideLocation::Invalid && brnum > 0 && cpnum > 0) {
             if (state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn != InletNode ||
                 state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut != OutletNode) {
                 ShowSevereError(state,
@@ -2173,7 +2173,6 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     int PlantSizNum; // index of Plant Sizing array
     bool ErrorsFound;
     Real64 TotalEffic = 0.0; // pump total efficiency
-    int Side;                // half loop index
     int BranchNum;           // index of branch
     int CompNum;             // index of component on branch
     Real64 PumpSizFac;       // pump sizing factor
@@ -2206,7 +2205,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     } else {
         // might be able to remove this next block
         if (state.dataPumps->PumpEquip(PumpNum).LoopNum > 0) {
-            for (Side = 1; Side <= 2; ++Side) {
+            for (DataPlant::LoopSideLocation Side : DataPlant::LoopSideKeys) {
                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide(Side).TotalBranches;
                      ++BranchNum) {
                     for (CompNum = 1;

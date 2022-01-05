@@ -10756,7 +10756,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
     int PlantInletNode(0);
     int PlantOutletNode(0);
     int PlantLoopIndex(0);
-    int PlantLoopSideIndex(0);
+    DataPlant::LoopSideLocation PlantLoopSideIndex(DataPlant::LoopSideLocation::Invalid);
     int PlantBranchIndex(0);
     int PlantCompIndex(0);
 
@@ -10921,7 +10921,7 @@ void RefrigRackData::simulate(EnergyPlusData &state,
     int PlantInletNode(0);
     int PlantOutletNode(0);
     int PlantLoopIndex(0);
-    int PlantLoopSideIndex(0);
+    DataPlant::LoopSideLocation PlantLoopSideIndex(DataPlant::LoopSideLocation::Invalid);
     int PlantBranchIndex(0);
     int PlantCompIndex(0);
 

@@ -1426,7 +1426,7 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
     // Initialize heat recovery flow rates at node
     if (this->HeatRecActive) {
         int LoopNum = this->HRLoopNum;
-        int LoopSideNum = this->HRLoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->HRLoopSideNum;
         int BranchIndex = this->HRBranchNum;
         int CompIndex = this->HRCompNum;
         if (RunFlag) {

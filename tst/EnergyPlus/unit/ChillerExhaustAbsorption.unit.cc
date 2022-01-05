@@ -332,36 +332,33 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_getDesignCapacities_Test)
     state->dataPlnt->TotNumLoops = 3;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 3;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(3);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 2;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 100;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 111;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(3);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 100;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).NodeNumIn = 111;
 
-    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 3;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(3);
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 200;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 222;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 3;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(3);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 200;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).NodeNumIn = 222;
 
-    state->dataPlnt->PlantLoop(3).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(3).LoopSide(1).TotalBranches = 4;
-    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch.allocate(4);
-    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch(1).TotalComponents = 2;
-    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch(1).Comp.allocate(2);
-    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 300;
-    state->dataPlnt->PlantLoop(3).LoopSide(1).Branch(1).Comp(2).NodeNumIn = 333;
+    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 4;
+    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(4);
+    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 300;
+    state->dataPlnt->PlantLoop(3).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).NodeNumIn = 333;
 
     ExhaustAbsorberSpecs thisChillerHeater;
     thisChillerHeater.ChillReturnNodeNum = 111;
     thisChillerHeater.HeatReturnNodeNum = 222;
     thisChillerHeater.CondReturnNodeNum = 333;
 
-    PlantLocation loc_1 = PlantLocation(1, 1, 1, 1);
+    PlantLocation loc_1 = PlantLocation(1, DataPlant::LoopSideLocation::Demand, 1, 1);
     Real64 maxload(-1.0);
     Real64 minload(-1.0);
     Real64 optload(-1.0);
@@ -379,7 +376,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_getDesignCapacities_Test)
     EXPECT_NEAR(optload, 80000.0, 0.001);
 
     thisChillerHeater.NomHeatCoolRatio = 0.9;
-    PlantLocation loc_2 = PlantLocation(2, 1, 1, 1);
+    PlantLocation loc_2 = PlantLocation(2, DataPlant::LoopSideLocation::Demand, 1, 1);
 
     // Heater
     thisChillerHeater.getDesignCapacities(*state, loc_2, maxload, minload, optload);
@@ -388,7 +385,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_getDesignCapacities_Test)
     EXPECT_NEAR(maxload, 81000.0, 0.001);
     EXPECT_NEAR(optload, 72000.0, 0.001);
 
-    PlantLocation loc_3 = PlantLocation(3, 1, 1, 1);
+    PlantLocation loc_3 = PlantLocation(3, DataPlant::LoopSideLocation::Demand, 1, 1);
 
     // Condenser
     thisChillerHeater.getDesignCapacities(*state, loc_3, maxload, minload, optload);
@@ -648,12 +645,11 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     thisChillerHeater.HWLoopNum = 1;
-    thisChillerHeater.HWLoopSideNum = 1;
+    thisChillerHeater.HWLoopSideNum = DataPlant::LoopSideLocation::Demand;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).FlowLock = DataPlant::FlowLock::Locked;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(3).Temp = 60.0;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.5;
     state->dataLoopNodes->Node(4).TempSetPoint = 70.0;

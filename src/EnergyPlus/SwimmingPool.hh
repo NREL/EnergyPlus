@@ -77,7 +77,7 @@ namespace SwimmingPool {
         std::string WaterOutletNodeName; // water outlet node name
         int WaterOutletNode;             // water outlet node number
         int HWLoopNum;
-        int HWLoopSide;
+        DataPlant::LoopSideLocation HWLoopSide;
         int HWBranchNum;
         int HWCompNum;
         Real64 WaterVolFlowMax;              // maximum water flow rate for pool, m3/s
@@ -144,16 +144,16 @@ namespace SwimmingPool {
 
         // Default Constructor
         SwimmingPoolData()
-            : SurfacePtr(0), ZonePtr(0), WaterInletNode(0), WaterOutletNode(0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0),
-              WaterVolFlowMax(0.0), WaterMassFlowRateMax(0.0), AvgDepth(0.0), ActivityFactor(0.0), ActivityFactorSchedPtr(0), CurActivityFactor(0.0),
-              MakeupWaterSupplySchedPtr(0), CurMakeupWaterTemp(0.0), CoverSchedPtr(0), CurCoverSchedVal(0.0), CoverEvapFactor(0.0),
-              CoverConvFactor(0.0), CoverSWRadFactor(0.0), CoverLWRadFactor(0.0), CurCoverEvapFac(0.0), CurCoverConvFac(0.0), CurCoverSWRadFac(0.0),
-              CurCoverLWRadFac(0.0), RadConvertToConvect(0.0), MiscPowerFactor(0.0), SetPtTempSchedPtr(0), CurSetPtTemp(23.0), MaxNumOfPeople(0.0),
-              PeopleSchedPtr(0), PeopleHeatGainSchedPtr(0), PeopleHeatGain(0.0), GlycolIndex(0), WaterMass(0.0), SatPressPoolWaterTemp(0.0),
-              PartPressZoneAirTemp(0.0), PoolWaterTemp(23.0), WaterInletTemp(0.0), WaterOutletTemp(0.0), WaterMassFlowRate(0.0),
-              MakeUpWaterMassFlowRate(0.0), MakeUpWaterMass(0.0), MakeUpWaterVolFlowRate(0.0), MakeUpWaterVol(0.0), HeatPower(0.0), HeatEnergy(0.0),
-              MiscEquipPower(0.0), MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0), EvapHeatLossRate(0.0), EvapEnergyLoss(0.0), MyOneTimeFlag(true),
-              MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
+            : SurfacePtr(0), ZonePtr(0), WaterInletNode(0), WaterOutletNode(0), HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid),
+              HWBranchNum(0), HWCompNum(0), WaterVolFlowMax(0.0), WaterMassFlowRateMax(0.0), AvgDepth(0.0), ActivityFactor(0.0),
+              ActivityFactorSchedPtr(0), CurActivityFactor(0.0), MakeupWaterSupplySchedPtr(0), CurMakeupWaterTemp(0.0), CoverSchedPtr(0),
+              CurCoverSchedVal(0.0), CoverEvapFactor(0.0), CoverConvFactor(0.0), CoverSWRadFactor(0.0), CoverLWRadFactor(0.0), CurCoverEvapFac(0.0),
+              CurCoverConvFac(0.0), CurCoverSWRadFac(0.0), CurCoverLWRadFac(0.0), RadConvertToConvect(0.0), MiscPowerFactor(0.0),
+              SetPtTempSchedPtr(0), CurSetPtTemp(23.0), MaxNumOfPeople(0.0), PeopleSchedPtr(0), PeopleHeatGainSchedPtr(0), PeopleHeatGain(0.0),
+              GlycolIndex(0), WaterMass(0.0), SatPressPoolWaterTemp(0.0), PartPressZoneAirTemp(0.0), PoolWaterTemp(23.0), WaterInletTemp(0.0),
+              WaterOutletTemp(0.0), WaterMassFlowRate(0.0), MakeUpWaterMassFlowRate(0.0), MakeUpWaterMass(0.0), MakeUpWaterVolFlowRate(0.0),
+              MakeUpWaterVol(0.0), HeatPower(0.0), HeatEnergy(0.0), MiscEquipPower(0.0), MiscEquipEnergy(0.0), RadConvertToConvectRep(0.0),
+              EvapHeatLossRate(0.0), EvapEnergyLoss(0.0), MyOneTimeFlag(true), MyEnvrnFlagGeneral(true), MyPlantScanFlagPool(true)
         {
         }
 

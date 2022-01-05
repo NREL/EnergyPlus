@@ -854,7 +854,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                       this->CWLoopNum,
                                                       this->CWLoopSideNum,
                                                       this->GenLoopNum,
-                                                      this->GenCompNum,
+                                                      this->GenLoopSideNum,
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       true);
     }
@@ -864,7 +864,7 @@ void IndirectAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                       this->CDLoopNum,
                                                       this->CDLoopSideNum,
                                                       this->GenLoopNum,
-                                                      this->GenCompNum,
+                                                      this->GenLoopSideNum,
                                                       DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                       false);
     }
