@@ -927,9 +927,13 @@ namespace EcoRoofManager {
                                    "Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
                 state.dataEcoRoofMgr->CurrentPrecipitation = state.dataEnvrn->LiquidPrecipitation; //  units of m
                 // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
-            } else if (state.dataEnvrn->IsRain) {
-                ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
-                state.dataEcoRoofMgr->CurrentPrecipitation = (1.5 / 1000.0); //  units of m
+            } else {
+                if (state.dataEnvrn->IsRain) {
+                    ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
+                    state.dataEcoRoofMgr->CurrentPrecipitation = (1.5 / 1000.0); //  units of m
+                } else {
+                    state.dataEcoRoofMgr->CurrentPrecipitation = state.dataEnvrn->LiquidPrecipitation; //  units of m
+                }
             }
             Moisture += state.dataEcoRoofMgr->CurrentPrecipitation / state.dataEcoRoofMgr->TopDepth; // x (m) evenly put into top layer
             if (!state.dataGlobal->WarmupFlag) {

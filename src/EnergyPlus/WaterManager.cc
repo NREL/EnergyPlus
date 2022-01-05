@@ -970,27 +970,36 @@ namespace WaterManager {
 //                           state.dataGlobal->TimeStep,
 //                           state.dataEnvrn->LiquidPrecipitation,
 //                           state.dataWaterData->RainFall.CurrentRate);
-            // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
-            } else if (state.dataEnvrn->IsRain) {
-                ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
-                state.dataWaterData->RainFall.CurrentRate = (1.5 / 1000.0) / (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
+            } else {
+                // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
+                if (state.dataEnvrn->IsRain) {
+                    ShowWarningMessage(state, "Rain flag is on but precipitation in the weather file is missing, fill it with 1.5mm");
+                    state.dataWaterData->RainFall.CurrentRate = (1.5 / 1000.0) / DataGlobalConstants::SecInHour;
+                    state.dataWaterData->RainFall.CurrentAmount =
+                        state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
+                } else {
+                    state.dataWaterData->RainFall.CurrentRate = 0.0;
+                    state.dataWaterData->RainFall.CurrentAmount = 0.0;
+                }
             }
-            // rain depth in an HVAC system loop
-            state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (DataGlobalConstants::SecInHour / (state.dataGlobal->NumOfTimeStepInHour * state.dataHVACGlobal->NumOfSysTimeSteps));
         }
+        state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
         int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
         // change unit back to mm in the reporting in monthly rain amount used in rain collector
-        state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+        if ((SysTimestepLoop == 0) && (state.dataWaterData->RainFall.CurrentAmount > 0.0)) {
+            state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+        }
         // fixme: debug print
-//        if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
-//            fmt::print("{} {}-{} rain fall amount for month {}: dep={}, cur={}, acc={:.5f}\n",
+//        if (state.dataWaterData->RainFall.CurrentAmount > 0.0) {
+//            fmt::print("{} {}-{} rain fall amount for month {}: dep={}, cur={}, acc={:.5f}, 1/TimeStepSys={:.1f}, SysTimestepLoop={}, numStep={}\n",
 //                       state.dataEnvrn->CurMnDy,
 //                       state.dataGlobal->HourOfDay,
 //                       state.dataGlobal->TimeStep,
 //                       month - 1,
 //                       state.dataEnvrn->LiquidPrecipitation,
 //                       state.dataWaterData->RainFall.CurrentAmount,
-//                       state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1]);
+//                       state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1],
+//                       1.0/TimeStepSys, SysTimestepLoop, state.dataGlobal->NumOfTimeStepInHour);
 //        }
     }
 
