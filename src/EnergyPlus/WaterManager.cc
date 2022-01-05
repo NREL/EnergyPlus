@@ -144,13 +144,13 @@ namespace WaterManager {
         } // tank loop
     }
 
-    void ManageWaterInits(EnergyPlusData &state)
+    void ManageWaterInits(EnergyPlusData &state, int const SysTimestepLoop)
     {
         if (!(state.dataWaterData->AnyWaterSystemsInModel)) return;
 
         UpdateWaterManager(state);
 
-        UpdatePrecipitation(state);
+        UpdatePrecipitation(state, SysTimestepLoop);
         UpdateIrrigation(state);
     }
 
@@ -928,7 +928,7 @@ namespace WaterManager {
         } // my one time flag block
     }
 
-    void UpdatePrecipitation(EnergyPlusData &state)
+    void UpdatePrecipitation(EnergyPlusData &state, int const SysTimestepLoop)
     {
 
         // SUBROUTINE INFORMATION:
