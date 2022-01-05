@@ -3651,7 +3651,7 @@ namespace WeatherManager {
                         }
                     } else {
                         bool error = false;
-                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line, error);
+                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                         if (error) {
                             ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                         }
@@ -3660,7 +3660,7 @@ namespace WeatherManager {
                     }
                 } else {
                     bool error = false;
-                    SnowDepth = UtilityRoutines::ProcessNumber(Line, error);
+                    SnowDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                     if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
@@ -3670,7 +3670,7 @@ namespace WeatherManager {
                 }
             } else {
                 bool error = false;
-                AerosolOptDepth = UtilityRoutines::ProcessNumber(Line, error);
+                AerosolOptDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                 if (error) {
                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                 }
@@ -3681,7 +3681,7 @@ namespace WeatherManager {
             }
         } else {
             bool error = false;
-            PrecipWater = UtilityRoutines::ProcessNumber(Line, error);
+            PrecipWater = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
             if (error) {
                 ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
             }
