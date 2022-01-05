@@ -355,7 +355,7 @@ void ManageHVAC(EnergyPlusData &state)
                 }
             }
 
-            ManageWaterInits(state);
+            ManageWaterInits(state, SysTimestepLoop);
 
             // Need to set the flag back since we do not need to shift the temps back again in the correct step.
             ShortenTimeStepSys = false;
