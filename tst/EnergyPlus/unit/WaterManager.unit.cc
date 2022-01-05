@@ -129,6 +129,10 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
     WaterManager::UpdatePrecipitation(*state);
     ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / (3600 / state->dataGlobal->NumOfTimeStepInHour));
+    // when "LiquidPrecipitation" is 0, rainfall rate is 0
+    state->dataEnvrn->LiquidPrecipitation = 0.0;
+    WaterManager::UpdatePrecipitation(*state);
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.0);
 
     // without site:precipitation, "LiquidPrecipitation" is also missing, but rain flag is on
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
@@ -136,7 +140,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     state->dataEnvrn->IsRain = true;
     WaterManager::UpdatePrecipitation(*state);
     // default 1.5mm rain depth is used
-    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, (1.5 / 1000.0) / (3600 / state->dataGlobal->NumOfTimeStepInHour));
+    ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, (1.5 / 1000.0) / 3600);
 }
 
 TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
