@@ -12005,8 +12005,15 @@ namespace UnitarySystems {
                     }
                     this->m_CoolCompPartLoadRatio = PartLoadFrac;
                     if (CoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-                        this->simMultiSpeedCoils(
-                            state, AirLoopNum, FirstHVACIteration, CompressorOp, SensibleLoad, LatentLoad, PartLoadFrac, CoolingCoil, this->m_SpeedNum);
+                        this->simMultiSpeedCoils(state,
+                                                 AirLoopNum,
+                                                 FirstHVACIteration,
+                                                 CompressorOp,
+                                                 SensibleLoad,
+                                                 LatentLoad,
+                                                 PartLoadFrac,
+                                                 CoolingCoil,
+                                                 this->m_SpeedNum);
                         OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                         if (SpeedNum == this->m_NumOfSpeedCooling) {
                             FullLoadHumRatOut = state.dataLoopNodes->Node(OutletNode).HumRat;
@@ -12026,7 +12033,13 @@ namespace UnitarySystems {
                 } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
                     this->m_CompPartLoadRatio = PartLoadFrac;
 
-                    DXCoils::SimDXCoil(state, CompName, DataHVACGlobals::CompressorOperation::On, FirstHVACIteration, this->m_CoolingCoilIndex, FanOpMode, PartLoadFrac);
+                    DXCoils::SimDXCoil(state,
+                                       CompName,
+                                       DataHVACGlobals::CompressorOperation::On,
+                                       FirstHVACIteration,
+                                       this->m_CoolingCoilIndex,
+                                       FanOpMode,
+                                       PartLoadFrac);
 
                 } else if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
                            (CoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted)) { // CoilSystem:Cooling:DX:HeatExchangerAssisted
