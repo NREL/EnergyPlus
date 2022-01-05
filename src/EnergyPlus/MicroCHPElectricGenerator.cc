@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -669,7 +669,6 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
     if (this->ZoneID > 0) {
         SetupZoneInternalGain(state,
                               this->ZoneID,
-                              "Generator:MicroCHP",
                               this->Name,
                               DataHeatBalance::IntGainType::GeneratorMicroCHP,
                               &this->A42Model.SkinLossConvect,
@@ -714,7 +713,7 @@ void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus
         this->PlantMassFlowRateMax =
             2.0 * CurveManager::CurveValue(
                       state, this->A42Model.WaterFlowCurveID, this->A42Model.MaxElecPower, state.dataLoopNodes->Node(this->PlantInletNodeID).Temp);
-    } else if (this->CWLoopSideNum == DataPlant::SupplySide) {
+    } else if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Supply) {
         if (state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate > 0.0) {
             this->PlantMassFlowRateMax = state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate;
         } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum > 0) {
@@ -723,7 +722,7 @@ void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus
             this->PlantMassFlowRateMax = 2.0;
         }
 
-    } else if (this->CWLoopSideNum == DataPlant::DemandSide) {
+    } else if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Demand) {
         this->PlantMassFlowRateMax = 2.0; // would like to use plant loop max but not ready yet
     }
 
@@ -1546,7 +1545,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
 
             if (!this->A42Model.InternalFlowControl) {
                 // IF this is on the supply side and not internal flow control then reset flow priority to lower
-                if (this->CWLoopSideNum == DataPlant::SupplySide) {
+                if (this->CWLoopSideNum == DataPlant::LoopSideLocation::Supply) {
                     state.dataPlnt->PlantLoop(this->CWLoopNum)
                         .LoopSide(this->CWLoopSideNum)
                         .Branch(this->CWBranchNum)

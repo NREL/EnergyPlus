@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -6762,47 +6762,47 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CombineLoadCompResults_test)
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_AddTotalRowsForLoadSummary_test)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cSensInst, rRefrig) = 4.;
-    compLoad.cells(cLatent, rLights) = 10.;
-    compLoad.cells(cLatent, rRefrig) = 20.;
+    compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights) = 3.;
+    compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Refrig) = 4.;
+    compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights) = 10.;
+    compLoad.cells(LoadCompCol::Latent, LoadCompRow::Refrig) = 20.;
 
-    compLoad.cells(cArea, rLights) = 5.;
-    compLoad.cells(cArea, rRefrig) = 5.;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights) = 5.;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Refrig) = 5.;
 
     AddTotalRowsForLoadSummary(compLoad);
 
-    EXPECT_EQ(3. + 4., compLoad.cells(cSensInst, rGrdTot));
-    EXPECT_EQ(10 + 20., compLoad.cells(cLatent, rGrdTot));
-    EXPECT_EQ(3. + 10., compLoad.cells(cTotal, rLights));
-    EXPECT_EQ(4 + 20., compLoad.cells(cTotal, rRefrig));
+    EXPECT_EQ(3. + 4., compLoad.cells(LoadCompCol::SensInst, LoadCompRow::GrdTot));
+    EXPECT_EQ(10 + 20., compLoad.cells(LoadCompCol::Latent, LoadCompRow::GrdTot));
+    EXPECT_EQ(3. + 10., compLoad.cells(LoadCompCol::Total, LoadCompRow::Lights));
+    EXPECT_EQ(4 + 20., compLoad.cells(LoadCompCol::Total, LoadCompRow::Refrig));
 
-    EXPECT_EQ(37., compLoad.cells(cTotal, rGrdTot));
+    EXPECT_EQ(37., compLoad.cells(LoadCompCol::Total, LoadCompRow::GrdTot));
 
-    EXPECT_EQ(100. * 13. / 37., compLoad.cells(cPerc, rLights));
-    EXPECT_EQ(100. * 24. / 37., compLoad.cells(cPerc, rRefrig));
+    EXPECT_EQ(100. * 13. / 37., compLoad.cells(LoadCompCol::Perc, LoadCompRow::Lights));
+    EXPECT_EQ(100. * 24. / 37., compLoad.cells(LoadCompCol::Perc, LoadCompRow::Refrig));
 
-    EXPECT_EQ(13. / 5., compLoad.cells(cPerArea, rLights));
-    EXPECT_EQ(24. / 5., compLoad.cells(cPerArea, rRefrig));
+    EXPECT_EQ(13. / 5., compLoad.cells(LoadCompCol::PerArea, LoadCompRow::Lights));
+    EXPECT_EQ(24. / 5., compLoad.cells(LoadCompCol::PerArea, LoadCompRow::Refrig));
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cLatent, rLights) = 10.;
+    compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights) = 3.;
+    compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights) = 10.;
 
-    compLoad.cells(cArea, rLights) = 5.;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights) = 5.;
 
     compLoad.outsideDryBulb = 20.;
     compLoad.mainFanAirFlow = 0.7;
@@ -6818,10 +6818,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LoadSummaryUnitConversion_test
 
     LoadSummaryUnitConversion(*state, compLoad);
 
-    EXPECT_EQ(3. * powerConversion, compLoad.cells(cSensInst, rLights));
-    EXPECT_EQ(10. * powerConversion, compLoad.cells(cLatent, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
+    EXPECT_EQ(3. * powerConversion, compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights));
+    EXPECT_EQ(10. * powerConversion, compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights));
 
     EXPECT_EQ(ConvertIP(*state, tempConvIndx, 20.), compLoad.outsideDryBulb);
     EXPECT_EQ(0.7 * airFlowConversion, compLoad.mainFanAirFlow);
@@ -9091,15 +9091,15 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
 TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
 {
     CompLoadTablesType compLoad;
-    compLoad.cells.allocate(cPerArea, rGrdTot);
+    compLoad.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cells = 0.;
-    compLoad.cellUsed.allocate(cPerArea, rGrdTot);
+    compLoad.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
     compLoad.cellUsed = true;
 
-    compLoad.cells(cSensInst, rLights) = 3.;
-    compLoad.cells(cLatent, rLights) = 10.;
+    compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights) = 3.;
+    compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights) = 10.;
 
-    compLoad.cells(cArea, rLights) = 5.;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights) = 5.;
 
     compLoad.outsideDryBulb = 20.;
     compLoad.mainFanAirFlow = 0.7;
@@ -9116,10 +9116,10 @@ TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
     // LoadSummaryUnitConversion(*state, compLoad);
     LoadSummaryUnitConversion(*state, compLoad, state->dataOutRptTab->unitsStyle_SQLite);
 
-    EXPECT_EQ(3. * powerConversion, compLoad.cells(cSensInst, rLights));
-    EXPECT_EQ(10. * powerConversion, compLoad.cells(cLatent, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
-    EXPECT_EQ(5. * areaConversion, compLoad.cells(cArea, rLights));
+    EXPECT_EQ(3. * powerConversion, compLoad.cells(LoadCompCol::SensInst, LoadCompRow::Lights));
+    EXPECT_EQ(10. * powerConversion, compLoad.cells(LoadCompCol::Latent, LoadCompRow::Lights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights));
+    EXPECT_EQ(5. * areaConversion, compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights));
 
     EXPECT_EQ(ConvertIP(*state, tempConvIndx, 20.), compLoad.outsideDryBulb);
     EXPECT_EQ(0.7 * airFlowConversion, compLoad.mainFanAirFlow);

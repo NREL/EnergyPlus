@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -117,7 +117,7 @@ namespace SZVAVModel {
         int coilFluidInletNode(0);
         int coilFluidOutletNode(0);
         int coilLoopNum(0);
-        int coilLoopSide(0);
+        DataPlant::LoopSideLocation coilLoopSide(DataPlant::LoopSideLocation::Invalid);
         int coilBranchNum(0);
         int coilCompNum(0);
         int coilAirInletNode(0);
@@ -164,7 +164,7 @@ namespace SZVAVModel {
             coilFluidInletNode = 0;
             coilFluidOutletNode = 0;
             coilLoopNum = 0;
-            coilLoopSide = 0;
+            coilLoopSide = DataPlant::LoopSideLocation::Invalid;
             coilBranchNum = 0;
             coilCompNum = 0;
             coilAirInletNode = 0;
@@ -557,7 +557,7 @@ namespace SZVAVModel {
         int coilFluidInletNode(0);
         int coilFluidOutletNode(0);
         int coilLoopNum(0);
-        int coilLoopSide(0);
+        DataPlant::LoopSideLocation coilLoopSide(DataPlant::LoopSideLocation::Invalid);
         int coilBranchNum(0);
         int coilCompNum(0);
         int coilAirInletNode(0);
@@ -604,7 +604,7 @@ namespace SZVAVModel {
             coilFluidInletNode = 0;
             coilFluidOutletNode = 0;
             coilLoopNum = 0;
-            coilLoopSide = 0;
+            coilLoopSide = DataPlant::LoopSideLocation::Invalid;
             coilBranchNum = 0;
             coilCompNum = 0;
             coilAirInletNode = 0;
@@ -1001,7 +1001,7 @@ namespace SZVAVModel {
         int coilFluidInletNode(0);
         int coilFluidOutletNode(0);
         int coilLoopNum(0);
-        int coilLoopSide(0);
+        DataPlant::LoopSideLocation coilLoopSide(DataPlant::LoopSideLocation::Invalid);
         int coilBranchNum(0);
         int coilCompNum(0);
         int coilAirInletNode(0);
@@ -1050,7 +1050,7 @@ namespace SZVAVModel {
             coilFluidInletNode = 0;
             coilFluidOutletNode = 0;
             coilLoopNum = 0;
-            coilLoopSide = 0;
+            coilLoopSide = DataPlant::LoopSideLocation::Invalid;
             coilBranchNum = 0;
             coilCompNum = 0;
             coilAirInletNode = 0;

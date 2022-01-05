@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,23 +48,25 @@
 #ifndef PLANTLOCATION_HH_INCLUDED
 #define PLANTLOCATION_HH_INCLUDED
 
+#include <EnergyPlus/Plant/Enums.hh>
+
 namespace EnergyPlus {
 
 struct PlantLocation
 {
     // Members
     int loopNum;
-    int loopSideNum;
+    DataPlant::LoopSideLocation loopSideNum;
     int branchNum;
     int compNum;
 
     // Default Constructor
-    PlantLocation() : loopNum(0), loopSideNum(0), branchNum(0), compNum(0)
+    PlantLocation() : loopNum(0), loopSideNum(DataPlant::LoopSideLocation::Invalid), branchNum(0), compNum(0)
     {
     }
 
     // Member Constructor
-    PlantLocation(int const loopNum, int const loopSideNum, int const branchNum, int const compNum)
+    PlantLocation(int const loopNum, const DataPlant::LoopSideLocation loopSideNum, int const branchNum, int const compNum)
         : loopNum(loopNum), loopSideNum(loopSideNum), branchNum(branchNum), compNum(compNum)
     {
     }

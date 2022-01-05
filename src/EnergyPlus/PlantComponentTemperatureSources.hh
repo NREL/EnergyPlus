@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -106,8 +106,9 @@ namespace PlantComponentTemperatureSources {
         WaterSourceSpecs()
             : InletNodeNum(0), OutletNodeNum(0), DesVolFlowRate(0.0), DesVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0),
               EMSOverrideOnMassFlowRateMax(false), EMSOverrideValueMassFlowRateMax(0.0), MassFlowRate(0.0), tempSpecType(TempSpecType::Invalid),
-              TempSpecScheduleNum(0), BoundaryTemp(0.0), OutletTemp(0.0), InletTemp(0.0), HeatRate(0.0), HeatEnergy(0.0), Location(0, 0, 0, 0),
-              SizFac(0.0), CheckEquipName(true), MyFlag(true), MyEnvironFlag(true), IsThisSized(false)
+              TempSpecScheduleNum(0), BoundaryTemp(0.0), OutletTemp(0.0), InletTemp(0.0), HeatRate(0.0), HeatEnergy(0.0),
+              Location(0, DataPlant::LoopSideLocation::Invalid, 0, 0), SizFac(0.0), CheckEquipName(true), MyFlag(true), MyEnvironFlag(true),
+              IsThisSized(false)
         {
         }
 

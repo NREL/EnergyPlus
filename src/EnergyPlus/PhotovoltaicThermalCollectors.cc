@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -367,7 +367,7 @@ namespace PhotovoltaicThermalCollectors {
                                                    state.dataIPShortCut->cAlphaArgs(7),
                                                    "Water Nodes");
 
-                state.dataPhotovoltaicThermalCollector->PVT(Item).WLoopSideNum = DataPlant::DemandSupply_No;
+                state.dataPhotovoltaicThermalCollector->PVT(Item).WLoopSideNum = DataPlant::LoopSideLocation::Invalid;
             }
 
             if (state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
@@ -694,7 +694,7 @@ namespace PhotovoltaicThermalCollectors {
             if (this->WLoopNum > 0) {
                 PltSizNum = state.dataPlnt->PlantLoop(this->WLoopNum).PlantSizNum;
             }
-            if (this->WLoopSideNum == DataPlant::SupplySide) {
+            if (this->WLoopSideNum == DataPlant::LoopSideLocation::Supply) {
                 if (PltSizNum > 0) {
                     if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         DesignVolFlowRateDes = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
@@ -718,7 +718,7 @@ namespace PhotovoltaicThermalCollectors {
                         }
                     }
                 }
-            } else if (this->WLoopSideNum == DataPlant::DemandSide) {
+            } else if (this->WLoopSideNum == DataPlant::LoopSideLocation::Demand) {
                 DesignVolFlowRateDes = this->AreaCol * SimplePVTWaterSizeFactor;
             }
             if (this->DesignVolFlowRateWasAutoSized) {
@@ -1261,7 +1261,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void simPVTfromOASys(EnergyPlusData &state, int const index, bool const FirstHVACIteration)
     {
-        PlantLocation dummyLoc(0, 0, 0, 0);
+        PlantLocation dummyLoc(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
         Real64 dummyCurLoad(0.0);
         bool dummyRunFlag(true);
 

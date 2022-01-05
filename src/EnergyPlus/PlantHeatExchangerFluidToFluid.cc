@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -900,7 +900,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
     if (this->controlMode == ControlType::CoolingSetPointOnOffWithComponentOverride) {
         // store current value for setpoint in central plant loop data structure
         int LoopNum2 = this->OtherCompSupplySideLoop.loopNum;
-        int LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
         int BranchNum = this->OtherCompSupplySideLoop.branchNum;
         int LoopCompNum = this->OtherCompSupplySideLoop.compNum;
 
@@ -3218,7 +3218,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 this->DemandSideLoop.inletNodeNum,
                                                 _);
 
-        if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
+        if (this->DemandSideLoop.loopSideNum != DataPlant::LoopSideLocation::Demand) { // throw error
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
@@ -3242,7 +3242,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
                                                 this->SupplySideLoop.inletNodeNum,
                                                 _);
 
-        if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
+        if (this->SupplySideLoop.loopSideNum != DataPlant::LoopSideLocation::Supply) { // throw error
             ShowSevereError(state,
                             format("{} Invalid connections for {} name = \"{}\"",
                                    RoutineName,
@@ -3293,7 +3293,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
             // revise how loads served category for other controlled equipment
             int LoopNum2 = this->OtherCompSupplySideLoop.loopNum;
-            int LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
+            DataPlant::LoopSideLocation LoopSideNum = this->OtherCompSupplySideLoop.loopSideNum;
             int BranchNum = this->OtherCompSupplySideLoop.branchNum;
             int LoopCompNum = this->OtherCompSupplySideLoop.compNum;
 

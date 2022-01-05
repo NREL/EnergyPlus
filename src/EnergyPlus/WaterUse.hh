@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -211,7 +211,7 @@ namespace WaterUse {
         int MaxIterationsErrorIndex; // recurring error index
         Array1D_int myWaterEquipArr;
         int PlantLoopNum;
-        int PlantLoopSide;
+        DataPlant::LoopSideLocation PlantLoopSide;
         int PlantLoopBranchNum;
         int PlantLoopCompNum;
         bool MyEnvrnFlag;
@@ -225,7 +225,8 @@ namespace WaterUse {
               DrainVolFlowRate(0.0), PeakMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0), MainsTemp(0.0), TankTemp(0.0),
               ColdSupplyTemp(0.0), ColdTemp(0.0), HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0),
               MainsVolume(0.0), TankVolume(0.0), ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0),
-              MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0), MyEnvrnFlag(true)
+              MaxIterationsErrorIndex(0), PlantLoopNum(0), PlantLoopSide(DataPlant::LoopSideLocation::Invalid), PlantLoopBranchNum(0),
+              PlantLoopCompNum(0), MyEnvrnFlag(true)
         {
         }
 

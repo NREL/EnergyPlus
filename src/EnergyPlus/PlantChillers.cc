@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1593,7 +1593,7 @@ namespace PlantChillers {
         if (state.dataPlnt->PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
             this->PossibleSubcooling = !(state.dataPlnt->PlantLoop(this->CWLoopNum)
                                              .LoopSide(this->CWLoopSideNum)
-                                             .Branch(this->CWLoopSideNum)
+                                             .Branch(this->CWBranchNum)
                                              .Comp(this->CWCompNum)
                                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased);
             this->QEvaporator = AvailChillerCap * OperPartLoadRat;
@@ -1734,7 +1734,7 @@ namespace PlantChillers {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
-                             .Branch(this->CWLoopSideNum)
+                             .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint != DataLoopNode::SensedNodeFlagValue)) {
@@ -1746,7 +1746,7 @@ namespace PlantChillers {
                     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
                         (state.dataPlnt->PlantLoop(this->CWLoopNum)
                              .LoopSide(this->CWLoopSideNum)
-                             .Branch(this->CWLoopSideNum)
+                             .Branch(this->CWBranchNum)
                              .Comp(this->CWCompNum)
                              .CurOpSchemeType == DataPlant::OpScheme::CompSetPtBased) ||
                         (state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPointHi != DataLoopNode::SensedNodeFlagValue)) {

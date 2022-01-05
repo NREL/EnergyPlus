@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -152,12 +152,12 @@ namespace HVACControllers {
         // --------------------
         // Actuated variable
         // --------------------
-        int ActuatedNode;                   // The node that is acted upon by the controller
-        Real64 ActuatedValue;               // Value of actuated variable before change by the controller
-        Real64 NextActuatedValue;           // The new control actuated value
-        int ActuatedNodePlantLoopNum;       // the plant loop index for the actuated node
-        int ActuatedNodePlantLoopSide;      // the plant loop side for the actuated node
-        int ActuatedNodePlantLoopBranchNum; // the plant loop branch num for actuated node
+        int ActuatedNode;                                      // The node that is acted upon by the controller
+        Real64 ActuatedValue;                                  // Value of actuated variable before change by the controller
+        Real64 NextActuatedValue;                              // The new control actuated value
+        int ActuatedNodePlantLoopNum;                          // the plant loop index for the actuated node
+        DataPlant::LoopSideLocation ActuatedNodePlantLoopSide; // the plant loop side for the actuated node
+        int ActuatedNodePlantLoopBranchNum;                    // the plant loop branch num for actuated node
         // --------------------
         // Sensed variable
         // --------------------
@@ -197,9 +197,10 @@ namespace HVACControllers {
               Action(ControllerAction::NoAction), InitFirstPass(true), NumCalcCalls(0), Mode(ControllerMode::None), DoWarmRestartFlag(false),
               ReuseIntermediateSolutionFlag(false), ReusePreviousSolutionFlag(false), SolutionTrackers(2), MaxAvailActuated(0.0), MaxAvailSensed(0.0),
               MinAvailActuated(0.0), MinAvailSensed(0.0), MaxVolFlowActuated(0.0), MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0),
-              ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0),
-              ActuatedNodePlantLoopBranchNum(0), SensedNode(0), IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0),
-              Offset(0.0), HumRatCntrlType(SetPointManager::CtrlVarType::Invalid), Range(0.0), Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0),
+              ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoopNum(0),
+              ActuatedNodePlantLoopSide(DataPlant::LoopSideLocation::Invalid), ActuatedNodePlantLoopBranchNum(0), SensedNode(0),
+              IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0),
+              HumRatCntrlType(SetPointManager::CtrlVarType::Invalid), Range(0.0), Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0),
               BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false),
               AirLoopControllerIndex(0), HumRatCtrlOverride(false)
         {

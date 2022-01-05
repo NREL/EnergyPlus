@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -173,7 +173,7 @@ namespace OutdoorAirUnit {
         int CoilWaterOutletNode;
         DataPlant::PlantEquipmentType CoilType;
         int LoopNum;
-        int LoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum;
         int BranchNum;
         int CompNum;
         int FluidIndex; // used in Steam...
@@ -187,8 +187,8 @@ namespace OutdoorAirUnit {
         // Default Constructor
         OAEquipList()
             : Type(CompType::Invalid), ComponentIndex(0), CoilAirInletNode(0), CoilAirOutletNode(0), CoilWaterInletNode(0), CoilWaterOutletNode(0),
-              CoilType(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), FluidIndex(0),
-              MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
+              CoilType(DataPlant::PlantEquipmentType::Invalid), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0),
+              CompNum(0), FluidIndex(0), MaxVolWaterFlow(0.0), MaxWaterMassFlow(0.0), MinVolWaterFlow(0.0), MinWaterMassFlow(0.0), FirstPass(true)
         {
         }
     };

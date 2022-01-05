@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -157,7 +157,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     HWBaseboard(1).AirMassFlowRateStd = 0.5;
     HWBaseboard(1).SchedPtr = -1;
     HWBaseboard(1).LoopNum = 1;
-    HWBaseboard(1).LoopSideNum = 1;
+    HWBaseboard(1).LoopSideNum = DataPlant::LoopSideLocation::Demand;
     HWBaseboard(1).BranchNum = 1;
     HWBaseboard(1).UA = 400.0;
     state->dataPlnt->PlantLoop(1).FluidName = "Water";
@@ -173,12 +173,10 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-        loop.LoopSide.allocate(1);
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -186,10 +184,10 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     state->dataPlnt->PlantLoop(1).FluidName = "HotWater";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = HWBaseboard(1).EquipID;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = HWBaseboard(1).EquipType;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWBaseboard(1).WaterInletNode;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWBaseboard(1).WaterOutletNode;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = HWBaseboard(1).EquipID;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = HWBaseboard(1).EquipType;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = HWBaseboard(1).WaterInletNode;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = HWBaseboard(1).WaterOutletNode;
 
     // zero zone load case, so zero LoadMet must be returned
     CalcHWBaseboard(*state, BBNum, LoadMet);

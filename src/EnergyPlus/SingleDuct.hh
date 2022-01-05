@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -197,13 +197,13 @@ namespace SingleDuct {
         bool NoOAFlowInputFromUser;           // avoids OA calculation if no input specified by user
         int OARequirementsPtr;                // - Index to DesignSpecification:OutdoorAir object
         int AirLoopNum;
-        int HWLoopNum;                // plant topology, loop number
-        int HWLoopSide;               // plant topology, loop side number
-        int HWBranchIndex;            // plant topology, Branch number
-        int HWCompIndex;              // plant topology, Component number
-        std::string ZoneHVACUnitType; // type of Zone HVAC unit for air terminal mixer units
-        std::string ZoneHVACUnitName; // name of Zone HVAC unit for air terminal mixer units
-        int SecInNode;                // zone or zone unit air node number
+        int HWLoopNum;                          // plant topology, loop number
+        DataPlant::LoopSideLocation HWLoopSide; // plant topology, loop side number
+        int HWBranchIndex;                      // plant topology, Branch number
+        int HWCompIndex;                        // plant topology, Component number
+        std::string ZoneHVACUnitType;           // type of Zone HVAC unit for air terminal mixer units
+        std::string ZoneHVACUnitName;           // name of Zone HVAC unit for air terminal mixer units
+        int SecInNode;                          // zone or zone unit air node number
         // warning variables
         int IterationLimit;                                       // Used for RegulaFalsi error -1
         int IterationFailed;                                      // Used for RegulaFalsi error -2
@@ -237,8 +237,8 @@ namespace SingleDuct {
               MaxReheatTemp(0.0), MaxReheatTempSetByUser(false), DamperHeatingAction(Action::HeatingActionNotUsed), DamperPosition(0.0), ADUNum(0),
               FluidIndex(0), ErrCount1(0), ErrCount1c(0), ErrCount2(0), ZoneFloorArea(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), ActualZoneNum(0),
               MaxAirVolFlowRateDuringReheat(0.0), MaxAirVolFractionDuringReheat(0.0), AirMassFlowDuringReheatMax(0.0), ZoneOutdoorAirMethod(0),
-              OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0), HWLoopSide(0),
-              HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0),
+              OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0), HWLoopNum(0),
+              HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchIndex(0), HWCompIndex(0), SecInNode(0), IterationLimit(0), IterationFailed(0),
               OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Invalid), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
               ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), MyEnvrnFlag(true),
               MySizeFlag(true), GetGasElecHeatCoilCap(true), PlantLoopScanFlag(true), MassFlow1(0.0), MassFlow2(0.0), MassFlow3(0.0),
