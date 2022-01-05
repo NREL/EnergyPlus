@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -116,7 +116,7 @@ void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration)
     state.dataHeatBalFanSys->SumConvPool = 0.0;
     state.dataHeatBalFanSys->SumLatentPool = 0.0;
 
-    PlantLocation A(0, 0, 0, 0);
+    PlantLocation A(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
     Real64 CurLoad = 0.0;
     bool RunFlag = true;
 

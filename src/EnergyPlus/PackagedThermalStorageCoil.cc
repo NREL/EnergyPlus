@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -383,7 +383,6 @@ void GetTESCoilInput(EnergyPlusData &state)
         if (ZoneIndexTrial > 0) { // tank is inside a zone so setup internal gains
             SetupZoneInternalGain(state,
                                   ZoneIndexTrial,
-                                  "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                   state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                   DataHeatBalance::IntGainType::PackagedTESCoilTank,
                                   &state.dataPackagedThermalStorageCoil->TESCoil(item).QdotAmbient);
@@ -2198,7 +2197,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     auto &MyWarmupFlag = state.dataPackagedThermalStorageCoil->MyWarmupFlag;
     bool errFlag;
     int plloopnum;
-    int lsnum;
+    DataPlant::LoopSideLocation lsnum;
     int brnum;
     int cpnum;
     Real64 tmpSchedValue;

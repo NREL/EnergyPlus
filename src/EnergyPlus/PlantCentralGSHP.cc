@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2860,7 +2860,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
         CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMaxAvail;
         HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
         GLHEInletMassFlowRate = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMaxAvail;
-        int LoopSideNum = this->CWLoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->CWLoopSideNum;
         this->WrapperCoolingLoad = 0.0;
         CurCoolingLoad = std::abs(MyLoad);
         this->WrapperCoolingLoad = CurCoolingLoad;
@@ -2874,7 +2874,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
         CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
         HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRateMaxAvail;
         GLHEInletMassFlowRate = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMaxAvail;
-        int LoopSideNum = this->HWLoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->HWLoopSideNum;
         this->WrapperHeatingLoad = 0.0;
         CurHeatingLoad = MyLoad;
         this->WrapperHeatingLoad = CurHeatingLoad;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -804,12 +804,12 @@ namespace WaterThermalTanks {
                                       int InNodeNum,
                                       bool FirstHVACIteration,
                                       WaterHeaterSide WaterThermalTankSide,
-                                      int PlantLoopSide,
+                                      DataPlant::LoopSideLocation PlantLoopSide,
                                       bool PlumbedInSeries, // !unused1208
                                       DataBranchAirLoopPlant::ControlType BranchControlType,
                                       Real64 OutletTemp,
                                       Real64 DeadBandTemp,
-                                      Real64 SetPointTemp);
+                                      Real64 SetPointTemp_loc);
 
         static Real64 CalcTimeNeeded(Real64 Ti, // Initial tank temperature (C)
                                      Real64 Tf, // Final tank temperature (C)

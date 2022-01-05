@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -111,7 +112,7 @@ namespace IceThermalStorage {
         int PltOutletNodeNum;     // Node number on the outlet side of the plant
         // loop topology variables
         int LoopNum;
-        int LoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum;
         int BranchNum;
         int CompNum;
         Real64 DesignMassFlowRate;
@@ -146,11 +147,12 @@ namespace IceThermalStorage {
 
         // Default Constructor
         SimpleIceStorageData()
-            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
-              DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0),
-              XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0),
-              ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0),
-              ITSmdot(0.0), ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
+            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0),
+              LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0),
+              ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0),
+              ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true),
+              MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0), ITSmdot(0.0), ITSCoolingRate_rep(0.0),
+              ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
 
@@ -194,7 +196,7 @@ namespace IceThermalStorage {
         int PlantInNodeNum;  // Plant inlet node number for ice storage unit
         int PlantOutNodeNum; // Plant outlet node number for ice storage unit
         int PlantLoopNum;
-        int PlantLoopSideNum;
+        DataPlant::LoopSideLocation PlantLoopSideNum;
         int PlantBranchNum;
         int PlantCompNum;
         Real64 DesignMassFlowRate;
@@ -243,13 +245,14 @@ namespace IceThermalStorage {
 
         // Default Constructor
         DetailedIceStorageData()
-            : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0),
-              PlantCompNum(0), DesignMassFlowRate(0.0), MapNum(0), DischargeCurveNum(0), ChargeCurveNum(0), CurveFitTimeStep(1.0),
-              DischargeParaElecLoad(0.0), ChargeParaElecLoad(0.0), TankLossCoeff(0.0), FreezingTemp(0.0), CompLoad(0.0), IceFracChange(0.0),
-              IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0), ChargingEnergy(0.0),
-              MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0), TankOutletTemp(0.0),
-              ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0), ChargeIterErrors(0),
-              ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyPlantScanFlag(true), MyEnvrnFlag2(true)
+            : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), PlantLoopNum(0),
+              PlantLoopSideNum(DataPlant::LoopSideLocation::Invalid), PlantBranchNum(0), PlantCompNum(0), DesignMassFlowRate(0.0), MapNum(0),
+              DischargeCurveNum(0), ChargeCurveNum(0), CurveFitTimeStep(1.0), DischargeParaElecLoad(0.0), ChargeParaElecLoad(0.0), TankLossCoeff(0.0),
+              FreezingTemp(0.0), CompLoad(0.0), IceFracChange(0.0), IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0),
+              DischargingEnergy(0.0), ChargingRate(0.0), ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0),
+              InletTemp(0.0), OutletTemp(0.0), TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0),
+              DischargeErrorCount(0), ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true),
+              MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
 

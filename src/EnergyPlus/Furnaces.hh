@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
@@ -209,22 +210,22 @@ namespace Furnaces {
         Real64 LatentLoadMet;                               // System latent load
         Real64 DehumidInducedHeatingDemandRate;             // Additional heating demand on supplemental heater
         // when heat pumps operate on dehumidification mode
-        int CoilOutletNode;                   // outlet node for hot water and steam heating coil
-        int LoopNum;                          // plant loop index for water and steam heating coil
-        int LoopSide;                         // plant loop side  index for water and steam heating coil
-        int BranchNum;                        // plant loop branch index for water and steam heating coil
-        int CompNum;                          // plant loop component index for water and steam heating coil
-        int SuppCoilOutletNode;               // outlet node for hot water and steam supplemental heating coil
-        int LoopNumSupp;                      // plant loop index for water and steam supplemental heating coil
-        int LoopSideSupp;                     // plant loop side  index for  water and steam supplemental heating coil
-        int BranchNumSupp;                    // plant loop branch index for water and steam supplemental heating coil
-        int CompNumSupp;                      // plant loop component index for water and steam supplemental heating coil
-        int HotWaterCoilMaxIterIndex;         // Index to recurring warning message
-        int HotWaterCoilMaxIterIndex2;        // Index to recurring warning message
-        bool EMSOverrideSensZoneLoadRequest;  // if true, then EMS is calling to override zone load
-        Real64 EMSSensibleZoneLoadValue;      // Value EMS is directing to use
-        bool EMSOverrideMoistZoneLoadRequest; // if true, then EMS is calling to override zone load
-        Real64 EMSMoistureZoneLoadValue;      // Value EMS is directing to use
+        int CoilOutletNode;                       // outlet node for hot water and steam heating coil
+        int LoopNum;                              // plant loop index for water and steam heating coil
+        DataPlant::LoopSideLocation LoopSide;     // plant loop side  index for water and steam heating coil
+        int BranchNum;                            // plant loop branch index for water and steam heating coil
+        int CompNum;                              // plant loop component index for water and steam heating coil
+        int SuppCoilOutletNode;                   // outlet node for hot water and steam supplemental heating coil
+        int LoopNumSupp;                          // plant loop index for water and steam supplemental heating coil
+        DataPlant::LoopSideLocation LoopSideSupp; // plant loop side  index for  water and steam supplemental heating coil
+        int BranchNumSupp;                        // plant loop branch index for water and steam supplemental heating coil
+        int CompNumSupp;                          // plant loop component index for water and steam supplemental heating coil
+        int HotWaterCoilMaxIterIndex;             // Index to recurring warning message
+        int HotWaterCoilMaxIterIndex2;            // Index to recurring warning message
+        bool EMSOverrideSensZoneLoadRequest;      // if true, then EMS is calling to override zone load
+        Real64 EMSSensibleZoneLoadValue;          // Value EMS is directing to use
+        bool EMSOverrideMoistZoneLoadRequest;     // if true, then EMS is calling to override zone load
+        Real64 EMSMoistureZoneLoadValue;          // Value EMS is directing to use
         // starting added varibles for variable speed water source heat pump, Bo Shen, ORNL, March 2012
         Furnaces::ModeOfOperation HeatCoolMode; // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         int NumOfSpeedCooling;                  // The number of speeds for cooling
@@ -275,16 +276,16 @@ namespace Furnaces {
               WSHPHeatRegulaFalsiFailedIndex(0), DXHeatingMaxIterIndex(0), DXHeatingRegulaFalsiFailedIndex(0), HeatingMaxIterIndex(0),
               HeatingMaxIterIndex2(0), HeatingRegulaFalsiFailedIndex(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
               NoHeatCoolSpeedRatio(1.0), ZoneInletNode(0), SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0),
-              DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), SuppCoilOutletNode(0),
-              LoopNumSupp(0), LoopSideSupp(0), BranchNumSupp(0), CompNumSupp(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
-              EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0), EMSOverrideMoistZoneLoadRequest(false),
-              EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Invalid), NumOfSpeedCooling(0), NumOfSpeedHeating(0),
-              IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
-              HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSHeatingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), MSCoolingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0), ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0),
-              iterationMode(0), FirstPass(true)
+              DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0),
+              CompNum(0), SuppCoilOutletNode(0), LoopNumSupp(0), LoopSideSupp(DataPlant::LoopSideLocation::Invalid), BranchNumSupp(0), CompNumSupp(0),
+              HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0),
+              EMSOverrideMoistZoneLoadRequest(false), EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Invalid),
+              NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0),
+              CheckFanFlow(true), HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSHeatingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSCoolingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), bIsIHP(false), CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0),
+              ErrIndexVar(0), WaterCyclingMode(0), iterationCounter(0), iterationMode(0), FirstPass(true)
         {
         }
     };

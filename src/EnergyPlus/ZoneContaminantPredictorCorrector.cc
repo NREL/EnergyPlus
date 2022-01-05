@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -363,7 +363,6 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericConstant(Loop).Name,
                               DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
@@ -510,7 +509,6 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (ZonePtr > 0)
             SetupZoneInternalGain(state,
                                   ZonePtr,
-                                  "ZoneContaminantSourceAndSink:GenericContaminant",
                                   state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).Name,
                                   DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                                   nullptr,
@@ -629,7 +627,6 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).Name,
                               DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
@@ -755,7 +752,6 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDecay(Loop).Name,
                               DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
@@ -882,7 +878,6 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).Name,
                               DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
@@ -990,7 +985,6 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDVS(Loop).Name,
                               DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,
@@ -1100,7 +1094,6 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         SetupZoneInternalGain(state,
                               ZonePtr,
-                              "ZoneContaminantSourceAndSink:GenericContaminant",
                               state.dataContaminantBalance->ZoneContamGenericDRS(Loop).Name,
                               DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
                               nullptr,

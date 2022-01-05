@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -162,7 +162,7 @@ namespace ZonePlenum {
 
     void SimAirZonePlenum(EnergyPlusData &state,
                           std::string_view CompName,
-                          DataZoneEquipment::AirLoopHVAC const iCompType,
+                          DataZoneEquipment::AirLoopHVACZone const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
                           Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -10425,15 +10425,15 @@ namespace Furnaces {
         Real64 HotWaterMdot;    // actual hot water mass flow rate
         std::array<Real64, 4> Par;
         int SolFlag;
-        auto &HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
-        int CoilTypeNum(0);                                          // heating coil type number
-        int HeatingCoilIndex(0);                                     // heating coil index
-        int CoilControlNode(0);                                      // control node for hot water and steam heating coils
-        int CoilOutletNode(0);                                       // air outlet node of the heatiing coils
-        int LoopNum(0);                                              // plant loop number
-        int LoopSideNum(0);                                          // plant loop side number
-        int BranchNum(0);                                            // plant branch number
-        int CompNum(0);                                              // Numeric Equivalent for Supplemental Heat Coil Type
+        auto &HeatingCoilName = state.dataFurnaces->HeatingCoilName;                   // name of heating coil
+        int CoilTypeNum(0);                                                            // heating coil type number
+        int HeatingCoilIndex(0);                                                       // heating coil index
+        int CoilControlNode(0);                                                        // control node for hot water and steam heating coils
+        int CoilOutletNode(0);                                                         // air outlet node of the heatiing coils
+        int LoopNum(0);                                                                // plant loop number
+        DataPlant::LoopSideLocation LoopSideNum(DataPlant::LoopSideLocation::Invalid); // plant loop side number
+        int BranchNum(0);                                                              // plant branch number
+        int CompNum(0);                                                                // Numeric Equivalent for Supplemental Heat Coil Type
 
         QActual = 0.0;
 

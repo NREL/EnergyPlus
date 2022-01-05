@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1419,7 +1419,6 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
-                                      "Coil:Cooling:DX:SingleSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                       DataHeatBalance::IntGainType::SecCoolingDXCoilSingleSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
@@ -2456,7 +2455,6 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
-                                      "Coil:Heating:DX:SingleSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                       DataHeatBalance::IntGainType::SecHeatingDXCoilSingleSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
@@ -3110,7 +3108,6 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
-                                      "Coil:Cooling:DX:TwoSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                       DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
@@ -4624,7 +4621,6 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
-                                      "Coil:Cooling:DX:MultiSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                       DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
@@ -5122,7 +5118,6 @@ void GetDXCoils(EnergyPlusData &state)
             if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
-                                      "Coil:Heating:DX:MultiSpeed",
                                       state.dataDXCoils->DXCoil(DXCoilNum).Name,
                                       DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed,
                                       &state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,

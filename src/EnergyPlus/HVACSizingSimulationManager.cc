@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -92,7 +92,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
                                                                          std::string const &PlantLoopName,
                                                                          int const PlantSizingIndex)
 {
-    using DataPlant::SupplySide;
     using namespace FluidProperties;
 
     Real64 density;
@@ -115,7 +114,7 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
 
             plantCoincAnalyObjs.emplace_back(PlantLoopName,
                                              i,
-                                             state.dataPlnt->PlantLoop(i).LoopSide(SupplySide).NodeNumIn,
+                                             state.dataPlnt->PlantLoop(i).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn,
                                              density,
                                              cp,
                                              state.dataSize->PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,

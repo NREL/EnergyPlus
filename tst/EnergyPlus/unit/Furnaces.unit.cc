@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum = 5;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterOutletNodeNum = 6;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopNum = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).BranchNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompNum = 1;
 
@@ -284,7 +284,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum = 7;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterOutletNodeNum = 8;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopNum = 2;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).BranchNum = 1;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompNum = 1;
 
@@ -293,12 +293,10 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
-        auto &loop(state->dataPlnt->PlantLoop(loopindex));
-        loop.LoopSide.allocate(2);
-        auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 2;
         loopsidebranch.Comp.allocate(2);
     }
@@ -310,10 +308,12 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
 
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATERCOOLINGCOIL";
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = "WATERHEATINGCOIL";
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "WATERCOOLINGCOIL";
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "WATERHEATINGCOIL";
 
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil.allocate(2);
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2653,8 +2653,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     int HPNum(1);
     int CyclingScheme(1);
     int LoopNum(1);
-    int DemandSide(1);
-    int SupplySide(2);
     int BranchNum(1);
     int CompNum(1);
     Real64 PLR(0.5);
@@ -2674,9 +2672,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
     state->dataPlnt->PlantLoop.allocate(LoopNum);
     state->dataPlnt->PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
-    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
-    auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide));
+    auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Supply));
     SupplySideloop.TotalBranches = 1;
     SupplySideloop.Branch.allocate(BranchNum);
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));
@@ -3204,7 +3200,6 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
 
     int TankNum(1);
-    int DemandSide(1);
     Real64 rho;
     int WaterIndex(1);
     bool NeedsHeatOrCool;
@@ -3215,7 +3210,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     Tank.SetPointTemp = 55.0;
 
     // Source side is in the demand side of the plant loop
-    Tank.SrcSide.loopSideNum = DemandSide;
+    Tank.SrcSide.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
     Tank.SavedSourceOutletTemp = 60.0;
     rho = GetDensityGlycol(*state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
 
@@ -5315,7 +5310,7 @@ TEST_F(EnergyPlusFixture, PlantMassFlowRatesFuncTest)
 
     state->dataLoopNodes->Node(1).MassFlowRate = 1.0e-33;
     int inNodeNum = 1;
-    int plantLoopSide = DataPlant::DemandSupply_No;
+    DataPlant::LoopSideLocation plantLoopSide = DataPlant::LoopSideLocation::Invalid;
     Real64 outletTemp = 23.0;
     Real64 deadbandTemp = 21.0;
     Real64 setPtTemp = 25.0;
