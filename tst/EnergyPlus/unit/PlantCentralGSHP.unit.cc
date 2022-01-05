@@ -201,7 +201,6 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     EXPECT_DOUBLE_EQ(RefCOPClgHtgExpected, state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).RefCOPClgHtg);
 }
 
-
 TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
 {
     std::string const idf_objects = delimited_string(
