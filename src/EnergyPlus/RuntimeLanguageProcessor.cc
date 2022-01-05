@@ -808,7 +808,7 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                     EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
             WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
             break; // RETURN always terminates an instruction stack
-        } break;
+        }
         case DataRuntimeLanguage::ErlKeywordParam::Set: {
             ReturnValue =
                 EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
