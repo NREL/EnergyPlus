@@ -1207,7 +1207,6 @@ namespace FuelCellElectricGenerator {
         if (this->FCPM.ZoneID > 0) {
             SetupZoneInternalGain(state,
                                   this->FCPM.ZoneID,
-                                  "Generator:FuelCell",
                                   this->Name,
                                   DataHeatBalance::IntGainType::GeneratorFuelCell,
                                   &this->Report.SkinLossConvect,
