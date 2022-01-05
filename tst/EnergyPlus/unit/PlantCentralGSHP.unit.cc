@@ -200,3 +200,34 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     Real64 RefCOPClgHtgExpected = RefCapClgHtgExpected / RefPowerClgHtgExpected;
     EXPECT_DOUBLE_EQ(RefCOPClgHtgExpected, state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).RefCOPClgHtg);
 }
+
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
+{
+    std::string const idf_objects =
+        delimited_string({"CentralHeatPumpSystem,",
+                          "ChW_Loop HeatPump1, !-Name",
+                          "SmartMixing, !-Control Method",
+                          "ChW_Loop HeatPump1 ChW Inlet, !-Cooling Loop Inlet Node Name",
+                          "ChW_Loop HeatPump1 ChW Outlet, !-Cooling Loop Outlet Node Name",
+                          "ChW_Loop HeatPump1 Cnd Inlet, !-Source Loop Inlet Node Name",
+                          "ChW_Loop HeatPump1 Cnd Outlet, !-Source Loop Outlet Node Name",
+                          "ChW_Loop HeatPump1 HHW Inlet, !-Heating Loop Inlet Node Name",
+                          "ChW_Loop HeatPump1 HHW Outlet, !-Heating Loop Outlet Node Name",
+                          "460,  !-Ancillary Power{W}",
+                          ",  !-Ancillary Operation Schedule Name",
+                          "ChillerHeaterPerformance:Electric:EIR, !-Chiller Heater Modules Performance Component Object Type 1",
+                          "ChW_Loop HeatPump1 Module, !-Chiller Heater Modules Performance Component Name 1",
+                          "Always1, !-Chiller Heater Modules Control Schedule Name 1",
+                          "2; !-Number of Chiller Heater Modules 1"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    state->dataPlantCentralGSHP->getWrapperInputFlag = true;
+
+    auto compPtr = PlantCentralGSHP::WrapperSpecs::factory(*state, "ChW_Loop HeatPump1");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).CHSchedPtr, -1);
+}
