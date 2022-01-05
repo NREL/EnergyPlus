@@ -511,17 +511,15 @@ PluginManager::PluginManager(EnergyPlusData &state)
                 if (epinPathObject.empty()) {
                     EnergyPlus::ShowWarningMessage(
                         state,
-                        "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable was empty, skipping."
-                    );
+                        "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable was empty, skipping.");
                 } else {
                     if (FileSystem::pathExists(epinPathObject)) {
                         fs::path sanitizedEnvInputDir = PluginManager::sanitizedPath(epinPathObject);
                         PluginManager::addToPythonPath(state, sanitizedEnvInputDir, true);
                     } else {
-                        EnergyPlus::ShowWarningMessage(
-                            state,
-                            "PluginManager: Search path inputs requested adding epin variable to Python path, but epin variable value is not a valid existent path, skipping."
-                        );
+                        EnergyPlus::ShowWarningMessage(state,
+                                                       "PluginManager: Search path inputs requested adding epin variable to Python path, but epin "
+                                                       "variable value is not a valid existent path, skipping.");
                     }
                 }
             }
