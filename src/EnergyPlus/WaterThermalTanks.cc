@@ -5033,39 +5033,22 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
     if (this->AmbientTempZone > 0) {
         switch (this->WaterThermalTankType) {
         case DataPlant::PlantEquipmentType::WtrHeaterMixed: {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "WaterHeater:Mixed",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::WaterHeaterMixed,
-                                  &this->AmbientZoneGain);
+            SetupZoneInternalGain(state, this->AmbientTempZone, this->Name, DataHeatBalance::IntGainType::WaterHeaterMixed, &this->AmbientZoneGain);
             break;
         }
         case DataPlant::PlantEquipmentType::WtrHeaterStratified: {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "WaterHeater:Stratified",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::WaterHeaterStratified,
-                                  &this->AmbientZoneGain);
+            SetupZoneInternalGain(
+                state, this->AmbientTempZone, this->Name, DataHeatBalance::IntGainType::WaterHeaterStratified, &this->AmbientZoneGain);
             break;
         }
         case DataPlant::PlantEquipmentType::ChilledWaterTankMixed: {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "ThermalStorage:ChilledWater:Mixed",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
-                                  &this->AmbientZoneGain);
+            SetupZoneInternalGain(
+                state, this->AmbientTempZone, this->Name, DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed, &this->AmbientZoneGain);
             break;
         }
         case DataPlant::PlantEquipmentType::ChilledWaterTankStratified: {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "ThermalStorage:ChilledWater:Stratified",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
-                                  &this->AmbientZoneGain);
+            SetupZoneInternalGain(
+                state, this->AmbientTempZone, this->Name, DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified, &this->AmbientZoneGain);
             break;
         }
         default:

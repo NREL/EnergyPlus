@@ -853,7 +853,6 @@ namespace WaterUse {
 
             SetupZoneInternalGain(state,
                                   this->Zone,
-                                  "WaterUse:Equipment",
                                   this->Name,
                                   DataHeatBalance::IntGainType::WaterUseEquipment,
                                   &this->SensibleRateNoMultiplier,

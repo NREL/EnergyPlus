@@ -1355,7 +1355,6 @@ void GetPumpInput(EnergyPlusData &state)
                 if (SELECT_CASE_var == PumpType::VarSpeed) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "Pump:VariableSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::Pump_VarSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -1364,7 +1363,6 @@ void GetPumpInput(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == PumpType::ConSpeed) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "Pump:ConstantSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::Pump_ConSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -1373,7 +1371,6 @@ void GetPumpInput(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == PumpType::Cond) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "Pump:VariableSpeed:Condensate",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::Pump_Cond,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -1382,7 +1379,6 @@ void GetPumpInput(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == PumpType::Bank_VarSpeed) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "HeaderedPumps:VariableSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::PumpBank_VarSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -1391,7 +1387,6 @@ void GetPumpInput(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == PumpType::Bank_ConSpeed) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "HeaderedPumps:ConstantSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::PumpBank_ConSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
