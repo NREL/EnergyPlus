@@ -669,7 +669,6 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
     if (this->ZoneID > 0) {
         SetupZoneInternalGain(state,
                               this->ZoneID,
-                              "Generator:MicroCHP",
                               this->Name,
                               DataHeatBalance::IntGainType::GeneratorMicroCHP,
                               &this->A42Model.SkinLossConvect,

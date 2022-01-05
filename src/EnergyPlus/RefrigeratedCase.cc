@@ -6833,7 +6833,6 @@ void SetupReportInput(EnergyPlusData &state)
                 if (RefrigCase(caseNum).ActualZoneNum > 0) {
                     SetupZoneInternalGain(state,
                                           RefrigCase(caseNum).ActualZoneNum,
-                                          "Refrigeration:Case",
                                           RefrigCase(caseNum).Name,
                                           DataHeatBalance::IntGainType::RefrigerationCase,
                                           &RefrigCase(caseNum).SensZoneCreditRate,
@@ -7045,7 +7044,6 @@ void SetupReportInput(EnergyPlusData &state)
                     if (WalkIn(walkInNum).ZoneNum(zoneId) > 0)
                         SetupZoneInternalGain(state,
                                               WalkIn(walkInNum).ZoneNum(zoneId),
-                                              "Refrigeration:WalkIn",
                                               Walkin_and_zone_name,
                                               DataHeatBalance::IntGainType::RefrigerationWalkIn,
                                               &WalkIn(walkInNum).SensZoneCreditRate(zoneId),
@@ -7612,7 +7610,6 @@ void SetupReportInput(EnergyPlusData &state)
                 if (Secondary(secondNum).ReceiverZoneNum > 0) {
                     SetupZoneInternalGain(state,
                                           Secondary(secondNum).ReceiverZoneNum,
-                                          "Refrigeration:SecondarySystem:Receiver",
                                           Secondary(secondNum).Name,
                                           DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
                                           &Secondary(secondNum).ReceiverZoneHeatGain);
@@ -7620,7 +7617,6 @@ void SetupReportInput(EnergyPlusData &state)
                 if (Secondary(secondNum).DistPipeZoneNum > 0) {
                     SetupZoneInternalGain(state,
                                           Secondary(secondNum).DistPipeZoneNum,
-                                          "Refrigeration:SecondarySystem:Pipe",
                                           Secondary(secondNum).Name,
                                           DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
                                           &Secondary(secondNum).DistPipeZoneHeatGain);
@@ -7792,7 +7788,6 @@ void SetupReportInput(EnergyPlusData &state)
 
                     SetupZoneInternalGain(state,
                                           RefrigCase(RefrigRack(rackNum).CaseNum(1)).ActualZoneNum,
-                                          "Refrigeration:CompressorRack",
                                           RefrigRack(rackNum).Name,
                                           DataHeatBalance::IntGainType::RefrigerationCompressorRack,
                                           &RefrigRack(rackNum).SensZoneCreditHeatRate,
@@ -7959,7 +7954,6 @@ void SetupReportInput(EnergyPlusData &state)
                                         RefrigRack(rackNum).Name);
                     SetupZoneInternalGain(state,
                                           RefrigCase(RefrigRack(rackNum).CaseNum(1)).ActualZoneNum,
-                                          "Refrigeration:CompressorRack",
                                           RefrigRack(rackNum).Name,
                                           DataHeatBalance::IntGainType::RefrigerationCompressorRack,
                                           &RefrigRack(rackNum).SensZoneCreditHeatRate,
@@ -8511,7 +8505,6 @@ void SetupReportInput(EnergyPlusData &state)
                 if (Condenser(System(refrigSysNum).CondenserNum(1)).InletAirZoneNum > 0)
                     SetupZoneInternalGain(state,
                                           Condenser(System(refrigSysNum).CondenserNum(1)).InletAirZoneNum,
-                                          "Refrigeration:System:Condenser:AirCooled",
                                           System(refrigSysNum).Name,
                                           DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
                                           &System(refrigSysNum).NetHeatRejectLoad);
@@ -8519,7 +8512,6 @@ void SetupReportInput(EnergyPlusData &state)
                 if (System(refrigSysNum).SuctionPipeActualZoneNum > 0)
                     SetupZoneInternalGain(state,
                                           System(refrigSysNum).SuctionPipeActualZoneNum,
-                                          "Refrigeration:System:SuctionPipe",
                                           System(refrigSysNum).Name,
                                           DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
                                           &System(refrigSysNum).PipeHeatLoad);
@@ -9211,7 +9203,6 @@ void SetupReportInput(EnergyPlusData &state)
                 if (GasCooler(TransSystem(refrigSysNum).GasCoolerNum(1)).InletAirZoneNum > 0)
                     SetupZoneInternalGain(state,
                                           GasCooler(TransSystem(refrigSysNum).GasCoolerNum(1)).InletAirZoneNum,
-                                          "Refrigeration:TranscriticalSystem:GasCooler:AirCooled",
                                           TransSystem(refrigSysNum).Name,
                                           DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
                                           &TransSystem(refrigSysNum).NetHeatRejectLoad);
@@ -9219,7 +9210,6 @@ void SetupReportInput(EnergyPlusData &state)
             if (TransSystem(refrigSysNum).SuctionPipeActualZoneNumMT > 0) {
                 SetupZoneInternalGain(state,
                                       TransSystem(refrigSysNum).SuctionPipeActualZoneNumMT,
-                                      "Refrigeration:TranscriticalSystem:SuctionPipeMT",
                                       TransSystem(refrigSysNum).Name,
                                       DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
                                       &TransSystem(refrigSysNum).PipeHeatLoadMT);
@@ -9227,7 +9217,6 @@ void SetupReportInput(EnergyPlusData &state)
             if (TransSystem(refrigSysNum).SuctionPipeActualZoneNumLT > 0) {
                 SetupZoneInternalGain(state,
                                       TransSystem(refrigSysNum).SuctionPipeActualZoneNumLT,
-                                      "Refrigeration:TranscriticalSystem:SuctionPipeLT",
                                       TransSystem(refrigSysNum).Name,
                                       DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT,
                                       &TransSystem(refrigSysNum).PipeHeatLoadLT);

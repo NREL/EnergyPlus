@@ -3155,7 +3155,7 @@ void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const
         if (all(state.dataPurchasedAirMgr->PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
             SimAirZonePlenum(state,
                              PurchAir(PurchAirNum).ReturnPlenumName,
-                             DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum,
+                             DataZoneEquipment::AirLoopHVACZone::ReturnPlenum,
                              PurchAir(PurchAirNum).ReturnPlenumIndex,
                              FirstHVACIteration,
                              FirstCall,
