@@ -705,6 +705,9 @@ void GetWrapperInput(EnergyPlusData &state)
                 } else {
                     state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr =
                         ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(loop + 2));
+                    if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr == 0) {
+                        state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                    }
                 }
                 state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum =
                     state.dataIPShortCut->rNumericArgs(1 + Comp);
