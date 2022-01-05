@@ -129,7 +129,9 @@ Turning this field to Yes will add the directory where the input file is located
 
 \paragraph{Field: Add epin Environment Variable to Search Path}
 
-Placeholder
+Some interfaces to EnergyPlus set an environment variable named "epin" to a path on the system where auxiliary files will be placed for a simulation run.
+If this input field is set to Yes, EnergyPlus will check to see if the "epin" variable has been set, and if the path exists, the path will be added to the list of search paths for Python Plugins.
+This field is defaulted to Yes, so that input files should work with tools like EPLaunch directly.
 
 \paragraph{Field: Search Path N}
 
