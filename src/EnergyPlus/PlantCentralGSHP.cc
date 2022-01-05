@@ -707,6 +707,13 @@ void GetWrapperInput(EnergyPlusData &state)
                         ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(loop + 2));
                     if (state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr == 0) {
                         state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).CHSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+                        ShowWarningError(state, "Chiller Heater Modules Control Schedule Name not found");
+                        ShowContinueError(state,
+                                          " for " + state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperPerformanceObjectType +
+                                              "= " + state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperComponentName);
+                        ShowContinueError(
+                            state, " in the object " + state.dataIPShortCut->cCurrentModuleObject + "= " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(state, "The Control Schedule is treated as AlwaysOn instead.");
                     }
                 }
                 state.dataPlantCentralGSHP->Wrapper(WrapperNum).WrapperComp(Comp).WrapperIdenticalObjectNum =
