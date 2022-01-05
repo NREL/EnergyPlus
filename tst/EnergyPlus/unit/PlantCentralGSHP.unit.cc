@@ -250,7 +250,45 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
          "    ChillerHeaterHtgEIRFT,   !- Heating Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name",
          "    ChillerHeaterHtgEIRFPLR, !- Heating Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
          "    1,                       !- Heating Mode Cooling Capacity Optimum Part Load Ratio",
-         "    1;                       !- Sizing Factor"});
+         "    1;                       !- Sizing Factor",
+        
+        "Curve:Biquadratic,",
+         "    ChillerHeaterClgCapFT,   !- Name",
+         "    0.950829,                !- Coefficient1 Constant",
+         "    3.419327E-02,            !- Coefficient2 x",
+         "    2.66642E-04,             !- Coefficient3 x**2",
+         "    -1.733397E-03,           !- Coefficient4 y",
+         "    -1.762417E-04,           !- Coefficient5 y**2",
+         "    -3.69198E-05,            !- Coefficient6 x*y",
+         "    4.44,                    !- Minimum Value of x",
+         "    12.78,                   !- Maximum Value of x",
+         "    12.78,                   !- Minimum Value of y",
+         "    29.44,                   !- Maximum Value of y",
+         "    ,                        !- Minimum Curve Output",
+         "    ,                        !- Maximum Curve Output",
+         "    Temperature,             !- Input Unit Type for X",
+         "    Temperature,             !- Input Unit Type for Y",
+         "    Dimensionless;           !- Output Unit Type",
+
+        " Curve:Cubic,",
+         "     ChillerHeaterClgEIRFPLR, !- Name",
+         "     0.0,                     !- Coefficient1 Constant",
+         "     1.22895,                 !- Coefficient2 x",
+         "     -0.751383,               !- Coefficient3 x**2",
+         "     0.517396,                !- Coefficient4 x**3",
+         "     0.2,                     !- Minimum Value of x",
+         "     1;                       !- Maximum Value of x",
+
+         "Curve:Cubic,",
+         "    ChillerHeaterHtgEIRFPLR, !- Name",
+         "    0.0,                     !- Coefficient1 Constant",
+         "    1.12853,                 !- Coefficient2 x",
+         "    -0.0264962,              !- Coefficient3 x**2",
+         "    -0.103811,               !- Coefficient4 x**3",
+         "    0.3,                     !- Minimum Value of x",
+         "    1;                       !- Maximum Value of x"
+
+        });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
