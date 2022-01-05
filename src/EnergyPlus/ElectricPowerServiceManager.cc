@@ -2693,20 +2693,13 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
         if (zoneNum_ > 0) {
             switch (modelType_) {
             case InverterModelType::SimpleConstantEff: {
-                SetupZoneInternalGain(state,
-                                      zoneNum_,
-                                      "ElectricLoadCenter:Inverter:Simple",
-                                      name_,
-                                      DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
-                                      &qdotConvZone_,
-                                      nullptr,
-                                      &qdotRadZone_);
+                SetupZoneInternalGain(
+                    state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple, &qdotConvZone_, nullptr, &qdotRadZone_);
                 break;
             }
             case InverterModelType::CurveFuncOfPower: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Inverter:FunctionOfPower",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
                                       &qdotConvZone_,
@@ -2717,7 +2710,6 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
             case InverterModelType::CECLookUpTableModel: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Inverter:LookUpTable",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
                                       &qdotConvZone_,
@@ -3156,14 +3148,8 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             "ACtoDCConverter Ancillary",
                             "Plant"); // called cogeneration for end use table
         if (zoneNum_ > 0) {
-            SetupZoneInternalGain(state,
-                                  zoneNum_,
-                                  "ElectricLoadCenter:Storage:Converter",
-                                  name_,
-                                  DataHeatBalance::IntGainType::ElectricLoadCenterConverter,
-                                  &qdotConvZone_,
-                                  nullptr,
-                                  &qdotRadZone_);
+            SetupZoneInternalGain(
+                state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterConverter, &qdotConvZone_, nullptr, &qdotRadZone_);
         }
     } else {
         ShowSevereError(state, std::string{routineName} + " did not find power converter name = " + objectName);
@@ -3742,31 +3728,18 @@ ElectricStorage::ElectricStorage( // main constructor
         if (zoneNum_ > 0) {
             switch (storageModelMode_) {
             case StorageModelType::SimpleBucketStorage: {
-                SetupZoneInternalGain(state,
-                                      zoneNum_,
-                                      "ElectricLoadCenter:Storage:Simple",
-                                      name_,
-                                      DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
-                                      &qdotConvZone_,
-                                      nullptr,
-                                      &qdotRadZone_);
+                SetupZoneInternalGain(
+                    state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple, &qdotConvZone_, nullptr, &qdotRadZone_);
                 break;
             }
             case StorageModelType::KIBaMBattery: {
-                SetupZoneInternalGain(state,
-                                      zoneNum_,
-                                      "ElectricLoadCenter:Storage:Battery",
-                                      name_,
-                                      DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
-                                      &qdotConvZone_,
-                                      nullptr,
-                                      &qdotRadZone_);
+                SetupZoneInternalGain(
+                    state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery, &qdotConvZone_, nullptr, &qdotRadZone_);
                 break;
             }
             case StorageModelType::LiIonNmcBattery: {
                 SetupZoneInternalGain(state,
                                       zoneNum_,
-                                      "ElectricLoadCenter:Storage:LiIonNMCBattery",
                                       name_,
                                       DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
                                       &qdotConvZone_,
@@ -4930,14 +4903,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         }
 
         if (zoneNum_ > 0) {
-            SetupZoneInternalGain(state,
-                                  zoneNum_,
-                                  "ElectricLoadCenter:Transformer",
-                                  name_,
-                                  DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
-                                  &qdotConvZone_,
-                                  nullptr,
-                                  &qdotRadZone_);
+            SetupZoneInternalGain(
+                state, zoneNum_, name_, DataHeatBalance::IntGainType::ElectricLoadCenterTransformer, &qdotConvZone_, nullptr, &qdotRadZone_);
         }
 
     } else {

@@ -854,41 +854,54 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     ort->MonthlyColumns(mColumn).units = UnitsVar;
                     ort->MonthlyColumns(mColumn).aggType = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).aggregate;
                     // set accumulator values to default as appropriate for aggregation type
-                    {
-                        auto const SELECT_CASE_var(ort->MonthlyColumns(mColumn).aggType);
-                        if (SELECT_CASE_var == AggType::SumOrAvg) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                            ort->MonthlyColumns(mColumn).duration = 0.0;
-                        } else if (SELECT_CASE_var == AggType::Maximum) {
-                            ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
-                            ort->MonthlyColumns(mColumn).timeStamp = 0;
-                        } else if (SELECT_CASE_var == AggType::Minimum) {
-                            ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
-                            ort->MonthlyColumns(mColumn).timeStamp = 0;
-                        } else if (SELECT_CASE_var == AggType::ValueWhenMaxMin) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == AggType::HoursZero) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == AggType::HoursNonZero) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == AggType::HoursPositive) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == AggType::HoursNonPositive) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == AggType::HoursNegative) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == AggType::HoursNonNegative) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                        } else if (SELECT_CASE_var == AggType::SumOrAverageHoursShown) {
-                            ort->MonthlyColumns(mColumn).reslt = 0.0;
-                            ort->MonthlyColumns(mColumn).duration = 0.0;
-                        } else if (SELECT_CASE_var == AggType::MaximumDuringHoursShown) {
-                            ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
-                            ort->MonthlyColumns(mColumn).timeStamp = 0;
-                        } else if (SELECT_CASE_var == AggType::MinimumDuringHoursShown) {
-                            ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
-                            ort->MonthlyColumns(mColumn).timeStamp = 0;
-                        }
+                    switch (ort->MonthlyColumns(mColumn).aggType) {
+                    case AggType::SumOrAvg: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                        ort->MonthlyColumns(mColumn).duration = 0.0;
+                    } break;
+                    case AggType::Maximum: {
+                        ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
+                        ort->MonthlyColumns(mColumn).timeStamp = 0;
+                    } break;
+                    case AggType::Minimum: {
+                        ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
+                        ort->MonthlyColumns(mColumn).timeStamp = 0;
+                    } break;
+                    case AggType::ValueWhenMaxMin: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case AggType::HoursZero: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case AggType::HoursNonZero: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case AggType::HoursPositive: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case AggType::HoursNonPositive: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case AggType::HoursNegative: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case AggType::HoursNonNegative: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                    } break;
+                    case AggType::SumOrAverageHoursShown: {
+                        ort->MonthlyColumns(mColumn).reslt = 0.0;
+                        ort->MonthlyColumns(mColumn).duration = 0.0;
+                    } break;
+                    case AggType::MaximumDuringHoursShown: {
+                        ort->MonthlyColumns(mColumn).reslt = -HUGE_(state.dataOutRptTab->BigNum);
+                        ort->MonthlyColumns(mColumn).timeStamp = 0;
+                    } break;
+                    case AggType::MinimumDuringHoursShown: {
+                        ort->MonthlyColumns(mColumn).reslt = HUGE_(state.dataOutRptTab->BigNum);
+                        ort->MonthlyColumns(mColumn).timeStamp = 0;
+                    } break;
+                    default:
+                        break;
                     }
                 } else { // if no key corresponds to this instance of the report
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
@@ -3641,104 +3654,113 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                     timestepTimeStamp, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->HourOfDay, minuteCalculated);
                 // perform the selected aggregation type
                 // use next lines since it is faster was: SELECT CASE (MonthlyColumns(curCol)%aggType)
-                {
-                    auto const SELECT_CASE_var(state.dataOutRptTab->MonthlyColumnsAggType(curCol));
-                    if (SELECT_CASE_var == AggType::SumOrAvg) {
-                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            newResultValue = oldResultValue + curValue;
-                        } else {
-                            newResultValue = oldResultValue + curValue * elapsedTime; // for averaging - weight by elapsed time
-                        }
-                        newDuration = oldDuration + elapsedTime;
-                        activeNewValue = true;
-                    } else if (SELECT_CASE_var == AggType::Maximum) {
-                        // per MJW when a summed variable is used divide it by the length of the time step
-                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                                curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                            } else {
-                                curValue /= state.dataGlobal->TimeStepZoneSec;
-                            }
-                        }
-                        if (curValue > oldResultValue) {
-                            newResultValue = curValue;
-                            newTimeStamp = timestepTimeStamp;
-                            activeMinMax = true;
-                            activeNewValue = true;
-                        } else {
-                            activeMinMax = false; // reset this
-                        }
-                    } else if (SELECT_CASE_var == AggType::Minimum) {
-                        // per MJW when a summed variable is used divide it by the length of the time step
-                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                            if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                                curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                            } else {
-                                curValue /= state.dataGlobal->TimeStepZoneSec;
-                            }
-                        }
-                        if (curValue < oldResultValue) {
-                            newResultValue = curValue;
-                            newTimeStamp = timestepTimeStamp;
-                            activeMinMax = true;
-                            activeNewValue = true;
-                        } else {
-                            activeMinMax = false; // reset this
-                        }
-                    } else if (SELECT_CASE_var == AggType::HoursZero) {
-                        if (curValue == 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == AggType::HoursNonZero) {
-                        if (curValue != 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == AggType::HoursPositive) {
-                        if (curValue > 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == AggType::HoursNonPositive) {
-                        if (curValue <= 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == AggType::HoursNegative) {
-                        if (curValue < 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                    } else if (SELECT_CASE_var == AggType::HoursNonNegative) {
-                        if (curValue >= 0) {
-                            newResultValue = oldResultValue + elapsedTime;
-                            activeHoursShown = true;
-                            activeNewValue = true;
-                        } else {
-                            activeHoursShown = false;
-                        }
-                        // The valueWhenMaxMin is picked up now during the activeMinMax if block below.
-                        // CASE (AggType::ValueWhenMaxMin)
-                        // CASE (AggType::SumOrAverageHoursShown)
-                        // CASE (AggType::MaximumDuringHoursShown)
-                        // CASE (AggType::MinimumDuringHoursShown)
+                switch (state.dataOutRptTab->MonthlyColumnsAggType(curCol)) {
+                case AggType::SumOrAvg: {
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        newResultValue = oldResultValue + curValue;
+                    } else {
+                        newResultValue = oldResultValue + curValue * elapsedTime; // for averaging - weight by elapsed time
                     }
+                    newDuration = oldDuration + elapsedTime;
+                    activeNewValue = true;
+                } break;
+                case AggType::Maximum: {
+                    // per MJW when a summed variable is used divide it by the length of the time step
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (t_timeStepType == OutputProcessor::TimeStepType::System) {
+                            curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                        } else {
+                            curValue /= state.dataGlobal->TimeStepZoneSec;
+                        }
+                    }
+                    if (curValue > oldResultValue) {
+                        newResultValue = curValue;
+                        newTimeStamp = timestepTimeStamp;
+                        activeMinMax = true;
+                        activeNewValue = true;
+                    } else {
+                        activeMinMax = false; // reset this
+                    }
+                } break;
+                case AggType::Minimum: {
+                    // per MJW when a summed variable is used divide it by the length of the time step
+                    if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (t_timeStepType == OutputProcessor::TimeStepType::System) {
+                            curValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                        } else {
+                            curValue /= state.dataGlobal->TimeStepZoneSec;
+                        }
+                    }
+                    if (curValue < oldResultValue) {
+                        newResultValue = curValue;
+                        newTimeStamp = timestepTimeStamp;
+                        activeMinMax = true;
+                        activeNewValue = true;
+                    } else {
+                        activeMinMax = false; // reset this
+                    }
+                } break;
+                case AggType::HoursZero: {
+                    if (curValue == 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case AggType::HoursNonZero: {
+                    if (curValue != 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case AggType::HoursPositive: {
+                    if (curValue > 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case AggType::HoursNonPositive: {
+                    if (curValue <= 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case AggType::HoursNegative: {
+                    if (curValue < 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                } break;
+                case AggType::HoursNonNegative: {
+                    if (curValue >= 0) {
+                        newResultValue = oldResultValue + elapsedTime;
+                        activeHoursShown = true;
+                        activeNewValue = true;
+                    } else {
+                        activeHoursShown = false;
+                    }
+                    // The valueWhenMaxMin is picked up now during the activeMinMax if block below.
+                    // CASE (iAggType::ValueWhenMaxMin)
+                    // CASE (iAggType::SumOrAverageHoursShown)
+                    // CASE (iAggType::MaximumDuringHoursShown)
+                    // CASE (iAggType::MinimumDuringHoursShown)
+                } break;
+                default:
+                    break;
                 }
                 // if the new value has been set then set the monthly values to the
                 // new columns. This skips the aggregation types that don't even get
@@ -3756,28 +3778,28 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                 if (activeMinMax) {
                     for (kOtherColumn = jColumn + 1; kOtherColumn <= ort->MonthlyTables(iTable).numColumns; ++kOtherColumn) {
                         scanColumn = kOtherColumn + ort->MonthlyTables(iTable).firstColumn - 1;
-                        {
-                            auto const SELECT_CASE_var(ort->MonthlyColumns(scanColumn).aggType);
-                            if ((SELECT_CASE_var == AggType::Maximum) || (SELECT_CASE_var == AggType::Minimum)) {
-                                // end scanning since these might reset
-                                break; // do
-                            } else if (SELECT_CASE_var == AggType::ValueWhenMaxMin) {
-                                // this case is when the value should be set
-                                scanTypeOfVar = ort->MonthlyColumns(scanColumn).typeOfVar;
-                                scanVarNum = ort->MonthlyColumns(scanColumn).varNum;
-                                scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
-                                // When a summed variable is used divide it by the length of the time step
-                                if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                                        scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                                    } else {
-                                        scanValue /= state.dataGlobal->TimeStepZoneSec;
-                                    }
+                        switch (ort->MonthlyColumns(scanColumn).aggType) {
+                        case AggType::Maximum:
+                        case AggType::Minimum:
+                            // end scanning since these might reset
+                            break; // do
+                        case AggType::ValueWhenMaxMin: {
+                            // this case is when the value should be set
+                            scanTypeOfVar = ort->MonthlyColumns(scanColumn).typeOfVar;
+                            scanVarNum = ort->MonthlyColumns(scanColumn).varNum;
+                            scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
+                            // When a summed variable is used divide it by the length of the time step
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                if (t_timeStepType == OutputProcessor::TimeStepType::System) {
+                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                } else {
+                                    scanValue /= state.dataGlobal->TimeStepZoneSec;
                                 }
-                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
-                            } else {
-                                // do nothing
                             }
+                            ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                        } break;
+                        default:
+                            break;
                         }
                     }
                 }
@@ -3790,53 +3812,53 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
                         scanVarNum = ort->MonthlyColumns(scanColumn).varNum;
                         scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                         oldScanValue = ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month);
-                        {
-                            auto const SELECT_CASE_var(ort->MonthlyColumns(scanColumn).aggType);
-                            if ((SELECT_CASE_var == AggType::HoursZero) || (SELECT_CASE_var == AggType::HoursNonZero)) {
-                                // end scanning since these might reset
-                                break; // do
-                            } else if ((SELECT_CASE_var == AggType::HoursPositive) || (SELECT_CASE_var == AggType::HoursNonPositive)) {
-                                // end scanning since these might reset
-                                break; // do
-                            } else if ((SELECT_CASE_var == AggType::HoursNegative) || (SELECT_CASE_var == AggType::HoursNonNegative)) {
-                                // end scanning since these might reset
-                                break; // do
-                            } else if (SELECT_CASE_var == AggType::SumOrAverageHoursShown) {
-                                // this case is when the value should be set
-                                if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
-                                } else {
-                                    // for averaging - weight by elapsed time
-                                    ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue * elapsedTime;
-                                }
-                                ort->MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
-                            } else if (SELECT_CASE_var == AggType::MaximumDuringHoursShown) {
-                                if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                                        scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                                    } else {
-                                        scanValue /= state.dataGlobal->TimeStepZoneSec;
-                                    }
-                                }
-                                if (scanValue > oldScanValue) {
-                                    ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
-                                    ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
-                                }
-                            } else if (SELECT_CASE_var == AggType::MinimumDuringHoursShown) {
-                                if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                    if (t_timeStepType == OutputProcessor::TimeStepType::System) {
-                                        scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
-                                    } else {
-                                        scanValue /= state.dataGlobal->TimeStepZoneSec;
-                                    }
-                                }
-                                if (scanValue < oldScanValue) {
-                                    ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
-                                    ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
-                                }
+                        switch (ort->MonthlyColumns(scanColumn).aggType) {
+                        case AggType::HoursZero:
+                        case AggType::HoursNonZero:
+                        case AggType::HoursPositive:
+                        case AggType::HoursNonPositive:
+                        case AggType::HoursNegative:
+                        case AggType::HoursNonNegative:
+                            // end scanning since these might reset
+                            break; // do
+                        case AggType::SumOrAverageHoursShown: {
+                            // this case is when the value should be set
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue;
                             } else {
-                                // do nothing
+                                // for averaging - weight by elapsed time
+                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = oldScanValue + scanValue * elapsedTime;
                             }
+                            ort->MonthlyColumns(scanColumn).duration(state.dataEnvrn->Month) += elapsedTime;
+                        } break;
+                        case AggType::MaximumDuringHoursShown: {
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                if (t_timeStepType == OutputProcessor::TimeStepType::System) {
+                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                } else {
+                                    scanValue /= state.dataGlobal->TimeStepZoneSec;
+                                }
+                            }
+                            if (scanValue > oldScanValue) {
+                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
+                            }
+                        } break;
+                        case AggType::MinimumDuringHoursShown: {
+                            if (ort->MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                if (t_timeStepType == OutputProcessor::TimeStepType::System) {
+                                    scanValue /= (TimeStepSys * DataGlobalConstants::SecInHour);
+                                } else {
+                                    scanValue /= state.dataGlobal->TimeStepZoneSec;
+                                }
+                            }
+                            if (scanValue < oldScanValue) {
+                                ort->MonthlyColumns(scanColumn).reslt(state.dataEnvrn->Month) = scanValue;
+                                ort->MonthlyColumns(scanColumn).timeStamp(state.dataEnvrn->Month) = timestepTimeStamp;
+                            }
+                        } break;
+                        default:
+                            break;
                         }
                         activeHoursShown = false; // fixed CR8317
                     }
@@ -5462,593 +5484,592 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             strip(lineIn);
             parseStatLine(lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen);
 
-            {
-                auto const SELECT_CASE_var(lineType);
-                if (SELECT_CASE_var == StatLineType::StatisticsLine) { // Statistics for USA_CA_San.Francisco_TMY2
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Reference", lineIn.substr(15));
-                } else if (SELECT_CASE_var == StatLineType::LocationLine) { // Location -- SAN_FRANCISCO CA USA
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Site:Location", lineIn.substr(11));
-                } else if (SELECT_CASE_var == StatLineType::LatLongLine) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
-                    // find the {}
-                    sposlt = index(lineIn, '{');
-                    eposlt = index(lineIn, '}');
-                    if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Latitude", lineIn.substr(sposlt, eposlt - sposlt + 1));
-                        // redefine so next scan can go with {}
-                        lineIn[sposlt] = '[';
-                        lineIn[eposlt] = ']';
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Latitude", "not found");
-                    }
-                    sposlg = index(lineIn, '{');
-                    eposlg = index(lineIn, '}');
-                    if (sposlg != std::string::npos && eposlg != std::string::npos) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Longitude", lineIn.substr(sposlg, eposlg - sposlg + 1));
-                        // redefine so next scan can go with {}
-                        lineIn[sposlg] = '[';
-                        lineIn[eposlg] = ']';
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Longitude", "not found");
-                    }
-                    spostz = index(lineIn, '{');
-                    epostz = index(lineIn, '}');
-                    if (spostz != std::string::npos && epostz != std::string::npos) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Time Zone", lineIn.substr(spostz, epostz - spostz + 1));
-                        // redefine so next scan can go with {}
-                        lineIn[spostz] = '[';
-                        lineIn[epostz] = ']';
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Time Zone", "not found");
-                    }
-                } else if (SELECT_CASE_var == StatLineType::ElevationLine) { // Elevation --     5m above sea level
-                    lnPtr = index(lineIn.substr(12), 'm');
-                    if (lnPtr != std::string::npos) {
-                        curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
-                        } else {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, curNameWithSIUnits, lineIn.substr(12, lnPtr));
-                        }
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Elevation", "not found");
-                    }
-                } else if (SELECT_CASE_var == StatLineType::StdPressureLine) { // Standard Pressure at Elevation -- 101265Pa
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Standard Pressure at Elevation", lineIn.substr(34));
-                } else if (SELECT_CASE_var == StatLineType::DataSourceLine) { // Data Source -- TMY2-23234
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Data Source", lineIn.substr(15));
-                } else if (SELECT_CASE_var == StatLineType::WMOStationLine) { // WMO Station 724940
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "WMO Station", lineIn.substr(12));
-                } else if (SELECT_CASE_var ==
-                           StatLineType::DesignConditionsLine) { //  - Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
-                    ashPtr = index(lineIn, "ASHRAE");
-                    if (ashPtr != std::string::npos) {
-                        isASHRAE = true;
-                        iscalc = true;
-                        if (ashPtr > 4u) { // Autodesk:BoundsViolation IF block added to protect against ashPtr<=5
-                            ashDesYear = lineIn.substr(ashPtr - 5, 5);
-                        } else {
-                            ashDesYear = "";
-                        }
+            switch (lineType) {
+            case StatLineType::StatisticsLine: { // Statistics for USA_CA_San.Francisco_TMY2
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Reference", lineIn.substr(15));
+            } break;
+            case StatLineType::LocationLine: { // Location -- SAN_FRANCISCO CA USA
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Site:Location", lineIn.substr(11));
+            } break;
+            case StatLineType::LatLongLine: { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
+                // find the {}
+                sposlt = index(lineIn, '{');
+                eposlt = index(lineIn, '}');
+                if (sposlt != std::string::npos && eposlt != std::string::npos) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Latitude", lineIn.substr(sposlt, eposlt - sposlt + 1));
+                    // redefine so next scan can go with {}
+                    lineIn[sposlt] = '[';
+                    lineIn[eposlt] = ']';
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Latitude", "not found");
+                }
+                sposlg = index(lineIn, '{');
+                eposlg = index(lineIn, '}');
+                if (sposlg != std::string::npos && eposlg != std::string::npos) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Longitude", lineIn.substr(sposlg, eposlg - sposlg + 1));
+                    // redefine so next scan can go with {}
+                    lineIn[sposlg] = '[';
+                    lineIn[eposlg] = ']';
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Longitude", "not found");
+                }
+                spostz = index(lineIn, '{');
+                epostz = index(lineIn, '}');
+                if (spostz != std::string::npos && epostz != std::string::npos) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Time Zone", lineIn.substr(spostz, epostz - spostz + 1));
+                    // redefine so next scan can go with {}
+                    lineIn[spostz] = '[';
+                    lineIn[epostz] = ']';
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Time Zone", "not found");
+                }
+            } break;
+            case StatLineType::ElevationLine: { // Elevation --     5m above sea level
+                lnPtr = index(lineIn.substr(12), 'm');
+                if (lnPtr != std::string::npos) {
+                    curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                         PreDefTableEntry(state,
                                          state.dataOutRptPredefined->pdchWthrVal,
-                                         "Weather File Design Conditions",
-                                         "Climate Design Data " + ashDesYear + "ASHRAE Handbook");
-                    } else if (has(lineIn, "not calculated") || lineIn == "") {
-                        iscalc = false;
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWthrVal,
-                                         "Weather File Design Conditions",
-                                         "not calculated, Number of days < 1 year");
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
                     } else {
-                        isASHRAE = false;
-                        iscalc = true;
-                        PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "Calculated from the weather file");
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, curNameWithSIUnits, lineIn.substr(12, lnPtr));
                     }
-                } else if (SELECT_CASE_var == StatLineType::HeatingConditionsLine) { //  winter/heating design conditions
-                    if (iscalc) {
-                        if (isASHRAE) {
-                            if (ashDesYear == "2001") {
-                                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                                    curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
-                                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     curNameAndUnits,
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) +
-                                                         degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Heating Design Temperature 99% (F)",
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 3))), 1) +
-                                                         degChar);
-                                } else {
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Heating Design Temperature 99.6% (C)",
-                                                     GetColumnUsingTabs(lineIn, 2) + degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Heating Design Temperature 99% (C)",
-                                                     GetColumnUsingTabs(lineIn, 3) + degChar);
-                                }
-                            } else { // 2005 and 2009 are the same
-                                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                                    curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
-                                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     curNameAndUnits,
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) +
-                                                         degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Heating Design Temperature 99% (F)",
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) +
-                                                         degChar);
-                                } else {
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Heating Design Temperature 99.6% (C)",
-                                                     GetColumnUsingTabs(lineIn, 4) + degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Heating Design Temperature 99% (C)",
-                                                     GetColumnUsingTabs(lineIn, 5) + degChar);
-                                }
-                            }
-                        } else { // from weather file
-                            if (is_blank(GetColumnUsingTabs(lineIn, 5))) {
-                                col1 = 3;
-                                col2 = 4;
-                            } else {
-                                col1 = 4;
-                                col2 = 5;
-                            }
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Elevation", "not found");
+                }
+            } break;
+            case StatLineType::StdPressureLine: { // Standard Pressure at Elevation -- 101265Pa
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Standard Pressure at Elevation", lineIn.substr(34));
+            } break;
+            case StatLineType::DataSourceLine: { // Data Source -- TMY2-23234
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Data Source", lineIn.substr(15));
+            } break;
+            case StatLineType::WMOStationLine: { // WMO Station 724940
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "WMO Station", lineIn.substr(12));
+            } break;
+            case StatLineType::DesignConditionsLine: { //  - Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
+                ashPtr = index(lineIn, "ASHRAE");
+                if (ashPtr != std::string::npos) {
+                    isASHRAE = true;
+                    iscalc = true;
+                    if (ashPtr > 4u) { // Autodesk:BoundsViolation IF block added to protect against ashPtr<=5
+                        ashDesYear = lineIn.substr(ashPtr - 5, 5);
+                    } else {
+                        ashDesYear = "";
+                    }
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     "Weather File Design Conditions",
+                                     "Climate Design Data " + ashDesYear + "ASHRAE Handbook");
+                } else if (has(lineIn, "not calculated") || lineIn == "") {
+                    iscalc = false;
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "not calculated, Number of days < 1 year");
+                } else {
+                    isASHRAE = false;
+                    iscalc = true;
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Design Conditions", "Calculated from the weather file");
+                }
+            } break;
+            case StatLineType::HeatingConditionsLine: { //  winter/heating design conditions
+                if (iscalc) {
+                    if (isASHRAE) {
+                        if (ashDesYear == "2001") {
                             if (ort->unitsStyle == UnitsStyle::InchPound) {
                                 curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  curNameAndUnits,
-                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) +
-                                                     degChar);
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  "Heating Design Temperature 99% (F)",
-                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) +
-                                                     degChar);
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 3))), 1) + degChar);
                             } else {
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  "Heating Design Temperature 99.6% (C)",
-                                                 GetColumnUsingTabs(lineIn, col1) + degChar);
+                                                 GetColumnUsingTabs(lineIn, 2) + degChar);
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  "Heating Design Temperature 99% (C)",
-                                                 GetColumnUsingTabs(lineIn, col2) + degChar);
+                                                 GetColumnUsingTabs(lineIn, 3) + degChar);
+                            }
+                        } else { // 2005 and 2009 are the same
+                            if (ort->unitsStyle == UnitsStyle::InchPound) {
+                                curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 curNameAndUnits,
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 "Heating Design Temperature 99% (F)",
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
+                            } else {
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 "Heating Design Temperature 99.6% (C)",
+                                                 GetColumnUsingTabs(lineIn, 4) + degChar);
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 "Heating Design Temperature 99% (C)",
+                                                 GetColumnUsingTabs(lineIn, 5) + degChar);
                             }
                         }
+                    } else { // from weather file
+                        if (is_blank(GetColumnUsingTabs(lineIn, 5))) {
+                            col1 = 3;
+                            col2 = 4;
+                        } else {
+                            col1 = 4;
+                            col2 = 5;
+                        }
+                        if (ort->unitsStyle == UnitsStyle::InchPound) {
+                            curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             curNameAndUnits,
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Heating Design Temperature 99% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
+                        } else {
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Heating Design Temperature 99.6% (C)",
+                                             GetColumnUsingTabs(lineIn, col1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Heating Design Temperature 99% (C)",
+                                             GetColumnUsingTabs(lineIn, col2) + degChar);
+                        }
                     }
-                } else if (SELECT_CASE_var == StatLineType::CoolingConditionsLine) { //  summer/cooling design conditions
-                    if (iscalc) {
-                        if (isASHRAE) {
-                            if (ashDesYear == "2001") {
-                                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                                    curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
-                                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     curNameAndUnits,
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) +
-                                                         degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 1% (F)",
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) +
-                                                         degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 2% (F)",
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 6))), 1) +
-                                                         degChar);
-                                } else {
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 0.4% (C)",
-                                                     GetColumnUsingTabs(lineIn, 2) + degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 1% (C)",
-                                                     GetColumnUsingTabs(lineIn, 4) + degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 2% (C)",
-                                                     GetColumnUsingTabs(lineIn, 6) + degChar);
-                                }
-                            } else { // 2005 and 2009 are the same
-                                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                                    curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
-                                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     curNameAndUnits,
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) +
-                                                         degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 1% (F)",
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 7))), 1) +
-                                                         degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 2% (F)",
-                                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 9))), 1) +
-                                                         degChar);
-                                } else {
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 0.4% (C)",
-                                                     GetColumnUsingTabs(lineIn, 5) + degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 1% (C)",
-                                                     GetColumnUsingTabs(lineIn, 7) + degChar);
-                                    PreDefTableEntry(state,
-                                                     state.dataOutRptPredefined->pdchWthrVal,
-                                                     "Cooling Design Temperature 2% (C)",
-                                                     GetColumnUsingTabs(lineIn, 9) + degChar);
-                                }
-                            }
-                        } else { // from weather file
-                            if (is_blank(GetColumnUsingTabs(lineIn, 6))) {
-                                col1 = 3;
-                                col2 = 4;
-                                col3 = 5;
-                            } else {
-                                col1 = 4;
-                                col2 = 5;
-                                col3 = 6;
-                            }
+                }
+            } break;
+            case StatLineType::CoolingConditionsLine: { //  summer/cooling design conditions
+                if (iscalc) {
+                    if (isASHRAE) {
+                        if (ashDesYear == "2001") {
                             if (ort->unitsStyle == UnitsStyle::InchPound) {
                                 curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  curNameAndUnits,
-                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) +
-                                                     degChar);
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  "Cooling Design Temperature 1% (F)",
-                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) +
-                                                     degChar);
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  "Cooling Design Temperature 2% (F)",
-                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col3))), 1) +
-                                                     degChar);
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 6))), 1) + degChar);
                             } else {
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  "Cooling Design Temperature 0.4% (C)",
-                                                 GetColumnUsingTabs(lineIn, col1) + degChar);
+                                                 GetColumnUsingTabs(lineIn, 2) + degChar);
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  "Cooling Design Temperature 1% (C)",
-                                                 GetColumnUsingTabs(lineIn, col2) + degChar);
+                                                 GetColumnUsingTabs(lineIn, 4) + degChar);
                                 PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchWthrVal,
                                                  "Cooling Design Temperature 2% (C)",
-                                                 GetColumnUsingTabs(lineIn, col3) + degChar);
+                                                 GetColumnUsingTabs(lineIn, 6) + degChar);
                             }
-                        }
-                    }
-                } else if (SELECT_CASE_var == StatLineType::StdHDDLine) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
-                    storeASHRAEHDD = lineIn.substr(2, 4);
-                } else if (SELECT_CASE_var == StatLineType::StdCDDLine) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
-                    storeASHRAECDD = lineIn.substr(2, 4);
-                } else if (SELECT_CASE_var == StatLineType::MaxDryBulbLine) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
-                    sposlt = index(lineIn, "of");
-                    eposlt = index(lineIn, 'C');
-                    sposlt += 2;
-                    auto deg_index = index(lineIn, degChar);
-                    if (deg_index != std::string::npos) {
-                        eposlt = deg_index - 1;
-                    } else {
-                        eposlt -= 2;
-                    }
-                    if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
-                                                 degChar);
-                        } else {
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Maximum Dry Bulb Temperature (C)",
-                                             lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
-                        }
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Temperature", "not found");
-                    }
-                    sposlt = index(lineIn, "on");
-                    sposlt += 2;
-                    if (sposlt != std::string::npos) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", lineIn.substr(sposlt));
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found");
-                    }
-                } else if (SELECT_CASE_var == StatLineType::MinDryBulbLine) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
-                    sposlt = index(lineIn, "of");
-                    eposlt = index(lineIn, 'C');
-                    sposlt += 2;
-                    auto deg_index = index(lineIn, degChar);
-                    if (deg_index != std::string::npos) {
-                        eposlt = deg_index - 1;
-                    } else {
-                        eposlt -= 2;
-                    }
-                    if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
-                                                 degChar);
-                        } else {
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Minimum Dry Bulb Temperature (C)",
-                                             lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
-                        }
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Temperature", "not found");
-                    }
-                    sposlt = index(lineIn, "on");
-                    sposlt += 2;
-                    if (sposlt != std::string::npos) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", lineIn.substr(sposlt));
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found");
-                    }
-                } else if (SELECT_CASE_var == StatLineType::MaxDewPointLine) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
-                    sposlt = index(lineIn, "of");
-                    eposlt = index(lineIn, 'C');
-                    sposlt += 2;
-                    auto deg_index = index(lineIn, degChar);
-                    if (deg_index != std::string::npos) {
-                        eposlt = deg_index - 1;
-                    } else {
-                        eposlt -= 2;
-                    }
-                    if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
-                                                 degChar);
-                        } else {
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Maximum Dew Point Temperature (C)",
-                                             lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
-                        }
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Temperature", "not found");
-                    }
-                    sposlt = index(lineIn, "on");
-                    sposlt += 2;
-                    if (sposlt != std::string::npos) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", lineIn.substr(sposlt));
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", "not found");
-                    }
-                } else if (SELECT_CASE_var == StatLineType::MinDewPointLine) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
-                    sposlt = index(lineIn, "of");
-                    eposlt = index(lineIn, 'C');
-                    sposlt += 2;
-                    auto deg_index = index(lineIn, degChar);
-                    if (deg_index != std::string::npos) {
-                        eposlt = deg_index - 1;
-                    } else {
-                        eposlt -= 2;
-                    }
-                    if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
-                                                 degChar);
-                        } else {
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Minimum Dew Point Temperature (C)",
-                                             lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
-                        }
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Temperature", "not found");
-                    }
-                    sposlt = index(lineIn, "on");
-                    sposlt += 2;
-                    if (sposlt != std::string::npos) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", lineIn.substr(sposlt));
-                    } else {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
-                    }
-                } else if (SELECT_CASE_var == StatLineType::WithHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
-                    if (storeASHRAEHDD != "") {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
-                        } else {
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)",
-                                             storeASHRAEHDD);
-                        }
-                    } else {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            PreDefTableEntry(
-                                state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
-                        } else {
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)",
-                                             "not found");
-                        }
-                    }
-                    if (ort->unitsStyle == UnitsStyle::InchPound) {
-                        curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
-                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWthrVal,
-                                         curNameAndUnits,
-                                         RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchLeedGenData,
-                                         "Heating Degree Days",
-                                         RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                    } else {
-                        PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr(2, 4));
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Heating Degree Days", lineIn.substr(2, 4));
-                    }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "HDD and CDD data source", "Weather File Stat");
-                } else if (SELECT_CASE_var == StatLineType::WithCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
-                    if (storeASHRAECDD != "") {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAECDD)), 1));
-                        } else {
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)",
-                                             storeASHRAECDD);
-                        }
-                    } else {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            PreDefTableEntry(
-                                state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
-                        } else {
-                            PreDefTableEntry(
-                                state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
-                        }
-                    }
-                    if (ort->unitsStyle == UnitsStyle::InchPound) {
-                        curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
-                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWthrVal,
-                                         curNameAndUnits,
-                                         RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchLeedGenData,
-                                         "Cooling Degree Days",
-                                         RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                    } else {
-                        PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr(2, 4));
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Cooling Degree Days", lineIn.substr(2, 4));
-                    }
-                } else if (SELECT_CASE_var == StatLineType::KoppenLine) { // - Climate type "BSk" (Köppen classification)
-                    if (!has(lineIn, "not shown")) {
-                        isKoppen = true;
-                        if (lineIn[18] == '"') { // two character classification
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Classification", lineIn.substr(16, 2));
-                        } else {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Classification", lineIn.substr(16, 3));
-                        }
-                    } else {
-                        isKoppen = false;
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
-                    }
-                } else if (SELECT_CASE_var ==
-                           StatLineType::KoppenDes1Line) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
-                    if (isKoppen) {
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Description", lineIn.substr(2));
-                    }
-                } else if (SELECT_CASE_var == StatLineType::KoppenDes2Line) { // - Unbearably humid periods in summer, but passive cooling is possible
-                    if (isKoppen) {
-                        if (len(lineIn) > 3) {                 // avoid blank lines
-                            if (lineIn.substr(2, 2) != "**") { // avoid line with warning
-                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
+                        } else { // 2005 and 2009 are the same
+                            if (ort->unitsStyle == UnitsStyle::InchPound) {
+                                curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
+                                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 curNameAndUnits,
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 "Cooling Design Temperature 1% (F)",
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 7))), 1) + degChar);
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 "Cooling Design Temperature 2% (F)",
+                                                 RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 9))), 1) + degChar);
                             } else {
-                                PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", "");
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 "Cooling Design Temperature 0.4% (C)",
+                                                 GetColumnUsingTabs(lineIn, 5) + degChar);
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 "Cooling Design Temperature 1% (C)",
+                                                 GetColumnUsingTabs(lineIn, 7) + degChar);
+                                PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchWthrVal,
+                                                 "Cooling Design Temperature 2% (C)",
+                                                 GetColumnUsingTabs(lineIn, 9) + degChar);
                             }
-                        } else {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", "");
                         }
-                    }
-                } else if ((SELECT_CASE_var == StatLineType::AshStdLine) || (SELECT_CASE_var == StatLineType::AshStdDes1Line) ||
-                           (SELECT_CASE_var == StatLineType::AshStdDes2Line) || (SELECT_CASE_var == StatLineType::AshStdDes3Line)) {
-                    //  - Climate type "1A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
-                    if (has(lineIn, "Standard")) {
-                        ashZone = lineIn.substr(16, 2);
-                        if (ashZone[1] == '"') ashZone[1] = ' ';
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Climate Zone", ashZone);
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Climate Zone", ashZone);
-                        if (ashZone == "1A") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Hot-Humid");
-                        } else if (ashZone == "1B") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Hot-Dry");
-                        } else if (ashZone == "2A") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Hot-Humid");
-                        } else if (ashZone == "2B") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Hot-Dry");
-                        } else if (ashZone == "3A") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Humid");
-                        } else if (ashZone == "3B") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Dry");
-                        } else if (ashZone == "3C") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Marine");
-                        } else if (ashZone == "4A") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Humid");
-                        } else if (ashZone == "4B") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Dry");
-                        } else if (ashZone == "4C") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Marine");
-                        } else if (ashZone == "5A") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Humid");
-                        } else if (ashZone == "5B") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Dry");
-                        } else if (ashZone == "5C") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Marine");
-                        } else if (ashZone == "6A") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cold-Humid");
-                        } else if (ashZone == "6B") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cold-Dry");
-                        } else if (ashZone == "7 ") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Cold");
-                        } else if (ashZone == "8 ") {
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Subarctic");
+                    } else { // from weather file
+                        if (is_blank(GetColumnUsingTabs(lineIn, 6))) {
+                            col1 = 3;
+                            col2 = 4;
+                            col3 = 5;
+                        } else {
+                            col1 = 4;
+                            col2 = 5;
+                            col3 = 6;
+                        }
+                        if (ort->unitsStyle == UnitsStyle::InchPound) {
+                            curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             curNameAndUnits,
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 1% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 2% (F)",
+                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col3))), 1) + degChar);
+                        } else {
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 0.4% (C)",
+                                             GetColumnUsingTabs(lineIn, col1) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 1% (C)",
+                                             GetColumnUsingTabs(lineIn, col2) + degChar);
+                            PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchWthrVal,
+                                             "Cooling Design Temperature 2% (C)",
+                                             GetColumnUsingTabs(lineIn, col3) + degChar);
                         }
                     }
                 }
+            } break;
+            case StatLineType::StdHDDLine: { //  - 1745 annual (standard) heating degree-days (10°C baseline)
+                storeASHRAEHDD = lineIn.substr(2, 4);
+            } break;
+            case StatLineType::StdCDDLine: { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
+                storeASHRAECDD = lineIn.substr(2, 4);
+            } break;
+            case StatLineType::MaxDryBulbLine: { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
+                sposlt = index(lineIn, "of");
+                eposlt = index(lineIn, 'C');
+                sposlt += 2;
+                auto deg_index = index(lineIn, degChar);
+                if (deg_index != std::string::npos) {
+                    eposlt = deg_index - 1;
+                } else {
+                    eposlt -= 2;
+                }
+                if (sposlt != std::string::npos && eposlt != std::string::npos) {
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
+                                             degChar);
+                    } else {
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         "Maximum Dry Bulb Temperature (C)",
+                                         lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
+                    }
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Temperature", "not found");
+                }
+                sposlt = index(lineIn, "on");
+                sposlt += 2;
+                if (sposlt != std::string::npos) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", lineIn.substr(sposlt));
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found");
+                }
+            } break;
+            case StatLineType::MinDryBulbLine: { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
+                sposlt = index(lineIn, "of");
+                eposlt = index(lineIn, 'C');
+                sposlt += 2;
+                auto deg_index = index(lineIn, degChar);
+                if (deg_index != std::string::npos) {
+                    eposlt = deg_index - 1;
+                } else {
+                    eposlt -= 2;
+                }
+                if (sposlt != std::string::npos && eposlt != std::string::npos) {
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
+                                             degChar);
+                    } else {
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         "Minimum Dry Bulb Temperature (C)",
+                                         lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
+                    }
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Temperature", "not found");
+                }
+                sposlt = index(lineIn, "on");
+                sposlt += 2;
+                if (sposlt != std::string::npos) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", lineIn.substr(sposlt));
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found");
+                }
+            } break;
+            case StatLineType::MaxDewPointLine: { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
+                sposlt = index(lineIn, "of");
+                eposlt = index(lineIn, 'C');
+                sposlt += 2;
+                auto deg_index = index(lineIn, degChar);
+                if (deg_index != std::string::npos) {
+                    eposlt = deg_index - 1;
+                } else {
+                    eposlt -= 2;
+                }
+                if (sposlt != std::string::npos && eposlt != std::string::npos) {
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
+                                             degChar);
+                    } else {
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         "Maximum Dew Point Temperature (C)",
+                                         lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
+                    }
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Temperature", "not found");
+                }
+                sposlt = index(lineIn, "on");
+                sposlt += 2;
+                if (sposlt != std::string::npos) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", lineIn.substr(sposlt));
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Maximum Dew Point Occurs on", "not found");
+                }
+            } break;
+            case StatLineType::MinDewPointLine: { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
+                sposlt = index(lineIn, "of");
+                eposlt = index(lineIn, 'C');
+                sposlt += 2;
+                auto deg_index = index(lineIn, degChar);
+                if (deg_index != std::string::npos) {
+                    eposlt = deg_index - 1;
+                } else {
+                    eposlt -= 2;
+                }
+                if (sposlt != std::string::npos && eposlt != std::string::npos) {
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) +
+                                             degChar);
+                    } else {
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         "Minimum Dew Point Temperature (C)",
+                                         lineIn.substr(sposlt, eposlt - sposlt + 1) + degChar);
+                    }
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Temperature", "not found");
+                }
+                sposlt = index(lineIn, "on");
+                sposlt += 2;
+                if (sposlt != std::string::npos) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", lineIn.substr(sposlt));
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
+                }
+            } break;
+            case StatLineType::WithHDDLine: { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
+                if (storeASHRAEHDD != "") {
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
+                    } else {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
+                    }
+                } else {
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
+                    } else {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found");
+                    }
+                }
+                if (ort->unitsStyle == UnitsStyle::InchPound) {
+                    curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedGenData,
+                                     "Heating Degree Days",
+                                     RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                } else {
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Heating Degree-Days (base 18°C)", lineIn.substr(2, 4));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Heating Degree Days", lineIn.substr(2, 4));
+                }
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "HDD and CDD data source", "Weather File Stat");
+            } break;
+            case StatLineType::WithCDDLine: { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
+                if (storeASHRAECDD != "") {
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
+                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchWthrVal,
+                                         curNameAndUnits,
+                                         RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAECDD)), 1));
+                    } else {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", storeASHRAECDD);
+                    }
+                } else {
+                    if (ort->unitsStyle == UnitsStyle::InchPound) {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 50°F)", "not found");
+                    } else {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
+                    }
+                }
+                if (ort->unitsStyle == UnitsStyle::InchPound) {
+                    curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchWthrVal,
+                                     curNameAndUnits,
+                                     RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedGenData,
+                                     "Cooling Degree Days",
+                                     RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
+                } else {
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr(2, 4));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Cooling Degree Days", lineIn.substr(2, 4));
+                }
+            } break;
+            case StatLineType::KoppenLine: { // - Climate type "BSk" (Köppen classification)
+                if (!has(lineIn, "not shown")) {
+                    isKoppen = true;
+                    if (lineIn[18] == '"') { // two character classification
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Classification", lineIn.substr(16, 2));
+                    } else {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Classification", lineIn.substr(16, 3));
+                    }
+                } else {
+                    isKoppen = false;
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
+                }
+            } break;
+            case StatLineType::KoppenDes1Line: { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
+                if (isKoppen) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Description", lineIn.substr(2));
+                }
+            } break;
+            case StatLineType::KoppenDes2Line: { // - Unbearably humid periods in summer, but passive cooling is possible
+                if (isKoppen) {
+                    if (len(lineIn) > 3) {                 // avoid blank lines
+                        if (lineIn.substr(2, 2) != "**") { // avoid line with warning
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
+                        } else {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", "");
+                        }
+                    } else {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Köppen Recommendation", "");
+                    }
+                }
+            } break;
+            case StatLineType::AshStdLine:
+            case StatLineType::AshStdDes1Line:
+            case StatLineType::AshStdDes2Line:
+            case StatLineType::AshStdDes3Line: {
+                //  - Climate type "1A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
+                if (has(lineIn, "Standard")) {
+                    ashZone = lineIn.substr(16, 2);
+                    if (ashZone[1] == '"') ashZone[1] = ' ';
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Climate Zone", ashZone);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Climate Zone", ashZone);
+                    if (ashZone == "1A") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Hot-Humid");
+                    } else if (ashZone == "1B") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Hot-Dry");
+                    } else if (ashZone == "2A") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Hot-Humid");
+                    } else if (ashZone == "2B") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Hot-Dry");
+                    } else if (ashZone == "3A") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Humid");
+                    } else if (ashZone == "3B") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Dry");
+                    } else if (ashZone == "3C") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Warm-Marine");
+                    } else if (ashZone == "4A") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Humid");
+                    } else if (ashZone == "4B") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Dry");
+                    } else if (ashZone == "4C") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Mixed-Marine");
+                    } else if (ashZone == "5A") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Humid");
+                    } else if (ashZone == "5B") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Dry");
+                    } else if (ashZone == "5C") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cool-Marine");
+                    } else if (ashZone == "6A") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cold-Humid");
+                    } else if (ashZone == "6B") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Cold-Dry");
+                    } else if (ashZone == "7 ") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Very Cold");
+                    } else if (ashZone == "8 ") {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Description", "Subarctic");
+                    }
+                }
+            } break;
+            default:
+                break;
             }
             lineIn = "";
             lineTypeinterim = StatLineType::Initialized;
@@ -7161,18 +7182,26 @@ void WriteMonthlyTables(EnergyPlusData &state)
                 columnUsedCount = 0;
                 for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
                     curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
-                    {
-                        auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
-                        if ((SELECT_CASE_var == AggType::SumOrAvg) || (SELECT_CASE_var == AggType::ValueWhenMaxMin) ||
-                            (SELECT_CASE_var == AggType::HoursZero) || (SELECT_CASE_var == AggType::HoursNonZero) ||
-                            (SELECT_CASE_var == AggType::HoursPositive) || (SELECT_CASE_var == AggType::HoursNonPositive) ||
-                            (SELECT_CASE_var == AggType::HoursNegative) || (SELECT_CASE_var == AggType::HoursNonNegative) ||
-                            (SELECT_CASE_var == AggType::SumOrAverageHoursShown)) {
-                            ++columnUsedCount;
-                        } else if ((SELECT_CASE_var == AggType::Maximum) || (SELECT_CASE_var == AggType::Minimum) ||
-                                   (SELECT_CASE_var == AggType::MaximumDuringHoursShown) || (SELECT_CASE_var == AggType::MinimumDuringHoursShown)) {
-                            columnUsedCount += 2;
-                        }
+                    switch (ort->MonthlyColumns(curCol).aggType) {
+                    case AggType::SumOrAvg:
+                    case AggType::ValueWhenMaxMin:
+                    case AggType::HoursZero:
+                    case AggType::HoursNonZero:
+                    case AggType::HoursPositive:
+                    case AggType::HoursNonPositive:
+                    case AggType::HoursNegative:
+                    case AggType::HoursNonNegative:
+                    case AggType::SumOrAverageHoursShown: {
+                        ++columnUsedCount;
+                    } break;
+                    case AggType::Maximum:
+                    case AggType::Minimum:
+                    case AggType::MaximumDuringHoursShown:
+                    case AggType::MinimumDuringHoursShown: {
+                        columnUsedCount += 2;
+                    } break;
+                    default:
+                        break;
                     }
                 } // jColumn
                 columnHead.allocate(columnUsedCount);
@@ -7203,218 +7232,226 @@ void WriteMonthlyTables(EnergyPlusData &state)
                             state.dataOutRptTab->curConversionOffset = 0.0;
                         }
                     }
-                    {
-                        auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
-                        if ((SELECT_CASE_var == AggType::SumOrAvg) || (SELECT_CASE_var == AggType::SumOrAverageHoursShown)) {
-                            ++columnRecount;
-                            // put in the name of the variable for the column
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
-                            sumVal = 0.0;
-                            sumDuration = 0.0;
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                if (ort->MonthlyColumns(curCol).avgSum ==
-                                    OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
-                                    if (ort->MonthlyColumns(curCol).duration(lMonth) != 0) {
-                                        curVal = ((ort->MonthlyColumns(curCol).reslt(lMonth) / ort->MonthlyColumns(curCol).duration(lMonth)) *
-                                                  curConversionFactor) +
-                                                 state.dataOutRptTab->curConversionOffset;
-                                    } else {
-                                        curVal = 0.0;
-                                    }
-                                    sumVal +=
-                                        (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + state.dataOutRptTab->curConversionOffset;
-                                    sumDuration += ort->MonthlyColumns(curCol).duration(lMonth);
-                                } else {
-                                    curVal =
-                                        (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + state.dataOutRptTab->curConversionOffset;
-                                    sumVal += curVal;
-                                }
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
-                                    if (curVal > maxVal) maxVal = curVal;
-                                    if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
+                    switch (ort->MonthlyColumns(curCol).aggType) {
+                    case AggType::SumOrAvg:
+                    case AggType::SumOrAverageHoursShown: {
+                        ++columnRecount;
+                        // put in the name of the variable for the column
+                        columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                        sumVal = 0.0;
+                        sumDuration = 0.0;
+                        minVal = storedMaxVal;
+                        maxVal = storedMinVal;
+                        for (lMonth = 1; lMonth <= 12; ++lMonth) {
                             if (ort->MonthlyColumns(curCol).avgSum ==
                                 OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
-                                if (sumDuration > 0) {
-                                    tableBody(columnRecount, 14) = RealToStr(sumVal / sumDuration, digitsShown);
+                                if (ort->MonthlyColumns(curCol).duration(lMonth) != 0) {
+                                    curVal = ((ort->MonthlyColumns(curCol).reslt(lMonth) / ort->MonthlyColumns(curCol).duration(lMonth)) *
+                                              curConversionFactor) +
+                                             state.dataOutRptTab->curConversionOffset;
                                 } else {
-                                    tableBody(columnRecount, 14) = "";
+                                    curVal = 0.0;
                                 }
+                                sumVal +=
+                                    (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + state.dataOutRptTab->curConversionOffset;
+                                sumDuration += ort->MonthlyColumns(curCol).duration(lMonth);
                             } else {
-                                tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
+                                curVal = (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + state.dataOutRptTab->curConversionOffset;
+                                sumVal += curVal;
                             }
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                            if (ort->IsMonthGathered(lMonth)) {
+                                tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
+                                if (curVal > maxVal) maxVal = curVal;
+                                if (curVal < minVal) minVal = curVal;
+                            } else {
+                                tableBody(columnRecount, lMonth) = "-";
                             }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                        } // lMonth
+                        // add the summary to bottom
+                        if (ort->MonthlyColumns(curCol).avgSum ==
+                            OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+                            if (sumDuration > 0) {
+                                tableBody(columnRecount, 14) = RealToStr(sumVal / sumDuration, digitsShown);
+                            } else {
+                                tableBody(columnRecount, 14) = "";
                             }
-                        } else if ((SELECT_CASE_var == AggType::HoursZero) || (SELECT_CASE_var == AggType::HoursNonZero) ||
-                                   (SELECT_CASE_var == AggType::HoursPositive) || (SELECT_CASE_var == AggType::HoursNonPositive) ||
-                                   (SELECT_CASE_var == AggType::HoursNegative) || (SELECT_CASE_var == AggType::HoursNonNegative)) {
-
-                            ++columnRecount;
-                            // put in the name of the variable for the column
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [HOURS]";
-                            sumVal = 0.0;
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
-                                    sumVal += curVal;
-                                    if (curVal > maxVal) maxVal = curVal;
-                                    if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
+                        } else {
                             tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                        }
+                        if (minVal != storedMaxVal) {
+                            tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                        }
+                        if (maxVal != storedMinVal) {
+                            tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                        }
+                    } break;
+                    case AggType::HoursZero:
+                    case AggType::HoursNonZero:
+                    case AggType::HoursPositive:
+                    case AggType::HoursNonPositive:
+                    case AggType::HoursNegative:
+                    case AggType::HoursNonNegative: {
+                        ++columnRecount;
+                        // put in the name of the variable for the column
+                        columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [HOURS]";
+                        sumVal = 0.0;
+                        minVal = storedMaxVal;
+                        maxVal = storedMinVal;
+                        for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                            curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
+                            if (ort->IsMonthGathered(lMonth)) {
+                                tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
+                                sumVal += curVal;
+                                if (curVal > maxVal) maxVal = curVal;
+                                if (curVal < minVal) minVal = curVal;
+                            } else {
+                                tableBody(columnRecount, lMonth) = "-";
                             }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                        } // lMonth
+                        // add the summary to bottom
+                        tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
+                        if (minVal != storedMaxVal) {
+                            tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                        }
+                        if (maxVal != storedMinVal) {
+                            tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                        }
+                    } break;
+                    case AggType::ValueWhenMaxMin: {
+                        ++columnRecount;
+                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
+                            curUnits += "/s";
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "J/s")) {
+                            curUnits = "W";
+                        }
+                        // CR7783 fix
+                        if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
+                            curUnits = "W";
+                            curConversionFactor *= 3600000.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
+                            curUnits = "kW";
+                            curConversionFactor *= 1000000.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
+                            curUnits = "kW";
+                            curConversionFactor *= 1000.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "therm/s")) {
+                            curUnits = "kBtu/h";
+                            curConversionFactor *= 360000.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
+                            curUnits = "kBtu/h";
+                            curConversionFactor *= 3600.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
+                            curUnits = "ton";
+                            curConversionFactor *= 3600.0;
+                        }
+                        columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                        minVal = storedMaxVal;
+                        maxVal = storedMinVal;
+                        for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                            curVal = ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + state.dataOutRptTab->curConversionOffset;
+                            if (ort->IsMonthGathered(lMonth)) {
+                                tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
+                                if (curVal > maxVal) maxVal = curVal;
+                                if (curVal < minVal) minVal = curVal;
+                            } else {
+                                tableBody(columnRecount, lMonth) = "-";
                             }
-                        } else if (SELECT_CASE_var == AggType::ValueWhenMaxMin) {
-                            ++columnRecount;
-                            if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
-                                curUnits += "/s";
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "J/s")) {
-                                curUnits = "W";
-                            }
-                            // CR7783 fix
-                            if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
-                                curUnits = "W";
-                                curConversionFactor *= 3600000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "therm/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 360000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 3600.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
-                                curUnits = "ton";
-                                curConversionFactor *= 3600.0;
-                            }
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                curVal = ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + state.dataOutRptTab->curConversionOffset;
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
+                        } // lMonth
+                        // add the summary to bottom
+                        if (minVal != storedMaxVal) {
+                            tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                        }
+                        if (maxVal != storedMinVal) {
+                            tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                        }
+                    } break;
+                    case AggType::Maximum:
+                    case AggType::Minimum:
+                    case AggType::MaximumDuringHoursShown:
+                    case AggType::MinimumDuringHoursShown: {
+                        columnRecount += 2;
+                        // put in the name of the variable for the column
+                        if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                            curUnits += "/s";
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "J/s")) {
+                            curUnits = "W";
+                        }
+                        // CR7783 fix
+                        if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
+                            curUnits = "W";
+                            curConversionFactor *= 3600000.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
+                            curUnits = "kW";
+                            curConversionFactor *= 1000000.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
+                            curUnits = "kW";
+                            curConversionFactor *= 1000.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "therm/s")) {
+                            curUnits = "kBtu/h";
+                            curConversionFactor *= 360000.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
+                            curUnits = "kBtu/h";
+                            curConversionFactor *= 3600.0;
+                        }
+                        if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
+                            curUnits = "ton";
+                            curConversionFactor *= 3600.0;
+                        }
+                        columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                        columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
+                        minVal = storedMaxVal;
+                        maxVal = storedMinVal;
+                        for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                            if (ort->IsMonthGathered(lMonth)) {
+                                curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
+                                // CR7788 the conversion factors were causing an overflow for the InchPound case since the
+                                // value was very small
+                                // restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
+                                if ((curVal < veryLarge) && (curVal > verySmall)) {
+                                    curVal = curVal * curConversionFactor + state.dataOutRptTab->curConversionOffset;
                                     if (curVal > maxVal) maxVal = curVal;
                                     if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
-                            }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
-                            }
-                        } else if ((SELECT_CASE_var == AggType::Maximum) || (SELECT_CASE_var == AggType::Minimum) ||
-                                   (SELECT_CASE_var == AggType::MaximumDuringHoursShown) || (SELECT_CASE_var == AggType::MinimumDuringHoursShown)) {
-                            columnRecount += 2;
-                            // put in the name of the variable for the column
-                            if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                curUnits += "/s";
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "J/s")) {
-                                curUnits = "W";
-                            }
-                            // CR7783 fix
-                            if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
-                                curUnits = "W";
-                                curConversionFactor *= 3600000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "therm/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 360000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 3600.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
-                                curUnits = "ton";
-                                curConversionFactor *= 3600.0;
-                            }
-                            columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
-                                    // CR7788 the conversion factors were causing an overflow for the InchPound case since the
-                                    // value was very small
-                                    // restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
-                                    if ((curVal < veryLarge) && (curVal > verySmall)) {
-                                        curVal = curVal * curConversionFactor + state.dataOutRptTab->curConversionOffset;
-                                        if (curVal > maxVal) maxVal = curVal;
-                                        if (curVal < minVal) minVal = curVal;
-                                        if (curVal < veryLarge && curVal > verySmall) {
-                                            tableBody(columnRecount - 1, lMonth) = RealToStr(curVal, digitsShown);
-                                        } else {
-                                            tableBody(columnRecount - 1, lMonth) = "-";
-                                        }
-                                        tableBody(columnRecount, lMonth) = DateToString(ort->MonthlyColumns(curCol).timeStamp(lMonth));
+                                    if (curVal < veryLarge && curVal > verySmall) {
+                                        tableBody(columnRecount - 1, lMonth) = RealToStr(curVal, digitsShown);
                                     } else {
                                         tableBody(columnRecount - 1, lMonth) = "-";
-                                        tableBody(columnRecount, lMonth) = "-";
                                     }
+                                    tableBody(columnRecount, lMonth) = DateToString(ort->MonthlyColumns(curCol).timeStamp(lMonth));
                                 } else {
                                     tableBody(columnRecount - 1, lMonth) = "-";
                                     tableBody(columnRecount, lMonth) = "-";
                                 }
-                            } // lMonth
-                            // add the summary to bottom
-                            // Don't include if the original min and max values are still present
-                            if (minVal < veryLarge) {
-                                tableBody(columnRecount - 1, 15) = RealToStr(minVal, digitsShown);
                             } else {
-                                tableBody(columnRecount - 1, 15) = "-";
+                                tableBody(columnRecount - 1, lMonth) = "-";
+                                tableBody(columnRecount, lMonth) = "-";
                             }
-                            if (maxVal > verySmall) {
-                                tableBody(columnRecount - 1, 16) = RealToStr(maxVal, digitsShown);
-                            } else {
-                                tableBody(columnRecount - 1, 15) = "-";
-                            }
+                        } // lMonth
+                        // add the summary to bottom
+                        // Don't include if the original min and max values are still present
+                        if (minVal < veryLarge) {
+                            tableBody(columnRecount - 1, 15) = RealToStr(minVal, digitsShown);
+                        } else {
+                            tableBody(columnRecount - 1, 15) = "-";
                         }
+                        if (maxVal > verySmall) {
+                            tableBody(columnRecount - 1, 16) = RealToStr(maxVal, digitsShown);
+                        } else {
+                            tableBody(columnRecount - 1, 15) = "-";
+                        }
+                    } break;
+                    default:
+                        break;
                     }
                 } // KColumn
                 if (produceTabular) {
@@ -7754,6 +7791,14 @@ void WriteBEPSTable(EnergyPlusData &state)
 
     int constexpr colElectricity(1);
     int constexpr colGas(2);
+    int constexpr colGasoline(3);
+    int constexpr colDiesel(4);
+    int constexpr colCoal(5);
+    int constexpr colFuelOilNo1(6);
+    int constexpr colFuelOilNo2(7);
+    int constexpr colPropane(8);
+    int constexpr colOtherFuel1(9);
+    int constexpr colOtherFuel2(10);
     int constexpr colPurchCool(11);
     int constexpr colPurchHeat(12);
 
@@ -7947,24 +7992,25 @@ void WriteBEPSTable(EnergyPlusData &state)
                 }
             }
             // unit conversion - all values are used as divisors
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    largeConversionFactor = 3600000.0;
-                    kConversionFactor = 1.0;
-                    waterConversionFactor = 1.0;
-                    areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
-                    kConversionFactor = 1.0;
-                    waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
-                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-                } else {
-                    largeConversionFactor = 1000000000.0;
-                    kConversionFactor = 1000.0;
-                    waterConversionFactor = 1.0;
-                    areaConversionFactor = 1.0;
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                largeConversionFactor = 3600000.0;
+                kConversionFactor = 1.0;
+                waterConversionFactor = 1.0;
+                areaConversionFactor = 1.0;
+            } break;
+            case UnitsStyle::InchPound: {
+                largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+                kConversionFactor = 1.0;
+                waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
+                areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+            } break;
+            default: {
+                largeConversionFactor = 1000000000.0;
+                kConversionFactor = 1000.0;
+                waterConversionFactor = 1.0;
+                areaConversionFactor = 1.0;
+            } break;
             }
 
             // convert floor areas
@@ -8053,21 +8099,22 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(3, 4);
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Total Energy [kWh]";
-                    columnHead(2) = "Energy Per Total Building Area [kWh/m2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [kWh/m2]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Total Energy [kBtu]";
-                    columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
-                } else {
-                    columnHead(1) = "Total Energy [GJ]";
-                    columnHead(2) = "Energy Per Total Building Area [MJ/m2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [MJ/m2]";
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Total Energy [kWh]";
+                columnHead(2) = "Energy Per Total Building Area [kWh/m2]";
+                columnHead(3) = "Energy Per Conditioned Building Area [kWh/m2]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Total Energy [kBtu]";
+                columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
+                columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
+            } break;
+            default: {
+                columnHead(1) = "Total Energy [GJ]";
+                columnHead(2) = "Energy Per Total Building Area [MJ/m2]";
+                columnHead(3) = "Energy Per Conditioned Building Area [MJ/m2]";
+            } break;
             }
 
             rowHead(1) = "Total Site Energy";
@@ -8458,15 +8505,16 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(1, 3);
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Area [m2]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Area [ft2]";
-                } else {
-                    columnHead(1) = "Area [m2]";
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Area [m2]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Area [ft2]";
+            } break;
+            default: {
+                columnHead(1) = "Area [m2]";
+            } break;
             }
 
             rowHead(1) = "Total Building Area";
@@ -8553,51 +8601,52 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(15) = "";
             rowHead(16) = "Total End Uses";
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity [kWh]";
-                    columnHead(2) = "Natural Gas [kWh]";
-                    columnHead(3) = "Gasoline [kWh]";
-                    columnHead(4) = "Diesel [kWh]";
-                    columnHead(5) = "Coal [kWh]";
-                    columnHead(6) = "Fuel Oil No 1 [kWh]";
-                    columnHead(7) = "Fuel Oil No 2 [kWh]";
-                    columnHead(8) = "Propane [kWh]";
-                    columnHead(9) = "Other Fuel 1 [kWh]";
-                    columnHead(10) = "Other Fuel 2 [kWh]";
-                    columnHead(11) = "District Cooling [kWh]";
-                    columnHead(12) = "District Heating [kWh]";
-                    columnHead(13) = "Water [m3]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity [kBtu]";
-                    columnHead(2) = "Natural Gas [kBtu]";
-                    columnHead(3) = "Gasoline [kBtu]";
-                    columnHead(4) = "Diesel [kBtu]";
-                    columnHead(5) = "Coal [kBtu]";
-                    columnHead(6) = "Fuel Oil No 1 [kBtu]";
-                    columnHead(7) = "Fuel Oil No 2 [kBtu]";
-                    columnHead(8) = "Propane [kBtu]";
-                    columnHead(9) = "Other Fuel 1 [kBtu]";
-                    columnHead(10) = "Other Fuel 2 [kBtu]";
-                    columnHead(11) = "District Cooling [kBtu]";
-                    columnHead(12) = "District Heating [kBtu]";
-                    columnHead(13) = "Water [gal]";
-                } else {
-                    columnHead(1) = "Electricity [GJ]";
-                    columnHead(2) = "Natural Gas [GJ]";
-                    columnHead(3) = "Gasoline [GJ]";
-                    columnHead(4) = "Diesel [GJ]";
-                    columnHead(5) = "Coal [GJ]";
-                    columnHead(6) = "Fuel Oil No 1 [GJ]";
-                    columnHead(7) = "Fuel Oil No 2 [GJ]";
-                    columnHead(8) = "Propane [GJ]";
-                    columnHead(9) = "Other Fuel 1 [GJ]";
-                    columnHead(10) = "Other Fuel 2 [GJ]";
-                    columnHead(11) = "District Cooling [GJ]";
-                    columnHead(12) = "District Heating [GJ]";
-                    columnHead(13) = "Water [m3]";
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Electricity [kWh]";
+                columnHead(2) = "Natural Gas [kWh]";
+                columnHead(3) = "Gasoline [kWh]";
+                columnHead(4) = "Diesel [kWh]";
+                columnHead(5) = "Coal [kWh]";
+                columnHead(6) = "Fuel Oil No 1 [kWh]";
+                columnHead(7) = "Fuel Oil No 2 [kWh]";
+                columnHead(8) = "Propane [kWh]";
+                columnHead(9) = "Other Fuel 1 [kWh]";
+                columnHead(10) = "Other Fuel 2 [kWh]";
+                columnHead(11) = "District Cooling [kWh]";
+                columnHead(12) = "District Heating [kWh]";
+                columnHead(13) = "Water [m3]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Electricity [kBtu]";
+                columnHead(2) = "Natural Gas [kBtu]";
+                columnHead(3) = "Gasoline [kBtu]";
+                columnHead(4) = "Diesel [kBtu]";
+                columnHead(5) = "Coal [kBtu]";
+                columnHead(6) = "Fuel Oil No 1 [kBtu]";
+                columnHead(7) = "Fuel Oil No 2 [kBtu]";
+                columnHead(8) = "Propane [kBtu]";
+                columnHead(9) = "Other Fuel 1 [kBtu]";
+                columnHead(10) = "Other Fuel 2 [kBtu]";
+                columnHead(11) = "District Cooling [kBtu]";
+                columnHead(12) = "District Heating [kBtu]";
+                columnHead(13) = "Water [gal]";
+            } break;
+            default: {
+                columnHead(1) = "Electricity [GJ]";
+                columnHead(2) = "Natural Gas [GJ]";
+                columnHead(3) = "Gasoline [GJ]";
+                columnHead(4) = "Diesel [GJ]";
+                columnHead(5) = "Coal [GJ]";
+                columnHead(6) = "Fuel Oil No 1 [GJ]";
+                columnHead(7) = "Fuel Oil No 2 [GJ]";
+                columnHead(8) = "Propane [GJ]";
+                columnHead(9) = "Other Fuel 1 [GJ]";
+                columnHead(10) = "Other Fuel 2 [GJ]";
+                columnHead(11) = "District Cooling [GJ]";
+                columnHead(12) = "District Heating [GJ]";
+                columnHead(13) = "Water [m3]";
+            } break;
             }
 
             tableBody = "";
@@ -8851,32 +8900,38 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
 
             footnote = "";
-            {
-                auto const SELECT_CASE_var(resourcePrimaryHeating);
-                if (SELECT_CASE_var == colElectricity) {
-                    if (produceTabular) {
-                        footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
-                    }
-                } else if (SELECT_CASE_var == colGas) {
-                    if (produceTabular) {
-                        footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
-                    }
-                } else if (SELECT_CASE_var == 3 || SELECT_CASE_var == 4 || SELECT_CASE_var == 5 || SELECT_CASE_var == 6 || SELECT_CASE_var == 7 ||
-                           SELECT_CASE_var == 8 || SELECT_CASE_var == 9 || SELECT_CASE_var == 10) {
-                    if (produceTabular) {
-                        footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
-                    }
-                    // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
-                    // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
-                } else if (SELECT_CASE_var == colPurchHeat) {
-                    if (produceTabular) {
-                        footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
-                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
-                    }
+            switch (resourcePrimaryHeating) {
+            case colElectricity: {
+                if (produceTabular) {
+                    footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
                 }
+            } break;
+            case colGas: {
+                if (produceTabular) {
+                    footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
+                }
+            } break;
+            case colGasoline:
+            case colDiesel:
+            case colCoal:
+            case colFuelOilNo1:
+            case colFuelOilNo2:
+            case colPropane:
+            case colOtherFuel1:
+            case colOtherFuel2: {
+                if (produceTabular) {
+                    footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
+                }
+            } break;
+            case colPurchHeat: {
+                if (produceTabular) {
+                    footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
+                }
+            } break;
             }
             // heading for the entire sub-table
             if (ort->displayTabularBEPS) {
@@ -9025,51 +9080,52 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(3) = "Other";
             rowHead(4) = "Total";
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity Intensity [kWh/m2]";
-                    columnHead(2) = "Natural Gas Intensity [kWh/m2]";
-                    columnHead(3) = "Gasoline Intensity [kWh/m2]";
-                    columnHead(4) = "Diesel Intensity [kWh/m2]";
-                    columnHead(5) = "Coal Intensity [kWh/m2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
-                    columnHead(8) = "Propane Intensity [kWh/m2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
-                    columnHead(11) = "District Cooling Intensity [kWh/m2]";
-                    columnHead(12) = "District Heating Intensity [kWh/m2]";
-                    columnHead(13) = "Water Intensity [m3/m2]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity Intensity [kBtu/ft2]";
-                    columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
-                    columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
-                    columnHead(4) = "Diesel Intensity [kBtu/ft2]";
-                    columnHead(5) = "Coal Intensity [kBtu/ft2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
-                    columnHead(8) = "Propane Intensity [kBtu/ft2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
-                    columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
-                    columnHead(12) = "District Heating Intensity [kBtu/ft2]";
-                    columnHead(13) = "Water Intensity [gal/ft2]";
-                } else {
-                    columnHead(1) = "Electricity Intensity [MJ/m2]";
-                    columnHead(2) = "Natural Gas Intensity [MJ/m2]";
-                    columnHead(3) = "Gasoline Intensity [MJ/m2]";
-                    columnHead(4) = "Diesel Intensity [MJ/m2]";
-                    columnHead(5) = "Coal Intensity [MJ/m2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
-                    columnHead(8) = "Propane Intensity [MJ/m2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
-                    columnHead(11) = "District Cooling Intensity [MJ/m2]";
-                    columnHead(12) = "District Heating Intensity [MJ/m2]";
-                    columnHead(13) = "Water Intensity [m3/m2]";
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Electricity Intensity [kWh/m2]";
+                columnHead(2) = "Natural Gas Intensity [kWh/m2]";
+                columnHead(3) = "Gasoline Intensity [kWh/m2]";
+                columnHead(4) = "Diesel Intensity [kWh/m2]";
+                columnHead(5) = "Coal Intensity [kWh/m2]";
+                columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
+                columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
+                columnHead(8) = "Propane Intensity [kWh/m2]";
+                columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
+                columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
+                columnHead(11) = "District Cooling Intensity [kWh/m2]";
+                columnHead(12) = "District Heating Intensity [kWh/m2]";
+                columnHead(13) = "Water Intensity [m3/m2]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Electricity Intensity [kBtu/ft2]";
+                columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
+                columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
+                columnHead(4) = "Diesel Intensity [kBtu/ft2]";
+                columnHead(5) = "Coal Intensity [kBtu/ft2]";
+                columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
+                columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
+                columnHead(8) = "Propane Intensity [kBtu/ft2]";
+                columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
+                columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
+                columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
+                columnHead(12) = "District Heating Intensity [kBtu/ft2]";
+                columnHead(13) = "Water Intensity [gal/ft2]";
+            } break;
+            default: {
+                columnHead(1) = "Electricity Intensity [MJ/m2]";
+                columnHead(2) = "Natural Gas Intensity [MJ/m2]";
+                columnHead(3) = "Gasoline Intensity [MJ/m2]";
+                columnHead(4) = "Diesel Intensity [MJ/m2]";
+                columnHead(5) = "Coal Intensity [MJ/m2]";
+                columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
+                columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
+                columnHead(8) = "Propane Intensity [MJ/m2]";
+                columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
+                columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
+                columnHead(11) = "District Cooling Intensity [MJ/m2]";
+                columnHead(12) = "District Heating Intensity [MJ/m2]";
+                columnHead(13) = "Water Intensity [m3/m2]";
+            } break;
             }
 
             if (produceTabular) {
@@ -9158,15 +9214,16 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(2, 14);
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity [kWh]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity [kBtu]";
-                } else {
-                    columnHead(1) = "Electricity [GJ]";
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Electricity [kWh]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Electricity [kBtu]";
+            } break;
+            default: {
+                columnHead(1) = "Electricity [GJ]";
+            } break;
             }
             columnHead(2) = "Percent Electricity [%]";
 
@@ -9258,15 +9315,16 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(2, 7);
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Heat [kWh]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Heat [kBtu]";
-                } else {
-                    columnHead(1) = "Heat [GJ]";
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Heat [kWh]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Heat [kBtu]";
+            } break;
+            default: {
+                columnHead(1) = "Heat [GJ]";
+            } break;
             }
 
             columnHead(2) = "Percent Heat [%]";
@@ -9366,16 +9424,18 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnWidth.allocate(2);
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(2, 13);
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Water [m3]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Water [gal]";
-                } else {
-                    columnHead(1) = "Water [m3]";
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Water [m3]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Water [gal]";
+            } break;
+            default: {
+                columnHead(1) = "Water [m3]";
+            } break;
             }
+
             columnHead(2) = "Percent Water [%]";
             rowHead(1) = "Rainwater Collection";
             rowHead(2) = "Condensate Collection";
@@ -9612,51 +9672,52 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
     for (int col = 1; col <= numCol; ++col) {
         columnWidth(col) = 10; // array assignment - same for all columns
     }
-    {
-        auto const SELECT_CASE_var(unitsStyle_cur);
-        if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-            columnHead(2) = "Electricity [kWh]";
-            columnHead(3) = "Natural Gas [kWh]";
-            columnHead(4) = "Gasoline [kWh]";
-            columnHead(5) = "Diesel [kWh]";
-            columnHead(6) = "Coal [kWh]";
-            columnHead(7) = "Fuel Oil No 1 [kWh]";
-            columnHead(8) = "Fuel Oil No 2 [kWh]";
-            columnHead(9) = "Propane [kWh]";
-            columnHead(10) = "Other Fuel 1 [kWh]";
-            columnHead(11) = "Other Fuel 2 [kWh]";
-            columnHead(12) = "District Cooling [kWh]";
-            columnHead(13) = "District Heating [kWh]";
-            columnHead(14) = "Water [m3]";
-        } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-            columnHead(2) = "Electricity [kBtu]";
-            columnHead(3) = "Natural Gas [kBtu]";
-            columnHead(4) = "Gasoline [kBtu]";
-            columnHead(5) = "Diesel [kBtu]";
-            columnHead(6) = "Coal [kBtu]";
-            columnHead(7) = "Fuel Oil No 1 [kBtu]";
-            columnHead(8) = "Fuel Oil No 2 [kBtu]";
-            columnHead(9) = "Propane [kBtu]";
-            columnHead(10) = "Other Fuel 1 [kBtu]";
-            columnHead(11) = "Other Fuel 2 [kBtu]";
-            columnHead(12) = "District Cooling [kBtu]";
-            columnHead(13) = "District Heating [kBtu]";
-            columnHead(14) = "Water [gal]";
-        } else {
-            columnHead(2) = "Electricity [GJ]";
-            columnHead(3) = "Natural Gas [GJ]";
-            columnHead(4) = "Gasoline [GJ]";
-            columnHead(5) = "Diesel [GJ]";
-            columnHead(6) = "Coal [GJ]";
-            columnHead(7) = "Fuel Oil No 1 [GJ]";
-            columnHead(8) = "Fuel Oil No 2 [GJ]";
-            columnHead(9) = "Propane [GJ]";
-            columnHead(10) = "Other Fuel 1 [GJ]";
-            columnHead(11) = "Other Fuel 2 [GJ]";
-            columnHead(12) = "District Cooling [GJ]";
-            columnHead(13) = "District Heating [GJ]";
-            columnHead(14) = "Water [m3]";
-        }
+    switch (unitsStyle_cur) {
+    case UnitsStyle::JtoKWH: {
+        columnHead(2) = "Electricity [kWh]";
+        columnHead(3) = "Natural Gas [kWh]";
+        columnHead(4) = "Gasoline [kWh]";
+        columnHead(5) = "Diesel [kWh]";
+        columnHead(6) = "Coal [kWh]";
+        columnHead(7) = "Fuel Oil No 1 [kWh]";
+        columnHead(8) = "Fuel Oil No 2 [kWh]";
+        columnHead(9) = "Propane [kWh]";
+        columnHead(10) = "Other Fuel 1 [kWh]";
+        columnHead(11) = "Other Fuel 2 [kWh]";
+        columnHead(12) = "District Cooling [kWh]";
+        columnHead(13) = "District Heating [kWh]";
+        columnHead(14) = "Water [m3]";
+    } break;
+    case UnitsStyle::InchPound: {
+        columnHead(2) = "Electricity [kBtu]";
+        columnHead(3) = "Natural Gas [kBtu]";
+        columnHead(4) = "Gasoline [kBtu]";
+        columnHead(5) = "Diesel [kBtu]";
+        columnHead(6) = "Coal [kBtu]";
+        columnHead(7) = "Fuel Oil No 1 [kBtu]";
+        columnHead(8) = "Fuel Oil No 2 [kBtu]";
+        columnHead(9) = "Propane [kBtu]";
+        columnHead(10) = "Other Fuel 1 [kBtu]";
+        columnHead(11) = "Other Fuel 2 [kBtu]";
+        columnHead(12) = "District Cooling [kBtu]";
+        columnHead(13) = "District Heating [kBtu]";
+        columnHead(14) = "Water [gal]";
+    } break;
+    default: {
+        columnHead(2) = "Electricity [GJ]";
+        columnHead(3) = "Natural Gas [GJ]";
+        columnHead(4) = "Gasoline [GJ]";
+        columnHead(5) = "Diesel [GJ]";
+        columnHead(6) = "Coal [GJ]";
+        columnHead(7) = "Fuel Oil No 1 [GJ]";
+        columnHead(8) = "Fuel Oil No 2 [GJ]";
+        columnHead(9) = "Propane [GJ]";
+        columnHead(10) = "Other Fuel 1 [GJ]";
+        columnHead(11) = "Other Fuel 2 [GJ]";
+        columnHead(12) = "District Cooling [GJ]";
+        columnHead(13) = "District Heating [GJ]";
+        columnHead(14) = "Water [m3]";
+    } break;
     }
 
     int numSubCatOrTypes = 0;
@@ -9912,18 +9973,19 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             // unit conversion - all values are used as divisors
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    largeConversionFactor = 3600000.0;
-                    areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
-                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-                } else {
-                    largeConversionFactor = 1000000.0; // to MJ
-                    areaConversionFactor = 1.0;
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                largeConversionFactor = 3600000.0;
+                areaConversionFactor = 1.0;
+            } break;
+            case UnitsStyle::InchPound: {
+                largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+                areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+            } break;
+            default: {
+                largeConversionFactor = 1000000.0; // to MJ
+                areaConversionFactor = 1.0;
+            } break;
             }
 
             // convert units into MJ (divide by 1,000,000) if J otherwise kWh
@@ -9977,49 +10039,50 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             largeConversionFactor = 1.0;
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Source Electricity [kWh]";
-                    columnHead(2) = "Source Natural Gas [kWh]";
-                    columnHead(3) = "Source Gasoline [kWh]";
-                    columnHead(4) = "Source Diesel [kWh]";
-                    columnHead(5) = "Source Coal [kWh]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kWh]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kWh]";
-                    columnHead(8) = "Source Propane [kWh]";
-                    columnHead(9) = "Source Other Fuel 1 [kWh]";
-                    columnHead(10) = "Source Other Fuel 2 [kWh]";
-                    columnHead(11) = "Source District Cooling [kWh]";
-                    columnHead(12) = "Source District Heating [kWh]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Source Electricity [kBtu]";
-                    columnHead(2) = "Source Natural Gas [kBtu]";
-                    columnHead(3) = "Source Gasoline [kBtu]";
-                    columnHead(4) = "Source Diesel [kBtu]";
-                    columnHead(5) = "Source Coal [kBtu]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
-                    columnHead(8) = "Source Propane [kBtu]";
-                    columnHead(9) = "Source Other Fuel 1 [kBtu]";
-                    columnHead(10) = "Source Other Fuel 2 [kBtu]";
-                    columnHead(11) = "Source District Cooling [kBtu]";
-                    columnHead(12) = "Source District Heating [kBtu]";
-                } else {
-                    columnHead(1) = "Source Electricity [GJ]";
-                    columnHead(2) = "Source Natural Gas [GJ]";
-                    columnHead(3) = "Source Gasoline [GJ]";
-                    columnHead(4) = "Source Diesel [GJ]";
-                    columnHead(5) = "Source Coal [GJ]";
-                    columnHead(6) = "Source Fuel Oil No 1 [GJ]";
-                    columnHead(7) = "Source Fuel Oil No 2 [GJ]";
-                    columnHead(8) = "Source Propane [GJ]";
-                    columnHead(9) = "Source Other Fuel 1 [GJ]";
-                    columnHead(10) = "Source Other Fuel 2 [GJ]";
-                    columnHead(11) = "Source District Cooling [GJ]";
-                    columnHead(12) = "Source District Heating [GJ]";
-                    largeConversionFactor = 1000.0; // for converting MJ to GJ
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Source Electricity [kWh]";
+                columnHead(2) = "Source Natural Gas [kWh]";
+                columnHead(3) = "Source Gasoline [kWh]";
+                columnHead(4) = "Source Diesel [kWh]";
+                columnHead(5) = "Source Coal [kWh]";
+                columnHead(6) = "Source Fuel Oil No 1 [kWh]";
+                columnHead(7) = "Source Fuel Oil No 2 [kWh]";
+                columnHead(8) = "Source Propane [kWh]";
+                columnHead(9) = "Source Other Fuel 1 [kWh]";
+                columnHead(10) = "Source Other Fuel 2 [kWh]";
+                columnHead(11) = "Source District Cooling [kWh]";
+                columnHead(12) = "Source District Heating [kWh]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Source Electricity [kBtu]";
+                columnHead(2) = "Source Natural Gas [kBtu]";
+                columnHead(3) = "Source Gasoline [kBtu]";
+                columnHead(4) = "Source Diesel [kBtu]";
+                columnHead(5) = "Source Coal [kBtu]";
+                columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
+                columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
+                columnHead(8) = "Source Propane [kBtu]";
+                columnHead(9) = "Source Other Fuel 1 [kBtu]";
+                columnHead(10) = "Source Other Fuel 2 [kBtu]";
+                columnHead(11) = "Source District Cooling [kBtu]";
+                columnHead(12) = "Source District Heating [kBtu]";
+            } break;
+            default: {
+                columnHead(1) = "Source Electricity [GJ]";
+                columnHead(2) = "Source Natural Gas [GJ]";
+                columnHead(3) = "Source Gasoline [GJ]";
+                columnHead(4) = "Source Diesel [GJ]";
+                columnHead(5) = "Source Coal [GJ]";
+                columnHead(6) = "Source Fuel Oil No 1 [GJ]";
+                columnHead(7) = "Source Fuel Oil No 2 [GJ]";
+                columnHead(8) = "Source Propane [GJ]";
+                columnHead(9) = "Source Other Fuel 1 [GJ]";
+                columnHead(10) = "Source Other Fuel 2 [GJ]";
+                columnHead(11) = "Source District Cooling [GJ]";
+                columnHead(12) = "Source District Heating [GJ]";
+                largeConversionFactor = 1000.0; // for converting MJ to GJ
+            } break;
             }
 
             //---- End Uses by Source Energy Sub-Table
@@ -10060,48 +10123,49 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
             // Normalized by Area tables
 
-            {
-                auto const SELECT_CASE_var(unitsStyle_cur);
-                if (SELECT_CASE_var == UnitsStyle::JtoKWH) {
-                    columnHead(1) = "Source Electricity [kWh/m2]";
-                    columnHead(2) = "Source Natural Gas [kWh/m2]";
-                    columnHead(3) = "Source Gasoline [kWh/m2]";
-                    columnHead(4) = "Source Diesel [kWh/m2]";
-                    columnHead(5) = "Source Coal [kWh/m2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
-                    columnHead(8) = "Source Propane [kWh/m2]";
-                    columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
-                    columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
-                    columnHead(11) = "Source District Cooling [kWh/m2]";
-                    columnHead(12) = "Source District Heating [kWh/m2]";
-                } else if (SELECT_CASE_var == UnitsStyle::InchPound) {
-                    columnHead(1) = "Source Electricity [kBtu/ft2]";
-                    columnHead(2) = "Source Natural Gas [kBtu/ft2]";
-                    columnHead(3) = "Source Gasoline [kBtu/ft2]";
-                    columnHead(4) = "Source Diesel [kBtu/ft2]";
-                    columnHead(5) = "Source Coal [kBtu/ft2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
-                    columnHead(8) = "Source Propane [kBtu/ft2]";
-                    columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
-                    columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
-                    columnHead(11) = "Source District Cooling [kBtu/ft2]";
-                    columnHead(12) = "Source District Heating [kBtu/ft2]";
-                } else {
-                    columnHead(1) = "Source Electricity [MJ/m2]";
-                    columnHead(2) = "Source Natural Gas [MJ/m2]";
-                    columnHead(3) = "Source Gasoline [MJ/m2]";
-                    columnHead(4) = "Source Diesel [MJ/m2]";
-                    columnHead(5) = "Source Coal [MJ/m2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
-                    columnHead(8) = "Source Propane [MJ/m2]";
-                    columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
-                    columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
-                    columnHead(11) = "Source District Cooling [MJ/m2]";
-                    columnHead(12) = "Source District Heating [MJ/m2]";
-                }
+            switch (unitsStyle_cur) {
+            case UnitsStyle::JtoKWH: {
+                columnHead(1) = "Source Electricity [kWh/m2]";
+                columnHead(2) = "Source Natural Gas [kWh/m2]";
+                columnHead(3) = "Source Gasoline [kWh/m2]";
+                columnHead(4) = "Source Diesel [kWh/m2]";
+                columnHead(5) = "Source Coal [kWh/m2]";
+                columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
+                columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
+                columnHead(8) = "Source Propane [kWh/m2]";
+                columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
+                columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
+                columnHead(11) = "Source District Cooling [kWh/m2]";
+                columnHead(12) = "Source District Heating [kWh/m2]";
+            } break;
+            case UnitsStyle::InchPound: {
+                columnHead(1) = "Source Electricity [kBtu/ft2]";
+                columnHead(2) = "Source Natural Gas [kBtu/ft2]";
+                columnHead(3) = "Source Gasoline [kBtu/ft2]";
+                columnHead(4) = "Source Diesel [kBtu/ft2]";
+                columnHead(5) = "Source Coal [kBtu/ft2]";
+                columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
+                columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
+                columnHead(8) = "Source Propane [kBtu/ft2]";
+                columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
+                columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
+                columnHead(11) = "Source District Cooling [kBtu/ft2]";
+                columnHead(12) = "Source District Heating [kBtu/ft2]";
+            } break;
+            default: {
+                columnHead(1) = "Source Electricity [MJ/m2]";
+                columnHead(2) = "Source Natural Gas [MJ/m2]";
+                columnHead(3) = "Source Gasoline [MJ/m2]";
+                columnHead(4) = "Source Diesel [MJ/m2]";
+                columnHead(5) = "Source Coal [MJ/m2]";
+                columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
+                columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
+                columnHead(8) = "Source Propane [MJ/m2]";
+                columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
+                columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
+                columnHead(11) = "Source District Cooling [MJ/m2]";
+                columnHead(12) = "Source District Heating [MJ/m2]";
+            } break;
             }
 
             //---- Normalized by Conditioned Area Sub-Table
@@ -10451,10 +10515,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 columnHead(10) = "Other Fuel 2 [kBtuh]";
                 columnHead(11) = "District Cooling [kBtuh]";
                 {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
+                    if (distrHeatSelected == 4) {
                         columnHead(12) = "District Heating [kBtuh]";
-                    } else if (SELECT_CASE_var == 5) {
+                    } else if (distrHeatSelected == 5) {
                         columnHead(12) = "Steam [kBtuh]";
                     }
                 }
@@ -10472,10 +10535,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 columnHead(10) = "Other Fuel 2 [W]";
                 columnHead(11) = "District Cooling [W]";
                 {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
+                    if (distrHeatSelected == 4) {
                         columnHead(12) = "District Heating [W]";
-                    } else if (SELECT_CASE_var == 5) {
+                    } else if (distrHeatSelected == 5) {
                         columnHead(12) = "Steam [W]";
                     }
                 }
@@ -10561,10 +10623,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 columnHead(11) = "Other Fuel 2 [kBtuh]";
                 columnHead(12) = "District Cooling [kBtuh]";
                 {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
+                    if (distrHeatSelected == 4) {
                         columnHead(13) = "District Heating [kBtuh]";
-                    } else if (SELECT_CASE_var == 5) {
+                    } else if (distrHeatSelected == 5) {
                         columnHead(13) = "Steam [kBtuh]";
                     }
                 }
@@ -10583,10 +10644,9 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                 columnHead(11) = "Other Fuel 2 [W]";
                 columnHead(12) = "District Cooling [W]";
                 {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
+                    if (distrHeatSelected == 4) {
                         columnHead(13) = "District Heating [W]";
-                    } else if (SELECT_CASE_var == 5) {
+                    } else if (distrHeatSelected == 5) {
                         columnHead(13) = "Steam [W]";
                     }
                 }
@@ -11308,108 +11368,116 @@ void WriteVeriSumTable(EnergyPlusData &state)
                     }
                     if ((state.dataSurface->Surface(iSurf).Tilt >= 60.0) && (state.dataSurface->Surface(iSurf).Tilt <= 120.0)) {
                         // vertical walls and windows
-                        {
-                            auto const SELECT_CASE_var(state.dataSurface->Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::Roof)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                                if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                    wallAreaN += curArea * mult;
-                                    if (isConditioned) wallAreaNcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaN += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaNcond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                    wallAreaE += curArea * mult;
-                                    if (isConditioned) wallAreaEcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaE += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaEcond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                    wallAreaS += curArea * mult;
-                                    if (isConditioned) wallAreaScond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaS += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaScond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                    wallAreaW += curArea * mult;
-                                    if (isConditioned) wallAreaWcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaW += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
-                                    }
+                        switch (state.dataSurface->Surface(iSurf).Class) {
+                        case SurfaceClass::Wall:
+                        case SurfaceClass::Floor:
+                        case SurfaceClass::Roof: {
+                            mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                            if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                                wallAreaN += curArea * mult;
+                                if (isConditioned) wallAreaNcond += curArea * mult;
+                                if (isAboveGround) {
+                                    aboveGroundWallAreaN += curArea * mult;
+                                    if (isConditioned) aboveGroundWallAreaNcond += curArea * mult;
                                 }
-                                if (DetailedWWR) {
-                                    if (produceTabular) {
-                                        print(state.files.debug,
-                                              "{},Wall,{:.1R},{:.1R}\n",
-                                              state.dataSurface->Surface(iSurf).Name,
-                                              curArea * mult,
-                                              state.dataSurface->Surface(iSurf).Tilt);
-                                    }
+                            } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                                wallAreaE += curArea * mult;
+                                if (isConditioned) wallAreaEcond += curArea * mult;
+                                if (isAboveGround) {
+                                    aboveGroundWallAreaE += curArea * mult;
+                                    if (isConditioned) aboveGroundWallAreaEcond += curArea * mult;
                                 }
-                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
-                                if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                    windowAreaN += curArea * mult;
-                                    if (isConditioned) windowAreaNcond += curArea * mult;
-                                } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                    windowAreaE += curArea * mult;
-                                    if (isConditioned) windowAreaEcond += curArea * mult;
-                                } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                    windowAreaS += curArea * mult;
-                                    if (isConditioned) windowAreaScond += curArea * mult;
-                                } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                    windowAreaW += curArea * mult;
-                                    if (isConditioned) windowAreaWcond += curArea * mult;
+                            } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                                wallAreaS += curArea * mult;
+                                if (isConditioned) wallAreaScond += curArea * mult;
+                                if (isAboveGround) {
+                                    aboveGroundWallAreaS += curArea * mult;
+                                    if (isConditioned) aboveGroundWallAreaScond += curArea * mult;
                                 }
-                                zoneOpeningArea(zonePt) +=
-                                    curArea *
-                                    state.dataSurface->Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
-                                zoneGlassArea(zonePt) += state.dataSurface->Surface(iSurf).GrossArea * state.dataSurface->Surface(iSurf).Multiplier;
-                                if (DetailedWWR) {
-                                    if (produceTabular) {
-                                        print(state.files.debug,
-                                              "{},Window,{:.1R},{:.1R}\n",
-                                              state.dataSurface->Surface(iSurf).Name,
-                                              curArea * mult,
-                                              state.dataSurface->Surface(iSurf).Tilt);
-                                    }
+                            } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                                wallAreaW += curArea * mult;
+                                if (isConditioned) wallAreaWcond += curArea * mult;
+                                if (isAboveGround) {
+                                    aboveGroundWallAreaW += curArea * mult;
+                                    if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
                                 }
                             }
+                            if (DetailedWWR) {
+                                if (produceTabular) {
+                                    print(state.files.debug,
+                                          "{},Wall,{:.1R},{:.1R}\n",
+                                          state.dataSurface->Surface(iSurf).Name,
+                                          curArea * mult,
+                                          state.dataSurface->Surface(iSurf).Tilt);
+                                }
+                            }
+                        } break;
+                        case SurfaceClass::Window:
+                        case SurfaceClass::TDD_Dome: {
+                            mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
+                            if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                                windowAreaN += curArea * mult;
+                                if (isConditioned) windowAreaNcond += curArea * mult;
+                            } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                                windowAreaE += curArea * mult;
+                                if (isConditioned) windowAreaEcond += curArea * mult;
+                            } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                                windowAreaS += curArea * mult;
+                                if (isConditioned) windowAreaScond += curArea * mult;
+                            } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                                windowAreaW += curArea * mult;
+                                if (isConditioned) windowAreaWcond += curArea * mult;
+                            }
+                            zoneOpeningArea(zonePt) +=
+                                curArea *
+                                state.dataSurface->Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
+                            zoneGlassArea(zonePt) += state.dataSurface->Surface(iSurf).GrossArea * state.dataSurface->Surface(iSurf).Multiplier;
+                            if (DetailedWWR) {
+                                if (produceTabular) {
+                                    print(state.files.debug,
+                                          "{},Window,{:.1R},{:.1R}\n",
+                                          state.dataSurface->Surface(iSurf).Name,
+                                          curArea * mult,
+                                          state.dataSurface->Surface(iSurf).Tilt);
+                                }
+                            }
+                        } break;
+                        default:
+                            break;
                         }
                     } else if (state.dataSurface->Surface(iSurf).Tilt < 60.0) { // roof and skylights
-                        {
-                            auto const SELECT_CASE_var(state.dataSurface->Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::Roof)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                                roofArea += curArea * mult;
-                                if (DetailedWWR) {
-                                    if (produceTabular) {
-                                        print(state.files.debug,
-                                              "{},Roof,{:.1R},{:.1R}\n",
-                                              state.dataSurface->Surface(iSurf).Name,
-                                              curArea * mult,
-                                              state.dataSurface->Surface(iSurf).Tilt);
-                                    }
-                                }
-                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
-                                skylightArea += curArea * mult;
-                                if (DetailedWWR) {
-                                    if (produceTabular) {
-                                        print(state.files.debug,
-                                              "{},Skylight,{:.1R},{:.1R}\n",
-                                              state.dataSurface->Surface(iSurf).Name,
-                                              curArea * mult,
-                                              state.dataSurface->Surface(iSurf).Tilt);
-                                    }
+                        switch (state.dataSurface->Surface(iSurf).Class) {
+                        case SurfaceClass::Wall:
+                        case SurfaceClass::Floor:
+                        case SurfaceClass::Roof: {
+                            mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                            roofArea += curArea * mult;
+                            if (DetailedWWR) {
+                                if (produceTabular) {
+                                    print(state.files.debug,
+                                          "{},Roof,{:.1R},{:.1R}\n",
+                                          state.dataSurface->Surface(iSurf).Name,
+                                          curArea * mult,
+                                          state.dataSurface->Surface(iSurf).Tilt);
                                 }
                             }
+                        } break;
+                        case SurfaceClass::Window:
+                        case SurfaceClass::TDD_Dome: {
+                            mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
+                            skylightArea += curArea * mult;
+                            if (DetailedWWR) {
+                                if (produceTabular) {
+                                    print(state.files.debug,
+                                          "{},Skylight,{:.1R},{:.1R}\n",
+                                          state.dataSurface->Surface(iSurf).Name,
+                                          curArea * mult,
+                                          state.dataSurface->Surface(iSurf).Tilt);
+                                }
+                            }
+                        } break;
+                        default:
+                            break;
                         }
                     } else { // floors
                              // ignored
@@ -14076,76 +14144,76 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
         if (ort->displayZoneComponentLoadSummary) {
             ZoneHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : ZoneHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cellUsed = false;
             }
             ZoneCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : ZoneCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cellUsed = false;
             }
         }
         if (ort->displayAirLoopComponentLoadSummary) {
             AirLoopHeatCompLoadTables.allocate(NumPrimaryAirSys);
             for (auto &e : AirLoopHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cellUsed = false;
                 e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
                 e.zoneIndices = 0;
             }
             AirLoopCoolCompLoadTables.allocate(NumPrimaryAirSys);
             for (auto &e : AirLoopCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cellUsed = false;
                 e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
                 e.zoneIndices = 0;
             }
             AirLoopZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : AirLoopZonesHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cellUsed = false;
             }
             AirLoopZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : AirLoopZonesCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cellUsed = false;
             }
         }
         if (ort->displayFacilityComponentLoadSummary) {
-            FacilityHeatCompLoadTables.cells.allocate(cPerArea, rGrdTot);
+            FacilityHeatCompLoadTables.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
             FacilityHeatCompLoadTables.cells = 0.;
-            FacilityHeatCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
+            FacilityHeatCompLoadTables.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
             FacilityHeatCompLoadTables.cellUsed = false;
 
-            FacilityCoolCompLoadTables.cells.allocate(cPerArea, rGrdTot);
+            FacilityCoolCompLoadTables.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
             FacilityCoolCompLoadTables.cells = 0.;
-            FacilityCoolCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
+            FacilityCoolCompLoadTables.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
             FacilityCoolCompLoadTables.cellUsed = false;
 
             FacilityZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : FacilityZonesHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cellUsed = false;
             }
             FacilityZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
             for (auto &e : FacilityZonesCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
+                e.cells.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
+                e.cellUsed.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
                 e.cellUsed = false;
             }
         }
@@ -14194,7 +14262,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                     CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     // send latent load info to coil summary report
                     state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(
-                        iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        iZone, ZoneCoolCompLoadTables(iZone).cells(LoadCompCol::Latent, LoadCompRow::GrdTot));
 
                     heatDesSelected = state.dataSize->CalcFinalZoneSizing(iZone).HeatDDNum;
                     ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
@@ -14231,7 +14299,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
 
                     // send latent load info to coil summary report
                     state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(
-                        iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
+                        iZone, ZoneHeatCompLoadTables(iZone).cells(LoadCompCol::Latent, LoadCompRow::GrdTot));
 
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
@@ -14757,7 +14825,7 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
 
     resultCells = 0.;
     resCellsUsd = false;
-    delayOpaque.allocate(rGrdTot);
+    delayOpaque.allocate(LoadCompRow::GrdTot);
     delayOpaque = 0.;
     AvgData.allocate(NumOfTimeStepInDay);
     AvgData = 0.;
@@ -14765,98 +14833,106 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
     if (desDaySelected != 0 && timeOfMax != 0) {
 
         // PEOPLE
-        resultCells(cSensInst, rPeople) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::People) =
             MovingAvgAtMaxTime(state, ort->peopleInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rPeople) = true;
-        resultCells(cLatent, rPeople) = MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rPeople) = true;
-        resultCells(cSensDelay, rPeople) = MovingAvgAtMaxTime(state, peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rPeople) = true;
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::People) = true;
+        resultCells(LoadCompCol::Latent, LoadCompRow::People) =
+            MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::Latent, LoadCompRow::People) = true;
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::People) = MovingAvgAtMaxTime(state, peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::People) = true;
 
         // LIGHTS
-        resultCells(cSensInst, rLights) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::Lights) =
             MovingAvgAtMaxTime(state, ort->lightInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rLights) = true;
-        resultCells(cSensRA, rLights) = MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensRA, rLights) = true;
-        resultCells(cSensDelay, rLights) = MovingAvgAtMaxTime(state, lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rLights) = true;
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Lights) = true;
+        resultCells(LoadCompCol::SensRA, LoadCompRow::Lights) =
+            MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensRA, LoadCompRow::Lights) = true;
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::Lights) = MovingAvgAtMaxTime(state, lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::Lights) = true;
 
         // EQUIPMENT
-        resultCells(cSensInst, rEquip) = MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rEquip) = true;
-        resultCells(cLatent, rEquip) = MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rEquip) = true;
-        resultCells(cSensDelay, rEquip) = MovingAvgAtMaxTime(state, equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rEquip) = true;
+        resultCells(LoadCompCol::SensInst, LoadCompRow::Equip) =
+            MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Equip) = true;
+        resultCells(LoadCompCol::Latent, LoadCompRow::Equip) =
+            MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::Latent, LoadCompRow::Equip) = true;
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::Equip) = MovingAvgAtMaxTime(state, equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::Equip) = true;
 
         // REFRIGERATION EQUIPMENT
-        resultCells(cSensInst, rRefrig) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::Refrig) =
             MovingAvgAtMaxTime(state, ort->refrigInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rRefrig) = true;
-        resultCells(cSensRA, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensRA, rRefrig) = true;
-        resultCells(cLatent, rRefrig) = MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rRefrig) = true;
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Refrig) = true;
+        resultCells(LoadCompCol::SensRA, LoadCompRow::Refrig) =
+            MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensRA, LoadCompRow::Refrig) = true;
+        resultCells(LoadCompCol::Latent, LoadCompRow::Refrig) =
+            MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::Latent, LoadCompRow::Refrig) = true;
 
         // WATER USE EQUIPMENT
-        resultCells(cSensInst, rWaterUse) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::WaterUse) =
             MovingAvgAtMaxTime(state, ort->waterUseInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rWaterUse) = true;
-        resultCells(cLatent, rWaterUse) =
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::WaterUse) = true;
+        resultCells(LoadCompCol::Latent, LoadCompRow::WaterUse) =
             MovingAvgAtMaxTime(state, ort->waterUseLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rWaterUse) = true;
+        resCellsUsd(LoadCompCol::Latent, LoadCompRow::WaterUse) = true;
 
         // HVAC EQUIPMENT LOSSES
-        resultCells(cSensInst, rHvacLoss) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::HvacLoss) =
             MovingAvgAtMaxTime(state, ort->hvacLossInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rHvacLoss) = true;
-        resultCells(cSensDelay, rHvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rHvacLoss) = true;
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::HvacLoss) = true;
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::HvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::HvacLoss) = true;
 
         // POWER GENERATION EQUIPMENT
-        resultCells(cSensInst, rPowerGen) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::PowerGen) =
             MovingAvgAtMaxTime(state, ort->powerGenInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rPowerGen) = true;
-        resultCells(cSensDelay, rPowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rPowerGen) = true;
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::PowerGen) = true;
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::PowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::PowerGen) = true;
 
         // DOAS
-        resultCells(cSensInst, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
-        resCellsUsd(cSensInst, rDOAS) = true;
-        resultCells(cLatent, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
-        resCellsUsd(cLatent, rDOAS) = true;
+        resultCells(LoadCompCol::SensInst, LoadCompRow::DOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::DOAS) = true;
+        resultCells(LoadCompCol::Latent, LoadCompRow::DOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
+        resCellsUsd(LoadCompCol::Latent, LoadCompRow::DOAS) = true;
 
         // INFILTRATION
-        resultCells(cSensInst, rInfil) = MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rInfil) = true;
-        resultCells(cLatent, rInfil) = MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rInfil) = true;
+        resultCells(LoadCompCol::SensInst, LoadCompRow::Infil) =
+            MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::Infil) = true;
+        resultCells(LoadCompCol::Latent, LoadCompRow::Infil) =
+            MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::Latent, LoadCompRow::Infil) = true;
 
         // ZONE VENTILATION
-        resultCells(cSensInst, rZoneVent) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::ZoneVent) =
             MovingAvgAtMaxTime(state, ort->zoneVentInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rZoneVent) = true;
-        resultCells(cLatent, rZoneVent) =
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::ZoneVent) = true;
+        resultCells(LoadCompCol::Latent, LoadCompRow::ZoneVent) =
             MovingAvgAtMaxTime(state, ort->zoneVentLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rZoneVent) = true;
+        resCellsUsd(LoadCompCol::Latent, LoadCompRow::ZoneVent) = true;
 
         // INTERZONE MIXING
-        resultCells(cSensInst, rIntZonMix) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::IntZonMix) =
             MovingAvgAtMaxTime(state, ort->interZoneMixInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rIntZonMix) = true;
-        resultCells(cLatent, rIntZonMix) =
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::IntZonMix) = true;
+        resultCells(LoadCompCol::Latent, LoadCompRow::IntZonMix) =
             MovingAvgAtMaxTime(state, ort->interZoneMixLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cLatent, rIntZonMix) = true;
+        resCellsUsd(LoadCompCol::Latent, LoadCompRow::IntZonMix) = true;
 
         // FENESTRATION CONDUCTION
-        resultCells(cSensInst, rFeneCond) =
+        resultCells(LoadCompCol::SensInst, LoadCompRow::FeneCond) =
             MovingAvgAtMaxTime(state, feneCondInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensInst, rFeneCond) = true;
+        resCellsUsd(LoadCompCol::SensInst, LoadCompRow::FeneCond) = true;
 
         // FENESTRATION SOLAR
-        resultCells(cSensDelay, rFeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
-        resCellsUsd(cSensDelay, rFeneSolr) = true;
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::FeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+        resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::FeneSolr) = true;
 
         // opaque surfaces - must combine individual surfaces by class and other side conditions
         delayOpaque = 0.0;
@@ -14873,62 +14949,78 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
             seqData = surfDelaySeq(_, kSurf);
             MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
             singleSurfDelay = AvgData(timeOfMax);
-            {
-                auto const SELECT_CASE_var(state.dataSurface->Surface(kSurf).Class);
-                if (SELECT_CASE_var == SurfaceClass::Wall) {
-                    {
-                        auto const SELECT_CASE_var1(curExtBoundCond);
-                        if (SELECT_CASE_var1 == ExternalEnvironment) {
-                            delayOpaque(rExtWall) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
-                                   (SELECT_CASE_var1 == KivaFoundation)) {
-                            delayOpaque(rGrdWall) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
-                                   (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
-                            delayOpaque(rOtherWall) += singleSurfDelay;
-                        } else { // interzone
-                            delayOpaque(rIntZonWall) += singleSurfDelay;
-                        }
-                    }
-                } else if (SELECT_CASE_var == SurfaceClass::Floor) {
-                    {
-                        auto const SELECT_CASE_var1(curExtBoundCond);
-                        if (SELECT_CASE_var1 == ExternalEnvironment) {
-                            delayOpaque(rExtFlr) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
-                                   (SELECT_CASE_var1 == KivaFoundation)) {
-                            delayOpaque(rGrdFlr) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == OtherSideCoefNoCalcExt) || (SELECT_CASE_var1 == OtherSideCoefCalcExt) ||
-                                   (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
-                            delayOpaque(rOtherFlr) += singleSurfDelay;
-                        } else { // interzone
-                            delayOpaque(rIntZonFlr) += singleSurfDelay;
-                        }
-                    }
-                } else if (SELECT_CASE_var == SurfaceClass::Roof) {
-                    {
-                        auto const SELECT_CASE_var1(curExtBoundCond);
-                        if (SELECT_CASE_var1 == ExternalEnvironment) {
-                            delayOpaque(rRoof) += singleSurfDelay;
-                        } else if ((SELECT_CASE_var1 == Ground) || (SELECT_CASE_var1 == GroundFCfactorMethod) ||
-                                   (SELECT_CASE_var1 == KivaFoundation) || (SELECT_CASE_var1 == OtherSideCoefNoCalcExt) ||
-                                   (SELECT_CASE_var1 == OtherSideCoefCalcExt) || (SELECT_CASE_var1 == OtherSideCondModeledExt)) {
-                            delayOpaque(rOtherRoof) += singleSurfDelay;
-                        } else { // interzone
-                            delayOpaque(rIntZonCeil) += singleSurfDelay;
-                        }
-                    }
-                } else if (SELECT_CASE_var == SurfaceClass::Door) {
-                    delayOpaque(rOpqDoor) += singleSurfDelay;
+            switch (state.dataSurface->Surface(kSurf).Class) {
+            case SurfaceClass::Wall: {
+                switch (curExtBoundCond) {
+                case ExternalEnvironment: {
+                    delayOpaque(LoadCompRow::ExtWall) += singleSurfDelay;
+                } break;
+                case Ground:
+                case GroundFCfactorMethod:
+                case KivaFoundation: {
+                    delayOpaque(LoadCompRow::GrdWall) += singleSurfDelay;
+                } break;
+                case OtherSideCoefNoCalcExt:
+                case OtherSideCoefCalcExt:
+                case OtherSideCondModeledExt: {
+                    delayOpaque(LoadCompRow::OtherWall) += singleSurfDelay;
+                } break;
+                default: { // interzone
+                    delayOpaque(LoadCompRow::IntZonWall) += singleSurfDelay;
+                } break;
                 }
+            } break;
+            case SurfaceClass::Floor: {
+                switch (curExtBoundCond) {
+                case ExternalEnvironment: {
+                    delayOpaque(LoadCompRow::ExtFlr) += singleSurfDelay;
+                } break;
+                case Ground:
+                case GroundFCfactorMethod:
+                case KivaFoundation: {
+                    delayOpaque(LoadCompRow::GrdFlr) += singleSurfDelay;
+                } break;
+                case OtherSideCoefNoCalcExt:
+                case OtherSideCoefCalcExt:
+                case OtherSideCondModeledExt: {
+                    delayOpaque(LoadCompRow::OtherFlr) += singleSurfDelay;
+                } break;
+                default: { // interzone
+                    delayOpaque(LoadCompRow::IntZonFlr) += singleSurfDelay;
+                } break;
+                }
+            } break;
+            case SurfaceClass::Roof: {
+                switch (curExtBoundCond) {
+                case ExternalEnvironment: {
+                    delayOpaque(LoadCompRow::Roof) += singleSurfDelay;
+                } break;
+                case Ground:
+                case GroundFCfactorMethod:
+                case KivaFoundation:
+                case OtherSideCoefNoCalcExt:
+                case OtherSideCoefCalcExt:
+                case OtherSideCondModeledExt: {
+                    delayOpaque(LoadCompRow::OtherRoof) += singleSurfDelay;
+                } break;
+                default: { // interzone
+                    delayOpaque(LoadCompRow::IntZonCeil) += singleSurfDelay;
+                } break;
+                }
+            } break;
+            case SurfaceClass::Door: {
+                delayOpaque(LoadCompRow::OpqDoor) += singleSurfDelay;
+            } break;
+            default:
+                break;
             }
         }
-        for (int k = rRoof; k <= rOtherFlr; ++k) {
-            resultCells(cSensDelay, k) = delayOpaque(k);
-            resCellsUsd(cSensDelay, k) = true;
+        for (int k = LoadCompRow::Roof; k <= LoadCompRow::OtherFlr; ++k) {
+            resultCells(LoadCompCol::SensDelay, k) = delayOpaque(k);
+            resCellsUsd(LoadCompCol::SensDelay, k) = true;
         }
-        resultCells(cSensDelay, rOpqDoor) = delayOpaque(rOpqDoor);
-        resCellsUsd(cSensDelay, rOpqDoor) = true;
+        resultCells(LoadCompCol::SensDelay, LoadCompRow::OpqDoor) = delayOpaque(LoadCompRow::OpqDoor);
+        resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::OpqDoor) = true;
     }
 }
 
@@ -15171,73 +15263,73 @@ void GetZoneComponentAreas(EnergyPlusData &state, Array1D<ZompComponentAreasType
 // adds the area column for the load component tables
 void AddAreaColumnForZone(int const zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoad)
 {
-    compLoad.cells(cArea, rPeople) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rPeople) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::People) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::People) = true;
 
-    compLoad.cells(cArea, rLights) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rLights) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Lights) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::Lights) = true;
 
-    compLoad.cells(cArea, rEquip) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rEquip) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Equip) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::Equip) = true;
 
-    compLoad.cells(cArea, rRefrig) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rRefrig) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Refrig) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::Refrig) = true;
 
-    compLoad.cells(cArea, rWaterUse) = compAreas(zoneNum).floor;
-    compLoad.cellUsed(cArea, rWaterUse) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::WaterUse) = compAreas(zoneNum).floor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::WaterUse) = true;
 
-    compLoad.cells(cArea, rInfil) = compAreas(zoneNum).extWall;
-    compLoad.cellUsed(cArea, rInfil) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Infil) = compAreas(zoneNum).extWall;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::Infil) = true;
 
-    compLoad.cells(cArea, rRoof) = compAreas(zoneNum).roof;
-    compLoad.cellUsed(cArea, rRoof) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::Roof) = compAreas(zoneNum).roof;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::Roof) = true;
 
-    compLoad.cells(cArea, rIntZonCeil) = compAreas(zoneNum).ceiling;
-    compLoad.cellUsed(cArea, rIntZonCeil) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::IntZonCeil) = compAreas(zoneNum).ceiling;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::IntZonCeil) = true;
 
-    compLoad.cells(cArea, rOtherRoof) = compAreas(zoneNum).roof;
-    compLoad.cellUsed(cArea, rOtherRoof) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::OtherRoof) = compAreas(zoneNum).roof;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::OtherRoof) = true;
 
-    compLoad.cells(cArea, rExtWall) = compAreas(zoneNum).extWall;
-    compLoad.cellUsed(cArea, rExtWall) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::ExtWall) = compAreas(zoneNum).extWall;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::ExtWall) = true;
 
-    compLoad.cells(cArea, rIntZonWall) = compAreas(zoneNum).intZoneWall;
-    compLoad.cellUsed(cArea, rIntZonWall) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::IntZonWall) = compAreas(zoneNum).intZoneWall;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::IntZonWall) = true;
 
-    compLoad.cells(cArea, rGrdWall) = compAreas(zoneNum).grndCntWall;
-    compLoad.cellUsed(cArea, rGrdWall) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::GrdWall) = compAreas(zoneNum).grndCntWall;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::GrdWall) = true;
 
-    compLoad.cells(cArea, rOtherWall) = compAreas(zoneNum).extWall;
-    compLoad.cellUsed(cArea, rOtherWall) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::OtherWall) = compAreas(zoneNum).extWall;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::OtherWall) = true;
 
-    compLoad.cells(cArea, rExtFlr) = compAreas(zoneNum).extFloor;
-    compLoad.cellUsed(cArea, rExtFlr) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::ExtFlr) = compAreas(zoneNum).extFloor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::ExtFlr) = true;
 
-    compLoad.cells(cArea, rIntZonFlr) = compAreas(zoneNum).intZoneFloor;
-    compLoad.cellUsed(cArea, rIntZonFlr) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::IntZonFlr) = compAreas(zoneNum).intZoneFloor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::IntZonFlr) = true;
 
-    compLoad.cells(cArea, rGrdFlr) = compAreas(zoneNum).grndCntFloor;
-    compLoad.cellUsed(cArea, rGrdFlr) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::GrdFlr) = compAreas(zoneNum).grndCntFloor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::GrdFlr) = true;
 
-    compLoad.cells(cArea, rOtherFlr) = compAreas(zoneNum).intZoneFloor;
-    compLoad.cellUsed(cArea, rOtherFlr) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::OtherFlr) = compAreas(zoneNum).intZoneFloor;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::OtherFlr) = true;
 
-    compLoad.cells(cArea, rFeneCond) = compAreas(zoneNum).fenestration;
-    compLoad.cellUsed(cArea, rFeneCond) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::FeneCond) = compAreas(zoneNum).fenestration;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::FeneCond) = true;
 
-    compLoad.cells(cArea, rFeneSolr) = compAreas(zoneNum).fenestration;
-    compLoad.cellUsed(cArea, rFeneSolr) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::FeneSolr) = compAreas(zoneNum).fenestration;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::FeneSolr) = true;
 
-    compLoad.cells(cArea, rOpqDoor) = compAreas(zoneNum).door;
-    compLoad.cellUsed(cArea, rOpqDoor) = true;
+    compLoad.cells(LoadCompCol::Area, LoadCompRow::OpqDoor) = compAreas(zoneNum).door;
+    compLoad.cellUsed(LoadCompCol::Area, LoadCompRow::OpqDoor) = true;
 }
 
 // Used for the AirLoop and Facility level load component tables to sum the results from invidual zones
 void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 const multiplier)
 {
     // sum the main results
-    for (int col = 1; col <= cPerArea; ++col) {
-        for (int row = 1; row <= rGrdTot; ++row) {
+    for (int col = 1; col <= LoadCompCol::PerArea; ++col) {
+        for (int row = 1; row <= LoadCompRow::GrdTot; ++row) {
             compLoadTotal.cells(col, row) += compLoadPartial.cells(col, row) * multiplier;
             compLoadTotal.cellUsed(col, row) = compLoadTotal.cellUsed(col, row) || compLoadPartial.cellUsed(col, row);
         }
@@ -15274,42 +15366,43 @@ void AddTotalRowsForLoadSummary(CompLoadTablesType &compLoadTotal)
 {
 
     // zero the grand total -total cell
-    compLoadTotal.cells(cTotal, rGrdTot) = 0.;
-    compLoadTotal.cellUsed(cTotal, rGrdTot) = true;
+    compLoadTotal.cells(LoadCompCol::Total, LoadCompRow::GrdTot) = 0.;
+    compLoadTotal.cellUsed(LoadCompCol::Total, LoadCompRow::GrdTot) = true;
 
     // zero the grand total row
-    for (int col = 1; col <= cLatent; ++col) {
-        compLoadTotal.cells(col, rGrdTot) = 0.;
-        compLoadTotal.cellUsed(col, rGrdTot) = true;
+    for (int col = 1; col <= LoadCompCol::Latent; ++col) {
+        compLoadTotal.cells(col, LoadCompRow::GrdTot) = 0.;
+        compLoadTotal.cellUsed(col, LoadCompRow::GrdTot) = true;
     }
 
-    for (int row = 1; row <= rOpqDoor; ++row) {
+    for (int row = 1; row <= LoadCompRow::OpqDoor; ++row) {
         // zero the total column
-        compLoadTotal.cells(cTotal, row) = 0.;
-        compLoadTotal.cellUsed(cTotal, row) = true;
-        for (int col = 1; col <= cLatent; ++col) {
+        compLoadTotal.cells(LoadCompCol::Total, row) = 0.;
+        compLoadTotal.cellUsed(LoadCompCol::Total, row) = true;
+        for (int col = 1; col <= LoadCompCol::Latent; ++col) {
             // add the cell to the grand total row and total column
             if (compLoadTotal.cellUsed(col, row)) {
-                compLoadTotal.cells(cTotal, row) += compLoadTotal.cells(col, row);
-                compLoadTotal.cells(col, rGrdTot) += compLoadTotal.cells(col, row);
-                compLoadTotal.cells(cTotal, rGrdTot) += compLoadTotal.cells(col, row);
+                compLoadTotal.cells(LoadCompCol::Total, row) += compLoadTotal.cells(col, row);
+                compLoadTotal.cells(col, LoadCompRow::GrdTot) += compLoadTotal.cells(col, row);
+                compLoadTotal.cells(LoadCompCol::Total, LoadCompRow::GrdTot) += compLoadTotal.cells(col, row);
             }
         }
     }
 
     // compute the % grand total column
-    Real64 grandTotalTotal = compLoadTotal.cells(cTotal, rGrdTot);
+    Real64 grandTotalTotal = compLoadTotal.cells(LoadCompCol::Total, LoadCompRow::GrdTot);
     if (grandTotalTotal != 0.0) {
-        for (int row = 1; row <= rOpqDoor; ++row) {
-            compLoadTotal.cells(cPerc, row) = 100 * compLoadTotal.cells(cTotal, row) / grandTotalTotal;
-            compLoadTotal.cellUsed(cPerc, row) = true;
+        for (int row = 1; row <= LoadCompRow::OpqDoor; ++row) {
+            compLoadTotal.cells(LoadCompCol::Perc, row) = 100 * compLoadTotal.cells(LoadCompCol::Total, row) / grandTotalTotal;
+            compLoadTotal.cellUsed(LoadCompCol::Perc, row) = true;
         }
     }
     // compute the Total per Area column
-    for (int row = 1; row <= rOpqDoor; ++row) {
-        if (compLoadTotal.cellUsed(cTotal, row) && compLoadTotal.cells(cArea, row) != 0.) {
-            compLoadTotal.cells(cPerArea, row) = compLoadTotal.cells(cTotal, row) / compLoadTotal.cells(cArea, row);
-            compLoadTotal.cellUsed(cPerArea, row) = true;
+    for (int row = 1; row <= LoadCompRow::OpqDoor; ++row) {
+        if (compLoadTotal.cellUsed(LoadCompCol::Total, row) && compLoadTotal.cells(LoadCompCol::Area, row) != 0.) {
+            compLoadTotal.cells(LoadCompCol::PerArea, row) =
+                compLoadTotal.cells(LoadCompCol::Total, row) / compLoadTotal.cells(LoadCompCol::Area, row);
+            compLoadTotal.cellUsed(LoadCompCol::PerArea, row) = true;
         }
     }
 }
@@ -15318,7 +15411,8 @@ void AddTotalRowsForLoadSummary(CompLoadTablesType &compLoadTotal)
 void ComputePeakDifference(CompLoadTablesType &compLoad)
 {
     // Estimated Instant + Delayed Sensible Load
-    compLoad.estInstDelSensLoad = compLoad.cells(cSensInst, rGrdTot) + compLoad.cells(cSensDelay, rGrdTot);
+    compLoad.estInstDelSensLoad =
+        compLoad.cells(LoadCompCol::SensInst, LoadCompRow::GrdTot) + compLoad.cells(LoadCompCol::SensDelay, LoadCompRow::GrdTot);
 
     // Difference
     compLoad.diffPeakEst = compLoad.peakDesSensLoad - compLoad.estInstDelSensLoad;
@@ -15339,20 +15433,20 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
         Real64 airFlowConversion = getSpecificUnitMultiplier(state, "m3/s", "ft3/min");
         Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
         Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
-        for (int row = 1; row <= rGrdTot; ++row) {
-            for (int col = 1; col <= cTotal; ++col) {
+        for (int row = 1; row <= LoadCompRow::GrdTot; ++row) {
+            for (int col = 1; col <= LoadCompCol::Total; ++col) {
                 if (compLoadTotal.cellUsed(col, row)) {
                     compLoadTotal.cells(col, row) *= powerConversion;
                 }
             }
-            if (compLoadTotal.cellUsed(cPerArea, row)) {
-                compLoadTotal.cells(cPerArea, row) *= powerConversion;
+            if (compLoadTotal.cellUsed(LoadCompCol::PerArea, row)) {
+                compLoadTotal.cells(LoadCompCol::PerArea, row) *= powerConversion;
             }
-            if (compLoadTotal.cellUsed(cArea, row)) {
-                compLoadTotal.cells(cArea, row) *= areaConversion;
+            if (compLoadTotal.cellUsed(LoadCompCol::Area, row)) {
+                compLoadTotal.cells(LoadCompCol::Area, row) *= areaConversion;
             }
-            if (compLoadTotal.cellUsed(cPerArea, row)) {
-                compLoadTotal.cells(cPerArea, row) *= powerPerAreaConversion;
+            if (compLoadTotal.cellUsed(LoadCompCol::PerArea, row)) {
+                compLoadTotal.cells(LoadCompCol::PerArea, row) *= powerPerAreaConversion;
             }
         }
         int tempConvIndx = getSpecificUnitIndex(state, "C", "F");
@@ -15398,20 +15492,20 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
         Real64 airFlowConversion = getSpecificUnitMultiplier(state, "m3/s", "ft3/min");
         Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
         Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
-        for (int row = 1; row <= rGrdTot; ++row) {
-            for (int col = 1; col <= cTotal; ++col) {
+        for (int row = 1; row <= LoadCompRow::GrdTot; ++row) {
+            for (int col = 1; col <= LoadCompCol::Total; ++col) {
                 if (compLoadTotal.cellUsed(col, row)) {
                     compLoadTotal.cells(col, row) *= powerConversion;
                 }
             }
-            if (compLoadTotal.cellUsed(cPerArea, row)) {
-                compLoadTotal.cells(cPerArea, row) *= powerConversion;
+            if (compLoadTotal.cellUsed(LoadCompCol::PerArea, row)) {
+                compLoadTotal.cells(LoadCompCol::PerArea, row) *= powerConversion;
             }
-            if (compLoadTotal.cellUsed(cArea, row)) {
-                compLoadTotal.cells(cArea, row) *= areaConversion;
+            if (compLoadTotal.cellUsed(LoadCompCol::Area, row)) {
+                compLoadTotal.cells(LoadCompCol::Area, row) *= areaConversion;
             }
-            if (compLoadTotal.cellUsed(cPerArea, row)) {
-                compLoadTotal.cells(cPerArea, row) *= powerPerAreaConversion;
+            if (compLoadTotal.cellUsed(LoadCompCol::PerArea, row)) {
+                compLoadTotal.cells(LoadCompCol::PerArea, row) *= powerPerAreaConversion;
             }
         }
         int tempConvIndx = getSpecificUnitIndex(state, "C", "F");
@@ -15502,7 +15596,7 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         std::string zonesIncludedName;
         std::string engineeringCheckName;
         for (int coolHeat = 1; coolHeat <= 2; ++coolHeat) {
-            tableBody.allocate(cPerArea, rGrdTot);
+            tableBody.allocate(LoadCompCol::PerArea, LoadCompRow::GrdTot);
             tableBody = "";
             if (coolHeat == 1) {
                 curCompLoad = compLoadCool;
@@ -15518,67 +15612,67 @@ void OutputCompLoadSummary(EnergyPlusData &state,
                 engineeringCheckName = "Engineering Checks for Heating";
             }
             // move number array into string array
-            for (int c = 1; c <= cPerArea; ++c) {
-                for (int r = 1; r <= rGrdTot; ++r) { // to last row before total
+            for (int c = 1; c <= LoadCompCol::PerArea; ++c) {
+                for (int r = 1; r <= LoadCompRow::GrdTot; ++r) { // to last row before total
                     if (curCompLoad.cellUsed(c, r)) {
                         tableBody(c, r) = RealToStr(curCompLoad.cells(c, r), 2);
                     }
                 }
             }
-            rowHead.allocate(rGrdTot);
+            rowHead.allocate(LoadCompRow::GrdTot);
             // internal gains
-            rowHead(rPeople) = "People";
-            rowHead(rLights) = "Lights";
-            rowHead(rEquip) = "Equipment";
-            rowHead(rRefrig) = "Refrigeration Equipment";
-            rowHead(rWaterUse) = "Water Use Equipment";
-            rowHead(rPowerGen) = "Power Generation Equipment";
-            rowHead(rHvacLoss) = "HVAC Equipment Losses";
-            rowHead(rRefrig) = "Refrigeration";
+            rowHead(LoadCompRow::People) = "People";
+            rowHead(LoadCompRow::Lights) = "Lights";
+            rowHead(LoadCompRow::Equip) = "Equipment";
+            rowHead(LoadCompRow::Refrig) = "Refrigeration Equipment";
+            rowHead(LoadCompRow::WaterUse) = "Water Use Equipment";
+            rowHead(LoadCompRow::PowerGen) = "Power Generation Equipment";
+            rowHead(LoadCompRow::HvacLoss) = "HVAC Equipment Losses";
+            rowHead(LoadCompRow::Refrig) = "Refrigeration";
             // misc
-            rowHead(rDOAS) = "DOAS Direct to Zone";
-            rowHead(rInfil) = "Infiltration";
-            rowHead(rZoneVent) = "Zone Ventilation";
-            rowHead(rIntZonMix) = "Interzone Mixing";
+            rowHead(LoadCompRow::DOAS) = "DOAS Direct to Zone";
+            rowHead(LoadCompRow::Infil) = "Infiltration";
+            rowHead(LoadCompRow::ZoneVent) = "Zone Ventilation";
+            rowHead(LoadCompRow::IntZonMix) = "Interzone Mixing";
             // opaque surfaces
-            rowHead(rRoof) = "Roof";
-            rowHead(rIntZonCeil) = "Interzone Ceiling";
-            rowHead(rOtherRoof) = "Other Roof";
-            rowHead(rExtWall) = "Exterior Wall";
-            rowHead(rIntZonWall) = "Interzone Wall";
-            rowHead(rGrdWall) = "Ground Contact Wall";
-            rowHead(rOtherWall) = "Other Wall";
-            rowHead(rExtFlr) = "Exterior Floor";
-            rowHead(rIntZonFlr) = "Interzone Floor";
-            rowHead(rGrdFlr) = "Ground Contact Floor";
-            rowHead(rOtherFlr) = "Other Floor";
+            rowHead(LoadCompRow::Roof) = "Roof";
+            rowHead(LoadCompRow::IntZonCeil) = "Interzone Ceiling";
+            rowHead(LoadCompRow::OtherRoof) = "Other Roof";
+            rowHead(LoadCompRow::ExtWall) = "Exterior Wall";
+            rowHead(LoadCompRow::IntZonWall) = "Interzone Wall";
+            rowHead(LoadCompRow::GrdWall) = "Ground Contact Wall";
+            rowHead(LoadCompRow::OtherWall) = "Other Wall";
+            rowHead(LoadCompRow::ExtFlr) = "Exterior Floor";
+            rowHead(LoadCompRow::IntZonFlr) = "Interzone Floor";
+            rowHead(LoadCompRow::GrdFlr) = "Ground Contact Floor";
+            rowHead(LoadCompRow::OtherFlr) = "Other Floor";
             // subsurfaces
-            rowHead(rFeneCond) = "Fenestration Conduction";
-            rowHead(rFeneSolr) = "Fenestration Solar";
-            rowHead(rOpqDoor) = "Opaque Door";
-            rowHead(rGrdTot) = "Grand Total";
+            rowHead(LoadCompRow::FeneCond) = "Fenestration Conduction";
+            rowHead(LoadCompRow::FeneSolr) = "Fenestration Solar";
+            rowHead(LoadCompRow::OpqDoor) = "Opaque Door";
+            rowHead(LoadCompRow::GrdTot) = "Grand Total";
 
-            columnHead.allocate(cPerArea);
+            columnHead.allocate(LoadCompCol::PerArea);
             if (unitsStyle_para != UnitsStyle::InchPound) {
-                columnHead(cSensInst) = "Sensible - Instant [W]";
-                columnHead(cSensDelay) = "Sensible - Delayed [W]";
-                columnHead(cSensRA) = "Sensible - Return Air [W]";
-                columnHead(cLatent) = "Latent [W]";
-                columnHead(cTotal) = "Total [W]";
-                columnHead(cPerc) = "%Grand Total";
-                columnHead(cArea) = "Related Area [m2]";
-                columnHead(cPerArea) = "Total per Area [W/m2]";
+                columnHead(LoadCompCol::SensInst) = "Sensible - Instant [W]";
+                columnHead(LoadCompCol::SensDelay) = "Sensible - Delayed [W]";
+                columnHead(LoadCompCol::SensRA) = "Sensible - Return Air [W]";
+                columnHead(LoadCompCol::Latent) = "Latent [W]";
+                columnHead(LoadCompCol::Total) = "Total [W]";
+                columnHead(LoadCompCol::Perc) = "%Grand Total";
+                columnHead(LoadCompCol::Area) = "Related Area [m2]";
+                columnHead(LoadCompCol::PerArea) = "Total per Area [W/m2]";
             } else {
-                columnHead(cSensInst) = "Sensible - Instant [Btu/h]";
-                columnHead(cSensDelay) = "Sensible - Delayed [Btu/h]";
-                columnHead(cSensRA) = "Sensible - Return Air [Btu/h]";
-                columnHead(cLatent) = "Latent [Btu/h]";
-                columnHead(cTotal) = "Total [Btu/h]";
-                columnHead(cPerc) = "%Grand Total";
-                columnHead(cArea) = "Related Area [ft2]";
-                columnHead(cPerArea) = "Total per Area [Btu/h-ft2]";
+                columnHead(LoadCompCol::SensInst) = "Sensible - Instant [Btu/h]";
+                columnHead(LoadCompCol::SensDelay) = "Sensible - Delayed [Btu/h]";
+                columnHead(LoadCompCol::SensRA) = "Sensible - Return Air [Btu/h]";
+                columnHead(LoadCompCol::Latent) = "Latent [Btu/h]";
+                columnHead(LoadCompCol::Total) = "Total [Btu/h]";
+                columnHead(LoadCompCol::Perc) = "%Grand Total";
+                columnHead(LoadCompCol::Area) = "Related Area [ft2]";
+                columnHead(LoadCompCol::PerArea) = "Total per Area [Btu/h-ft2]";
             }
-            columnWidth.dimension(cPerArea, 14); // array assignment - same for all columns
+            columnWidth.dimension(LoadCompCol::PerArea, 14); // array assignment - same for all columns
 
             if (produceTabular_para) {
                 WriteSubtitle(state, peakLoadCompName);

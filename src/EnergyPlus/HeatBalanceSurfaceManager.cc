@@ -61,10 +61,8 @@
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
-#include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -157,7 +155,6 @@ using namespace DataSurfaces;
 // Use statements for access to subroutines in other modules
 using namespace ScheduleManager;
 using namespace SolarShading;
-using namespace DaylightingManager;
 using namespace WindowManager;
 using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
@@ -257,13 +254,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     //       MODIFIED       Nov. 1999, FCW,
     //                      Move ComputeIntThermalAbsorpFactors
     //                      so called every timestep
-    //                      Jan 2004, RJH
-    //                      Added calls to alternative daylighting analysis using DElight
-    //                      All modifications demarked with RJH (Rob Hitchcock)
-    //                      RJH, Jul 2004: add error handling for DElight calls
     //       MODIFIED       Aug. 2017
     //                      Add initializations of surface data to linked air node value if defined
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for surface initializations within the
@@ -273,13 +265,11 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     // Uses the status flags to trigger record keeping events.
 
     // Using/Aliasing
-    using DataDElight::LUX2FC;
     using namespace SolarShading;
     using ConvectionCoefficients::InitInteriorConvectionCoeffs;
     using HeatBalanceIntRadExchange::CalcInteriorRadExchange;
     using HeatBalFiniteDiffManager::InitHeatBalFiniteDiff;
     using InternalHeatGains::ManageInternalHeatGains;
-    using namespace DElightManagerF;
 
     auto &Surface(state.dataSurface->Surface);
 
@@ -455,192 +445,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         ComputeDifSolExcZonesWIZWindows(state, state.dataGlobal->NumOfZones);
     }
 
-    // For daylit zones, calculate interior daylight illuminance at reference points and
-    // simulate lighting control system to get overhead electric lighting reduction
-    // factor due to daylighting.
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-        int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-            if (Surface(SurfNum).ExtSolar) {
-                state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
-            }
-        }
-    }
-
-    // Reset space power reduction factors
-    for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-        state.dataDaylightingData->spacePowerReductionFactor(spaceNum) = 1.0;
-    }
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
-        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-        auto &thisEnclDaylight = state.dataDaylightingData->enclDaylight(thisDaylightControl.enclIndex);
-        thisDaylightControl.DaylIllumAtRefPt = 0.0;
-        thisDaylightControl.GlareIndexAtRefPt = 0.0;
-        thisDaylightControl.PowerReductionFactor = 1.0;
-        thisEnclDaylight.InterReflIllFrIntWins = 0.0; // inter-reflected illuminance from interior windows
-        if (thisDaylightControl.TotalDaylRefPoints != 0) {
-            thisDaylightControl.TimeExceedingGlareIndexSPAtRefPt = 0.0;
-            thisDaylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
-        }
-
-        if (state.dataEnvrn->SunIsUp && thisDaylightControl.TotalDaylRefPoints != 0) {
-            if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Daylighting Illumination");
-            DayltgInteriorIllum(state, daylightCtrlNum);
-        }
-    }
-
-    if (state.dataEnvrn->SunIsUp && state.dataDaylightingDevicesData->NumOfTDDPipes > 0) {
-        if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime)
-            DisplayString(state, "Computing Interior Daylighting Illumination for TDD pipes");
-        DayltgInteriorTDDIllum(state);
-    }
-
-    for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
-        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-
-        // RJH DElight Modification Begin - Call to DElight electric lighting control subroutine
-        // Check if the sun is up and the current Thermal Zone hosts a Daylighting:DElight object
-        if (state.dataEnvrn->SunIsUp && thisDaylightControl.TotalDaylRefPoints != 0 &&
-            (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight)) {
-            int zoneNum = thisDaylightControl.zoneIndex;
-            // Call DElight interior illuminance and electric lighting control subroutine
-            Real64 dPowerReducFac = 1.0; // Return value Electric Lighting Power Reduction Factor for current Zone and Timestep
-            Real64 dHISKFFC = state.dataEnvrn->HISKF * LUX2FC;
-            Real64 dHISUNFFC = state.dataEnvrn->HISUNF * LUX2FC;
-            Real64 dSOLCOS1 = state.dataEnvrn->SOLCOS(1);
-            Real64 dSOLCOS2 = state.dataEnvrn->SOLCOS(2);
-            Real64 dSOLCOS3 = state.dataEnvrn->SOLCOS(3);
-            Real64 dLatitude = state.dataEnvrn->Latitude;
-            Real64 dCloudFraction = state.dataEnvrn->CloudFraction;
-            // Init Error Flag to 0 (no Warnings or Errors) (returned from DElight)
-            int iErrorFlag = 0;
-            bool elOpened;
-
-            int iReadStatus;       // Error File Read Status
-            std::string cErrorMsg; // Each DElight Error Message can be up to 200 characters long
-            bool bEndofErrFile;    // End of Error File flag
-
-            DElightElecLtgCtrl(len(state.dataHeatBal->Zone(zoneNum).Name),
-                               state.dataHeatBal->Zone(zoneNum).Name,
-                               dLatitude,
-                               dHISKFFC,
-                               dHISUNFFC,
-                               dCloudFraction,
-                               dSOLCOS1,
-                               dSOLCOS2,
-                               dSOLCOS3,
-                               dPowerReducFac,
-                               iErrorFlag);
-            // Check Error Flag for Warnings or Errors returning from DElight
-            // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
-            if (iErrorFlag != 0) {
-                // Open DElight Electric Lighting Error File for reading
-                auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp);
-                if (iDElightErrorFile.good()) {
-                    elOpened = true;
-                } else {
-                    elOpened = false;
-                }
-                //            IF (iwriteStatus /= 0) THEN
-                //              CALL ShowFatalError(state, 'InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output
-                //              (readwrite).')
-                //            ENDIF
-                //            Open(unit=iDElightErrorFile, file='eplusout.delighteldmp', action='READ')
-
-                // Sequentially read lines in DElight Electric Lighting Error File
-                // and process them using standard EPlus warning/error handling calls
-                bEndofErrFile = false;
-                iReadStatus = 0;
-                while (!bEndofErrFile && elOpened) {
-                    auto cErrorLine = iDElightErrorFile.readLine();
-                    if (cErrorLine.eof) {
-                        bEndofErrFile = true;
-                        continue;
-                    }
-
-                    // Is the current line a Warning message?
-                    if (has_prefix(cErrorLine.data, "WARNING: ")) {
-                        cErrorMsg = cErrorLine.data.substr(9);
-                        ShowWarningError(state, cErrorMsg);
-                    }
-                    // Is the current line an Error message?
-                    if (has_prefix(cErrorLine.data, "ERROR: ")) {
-                        cErrorMsg = cErrorLine.data.substr(7);
-                        ShowSevereError(state, cErrorMsg);
-                        iErrorFlag = 1;
-                    }
-                }
-
-                // Close DElight Error File and delete
-
-                if (elOpened) {
-                    iDElightErrorFile.close();
-                    FileSystem::removeFile(iDElightErrorFile.filePath);
-                }
-                // If any DElight Error occurred then ShowFatalError to terminate
-                if (iErrorFlag > 0) {
-                    ShowFatalError(state, "End of DElight Error Messages");
-                }
-            } else { // RJH 2008-03-07: No errors
-                // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
-                // Open DElight Electric Lighting Dump File for reading
-                auto iDElightErrorFile = state.files.outputDelightEldmpFilePath.try_open(state.files.outputControl.delighteldmp);
-                if (iDElightErrorFile.is_open()) {
-                    elOpened = true;
-                } else {
-                    elOpened = false;
-                }
-
-                // Sequentially read lines in DElight Electric Lighting Dump File
-                // and extract refpt illuminances for standard EPlus output handling
-                bEndofErrFile = false;
-                int iDElightRefPt = 0; // Reference Point number for reading DElight Dump File (eplusout.delighteldmp)
-                iReadStatus = 0;
-                while (!bEndofErrFile && elOpened) {
-                    auto line = iDElightErrorFile.read<Real64>();
-                    Real64 dRefPtIllum = line.data; // tmp var for reading RefPt illuminance
-                    if (line.eof) {
-                        bEndofErrFile = true;
-                        continue;
-                    }
-                    // Increment refpt counter
-                    ++iDElightRefPt;
-                    // Assure refpt index does not exceed number of refpts in this zone
-                    if (iDElightRefPt <= thisDaylightControl.TotalDaylRefPoints) {
-                        thisDaylightControl.DaylIllumAtRefPt(iDElightRefPt) = dRefPtIllum;
-                    }
-                }
-
-                // Close DElight Electric Lighting Dump File and delete
-                if (elOpened) {
-                    iDElightErrorFile.close();
-                    FileSystem::removeFile(iDElightErrorFile.filePath);
-                };
-            }
-            // Store the calculated total zone Power Reduction Factor due to DElight daylighting
-            // in the ZoneDaylight structure for later use
-            thisDaylightControl.PowerReductionFactor = dPowerReducFac;
-        }
-        // RJH DElight Modification End - Call to DElight electric lighting control subroutine
-    }
-
-    if (state.dataEnvrn->SunIsUp && !state.dataGlobal->DoingSizing) {
-        DayltgInteriorMapIllum(state);
-    }
-    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
-        int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-            state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
-            if (IS_SHADED(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 1.0;
-            } else {
-                state.dataSurface->SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
-            }
-        }
-    }
+    DaylightingManager::initDaylighting(state, state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime);
 
     CalcInteriorRadExchange(state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, _, "Main");
 
@@ -651,25 +456,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Solar Heat Gains");
 
     InitSolarHeatGains(state);
-    if (state.dataEnvrn->SunIsUp && (state.dataEnvrn->BeamSolarRad + state.dataEnvrn->GndSolarRad + state.dataEnvrn->DifSolarRad > 0.0)) {
-        for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
-            if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0) {
-                if (state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow) {
-                    DayltgInterReflIllFrIntWins(state, enclNum);
-                    for (int daylightCtrlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
-                        auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-                        DayltgGlareWithIntWins(state, thisDaylightControl.GlareIndexAtRefPt, enclNum);
-                    }
-                }
-            }
-        }
-        DayltgElecLightingControl(state);
-    } else if (state.dataDaylightingData->mapResultsToReport && state.dataGlobal->TimeStep == state.dataGlobal->NumOfTimeStepInHour) {
-        for (int MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
-            ReportIllumMap(state, MapNum);
-        }
-        state.dataDaylightingData->mapResultsToReport = false;
-    }
+
+    DaylightingManager::manageDaylighting(state);
 
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Internal Heat Gains");
     ManageInternalHeatGains(state, false);
