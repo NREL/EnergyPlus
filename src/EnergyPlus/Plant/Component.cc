@@ -121,5 +121,9 @@ namespace DataPlant {
         }
     }
 
+    CompData &CompData::getPlantComponent(EnergyPlusData &state, PlantLocation const &plantLoc) {
+        return DataPlant::CompData::getPlantComponent(state, plantLoc);
+    }
+
 } // namespace DataPlant
 } // namespace EnergyPlus

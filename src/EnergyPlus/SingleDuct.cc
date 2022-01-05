@@ -2545,7 +2545,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
             }
 
             this->ReheatCoilOutletNode =
-                state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).LoopSide(this->HWplantLoc.loopSideNum).Branch(this->HWplantLoc.branchNum).Comp(this->HWplantLoc.compNum).NodeNumOut;
+                DataPlant::CompData::getPlantComponent(state, this->HWplantLoc).NodeNumOut;
 
             this->PlantLoopScanFlag = false;
         } else {

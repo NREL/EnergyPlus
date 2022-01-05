@@ -1923,10 +1923,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     //  ! If this is a variable speed pump
     if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).pumpType),
                       BITF(PumpType::VarSpeed) | BITF(PumpType::Bank_VarSpeed) | BITF(PumpType::Cond))) {
-        if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                .LoopSide(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum)
-                .Branch(state.dataPumps->PumpEquip(PumpNum).plantLoc.branchNum)
-                .Comp(state.dataPumps->PumpEquip(PumpNum).plantLoc.compNum)
+        if (DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc)
                 .FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
             state.dataPumps->PumpMassFlowRate = 0.0;
         }

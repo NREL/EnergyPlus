@@ -2036,7 +2036,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         plantLoc.loopSideNum = this_equip.LoopSideNumPtr;
                         plantLoc.branchNum = this_equip.BranchNumPtr;
                         plantLoc.compNum = this_equip.CompNumPtr;
-                        auto &dummy_loop_equip(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum));
+                        auto &dummy_loop_equip(DataPlant::CompData::getPlantComponent(state, plantLoc));
 
                         if (dummy_loop_equip.NumOpSchemes == 0) {
                             // first op scheme for this component, allocate OpScheme and its EquipList to size 1

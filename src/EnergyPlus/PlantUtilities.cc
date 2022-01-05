@@ -438,9 +438,9 @@ Real64 RegulateCondenserCompFlowReqOp(
     Real64 CompCurLoad;
     bool CompRunFlag;
 
-    CompCurLoad = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum).MyLoad;
-    CompRunFlag = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum).ON;
-    auto CompOpScheme = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(plantLoc.compNum).CurOpSchemeType;
+    CompCurLoad = DataPlant::CompData::getPlantComponent(state, plantLoc).MyLoad;
+    CompRunFlag = DataPlant::CompData::getPlantComponent(state, plantLoc).ON;
+    auto CompOpScheme = DataPlant::CompData::getPlantComponent(state, plantLoc).CurOpSchemeType;
 
     if (CompRunFlag) {
 

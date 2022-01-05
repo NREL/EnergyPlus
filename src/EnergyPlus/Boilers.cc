@@ -118,7 +118,7 @@ void BoilerSpecs::simulate(EnergyPlusData &state,
                            Real64 &CurLoad,
                            bool const RunFlag)
 {
-    auto &sim_component(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).Branch(this->plantLoc.branchNum).Comp(this->plantLoc.compNum));
+    auto &sim_component(DataPlant::CompData::getPlantComponent(state, this->plantLoc));
     this->InitBoiler(state);
     this->CalcBoilerModel(state, CurLoad, RunFlag, sim_component.FlowCtrl);
     this->UpdateBoilerRecords(state, CurLoad, RunFlag);
@@ -480,7 +480,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
 
     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->FlowMode == DataPlant::FlowMode::Constant)) {
         // reset flow priority
-        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).Branch(this->plantLoc.branchNum).Comp(this->plantLoc.compNum).FlowPriority =
+        DataPlant::CompData::getPlantComponent(state, this->plantLoc).FlowPriority =
             DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 }
