@@ -2173,9 +2173,9 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     int PlantSizNum; // index of Plant Sizing array
     bool ErrorsFound;
     Real64 TotalEffic = 0.0; // pump total efficiency
-    int BranchNum;     // index of branch
-    int CompNum;       // index of component on branch
-    Real64 PumpSizFac; // pump sizing factor
+    int BranchNum;           // index of branch
+    int CompNum;             // index of component on branch
+    Real64 PumpSizFac;       // pump sizing factor
     Real64 SteamDensity;
     Real64 TempWaterDensity;
     int DummyWaterIndex(1);

@@ -56,8 +56,8 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -93,7 +93,7 @@ namespace BoilerSteam {
         Array1D<Real64> FullLoadCoef;               // Coefficients of the fuel consumption/part load ratio curve
         int TypeNum;                                // Plant loop type identifier
         int LoopNum;                                // Plant loop index number
-        DataPlant::LoopSideLocation LoopSideNum;                            // Loop side index number
+        DataPlant::LoopSideLocation LoopSideNum;    // Loop side index number
         int BranchNum;                              // Branch index number
         int CompNum;                                // Plant loop component index number
         int PressErrIndex;                          // index pointer for recurring errors
@@ -120,9 +120,9 @@ namespace BoilerSteam {
               DesMassFlowRate(0.0), MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), MinPartLoadRat(0.0),
               MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0),
               BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), LoopNum(0),
-              LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), PressErrIndex(0), FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0),
-              BoilerLoad(0.0), BoilerEff(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
-              BoilerInletTemp(0.0), BoilerFuelTypeForOutputVariable("")
+              LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), PressErrIndex(0), FluidIndex(0), myFlag(true),
+              myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0), BoilerEff(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerEnergy(0.0),
+              FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
 

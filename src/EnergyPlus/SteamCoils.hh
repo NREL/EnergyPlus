@@ -119,7 +119,7 @@ namespace SteamCoils {
         int TypeOfCoil;                         // Control of Coil , temperature or Zone load
         int FluidIndex;                         // Fluid index for FluidProperties (Steam)
         int LoopNum;                            // index for plant loop with steam coil
-        DataPlant::LoopSideLocation LoopSide;                           // index for plant loop side for steam coil
+        DataPlant::LoopSideLocation LoopSide;   // index for plant loop side for steam coil
         int BranchNum;                          // index for plant branch for steam coil
         int CompNum;                            // index for plant component for steam coil
         DataPlant::PlantEquipmentType CoilType; // plant level index for coil type
@@ -143,9 +143,10 @@ namespace SteamCoils {
               InletSteamMassFlowRate(0.0), OutletSteamMassFlowRate(0.0), MaxSteamVolFlowRate(0.0), MaxSteamMassFlowRate(0.0), InletSteamEnthalpy(0.0),
               OutletWaterEnthalpy(0.0), InletSteamPress(0.0), InletSteamQuality(0.0), OutletSteamQuality(0.0), DegOfSubcooling(0.0),
               LoopSubcoolReturn(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), SteamInletNodeNum(0), SteamOutletNodeNum(0), TempSetPointNodeNum(0),
-              TypeOfCoil(0), FluidIndex(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), CoilType(DataPlant::PlantEquipmentType::Invalid),
-              OperatingCapacity(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
-              FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), DesCoilCapacity(0.0), DesAirVolFlow(0.0)
+              TypeOfCoil(0), FluidIndex(0), LoopNum(0), LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
+              CoilType(DataPlant::PlantEquipmentType::Invalid), OperatingCapacity(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
+              FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), DesCoilCapacity(0.0),
+              DesAirVolFlow(0.0)
         {
         }
     };

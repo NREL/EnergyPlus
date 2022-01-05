@@ -321,14 +321,14 @@ namespace PackagedThermalStorageCoil {
         int StorageAmbientNodeNum;          // node "pointer" for ambient conditions exposed to TES
         Real64 StorageUA;                   // overall heat transfer coefficient for TES to ambient [W/k]
         bool TESPlantConnectionAvailable;
-        int TESPlantInletNodeNum;            // plant loop inlet node index
-        int TESPlantOutletNodeNum;           // plant loop outlet node index
-        int TESPlantLoopNum;                 // plant loop connection index
-        DataPlant::LoopSideLocation TESPlantLoopSideNum;             // plant loop side connection index
-        int TESPlantBranchNum;               // plant loop branch connection index
-        int TESPlantCompNum;                 // plant loop component connection index
-        Real64 TESPlantDesignVolumeFlowRate; // plant connection design mass flow rate [m3/s]
-        Real64 TESPlantDesignMassFlowRate;   // [kg/s]
+        int TESPlantInletNodeNum;                        // plant loop inlet node index
+        int TESPlantOutletNodeNum;                       // plant loop outlet node index
+        int TESPlantLoopNum;                             // plant loop connection index
+        DataPlant::LoopSideLocation TESPlantLoopSideNum; // plant loop side connection index
+        int TESPlantBranchNum;                           // plant loop branch connection index
+        int TESPlantCompNum;                             // plant loop component connection index
+        Real64 TESPlantDesignVolumeFlowRate;             // plant connection design mass flow rate [m3/s]
+        Real64 TESPlantDesignMassFlowRate;               // [kg/s]
         Real64 TESPlantEffectiveness;
         Real64 TimeElapsed;
         Real64 IceFracRemain;             // state of storage for current time step [0..1.0]
@@ -412,15 +412,15 @@ namespace PackagedThermalStorageCoil {
               CondensateCollectMode(CondensateAction::Discard), CondensateTankID(0), CondensateTankSupplyARRID(0), StorageMedia(MediaType::Invalid),
               StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0), StorageCapacitySizingFactor(0.0),
               MinimumFluidTankTempLimit(0.0), MaximumFluidTankTempLimit(100.0), RatedFluidTankTemp(0.0), StorageAmbientNodeNum(0), StorageUA(0.0),
-              TESPlantConnectionAvailable(false), TESPlantInletNodeNum(0), TESPlantOutletNodeNum(0), TESPlantLoopNum(0), TESPlantLoopSideNum(DataPlant::LoopSideLocation::Invalid),
-              TESPlantBranchNum(0), TESPlantCompNum(0), TESPlantDesignVolumeFlowRate(0.0), TESPlantDesignMassFlowRate(0.0),
-              TESPlantEffectiveness(0.0), TimeElapsed(0.0), IceFracRemain(0.0), IceFracRemainLastTimestep(0.0), FluidTankTempFinal(0.0),
-              FluidTankTempFinalLastTimestep(0.0), QdotPlant(0.0), Q_Plant(0.0), QdotAmbient(0.0), Q_Ambient(0.0), QdotTES(0.0), Q_TES(0.0),
-              ElecCoolingPower(0.0), ElecCoolingEnergy(0.0), EvapTotCoolingRate(0.0), EvapTotCoolingEnergy(0.0), EvapSensCoolingRate(0.0),
-              EvapSensCoolingEnergy(0.0), EvapLatCoolingRate(0.0), EvapLatCoolingEnergy(0.0), RuntimeFraction(0.0), CondenserRuntimeFraction(0.0),
-              ElectColdWeatherPower(0.0), ElectColdWeatherEnergy(0.0), ElectEvapCondBasinHeaterPower(0.0), ElectEvapCondBasinHeaterEnergy(0.0),
-              EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapWaterStarvMakupRate(0.0), EvapWaterStarvMakup(0.0), EvapCondPumpElecPower(0.0),
-              EvapCondPumpElecConsumption(0.0)
+              TESPlantConnectionAvailable(false), TESPlantInletNodeNum(0), TESPlantOutletNodeNum(0), TESPlantLoopNum(0),
+              TESPlantLoopSideNum(DataPlant::LoopSideLocation::Invalid), TESPlantBranchNum(0), TESPlantCompNum(0), TESPlantDesignVolumeFlowRate(0.0),
+              TESPlantDesignMassFlowRate(0.0), TESPlantEffectiveness(0.0), TimeElapsed(0.0), IceFracRemain(0.0), IceFracRemainLastTimestep(0.0),
+              FluidTankTempFinal(0.0), FluidTankTempFinalLastTimestep(0.0), QdotPlant(0.0), Q_Plant(0.0), QdotAmbient(0.0), Q_Ambient(0.0),
+              QdotTES(0.0), Q_TES(0.0), ElecCoolingPower(0.0), ElecCoolingEnergy(0.0), EvapTotCoolingRate(0.0), EvapTotCoolingEnergy(0.0),
+              EvapSensCoolingRate(0.0), EvapSensCoolingEnergy(0.0), EvapLatCoolingRate(0.0), EvapLatCoolingEnergy(0.0), RuntimeFraction(0.0),
+              CondenserRuntimeFraction(0.0), ElectColdWeatherPower(0.0), ElectColdWeatherEnergy(0.0), ElectEvapCondBasinHeaterPower(0.0),
+              ElectEvapCondBasinHeaterEnergy(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsump(0.0), EvapWaterStarvMakupRate(0.0),
+              EvapWaterStarvMakup(0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0)
         {
         }
     };

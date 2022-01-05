@@ -339,11 +339,11 @@ namespace UnitarySystems {
         bool m_InitHeatPump; // Heat pump initialization flag (for error reporting)
 
         int m_HRLoopNum;
-        DataPlant::LoopSideLocation m_HRLoopSideNum {DataPlant::LoopSideLocation::Invalid};
+        DataPlant::LoopSideLocation m_HRLoopSideNum{DataPlant::LoopSideLocation::Invalid};
         int m_HRBranchNum;
         int m_HRCompNum;
         int m_SuppCoilLoopNum;
-        DataPlant::LoopSideLocation m_SuppCoilLoopSide {DataPlant::LoopSideLocation::Invalid};
+        DataPlant::LoopSideLocation m_SuppCoilLoopSide{DataPlant::LoopSideLocation::Invalid};
         int m_SuppCoilBranchNum;
         int m_SuppCoilCompNum;
         int m_SuppCoilFluidOutletNodeNum;
@@ -475,22 +475,22 @@ namespace UnitarySystems {
         int CoolCoilOutletNodeNum;       // Cooling coil air outlet node number
         int CoolCoilFluidOutletNodeNum;  // Cooling coil fluid outlet node number (from Plant Loop data)
         int CoolCoilLoopNum;             // Plant loop num of chilled water coil
-        DataPlant::LoopSideLocation CoolCoilLoopSide{DataPlant::LoopSideLocation::Invalid};            // Supply side or demand side
-        int CoolCoilBranchNum;           // Branch of number of the cooling coil in the plant loop
-        int CoolCoilCompNum;             // Comp num of the cooling coil in the plant loop
-        int CoolCoilFluidInletNode;      // Cooling coil fluid inlet node
-        int HeatCoilLoopNum;             // Plant loop num of hot water or steam coil
-        DataPlant::LoopSideLocation HeatCoilLoopSide{DataPlant::LoopSideLocation::Invalid};            // Supply side or demand side
-        int HeatCoilBranchNum;           // Branch of number of the heating coil in the plant loop
-        int HeatCoilCompNum;             // Comp num of the heating coil in the plant loop
-        int HeatCoilFluidInletNode;      // Heating coil fluid inlet node
-        int HeatCoilFluidOutletNodeNum;  // Heating coil fluid outlet node number (from Plant Loop data)
-        int HeatCoilInletNodeNum;        // Heating coil air inlet node number
-        int HeatCoilOutletNodeNum;       // Heating coil air outlet node number
-        bool ATMixerExists;              // true if AT mixer is connected to Unitary System
-        int ATMixerType;                 // type of AT mixer, inlet-side or supply-side
-        int ATMixerOutNode;              // AT mixer outlet node number
-        Real64 ControlZoneMassFlowFrac;  // fraction of air flow to the control zone
+        DataPlant::LoopSideLocation CoolCoilLoopSide{DataPlant::LoopSideLocation::Invalid}; // Supply side or demand side
+        int CoolCoilBranchNum;                                                              // Branch of number of the cooling coil in the plant loop
+        int CoolCoilCompNum;                                                                // Comp num of the cooling coil in the plant loop
+        int CoolCoilFluidInletNode;                                                         // Cooling coil fluid inlet node
+        int HeatCoilLoopNum;                                                                // Plant loop num of hot water or steam coil
+        DataPlant::LoopSideLocation HeatCoilLoopSide{DataPlant::LoopSideLocation::Invalid}; // Supply side or demand side
+        int HeatCoilBranchNum;                                                              // Branch of number of the heating coil in the plant loop
+        int HeatCoilCompNum;                                                                // Comp num of the heating coil in the plant loop
+        int HeatCoilFluidInletNode;                                                         // Heating coil fluid inlet node
+        int HeatCoilFluidOutletNodeNum; // Heating coil fluid outlet node number (from Plant Loop data)
+        int HeatCoilInletNodeNum;       // Heating coil air inlet node number
+        int HeatCoilOutletNodeNum;      // Heating coil air outlet node number
+        bool ATMixerExists;             // true if AT mixer is connected to Unitary System
+        int ATMixerType;                // type of AT mixer, inlet-side or supply-side
+        int ATMixerOutNode;             // AT mixer outlet node number
+        Real64 ControlZoneMassFlowFrac; // fraction of air flow to the control zone
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;

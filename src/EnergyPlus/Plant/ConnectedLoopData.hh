@@ -54,10 +54,10 @@ namespace DataPlant {
     struct ConnectedLoopData
     {
         // Members
-        int LoopNum;              // plant loop index pointer, for the other loop
-        DataPlant::LoopSideLocation LoopSideNum;          // plant loop side number, for the other loop
-        int ConnectorTypeOf_Num;  // plant equipment type doing the connecting
-        bool LoopDemandsOnRemote; // true if this loop puts demand on connected loop
+        int LoopNum;                             // plant loop index pointer, for the other loop
+        DataPlant::LoopSideLocation LoopSideNum; // plant loop side number, for the other loop
+        int ConnectorTypeOf_Num;                 // plant equipment type doing the connecting
+        bool LoopDemandsOnRemote;                // true if this loop puts demand on connected loop
 
         // Default Constructor
         ConnectedLoopData() : LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), ConnectorTypeOf_Num(0), LoopDemandsOnRemote(false)

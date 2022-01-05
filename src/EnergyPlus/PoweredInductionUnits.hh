@@ -123,23 +123,23 @@ namespace PoweredInductionUnits {
         std::string HCoil; // name of heating coil component
         int HCoil_Index;   // index to this heating coil
         int HCoil_FluidIndex;
-        Real64 MaxVolHotWaterFlow; // m3/s
-        Real64 MaxVolHotSteamFlow; // m3/s
-        Real64 MaxHotWaterFlow;    // kg/s
-        Real64 MaxHotSteamFlow;    // kg/s
-        Real64 MinVolHotWaterFlow; // m3/s
-        Real64 MinHotSteamFlow;    // kg/s
-        Real64 MinVolHotSteamFlow; // m3/s
-        Real64 MinHotWaterFlow;    // kg/s
-        int HotControlNode;        // hot water control node
-        int HotCoilOutNodeNum;     // outlet of coil
-        Real64 HotControlOffset;   // control tolerance
-        int HWLoopNum;             // index for plant loop with hot plant coil
-        DataPlant::LoopSideLocation HWLoopSide;            // index for plant loop side for hot plant coil
-        int HWBranchNum;           // index for plant branch for hot plant coil
-        int HWCompNum;             // index for plant component for hot plant coil
-        int ADUNum;                // index of corresponding air distribution unit
-        bool InducesPlenumAir;     // True if secondary air comes from the plenum
+        Real64 MaxVolHotWaterFlow;              // m3/s
+        Real64 MaxVolHotSteamFlow;              // m3/s
+        Real64 MaxHotWaterFlow;                 // kg/s
+        Real64 MaxHotSteamFlow;                 // kg/s
+        Real64 MinVolHotWaterFlow;              // m3/s
+        Real64 MinHotSteamFlow;                 // kg/s
+        Real64 MinVolHotSteamFlow;              // m3/s
+        Real64 MinHotWaterFlow;                 // kg/s
+        int HotControlNode;                     // hot water control node
+        int HotCoilOutNodeNum;                  // outlet of coil
+        Real64 HotControlOffset;                // control tolerance
+        int HWLoopNum;                          // index for plant loop with hot plant coil
+        DataPlant::LoopSideLocation HWLoopSide; // index for plant loop side for hot plant coil
+        int HWBranchNum;                        // index for plant branch for hot plant coil
+        int HWCompNum;                          // index for plant component for hot plant coil
+        int ADUNum;                             // index of corresponding air distribution unit
+        bool InducesPlenumAir;                  // True if secondary air comes from the plenum
         // Report data
         Real64 HeatingRate;        // unit heat addition rate to zone [W]
         Real64 HeatingEnergy;      // unit heat addition to zone [J]
@@ -159,8 +159,9 @@ namespace PoweredInductionUnits {
               HCoilType(HtgCoilType::Invalid), HCoil_PlantType(DataPlant::PlantEquipmentType::Invalid), HCoil_Index(0), HCoil_FluidIndex(0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0),
               MinHotSteamFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
-              HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), ADUNum(0), InducesPlenumAir(false), HeatingRate(0.0), HeatingEnergy(0.0),
-              SensCoolRate(0.0), SensCoolEnergy(0.0), CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
+              HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), ADUNum(0), InducesPlenumAir(false),
+              HeatingRate(0.0), HeatingEnergy(0.0), SensCoolRate(0.0), SensCoolEnergy(0.0), CtrlZoneNum(0), ctrlZoneInNodeIndex(0), AirLoopNum(0),
+              OutdoorAirFlowRate(0.0)
         {
         }
 

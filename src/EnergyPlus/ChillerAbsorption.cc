@@ -742,8 +742,13 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->GeneratorInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenLoopSideNum, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->CWLoopNum,
+                                                      this->CWLoopSideNum,
+                                                      this->GenLoopNum,
+                                                      this->GenLoopSideNum,
+                                                      DataPlant::PlantEquipmentType::Chiller_Absorption,
+                                                      true);
     }
 
     // Fill in connection data

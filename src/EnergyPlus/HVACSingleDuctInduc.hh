@@ -93,54 +93,55 @@ namespace HVACSingleDuctInduc {
         std::string HCoil;          // name of heating coil component
         int HCoil_Num;              // index to this coil
         DataPlant::PlantEquipmentType HeatingCoilType;
-        Real64 MaxVolHotWaterFlow; // m3/s (autosizable)
-        Real64 MaxHotWaterFlow;    // kg/s
-        Real64 MinVolHotWaterFlow; // m3/s
-        Real64 MinHotWaterFlow;    // kg/s
-        Real64 HotControlOffset;   // control tolerance
-        int HWLoopNum;             // index for plant loop with hot water coil
-        DataPlant::LoopSideLocation HWLoopSide;            // index for plant loop side for hot water coil
-        int HWBranchNum;           // index for plant branch for hot water coil
-        int HWCompNum;             // index for plant component for hot water coil
-        int HWCoilFailNum1;        // index for errors
-        int HWCoilFailNum2;        // index for errors
-        std::string CCoilType;     // type of cooling coil component
-        std::string CCoil;         // name of cooling coil component
-        int CCoil_Num;             // index to this coil
+        Real64 MaxVolHotWaterFlow;              // m3/s (autosizable)
+        Real64 MaxHotWaterFlow;                 // kg/s
+        Real64 MinVolHotWaterFlow;              // m3/s
+        Real64 MinHotWaterFlow;                 // kg/s
+        Real64 HotControlOffset;                // control tolerance
+        int HWLoopNum;                          // index for plant loop with hot water coil
+        DataPlant::LoopSideLocation HWLoopSide; // index for plant loop side for hot water coil
+        int HWBranchNum;                        // index for plant branch for hot water coil
+        int HWCompNum;                          // index for plant component for hot water coil
+        int HWCoilFailNum1;                     // index for errors
+        int HWCoilFailNum2;                     // index for errors
+        std::string CCoilType;                  // type of cooling coil component
+        std::string CCoil;                      // name of cooling coil component
+        int CCoil_Num;                          // index to this coil
         DataPlant::PlantEquipmentType CoolingCoilType;
-        Real64 MaxVolColdWaterFlow; // m3/s (autosizable)
-        Real64 MaxColdWaterFlow;    // kg/s
-        Real64 MinVolColdWaterFlow; // m3/s
-        Real64 MinColdWaterFlow;    // kg/s
-        Real64 ColdControlOffset;   // control tolerance
-        int CWLoopNum;              // index for plant loop with chilled water coil
-        DataPlant::LoopSideLocation CWLoopSide;             // index for plant loop side for chilled water coil
-        int CWBranchNum;            // index for plant branch for chilled water coil
-        int CWCompNum;              // index for plant component for chilled water coil
-        int CWCoilFailNum1;         // index for errors
-        int CWCoilFailNum2;         // index for errors
-        std::string MixerName;      // name of air mixer component
-        int Mixer_Num;              // index to this mixer
-        Real64 MaxPriAirMassFlow;   // kg/s
-        Real64 MaxSecAirMassFlow;   // kg/s
-        int ADUNum;                 // index of corresponding air distribution unit
-        Real64 DesCoolingLoad;      // used for reporting during coil sizing
-        Real64 DesHeatingLoad;      // used for reporting during coil sizing
-        int CtrlZoneNum;            // Pointer to CtrlZone data structure
-        int CtrlZoneInNodeIndex;    // which controlled zone inlet node number corresponds with this unit
-        int AirLoopNum;             // index to airloop that this terminal unit is connected to
-        Real64 OutdoorAirFlowRate;  // zone outdoor air volume flow rate
+        Real64 MaxVolColdWaterFlow;             // m3/s (autosizable)
+        Real64 MaxColdWaterFlow;                // kg/s
+        Real64 MinVolColdWaterFlow;             // m3/s
+        Real64 MinColdWaterFlow;                // kg/s
+        Real64 ColdControlOffset;               // control tolerance
+        int CWLoopNum;                          // index for plant loop with chilled water coil
+        DataPlant::LoopSideLocation CWLoopSide; // index for plant loop side for chilled water coil
+        int CWBranchNum;                        // index for plant branch for chilled water coil
+        int CWCompNum;                          // index for plant component for chilled water coil
+        int CWCoilFailNum1;                     // index for errors
+        int CWCoilFailNum2;                     // index for errors
+        std::string MixerName;                  // name of air mixer component
+        int Mixer_Num;                          // index to this mixer
+        Real64 MaxPriAirMassFlow;               // kg/s
+        Real64 MaxSecAirMassFlow;               // kg/s
+        int ADUNum;                             // index of corresponding air distribution unit
+        Real64 DesCoolingLoad;                  // used for reporting during coil sizing
+        Real64 DesHeatingLoad;                  // used for reporting during coil sizing
+        int CtrlZoneNum;                        // Pointer to CtrlZone data structure
+        int CtrlZoneInNodeIndex;                // which controlled zone inlet node number corresponds with this unit
+        int AirLoopNum;                         // index to airloop that this terminal unit is connected to
+        Real64 OutdoorAirFlowRate;              // zone outdoor air volume flow rate
 
         // Default Constructor
         IndUnitData()
             : UnitType_Num(SingleDuct_CV::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0), InducRatio(2.5), PriAirInNode(0),
               SecAirInNode(0), OutAirNode(0), HWControlNode(0), CWControlNode(0), HCoil_Num(0),
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolHotWaterFlow(0.0), MaxHotWaterFlow(0.0), MinVolHotWaterFlow(0.0),
-              MinHotWaterFlow(0.0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), HWCoilFailNum1(0),
-              HWCoilFailNum2(0), CCoil_Num(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolColdWaterFlow(0.0),
-              MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid),
-              CWBranchNum(0), CWCompNum(0), CWCoilFailNum1(0), CWCoilFailNum2(0), Mixer_Num(0), MaxPriAirMassFlow(0.0), MaxSecAirMassFlow(0.0),
-              ADUNum(0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
+              MinHotWaterFlow(0.0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0),
+              HWCompNum(0), HWCoilFailNum1(0), HWCoilFailNum2(0), CCoil_Num(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid),
+              MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), CWLoopNum(0),
+              CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CWCoilFailNum1(0), CWCoilFailNum2(0), Mixer_Num(0),
+              MaxPriAirMassFlow(0.0), MaxSecAirMassFlow(0.0), ADUNum(0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), CtrlZoneNum(0),
+              CtrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
         {
         }
         void ReportIndUnit(EnergyPlusData &state);

@@ -2157,8 +2157,9 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                                          Real64 thermalToElectRatio)
     : generatorType(GeneratorType::Invalid), compPlantType(DataPlant::PlantEquipmentType::Invalid), generatorIndex(0), maxPowerOut(0.0),
       availSchedPtr(0), powerRequestThisTimestep(0.0), onThisTimestep(false), eMSPowerRequest(0.0), eMSRequestOn(false), plantInfoFound(false),
-      cogenLocation(PlantLocation(0, DataPlant::LoopSideLocation::Invalid, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0), dCElectProdRate(0.0), electricityProd(0.0),
-      electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr), errCountNegElectProd_(0)
+      cogenLocation(PlantLocation(0, DataPlant::LoopSideLocation::Invalid, 0, 0)), nominalThermElectRatio(0.0), dCElectricityProd(0.0),
+      dCElectProdRate(0.0), electricityProd(0.0), electProdRate(0.0), thermalProd(0.0), thermProdRate(0.0), pvwattsGenerator(nullptr),
+      errCountNegElectProd_(0)
 {
 
     static constexpr std::string_view routineName = "GeneratorController constructor ";

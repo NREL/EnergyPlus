@@ -212,42 +212,42 @@ namespace FanCoilUnits {
         int fanAvailSchIndex;      // fan availability schedule index
 
         // SZVAV Model inputs
-        std::string Name;                // name of unit
-        std::string UnitType;            // type of unit
-        Real64 MaxCoolCoilFluidFlow;     // kg/s
-        Real64 MaxHeatCoilFluidFlow;     // kg/s
-        Real64 DesignMinOutletTemp;      // ASHRAE90.1 maximum supply air temperature in Cooling mode
-        Real64 DesignMaxOutletTemp;      // ASHRAE90.1 maximum supply air temperature in Heating mode
-        Real64 MaxNoCoolHeatAirMassFlow; // minimum air flow rate using constant fan and ASHRAE90.1 control method
-        Real64 MaxCoolAirMassFlow;       // used in ASHRAE90.1 model, same as MaxAirMassFlow
-        Real64 MaxHeatAirMassFlow;       // used in ASHRAE90.1 model, same as MaxAirMassFlow
-        Real64 LowSpeedCoolFanRatio;     // ratio of min air flow to max air flow
-        Real64 LowSpeedHeatFanRatio;     // ratio of min air flow to max air flow
-        int CoolCoilFluidInletNode;      // chilled water control node
-        int CoolCoilFluidOutletNodeNum;  // chilled water coil outlet plant node
-        int HeatCoilFluidInletNode;      // hot water control node
-        int HeatCoilFluidOutletNodeNum;  // hot water coil outlet plant node
-        int CoolCoilLoopNum;             // index for plant loop with chilled water coil
-        DataPlant::LoopSideLocation CoolCoilLoopSide;            // index for plant loop side for chilled water coil
-        int CoolCoilBranchNum;           // index for plant branch for chilled water coil
-        int CoolCoilCompNum;             // index for plant component for chilled water coil
-        int HeatCoilLoopNum;             // index for plant loop with hot water coil
-        DataPlant::LoopSideLocation HeatCoilLoopSide;            // index for plant loop side for hot water coil
-        int HeatCoilBranchNum;           // index for plant branch for hot water coil
-        int HeatCoilCompNum;             // index for plant component for hot water coil
-        int CoolCoilInletNodeNum;        // index of cooling coil inlet node number
-        int CoolCoilOutletNodeNum;       // index of cooling coil outlet node number
-        int HeatCoilInletNodeNum;        // index of heating coil inlet node number
-        int HeatCoilOutletNodeNum;       // index of heating coil outlet node number
-        int ControlZoneNum;              // pointer to a zone served by a fancoil unit
-        int NodeNumOfControlledZone;     // node number of controlled zone
-        bool ATMixerExists;              // True if there is an ATMixer
-        int ATMixerOutNode;              // outlet air node number for the air terminal mixer
-        Real64 FanPartLoadRatio;         // ratio of air flow to max air flow to simulation modulating fan
-        Real64 HeatCoilWaterFlowRatio;   // ratio of water flow rate to max water flow rate
-        Real64 ControlZoneMassFlowFrac;  // flow fraction of control zone (always 1 for zone equipment)
-        int MaxIterIndex;                // recurring message index
-        int RegulaFalsiFailedIndex;      // iteration loop warning
+        std::string Name;                             // name of unit
+        std::string UnitType;                         // type of unit
+        Real64 MaxCoolCoilFluidFlow;                  // kg/s
+        Real64 MaxHeatCoilFluidFlow;                  // kg/s
+        Real64 DesignMinOutletTemp;                   // ASHRAE90.1 maximum supply air temperature in Cooling mode
+        Real64 DesignMaxOutletTemp;                   // ASHRAE90.1 maximum supply air temperature in Heating mode
+        Real64 MaxNoCoolHeatAirMassFlow;              // minimum air flow rate using constant fan and ASHRAE90.1 control method
+        Real64 MaxCoolAirMassFlow;                    // used in ASHRAE90.1 model, same as MaxAirMassFlow
+        Real64 MaxHeatAirMassFlow;                    // used in ASHRAE90.1 model, same as MaxAirMassFlow
+        Real64 LowSpeedCoolFanRatio;                  // ratio of min air flow to max air flow
+        Real64 LowSpeedHeatFanRatio;                  // ratio of min air flow to max air flow
+        int CoolCoilFluidInletNode;                   // chilled water control node
+        int CoolCoilFluidOutletNodeNum;               // chilled water coil outlet plant node
+        int HeatCoilFluidInletNode;                   // hot water control node
+        int HeatCoilFluidOutletNodeNum;               // hot water coil outlet plant node
+        int CoolCoilLoopNum;                          // index for plant loop with chilled water coil
+        DataPlant::LoopSideLocation CoolCoilLoopSide; // index for plant loop side for chilled water coil
+        int CoolCoilBranchNum;                        // index for plant branch for chilled water coil
+        int CoolCoilCompNum;                          // index for plant component for chilled water coil
+        int HeatCoilLoopNum;                          // index for plant loop with hot water coil
+        DataPlant::LoopSideLocation HeatCoilLoopSide; // index for plant loop side for hot water coil
+        int HeatCoilBranchNum;                        // index for plant branch for hot water coil
+        int HeatCoilCompNum;                          // index for plant component for hot water coil
+        int CoolCoilInletNodeNum;                     // index of cooling coil inlet node number
+        int CoolCoilOutletNodeNum;                    // index of cooling coil outlet node number
+        int HeatCoilInletNodeNum;                     // index of heating coil inlet node number
+        int HeatCoilOutletNodeNum;                    // index of heating coil outlet node number
+        int ControlZoneNum;                           // pointer to a zone served by a fancoil unit
+        int NodeNumOfControlledZone;                  // node number of controlled zone
+        bool ATMixerExists;                           // True if there is an ATMixer
+        int ATMixerOutNode;                           // outlet air node number for the air terminal mixer
+        Real64 FanPartLoadRatio;                      // ratio of air flow to max air flow to simulation modulating fan
+        Real64 HeatCoilWaterFlowRatio;                // ratio of water flow rate to max water flow rate
+        Real64 ControlZoneMassFlowFrac;               // flow fraction of control zone (always 1 for zone equipment)
+        int MaxIterIndex;                             // recurring message index
+        int RegulaFalsiFailedIndex;                   // iteration loop warning
 
         FanCoilData() // Default Constructor
             : UnitType_Num(0), SchedPtr(0), SchedOutAirPtr(0), FanType_Num(0), SpeedFanSel(0), CapCtrlMeth_Num(CCM::Invalid), PLR(0.0),
@@ -264,11 +264,11 @@ namespace FanCoilUnits {
               DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0), FirstPass(true), fanAvailSchIndex(0), MaxCoolCoilFluidFlow(0.0),
               MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), MaxNoCoolHeatAirMassFlow(0.0), MaxCoolAirMassFlow(0.0),
               MaxHeatAirMassFlow(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0),
-              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(DataPlant::LoopSideLocation::Invalid), CoolCoilBranchNum(0),
-              CoolCoilCompNum(0), HeatCoilLoopNum(0), HeatCoilLoopSide(DataPlant::LoopSideLocation::Invalid), HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilInletNodeNum(0),
-              CoolCoilOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ControlZoneNum(0), NodeNumOfControlledZone(0),
-              ATMixerExists(false), ATMixerOutNode(0), FanPartLoadRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneMassFlowFrac(1.0),
-              MaxIterIndex(0), RegulaFalsiFailedIndex(0)
+              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(DataPlant::LoopSideLocation::Invalid),
+              CoolCoilBranchNum(0), CoolCoilCompNum(0), HeatCoilLoopNum(0), HeatCoilLoopSide(DataPlant::LoopSideLocation::Invalid),
+              HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilInletNodeNum(0),
+              HeatCoilOutletNodeNum(0), ControlZoneNum(0), NodeNumOfControlledZone(0), ATMixerExists(false), ATMixerOutNode(0), FanPartLoadRatio(0.0),
+              HeatCoilWaterFlowRatio(0.0), ControlZoneMassFlowFrac(1.0), MaxIterIndex(0), RegulaFalsiFailedIndex(0)
         {
         }
     };

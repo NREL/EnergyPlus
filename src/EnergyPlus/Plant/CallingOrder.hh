@@ -48,8 +48,8 @@
 #ifndef PlantOperationCallingOrder_hh_INCLUDED
 #define PlantOperationCallingOrder_hh_INCLUDED
 
-#include <EnergyPlus/Plant/MeterData.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/MeterData.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -57,9 +57,9 @@ namespace DataPlant {
     struct PlantCallingOrderInfoStruct
     {
         // Members
-        int LoopIndex;              // plant or condenser loop indexes in calling order
-        DataPlant::LoopSideLocation LoopSide;               // plant or condenser loop sides in calling order
-        int LoopPumpSimulationType; // type of pump topology on half loop
+        int LoopIndex;                        // plant or condenser loop indexes in calling order
+        DataPlant::LoopSideLocation LoopSide; // plant or condenser loop sides in calling order
+        int LoopPumpSimulationType;           // type of pump topology on half loop
 
         // Default Constructor
         PlantCallingOrderInfoStruct() : LoopIndex(0), LoopSide(DataPlant::LoopSideLocation::Invalid), LoopPumpSimulationType(0)
