@@ -116,7 +116,7 @@ void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration)
     state.dataHeatBalFanSys->SumConvPool = 0.0;
     state.dataHeatBalFanSys->SumLatentPool = 0.0;
 
-    PlantLocation A(0, 0, 0, 0);
+    PlantLocation A(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
     Real64 CurLoad = 0.0;
     bool RunFlag = true;
 

@@ -133,36 +133,37 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     state->dataSwimmingPools->Pool(1).WaterInletNode = 1;
     state->dataSwimmingPools->Pool(2).WaterInletNode = 11;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(2).LoopSide(2).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "FirstPool";
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
-    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1).Name = "SecondPool";
-    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 11;
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "FirstPool";
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Name = "SecondPool";
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumIn = 11;
 
     // Test 1
     state->dataSwimmingPools->Pool(1).initSwimmingPoolPlantLoopIndex(*state);
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWLoopNum, 1);
-    EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWLoopSide, 1);
+    EXPECT_TRUE(compare_enums(state->dataSwimmingPools->Pool(1).HWLoopSide, DataPlant::LoopSideLocation::Demand));
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWBranchNum, 1);
     EXPECT_EQ(state->dataSwimmingPools->Pool(1).HWCompNum, 1);
 
@@ -170,7 +171,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantLoopIndex)
     state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool = true;
     state->dataSwimmingPools->Pool(2).initSwimmingPoolPlantLoopIndex(*state);
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWLoopNum, 2);
-    EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWLoopSide, 2);
+    EXPECT_TRUE(compare_enums(state->dataSwimmingPools->Pool(2).HWLoopSide, DataPlant::LoopSideLocation::Supply));
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWBranchNum, 1);
     EXPECT_EQ(state->dataSwimmingPools->Pool(2).HWCompNum, 1);
 }
@@ -188,23 +189,24 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     state->dataSwimmingPools->Pool(1).WaterInletNode = 1;
     state->dataSwimmingPools->Pool(1).WaterOutletNode = 2;
     state->dataSwimmingPools->Pool(1).HWLoopNum = 1;
-    state->dataSwimmingPools->Pool(1).HWLoopSide = 1;
+    state->dataSwimmingPools->Pool(1).HWLoopSide = DataPlant::LoopSideLocation::Demand;
     state->dataSwimmingPools->Pool(1).HWBranchNum = 1;
     state->dataSwimmingPools->Pool(1).HWCompNum = 1;
 
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "FirstPool";
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 1;
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::SwimmingPool_Indoor;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "FirstPool";
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
 
     state->dataLoopNodes->Node.allocate(2);
 
