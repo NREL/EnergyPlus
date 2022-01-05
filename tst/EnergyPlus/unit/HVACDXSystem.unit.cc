@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -846,7 +847,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name",
         "    Electricity,             !- Compressor Fuel Type",
         "    DX Cool Cooling Coil Operating Mode,  !- Base Operating Mode",
-        "    ,                        !- Alternative Operating Mode 1",
+        "    DX Cool Cooling Coil Operating Mode2, !- Alternative Operating Mode 1",
         "    ;                        !- Alternative Operating Mode 1",
 
         "  Coil:Cooling:DX:CurveFit:OperatingMode,",
@@ -863,7 +864,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    0,                       !- Nominal Evaporative Condenser Pump Power {W}",
         "    2,                       !- Nominal Speed Number",
         "    DX Cool Cooling Coil Speed 1 Performance,  !- Speed 1 Name",
-        "    DX Cool Cooling Coil Speed 2 Performance;  !- Speed 1 Name",
+        "    DX Cool Cooling Coil Speed 2 Performance;  !- Speed 2 Name",
 
         "  Coil:Cooling:DX:CurveFit:Speed,",
         "    DX Cool Cooling Coil Speed 1 Performance,  !- Name",
@@ -892,6 +893,64 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
         "    1.0,                     !- Evaporator Air Flow Rate Fraction",
         "    1.0,                     !- Condenser Air Flow Rate Fraction",
         "    0.77,                    !- Gross Sensible Heat Ratio",
+        "    4.17,                    !- Gross Cooling COP {W/W}",
+        "    1.0,                     !- Active Fraction of Coil Face Area",
+        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    1.0,                     !- Evaporative Condenser Pump Power Fraction",
+        "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
+        "    CAPFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name",
+        "    1Pow,  !- Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "    EIRFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name",
+        "    PLFCurve,  !- Part Load Fraction Correlation Curve Name",
+        "    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}",
+        "    ,                        !- Waste Heat Modifier Function of Temperature Curve Name",
+        "    ,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
+        "    ;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
+
+        "  Coil:Cooling:DX:CurveFit:OperatingMode,",
+        "    DX Cool Cooling Coil Operating Mode2,  !- Name",
+        "    15000,                   !- Rated Gross Total Cooling Capacity {W}",
+        "    0.7,                     !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    ,                        !- Rated Condenser Air Flow Rate {m3/s}",
+        "    0,                       !- Maximum Cycling Rate {cycles/hr}",
+        "    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "    0,                       !- Latent Capacity Time Constant {s}",
+        "    0,                       !- Nominal Time for Condensate Removal to Begin {s}",
+        "    ,                        !- Apply Latent Degradation to Speeds Greater than 1",
+        "    AirCooled,               !- Condenser Type",
+        "    0,                       !- Nominal Evaporative Condenser Pump Power {W}",
+        "    2,                       !- Nominal Speed Number",
+        "    DX Cool Cooling Coil Speed 1 Performance2,  !- Speed 1 Name",
+        "    DX Cool Cooling Coil Speed 2 Performance2;  !- Speed 2 Name",
+
+        "  Coil:Cooling:DX:CurveFit:Speed,",
+        "    DX Cool Cooling Coil Speed 1 Performance2,  !- Name",
+        "    0.5,                     !- Gross Total Cooling Capacity Fraction",
+        "    0.5,                     !- Evaporator Air Flow Rate Fraction",
+        "    0.5,                     !- Condenser Air Flow Rate Fraction",
+        "    0.67,                    !- Gross Sensible Heat Ratio",
+        "    4.17,                    !- Gross Cooling COP {W/W}",
+        "    1.0,                     !- Active Fraction of Coil Face Area",
+        "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "    0.5,                     !- Evaporative Condenser Pump Power Fraction",
+        "    0,                       !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    1Cap,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name",
+        "    CAPFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name",
+        "    1Pow,  !- Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "    EIRFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name",
+        "    PLFCurve,  !- Part Load Fraction Correlation Curve Name",
+        "    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}",
+        "    ,                        !- Waste Heat Modifier Function of Temperature Curve Name",
+        "    ,  !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
+        "    ;  !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
+
+        "  Coil:Cooling:DX:CurveFit:Speed,",
+        "    DX Cool Cooling Coil Speed 2 Performance2,  !- Name",
+        "    1.0,                     !- Gross Total Cooling Capacity Fraction",
+        "    1.0,                     !- Evaporator Air Flow Rate Fraction",
+        "    1.0,                     !- Condenser Air Flow Rate Fraction",
+        "    0.67,                    !- Gross Sensible Heat Ratio",
         "    4.17,                    !- Gross Cooling COP {W/W}",
         "    1.0,                     !- Active Fraction of Coil Face Area",
         "    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
@@ -998,20 +1057,39 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     // sensible load met by compressor speed 1
     EXPECT_EQ(1, thisSys->m_CoolingSpeedNum);
 
-    // test latent control
+    // test cool reheat latent control
     thisSys->m_DesiredOutletHumRat = RHControlHumRat;
+    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0, 0.0);
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
 
     Real64 outTemp2 = state->dataLoopNodes->Node(ControlNode).Temp;
     Real64 outHumRat2 = state->dataLoopNodes->Node(ControlNode).HumRat;
     // system over cools past temperature set point
     EXPECT_LT(outTemp2, thisSys->m_DesiredOutletTemp);
-    EXPECT_LT(outTemp2, outTemp1);
-    EXPECT_LT(outHumRat2, outHumRat1);
+    EXPECT_LT(outTemp2, outTemp1);     // cool reheat overshoots Tsetpoint
+    EXPECT_LT(outHumRat2, outHumRat1); // and provides more dehumidification
+
     // system does meet humidity ratio set point
     EXPECT_NEAR(outHumRat2, state->dataLoopNodes->Node(ControlNode).HumRatMax, 0.001);
+    EXPECT_NEAR(outHumRat1, 0.01166, 0.0001);      // sensible control yields higher outlet humrat
+    EXPECT_NEAR(outHumRat2, 0.01000, 0.0001);      // cool reheat control yields lower outlet humrat at set point
+    EXPECT_NEAR(RHControlHumRat, 0.01000, 0.0001); // cool reheat controls to humrat set point
+
     // latent load needed to increase compressor speed to speed 2
     EXPECT_EQ(2, thisSys->m_CoolingSpeedNum);
+
+    // test multimode latent control (change CoilSystem:Cooling:DX coolreheat to multimode)
+    thisSys->m_DehumidControlType_Num = UnitarySystems::UnitarySys::DehumCtrlType::Multimode;
+    thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0, 0.0);
+    thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
+
+    Real64 outTemp3 = state->dataLoopNodes->Node(ControlNode).Temp;
+    Real64 outHumRat3 = state->dataLoopNodes->Node(ControlNode).HumRat;
+    // expect same sensible and better dehumidification using multimode since alternate mode coil specs have improved latent
+    EXPECT_NEAR(outTemp3, outTemp1, 0.00001); // multimode controls to same Tsetpoint
+    EXPECT_LT(outHumRat3, outHumRat1);        // lower outlet humrat with multimode's alternate operating mode
+    EXPECT_NEAR(outHumRat1, 0.01166, 0.0001); // sensible control yields higher outlet humrat
+    EXPECT_NEAR(outHumRat3, 0.01119, 0.0001); // multimode control yields lower outlet humrat
 }
 
 } // namespace EnergyPlus

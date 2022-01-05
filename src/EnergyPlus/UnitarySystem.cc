@@ -12873,7 +12873,7 @@ namespace UnitarySystems {
                     }
 
                     // make sure outlet temp is below set point before calling SolveRoot
-                    if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) {
+                    if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < -Acc) {
                         std::array<Real64, 8> Par2 = {double(this->m_CoolingCoilIndex),
                                                       DesOutTemp,
                                                       // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
@@ -13246,10 +13246,10 @@ namespace UnitarySystems {
                                                                                                       this->m_CoolingSpeedRatio,
                                                                                                       this->m_FanOpMode,
                                                                                                       singleMode);
-                            if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < Acc) break;
+                            if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < HumRatAcc) break;
                         }
                         // make sure outlet HumRat is below set point before calling SolveRoot
-                        if (state.dataLoopNodes->Node(OutletNode).HumRat < DesOutHumRat) {
+                        if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < -HumRatAcc) {
                             std::array<Real64, 8> Par2 = {
                                 double(this->m_CoolingCoilIndex),
                                 DesOutHumRat,
