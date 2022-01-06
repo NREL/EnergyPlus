@@ -2197,7 +2197,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     auto &MyWarmupFlag = state.dataPackagedThermalStorageCoil->MyWarmupFlag;
     bool errFlag;
     int plloopnum;
-    int lsnum;
+    DataPlant::LoopSideLocation lsnum;
     int brnum;
     int cpnum;
     Real64 tmpSchedValue;

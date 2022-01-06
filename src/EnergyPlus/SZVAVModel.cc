@@ -117,7 +117,7 @@ namespace SZVAVModel {
         int coilFluidInletNode(0);
         int coilFluidOutletNode(0);
         int coilLoopNum(0);
-        int coilLoopSide(0);
+        DataPlant::LoopSideLocation coilLoopSide(DataPlant::LoopSideLocation::Invalid);
         int coilBranchNum(0);
         int coilCompNum(0);
         int coilAirInletNode(0);
@@ -164,7 +164,7 @@ namespace SZVAVModel {
             coilFluidInletNode = 0;
             coilFluidOutletNode = 0;
             coilLoopNum = 0;
-            coilLoopSide = 0;
+            coilLoopSide = DataPlant::LoopSideLocation::Invalid;
             coilBranchNum = 0;
             coilCompNum = 0;
             coilAirInletNode = 0;
@@ -557,7 +557,7 @@ namespace SZVAVModel {
         int coilFluidInletNode(0);
         int coilFluidOutletNode(0);
         int coilLoopNum(0);
-        int coilLoopSide(0);
+        DataPlant::LoopSideLocation coilLoopSide(DataPlant::LoopSideLocation::Invalid);
         int coilBranchNum(0);
         int coilCompNum(0);
         int coilAirInletNode(0);
@@ -604,7 +604,7 @@ namespace SZVAVModel {
             coilFluidInletNode = 0;
             coilFluidOutletNode = 0;
             coilLoopNum = 0;
-            coilLoopSide = 0;
+            coilLoopSide = DataPlant::LoopSideLocation::Invalid;
             coilBranchNum = 0;
             coilCompNum = 0;
             coilAirInletNode = 0;
@@ -1001,7 +1001,7 @@ namespace SZVAVModel {
         int coilFluidInletNode(0);
         int coilFluidOutletNode(0);
         int coilLoopNum(0);
-        int coilLoopSide(0);
+        DataPlant::LoopSideLocation coilLoopSide(DataPlant::LoopSideLocation::Invalid);
         int coilBranchNum(0);
         int coilCompNum(0);
         int coilAirInletNode(0);
@@ -1050,7 +1050,7 @@ namespace SZVAVModel {
             coilFluidInletNode = 0;
             coilFluidOutletNode = 0;
             coilLoopNum = 0;
-            coilLoopSide = 0;
+            coilLoopSide = DataPlant::LoopSideLocation::Invalid;
             coilBranchNum = 0;
             coilCompNum = 0;
             coilAirInletNode = 0;

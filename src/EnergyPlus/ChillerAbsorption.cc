@@ -742,8 +742,13 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                 _,
                                                 this->GeneratorInletNodeNum,
                                                 _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(
-            state, this->CWLoopNum, this->CWLoopSideNum, this->GenLoopNum, this->GenCompNum, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(state,
+                                                      this->CWLoopNum,
+                                                      this->CWLoopSideNum,
+                                                      this->GenLoopNum,
+                                                      this->GenLoopSideNum,
+                                                      DataPlant::PlantEquipmentType::Chiller_Absorption,
+                                                      true);
     }
 
     // Fill in connection data
@@ -752,7 +757,7 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
                                                       this->CDLoopNum,
                                                       this->CDLoopSideNum,
                                                       this->GenLoopNum,
-                                                      this->GenCompNum,
+                                                      this->GenLoopSideNum,
                                                       DataPlant::PlantEquipmentType::Chiller_Absorption,
                                                       false);
     }
@@ -1790,7 +1795,7 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
             CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                              state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                              state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
-                                                             state.dataPlnt->PlantLoop(GenLoopSideNum).FluidIndex,
+                                                             state.dataPlnt->PlantLoop(GenLoopNum).FluidIndex,
                                                              RoutineName);
             if (state.dataPlnt->PlantLoop(this->GenLoopNum).LoopSide(this->GenLoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
                 if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {

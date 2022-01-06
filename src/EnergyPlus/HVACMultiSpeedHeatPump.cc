@@ -4708,7 +4708,7 @@ namespace HVACMultiSpeedHeatPump {
         int CoilControlNode;
         int CoilOutletNode;
         int LoopNum;
-        int LoopSide;
+        DataPlant::LoopSideLocation LoopSide;
         int BranchNum;
         int CompNum;
 

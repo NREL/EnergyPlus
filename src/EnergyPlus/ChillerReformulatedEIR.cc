@@ -187,7 +187,7 @@ void ReformulatedEIRChillerSpecs::simulate(
         this->control(state, CurLoad, RunFlag, FirstHVACIteration);
         this->update(state, CurLoad, RunFlag);
     } else if (calledFromLocation.loopNum == this->CDLoopNum) {
-        int LoopSide = this->CDLoopSideNum;
+        DataPlant::LoopSideLocation LoopSide = this->CDLoopSideNum;
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             LoopSide,
@@ -1154,7 +1154,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
     // Initialize heat recovery flow rates at node
     if (this->HeatRecActive) {
         int LoopNum = this->HRLoopNum;
-        int LoopSideNum = this->HRLoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->HRLoopSideNum;
         int BranchIndex = this->HRBranchNum;
         int CompIndex = this->HRCompNum;
 
@@ -2053,7 +2053,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     this->QEvaporator = 0.0;
     this->QHeatRecovery = 0.0;
     int PlantLoopNum = this->CWLoopNum;
-    int LoopSideNum = this->CWLoopSideNum;
+    DataPlant::LoopSideLocation LoopSideNum = this->CWLoopSideNum;
     int BranchNum = this->CWBranchNum;
     int CompNum = this->CWCompNum;
 
@@ -2540,7 +2540,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
 
     // Do not print out warnings if chiller not operating or FirstIteration/WarmupFlag/FlowLock
     int PlantLoopNum = this->CWLoopNum;
-    int LoopSideNum = this->CWLoopSideNum;
+    DataPlant::LoopSideLocation LoopSideNum = this->CWLoopSideNum;
     int BranchNum = this->CWBranchNum;
     int CompNum = this->CWCompNum;
 
