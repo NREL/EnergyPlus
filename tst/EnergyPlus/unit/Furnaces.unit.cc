@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     EXPECT_DOUBLE_EQ(0.5, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
     bool firstHVACIteration = true;
-    int compOp = 1;
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     Real64 zoneLoad = 1000;
     Real64 moistureLoad = 0.0;
     Real64 heatCoilLoad = 0.0;
@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->CoolingLoad = false;
 
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).MdotFurnace, 0.5); // CompOnMassFlow rate
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.5);  // furnace inlet node mass flow rate
     EXPECT_EQ(state->dataFurnaces->Furnace(1).CoolPartLoadRatio, 0.0);
@@ -319,7 +319,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     state->dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false; // turn off water source coil GetInput
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.2);  // furnace inlet node mass flow rate is at idle speed flow rate
     EXPECT_EQ(state->dataFurnaces->Furnace(1).CoolPartLoadRatio, 0.0);
@@ -328,7 +328,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->Furnace(1).HeatPartLoadRatio = 1.0;
     state->dataFurnaces->HeatingLoad = true;
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).HeatPartLoadRatio, 1.0);
 }
 
