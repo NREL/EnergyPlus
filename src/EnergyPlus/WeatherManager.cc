@@ -2300,14 +2300,14 @@ namespace WeatherManager {
                 state.dataWaterData->RainFall.numRainyHoursInWeather[month - 1] += 1;
             }
             // fixme: debug print
-//            if (state.dataEnvrn->LiquidPrecipitation > 0) {
-//                fmt::print("{} {}-{} rain: ts={}, month={}\n",
-//                           state.dataEnvrn->CurMnDy,
-//                           state.dataGlobal->HourOfDay,
-//                           state.dataGlobal->TimeStep,
-//                           state.dataEnvrn->LiquidPrecipitation * 1000.0,
-//                           state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1]);
-//            }
+            //            if (state.dataEnvrn->LiquidPrecipitation > 0) {
+            //                fmt::print("{} {}-{} rain: ts={}, month={}\n",
+            //                           state.dataEnvrn->CurMnDy,
+            //                           state.dataGlobal->HourOfDay,
+            //                           state.dataGlobal->TimeStep,
+            //                           state.dataEnvrn->LiquidPrecipitation * 1000.0,
+            //                           state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1]);
+            //            }
         }
         state.dataEnvrn->TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         state.dataEnvrn->OpaqueCloudCover = state.dataWeatherManager->TodayOpaqueSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);

@@ -960,16 +960,20 @@ namespace WaterManager {
             // placeholder: add EP checks for out of range precipitation value later -- yujie
             // when there's no site:precipitation but non-zero epw precipitation, uset the epw precipitation as the CurrentRate
             if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
-                ShowWarningMessage(state, "Please be aware that precipitation depth in the .epw weather file is used in the RainCollector calculation as the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
+                ShowWarningMessage(state,
+                                   "Please be aware that precipitation depth in the .epw weather file is used in the RainCollector calculation as "
+                                   "the site:precipitation object is missing. Please make sure the precipitation depth in the weather file is valid. "
+                                   "Please refer to the 24-Hour Precipitation records by the State Climate Extremes Committee for a sanity check.");
                 // LiquidPrecipitation is for a certain timestep in an hour, the rate = depth / seconds in a timestep
-                state.dataWaterData->RainFall.CurrentRate = state.dataEnvrn->LiquidPrecipitation / (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
+                state.dataWaterData->RainFall.CurrentRate =
+                    state.dataEnvrn->LiquidPrecipitation / (DataGlobalConstants::SecInHour / state.dataGlobal->NumOfTimeStepInHour);
                 // fixme: debug print
-//                fmt::print("{} {}-{} prec amount: dep={}, rate={}\n",
-//                           state.dataEnvrn->CurMnDy,
-//                           state.dataGlobal->HourOfDay,
-//                           state.dataGlobal->TimeStep,
-//                           state.dataEnvrn->LiquidPrecipitation,
-//                           state.dataWaterData->RainFall.CurrentRate);
+                //                fmt::print("{} {}-{} prec amount: dep={}, rate={}\n",
+                //                           state.dataEnvrn->CurMnDy,
+                //                           state.dataGlobal->HourOfDay,
+                //                           state.dataGlobal->TimeStep,
+                //                           state.dataEnvrn->LiquidPrecipitation,
+                //                           state.dataWaterData->RainFall.CurrentRate);
             } else {
                 // no site:precipitation, LiquidPrecipitation is zero but rain flag is on, assume 1.5mm rain
                 if (state.dataEnvrn->IsRain) {
@@ -990,17 +994,18 @@ namespace WaterManager {
             state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
         }
         // fixme: debug print
-//        if (state.dataWaterData->RainFall.CurrentAmount > 0.0) {
-//            fmt::print("{} {}-{} rain fall amount for month {}: dep={}, cur={}, acc={:.5f}, 1/TimeStepSys={:.1f}, SysTimestepLoop={}, numStep={}\n",
-//                       state.dataEnvrn->CurMnDy,
-//                       state.dataGlobal->HourOfDay,
-//                       state.dataGlobal->TimeStep,
-//                       month - 1,
-//                       state.dataEnvrn->LiquidPrecipitation,
-//                       state.dataWaterData->RainFall.CurrentAmount,
-//                       state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1],
-//                       1.0/TimeStepSys, SysTimestepLoop, state.dataGlobal->NumOfTimeStepInHour);
-//        }
+        //        if (state.dataWaterData->RainFall.CurrentAmount > 0.0) {
+        //            fmt::print("{} {}-{} rain fall amount for month {}: dep={}, cur={}, acc={:.5f}, 1/TimeStepSys={:.1f}, SysTimestepLoop={},
+        //            numStep={}\n",
+        //                       state.dataEnvrn->CurMnDy,
+        //                       state.dataGlobal->HourOfDay,
+        //                       state.dataGlobal->TimeStep,
+        //                       month - 1,
+        //                       state.dataEnvrn->LiquidPrecipitation,
+        //                       state.dataWaterData->RainFall.CurrentAmount,
+        //                       state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1],
+        //                       1.0/TimeStepSys, SysTimestepLoop, state.dataGlobal->NumOfTimeStepInHour);
+        //        }
     }
 
     void UpdateIrrigation(EnergyPlusData &state)
@@ -1032,9 +1037,9 @@ namespace WaterManager {
             state.dataWaterData->Irrigation.ScheduledAmount =
                 schedRate * (TimeStepSys * DataGlobalConstants::SecInHour) / DataGlobalConstants::SecInHour; // convert to m/timestep
             // fixme: debug print
-//            if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
-//                fmt::print("liquid precip > 0");
-//            }
+            //            if (state.dataEnvrn->LiquidPrecipitation > 0.0) {
+            //                fmt::print("liquid precip > 0");
+            //            }
         }
     }
 
@@ -1521,14 +1526,15 @@ namespace WaterManager {
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
             int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
             // fixme: check memory
-            state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] += state.dataWaterData->RainCollector(RainColNum).VolCollected;
+            state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] +=
+                state.dataWaterData->RainCollector(RainColNum).VolCollected;
             // fixme: debug print
-//            fmt::print("{} {}-{} rain water collected for {}: {}\n",
-//                       state.dataEnvrn->CurMnDy,
-//                       state.dataGlobal->HourOfDay,
-//                       state.dataGlobal->TimeStep,
-//                       RainColNum,
-//                       state.dataWaterData->RainCollector(RainColNum).VolCollected);
+            //            fmt::print("{} {}-{} rain water collected for {}: {}\n",
+            //                       state.dataEnvrn->CurMnDy,
+            //                       state.dataGlobal->HourOfDay,
+            //                       state.dataGlobal->TimeStep,
+            //                       RainColNum,
+            //                       state.dataWaterData->RainCollector(RainColNum).VolCollected);
         }
     }
 

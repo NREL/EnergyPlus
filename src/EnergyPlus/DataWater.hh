@@ -278,7 +278,7 @@ namespace DataWater {
         Array1D<Real64> MonthlyTotalPrecInRainCol; // Monthly total rain in rain collector
         Array1D<Real64> MonthlyTotalPrecInRoofIrr; // Monthly total rain in roof irrigation
         Array1D<Real64> MonthlyTotalPrecInWeather; // Monthly total rain in weather file
-        Array1D<int> numRainyHoursInWeather;   // Monthly number of rainy hours
+        Array1D<int> numRainyHoursInWeather;       // Monthly number of rainy hours
 
         // Default Constructor
         SiteRainFallDataStruct()
