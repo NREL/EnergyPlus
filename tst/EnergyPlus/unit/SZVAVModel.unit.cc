@@ -259,7 +259,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     bool HXUnitOn = false;
     int AirLoopNum = 0;
     Real64 PLR = 0.0;
-    int CompressorOnFlag = 0;
+    DataHVACGlobals::CompressorOperation CompressorOnFlag = DataHVACGlobals::CompressorOperation::Off;
     auto &SZVAVModel(state->dataPTHP->PTUnit(1));
     // first pass through will get objects and reset node data
     SZVAVModel::calcSZVAVModel(*state,
@@ -479,7 +479,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int CompressorOnFlag(0);
+    CompressorOperation CompressorOnFlag(CompressorOperation::Off);
     int AirLoopNum(0);
     bool FirstHVACIteration(false);
     bool ErrorsFound(false);
@@ -742,7 +742,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     OnOffAirFlowRatio = 1.0;
     HXUnitOn = false;
     AirLoopNum = 0;
-    CompressorOnFlag = 0;
+    CompressorOnFlag = CompressorOperation::Off;
     FirstHVACIteration = true;
     auto &SZVAVModel(state->dataFanCoilUnits->FanCoil(FanCoilNum));
 

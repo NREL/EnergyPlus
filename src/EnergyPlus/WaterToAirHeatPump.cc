@@ -113,7 +113,7 @@ namespace WaterToAirHeatPump {
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         int const CompOp,
+                         DataHVACGlobals::CompressorOperation const CompressorOp,
                          Real64 const PartLoadRatio)
     {
 
@@ -174,14 +174,14 @@ namespace WaterToAirHeatPump {
         if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
+            CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
         } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
             InitWatertoAirHP(
                 state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
+            CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
@@ -1138,7 +1138,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const RuntimeFrac,
                                  [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
-                                 int const CompOp,
+                                 DataHVACGlobals::CompressorOperation const CompressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1329,7 +1329,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
         }
 
-        if (CompOp == 0) {
+        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             return;
         }
@@ -1780,7 +1780,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const RuntimeFrac,
                                  [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
-                                 int const CompOp,
+                                 DataHVACGlobals::CompressorOperation const CompressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1949,7 +1949,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
         }
 
-        if (CompOp == 0) {
+        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
             return;
         }

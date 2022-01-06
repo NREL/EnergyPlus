@@ -118,7 +118,7 @@ namespace WaterToAirHeatPumpSimple {
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                                Real64 &HPTimeConstant,        // Heat pump time constant [s]
                                Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
-                               int const CompOp,
+                               DataHVACGlobals::CompressorOperation const CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
                                Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
@@ -199,7 +199,7 @@ namespace WaterToAirHeatPumpSimple {
                                    CyclingScheme,
                                    OnOffAirFlowRatio,
                                    FirstHVACIteration);
-            CalcHPCoolingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
+            CalcHPCoolingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WAHPPlantType ==
                    DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
@@ -214,7 +214,7 @@ namespace WaterToAirHeatPumpSimple {
                                    CyclingScheme,
                                    OnOffAirFlowRatio,
                                    FirstHVACIteration);
-            CalcHPHeatingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadRatio, OnOffAirFlowRatio);
+            CalcHPHeatingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else {
             ShowFatalError(state, "SimWatertoAirHPSimple: WatertoAir heatpump not in either HEATING or COOLING mode");
@@ -2113,14 +2113,14 @@ namespace WaterToAirHeatPumpSimple {
     }
 
     void CalcHPCoolingSimple(EnergyPlusData &state,
-                             int const HPNum,                                // Heat Pump Number
-                             int const CyclingScheme,                        // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                       // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                             [[maybe_unused]] Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
-                             [[maybe_unused]] Real64 const LatentDemand,     // Cooling Latent Demand [W]
-                             int const CompOp,                               // compressor operation flag
-                             Real64 const PartLoadRatio,                     // compressor part load ratio
-                             [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
+                             int const HPNum,                            // Heat Pump Number
+                             int const CyclingScheme,                    // Fan/Compressor cycling scheme indicator
+                             Real64 const RuntimeFrac,                   // Runtime Fraction of compressor or percent on time (on-time/cycle time)
+                             [[maybe_unused]] Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
+                             [[maybe_unused]] Real64 const LatentDemand, // Cooling Latent Demand [W]
+                             DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag
+                             Real64 const PartLoadRatio,                              // compressor part load ratio
+                             [[maybe_unused]] Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
     )
     {
 
@@ -2247,7 +2247,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.SimFlag = true;
         }
 
-        if (CompOp == 0) {
+        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
             simpleWatertoAirHP.SimFlag = false;
             return;
         }
@@ -2445,13 +2445,13 @@ namespace WaterToAirHeatPumpSimple {
     }
 
     void CalcHPHeatingSimple(EnergyPlusData &state,
-                             int const HPNum,                                // Heat Pump Number
-                             int const CyclingScheme,                        // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                       // Runtime Fraction of compressor
-                             [[maybe_unused]] Real64 const SensDemand,       // Sensible Demand [W] !unused1208
-                             int const CompOp,                               // compressor operation flag
-                             Real64 const PartLoadRatio,                     // compressor part load ratio
-                             [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
+                             int const HPNum,                                         // Heat Pump Number
+                             int const CyclingScheme,                                 // Fan/Compressor cycling scheme indicator
+                             Real64 const RuntimeFrac,                                // Runtime Fraction of compressor
+                             [[maybe_unused]] Real64 const SensDemand,                // Sensible Demand [W] !unused1208
+                             DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag
+                             Real64 const PartLoadRatio,                              // compressor part load ratio
+                             [[maybe_unused]] Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
     )
     {
 
@@ -2544,7 +2544,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.SimFlag = true;
         }
 
-        if (CompOp == 0) {
+        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
             simpleWatertoAirHP.SimFlag = false;
             return;
         }

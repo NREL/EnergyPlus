@@ -94,7 +94,7 @@ namespace SZVAVModel {
                         bool const HXUnitOn,
                         int const AirLoopNum,
                         Real64 &PartLoadRatio,
-                        int const CompressorONFlag)
+                        DataHVACGlobals::CompressorOperation const CompressorONFlag)
     {
 
         int constexpr MaxIter(100); // maximum number of iterations
@@ -507,7 +507,7 @@ namespace SZVAVModel {
                         [[maybe_unused]] bool const HXUnitOn,
                         int const AirLoopNum,
                         Real64 &PartLoadRatio,
-                        int const CompressorONFlag)
+                        DataHVACGlobals::CompressorOperation const CompressorONFlag)
     {
 
         int constexpr MaxIter(100); // maximum number of iterations
@@ -923,7 +923,7 @@ namespace SZVAVModel {
                         bool const HXUnitOn,
                         int const AirLoopNum,
                         Real64 &PartLoadRatio,
-                        int const CompressorONFlag)
+                        DataHVACGlobals::CompressorOperation const CompressorONFlag)
     {
 
         UnitarySystems::UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[SysIndex];

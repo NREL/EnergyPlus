@@ -67,9 +67,6 @@ namespace HVACUnitaryBypassVAV {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    // Compressor operation
-    constexpr int On(1);  // Normal compressor operation
-    constexpr int Off(0); // Signal DXCoil that compressor should not run
 
     // Mode of operation
     // can't change these to enum class since these are used in SetupOutputVariable()
