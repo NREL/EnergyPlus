@@ -128,11 +128,8 @@ namespace PlantCondLoopOperation {
     );
 
     void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
-                                       int const LoopNum,                             // component topology
-                                       const DataPlant::LoopSideLocation LoopSideNum, // component topology
-                                       int const BranchNum,                           // component topology
-                                       int const CompNum,                             // component topology
-                                       Real64 &ChangeInLoad                           // positive magnitude of load change
+                                       PlantLocation const &plantLoc, // component topology
+                                       Real64 &ChangeInLoad           // positive magnitude of load change
     );
 
     void FindCompSPLoad(EnergyPlusData &state,

@@ -2370,7 +2370,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 ChangeInLoad = max(0.0, ChangeInLoad);
                 this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
@@ -2451,7 +2451,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 ChangeInLoad = max(0.0, ChangeInLoad);
                 this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
@@ -2501,7 +2501,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
                 ChangeInLoad = max(0.0, ChangeInLoad);
                 this_component.MyLoad = sign(ChangeInLoad, RemLoopDemand);
                 RemLoopDemand -= sign(ChangeInLoad, RemLoopDemand);
@@ -2620,7 +2620,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 ChangeInLoad = max(0.0, ChangeInLoad);
 
@@ -2702,7 +2702,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
 
-                AdjustChangeInLoadByHowServed(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 ChangeInLoad = max(0.0, ChangeInLoad);
 
@@ -2785,11 +2785,8 @@ void AdjustChangeInLoadForLastStageUpperRangeLimit(EnergyPlusData &state,
 }
 
 void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
-                                   int const LoopNum,                  // component topology
-                                   const LoopSideLocation LoopSideNum, // component topology
-                                   int const BranchNum,                // component topology
-                                   int const CompNum,                  // component topology
-                                   Real64 &ChangeInLoad                // positive magnitude of load change
+                                   PlantLocation const &plantLoc, // component topology
+                                   Real64 &ChangeInLoad           // positive magnitude of load change
 )
 {
 
@@ -2820,7 +2817,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
     Real64 QdotTmp(0.0);
     int ControlNodeNum(0);
 
-    auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
+    auto &this_component(CompData::getPlantComponent(state, plantLoc));
 
     // start of bad band-aid, need a general and comprehensive approach for determining current capacity of all kinds of equipment
     // Need to truncate the load down in case outlet temperature will hit a lower/upper limit
@@ -2835,7 +2832,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
         ToutLowLimit = this_component.MinOutletTemp;
         Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
         CurSpecHeat = GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
         QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
         //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned on
@@ -2920,7 +2917,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
             ToutLowLimit = this_component.MinOutletTemp;
             Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
             CurSpecHeat = GetSpecificHeatGlycol(
-                state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+                state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
             QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
             //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned
@@ -2938,7 +2935,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
         ToutHiLimit = this_component.MaxOutletTemp;
         Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
         CurSpecHeat = GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
         QdotTmp = CurMassFlowRate * CurSpecHeat * (ToutHiLimit - Tinlet);
 
         if (CurMassFlowRate > 0.0) {
