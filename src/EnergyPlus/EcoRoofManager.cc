@@ -938,7 +938,7 @@ namespace EcoRoofManager {
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
                 // aggregate to monthly for reporting
-                int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+                int month = state.dataEnvrn->Month;
                 state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
             }
         }
@@ -965,7 +965,7 @@ namespace EcoRoofManager {
         if (!state.dataGlobal->WarmupFlag) {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
             // aggregate to monthly for reporting
-            int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+            int month = state.dataEnvrn->Month;
             state.dataEcoRoofMgr->MonthlyIrrigation[month - 1] += state.dataWaterData->Irrigation.ActualAmount * 1000.0;
         }
 

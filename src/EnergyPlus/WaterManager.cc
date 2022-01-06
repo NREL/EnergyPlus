@@ -987,7 +987,7 @@ namespace WaterManager {
             }
         }
         state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
-        int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+        int month = state.dataEnvrn->Month;
         // change unit back to mm in the reporting in monthly rain amount used in rain collector
         if ((SysTimestepLoop == 0) && (state.dataWaterData->RainFall.CurrentAmount > 0.0)) {
             state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
@@ -1523,7 +1523,7 @@ namespace WaterManager {
 
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
-            int month = std::stoi(state.dataEnvrn->CurMnDy.std::string::substr(0, 2));
+            int month = state.dataEnvrn->Month;
             // fixme: check memory
             state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] +=
                 state.dataWaterData->RainCollector(RainColNum).VolCollected;

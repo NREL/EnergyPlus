@@ -81,8 +81,6 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataEnvrn->CurMnDy = "01/02";
-
     WaterManager::UpdatePrecipitation(*state);
 
     Real64 ExpectedNomAnnualRain = 0.80771;
@@ -113,7 +111,6 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput(*state);
-    state->dataEnvrn->CurMnDy = "01/02";
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 2.0;
 
@@ -162,7 +159,6 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    state->dataEnvrn->CurMnDy = "01/02";
     WaterManager::UpdatePrecipitation(*state);
 
     Real64 NomAnnualRain = state->dataWaterData->RainFall.NomAnnualRain;
