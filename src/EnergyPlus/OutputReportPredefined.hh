@@ -1220,7 +1220,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchDDhumTyp = 0;
         this->pdchDDwindSp = 0;
         this->pdchDDwindDr = 0;
-        // this->monthlyPrec = 0;
         this->pdchMonthlyTotalPrecInWeather = 0;
         this->pdchMonthlyTotalHrRain = 0;
         this->pdchMonthlyTotalPrecInIrr = 0;
