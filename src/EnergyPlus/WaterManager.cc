@@ -461,7 +461,6 @@ namespace WaterManager {
                     state.dataWaterData->RainCollector(Item).NumCollectSurfs = NumAlphas - alphaOffset;
                     state.dataWaterData->RainCollector(Item).SurfName.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
                     state.dataWaterData->RainCollector(Item).SurfID.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
-                    state.dataWaterData->RainCollector(Item).VolCollectedMonthly.dimension(12, 0.0);
                     for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
                         state.dataWaterData->RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
                         state.dataWaterData->RainCollector(Item).SurfID(SurfNum) =

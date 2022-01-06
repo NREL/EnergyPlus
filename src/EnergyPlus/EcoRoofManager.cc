@@ -453,7 +453,6 @@ namespace EcoRoofManager {
             state.dataEcoRoofMgr->CumET = 0.0;
             state.dataEcoRoofMgr->CumPrecip = 0.0;
             state.dataEcoRoofMgr->CumIrrigation = 0.0;
-            state.dataEcoRoofMgr->MonthlyIrrigation.dimension(12, 0.0);
             state.dataEcoRoofMgr->CurrentRunoff = 0.0;
             state.dataEcoRoofMgr->CurrentET = 0.0;
             state.dataEcoRoofMgr->CurrentPrecipitation = 0.0;
