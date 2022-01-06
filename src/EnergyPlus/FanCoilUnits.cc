@@ -3249,52 +3249,52 @@ namespace FanCoilUnits {
                                          FanCoil(FanCoilNum).CoolCoilBranchNum,
                                          FanCoil(FanCoilNum).CoolCoilCompNum);
 
-                    if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
-                        mdot = 0.0;
-                        SetComponentFlowRate(state,
-                                             mdot,
-                                             FanCoil(FanCoilNum).HeatCoilFluidInletNode,
-                                             FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                             FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                             FanCoil(FanCoilNum).HeatCoilCompNum);
+                        if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
+                            mdot = 0.0;
+                            SetComponentFlowRate(state,
+                                                 mdot,
+                                                 FanCoil(FanCoilNum).HeatCoilFluidInletNode,
+                                                 FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
+                                                 FanCoil(FanCoilNum).HeatCoilLoopNum,
+                                                 FanCoil(FanCoilNum).HeatCoilLoopSide,
+                                                 FanCoil(FanCoilNum).HeatCoilBranchNum,
+                                                 FanCoil(FanCoilNum).HeatCoilCompNum);
+                        }
+                    } else {
+                        Real64 OnOffAirFlowRatio = 1.0;
+                        bool HXUnitOn = false;
+                        int AirLoopNum = 0;
+                        DataHVACGlobals::CompressorOperation CompressorOnFlag = DataHVACGlobals::CompressorOperation::Off;
+                        auto &SZVAVModel(FanCoil(FanCoilNum));
+                        // seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different
+                        // models
+                        SZVAVModel::calcSZVAVModel(state,
+                                                   SZVAVModel,
+                                                   FanCoilNum,
+                                                   FirstHVACIteration,
+                                                   state.dataFanCoilUnits->CoolingLoad,
+                                                   state.dataFanCoilUnits->HeatingLoad,
+                                                   QZnReq,
+                                                   OnOffAirFlowRatio,
+                                                   HXUnitOn,
+                                                   AirLoopNum,
+                                                   PLR,
+                                                   CompressorOnFlag);
                     }
-                } else {
-                    Real64 OnOffAirFlowRatio = 1.0;
-                    bool HXUnitOn = false;
-                    int AirLoopNum = 0;
-                    int CompressorOnFlag = 0;
-                    auto &SZVAVModel(FanCoil(FanCoilNum));
-                    // seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different
-                    // models
-                    SZVAVModel::calcSZVAVModel(state,
-                                               SZVAVModel,
-                                               FanCoilNum,
-                                               FirstHVACIteration,
-                                               state.dataFanCoilUnits->CoolingLoad,
-                                               state.dataFanCoilUnits->HeatingLoad,
-                                               QZnReq,
-                                               OnOffAirFlowRatio,
-                                               HXUnitOn,
-                                               AirLoopNum,
-                                               PLR,
-                                               CompressorOnFlag);
+                } else if ((state.dataFanCoilUnits->CoolingLoad && QUnitOutMax > QZnReq && QZnReq < 0.0) ||
+                           (state.dataFanCoilUnits->HeatingLoad && QUnitOutMax < QZnReq && QZnReq > 0.0)) {
+                    // load is larger than capacity, thus run the fancoil unit at full capacity
+                    PLR = 1.0;
                 }
-            } else if ((state.dataFanCoilUnits->CoolingLoad && QUnitOutMax > QZnReq && QZnReq < 0.0) ||
-                       (state.dataFanCoilUnits->HeatingLoad && QUnitOutMax < QZnReq && QZnReq > 0.0)) {
-                // load is larger than capacity, thus run the fancoil unit at full capacity
-                PLR = 1.0;
-            }
-            Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
-            PowerMet = QUnitOut;
-            AirMassFlow = Node(InletNode).MassFlowRate;
-            // CR9155 Remove specific humidity calculations
-            SpecHumOut = Node(OutletNode).HumRat;
-            SpecHumIn = Node(InletNode).HumRat;
-            // Latent rate (kg/s), dehumid = negative
-            LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
-            FanCoil(FanCoilNum).PLR = PLR;
+                Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
+                PowerMet = QUnitOut;
+                AirMassFlow = Node(InletNode).MassFlowRate;
+                // CR9155 Remove specific humidity calculations
+                SpecHumOut = Node(OutletNode).HumRat;
+                SpecHumIn = Node(InletNode).HumRat;
+                // Latent rate (kg/s), dehumid = negative
+                LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn);
+                FanCoil(FanCoilNum).PLR = PLR;
 
             // cycling fan constant water flow AND VarFanVarFlow
         } break;
@@ -3838,8 +3838,13 @@ namespace FanCoilUnits {
                 }
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataHVACGlobals::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
             }
@@ -3874,8 +3879,13 @@ namespace FanCoilUnits {
                     state, ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataHVACGlobals::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
             }
@@ -3922,8 +3932,13 @@ namespace FanCoilUnits {
             }
 
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataHVACGlobals::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index);
             }

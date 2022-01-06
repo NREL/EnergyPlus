@@ -3203,7 +3203,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
 
     // Evaluate water coils with new actuated variables
     if (HXAssistedWaterCoil) {
-        SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil);
+        SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
     } else {
         SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
     }
@@ -3277,7 +3277,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
 
             // Re-evaluate air loop components with new actuated variables
             if (HXAssistedWaterCoil) {
-                SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
             }
@@ -3567,16 +3567,25 @@ void SimAirLoopComponent(EnergyPlusData &state,
     } break;
     case CompType::Fan_ComponentModel: { // 'Fan:ComponentModel'
         Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
+
         // Coil Types for the air sys simulation
         //  Currently no control for HX Assisted coils
         //  CASE(DXCoil_CoolingHXAsst)  ! 'CoilSystem:Cooling:DX:HeatExchangerAssisted'
         //    CALL SimHXAssistedCoolingCoil(CompName,FirstHVACIteration,CoilOn,0.0,CompIndex,ContFanCycCoil)
     } break;
     case CompType::WaterCoil_CoolingHXAsst: { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-        SimHXAssistedCoolingCoil(
-            state, CompName, FirstHVACIteration, CoilOn, DataPrecisionGlobals::constant_zero, CompIndex, ContFanCycCoil, _, _, _, QActual);
+        SimHXAssistedCoolingCoil(state,
+                                 CompName,
+                                 FirstHVACIteration,
+                                 CompressorOperation::On,
+                                 DataPrecisionGlobals::constant_zero,
+                                 CompIndex,
+                                 ContFanCycCoil,
+                                 _,
+                                 _,
+                                 _,
+                                 QActual);
         if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
-
     } break;
     case CompType::WaterCoil_SimpleHeat: { // 'Coil:Heating:Water'
         SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex, QActual);
