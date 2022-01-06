@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
 
     // without site:precipitation, use epw "LiquidPrecipitation"
     state->dataEnvrn->LiquidPrecipitation = 0.5;
-    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Invalid;
     WaterManager::UpdatePrecipitation(*state);
     ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.5 / (3600 / state->dataGlobal->NumOfTimeStepInHour));
     // when "LiquidPrecipitation" is 0, rainfall rate is 0
@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     ASSERT_EQ(state->dataWaterData->RainFall.CurrentRate, 0.0);
 
     // without site:precipitation, "LiquidPrecipitation" is also missing, but rain flag is on
-    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Unassigned;
+    state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::Invalid;
     state->dataEnvrn->LiquidPrecipitation = 0;
     state->dataEnvrn->IsRain = true;
     WaterManager::UpdatePrecipitation(*state);
