@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -215,12 +215,14 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode = 1;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode = 2;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode;
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode = 3;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode = 4;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum = 2;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode;
 
     // Hydronic - HeatingDesignCapacity/CoolingDesignCapacity method
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat = AutoSize;
@@ -306,12 +308,14 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode = 1;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterOutNode = 2;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HWplantLoc.loopNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode;
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode = 3;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterOutNode = 4;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).CWPlantLoc.loopNum = 2;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataLowTempRadSys->HydrRadSys(RadSysNum).ColdWaterInNode;
 
     // Hydronic - HeatingDesignCapacity/CoolingDesignCapacity Autosize Method
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = HeatingDesignCapacity;
@@ -380,12 +384,14 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode = 1;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode = 2;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
 
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode = 3;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode = 4;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum = 2;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode;
 
     // Hydronic - Hot water volume flow rate autosize
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode = 0;
@@ -2612,12 +2618,14 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode = 1;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterOutNode = 2;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).HWplantLoc.loopNum = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
 
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode = 3;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode = 4;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).CWPlantLoc.loopNum = 2;
-    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn =
+        state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode;
 
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).SurfacePtr.allocate(1);
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).SurfacePtr(1) = 1;

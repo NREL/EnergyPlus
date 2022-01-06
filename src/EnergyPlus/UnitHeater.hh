@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -110,19 +110,19 @@ namespace UnitHeater {
         int HCoil_Index;
         DataPlant::PlantEquipmentType HeatingCoilType;
         int HCoil_FluidIndex;
-        Real64 MaxVolHotWaterFlow; // m3/s
-        Real64 MaxVolHotSteamFlow; // m3/s
-        Real64 MaxHotWaterFlow;    // kg/s
-        Real64 MaxHotSteamFlow;    // m3/s
-        Real64 MinVolHotWaterFlow; // m3/s
-        Real64 MinVolHotSteamFlow; // m3/s
-        Real64 MinHotWaterFlow;    // kg/s
-        Real64 MinHotSteamFlow;    // kg/s
-        int HotControlNode;        // hot water control node, inlet of coil
-        Real64 HotControlOffset;   // control tolerance
-        int HotCoilOutNodeNum;     // outlet of coil
+        Real64 MaxVolHotWaterFlow;              // m3/s
+        Real64 MaxVolHotSteamFlow;              // m3/s
+        Real64 MaxHotWaterFlow;                 // kg/s
+        Real64 MaxHotSteamFlow;                 // m3/s
+        Real64 MinVolHotWaterFlow;              // m3/s
+        Real64 MinVolHotSteamFlow;              // m3/s
+        Real64 MinHotWaterFlow;                 // kg/s
+        Real64 MinHotSteamFlow;                 // kg/s
+        int HotControlNode;                     // hot water control node, inlet of coil
+        Real64 HotControlOffset;                // control tolerance
+        int HotCoilOutNodeNum;                  // outlet of coil
         PlantLocation HWplantLoc{};// Location of plant component for hot plant coil
-        Real64 PartLoadFrac;       // part load fraction for the unit
+        Real64 PartLoadFrac;                    // part load fraction for the unit
         // Report data
         Real64 HeatPower;  // unit heating output in watts
         Real64 HeatEnergy; // unit heating output in J

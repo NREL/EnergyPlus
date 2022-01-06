@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -343,22 +343,22 @@ namespace PlantCentralGSHP {
         Real64 WrapperHeatingLoad;  // Heating demand for the central heat pump system
         Real64 AncillaryPower;      // Wrapper Ancillary Power
         Array1D<WrapperComponentSpecs> WrapperComp;
-        Array1D<ChillerHeaterSpecs> ChillerHeater; // Dimension to number of machines
-        bool CoolSetPointErrDone;                  // true if setpoint warning issued
-        bool HeatSetPointErrDone;                  // true if setpoint warning issued
-        bool CoolSetPointSetToLoop;                // True if the setpoint is missing at the outlet node
-        bool HeatSetPointSetToLoop;                // True if the setpoint is missing at the outlet node
-        int ChillerHeaterNums;                     // Total number of chiller heater units
-        PlantLocation CWPlantLoc{};                             // Chilled water plant loop component index
-        PlantLocation HWPlantLoc{};                             // Hot water plant loop component index
-        PlantLocation GLHEPlantLoc{};                           // Geo-field water plant loop component index
-        int CHWMassFlowIndex;                      // Chilled water flow index
-        int HWMassFlowIndex;                       // Hot water flow index
-        int GLHEMassFlowIndex;                     // Condenser side flow index
-        Real64 SizingFactor;                       // Sizing factor to adjust the capacity
-        Real64 CHWVolFlowRate;                     // Chilled water volume flow rate [kg/s]
-        Real64 HWVolFlowRate;                      // Hot water volume flow rate [kg/s]
-        Real64 GLHEVolFlowRate;                    // Geo-field volume flow rate [kg/s]
+        Array1D<ChillerHeaterSpecs> ChillerHeater;   // Dimension to number of machines
+        bool CoolSetPointErrDone;                    // true if setpoint warning issued
+        bool HeatSetPointErrDone;                    // true if setpoint warning issued
+        bool CoolSetPointSetToLoop;                  // True if the setpoint is missing at the outlet node
+        bool HeatSetPointSetToLoop;                  // True if the setpoint is missing at the outlet node
+        int ChillerHeaterNums;                       // Total number of chiller heater units
+        PlantLocation CWPlantLoc{};                               // Chilled water plant loop component index
+        PlantLocation HWPlantLoc{};                               // Hot water plant loop component index
+        PlantLocation GLHEPlantLoc{};                             // Geo-field water plant loop component index
+        int CHWMassFlowIndex;                        // Chilled water flow index
+        int HWMassFlowIndex;                         // Hot water flow index
+        int GLHEMassFlowIndex;                       // Condenser side flow index
+        Real64 SizingFactor;                         // Sizing factor to adjust the capacity
+        Real64 CHWVolFlowRate;                       // Chilled water volume flow rate [kg/s]
+        Real64 HWVolFlowRate;                        // Hot water volume flow rate [kg/s]
+        Real64 GLHEVolFlowRate;                      // Geo-field volume flow rate [kg/s]
         bool MyWrapperFlag;
         bool MyWrapperEnvrnFlag;
         bool SimulClgDominant;

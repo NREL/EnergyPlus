@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,8 +56,8 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
@@ -214,16 +214,16 @@ namespace Furnaces {
         Real64 LatentLoadMet;                               // System latent load
         Real64 DehumidInducedHeatingDemandRate;             // Additional heating demand on supplemental heater
         // when heat pumps operate on dehumidification mode
-        int CoilOutletNode;                   // outlet node for hot water and steam heating coil
+        int CoilOutletNode;                       // outlet node for hot water and steam heating coil
         PlantLocation plantLoc{};             // plant loop component location for water and steam heating coil
-        int SuppCoilOutletNode;               // outlet node for hot water and steam supplemental heating coil
+        int SuppCoilOutletNode;                   // outlet node for hot water and steam supplemental heating coil
         PlantLocation SuppPlantLoc{};         // plant loop component location for water and steam supplemental heating coil
-        int HotWaterCoilMaxIterIndex;         // Index to recurring warning message
-        int HotWaterCoilMaxIterIndex2;        // Index to recurring warning message
-        bool EMSOverrideSensZoneLoadRequest;  // if true, then EMS is calling to override zone load
-        Real64 EMSSensibleZoneLoadValue;      // Value EMS is directing to use
-        bool EMSOverrideMoistZoneLoadRequest; // if true, then EMS is calling to override zone load
-        Real64 EMSMoistureZoneLoadValue;      // Value EMS is directing to use
+        int HotWaterCoilMaxIterIndex;             // Index to recurring warning message
+        int HotWaterCoilMaxIterIndex2;            // Index to recurring warning message
+        bool EMSOverrideSensZoneLoadRequest;      // if true, then EMS is calling to override zone load
+        Real64 EMSSensibleZoneLoadValue;          // Value EMS is directing to use
+        bool EMSOverrideMoistZoneLoadRequest;     // if true, then EMS is calling to override zone load
+        Real64 EMSMoistureZoneLoadValue;          // Value EMS is directing to use
         // starting added varibles for variable speed water source heat pump, Bo Shen, ORNL, March 2012
         Furnaces::ModeOfOperation HeatCoolMode; // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         int NumOfSpeedCooling;                  // The number of speeds for cooling

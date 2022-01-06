@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -138,10 +138,10 @@ namespace HVACVariableRefrigerantFlow {
     struct VRFCondenserEquipment : PlantComponent
     {
         // Members
-        std::string Name;                      // Name of the VRF Terminal Unit
-        int VRFSystemTypeNum;                  // integer equivalent of system type
-        AlgorithmType VRFAlgorithmTypeNum;     // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
-        DataPlant::PlantEquipmentType VRFType; // integer equivalent of index to DataPlant type
+        std::string Name;                              // Name of the VRF Terminal Unit
+        int VRFSystemTypeNum;                          // integer equivalent of system type
+        AlgorithmType VRFAlgorithmTypeNum;             // Algorithm type: 1_system curve based model; 2_physics based model (FluidTCtrl)
+        DataPlant::PlantEquipmentType VRFType;         // integer equivalent of index to DataPlant type
         PlantLocation SourcePlantLoc;          // plant data for water-cooled only
         Real64 WaterCondenserDesignMassFlow;   // plant data for water-cooled only
         Real64 WaterCondenserMassFlow;         // Water condenser flow rate (kg/s)
@@ -374,19 +374,20 @@ namespace HVACVariableRefrigerantFlow {
 
         // Default Constructor
         VRFCondenserEquipment()
-            : VRFSystemTypeNum(0), VRFAlgorithmTypeNum(AlgorithmType::Invalid), VRFType(DataPlant::PlantEquipmentType::Invalid), SourcePlantLoc{}, WaterCondenserDesignMassFlow(0.0), WaterCondenserMassFlow(0.0),
-              QCondenser(0.0), QCondEnergy(0.0), CondenserSideOutletTemp(0.0), SchedPtr(-1), CoolingCapacity(0.0), TotalCoolingCapacity(0.0),
-              CoolingCombinationRatio(1.0), VRFCondPLR(0.0), VRFCondRTF(0.0), VRFCondCyclingRatio(0.0), CondenserInletTemp(0.0), CoolingCOP(0.0),
-              OperatingCoolingCOP(0.0), RatedCoolingPower(0.0), HeatingCapacity(0.0), HeatingCapacitySizeRatio(1.0), LockHeatingCapacity(false),
-              TotalHeatingCapacity(0.0), HeatingCombinationRatio(1.0), HeatingCOP(0.0), OperatingHeatingCOP(0.0), RatedHeatingPower(0.0),
-              MinOATCooling(0.0), MaxOATCooling(0.0), MinOATHeating(0.0), MaxOATHeating(0.0), CoolCapFT(0), CoolEIRFT(0), HeatCapFT(0), HeatEIRFT(0),
-              CoolBoundaryCurvePtr(0), HeatBoundaryCurvePtr(0), EIRCoolBoundaryCurvePtr(0), CoolEIRFPLR1(0), CoolEIRFPLR2(0), CoolCapFTHi(0),
-              CoolEIRFTHi(0), HeatCapFTHi(0), HeatEIRFTHi(0), EIRHeatBoundaryCurvePtr(0), HeatEIRFPLR1(0), HeatEIRFPLR2(0), CoolPLFFPLR(0),
-              HeatPLFFPLR(0), HeatingPerformanceOATType(0), MinPLR(0.0), MasterZonePtr(0), MasterZoneTUIndex(0),
-              ThermostatPriority(ThermostatCtrlType::Invalid), SchedPriorityPtr(0), ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0),
-              PCFLengthCoolPtr(0), PCFHeightCool(0.0), EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0),
-              EquivPipeLngthHeat(0.0), PipingCorrectionHeating(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0),
-              MaxOATCCHeater(0.0), DefrostEIRPtr(0), DefrostFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Invalid),
+            : VRFSystemTypeNum(0), VRFAlgorithmTypeNum(AlgorithmType::Invalid), VRFType(DataPlant::PlantEquipmentType::Invalid), SourcePlantLoc{},
+              WaterCondenserDesignMassFlow(0.0), WaterCondenserMassFlow(0.0), QCondenser(0.0), QCondEnergy(0.0), CondenserSideOutletTemp(0.0),
+              SchedPtr(-1), CoolingCapacity(0.0), TotalCoolingCapacity(0.0), CoolingCombinationRatio(1.0), VRFCondPLR(0.0), VRFCondRTF(0.0),
+              VRFCondCyclingRatio(0.0), CondenserInletTemp(0.0), CoolingCOP(0.0), OperatingCoolingCOP(0.0), RatedCoolingPower(0.0),
+              HeatingCapacity(0.0), HeatingCapacitySizeRatio(1.0), LockHeatingCapacity(false), TotalHeatingCapacity(0.0),
+              HeatingCombinationRatio(1.0), HeatingCOP(0.0), OperatingHeatingCOP(0.0), RatedHeatingPower(0.0), MinOATCooling(0.0), MaxOATCooling(0.0),
+              MinOATHeating(0.0), MaxOATHeating(0.0), CoolCapFT(0), CoolEIRFT(0), HeatCapFT(0), HeatEIRFT(0), CoolBoundaryCurvePtr(0),
+              HeatBoundaryCurvePtr(0), EIRCoolBoundaryCurvePtr(0), CoolEIRFPLR1(0), CoolEIRFPLR2(0), CoolCapFTHi(0), CoolEIRFTHi(0), HeatCapFTHi(0),
+              HeatEIRFTHi(0), EIRHeatBoundaryCurvePtr(0), HeatEIRFPLR1(0), HeatEIRFPLR2(0), CoolPLFFPLR(0), HeatPLFFPLR(0),
+              HeatingPerformanceOATType(0), MinPLR(0.0), MasterZonePtr(0), MasterZoneTUIndex(0), ThermostatPriority(ThermostatCtrlType::Invalid),
+              SchedPriorityPtr(0), ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0), PCFLengthCoolPtr(0), PCFHeightCool(0.0),
+              EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0), EquivPipeLngthHeat(0.0),
+              PipingCorrectionHeating(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0), MaxOATCCHeater(0.0), DefrostEIRPtr(0),
+              DefrostFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Invalid),
               DefrostControl(StandardRatings::HPdefrostControl::Invalid), DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
               MaxOATDefrost(0.0), CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), CondenserNodeNum(0), SkipCondenserNodeNumCheck(false),
               CondenserOutletNodeNum(0), WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0),
@@ -697,37 +698,37 @@ namespace HVACVariableRefrigerantFlow {
         bool SuppHeatingCoilPresent;         // FALSE if coil not present
         std::string AvailManagerListName;    // Name of an availability manager list object
         int AvailStatus;
-        Real64 TerminalUnitSensibleRate; // sensible cooling/heating rate of VRF terminal unit (W)
-        Real64 TerminalUnitLatentRate;   // latent dehumidification/humidification rate of VRF terminal unit (W)
-        Real64 TotalCoolingRate;         // report variable for total cooling rate (W)
-        Real64 TotalHeatingRate;         // report variable for total heating rate (W)
-        Real64 SensibleCoolingRate;      // report variable for sensible cooling rate (W)
-        Real64 SensibleHeatingRate;      // report variable for sensible heating rate (W)
-        Real64 LatentCoolingRate;        // report variable for latent cooling rate (W)
-        Real64 LatentHeatingRate;        // report variable for latent heating rate (W)
-        Real64 TotalCoolingEnergy;       // report variable for total cooling energy (J)
-        Real64 TotalHeatingEnergy;       // report variable for total heating energy (J)
-        Real64 SensibleCoolingEnergy;    // report variable for sensible cooling energy (J)
-        Real64 SensibleHeatingEnergy;    // report variable for sensible heating energy (J)
-        Real64 LatentCoolingEnergy;      // report variable for latent cooling energy (J)
-        Real64 LatentHeatingEnergy;      // report variable for latent heating energy (J)
-        bool EMSOverridePartLoadFrac;    // User defined EMS function
-        Real64 EMSValueForPartLoadFrac;  // user defined value for EMS function
-        int IterLimitExceeded;           // index used for warning messages
-        int FirstIterfailed;             // index used for warning messages
-        int HVACSizingIndex;             // index of a HVACSizing object for a VRF terminal
-        bool ATMixerExists;              // True if there is an ATMixer
-        std::string ATMixerName;         // name of air terminal mixer
-        int ATMixerIndex;                // index to the air terminal mixer
-        int ATMixerType;                 // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode;              // primary inlet air node number for the air terminal mixer
-        int ATMixerSecNode;              // secondary air inlet node number for the air terminal mixer
-        int ATMixerOutNode;              // outlet air node number for the air terminal mixer
-        int SuppHeatCoilAirInletNode;    // supplemental heating coil air inlet node
-        int SuppHeatCoilAirOutletNode;   // supplemental heating coil air outlet node
-        int SuppHeatCoilFluidInletNode;  // supplemental heating coil fluid inlet node
-        int SuppHeatCoilFluidOutletNode; // supplemental heating coil fluid outlet node
-        bool firstPass;                  // used to reset global sizing data
+        Real64 TerminalUnitSensibleRate;                  // sensible cooling/heating rate of VRF terminal unit (W)
+        Real64 TerminalUnitLatentRate;                    // latent dehumidification/humidification rate of VRF terminal unit (W)
+        Real64 TotalCoolingRate;                          // report variable for total cooling rate (W)
+        Real64 TotalHeatingRate;                          // report variable for total heating rate (W)
+        Real64 SensibleCoolingRate;                       // report variable for sensible cooling rate (W)
+        Real64 SensibleHeatingRate;                       // report variable for sensible heating rate (W)
+        Real64 LatentCoolingRate;                         // report variable for latent cooling rate (W)
+        Real64 LatentHeatingRate;                         // report variable for latent heating rate (W)
+        Real64 TotalCoolingEnergy;                        // report variable for total cooling energy (J)
+        Real64 TotalHeatingEnergy;                        // report variable for total heating energy (J)
+        Real64 SensibleCoolingEnergy;                     // report variable for sensible cooling energy (J)
+        Real64 SensibleHeatingEnergy;                     // report variable for sensible heating energy (J)
+        Real64 LatentCoolingEnergy;                       // report variable for latent cooling energy (J)
+        Real64 LatentHeatingEnergy;                       // report variable for latent heating energy (J)
+        bool EMSOverridePartLoadFrac;                     // User defined EMS function
+        Real64 EMSValueForPartLoadFrac;                   // user defined value for EMS function
+        int IterLimitExceeded;                            // index used for warning messages
+        int FirstIterfailed;                              // index used for warning messages
+        int HVACSizingIndex;                              // index of a HVACSizing object for a VRF terminal
+        bool ATMixerExists;                               // True if there is an ATMixer
+        std::string ATMixerName;                          // name of air terminal mixer
+        int ATMixerIndex;                                 // index to the air terminal mixer
+        int ATMixerType;                                  // 1 = inlet side mixer, 2 = supply side mixer
+        int ATMixerPriNode;                               // primary inlet air node number for the air terminal mixer
+        int ATMixerSecNode;                               // secondary air inlet node number for the air terminal mixer
+        int ATMixerOutNode;                               // outlet air node number for the air terminal mixer
+        int SuppHeatCoilAirInletNode;                     // supplemental heating coil air inlet node
+        int SuppHeatCoilAirOutletNode;                    // supplemental heating coil air outlet node
+        int SuppHeatCoilFluidInletNode;                   // supplemental heating coil fluid inlet node
+        int SuppHeatCoilFluidOutletNode;                  // supplemental heating coil fluid outlet node
+        bool firstPass;                                   // used to reset global sizing data
         PlantLocation SuppHeatCoilPlantLoc; // supplemental heating coil plant component index
         Real64 coilInNodeT;              // coil inlet node temp at full flow (C)
         Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
@@ -772,11 +773,11 @@ namespace HVACVariableRefrigerantFlow {
               EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0), FirstIterfailed(0), HVACSizingIndex(0),
               ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0),
               SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), SuppHeatCoilFluidOutletNode(0),
-              firstPass(true), SuppHeatCoilPlantLoc{}, coilInNodeT(0.0),
-              coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0), MySuppCoilPlantScanFlag(true), airLoopNum(0), isInOASys(false), isInAirLoop(false),
-              isInZone(false), isSetPointControlled(false), coolSPActive(false), heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0),
-              coilTempSetPoint(0.0), suppTempSetPoint(0.0), controlZoneMassFlowFrac(1.0), zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0),
-              coolCoilAirInNode(0), coolCoilAirOutNode(0), heatCoilAirInNode(0), heatCoilAirOutNode(0)
+              firstPass(true), SuppHeatCoilPlantLoc{}, coilInNodeT(0.0), coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0),
+              MySuppCoilPlantScanFlag(true), airLoopNum(0), isInOASys(false), isInAirLoop(false), isInZone(false), isSetPointControlled(false),
+              coolSPActive(false), heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0), coilTempSetPoint(0.0), suppTempSetPoint(0.0),
+              controlZoneMassFlowFrac(1.0), zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0),
+              heatCoilAirInNode(0), heatCoilAirOutNode(0)
         {
         }
 

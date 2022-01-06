@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -120,16 +120,16 @@ namespace UnitVentilator {
         Real64 MaxHotWaterFlow;    // kg/s
         Real64 MaxHotSteamFlow;
         Real64 MinHotSteamFlow;
-        Real64 MinVolHotWaterFlow; // m3/s
-        Real64 MinVolHotSteamFlow; // m3/s
-        Real64 MinHotWaterFlow;    // kg/s
-        int HotControlNode;        // hot water control node
-        int HotCoilOutNodeNum;     // outlet of coil
-        Real64 HotControlOffset;   // control tolerance
+        Real64 MinVolHotWaterFlow;              // m3/s
+        Real64 MinVolHotSteamFlow;              // m3/s
+        Real64 MinHotWaterFlow;                 // kg/s
+        int HotControlNode;                     // hot water control node
+        int HotCoilOutNodeNum;                  // outlet of coil
+        Real64 HotControlOffset;                // control tolerance
         PlantLocation HWplantLoc{};             // index for plant location for hot water coil
-        bool CCoilPresent;         // .TRUE. if unit ventilator has a cooling coil
-        std::string CCoilName;     // name of cooling coil
-        std::string CCoilTypeCh;   // type of cooling coil as character string (same as on idf file)
+        bool CCoilPresent;                      // .TRUE. if unit ventilator has a cooling coil
+        std::string CCoilName;                  // name of cooling coil
+        std::string CCoilTypeCh;                // type of cooling coil as character string (same as on idf file)
         int CCoil_Index;
         std::string CCoilPlantName; // name of cooling coil for plant
         std::string CCoilPlantType; // type of cooling coil for plant
@@ -140,14 +140,14 @@ namespace UnitVentilator {
         std::string CCoilSchedName; // availability schedule for the cooling coil
         int CCoilSchedPtr;          // index to schedule
         Real64 CCoilSchedValue;
-        Real64 MaxVolColdWaterFlow; // m3/s
-        Real64 MaxColdWaterFlow;    // kg/s
-        Real64 MinVolColdWaterFlow; // m3/s
-        Real64 MinColdWaterFlow;    // kg/s
-        int ColdControlNode;        // chilled water control node
-        int ColdCoilOutNodeNum;     // chilled water coil out node
-        Real64 ColdControlOffset;   // control tolerance
-        PlantLocation CWPlantLoc;              // index for plant component for chilled water coil
+        Real64 MaxVolColdWaterFlow;             // m3/s
+        Real64 MaxColdWaterFlow;                // kg/s
+        Real64 MinVolColdWaterFlow;             // m3/s
+        Real64 MinColdWaterFlow;                // kg/s
+        int ColdControlNode;                    // chilled water control node
+        int ColdCoilOutNodeNum;                 // chilled water coil out node
+        Real64 ColdControlOffset;               // control tolerance
+        PlantLocation CWPlantLoc;                          // index for plant component for chilled water coil
         // Report data
         Real64 HeatPower;  // unit heating output in watts
         Real64 HeatEnergy; // unit heating output in J
@@ -184,10 +184,10 @@ namespace UnitVentilator {
               MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
               CCoilPresent(false), CCoil_Index(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
               MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
-              ColdControlOffset(0.0), CWPlantLoc{}, HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
-              TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanPartLoadRatio(0.0),
-              PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0),
-              ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)
+              ColdControlOffset(0.0), CWPlantLoc{}, HeatPower(0.0),
+              HeatEnergy(0.0), TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0),
+              AvailStatus(0), FanPartLoadRatio(0.0), PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0),
+              ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)
         {
         }
     };

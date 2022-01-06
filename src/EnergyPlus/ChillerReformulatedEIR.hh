@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -128,52 +128,52 @@ namespace ChillerReformulatedEIR {
         // (function of leaving evaporator and condenser water temperatures)
         int ChillerEIRFPLRIndex; // Index for the energy input ratio vs part-load ratio curve
         // (function of leaving condenser water temperature and part-load ratio)
-        int ChillerCapFTError;         // Used for negative capacity as a function of temp warnings
-        int ChillerCapFTErrorIndex;    // Used for negative capacity as a function of temp warnings
-        int ChillerEIRFTError;         // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFTErrorIndex;    // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFPLRError;       // Used for negative EIR as a function of PLR warnings
-        int ChillerEIRFPLRErrorIndex;  // Used for negative EIR as a function of PLR warnings
-        Real64 ChillerCAPFTXTempMin;   // Minimum value of CAPFT curve X variable [C]
-        Real64 ChillerCAPFTXTempMax;   // Maximum value of CAPFT curve X variable [C]
-        Real64 ChillerCAPFTYTempMin;   // Minimum value of CAPFT curve Y variable [C]
-        Real64 ChillerCAPFTYTempMax;   // Maximum value of CAPFT curve Y variable [C]
-        Real64 ChillerEIRFTXTempMin;   // Minimum value of EIRFT curve X variable [C]
-        Real64 ChillerEIRFTXTempMax;   // Maximum value of EIRFT curve X variable [C]
-        Real64 ChillerEIRFTYTempMin;   // Minimum value of EIRFT curve Y variable [C]
-        Real64 ChillerEIRFTYTempMax;   // Maximum value of EIRFT curve Y variable [C]
-        Real64 ChillerEIRFPLRTempMin;  // Minimum value of EIRFPLR curve condenser outlet temperature [C]
-        Real64 ChillerEIRFPLRTempMax;  // Maximum value of EIRFPLR curve condenser outlet temperature [C]
-        Real64 ChillerEIRFPLRPLRMin;   // Minimum value of EIRFPLR curve part-load ratio
-        Real64 ChillerEIRFPLRPLRMax;   // Maximum value of EIRFPLR curve part-load ratio
-        Real64 ChillerLiftNomMin;      // Minimum value of EIRFPLR curve Normalized Chiller lift
-        Real64 ChillerLiftNomMax;      // Maximum value of EIRFPLR curve Normalized Chiller lift
-        Real64 ChillerTdevNomMin;      // Minimum value of EIRFPLR curve Normalized Tdev
-        Real64 ChillerTdevNomMax;      // Maximum value of EIRFPLR curve Normalized Tdev
-        int CAPFTXIter;                // Iteration counter for evaporator outlet temperature CAPFT warning messages
-        int CAPFTXIterIndex;           // Index for evaporator outlet temperature CAPFT warning messages
-        int CAPFTYIter;                // Iteration counter for condenser outlet temperature CAPFT warning messages
-        int CAPFTYIterIndex;           // Index for condenser outlet temperature CAPFT warning messages
-        int EIRFTXIter;                // Iteration counter for evaporator outlet temperature EIRFT warning messages
-        int EIRFTXIterIndex;           // Index for evaporator outlet temperature EIRFT warning messages
-        int EIRFTYIter;                // Iteration counter for condenser outlet temperature EIRFT warning messages
-        int EIRFTYIterIndex;           // Index for condenser outlet temperature EIRFT warning messages
-        int EIRFPLRTIter;              // Iteration counter for condenser outlet temperature EIRFPLR warning messages
-        int EIRFPLRTIterIndex;         // Index for condenser outlet temperature EIRFPLR warning messages
-        int EIRFPLRPLRIter;            // Iteration counter for part-load ratio EIRFPLR warning messages
-        int EIRFPLRPLRIterIndex;       // Index for part-load ratio EIRFPLR warning messages
-        bool FaultyChillerSWTFlag;     // True if the chiller has SWT sensor fault
-        int FaultyChillerSWTIndex;     // Index of the fault object corresponding to the chiller
-        Real64 FaultyChillerSWTOffset; // Chiller SWT sensor offset
-        int IterLimitExceededNum;      // Iteration limit exceeded for RegulaFalsi routine
-        int IterLimitErrIndex;         // Index to iteration limit warning for RegulaFalsi routine
-        int IterFailed;                // Iteration limit failed for RegulaFalsi routine
-        int IterFailedIndex;           // Index to iteration limit failed for RegulaFalsi routine
-        int DeltaTErrCount;            // Evaporator delta T equals 0 for variable flow chiller warning messages
-        int DeltaTErrCountIndex;       // Index to evaporator delta T = 0 for variable flow chiller warning messages
-        PlantLocation CWPlantLoc;                 // chilled water plant loop component index
-        PlantLocation CDPlantLoc;                 // condenser water plant loop component index
-        PlantLocation HRPlantLoc;                 // heat recovery water plant loop component index
+        int ChillerCapFTError;                     // Used for negative capacity as a function of temp warnings
+        int ChillerCapFTErrorIndex;                // Used for negative capacity as a function of temp warnings
+        int ChillerEIRFTError;                     // Used for negative EIR as a function of temp warnings
+        int ChillerEIRFTErrorIndex;                // Used for negative EIR as a function of temp warnings
+        int ChillerEIRFPLRError;                   // Used for negative EIR as a function of PLR warnings
+        int ChillerEIRFPLRErrorIndex;              // Used for negative EIR as a function of PLR warnings
+        Real64 ChillerCAPFTXTempMin;               // Minimum value of CAPFT curve X variable [C]
+        Real64 ChillerCAPFTXTempMax;               // Maximum value of CAPFT curve X variable [C]
+        Real64 ChillerCAPFTYTempMin;               // Minimum value of CAPFT curve Y variable [C]
+        Real64 ChillerCAPFTYTempMax;               // Maximum value of CAPFT curve Y variable [C]
+        Real64 ChillerEIRFTXTempMin;               // Minimum value of EIRFT curve X variable [C]
+        Real64 ChillerEIRFTXTempMax;               // Maximum value of EIRFT curve X variable [C]
+        Real64 ChillerEIRFTYTempMin;               // Minimum value of EIRFT curve Y variable [C]
+        Real64 ChillerEIRFTYTempMax;               // Maximum value of EIRFT curve Y variable [C]
+        Real64 ChillerEIRFPLRTempMin;              // Minimum value of EIRFPLR curve condenser outlet temperature [C]
+        Real64 ChillerEIRFPLRTempMax;              // Maximum value of EIRFPLR curve condenser outlet temperature [C]
+        Real64 ChillerEIRFPLRPLRMin;               // Minimum value of EIRFPLR curve part-load ratio
+        Real64 ChillerEIRFPLRPLRMax;               // Maximum value of EIRFPLR curve part-load ratio
+        Real64 ChillerLiftNomMin;                  // Minimum value of EIRFPLR curve Normalized Chiller lift
+        Real64 ChillerLiftNomMax;                  // Maximum value of EIRFPLR curve Normalized Chiller lift
+        Real64 ChillerTdevNomMin;                  // Minimum value of EIRFPLR curve Normalized Tdev
+        Real64 ChillerTdevNomMax;                  // Maximum value of EIRFPLR curve Normalized Tdev
+        int CAPFTXIter;                            // Iteration counter for evaporator outlet temperature CAPFT warning messages
+        int CAPFTXIterIndex;                       // Index for evaporator outlet temperature CAPFT warning messages
+        int CAPFTYIter;                            // Iteration counter for condenser outlet temperature CAPFT warning messages
+        int CAPFTYIterIndex;                       // Index for condenser outlet temperature CAPFT warning messages
+        int EIRFTXIter;                            // Iteration counter for evaporator outlet temperature EIRFT warning messages
+        int EIRFTXIterIndex;                       // Index for evaporator outlet temperature EIRFT warning messages
+        int EIRFTYIter;                            // Iteration counter for condenser outlet temperature EIRFT warning messages
+        int EIRFTYIterIndex;                       // Index for condenser outlet temperature EIRFT warning messages
+        int EIRFPLRTIter;                          // Iteration counter for condenser outlet temperature EIRFPLR warning messages
+        int EIRFPLRTIterIndex;                     // Index for condenser outlet temperature EIRFPLR warning messages
+        int EIRFPLRPLRIter;                        // Iteration counter for part-load ratio EIRFPLR warning messages
+        int EIRFPLRPLRIterIndex;                   // Index for part-load ratio EIRFPLR warning messages
+        bool FaultyChillerSWTFlag;                 // True if the chiller has SWT sensor fault
+        int FaultyChillerSWTIndex;                 // Index of the fault object corresponding to the chiller
+        Real64 FaultyChillerSWTOffset;             // Chiller SWT sensor offset
+        int IterLimitExceededNum;                  // Iteration limit exceeded for RegulaFalsi routine
+        int IterLimitErrIndex;                     // Index to iteration limit warning for RegulaFalsi routine
+        int IterFailed;                            // Iteration limit failed for RegulaFalsi routine
+        int IterFailedIndex;                       // Index to iteration limit failed for RegulaFalsi routine
+        int DeltaTErrCount;                        // Evaporator delta T equals 0 for variable flow chiller warning messages
+        int DeltaTErrCountIndex;                   // Index to evaporator delta T = 0 for variable flow chiller warning messages
+        PlantLocation CWPlantLoc;                             // chilled water plant loop component index
+        PlantLocation CDPlantLoc;                             // condenser water plant loop component index
+        PlantLocation HRPlantLoc;                             // heat recovery water plant loop component index
         int CondMassFlowIndex;
         bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
         // Operational fault parameters

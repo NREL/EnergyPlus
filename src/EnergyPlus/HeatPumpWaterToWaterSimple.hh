@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,14 +111,14 @@ namespace HeatPumpWaterToWaterSimple {
         int HeatPowerNegativeCounter;            // Counter for number of times heating power curve is <= 0.0
         int HeatPowerNegativeIndex;              // Index for recurring warning message regarding heating power curve is <= 0.0
         // loop topology variables
-        PlantLocation SourcePlantLoc{};         // source side plant loop component location
-        PlantLocation LoadPlantLoc{};           // load side plant loop component location
-        int CondMassFlowIndex;     // index for criteria in PullCompInterconnectTrigger
-        Real64 refCOP;             // reference COP used for sizing reference power, user input
-        Real64 sizFac;             // component level sizing factor, user input
-        std::string companionName; // name of companion GSHP
-        int companionIndex;        // index in GSHP structure for companion heat pump
-        bool companionIdentified;  // true if this GSHP has found its companion heat pump
+        PlantLocation SourcePlantLoc{};                             // source side plant loop component location
+        PlantLocation LoadPlantLoc{};                               // load side plant loop component location
+        int CondMassFlowIndex;                         // index for criteria in PullCompInterconnectTrigger
+        Real64 refCOP;                                 // reference COP used for sizing reference power, user input
+        Real64 sizFac;                                 // component level sizing factor, user input
+        std::string companionName;                     // name of companion GSHP
+        int companionIndex;                            // index in GSHP structure for companion heat pump
+        bool companionIdentified;                      // true if this GSHP has found its companion heat pump
 
         // Report variables
         Real64 reportPower;                  // Power Consumption [W]

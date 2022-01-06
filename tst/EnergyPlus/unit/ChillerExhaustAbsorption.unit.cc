@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -339,7 +339,6 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_getDesignCapacities_Test)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 100;
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(2).NodeNumIn = 111;
 
-
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 3;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(3);
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 2;
@@ -359,7 +358,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_getDesignCapacities_Test)
     thisChillerHeater.HeatReturnNodeNum = 222;
     thisChillerHeater.CondReturnNodeNum = 333;
 
-    PlantLocation loc_1 = PlantLocation(1,DataPlant::LoopSideLocation::Demand, 1, 1);
+    PlantLocation loc_1 = PlantLocation(1, DataPlant::LoopSideLocation::Demand, 1, 1);
     Real64 maxload(-1.0);
     Real64 minload(-1.0);
     Real64 optload(-1.0);

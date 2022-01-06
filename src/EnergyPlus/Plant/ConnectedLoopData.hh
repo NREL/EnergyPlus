@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,10 +54,10 @@ namespace DataPlant {
     struct ConnectedLoopData
     {
         // Members
-        int LoopNum;              // plant loop index pointer, for the other loop
-        DataPlant::LoopSideLocation LoopSideNum;          // plant loop side number, for the other loop
-        int ConnectorTypeOf_Num;  // plant equipment type doing the connecting
-        bool LoopDemandsOnRemote; // true if this loop puts demand on connected loop
+        int LoopNum;                             // plant loop index pointer, for the other loop
+        DataPlant::LoopSideLocation LoopSideNum; // plant loop side number, for the other loop
+        int ConnectorTypeOf_Num;                 // plant equipment type doing the connecting
+        bool LoopDemandsOnRemote;                // true if this loop puts demand on connected loop
 
         // Default Constructor
         ConnectedLoopData() : LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), ConnectorTypeOf_Num(0), LoopDemandsOnRemote(false)

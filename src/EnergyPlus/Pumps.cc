@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1355,7 +1355,6 @@ void GetPumpInput(EnergyPlusData &state)
                 if (SELECT_CASE_var == PumpType::VarSpeed) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "Pump:VariableSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::Pump_VarSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -1364,7 +1363,6 @@ void GetPumpInput(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == PumpType::ConSpeed) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "Pump:ConstantSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::Pump_ConSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -1373,7 +1371,6 @@ void GetPumpInput(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == PumpType::Cond) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "Pump:VariableSpeed:Condensate",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::Pump_Cond,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -1382,7 +1379,6 @@ void GetPumpInput(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == PumpType::Bank_VarSpeed) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "HeaderedPumps:VariableSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::PumpBank_VarSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -1391,7 +1387,6 @@ void GetPumpInput(EnergyPlusData &state)
                 } else if (SELECT_CASE_var == PumpType::Bank_ConSpeed) {
                     SetupZoneInternalGain(state,
                                           state.dataPumps->PumpEquip(PumpNum).ZoneNum,
-                                          "HeaderedPumps:ConstantSpeed",
                                           state.dataPumps->PumpEquip(PumpNum).Name,
                                           DataHeatBalance::IntGainType::PumpBank_ConSpeed,
                                           &state.dataPumps->PumpEquipReport(PumpNum).ZoneConvGainRate,
@@ -2147,9 +2142,9 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     int PlantSizNum; // index of Plant Sizing array
     bool ErrorsFound;
     Real64 TotalEffic = 0.0; // pump total efficiency
-    int BranchNum;     // index of branch
-    int CompNum;       // index of component on branch
-    Real64 PumpSizFac; // pump sizing factor
+    int BranchNum;           // index of branch
+    int CompNum;             // index of component on branch
+    Real64 PumpSizFac;       // pump sizing factor
     Real64 SteamDensity;
     Real64 TempWaterDensity;
     int DummyWaterIndex(1);

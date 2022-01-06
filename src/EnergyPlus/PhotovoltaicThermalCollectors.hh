@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -121,18 +121,18 @@ namespace PhotovoltaicThermalCollectors {
     struct PVTCollectorStruct : PlantComponent
     {
         // Members
-        std::string Name;                   // Name of PVT collector
-        DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
+        std::string Name;                         // Name of PVT collector
+        DataPlant::PlantEquipmentType Type;       // Plant Side Connection: 'Type' assigned in DataPlant
         PlantLocation WPlantLoc{};                      // Water plant loop component location
-        bool EnvrnInit;                     // manage begin environment inits
-        bool SizingInit;                    // manage when sizing is complete
-        std::string PVTModelName;           // Name of PVT performance object
-        int PVTModelType;                   // model type indicator, only simple avail now
-        int SurfNum;                        // surface index
-        std::string PVname;                 // named Generator:Photovoltaic object
-        int PVnum;                          // PV index
-        bool PVfound;                       // init, need to delay get input until PV gotten
-        SimplePVTModelStruct Simple;        // performance data structure.
+        bool EnvrnInit;                           // manage begin environment inits
+        bool SizingInit;                          // manage when sizing is complete
+        std::string PVTModelName;                 // Name of PVT performance object
+        int PVTModelType;                         // model type indicator, only simple avail now
+        int SurfNum;                              // surface index
+        std::string PVname;                       // named Generator:Photovoltaic object
+        int PVnum;                                // PV index
+        bool PVfound;                             // init, need to delay get input until PV gotten
+        SimplePVTModelStruct Simple;              // performance data structure.
         WorkingFluidEnum WorkingFluidType;
         int PlantInletNodeNum;
         int PlantOutletNodeNum;

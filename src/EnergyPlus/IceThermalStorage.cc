@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1353,9 +1353,10 @@ namespace IceThermalStorage {
             if ((state.dataPlnt->PlantLoop(this->plantLoc.loopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                 (this->plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
-                for (CompNum = 1;
-                     CompNum <=
-                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(this->plantLoc.branchNum).TotalComponents;
+                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
+                                                 .LoopSide(DataPlant::LoopSideLocation::Supply)
+                                                 .Branch(this->plantLoc.branchNum)
+                                                 .TotalComponents;
                      ++CompNum) {
                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
                         .LoopSide(DataPlant::LoopSideLocation::Supply)
@@ -1409,11 +1410,16 @@ namespace IceThermalStorage {
             if ((state.dataPlnt->PlantLoop(this->plantLoc.loopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                 (this->plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
-                for (int compNum = 1;
-                     compNum <= state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(this->plantLoc.branchNum).TotalComponents;
+                for (int compNum = 1; compNum <= state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
+                                                     .LoopSide(DataPlant::LoopSideLocation::Supply)
+                                                     .Branch(this->plantLoc.branchNum)
+                                                     .TotalComponents;
                      ++compNum) {
-                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(this->plantLoc.branchNum).Comp(compNum).FlowPriority =
-                        DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
+                        .LoopSide(DataPlant::LoopSideLocation::Supply)
+                        .Branch(this->plantLoc.branchNum)
+                        .Comp(compNum)
+                        .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                 }
             }
             this->MyLoad = 0.0;

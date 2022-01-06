@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -121,19 +121,19 @@ namespace WaterToAirHeatPump {
         Real64 VolumeRatio;   // Built-in-volume ratio [~]
         Real64 LeakRateCoeff; // Coefficient for the relationship between
         // Pressure Ratio and Leakage Rate [~]
-        Real64 SourceSideHTR1;  // Source Side Heat Transfer Resistance coefficient 1 [~]
-        Real64 SourceSideHTR2;  // Source Side Heat Transfer Resistance coefficient 2 [k/kW]
-        Real64 HighPressCutoff; // High Pressure Cut-off [Pa]
-        Real64 LowPressCutoff;  // Low Pressure Cut-off [Pa]
-        int CompressorType;     // Type of Compressor ie. Reciprocating,Rotary or Scroll
-        int AirInletNodeNum;    // air side coil inlet node number
-        int AirOutletNodeNum;   // air side coil outlet node number
-        int WaterInletNodeNum;  // water side coil inlet node number
-        int WaterOutletNodeNum; // water side coil outlet node number
-        int LowPressClgError;   // count for low pressure errors (cooling)
-        int HighPressClgError;  // count for high pressure errors (cooling)
-        int LowPressHtgError;   // count for low pressure errors (heating)
-        int HighPressHtgError;  // count for high pressure errors (heating)
+        Real64 SourceSideHTR1;                // Source Side Heat Transfer Resistance coefficient 1 [~]
+        Real64 SourceSideHTR2;                // Source Side Heat Transfer Resistance coefficient 2 [k/kW]
+        Real64 HighPressCutoff;               // High Pressure Cut-off [Pa]
+        Real64 LowPressCutoff;                // Low Pressure Cut-off [Pa]
+        int CompressorType;                   // Type of Compressor ie. Reciprocating,Rotary or Scroll
+        int AirInletNodeNum;                  // air side coil inlet node number
+        int AirOutletNodeNum;                 // air side coil outlet node number
+        int WaterInletNodeNum;                // water side coil inlet node number
+        int WaterOutletNodeNum;               // water side coil outlet node number
+        int LowPressClgError;                 // count for low pressure errors (cooling)
+        int HighPressClgError;                // count for high pressure errors (cooling)
+        int LowPressHtgError;                 // count for low pressure errors (heating)
+        int HighPressHtgError;                // count for high pressure errors (heating)
         PlantLocation plantLoc{};
 
         // Default Constructor

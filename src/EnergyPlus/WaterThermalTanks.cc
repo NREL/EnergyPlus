@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4667,7 +4667,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                             ErrorsFound = true;
                         }
                         // if both volume and demand side flow connections are autosized, must be a good NominalVolForSizingDemandSideFlow
-                        if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).UseSidePlantLoc.loopSideNum == DataPlant::LoopSideLocation::Demand) &&
+                        if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).UseSidePlantLoc.loopSideNum ==
+                             DataPlant::LoopSideLocation::Demand) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).UseDesignVolFlowRateWasAutoSized)) {
                             if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NominalVolForSizingDemandSideFlow <= 0.0) {
                                 ShowWarningError(state,
@@ -4676,7 +4677,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                 ErrorsFound = true;
                             }
                         }
-                        if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).SrcSidePlantLoc.loopSideNum == DataPlant::LoopSideLocation::Demand) &&
+                        if ((state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).SrcSidePlantLoc.loopSideNum ==
+                             DataPlant::LoopSideLocation::Demand) &&
                             (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).SourceDesignVolFlowRateWasAutoSized)) {
                             if (state.dataWaterThermalTanks->WaterThermalTank(WaterThermalTankNum).Sizing.NominalVolForSizingDemandSideFlow <= 0.0) {
                                 ShowWarningError(state,
@@ -5033,39 +5035,22 @@ void WaterThermalTankData::setupZoneInternalGains(EnergyPlusData &state)
     if (this->AmbientTempZone > 0) {
         switch (this->WaterThermalTankType) {
         case DataPlant::PlantEquipmentType::WtrHeaterMixed: {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "WaterHeater:Mixed",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::WaterHeaterMixed,
-                                  &this->AmbientZoneGain);
+            SetupZoneInternalGain(state, this->AmbientTempZone, this->Name, DataHeatBalance::IntGainType::WaterHeaterMixed, &this->AmbientZoneGain);
             break;
         }
         case DataPlant::PlantEquipmentType::WtrHeaterStratified: {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "WaterHeater:Stratified",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::WaterHeaterStratified,
-                                  &this->AmbientZoneGain);
+            SetupZoneInternalGain(
+                state, this->AmbientTempZone, this->Name, DataHeatBalance::IntGainType::WaterHeaterStratified, &this->AmbientZoneGain);
             break;
         }
         case DataPlant::PlantEquipmentType::ChilledWaterTankMixed: {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "ThermalStorage:ChilledWater:Mixed",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
-                                  &this->AmbientZoneGain);
+            SetupZoneInternalGain(
+                state, this->AmbientTempZone, this->Name, DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed, &this->AmbientZoneGain);
             break;
         }
         case DataPlant::PlantEquipmentType::ChilledWaterTankStratified: {
-            SetupZoneInternalGain(state,
-                                  this->AmbientTempZone,
-                                  "ThermalStorage:ChilledWater:Stratified",
-                                  this->Name,
-                                  DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
-                                  &this->AmbientZoneGain);
+            SetupZoneInternalGain(
+                state, this->AmbientTempZone, this->Name, DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified, &this->AmbientZoneGain);
             break;
         }
         default:

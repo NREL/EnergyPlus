@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -110,9 +110,8 @@ namespace PondGroundHeatExchanger {
         PondGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), DesignCapacity(0.0), Depth(0.0), Area(0.0), TubeInDiameter(0.0), TubeOutDiameter(0.0), TubeConductivity(0.0),
               GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), InletNodeNum(0),
-              OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), plantLoc{}, InletTemp(0.0),
-              OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true), MyFlag(true),
-              setupOutputVarsFlag(true), WaterIndex(0), firstTimeThrough(true)
+              OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), plantLoc{}, InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true),
+              MyFlag(true), setupOutputVarsFlag(true), WaterIndex(0), firstTimeThrough(true)
         {
         }
 

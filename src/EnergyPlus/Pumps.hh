@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -211,15 +211,14 @@ namespace Pumps {
 
         // Default Constructor
         PumpSpecs()
-            : pumpType(PumpType::Invalid), TypeOf_Num(DataPlant::PlantEquipmentType::Invalid), plantLoc{},
-              PumpControl(PumpControlType::Invalid), PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0),
-              SequencingScheme(PumpBankControlSeq::Invalid), FluidIndex(0), NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0),
-              MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0), NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false),
-              EMSMassFlowValue(0.0), NomSteamVolFlowRate(0.0), NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0),
-              minVolFlowRateWasAutosized(false), MassFlowRateMin(0.0), NomPumpHead(0.0), EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0),
-              NomPowerUse(0.0), NomPowerUseWasAutoSized(false), powerSizingMethod(PowerSizingMethod::SizePowerPerFlowPerPressure),
-              powerPerFlowScalingFactor(348701.1),            // 22 W/gpm
-              powerPerFlowPerPressureScalingFactor(1 / 0.78), // legacy impeller efficiency
+            : pumpType(PumpType::Invalid), TypeOf_Num(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, PumpControl(PumpControlType::Invalid),
+              PumpScheduleIndex(0), InletNodeNum(0), OutletNodeNum(0), SequencingScheme(PumpBankControlSeq::Invalid), FluidIndex(0),
+              NumPumpsInBank(0), PowerErrIndex1(0), PowerErrIndex2(0), MinVolFlowRateFrac(0.0), NomVolFlowRate(0.0),
+              NomVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0), EMSMassFlowOverrideOn(false), EMSMassFlowValue(0.0), NomSteamVolFlowRate(0.0),
+              NomSteamVolFlowRateWasAutoSized(false), MinVolFlowRate(0.0), minVolFlowRateWasAutosized(false), MassFlowRateMin(0.0), NomPumpHead(0.0),
+              EMSPressureOverrideOn(false), EMSPressureOverrideValue(0.0), NomPowerUse(0.0), NomPowerUseWasAutoSized(false),
+              powerSizingMethod(PowerSizingMethod::SizePowerPerFlowPerPressure), powerPerFlowScalingFactor(348701.1), // 22 W/gpm
+              powerPerFlowPerPressureScalingFactor(1 / 0.78),                                                         // legacy impeller efficiency
               MotorEffic(0.0), PumpEffic(0.0), FracMotorLossToFluid(0.0), Energy(0.0), Power(0.0), PartLoadCoef(4, 0.0), PressureCurve_Index(0),
               PumpMassFlowRateMaxRPM(0.0), PumpMassFlowRateMinRPM(0.0), MinPhiValue(0.0), MaxPhiValue(0.0), ImpellerDiameter(0.0), RotSpeed_RPM(0.0),
               RotSpeed(0.0), PumpInitFlag(true), PumpOneTimeFlag(true), CheckEquipName(true), HasVFD(false), OneTimePressureWarning(true),

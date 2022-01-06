@@ -418,6 +418,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with O, insert the rules here
 
               ! If your original object starts with P, insert the rules here
+              CASE('PYTHONPLUGIN:SEARCHPATHS')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:3)=InArgs(1:3)
+                 OutArgs(4) = 'Yes'
+                 OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                 CurArgs = CurArgs + 1
 
               ! If your original object starts with R, insert the rules here
 

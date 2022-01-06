@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -505,35 +505,35 @@ namespace RefrigeratedCase {
         Real64 CondenserFanPower;                           // Condenser fan power (W)
         int TotCondFTempPtr;                                // Index for condenser fan power modifier curve
         // (function of outdoor temperature)
-        Real64 ActualCondenserFanPower; // Rack condenser fan power (W)
-        Real64 CondenserFanConsumption; // Rack condenser fan electric consumption (J)
-        Real64 SensZoneCreditHeatRate;  // Rack sensible heating zone credit rate (W)
-        Real64 SensZoneCreditHeat;      // Rack sensible heating zone credit energy (J)
-        Real64 SensHVACCreditHeatRate;  // Rack sensible heating HVAC credit rate (W)
-        Real64 SensHVACCreditHeat;      // Rack sensible heating HVAC credit energy (J)
-        int EvapFreezeWarnIndex;        // Recurring freeze warning index
-        int NoFlowWarnIndex;            // No cooling water when needed warning index
-        int HighTempWarnIndex;          // Water outlet high temp warning index
-        int LowTempWarnIndex;           // Water outlet low temp warning index
-        int HighFlowWarnIndex;          // Water outlet high flow warning index
-        int HighInletWarnIndex;         // Water inlet high temp warning index
-        int InletNode;                  // Water-cooled condenser inlet node number
-        Real64 InletTemp;               // Water-cooling condenser inlet temperature (C)
-        int OutletNode;                 // Water-cooled condenser outlet node number
-        int PlantTypeOfNum;             // Water-cooled condenser plant equipment type
+        Real64 ActualCondenserFanPower;               // Rack condenser fan power (W)
+        Real64 CondenserFanConsumption;               // Rack condenser fan electric consumption (J)
+        Real64 SensZoneCreditHeatRate;                // Rack sensible heating zone credit rate (W)
+        Real64 SensZoneCreditHeat;                    // Rack sensible heating zone credit energy (J)
+        Real64 SensHVACCreditHeatRate;                // Rack sensible heating HVAC credit rate (W)
+        Real64 SensHVACCreditHeat;                    // Rack sensible heating HVAC credit energy (J)
+        int EvapFreezeWarnIndex;                      // Recurring freeze warning index
+        int NoFlowWarnIndex;                          // No cooling water when needed warning index
+        int HighTempWarnIndex;                        // Water outlet high temp warning index
+        int LowTempWarnIndex;                         // Water outlet low temp warning index
+        int HighFlowWarnIndex;                        // Water outlet high flow warning index
+        int HighInletWarnIndex;                       // Water inlet high temp warning index
+        int InletNode;                                // Water-cooled condenser inlet node number
+        Real64 InletTemp;                             // Water-cooling condenser inlet temperature (C)
+        int OutletNode;                               // Water-cooled condenser outlet node number
+        int PlantTypeOfNum;                           // Water-cooled condenser plant equipment type
         PlantLocation plantLoc{};       // Water-cooled condenser plant location
-        Real64 OutletTemp;              // Water-cooling condenser outlet temperature (C)
-        int OutletTempSchedPtr;         // Schedule pointer for condenser outlet temp setting
-        Real64 VolFlowRate;             // Water-cooled condenser volumetric flow rate (m3/s)
-        Real64 DesVolFlowRate;          // Water-cooled condenser design volumetric flow rate (m3/s)
-        Real64 MassFlowRate;            // Water-cooled condenser mass flow rate (kg/s)
-        Real64 CondLoad;                // Total condenser load (W)
-        Real64 CondEnergy;              // Condenser energy (J)
-        CndsrFlowType FlowType;         // Water-cooled condenser loop flow type
-        Real64 VolFlowRateMax;          // Maximum condenser volumetric flow rate (m3/s)
-        Real64 MassFlowRateMax;         // Maximum condenser mass flow rate (kg/s)
-        Real64 InletTempMin;            // Minimum condenser water inlet temperature (C)
-        Real64 OutletTempMax;           // Maximum condenser water outlet temperature (C)
+        Real64 OutletTemp;                            // Water-cooling condenser outlet temperature (C)
+        int OutletTempSchedPtr;                       // Schedule pointer for condenser outlet temp setting
+        Real64 VolFlowRate;                           // Water-cooled condenser volumetric flow rate (m3/s)
+        Real64 DesVolFlowRate;                        // Water-cooled condenser design volumetric flow rate (m3/s)
+        Real64 MassFlowRate;                          // Water-cooled condenser mass flow rate (kg/s)
+        Real64 CondLoad;                              // Total condenser load (W)
+        Real64 CondEnergy;                            // Condenser energy (J)
+        CndsrFlowType FlowType;                       // Water-cooled condenser loop flow type
+        Real64 VolFlowRateMax;                        // Maximum condenser volumetric flow rate (m3/s)
+        Real64 MassFlowRateMax;                       // Maximum condenser mass flow rate (kg/s)
+        Real64 InletTempMin;                          // Minimum condenser water inlet temperature (C)
+        Real64 OutletTempMax;                         // Maximum condenser water outlet temperature (C)
         Real64 TotalCoolingLoad;
         bool ShowCOPWarning;
 
@@ -550,9 +550,9 @@ namespace RefrigeratedCase {
               ActualCondenserFanPower(0.0), CondenserFanConsumption(0.0), SensZoneCreditHeatRate(0.0), SensZoneCreditHeat(0.0),
               SensHVACCreditHeatRate(0.0), SensHVACCreditHeat(0.0), EvapFreezeWarnIndex(0), NoFlowWarnIndex(0), HighTempWarnIndex(0),
               LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), InletTemp(0.0), OutletNode(0), PlantTypeOfNum(0),
-              OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0),
-              DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0), FlowType(CndsrFlowType::VariableFlow), VolFlowRateMax(0.0),
-              MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
+              OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0),
+              FlowType(CndsrFlowType::VariableFlow), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0),
+              TotalCoolingLoad(0.0), ShowCOPWarning(true)
         {
         }
 
@@ -1042,19 +1042,18 @@ namespace RefrigeratedCase {
               CondCreditWarnIndex1(0), CondCreditWarnIndex2(0), CondCreditWarnIndex3(0), CondCreditWarnIndex4(0), CondCreditWarnIndex5(0),
               CondCreditWarnIndex6(0), CondCreditWarnIndex7(0), NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0),
               HighInletWarnIndex(0), InletNode(0), EvapSchedPtr(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0),
-              EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0),
-              OutletTempSchedPtr(0), InletAirNodeNum(0), InletAirZoneNum(0), FanSpeedControlType(FanSpeedCtrlType::Invalid), CapCurvePtr(0),
-              CascadeSysID(0), CascadeTempControl(CascadeCndsrTempCtrlType::Invalid), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0),
-              MinCondLoad(0.0), TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0),
-              EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0),
-              BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), FanMinAirFlowRatio(0.0), RatedFanPower(0.0),
-              ActualFanPower(0.0), FanElecEnergy(0.0), InletTemp(0.0), OutletTemp(0.0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0),
-              RatedTCondense(0.0), CondLoad(0.0), CondEnergy(0.0), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0),
-              RatedSubcool(0.0), RatedDelT(0.0), RatedCapacity(0.0), RatedWaterInletT(0.0), RatedApproachT(0.0), MinCapFacEvap(0.0),
-              MaxCapFacEvap(0.0), EvapCoeff1(0.0), EvapCoeff2(0.0), EvapCoeff3(0.0), EvapCoeff4(0.0), EvapElevFact(1.0), RefOpCharge(0.0),
-              RefReceiverInventory(0.0), RefPipingInventory(0.0), TotalHeatRecoveredEnergy(0.0), TotalHeatRecoveredLoad(0.0),
-              ExternalEnergyRecovered(0.0), InternalEnergyRecovered(0.0), ExternalHeatRecoveredLoad(0.0), InternalHeatRecoveredLoad(0.0),
-              LaggedUsedWaterHeater(0.0), LaggedUsedHVACCoil(0.0)
+              EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0), OutletTempSchedPtr(0), InletAirNodeNum(0), InletAirZoneNum(0),
+              FanSpeedControlType(FanSpeedCtrlType::Invalid), CapCurvePtr(0), CascadeSysID(0), CascadeTempControl(CascadeCndsrTempCtrlType::Invalid),
+              CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0), MinCondLoad(0.0), TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0),
+              EvapPumpPower(0.0), ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0),
+              BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0),
+              FanMinAirFlowRatio(0.0), RatedFanPower(0.0), ActualFanPower(0.0), FanElecEnergy(0.0), InletTemp(0.0), OutletTemp(0.0), VolFlowRate(0.0),
+              DesVolFlowRate(0.0), MassFlowRate(0.0), RatedTCondense(0.0), CondLoad(0.0), CondEnergy(0.0), VolFlowRateMax(0.0), MassFlowRateMax(0.0),
+              InletTempMin(10.0), OutletTempMax(55.0), RatedSubcool(0.0), RatedDelT(0.0), RatedCapacity(0.0), RatedWaterInletT(0.0),
+              RatedApproachT(0.0), MinCapFacEvap(0.0), MaxCapFacEvap(0.0), EvapCoeff1(0.0), EvapCoeff2(0.0), EvapCoeff3(0.0), EvapCoeff4(0.0),
+              EvapElevFact(1.0), RefOpCharge(0.0), RefReceiverInventory(0.0), RefPipingInventory(0.0), TotalHeatRecoveredEnergy(0.0),
+              TotalHeatRecoveredLoad(0.0), ExternalEnergyRecovered(0.0), InternalEnergyRecovered(0.0), ExternalHeatRecoveredLoad(0.0),
+              InternalHeatRecoveredLoad(0.0), LaggedUsedWaterHeater(0.0), LaggedUsedHVACCoil(0.0)
         {
         }
 

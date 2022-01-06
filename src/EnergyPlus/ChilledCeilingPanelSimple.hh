@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -139,7 +139,8 @@ namespace CoolingPanelSimple {
         Real64 Energy;
         Real64 ConvEnergy;
         Real64 RadEnergy;
-        PlantLocation plantLoc;        int CoolingPanelLoadReSimIndex;
+        PlantLocation plantLoc;
+        int CoolingPanelLoadReSimIndex;
         int CoolingPanelMassFlowReSimIndex;
         int CoolingPanelInletTempFlowReSimIndex;
 
@@ -152,7 +153,8 @@ namespace CoolingPanelSimple {
               WaterInletTempStd(0.0), WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0),
               WaterOutletEnthalpy(0.0), RatedZoneAirTemp(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0), TotPower(0.0), Power(0.0),
               ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), plantLoc{},
-              CoolingPanelLoadReSimIndex(0), CoolingPanelMassFlowReSimIndex(0), CoolingPanelInletTempFlowReSimIndex(0)
+              CoolingPanelLoadReSimIndex(0),
+              CoolingPanelMassFlowReSimIndex(0), CoolingPanelInletTempFlowReSimIndex(0)
         {
         }
 

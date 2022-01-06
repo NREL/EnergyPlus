@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -164,7 +164,7 @@ namespace ReturnAirPathManager {
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType = "";
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
-                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVAC::Invalid;
+                state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum = DataZoneEquipment::AirLoopHVACZone::Invalid;
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentName = "";
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentIndex.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
@@ -187,7 +187,7 @@ namespace ReturnAirPathManager {
                             ShowContinueError(state, "In AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(PathNum).Name);
                             ErrorsFound = true;
                         }
-                        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = static_cast<DataZoneEquipment::AirLoopHVAC>(
+                        state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) = static_cast<DataZoneEquipment::AirLoopHVACZone>(
                             getEnumerationValue(DataZoneEquipment::AirLoopHVACTypeNamesCC, state.dataIPShortCut->cAlphaArgs(Counter)));
 
                     } else {
@@ -244,33 +244,33 @@ namespace ReturnAirPathManager {
         int ComponentNum;
 
         for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
+            switch (state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentTypeEnum(ComponentNum)) {
+            case DataZoneEquipment::AirLoopHVACZone::Mixer: // 'AirLoopHVAC:ZoneMixer'
 
-            {
-                auto const SELECT_CASE_var(state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentTypeEnum(ComponentNum));
-
-                if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneMixer) { // 'AirLoopHVAC:ZoneMixer'
-
-                    if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
-                          state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
-                        SimAirMixer(state,
-                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
-                    }
-
-                } else if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum) { // 'AirLoopHVAC:ReturnPlenum'
-
-                    SimAirZonePlenum(state,
-                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
-                                     DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum,
-                                     state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
-
-                } else {
-                    ShowSevereError(state,
-                                    "Invalid AirLoopHVAC:ReturnPath Component=" +
-                                        state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
-                    ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).Name);
-                    ShowFatalError(state, "Preceding condition causes termination.");
+                if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
+                      state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
+                    SimAirMixer(state,
+                                state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                                state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
                 }
+
+                break;
+
+            case DataZoneEquipment::AirLoopHVACZone::ReturnPlenum: // 'AirLoopHVAC:ReturnPlenum'
+
+                SimAirZonePlenum(state,
+                                 state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentName(ComponentNum),
+                                 DataZoneEquipment::AirLoopHVACZone::ReturnPlenum,
+                                 state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentIndex(ComponentNum));
+                break;
+
+            default:
+                ShowSevereError(state,
+                                "Invalid AirLoopHVAC:ReturnPath Component=" +
+                                    state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentType(ComponentNum));
+                ShowContinueError(state, "Occurs in AirLoopHVAC:ReturnPath =" + state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).Name);
+                ShowFatalError(state, "Preceding condition causes termination.");
+                break;
             }
         }
     }

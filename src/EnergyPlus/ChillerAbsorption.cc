@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -706,14 +706,22 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
     if (this->CondInletNodeNum > 0) {
         PlantUtilities::ScanPlantLoopsForObject(
             state, this->Name, DataPlant::PlantEquipmentType::Chiller_Absorption, this->CDPlantLoc, errFlag, _, _, _, this->CondInletNodeNum, _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->CDPlantLoc,
-                                                      DataPlant::PlantEquipmentType::Chiller_Absorption,
-                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWPlantLoc, this->CDPlantLoc, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
     }
     if (this->GeneratorInletNodeNum > 0) {
-        PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, DataPlant::PlantEquipmentType::Chiller_Absorption, this->GenPlantLoc, errFlag, _, _, _, this->GeneratorInletNodeNum, _);
-        PlantUtilities::InterConnectTwoPlantLoopSides(state, this->CWPlantLoc, this->GenPlantLoc, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::PlantEquipmentType::Chiller_Absorption,
+                                                this->GenPlantLoc,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                this->GeneratorInletNodeNum,
+                                                _);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWPlantLoc, this->GenPlantLoc, DataPlant::PlantEquipmentType::Chiller_Absorption, true);
     }
 
     // Fill in connection data

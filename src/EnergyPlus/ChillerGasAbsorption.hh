@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,9 +55,9 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -132,7 +132,7 @@ namespace ChillerGasAbsorption {
         // loop topology variables
         PlantLocation CWplantLoc;  // chilled water plant loop component index
         PlantLocation CDplantLoc;  // condenser water plant loop component index
-        PlantLocation HWplantLoc;     // hot water plant loop component index
+        PlantLocation HWplantLoc;                             // hot water plant loop component index
         bool envrnFlag;
         Real64 oldCondSupplyTemp; // save the last iteration value of leaving condenser water temperature
 
@@ -182,14 +182,14 @@ namespace ChillerGasAbsorption {
               HeatVolFlowRateWasAutoSized(false), SizFac(0.0), CoolCapFTCurve(0), FuelCoolFTCurve(0), FuelCoolFPLRCurve(0), ElecCoolFTCurve(0),
               ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), FuelHeatFHPLRCurve(0), isEnterCondensTemp(false), isWaterCooled(false),
               CHWLowLimitTemp(0.0), FuelHeatingValue(0.0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0), DesEvapMassFlowRate(0.0),
-              DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWplantLoc{},
-              CDplantLoc{}, HWplantLoc{}, envrnFlag(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0),
-              HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), FuelUseRate(0.0), FuelEnergy(0.0), CoolFuelUseRate(0.0), CoolFuelEnergy(0.0),
-              HeatFuelUseRate(0.0), HeatFuelEnergy(0.0), ElectricPower(0.0), ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0),
-              HeatElectricPower(0.0), HeatElectricEnergy(0.0), ChillReturnTemp(0.0), ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0),
-              CondReturnTemp(0.0), CondSupplyTemp(0.0), CondWaterFlowRate(0.0), HotWaterReturnTemp(0.0), HotWaterSupplyTemp(0.0),
-              HotWaterFlowRate(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0), CoolingCapacity(0.0), HeatingCapacity(0.0),
-              FractionOfPeriodRunning(0.0), FuelCOP(0.0)
+              DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0),
+              PossibleSubcooling(false), CWplantLoc{}, CDplantLoc{}, HWplantLoc{}, envrnFlag(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0),
+              CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), FuelUseRate(0.0), FuelEnergy(0.0),
+              CoolFuelUseRate(0.0), CoolFuelEnergy(0.0), HeatFuelUseRate(0.0), HeatFuelEnergy(0.0), ElectricPower(0.0), ElectricEnergy(0.0),
+              CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0), HeatElectricEnergy(0.0), ChillReturnTemp(0.0),
+              ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0), CondReturnTemp(0.0), CondSupplyTemp(0.0), CondWaterFlowRate(0.0),
+              HotWaterReturnTemp(0.0), HotWaterSupplyTemp(0.0), HotWaterFlowRate(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0),
+              CoolingCapacity(0.0), HeatingCapacity(0.0), FractionOfPeriodRunning(0.0), FuelCOP(0.0)
         {
         }
 

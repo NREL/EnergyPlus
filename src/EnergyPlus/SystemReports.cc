@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -790,11 +790,17 @@ void InitEnergyReports(EnergyPlusData &state)
 
                 // 3. Find Demand Side Component Corresponding to Supply Side Component
                 for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops; ++PlantLoopNum) {
-                    for (BranchNum = 1; BranchNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).TotalBranches; ++BranchNum) {
-                        for (CompNum = 1; CompNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).Branch(BranchNum).TotalComponents;
+                    for (BranchNum = 1;
+                         BranchNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).TotalBranches;
+                         ++BranchNum) {
+                        for (CompNum = 1;
+                             CompNum <=
+                             state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).Branch(BranchNum).TotalComponents;
                              ++CompNum) {
                             {
-                                auto &thisVentRepComp(state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).Branch(BranchNum).Comp(CompNum));
+                                auto &thisVentRepComp(state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum)
+                                                          .Branch(BranchNum)
+                                                          .Comp(CompNum));
                                 CompType = thisVentRepComp.TypeOf;
                                 CompName = thisVentRepComp.Name;
                                 FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
@@ -808,11 +814,17 @@ void InitEnergyReports(EnergyPlusData &state)
                 }
 
                 for (PlantLoopNum = 1; PlantLoopNum <= state.dataHVACGlobal->NumCondLoops; ++PlantLoopNum) {
-                    for (BranchNum = 1; BranchNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).TotalBranches; ++BranchNum) {
-                        for (CompNum = 1; CompNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).Branch(BranchNum).TotalComponents;
+                    for (BranchNum = 1;
+                         BranchNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).TotalBranches;
+                         ++BranchNum) {
+                        for (CompNum = 1;
+                             CompNum <=
+                             state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).Branch(BranchNum).TotalComponents;
                              ++CompNum) {
                             {
-                                auto &thisVentRepComp(state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum).Branch(BranchNum).Comp(CompNum));
+                                auto &thisVentRepComp(state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](PlantLoopNum)
+                                                          .Branch(BranchNum)
+                                                          .Comp(CompNum));
                                 CompType = thisVentRepComp.TypeOf;
                                 CompName = thisVentRepComp.Name;
                                 FindDemandSideMatch(state, CompType, CompName, MatchFound, MatchLoopType, MatchLoop, MatchBranch, MatchComp);
@@ -1139,12 +1151,16 @@ void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &A
         //        countloop=countloop+1
         //        if (countloop > 100) exit
         if (LoopType == 1) {
-            for (int BranchNum = 1; BranchNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](LoopNum).TotalBranches; ++BranchNum) {
+            for (int BranchNum = 1; BranchNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](LoopNum).TotalBranches;
+                 ++BranchNum) {
                 for (int SupplySideCompNum = 1;
-                     SupplySideCompNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).TotalComponents;
+                     SupplySideCompNum <=
+                     state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).TotalComponents;
                      ++SupplySideCompNum) {
                     {
-                        auto &thisVentRepComp(state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(SupplySideCompNum));
+                        auto &thisVentRepComp(
+                            state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(
+                                SupplySideCompNum));
                         DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
                         DemandSideLoopNum = thisVentRepComp.ConnectPlant.LoopNum;
                         DemandSideBranchNum = thisVentRepComp.ConnectPlant.BranchNum;
@@ -1186,11 +1202,15 @@ void FindFirstLastPtr(EnergyPlusData &state, int &LoopType, int &LoopNum, int &A
                 }
             }
         } else if (LoopType == 2) {
-            for (int BranchNum = 1; BranchNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).TotalBranches; ++BranchNum) {
-                for (SupplySideCompNum = 1; SupplySideCompNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).TotalComponents;
+            for (int BranchNum = 1; BranchNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).TotalBranches;
+                 ++BranchNum) {
+                for (SupplySideCompNum = 1;
+                     SupplySideCompNum <=
+                     state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).TotalComponents;
                      ++SupplySideCompNum) {
                     {
-                        auto &thisVentRepComp(state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(SupplySideCompNum));
+                        auto &thisVentRepComp(state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Supply)](LoopNum).Branch(BranchNum).Comp(
+                            SupplySideCompNum));
                         DemandSideLoopType = thisVentRepComp.ConnectPlant.LoopType;
                         DemandSideLoopNum = thisVentRepComp.ConnectPlant.LoopNum;
                         DemandSideBranchNum = thisVentRepComp.ConnectPlant.BranchNum;
@@ -3162,7 +3182,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             if (PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops) {
                 select_ThisReportData = &state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideNum)](PlantLoopNum);
             } else { // CondLoop
-                select_ThisReportData = &state.dataPlnt->VentRepCond[static_cast<int>(LoopSideNum)](PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
+                select_ThisReportData =
+                    &state.dataPlnt->VentRepCond[static_cast<int>(LoopSideNum)](PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
             }
 
             // Object Data
@@ -3288,7 +3309,8 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             if (PlantLoopNum <= state.dataHVACGlobal->NumPlantLoops) {
                 select_ThisReportData = &state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideNum)](PlantLoopNum);
             } else { // CondLoop
-                select_ThisReportData = &state.dataPlnt->VentRepCond[static_cast<int>(LoopSideNum)](PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
+                select_ThisReportData =
+                    &state.dataPlnt->VentRepCond[static_cast<int>(LoopSideNum)](PlantLoopNum - state.dataHVACGlobal->NumPlantLoops);
             }
 
             // Object Data
@@ -5261,13 +5283,23 @@ void FindDemandSideMatch(EnergyPlusData &state,
     // record the type of loop and the loop, branch, and component numbers.
     if (!MatchFound) { // Go through the plant demand side loops
         for (PassLoopNum = 1; PassLoopNum <= state.dataHVACGlobal->NumPlantLoops; ++PassLoopNum) {
-            for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).TotalBranches; ++PassBranchNum) {
-                for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
+            for (PassBranchNum = 1;
+                 PassBranchNum <= state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).TotalBranches;
+                 ++PassBranchNum) {
+                for (PassCompNum = 1;
+                     PassCompNum <=
+                     state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
-                    if (UtilityRoutines::SameString(
-                            CompType, state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
-                        UtilityRoutines::SameString(
-                            CompName, state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
+                    if (UtilityRoutines::SameString(CompType,
+                                                    state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                                        .Branch(PassBranchNum)
+                                                        .Comp(PassCompNum)
+                                                        .TypeOf) &&
+                        UtilityRoutines::SameString(CompName,
+                                                    state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                                        .Branch(PassBranchNum)
+                                                        .Comp(PassCompNum)
+                                                        .Name)) {
                         // Found a match on the plant demand side--increment the counter
                         MatchFound = true;
                         MatchLoopType = 1;
@@ -5285,13 +5317,23 @@ void FindDemandSideMatch(EnergyPlusData &state,
 
     if (!MatchFound) { // Go through the condenser demand side loops
         for (PassLoopNum = 1; PassLoopNum <= state.dataHVACGlobal->NumCondLoops; ++PassLoopNum) {
-            for (PassBranchNum = 1; PassBranchNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).TotalBranches; ++PassBranchNum) {
-                for (PassCompNum = 1; PassCompNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
+            for (PassBranchNum = 1;
+                 PassBranchNum <= state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).TotalBranches;
+                 ++PassBranchNum) {
+                for (PassCompNum = 1;
+                     PassCompNum <=
+                     state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
-                    if (UtilityRoutines::SameString(
-                            CompType, state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).TypeOf) &&
-                        UtilityRoutines::SameString(
-                            CompName, state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).Comp(PassCompNum).Name)) {
+                    if (UtilityRoutines::SameString(CompType,
+                                                    state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                                        .Branch(PassBranchNum)
+                                                        .Comp(PassCompNum)
+                                                        .TypeOf) &&
+                        UtilityRoutines::SameString(CompName,
+                                                    state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
+                                                        .Branch(PassBranchNum)
+                                                        .Comp(PassCompNum)
+                                                        .Name)) {
                         // Found a match on the plant demand side--increment the counter
                         MatchFound = true;
                         MatchLoopType = 2;

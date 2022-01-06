@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,8 +56,9 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -92,7 +93,8 @@ namespace BoilerSteam {
         int BoilerOutletNodeNum;                    // Node number at the boiler outlet
         Array1D<Real64> FullLoadCoef;               // Coefficients of the fuel consumption/part load ratio curve
         int TypeNum;                                // Plant loop type identifier
-        PlantLocation plantLoc;        int PressErrIndex;                          // index pointer for recurring errors
+        PlantLocation plantLoc;
+        int PressErrIndex;                          // index pointer for recurring errors
         int FluidIndex;                             // Steam index
         std::string EndUseSubcategory;              // identifier use for the end use subcategory
         bool myFlag;
@@ -116,9 +118,9 @@ namespace BoilerSteam {
               DesMassFlowRate(0.0), MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), NomEffic(0.0), MinPartLoadRat(0.0),
               MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0),
               BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0), BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), plantLoc{},
-              PressErrIndex(0), FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0),
-              BoilerLoad(0.0), BoilerEff(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
-              BoilerInletTemp(0.0), BoilerFuelTypeForOutputVariable("")
+              PressErrIndex(0), FluidIndex(0), myFlag(true),
+              myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0), BoilerEff(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerEnergy(0.0),
+              FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
 

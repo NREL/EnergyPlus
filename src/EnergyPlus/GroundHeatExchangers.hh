@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -265,11 +265,11 @@ namespace GroundHeatExchangers {
         bool needToSetupOutputVars;
 
         GLHEBase()
-            : available(false), on(false), plantLoc{}, inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
-              designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
-              aveFluidTemp(0.0), QGLHE(0.0), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0), totalTubeLength(0.0),
-              timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1), updateCurSimTime(true),
-              triggerDesignDayReset(false), needToSetupOutputVars(true)
+            : available(false), on(false), plantLoc{}, inletNodeNum(0),
+              outletNodeNum(0), designFlow(0.0), designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0),
+              outletTemp(0.0), inletTemp(0.0), aveFluidTemp(0.0), QGLHE(0.0), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0),
+              HXResistance(0.0), totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
+              updateCurSimTime(true), triggerDesignDayReset(false), needToSetupOutputVars(true)
         {
         }
 

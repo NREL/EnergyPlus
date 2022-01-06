@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -598,13 +598,13 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation TankOutletLoopSide;    // inlet loopsidenumber
-    int TankInletNode;         // inlet loop side outlet node
-    int TankOutletNode;        // inlet loop side outlet node
-    Real64 TankInletTemp;      // temporary variable
-    Real64 LastTankOutletTemp; // temporary variable
-    Real64 Cp;                 // specific heat
-    Real64 TimeElapsed;        // temporary value based on current clock time during simulation, fractional hours
+    DataPlant::LoopSideLocation TankOutletLoopSide; // inlet loopsidenumber
+    int TankInletNode;                              // inlet loop side outlet node
+    int TankOutletNode;                             // inlet loop side outlet node
+    Real64 TankInletTemp;                           // temporary variable
+    Real64 LastTankOutletTemp;                      // temporary variable
+    Real64 Cp;                                      // specific heat
+    Real64 TimeElapsed;                             // temporary value based on current clock time during simulation, fractional hours
 
     Real64 TimeStepSeconds;
     Real64 MassFlowRate;
@@ -697,8 +697,10 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     TankOutletTemp = TankAverageTemp;
 }
 
-void UpdateCommonPipe(
-    EnergyPlusData &state, PlantLocation const &TankInletPlantLoc, DataPlant::CommonPipeType const CommonPipeType, Real64 &MixedOutletTemp)
+void UpdateCommonPipe(EnergyPlusData &state,
+                      PlantLocation const &TankInletPlantLoc,
+                      DataPlant::CommonPipeType const CommonPipeType,
+                      Real64 &MixedOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
@@ -843,8 +845,8 @@ void UpdateCommonPipe(
 }
 
 void ManageSingleCommonPipe(EnergyPlusData &state,
-                            int const LoopNum,           // plant loop number
-                            DataPlant::LoopSideLocation const LoopSide,          // plant loop side number
+                            int const LoopNum,                          // plant loop number
+                            DataPlant::LoopSideLocation const LoopSide, // plant loop side number
                             Real64 const TankOutletTemp, // inlet temperature to the common pipe passed in from the capacitance calculation
                             Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
 )

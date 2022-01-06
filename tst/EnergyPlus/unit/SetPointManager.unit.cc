@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -352,21 +352,33 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(2);
 
-
     state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
     state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(chillerBranchChW).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(chillerBranchChW).Comp(chillerCompIndex).NodeNumOut = evapOutletNodeNum;
+    state->dataPlnt->PlantLoop(chwLoopIndex)
+        .LoopSide(DataPlant::LoopSideLocation::Supply)
+        .Branch(chillerBranchChW)
+        .Comp(chillerCompIndex)
+        .NodeNumOut = evapOutletNodeNum;
     Real64 constexpr designCondenserEnteringTemp = 20;
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn =
-        designCondenserEnteringTemp;
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesEvapOut = 5;
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(chillerBranchChW).Comp(chillerCompIndex).MaxLoad = 5000;
-
+    state->dataPlnt->PlantLoop(chwLoopIndex)
+        .LoopSide(DataPlant::LoopSideLocation::Supply)
+        .Branch(chillerBranchChW)
+        .Comp(chillerCompIndex)
+        .TempDesCondIn = designCondenserEnteringTemp;
+    state->dataPlnt->PlantLoop(chwLoopIndex)
+        .LoopSide(DataPlant::LoopSideLocation::Supply)
+        .Branch(chillerBranchChW)
+        .Comp(chillerCompIndex)
+        .TempDesEvapOut = 5;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(chillerBranchChW).Comp(chillerCompIndex).MaxLoad =
+        5000;
 
     state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
     state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(chillerBranchCW).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(chillerBranchCW).Comp(chillerCompIndex).NodeNumIn = condInletNodeNum;
-    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
+    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(chillerBranchCW).Comp(chillerCompIndex).NodeNumIn =
+        condInletNodeNum;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad =
+        1000;
 
     state->dataLoopNodes->Node.allocate(2);
     state->dataLoopNodes->Node(evapOutletNodeNum).Temp = 7;

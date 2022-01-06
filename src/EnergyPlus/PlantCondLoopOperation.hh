@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,7 @@ namespace EnergyPlus {
 namespace PlantCondLoopOperation {
 
     void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                     PlantLocation const &plantLoc,     // PlantLoop data structure Location struct
+                                     PlantLocation const &plantLoc,                             // PlantLoop data structure Location struct
                                      Real64 &LoopDemand,
                                      Real64 &RemLoopDemand,
                                      bool const FirstHVACIteration,
@@ -128,11 +128,11 @@ namespace PlantCondLoopOperation {
     );
 
     void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
-                                       int const LoopNum,     // component topology
+                                       int const LoopNum,                             // component topology
                                        const DataPlant::LoopSideLocation LoopSideNum, // component topology
-                                       int const BranchNum,   // component topology
-                                       int const CompNum,     // component topology
-                                       Real64 &ChangeInLoad   // positive magnitude of load change
+                                       int const BranchNum,                           // component topology
+                                       int const CompNum,                             // component topology
+                                       Real64 &ChangeInLoad                           // positive magnitude of load change
     );
 
     void FindCompSPLoad(EnergyPlusData &state,
@@ -167,9 +167,12 @@ namespace PlantCondLoopOperation {
 
     void SetupPlantEMSActuators(EnergyPlusData &state);
 
-    void ActivateEMSControls(
-        EnergyPlusData &state, int const LoopNum,
-                             const DataPlant::LoopSideLocation LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
+    void ActivateEMSControls(EnergyPlusData &state,
+                             int const LoopNum,
+                             const DataPlant::LoopSideLocation LoopSideNum,
+                             int const BranchNum,
+                             int const CompNum,
+                             bool &LoopShutDownFlag);
 
     void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
                                          int const LoopNum,

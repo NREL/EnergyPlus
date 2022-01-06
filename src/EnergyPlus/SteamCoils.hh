@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -141,8 +141,8 @@ namespace SteamCoils {
               OutletWaterEnthalpy(0.0), InletSteamPress(0.0), InletSteamQuality(0.0), OutletSteamQuality(0.0), DegOfSubcooling(0.0),
               LoopSubcoolReturn(0.0), AirInletNodeNum(0), AirOutletNodeNum(0), SteamInletNodeNum(0), SteamOutletNodeNum(0), TempSetPointNodeNum(0),
               TypeOfCoil(0), FluidIndex(0), CoilType(DataPlant::PlantEquipmentType::Invalid), OperatingCapacity(0.0),
-              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
-              FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), DesCoilCapacity(0.0), DesAirVolFlow(0.0)
+              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
+              reportCoilFinalSizes(true), DesCoilCapacity(0.0), DesAirVolFlow(0.0)
         {
         }
     };

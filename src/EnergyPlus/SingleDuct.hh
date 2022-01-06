@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -198,10 +198,10 @@ namespace SingleDuct {
         bool NoOAFlowInputFromUser;           // avoids OA calculation if no input specified by user
         int OARequirementsPtr;                // - Index to DesignSpecification:OutdoorAir object
         int AirLoopNum;
-        PlantLocation HWplantLoc{};              // plant topology, Component location
-        std::string ZoneHVACUnitType; // type of Zone HVAC unit for air terminal mixer units
-        std::string ZoneHVACUnitName; // name of Zone HVAC unit for air terminal mixer units
-        int SecInNode;                // zone or zone unit air node number
+        PlantLocation HWplantLoc{};                        // plant topology, Component location
+        std::string ZoneHVACUnitType;           // type of Zone HVAC unit for air terminal mixer units
+        std::string ZoneHVACUnitName;           // name of Zone HVAC unit for air terminal mixer units
+        int SecInNode;                          // zone or zone unit air node number
         // warning variables
         int IterationLimit;                                       // Used for RegulaFalsi error -1
         int IterationFailed;                                      // Used for RegulaFalsi error -2

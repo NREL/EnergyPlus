@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -129,14 +129,14 @@ namespace ChillerExhaustAbsorption {
         int CondErrCount;          // error count for poor Condenser Supply Estimate
         bool PossibleSubcooling;   // Flag to determine whether plant is overcooled
         // loop topology variables
-        PlantLocation CWPlantLoc{};                           // chilled water plant loop component index
-        PlantLocation CDPlantLoc{};                           // condenser water plant loop component index
-        PlantLocation HWPlantLoc{};                           // hot water plant loop component index
-        GeneratorType CompType_Num;              // Numeric designator for CompType (TypeOf)
-        int ExhTempLTAbsLeavingTempIndex;        // index for exhaust potential less than thermal energy needed during cooling
-        int ExhTempLTAbsLeavingHeatingTempIndex; // index for exhaust potential less than thermal energy needed during heating
-        std::string TypeOf;                      // Generator type
-        std::string ExhaustSourceName;           // Generator type Name
+        PlantLocation CWPlantLoc{};                             // chilled water plant loop component index
+        PlantLocation CDPlantLoc{};                             // condenser water plant loop component index
+        PlantLocation HWPlantLoc{};                             // hot water plant loop component index
+        GeneratorType CompType_Num;                // Numeric designator for CompType (TypeOf)
+        int ExhTempLTAbsLeavingTempIndex;          // index for exhaust potential less than thermal energy needed during cooling
+        int ExhTempLTAbsLeavingHeatingTempIndex;   // index for exhaust potential less than thermal energy needed during heating
+        std::string TypeOf;                        // Generator type
+        std::string ExhaustSourceName;             // Generator type Name
         bool envrnInit;
         Real64 oldCondSupplyTemp; // save the last iteration value of leaving condenser water temperature
 
@@ -190,16 +190,16 @@ namespace ChillerExhaustAbsorption {
               HeatVolFlowRateWasAutoSized(false), SizFac(0.0), CoolCapFTCurve(0), ThermalEnergyCoolFTCurve(0), ThermalEnergyCoolFPLRCurve(0),
               ElecCoolFTCurve(0), ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), ThermalEnergyHeatFHPLRCurve(0), isEnterCondensTemp(false),
               isWaterCooled(false), CHWLowLimitTemp(0.0), ExhaustAirInletNodeNum(0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0),
-              DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWPlantLoc{}, CDPlantLoc{}, HWPlantLoc{},
-              CompType_Num(GeneratorType::Invalid), ExhTempLTAbsLeavingTempIndex(0),
-              ExhTempLTAbsLeavingHeatingTempIndex(0), envrnInit(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0),
-              HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0), ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0),
-              CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0), ElectricPower(0.0), ElectricEnergy(0.0),
-              CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0), HeatElectricEnergy(0.0), ChillReturnTemp(0.0),
-              ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0), CondReturnTemp(0.0), CondSupplyTemp(0.0), CondWaterFlowRate(0.0),
-              HotWaterReturnTemp(0.0), HotWaterSupplyTemp(0.0), HotWaterFlowRate(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0),
-              CoolingCapacity(0.0), HeatingCapacity(0.0), FractionOfPeriodRunning(0.0), ThermalEnergyCOP(0.0), ExhaustInTemp(0.0), ExhaustInFlow(0.0),
-              ExhHeatRecPotentialHeat(0.0), ExhHeatRecPotentialCool(0.0)
+              DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0),
+              PossibleSubcooling(false), CWPlantLoc{}, CDPlantLoc{}, HWPlantLoc{}, CompType_Num(GeneratorType::Invalid),
+              ExhTempLTAbsLeavingTempIndex(0), ExhTempLTAbsLeavingHeatingTempIndex(0), envrnInit(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0),
+              CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0),
+              ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0), CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0),
+              ElectricPower(0.0), ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0),
+              HeatElectricEnergy(0.0), ChillReturnTemp(0.0), ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0), CondReturnTemp(0.0), CondSupplyTemp(0.0),
+              CondWaterFlowRate(0.0), HotWaterReturnTemp(0.0), HotWaterSupplyTemp(0.0), HotWaterFlowRate(0.0), CoolPartLoadRatio(0.0),
+              HeatPartLoadRatio(0.0), CoolingCapacity(0.0), HeatingCapacity(0.0), FractionOfPeriodRunning(0.0), ThermalEnergyCOP(0.0),
+              ExhaustInTemp(0.0), ExhaustInFlow(0.0), ExhHeatRecPotentialHeat(0.0), ExhHeatRecPotentialCool(0.0)
         {
         }
 

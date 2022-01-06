@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -702,7 +702,8 @@ namespace DataPlant {
         // If we are doing a common pipe simulation, and there is greater other-side flow than this side,
         //  then the "other side" demand needs to include getting the flow through the common pipe to the same setpoint
         //  as the flow going through the actual supply side
-        if (this->hasConstSpeedBranchPumps && this->plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply && thisPlantLoop.CommonPipeType != DataPlant::CommonPipeType::No) {
+        if (this->hasConstSpeedBranchPumps && this->plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply &&
+            thisPlantLoop.CommonPipeType != DataPlant::CommonPipeType::No) {
             const DataPlant::LoopSideLocation OtherSide = LoopSideOther[static_cast<int>(this->plantLoc.loopSideNum)];
             const int otherSideOutletNodeNum = thisPlantLoop.LoopSide(OtherSide).NodeNumOut;
             Real64 commonPipeFlow = state.dataLoopNodes->Node(otherSideOutletNodeNum).MassFlowRate - ThisLoopSideFlow;

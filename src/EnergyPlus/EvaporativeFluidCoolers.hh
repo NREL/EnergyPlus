@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -236,8 +236,8 @@ namespace EvaporativeFluidCoolers {
               WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0),
               WMFRGreaterThanMaxAvailErrIndex(0), EvapFluidCoolerAFRRFailedCount(0), EvapFluidCoolerAFRRFailedIndex(0), CapacityControl(0),
               BypassFraction(0.0), EvapLossMode(EvapLoss::ByMoistTheory), BlowdownMode(Blowdown::ByConcentration), SchedIDBlowdown(0), WaterTankID(0),
-              WaterTankDemandARRID(0), UserEvapLossFactor(0.0), DriftLossFraction(0.0), ConcentrationRatio(0.0), SuppliedByWaterSystem(false),
-              plantLoc{}, InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterInletNode(0), WaterOutletNode(0),
+              WaterTankDemandARRID(0), UserEvapLossFactor(0.0), DriftLossFraction(0.0), ConcentrationRatio(0.0),
+              SuppliedByWaterSystem(false), plantLoc{}, InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterInletNode(0), WaterOutletNode(0),
               WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), AirFlowRateRatio(0.0), WaterUsage(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true),
               OneTimeFlagForEachEvapFluidCooler(true), CheckEquipName(true), fluidCoolerInletWaterTemp(0.0), fluidCoolerOutletWaterTemp(0.0),
               FanEnergy(0.0), WaterAmountUsed(0.0), EvaporationVdot(0.0), EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0),

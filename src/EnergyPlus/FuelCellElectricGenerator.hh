@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -506,27 +506,27 @@ namespace FuelCellElectricGenerator {
         // Members
         // from input data and nested types for subsystems
         DataPlant::PlantEquipmentType Type;
-        std::string Name;                    // user identifier
-        std::string NameFCPM;                // name of FC Power Module
-        FCPowerModuleStruct FCPM;            // data for Power Module
-        std::string NameFCAirSup;            // name of air supply module for fuel cell
-        FCAirSupplyDataStruct AirSup;        // data for air supply module
-        std::string NameFCFuelSup;           // name of fuel supply module
-        int FuelSupNum;                      // index for fuel supply module structure
-        std::string NameFCWaterSup;          // name of water supply module
-        FCWaterSupplyDataStruct WaterSup;    // data for water supply module
-        std::string NameFCAuxilHeat;         // name of auxiliary heating module
-        FCAuxilHeatDataStruct AuxilHeat;     // data for auxiliary heating module
-        std::string NameExhaustHX;           // name of Exhaust HX module
-        FCExhaustHXDataStruct ExhaustHX;     // data for Exhaust heat exchanger module
-        std::string NameElecStorage;         // name of Battery module
-        FCElecStorageDataStruct ElecStorage; // data for Battery module
-        std::string NameInverter;            // name of Inverter Module
-        FCInverterDataStruct Inverter;       // data for Inverter module
-        std::string NameStackCooler;         // name of Inverter Module
-        FCStackCoolerDataStruct StackCooler; // data for Inverter module
-        PlantLocation CWPlantLoc{};                       // cooling water plant loop component index
-        FCReportDataStruct Report;           // data for reporting as E+ output variables
+        std::string Name;                          // user identifier
+        std::string NameFCPM;                      // name of FC Power Module
+        FCPowerModuleStruct FCPM;                  // data for Power Module
+        std::string NameFCAirSup;                  // name of air supply module for fuel cell
+        FCAirSupplyDataStruct AirSup;              // data for air supply module
+        std::string NameFCFuelSup;                 // name of fuel supply module
+        int FuelSupNum;                            // index for fuel supply module structure
+        std::string NameFCWaterSup;                // name of water supply module
+        FCWaterSupplyDataStruct WaterSup;          // data for water supply module
+        std::string NameFCAuxilHeat;               // name of auxiliary heating module
+        FCAuxilHeatDataStruct AuxilHeat;           // data for auxiliary heating module
+        std::string NameExhaustHX;                 // name of Exhaust HX module
+        FCExhaustHXDataStruct ExhaustHX;           // data for Exhaust heat exchanger module
+        std::string NameElecStorage;               // name of Battery module
+        FCElecStorageDataStruct ElecStorage;       // data for Battery module
+        std::string NameInverter;                  // name of Inverter Module
+        FCInverterDataStruct Inverter;             // data for Inverter module
+        std::string NameStackCooler;               // name of Inverter Module
+        FCStackCoolerDataStruct StackCooler;       // data for Inverter module
+        PlantLocation CWPlantLoc{};                             // cooling water plant loop component index
+        FCReportDataStruct Report;                 // data for reporting as E+ output variables
         // calculated whole-system level variables
         Real64 ACPowerGen; // Net output from SOFC unit
         Real64 QconvZone;  // convective heat lost to surrounding zone
@@ -544,9 +544,9 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCDataStruct()
-            : Type(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWPlantLoc{}, ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0), DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true),
-              MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true), SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0),
-              SolverErr_Type2_IterIndex(0)
+            : Type(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWPlantLoc{}, ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
+              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true),
+              SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0), SolverErr_Type2_IterIndex(0)
         {
         }
 

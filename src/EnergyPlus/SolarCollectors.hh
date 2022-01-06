@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,26 +126,26 @@ namespace SolarCollectors {
     struct CollectorData : PlantComponent
     {
         // Members
-        std::string Name;                   // Name of solar collector
-        std::string BCType;                 // Boundary condition Type
-        std::string OSCMName;               // OtherSideConditionsModel
-        int VentCavIndex;                   // index of ventilated cavity object
-        TankTypeEnum ICSType_Num;           // ICS collector type number
-        DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
+        std::string Name;                         // Name of solar collector
+        std::string BCType;                       // Boundary condition Type
+        std::string OSCMName;                     // OtherSideConditionsModel
+        int VentCavIndex;                         // index of ventilated cavity object
+        TankTypeEnum ICSType_Num;                 // ICS collector type number
+        DataPlant::PlantEquipmentType Type;       // Plant Side Connection: 'Type' assigned in DataPlant
         PlantLocation plantLoc{};           // Water plant loop component location object
-        bool Init;                          // Flag for initialization:  TRUE means do the init
-        bool InitSizing;                    // Flag for initialization of plant sizing
-        int Parameters;                     // Parameters object number
-        int Surface;                        // Surface object number
-        int InletNode;                      // Inlet node
-        Real64 InletTemp;                   // Inlet temperature from plant (C)
-        int OutletNode;                     // Outlet node
-        Real64 OutletTemp;                  // Outlet temperature or stagnation temperature in the collector (C)
-        Real64 MassFlowRate;                // Mass flow rate through the collector (kg/s)
-        Real64 MassFlowRateMax;             // Maximum mass flow rate through the collector (kg/s)
-        Real64 VolFlowRateMax;              // Maximum volumetric flow rate through the collector (m3/s)
-        int ErrIndex;                       // Error index for recurring error
-        int IterErrIndex;                   // Error index for recurring error (iteration - did not converge)
+        bool Init;                                // Flag for initialization:  TRUE means do the init
+        bool InitSizing;                          // Flag for initialization of plant sizing
+        int Parameters;                           // Parameters object number
+        int Surface;                              // Surface object number
+        int InletNode;                            // Inlet node
+        Real64 InletTemp;                         // Inlet temperature from plant (C)
+        int OutletNode;                           // Outlet node
+        Real64 OutletTemp;                        // Outlet temperature or stagnation temperature in the collector (C)
+        Real64 MassFlowRate;                      // Mass flow rate through the collector (kg/s)
+        Real64 MassFlowRateMax;                   // Maximum mass flow rate through the collector (kg/s)
+        Real64 VolFlowRateMax;                    // Maximum volumetric flow rate through the collector (m3/s)
+        int ErrIndex;                             // Error index for recurring error
+        int IterErrIndex;                         // Error index for recurring error (iteration - did not converge)
         // Report variables
         Real64 IncidentAngleModifier; // Net incident angle modifier
         Real64 Efficiency;            // Thermal efficiency of solar energy conversion
