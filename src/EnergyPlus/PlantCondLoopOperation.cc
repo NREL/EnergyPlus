@@ -169,7 +169,7 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     auto &this_component(loop_side.Branch(plantLoc.branchNum).Comp(plantLoc.compNum));
 
     // Implement EMS control commands
-    ActivateEMSControls(state, plantLoc.loopNum, plantLoc.loopSideNum, plantLoc.branchNum, plantLoc.compNum, LoopShutDownFlag);
+    ActivateEMSControls(state, plantLoc, LoopShutDownFlag);
 
     // Schedules are checked and CurOpScheme updated on FirstHVACIteration in InitLoadDistribution
     // Here we just load CurOpScheme to a local variable
@@ -3509,7 +3509,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
 }
 
 void ActivateEMSControls(
-    EnergyPlusData &state, int const LoopNum, const LoopSideLocation LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag)
+    EnergyPlusData &state, PlantLocation const &plantLoc, bool &LoopShutDownFlag)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3557,15 +3557,15 @@ void ActivateEMSControls(
     // MODULE VARIABLE DECLARATIONS:
 
     // set up some nice references to avoid lookups
-    auto &this_loop(state.dataPlnt->PlantLoop(LoopNum));
-    auto &this_loopside(this_loop.LoopSide(LoopSideNum));
-    auto &this_comp(this_loopside.Branch(BranchNum).Comp(CompNum));
+    auto &this_loop(state.dataPlnt->PlantLoop(plantLoc.loopNum));
+    auto &this_loopside(this_loop.LoopSide(plantLoc.loopSideNum));
+    auto &this_comp(this_loopside.Branch(plantLoc.branchNum).Comp(plantLoc.compNum));
 
     // Loop Control
     if (this_loop.EMSCtrl) {
         if (this_loop.EMSValue <= 0.0) {
             LoopShutDownFlag = true;
-            TurnOffLoopEquipment(state, LoopNum);
+            TurnOffLoopEquipment(state, plantLoc.loopNum);
             return;
         } else {
             LoopShutDownFlag = false;
@@ -3577,7 +3577,7 @@ void ActivateEMSControls(
     // Half-loop control
     if (this_loopside.EMSCtrl) {
         if (this_loopside.EMSValue <= 0.0) {
-            TurnOffLoopSideEquipment(state, LoopNum, LoopSideNum);
+            TurnOffLoopSideEquipment(state, plantLoc.loopNum, plantLoc.loopSideNum);
             return;
         } else {
             // do nothing:  can't turn all LoopSide equip. ON with loop switch
