@@ -258,7 +258,7 @@ void ManagePlantLoadDistribution(EnergyPlusData &state,
     case OpScheme::CompSetPtBased: {
         // check for EMS Control
         TurnOnPlantLoopPipes(state, plantLoc.loopNum, plantLoc.loopSideNum);
-        FindCompSPLoad(state, plantLoc.loopNum, plantLoc.loopSideNum, plantLoc.branchNum, plantLoc.compNum, CurCompLevelOpNum);
+        FindCompSPLoad(state, plantLoc, CurCompLevelOpNum);
         break;
     }
     case OpScheme::EMS: {
@@ -2954,10 +2954,7 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
 }
 
 void FindCompSPLoad(EnergyPlusData &state,
-                    int const LoopNum,
-                    const LoopSideLocation LoopSideNum,
-                    int const BranchNum,
-                    int const CompNum,
+                    PlantLocation const &plantLoc,
                     int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
 )
 {
@@ -3002,7 +2999,7 @@ void FindCompSPLoad(EnergyPlusData &state,
     Real64 CurrentDemandForCoolingOp;
     Real64 CurrentDemandForHeatingOp;
 
-    auto &this_component(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
+    auto &this_component(CompData::getPlantComponent(state, plantLoc));
 
     // find the pointer to the 'PlantLoop()%OpScheme()'...data structure
     NumEquipLists = this_component.OpScheme(OpNum).NumEquipLists;
@@ -3018,31 +3015,31 @@ void FindCompSPLoad(EnergyPlusData &state,
     CompMinLoad = this_component.MinLoad;
     CompMaxLoad = this_component.MaxLoad;
     CompOptLoad = this_component.OptLoad;
-    DemandNode = state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).DemandNodeNum;
-    SetPtNode = state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointNodeNum;
+    DemandNode = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).DemandNodeNum;
+    SetPtNode = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointNodeNum;
     TempIn = state.dataLoopNodes->Node(DemandNode).Temp;
-    rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+    rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
 
-    DemandMdot = state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointFlowRate * rho;
+    DemandMdot = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointFlowRate * rho;
     // DemandMDot is a constant design flow rate, next based on actual current flow rate for accurate current demand?
     ActualMdot = state.dataLoopNodes->Node(DemandNode).MassFlowRate;
     CurSpecHeat = GetSpecificHeatGlycol(
-        state, state.dataPlnt->PlantLoop(LoopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+        state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
     if ((ActualMdot > 0.0) && (ActualMdot != DemandMdot)) {
         DemandMdot = ActualMdot;
     }
 
-    switch (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme) {
+    switch (state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopDemandCalcScheme) {
     case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
         TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPoint;
         break;
     }
     case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-        if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::CoolingOp) {
+        if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::CoolingOp) {
             TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointHi;
-        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::HeatingOp) {
+        } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::HeatingOp) {
             TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointLo;
-        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::DualOp) {
+        } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::DualOp) {
             CurrentDemandForCoolingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointHi - TempIn);
             CurrentDemandForHeatingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointLo - TempIn);
             if ((CurrentDemandForCoolingOp < 0.0) && (CurrentDemandForHeatingOp <= 0.0)) { // cooling
@@ -3074,7 +3071,7 @@ void FindCompSPLoad(EnergyPlusData &state,
         this_component.EquipDemand = CompDemand;
 
         // set MyLoad and runflag
-        if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::CoolingOp) {
+        if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::CoolingOp) {
             if (CompDemand < (-LoopDemandTol)) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
@@ -3082,7 +3079,7 @@ void FindCompSPLoad(EnergyPlusData &state,
                 this_component.ON = false;
                 this_component.MyLoad = 0.0;
             }
-        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::HeatingOp) {
+        } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::HeatingOp) {
             if (CompDemand > LoopDemandTol) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
@@ -3090,7 +3087,7 @@ void FindCompSPLoad(EnergyPlusData &state,
                 this_component.ON = false;
                 this_component.MyLoad = 0.0;
             }
-        } else if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::DualOp) {
+        } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::DualOp) {
             if (CompDemand > LoopDemandTol || CompDemand < (-LoopDemandTol)) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
