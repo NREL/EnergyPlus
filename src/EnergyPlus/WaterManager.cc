@@ -1697,7 +1697,7 @@ namespace WaterManager {
 
     void ReportRainfall(EnergyPlusData &state)
     {
-        Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
+        constexpr std::array<std::string, 12> = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         for (int i = 0; i < 12; i++) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchMonthlyTotalPrecInWeather,

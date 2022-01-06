@@ -5959,7 +5959,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         MaxHourlyPrecIdx = i;
                     }
                 }
-                std::string Months[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+                constexpr std::array<std::string, 12> Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Max Hourly Precipitation [mm]", MaxHourlyPrec);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWthrVal, "Max Hourly Precipitation Occurs in", Months[MaxHourlyPrecIdx]);
             } break;
