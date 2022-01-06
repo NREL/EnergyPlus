@@ -309,18 +309,15 @@ void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
         ErlVariableNum = state.dataRuntimeLang->EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
         state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value.Type = Value::Null;
         *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
-        switch (state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed) {
-        case PtrDataType::Real: {
-            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
-        } break;
-        case PtrDataType::Integer: {
-            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
-        } break;
-        case PtrDataType::Logical: {
-            *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
-        } break;
-        default:
-            break;
+        {
+            auto const SELECT_CASE_var(state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
+            if (SELECT_CASE_var == PtrDataType::Real) {
+                *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
+            } else if (SELECT_CASE_var == PtrDataType::Integer) {
+                *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
+            } else if (SELECT_CASE_var == PtrDataType::Logical) {
+                *state.dataRuntimeLang->EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+            }
         }
     }
 
@@ -798,112 +795,112 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
     InstructionNum = 1;
     while (InstructionNum <= state.dataRuntimeLang->ErlStack(StackNum).NumInstructions) {
 
-        switch (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword) {
-        case DataRuntimeLanguage::ErlKeywordParam::None: {
-            // There probably shouldn't be any of these
-        } break;
-        case DataRuntimeLanguage::ErlKeywordParam::Return: {
-            if (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
-                ReturnValue =
-                    EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
-            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-            break; // RETURN always terminates an instruction stack
-        }
-        case DataRuntimeLanguage::ErlKeywordParam::Set: {
-            ReturnValue =
-                EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
-            ESVariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-            if ((!state.dataRuntimeLang->ErlVariable(ESVariableNum).ReadOnly) &&
-                (!state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable)) {
-                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value = ReturnValue;
-            } else if (state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable) {
-                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Number = ReturnValue.Number;
-                state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Error = ReturnValue.Error;
-            }
+        {
+            auto const SELECT_CASE_var(state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Keyword);
 
-            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-        } break;
-        case DataRuntimeLanguage::ErlKeywordParam::Run: {
-            ReturnValue.Type = Value::String;
-            ReturnValue.String = "";
-            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-            ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
-        } break;
-        case DataRuntimeLanguage::ErlKeywordParam::If:
-        case DataRuntimeLanguage::ErlKeywordParam::Else: { // same???
-            ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-            InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-            if (ExpressionNum > 0) { // could be 0 if this was an ELSE
+            if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::None) {
+                // There probably shouldn't be any of these
+
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Return) {
+                if (state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
+                    ReturnValue =
+                        EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
+                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                break; // RETURN always terminates an instruction stack
+
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Set) {
+
+                ReturnValue =
+                    EvaluateExpression(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
+                ESVariableNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                if ((!state.dataRuntimeLang->ErlVariable(ESVariableNum).ReadOnly) &&
+                    (!state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable)) {
+                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value = ReturnValue;
+                } else if (state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.TrendVariable) {
+                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Number = ReturnValue.Number;
+                    state.dataRuntimeLang->ErlVariable(ESVariableNum).Value.Error = ReturnValue.Error;
+                }
+
+                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Run) {
+                ReturnValue.Type = Value::String;
+                ReturnValue.String = "";
+                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                ReturnValue = EvaluateStack(state, state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+            } else if ((SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::If) ||
+                       (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Else)) { // same???
+                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+                if (ExpressionNum > 0) { // could be 0 if this was an ELSE
+                    ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    if (ReturnValue.Number == 0.0) { //  This is the FALSE case
+                        // Eventually should handle strings and arrays too
+                        InstructionNum = InstructionNum2;
+                        continue;
+                    }
+                } else {
+                    // KeywordELSE  -- kind of a kludge
+                    ReturnValue.Type = Value::Number;
+                    ReturnValue.Number = 1.0;
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                }
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::Goto) {
+                InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+
+                // For debug purposes only...
+                ReturnValue.Type = Value::String;
+                ReturnValue.String = ""; // IntegerToString(InstructionNum)
+
+                continue;
+                // PE if this ever went out of bounds, would the DO loop save it?  or need check here?
+
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::EndIf) {
+                ReturnValue.Type = Value::String;
+                ReturnValue.String = "";
+                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::While) {
+                // evaluate expression at while, skip to past endwhile if not true
+                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                 ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                 WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                 if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                     // Eventually should handle strings and arrays too
                     InstructionNum = InstructionNum2;
+                    // CYCLE
+                }
+            } else if (SELECT_CASE_var == DataRuntimeLanguage::ErlKeywordParam::EndWhile) {
+
+                // reevaluate expression at While and goto there if true, otherwise continue
+                ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
+                InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
+                ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
+                if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
+                    // Eventually should handle strings and arrays too
+                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
+                    InstructionNum = InstructionNum2;
+                    ++WhileLoopExitCounter;
+
                     continue;
+                } else { // false, leave while block
+                    if (WhileLoopExitCounter > MaxWhileLoopIterations) {
+                        WhileLoopExitCounter = 0;
+                        ReturnValue.Type = Value::Error;
+                        ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
+                        WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    } else {
+                        ReturnValue.Type = Value::Number;
+                        ReturnValue.Number = 0.0;
+                        WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WhileLoopExitCounter = 0;
+                    }
                 }
             } else {
-                // KeywordELSE  -- kind of a kludge
-                ReturnValue.Type = Value::Number;
-                ReturnValue.Number = 1.0;
-                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                ShowFatalError(state, "Fatal error in RunStack:  Unknown keyword.");
             }
-        } break;
-        case DataRuntimeLanguage::ErlKeywordParam::Goto: {
-            InstructionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-
-            // For debug purposes only...
-            ReturnValue.Type = Value::String;
-            ReturnValue.String = ""; // IntegerToString(InstructionNum)
-
-            continue;
-            // PE if this ever went out of bounds, would the DO loop save it?  or need check here?
-        } break;
-        case DataRuntimeLanguage::ErlKeywordParam::EndIf: {
-            ReturnValue.Type = Value::String;
-            ReturnValue.String = "";
-            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-        } break;
-        case DataRuntimeLanguage::ErlKeywordParam::While: {
-            // evaluate expression at while, skip to past endwhile if not true
-            ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-            InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-            ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
-            WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-            if (ReturnValue.Number == 0.0) { //  This is the FALSE case
-                // Eventually should handle strings and arrays too
-                InstructionNum = InstructionNum2;
-                // CYCLE
-            }
-        } break;
-        case DataRuntimeLanguage::ErlKeywordParam::EndWhile: {
-            // reevaluate expression at While and goto there if true, otherwise continue
-            ExpressionNum = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument1;
-            InstructionNum2 = state.dataRuntimeLang->ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-            ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
-            if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
-                // Eventually should handle strings and arrays too
-                WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
-                InstructionNum = InstructionNum2;
-                ++WhileLoopExitCounter;
-
-                continue;
-            } else { // false, leave while block
-                if (WhileLoopExitCounter > MaxWhileLoopIterations) {
-                    WhileLoopExitCounter = 0;
-                    ReturnValue.Type = Value::Error;
-                    ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                } else {
-                    ReturnValue.Type = Value::Number;
-                    ReturnValue.Number = 0.0;
-                    WriteTrace(state, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    WhileLoopExitCounter = 0;
-                }
-            }
-        } break;
-        default: {
-            ShowFatalError(state, "Fatal error in RunStack:  Unknown keyword.");
-        } break;
         }
 
         ++InstructionNum;
