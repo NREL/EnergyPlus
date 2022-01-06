@@ -1706,6 +1706,7 @@ namespace WaterManager {
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchMonthlyTotalHrRain, Months[i], state.dataWaterData->RainFall.numRainyHoursInWeather[i]);
         }
+        // report rain collector
         if (state.dataWaterData->NumWaterStorageTanks > 0) {
             for (int i = 0; i < 12; i++) {
                 OutputReportPredefined::PreDefTableEntry(state,
@@ -1720,20 +1721,18 @@ namespace WaterManager {
                     state, state.dataOutRptPredefined->pdchMonthlyTotalRainCol, Months[i], accVolCollectedMonthly);
             }
         }
-        // check whether there are eco roofs
-        bool ecoroofFlag = false;
-        for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
-            ecoroofFlag = (state.dataConstruction->Construct(ConstrNum).TypeIsEcoRoof) || ecoroofFlag;
-        }
-        // report ecoroof
-        if (ecoroofFlag) {
-            for (int i = 0; i < 12; i++) {
-                OutputReportPredefined::PreDefTableEntry(state,
-                                                         state.dataOutRptPredefined->pdchMonthlyTotalPrecInRoofIrr,
-                                                         Months[i],
-                                                         state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[i]);
-                OutputReportPredefined::PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchMonthlyTotalIrrDep, Months[i], state.dataEcoRoofMgr->MonthlyIrrigation[i]);
+        // report eco roof
+        for (auto const &c : state.dataConstruction->Construct) {
+            if (c.TypeIsEcoRoof) {
+                for (int i = 0; i < 12; i++) {
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchMonthlyTotalPrecInRoofIrr,
+                                                             Months[i],
+                                                             state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[i]);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchMonthlyTotalIrrDep, Months[i], state.dataEcoRoofMgr->MonthlyIrrigation[i]);
+                }
+                break;
             }
         }
     }
