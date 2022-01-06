@@ -6091,10 +6091,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->SavedUseOutletTemp = 0.0;
 
             this->Mass = this->Volume * rho;
-            this->UseBranchControlType = state.dataPlnt->PlantLoop(this->UseSidePlantLoc.loopNum)
-                                             .LoopSide(this->UseSidePlantLoc.loopSideNum)
-                                             .Branch(this->UseSidePlantLoc.branchNum)
-                                             .Comp(this->UseSidePlantLoc.compNum)
+            this->UseBranchControlType = DataPlant::CompData::getPlantComponent(state, this->UseSidePlantLoc)
                                              .FlowCtrl;
         }
 
@@ -6111,10 +6108,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->SourceMassFlowRate = 0.0;
             this->SavedSourceOutletTemp = 0.0;
 
-            this->SourceBranchControlType = state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum)
-                                                .LoopSide(this->SrcSidePlantLoc.loopSideNum)
-                                                .Branch(this->SrcSidePlantLoc.branchNum)
-                                                .Comp(this->SrcSidePlantLoc.compNum)
+            this->SourceBranchControlType = DataPlant::CompData::getPlantComponent(state, this->SrcSidePlantLoc)
                                                 .FlowCtrl;
         }
 

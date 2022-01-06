@@ -2411,17 +2411,11 @@ namespace UserDefinedComponents {
                     ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
                 // set user input for flow priority
-                state.dataPlnt->PlantLoop(this->Loop.plantLoc.loopNum)
-                    .LoopSide(this->Loop.plantLoc.loopSideNum)
-                    .Branch(this->Loop.plantLoc.branchNum)
-                    .Comp(this->Loop.plantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->Loop.plantLoc)
                     .FlowPriority = this->Loop.FlowPriority;
 
                 // set user input for how loads served
-                state.dataPlnt->PlantLoop(this->Loop.plantLoc.loopNum)
-                    .LoopSide(this->Loop.plantLoc.loopSideNum)
-                    .Branch(this->Loop.plantLoc.branchNum)
-                    .Comp(this->Loop.plantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->Loop.plantLoc)
                     .HowLoadServed = this->Loop.HowLoadServed;
             }
             this->myOneTimeFlag = false;
@@ -2489,17 +2483,11 @@ namespace UserDefinedComponents {
                         ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
                     // set user input for flow priority
-                    state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum)
-                        .LoopSide(this->Loop(loop).plantLoc.loopSideNum)
-                        .Branch(this->Loop(loop).plantLoc.branchNum)
-                        .Comp(this->Loop(loop).plantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc)
                         .FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
-                    state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum)
-                        .LoopSide(this->Loop(loop).plantLoc.loopSideNum)
-                        .Branch(this->Loop(loop).plantLoc.branchNum)
-                        .Comp(this->Loop(loop).plantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc)
                         .HowLoadServed = this->Loop(loop).HowLoadServed;
                 }
             }
@@ -2578,17 +2566,11 @@ namespace UserDefinedComponents {
                         ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
                     // set user input for flow priority
-                    state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum)
-                        .LoopSide(this->Loop(loop).plantLoc.loopSideNum)
-                        .Branch(this->Loop(loop).plantLoc.branchNum)
-                        .Comp(this->Loop(loop).plantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc)
                         .FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
-                    state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum)
-                        .LoopSide(this->Loop(loop).plantLoc.loopSideNum)
-                        .Branch(this->Loop(loop).plantLoc.branchNum)
-                        .Comp(this->Loop(loop).plantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc)
                         .HowLoadServed = this->Loop(loop).HowLoadServed;
                 }
             }
@@ -2684,18 +2666,12 @@ namespace UserDefinedComponents {
         }
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapLowOutLimit) {
-            state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum)
-                .LoopSide(this->Loop(LoopNum).plantLoc.loopSideNum)
-                .Branch(this->Loop(LoopNum).plantLoc.branchNum)
-                .Comp(this->Loop(LoopNum).plantLoc.compNum)
+            DataPlant::CompData::getPlantComponent(state, this->Loop(LoopNum).plantLoc)
                 .MinOutletTemp = this->Loop(LoopNum).LowOutTempLimit;
         }
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapHiOutLimit) {
-            state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum)
-                .LoopSide(this->Loop(LoopNum).plantLoc.loopSideNum)
-                .Branch(this->Loop(LoopNum).plantLoc.branchNum)
-                .Comp(this->Loop(LoopNum).plantLoc.compNum)
+            DataPlant::CompData::getPlantComponent(state, this->Loop(LoopNum).plantLoc)
                 .MaxOutletTemp = this->Loop(LoopNum).HiOutTempLimit;
         }
     }
@@ -2721,17 +2697,11 @@ namespace UserDefinedComponents {
                 }
 
                 // set user input for flow priority
-                state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).plantLoc.loopNum)
-                    .LoopSide(this->Loop(ConnectionNum).plantLoc.loopSideNum)
-                    .Branch(this->Loop(ConnectionNum).plantLoc.branchNum)
-                    .Comp(this->Loop(ConnectionNum).plantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->Loop(ConnectionNum).plantLoc)
                     .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
 
                 // set user input for how loads served
-                state.dataPlnt->PlantLoop(this->Loop(ConnectionNum).plantLoc.loopNum)
-                    .LoopSide(this->Loop(ConnectionNum).plantLoc.loopSideNum)
-                    .Branch(this->Loop(ConnectionNum).plantLoc.branchNum)
-                    .Comp(this->Loop(ConnectionNum).plantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->Loop(ConnectionNum).plantLoc)
                     .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;
             }
 

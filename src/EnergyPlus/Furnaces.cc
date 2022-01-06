@@ -5429,10 +5429,7 @@ namespace Furnaces {
                     }
                 }
                 // fill outlet node for coil
-                state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode = state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopNum)
-                                                                             .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.loopSideNum)
-                                                                             .Branch(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.branchNum)
-                                                                             .Comp(state.dataFurnaces->Furnace(FurnaceNum).plantLoc.compNum)
+                state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataFurnaces->Furnace(FurnaceNum).plantLoc)
                                                                              .NodeNumOut;
                 state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
@@ -5497,10 +5494,7 @@ namespace Furnaces {
                 }
                 // fill outlet node for coil
                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode =
-                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopNum)
-                        .LoopSide(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.loopSideNum)
-                        .Branch(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.branchNum)
-                        .Comp(state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc)
                         .NodeNumOut;
                 state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant

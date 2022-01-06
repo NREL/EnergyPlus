@@ -4186,10 +4186,7 @@ void InitPTUnit(EnergyPlusData &state,
             }
 
             // fill outlet node for coil
-            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopNum)
-                                                                        .LoopSide(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopSideNum)
-                                                                        .Branch(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.branchNum)
-                                                                        .Comp(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.compNum)
+            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc)
                                                                         .NodeNumOut;
             state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidOutletNodeNum = state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode;
             MyPlantScanFlag(PTUnitNum) = false;
@@ -4250,10 +4247,7 @@ void InitPTUnit(EnergyPlusData &state,
                 }
             }
             // fill outlet node for coil
-            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum)
-                                                                        .LoopSide(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopSideNum)
-                                                                        .Branch(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.branchNum)
-                                                                        .Comp(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.compNum)
+            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc)
                                                                         .NodeNumOut;
             MyPlantScanFlag(PTUnitNum) = false;
         } else { // pthp not connected to plant

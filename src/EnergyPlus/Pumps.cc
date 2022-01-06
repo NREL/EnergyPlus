@@ -1501,10 +1501,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
         if (errFlag) {
             ShowFatalError(state, "InitializePumps: Program terminated due to previous condition(s).");
         }
-        state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-            .LoopSide(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum)
-            .Branch(state.dataPumps->PumpEquip(PumpNum).plantLoc.branchNum)
-            .Comp(state.dataPumps->PumpEquip(PumpNum).plantLoc.compNum)
+        DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc)
             .CompNum = PumpNum;
 
         SizePump(state, PumpNum);
@@ -1575,10 +1572,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
 
         if (state.dataPumps->PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
             // reset flow priority appropriately (default was for Intermittent)
-            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                .LoopSide(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum)
-                .Branch(state.dataPumps->PumpEquip(PumpNum).plantLoc.branchNum)
-                .Comp(state.dataPumps->PumpEquip(PumpNum).plantLoc.compNum)
+            DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc)
                 .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
         }
 

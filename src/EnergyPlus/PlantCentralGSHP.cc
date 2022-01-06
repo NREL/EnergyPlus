@@ -1590,16 +1590,10 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
         if (this->VariableFlowCH) {
             // Reset flow priority
             if (LoopNum == this->CWPlantLoc.loopNum) {
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             } else if (LoopNum == this->HWPlantLoc.loopNum) {
-                state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum)
-                    .LoopSide(this->HWPlantLoc.loopSideNum)
-                    .Branch(this->HWPlantLoc.branchNum)
-                    .Comp(this->HWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->HWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 

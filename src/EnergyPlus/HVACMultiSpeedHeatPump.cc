@@ -1997,10 +1997,7 @@ namespace HVACMultiSpeedHeatPump {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).plantLoc.loopNum)
-                                                               .LoopSide(MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum)
-                                                               .Branch(MSHeatPump(MSHeatPumpNum).plantLoc.branchNum)
-                                                               .Comp(MSHeatPump(MSHeatPumpNum).plantLoc.compNum)
+                MSHeatPump(MSHeatPumpNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).plantLoc)
                                                                .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
 
@@ -2028,10 +2025,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).CoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).plantLoc.loopNum)
-                                                               .LoopSide(MSHeatPump(MSHeatPumpNum).plantLoc.loopSideNum)
-                                                               .Branch(MSHeatPump(MSHeatPumpNum).plantLoc.branchNum)
-                                                               .Comp(MSHeatPump(MSHeatPumpNum).plantLoc.compNum)
+                MSHeatPump(MSHeatPumpNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).plantLoc)
                                                                .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
             }
@@ -2063,10 +2057,7 @@ namespace HVACMultiSpeedHeatPump {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum)
-                                                                   .LoopSide(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum)
-                                                                   .Branch(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum)
-                                                                   .Comp(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum)
+                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).SuppPlantLoc)
                                                                    .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
 
@@ -2094,10 +2085,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = state.dataPlnt->PlantLoop(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopNum)
-                                                                   .LoopSide(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.loopSideNum)
-                                                                   .Branch(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.branchNum)
-                                                                   .Comp(MSHeatPump(MSHeatPumpNum).SuppPlantLoc.compNum)
+                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).SuppPlantLoc)
                                                                    .NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
             }

@@ -817,10 +817,7 @@ namespace UnitHeater {
                 }
 
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum =
-                    state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum)
-                        .LoopSide(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopSideNum)
-                        .Branch(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.branchNum)
-                        .Comp(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc)
                         .NodeNumOut;
             }
             state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) = false;

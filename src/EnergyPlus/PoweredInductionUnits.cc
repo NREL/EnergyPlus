@@ -888,10 +888,7 @@ void InitPIU(EnergyPlusData &state,
                 ShowFatalError(state, "InitPIU: Program terminated due to previous condition(s).");
             }
             state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum =
-                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum)
-                    .LoopSide(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopSideNum)
-                    .Branch(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.branchNum)
-                    .Comp(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc)
                     .NodeNumOut;
         }
         MyPlantScanFlag(PIUNum) = false;

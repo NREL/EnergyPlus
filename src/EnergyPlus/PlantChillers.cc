@@ -2043,19 +2043,13 @@ namespace PlantChillers {
 
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
@@ -4099,19 +4093,13 @@ namespace PlantChillers {
 
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
                 // check if setpoint on outlet node
                 if ((state.dataLoopNodes->Node(this->EvapOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
@@ -6065,19 +6053,13 @@ namespace PlantChillers {
 
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node
@@ -7497,19 +7479,13 @@ namespace PlantChillers {
             }
             if (this->FlowMode == DataPlant::FlowMode::Constant) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
                 // reset flow priority
-                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                    .LoopSide(this->CWPlantLoc.loopSideNum)
-                    .Branch(this->CWPlantLoc.branchNum)
-                    .Comp(this->CWPlantLoc.compNum)
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
                     .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
 
                 // check if setpoint on outlet node

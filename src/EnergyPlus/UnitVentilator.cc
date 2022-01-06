@@ -1531,10 +1531,7 @@ namespace UnitVentilator {
                 }
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum =
-                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum)
-                        .LoopSide(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopSideNum)
-                        .Branch(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.branchNum)
-                        .Comp(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc)
                         .NodeNumOut;
             }
             if ((state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
@@ -1557,10 +1554,7 @@ namespace UnitVentilator {
                 }
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ColdCoilOutNodeNum =
-                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopNum)
-                        .LoopSide(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopSideNum)
-                        .Branch(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.branchNum)
-                        .Comp(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc)
                         .NodeNumOut;
             } else {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent)

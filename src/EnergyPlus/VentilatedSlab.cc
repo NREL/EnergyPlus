@@ -1599,10 +1599,7 @@ namespace VentilatedSlab {
                 }
 
                 state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum =
-                    state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum)
-                        .LoopSide(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopSideNum)
-                        .Branch(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.branchNum)
-                        .Comp(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc)
                         .NodeNumOut;
             }
             if ((state.dataVentilatedSlab->VentSlab(Item).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
@@ -1624,10 +1621,7 @@ namespace VentilatedSlab {
                     ShowFatalError(state, "InitVentilatedSlab: Program terminated due to previous condition(s).");
                 }
                 state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum =
-                    state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum)
-                        .LoopSide(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopSideNum)
-                        .Branch(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.branchNum)
-                        .Comp(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.compNum)
+                    DataPlant::CompData::getPlantComponent(state, state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc)
                         .NodeNumOut;
             } else {
                 if (state.dataVentilatedSlab->VentSlab(Item).CCoilPresent)

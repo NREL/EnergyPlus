@@ -1541,10 +1541,7 @@ namespace HVACUnitaryBypassVAV {
                 }
 
                 // fill outlet node for heating coil
-                CBVAV(CBVAVNum).CoilOutletNode = state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum)
-                                                     .LoopSide(CBVAV(CBVAVNum).plantLoc.loopSideNum)
-                                                     .Branch(CBVAV(CBVAVNum).plantLoc.branchNum)
-                                                     .Comp(CBVAV(CBVAVNum).plantLoc.compNum)
+                CBVAV(CBVAVNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, CBVAV(CBVAVNum).plantLoc)
                                                      .NodeNumOut;
                 state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
 

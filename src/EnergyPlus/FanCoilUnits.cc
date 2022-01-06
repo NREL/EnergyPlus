@@ -1179,11 +1179,7 @@ namespace FanCoilUnits {
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
                 }
 
-                FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum)
-                                                                     .LoopSide(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum)
-                                                                     .Branch(FanCoil(FanCoilNum).HeatCoilPlantLoc.branchNum)
-                                                                     .Comp(FanCoil(FanCoilNum).HeatCoilPlantLoc.compNum)
-                                                                     .NodeNumOut;
+                FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum = DataPlant::CompData::getPlantComponent(state, FanCoil(FanCoilNum).HeatCoilPlantLoc).NodeNumOut;
 
             } else if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Electric) {
                 // do nothing, valid type
@@ -1199,10 +1195,7 @@ namespace FanCoilUnits {
                     ShowContinueError(state, "Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
                 }
-                FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum)
-                                                                     .LoopSide(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum)
-                                                                     .Branch(FanCoil(FanCoilNum).CoolCoilPlantLoc.branchNum)
-                                                                     .Comp(FanCoil(FanCoilNum).CoolCoilPlantLoc.compNum)
+                FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum = DataPlant::CompData::getPlantComponent(state, FanCoil(FanCoilNum).CoolCoilPlantLoc)
                                                                      .NodeNumOut;
             } else {
                 ShowFatalError(state, "InitFanCoilUnits: FanCoil=" + FanCoil(FanCoilNum).Name + ", invalid cooling coil type. Program terminated.");

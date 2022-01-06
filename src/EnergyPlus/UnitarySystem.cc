@@ -747,10 +747,7 @@ namespace UnitarySystems {
                     this->MaxCoolCoilFluidFlow *= rho;
                 }
                 // fill outlet node for coil
-                this->CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->CoolCoilPlantLoc.loopNum)
-                                                       .LoopSide(this->CoolCoilPlantLoc.loopSideNum)
-                                                       .Branch(this->CoolCoilPlantLoc.branchNum)
-                                                       .Comp(this->CoolCoilPlantLoc.compNum)
+                this->CoolCoilFluidOutletNodeNum = DataPlant::CompData::getPlantComponent(state, this->CoolCoilPlantLoc)
                                                        .NodeNumOut;
             }
             DataPlant::PlantEquipmentType TypeOfCoilWaterHeating = DataPlant::PlantEquipmentType::Invalid;
@@ -809,10 +806,7 @@ namespace UnitarySystems {
                     }
                 }
                 // fill outlet node for coil
-                this->HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->HeatCoilPlantLoc.loopNum)
-                                                       .LoopSide(this->HeatCoilPlantLoc.loopSideNum)
-                                                       .Branch(this->HeatCoilPlantLoc.branchNum)
-                                                       .Comp(this->HeatCoilPlantLoc.compNum)
+                this->HeatCoilFluidOutletNodeNum = DataPlant::CompData::getPlantComponent(state, this->HeatCoilPlantLoc)
                                                        .NodeNumOut;
             }
 
@@ -860,10 +854,7 @@ namespace UnitarySystems {
                         rho;
                 }
                 // fill outlet node for coil
-                this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilPlantLoc.loopNum)
-                                                         .LoopSide(this->m_SuppCoilPlantLoc.loopSideNum)
-                                                         .Branch(this->m_SuppCoilPlantLoc.branchNum)
-                                                         .Comp(this->m_SuppCoilPlantLoc.compNum)
+                this->m_SuppCoilFluidOutletNodeNum = DataPlant::CompData::getPlantComponent(state, this->m_SuppCoilPlantLoc)
                                                          .NodeNumOut;
 
             } else if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
@@ -891,10 +882,7 @@ namespace UnitarySystems {
                 }
 
                 // fill outlet node for coil
-                this->m_SuppCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(this->m_SuppCoilPlantLoc.loopNum)
-                                                         .LoopSide(this->m_SuppCoilPlantLoc.loopSideNum)
-                                                         .Branch(this->m_SuppCoilPlantLoc.branchNum)
-                                                         .Comp(this->m_SuppCoilPlantLoc.compNum)
+                this->m_SuppCoilFluidOutletNodeNum = DataPlant::CompData::getPlantComponent(state, this->m_SuppCoilPlantLoc)
                                                          .NodeNumOut;
             }
 
