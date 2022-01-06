@@ -159,9 +159,6 @@ namespace VentilatedSlab {
     int constexpr SURControl = 6;  // Controls system using surface temperature !Phase2-A
     int constexpr DPTZControl = 7; // Controls system using dew-point temperature of zone!Phase2-A
 
-    // coil operation
-    int constexpr On = 1; // normal coil operation
-
     int constexpr NoneOption = 0;
     int constexpr BothOption = 1;
     int constexpr HeatingOption = 2;
@@ -3663,7 +3660,7 @@ namespace VentilatedSlab {
                 SimHXAssistedCoolingCoil(state,
                                          state.dataVentilatedSlab->VentSlab(Item).CCoilName,
                                          FirstHVACIteration,
-                                         On,
+                                         DataHVACGlobals::CompressorOperation::On,
                                          0.0,
                                          state.dataVentilatedSlab->VentSlab(Item).CCoil_Index,
                                          ContFanCycCoil);

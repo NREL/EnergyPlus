@@ -68,10 +68,6 @@ struct EnergyPlusData;
 
 namespace HVACVariableRefrigerantFlow {
 
-    // Compressor operation
-    constexpr int On(1);  // normal compressor operation
-    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
-
     // Thermostat Priority Control Type
     enum class ThermostatCtrlType
     {
