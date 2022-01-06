@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1784,7 +1784,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     // set conditions for test
     int AbsChillNum = 1;
-    DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
+    DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
     Real64 AbsChillEvapLoad;
     bool AbsChillRunFlag = true;
     // check chiller inputs
@@ -1817,11 +1817,11 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         (state->dataLoopNodes->Node(EvapInletNode).MassFlowRate / thisChiller.EvapMassFlowRateMax) * thisChiller.GenMassFlowRateMax;
     // lock the evap flow at test condition specified
     int LoopNum = thisChiller.CWLoopNum;
-    int LoopSideNum = thisChiller.CWLoopSideNum;
+    DataPlant::LoopSideLocation LoopSideNum = thisChiller.CWLoopSideNum;
     state->dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::FlowLock::Locked;
     // calc generator flow
     int GenLoopNum = thisChiller.GenLoopNum;
-    int GenLoopSideNum = thisChiller.GenLoopSideNum;
+    DataPlant::LoopSideLocation GenLoopSideNum = thisChiller.GenLoopSideNum;
     state->dataPlnt->PlantLoop(GenLoopNum).LoopSide(GenLoopSideNum).FlowLock = DataPlant::FlowLock::Unlocked;
     // run CalcBLASTAbsorberModel
     thisChiller.EquipFlowCtrl = EquipFlowCtrl;

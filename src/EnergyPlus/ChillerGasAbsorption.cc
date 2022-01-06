@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -357,7 +357,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           NodeInputManager::compFluidStream::Primary,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.ChillSupplyNodeNum = GetOnlySingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(3),
@@ -366,7 +366,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                           NodeInputManager::compFluidStream::Primary,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -382,7 +382,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                          NodeInputManager::compFluidStream::Tertiary,
+                                                          NodeInputManager::CompFluidStream::Tertiary,
                                                           DataLoopNode::ObjectIsNotParent);
         thisChiller.HeatSupplyNodeNum = GetOnlySingleNode(state,
                                                           state.dataIPShortCut->cAlphaArgs(7),
@@ -391,7 +391,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                          NodeInputManager::compFluidStream::Tertiary,
+                                                          NodeInputManager::CompFluidStream::Tertiary,
                                                           DataLoopNode::ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -479,7 +479,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                              NodeInputManager::compFluidStream::Secondary,
+                                                              NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             thisChiller.CondSupplyNodeNum = GetOnlySingleNode(state,
                                                               state.dataIPShortCut->cAlphaArgs(5),
@@ -488,7 +488,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Secondary,
+                                                              NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             TestCompSet(state,
                         cCurrentModuleObject,
@@ -504,7 +504,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                              NodeInputManager::compFluidStream::Secondary,
+                                                              NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             // Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )
             // Connection not required for air or evap cooled condenser so no call to TestCompSet here
@@ -923,7 +923,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         } else {
             // need call to EMS to check node
             errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->ChillSupplyNodeNum, EMSManager::SPControlType::TemperatureSetPoint, errFlag);
             state.dataLoopNodes->NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
             if (errFlag) {
                 if (!this->ChillSetPointErrDone) {
@@ -955,7 +955,7 @@ void GasAbsorberSpecs::oneTimeInit_new(EnergyPlusData &state)
         } else {
             // need call to EMS to check node
             errFlag = false; // but not really fatal yet, but should be.
-            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, errFlag);
+            EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->HeatSupplyNodeNum, EMSManager::SPControlType::TemperatureSetPoint, errFlag);
             state.dataLoopNodes->NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
             if (errFlag) {
                 if (!this->HeatSetPointErrDone) {
@@ -1548,7 +1548,7 @@ void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
     // condenser water temperature
     Real64 errorAvailCap; // error fraction on final estimate of AvailableCoolingCapacity
     int LoopNum;
-    int LoopSideNum;
+    DataPlant::LoopSideLocation LoopSideNum;
     Real64 Cp_CW; // local fluid specific heat for chilled water
     Real64 Cp_CD; // local fluid specific heat for condenser water
 
@@ -1914,7 +1914,7 @@ void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bo
     Real64 HeatDeltaTemp(0.0); // hot water temperature difference
     Real64 HeatSupplySetPointTemp(0.0);
     int LoopNum;
-    int LoopSideNum;
+    DataPlant::LoopSideLocation LoopSideNum;
     Real64 Cp_HW; // local fluid specific heat for hot water
 
     // set node values to data structure values for nodes

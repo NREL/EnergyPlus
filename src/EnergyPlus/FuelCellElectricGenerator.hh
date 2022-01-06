@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -133,10 +133,10 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCPowerModuleStruct()
-            : EffMode(DataGenerators::CurveMode::Unassigned), EffCurveID(0), NomEff(0.0), NomPel(0.0), NumCycles(0), CyclingDegradRat(0.0),
+            : EffMode(DataGenerators::CurveMode::Invalid), EffCurveID(0), NomEff(0.0), NomPel(0.0), NumCycles(0), CyclingDegradRat(0.0),
               NumRunHours(0.0), OperateDegradRat(0.0), ThreshRunHours(0.0), UpTranLimit(0.0), DownTranLimit(0.0), StartUpTime(0.0), StartUpFuel(0.0),
               StartUpElectConsum(0.0), StartUpElectProd(0.0), ShutDownTime(0.0), ShutDownFuel(0.0), ShutDownElectConsum(0.0), ANC0(0.0), ANC1(0.0),
-              SkinLossMode(DataGenerators::SkinLoss::Unassigned), ZoneID(0), RadiativeFract(0.0), QdotSkin(0.0), UAskin(0.0), SkinLossCurveID(0),
+              SkinLossMode(DataGenerators::SkinLoss::Invalid), ZoneID(0), RadiativeFract(0.0), QdotSkin(0.0), UAskin(0.0), SkinLossCurveID(0),
               WaterSupplyCurveID(0), NdotDilutionAir(0.0), StackHeatLossToDilution(0.0), DilutionInletNode(0), DilutionExhaustNode(0), PelMin(0.0),
               PelMax(0.0), Pel(0.0), PelLastTimeStep(0.0), Eel(0.0), QdotStackCool(0.0), FractionalDayofLastStartUp(0.0),
               FractionalDayofLastShutDown(0.0), HasBeenOn(true), DuringShutDown(false), DuringStartUp(false), NdotFuel(0.0), TotFuelInEnthalphy(0.0),
@@ -175,11 +175,10 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCAirSupplyDataStruct()
-            : SupNodeNum(0), BlowerPowerCurveID(0), BlowerHeatLossFactor(0.0), AirSupRateMode(DataGenerators::AirSupRateMode::Unassigned),
-              Stoics(0.0), AirFuncPelCurveID(0), AirTempCoeff(0.0), AirFuncNdotCurveID(0),
-              IntakeRecoveryMode(DataGenerators::RecoverMode::Unassigned), ConstituentMode(DataGenerators::ConstituentMode::Unassigned),
-              NumConstituents(0), ConstitName(14), ConstitMolalFract(14, 0.0), GasLibID(14, 0), O2fraction(0.0), TairIntoBlower(0.0),
-              TairIntoFCPM(0.0), PairCompEl(0.0), QskinLoss(0.0), QintakeRecovery(0.0)
+            : SupNodeNum(0), BlowerPowerCurveID(0), BlowerHeatLossFactor(0.0), AirSupRateMode(DataGenerators::AirSupRateMode::Invalid), Stoics(0.0),
+              AirFuncPelCurveID(0), AirTempCoeff(0.0), AirFuncNdotCurveID(0), IntakeRecoveryMode(DataGenerators::RecoverMode::Invalid),
+              ConstituentMode(DataGenerators::ConstituentMode::Invalid), NumConstituents(0), ConstitName(14), ConstitMolalFract(14, 0.0),
+              GasLibID(14, 0), O2fraction(0.0), TairIntoBlower(0.0), TairIntoFCPM(0.0), PairCompEl(0.0), QskinLoss(0.0), QintakeRecovery(0.0)
         {
         }
     };
@@ -203,7 +202,7 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCWaterSupplyDataStruct()
-            : WaterTempMode(DataGenerators::WaterTemperatureMode::Unassigned), NodeNum(0), SchedNum(0), WaterSupRateCurveID(0), PmpPowerCurveID(0),
+            : WaterTempMode(DataGenerators::WaterTemperatureMode::Invalid), NodeNum(0), SchedNum(0), WaterSupRateCurveID(0), PmpPowerCurveID(0),
               PmpPowerLossFactor(0.0), IsModeled(true), TwaterIntoCompress(0.0), TwaterIntoFCPM(0.0), PwaterCompEl(0.0), QskinLoss(0.0)
         {
         }
@@ -234,7 +233,7 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCAuxilHeatDataStruct()
-            : ZoneID(0), UASkin(0.0), ExcessAirRAT(0.0), ANC0(0.0), ANC1(0.0), SkinLossDestination(DataGenerators::LossDestination::Unassigned),
+            : ZoneID(0), UASkin(0.0), ExcessAirRAT(0.0), ANC0(0.0), ANC1(0.0), SkinLossDestination(DataGenerators::LossDestination::Invalid),
               MaxPowerW(0.0), MinPowerW(0.0), MaxPowerkmolperSec(0.0), MinPowerkmolperSec(0.0), NumConstituents(0), TauxMix(0.0), NdotAuxMix(0.0),
               ConstitMolalFract(14, 0.0), GasLibID(14, 0), QskinLoss(0.0), QairIntake(0.0)
         {
@@ -286,7 +285,7 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCExhaustHXDataStruct()
-            : WaterInNode(0), WaterOutNode(0), WaterVolumeFlowMax(0.0), ExhaustOutNode(0), HXmodelMode(DataGenerators::ExhaustGasHX::Unassigned),
+            : WaterInNode(0), WaterOutNode(0), WaterVolumeFlowMax(0.0), ExhaustOutNode(0), HXmodelMode(DataGenerators::ExhaustGasHX::Invalid),
               HXEffect(0.0), hxs0(0.0), hxs1(0.0), hxs2(0.0), hxs3(0.0), hxs4(0.0), h0gas(0.0), NdotGasRef(0.0), nCoeff(0.0), AreaGas(0.0),
               h0Water(0.0), NdotWaterRef(0.0), mCoeff(0.0), AreaWater(0.0), Fadjust(0.0), l1Coeff(0.0), l2Coeff(0.0), CondensationThresholdTemp(0.0),
               qHX(0.0), THXexh(0.0), WaterMassFlowRateDesign(0.0), WaterMassFlowRate(0.0), WaterInletTemp(0.0), WaterVaporFractExh(0.0),
@@ -342,7 +341,7 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCElecStorageDataStruct()
-            : StorageModelMode(DataGenerators::ElectricalStorage::Unassigned), StartingEnergyStored(0.0), EnergeticEfficCharge(0.0),
+            : StorageModelMode(DataGenerators::ElectricalStorage::Invalid), StartingEnergyStored(0.0), EnergeticEfficCharge(0.0),
               EnergeticEfficDischarge(0.0), MaxPowerDraw(0.0), MaxPowerStore(0.0), NominalVoltage(0.0), NominalEnergyCapacity(0.0),
               ThisTimeStepStateOfCharge(0.0), LastTimeStepStateOfCharge(0.0), PelNeedFromStorage(0.0), IdesiredDischargeCurrent(0.0),
               PelFromStorage(0.0), IfromStorage(0.0), PelIntoStorage(0.0), QairIntake(0.0)
@@ -362,7 +361,7 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCInverterDataStruct()
-            : EffMode(DataGenerators::InverterEfficiencyMode::Unassigned), ConstEff(0.0), EffQuadraticCurveID(0), PCUlosses(0.0), QairIntake(0.0)
+            : EffMode(DataGenerators::InverterEfficiencyMode::Invalid), ConstEff(0.0), EffQuadraticCurveID(0), PCUlosses(0.0), QairIntake(0.0)
         {
         }
     };
@@ -507,30 +506,30 @@ namespace FuelCellElectricGenerator {
         // Members
         // from input data and nested types for subsystems
         DataPlant::PlantEquipmentType Type;
-        std::string Name;                    // user identifier
-        std::string NameFCPM;                // name of FC Power Module
-        FCPowerModuleStruct FCPM;            // data for Power Module
-        std::string NameFCAirSup;            // name of air supply module for fuel cell
-        FCAirSupplyDataStruct AirSup;        // data for air supply module
-        std::string NameFCFuelSup;           // name of fuel supply module
-        int FuelSupNum;                      // index for fuel supply module structure
-        std::string NameFCWaterSup;          // name of water supply module
-        FCWaterSupplyDataStruct WaterSup;    // data for water supply module
-        std::string NameFCAuxilHeat;         // name of auxiliary heating module
-        FCAuxilHeatDataStruct AuxilHeat;     // data for auxiliary heating module
-        std::string NameExhaustHX;           // name of Exhaust HX module
-        FCExhaustHXDataStruct ExhaustHX;     // data for Exhaust heat exchanger module
-        std::string NameElecStorage;         // name of Battery module
-        FCElecStorageDataStruct ElecStorage; // data for Battery module
-        std::string NameInverter;            // name of Inverter Module
-        FCInverterDataStruct Inverter;       // data for Inverter module
-        std::string NameStackCooler;         // name of Inverter Module
-        FCStackCoolerDataStruct StackCooler; // data for Inverter module
-        int CWLoopNum;                       // cooling water plant loop index number
-        int CWLoopSideNum;                   // cooling water plant loop side index
-        int CWBranchNum;                     // cooling water plant loop branch index
-        int CWCompNum;                       // cooling water plant loop component index
-        FCReportDataStruct Report;           // data for reporting as E+ output variables
+        std::string Name;                          // user identifier
+        std::string NameFCPM;                      // name of FC Power Module
+        FCPowerModuleStruct FCPM;                  // data for Power Module
+        std::string NameFCAirSup;                  // name of air supply module for fuel cell
+        FCAirSupplyDataStruct AirSup;              // data for air supply module
+        std::string NameFCFuelSup;                 // name of fuel supply module
+        int FuelSupNum;                            // index for fuel supply module structure
+        std::string NameFCWaterSup;                // name of water supply module
+        FCWaterSupplyDataStruct WaterSup;          // data for water supply module
+        std::string NameFCAuxilHeat;               // name of auxiliary heating module
+        FCAuxilHeatDataStruct AuxilHeat;           // data for auxiliary heating module
+        std::string NameExhaustHX;                 // name of Exhaust HX module
+        FCExhaustHXDataStruct ExhaustHX;           // data for Exhaust heat exchanger module
+        std::string NameElecStorage;               // name of Battery module
+        FCElecStorageDataStruct ElecStorage;       // data for Battery module
+        std::string NameInverter;                  // name of Inverter Module
+        FCInverterDataStruct Inverter;             // data for Inverter module
+        std::string NameStackCooler;               // name of Inverter Module
+        FCStackCoolerDataStruct StackCooler;       // data for Inverter module
+        int CWLoopNum;                             // cooling water plant loop index number
+        DataPlant::LoopSideLocation CWLoopSideNum; // cooling water plant loop side index
+        int CWBranchNum;                           // cooling water plant loop branch index
+        int CWCompNum;                             // cooling water plant loop component index
+        FCReportDataStruct Report;                 // data for reporting as E+ output variables
         // calculated whole-system level variables
         Real64 ACPowerGen; // Net output from SOFC unit
         Real64 QconvZone;  // convective heat lost to surrounding zone
@@ -548,10 +547,10 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCDataStruct()
-            : Type(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-              ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0), DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true),
-              MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true), SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0),
-              SolverErr_Type2_IterIndex(0)
+            : Type(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(DataPlant::LoopSideLocation::Invalid),
+              CWBranchNum(0), CWCompNum(0), ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0), DynamicsControlID(0), TimeElapsed(0.0),
+              MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true), SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0),
+              SolverErr_Type2_Iter(0), SolverErr_Type2_IterIndex(0)
         {
         }
 

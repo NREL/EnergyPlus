@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -316,7 +316,7 @@ namespace Humidifiers {
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Air,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             NodeInputManager::compFluidStream::Primary,
+                                                             NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
             Humidifier(HumNum).AirOutNode = GetOnlySingleNode(state,
                                                               Alphas(4),
@@ -325,7 +325,7 @@ namespace Humidifiers {
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -387,7 +387,7 @@ namespace Humidifiers {
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Air,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             NodeInputManager::compFluidStream::Primary,
+                                                             NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
             Humidifier(HumNum).AirOutNode = GetOnlySingleNode(state,
                                                               Alphas(5),
@@ -396,7 +396,7 @@ namespace Humidifiers {
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 
@@ -671,7 +671,7 @@ namespace Humidifiers {
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         CheckIfNodeSetPointManagedByEMS(
-                            state, AirOutNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                            state, AirOutNode, EMSManager::SPControlType::HumidityRatioMinSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             "Humidifiers: Missing humidity setpoint for " + format(HumidifierType[static_cast<int>(HumType)]) +

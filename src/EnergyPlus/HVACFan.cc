@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -248,22 +248,24 @@ namespace HVACFan {
 
             switch (m_powerSizingMethod) {
 
-            case PowerSizingMethod::powerPerFlow: {
+            case PowerSizingMethod::PowerPerFlow: {
                 designElecPower = designAirVolFlowRate * m_elecPowerPerFlowRate;
                 break;
             }
-            case PowerSizingMethod::powerPerFlowPerPressure: {
+            case PowerSizingMethod::PowerPerFlowPerPressure: {
                 designElecPower = designAirVolFlowRate * deltaPress * m_elecPowerPerFlowRatePerPressure;
                 break;
             }
-            case PowerSizingMethod::totalEfficiencyAndPressure: {
+            case PowerSizingMethod::TotalEfficiencyAndPressure: {
                 designElecPower = designAirVolFlowRate * deltaPress / m_fanTotalEff;
                 break;
             }
-            case PowerSizingMethod::powerSizingMethodNotSet: {
+            case PowerSizingMethod::Invalid: {
                 // do nothing
                 break;
             }
+            default:
+                assert(false);
 
             } // end switch
 
@@ -367,12 +369,12 @@ namespace HVACFan {
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
           designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), fanIsSecondaryDriver(false),
           m_fanType_Num(0), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
-          m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::powerSizingMethodNotSet), m_elecPowerPerFlowRate(0.0),
+          m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::Invalid), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
-          m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::heatLossNotDetermined), m_qdotConvZone(0.0), m_qdotRadZone(0.0),
-          m_numSpeeds(0), m_inletAirMassFlowRate(0.0), m_outletAirMassFlowRate(0.0), m_maxAirMassFlowRate(0.0), m_inletAirTemp(0.0),
-          m_outletAirTemp(0.0), m_inletAirHumRat(0.0), m_outletAirHumRat(0.0), m_inletAirEnthalpy(0.0), m_outletAirEnthalpy(0.0),
-          m_objTurnFansOn(false), m_objTurnFansOff(false), m_objEnvrnFlag(true), m_objSizingFlag(true), m_fanPower(0.0), m_fanEnergy(0.0),
+          m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::Invalid), m_qdotConvZone(0.0), m_qdotRadZone(0.0), m_numSpeeds(0),
+          m_inletAirMassFlowRate(0.0), m_outletAirMassFlowRate(0.0), m_maxAirMassFlowRate(0.0), m_inletAirTemp(0.0), m_outletAirTemp(0.0),
+          m_inletAirHumRat(0.0), m_outletAirHumRat(0.0), m_inletAirEnthalpy(0.0), m_outletAirEnthalpy(0.0), m_objTurnFansOn(false),
+          m_objTurnFansOff(false), m_objEnvrnFlag(true), m_objSizingFlag(true), m_fanPower(0.0), m_fanEnergy(0.0),
           m_maxAirFlowRateEMSOverrideOn(false), m_maxAirFlowRateEMSOverrideValue(0.0), m_eMSFanPressureOverrideOn(false), m_eMSFanPressureValue(0.0),
           m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
           m_faultyFilterFlag(false), m_faultyFilterIndex(0),
@@ -441,7 +443,7 @@ namespace HVACFan {
                                                            alphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           NodeInputManager::compFluidStream::Primary,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                             alphaArgs(4),
@@ -450,7 +452,7 @@ namespace HVACFan {
                                                             alphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
         BranchNodeConnections::TestCompSet(state, locCurrentModuleObject, alphaArgs(1), alphaArgs(3), alphaArgs(4), "Air Nodes");
@@ -486,13 +488,13 @@ namespace HVACFan {
         }
         if (m_designElecPowerWasAutosized) {
             if (isAlphaFieldBlank(6)) {
-                m_powerSizingMethod = PowerSizingMethod::powerPerFlowPerPressure;
+                m_powerSizingMethod = PowerSizingMethod::PowerPerFlowPerPressure;
             } else if (UtilityRoutines::SameString(alphaArgs(6), "PowerPerFlow")) {
-                m_powerSizingMethod = PowerSizingMethod::powerPerFlow;
+                m_powerSizingMethod = PowerSizingMethod::PowerPerFlow;
             } else if (UtilityRoutines::SameString(alphaArgs(6), "PowerPerFlowPerPressure")) {
-                m_powerSizingMethod = PowerSizingMethod::powerPerFlowPerPressure;
+                m_powerSizingMethod = PowerSizingMethod::PowerPerFlowPerPressure;
             } else if (UtilityRoutines::SameString(alphaArgs(6), "TotalEfficiencyAndPressure")) {
-                m_powerSizingMethod = PowerSizingMethod::totalEfficiencyAndPressure;
+                m_powerSizingMethod = PowerSizingMethod::TotalEfficiencyAndPressure;
             } else {
                 ShowSevereError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + alphaFieldNames(6) + " = " + alphaArgs(6));
@@ -522,12 +524,12 @@ namespace HVACFan {
         m_nightVentPressureDelta = numericArgs(10);
         m_nightVentFlowFraction = numericArgs(11); // not used
         m_zoneNum = UtilityRoutines::FindItemInList(alphaArgs(8), state.dataHeatBal->Zone);
-        if (m_zoneNum > 0) m_heatLossesDestination = ThermalLossDestination::zoneGains;
+        if (m_zoneNum > 0) m_heatLossesDestination = ThermalLossDestination::ZoneGains;
         if (m_zoneNum == 0) {
             if (isAlphaFieldBlank(8)) {
-                m_heatLossesDestination = ThermalLossDestination::lostToOutside;
+                m_heatLossesDestination = ThermalLossDestination::LostToOutside;
             } else {
-                m_heatLossesDestination = ThermalLossDestination::lostToOutside;
+                m_heatLossesDestination = ThermalLossDestination::LostToOutside;
                 ShowWarningError(state, std::string{routineName} + locCurrentModuleObject + "=\"" + alphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + alphaFieldNames(8) + " = " + alphaArgs(8));
                 ShowContinueError(state, "Zone name not found. Fan motor heat losses will not be added to a zone");
@@ -677,9 +679,8 @@ namespace HVACFan {
                 state, "Fan", name, "Fan Autosized Air Flow Rate", "[m3/s]", m_maxAirFlowRateEMSOverrideOn, m_maxAirFlowRateEMSOverrideValue);
         }
 
-        if (m_heatLossesDestination == ThermalLossDestination::zoneGains) {
-            SetupZoneInternalGain(
-                state, m_zoneNum, "Fan:SystemModel", name, DataHeatBalance::IntGainType::FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
+        if (m_heatLossesDestination == ThermalLossDestination::ZoneGains) {
+            SetupZoneInternalGain(state, m_zoneNum, name, DataHeatBalance::IntGainType::FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
         }
 
         alphaArgs.deallocate();
@@ -1019,6 +1020,8 @@ namespace HVACFan {
                     // do nothing
                     break;
                 }
+                default:
+                    assert(false);
                 } // end switch
                 m_outletAirMassFlowRate += localAirMassFlow[mode];
 
@@ -1064,7 +1067,7 @@ namespace HVACFan {
             }
         }
 
-        if (m_heatLossesDestination == ThermalLossDestination::zoneGains) {
+        if (m_heatLossesDestination == ThermalLossDestination::ZoneGains) {
             Real64 powerLossToZone = m_fanPower - m_powerLossToAir;
             m_qdotConvZone = powerLossToZone * (1.0 - m_zoneRadFract);
             m_qdotRadZone = powerLossToZone * m_zoneRadFract;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -295,7 +295,7 @@ namespace HWBaseboardRadiator {
         int constexpr iHeatCAPMAlphaNum(2);                   // get input index to HW baseboard heating capacity sizing method
         int constexpr iHeatDesignCapacityNumericNum(3);       // get input index to HW baseboard heating capacity
         int constexpr iHeatCapacityPerFloorAreaNumericNum(1); // get input index to HW baseboard heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             2); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -523,7 +523,7 @@ namespace HWBaseboardRadiator {
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
             // Get outlet node number
@@ -534,7 +534,7 @@ namespace HWBaseboardRadiator {
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Water,
                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                          NodeInputManager::compFluidStream::Primary,
+                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                           ObjectIsNotParent);
             TestCompSet(state,
                         cCMO_BBRadiator_Water,
@@ -658,7 +658,7 @@ namespace HWBaseboardRadiator {
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBWater_Num &&
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBWater &&
                         state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == HWBaseboard(BaseboardNum).EquipID) {
                         HWBaseboard(BaseboardNum).ZonePtr = ctrlZone;
                     }
@@ -1861,12 +1861,12 @@ namespace HWBaseboardRadiator {
     }
 
     void UpdateHWBaseboardPlantConnection(EnergyPlusData &state,
-                                          int const BaseboardTypeNum,               // type index
-                                          std::string const &BaseboardName,         // component name
-                                          [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
-                                          [[maybe_unused]] int const LoopNum,       // Plant loop index for where called from
-                                          [[maybe_unused]] int const LoopSide,      // Plant loop side index for where called from
-                                          int &CompIndex,                           // Chiller number pointer
+                                          int const BaseboardTypeNum,                                  // type index
+                                          std::string const &BaseboardName,                            // component name
+                                          [[maybe_unused]] int const EquipFlowCtrl,                    // Flow control mode for the equipment
+                                          [[maybe_unused]] int const LoopNum,                          // Plant loop index for where called from
+                                          [[maybe_unused]] const DataPlant::LoopSideLocation LoopSide, // Plant loop side index for where called from
+                                          int &CompIndex,                                              // Chiller number pointer
                                           [[maybe_unused]] bool const FirstHVACIteration,
                                           bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )

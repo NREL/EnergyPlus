@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,6 +63,7 @@ enum class AutoSizingType
 {
     // align with DataHVACGlobals so scalable sizing strings can be applied
     // this will not be necessary when scalable sizing is moved to BaseSizerWithScalableInputs
+    Invalid = -1,
     ASHRAEMinSATCoolingSizing = 30,
     ASHRAEMaxSATHeatingSizing = 31,
     AutoCalculateSizing = 25,
@@ -98,14 +99,16 @@ enum class AutoSizingType
     WaterHeatingCoilUASizing = 20,
     ZoneCoolingLoadSizing = 26,
     ZoneHeatingLoadSizing = 27,
-    Unknown = 0
+    Num
 };
 
 enum class AutoSizingResultType
 {
+    Invalid = -1,
     NoError,    // no errors found
     ErrorType1, // sizing error
-    ErrorType2  // uninitialized sizing type
+    ErrorType2, // uninitialized sizing type
+    Num
 };
 
 struct BaseSizer
@@ -120,7 +123,7 @@ struct BaseSizer
     bool isFanReportObject = false;  // provides access to fan reporting
     bool initialized = false;        // indicates initializeWithinEP was called
     AutoSizingResultType errorType = AutoSizingResultType::NoError;
-    AutoSizingType sizingType = AutoSizingType::Unknown;
+    AutoSizingType sizingType = AutoSizingType::Invalid;
     std::string sizingString;
     std::string sizingStringScalable;
     bool overrideSizeString = true;
@@ -195,7 +198,7 @@ struct BaseSizer
     Real64 dataAirFlowUsedForSizing = 0.0;
     Real64 dataDesInletAirTemp = 0.0;
     bool dataDesAccountForFanHeat = false;
-    DataSizing::zoneFanPlacement dataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
+    DataSizing::ZoneFanPlacement dataFanPlacement = DataSizing::ZoneFanPlacement::NotSet;
 
     // CoolingWaterDesAirInletHumRatSizer, HeatingWaterDesAirInletHumRatSizer,
     // HeatingWaterDesAirInletTempSizer
@@ -261,7 +264,7 @@ struct BaseSizer
     virtual void initializeWithinEP(EnergyPlusData &state,
                                     std::string_view const _compType,
                                     std::string_view const _compName,
-                                    bool const &_printWarningFlag,
+                                    bool _printWarningFlag,
                                     std::string_view const _callingRoutine);
 
     virtual Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) = 0;
@@ -300,17 +303,17 @@ public:
                                   Optional_string_const UsrDesc = _,
                                   Optional<Real64 const> UsrValue = _);
 
-    Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
-    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+    Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 outAirFrac,
                                                DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 outAirFrac,
                                                  DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                  DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 outAirFrac,
                                                DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 outAirFrac,
                                                  DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                  DataSizing::ZoneSizingData const &finalZoneSizing);
 };

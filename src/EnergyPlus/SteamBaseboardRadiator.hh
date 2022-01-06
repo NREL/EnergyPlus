@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -97,18 +97,18 @@ namespace SteamBaseboardRadiator {
         Real64 FracConvect;          // Fraction for convective heat addition
         Real64 FracDistribPerson;    // Fraction for radiant heat incident on people
         Array1D<Real64> FracDistribToSurf;
-        Real64 TotPower;   // Convective system impact rate that the heater actually meets [W]
-        Real64 Power;      // Maximum heating rate [W]
-        Real64 ConvPower;  // Convective heating rate [W]
-        Real64 RadPower;   // Radiant heating rate [W]
-        Real64 TotEnergy;  // Convective system impact energy [J]
-        Real64 Energy;     // Maximum heating energy [J]
-        Real64 ConvEnergy; // Convective heating energy [J]
-        Real64 RadEnergy;  // Radiant heating energy [J]
-        int LoopNum;       // plant loop index
-        int LoopSideNum;   // plant loop side index
-        int BranchNum;     // plant loop branch index
-        int CompNum;       // plant loop component index
+        Real64 TotPower;                         // Convective system impact rate that the heater actually meets [W]
+        Real64 Power;                            // Maximum heating rate [W]
+        Real64 ConvPower;                        // Convective heating rate [W]
+        Real64 RadPower;                         // Radiant heating rate [W]
+        Real64 TotEnergy;                        // Convective system impact energy [J]
+        Real64 Energy;                           // Maximum heating energy [J]
+        Real64 ConvEnergy;                       // Convective heating energy [J]
+        Real64 RadEnergy;                        // Radiant heating energy [J]
+        int LoopNum;                             // plant loop index
+        DataPlant::LoopSideLocation LoopSideNum; // plant loop side index
+        int BranchNum;                           // plant loop branch index
+        int CompNum;                             // plant loop component index
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
@@ -122,8 +122,8 @@ namespace SteamBaseboardRadiator {
               SteamMassFlowRateMax(0.0), SteamVolFlowRateMax(0.0), SteamOutletTemp(0.0), SteamInletTemp(0.0), SteamInletEnthalpy(0.0),
               SteamOutletEnthalpy(0.0), SteamInletPress(0.0), SteamOutletPress(0.0), SteamInletQuality(0.0), SteamOutletQuality(0.0),
               FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0),
-              Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0),
-              BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), ScaledHeatingCapacity(0.0)
+              Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0), LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0),
+              BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), ScaledHeatingCapacity(0.0)
         {
         }
     };
@@ -198,7 +198,7 @@ namespace SteamBaseboardRadiator {
                                              std::string const &BaseboardName,            // component name
                                              int const EquipFlowCtrl,                     // Flow control mode for the equipment
                                              int const LoopNum,                           // Plant loop index for where called from
-                                             int const LoopSide,                          // Plant loop side index for where called from
+                                             const DataPlant::LoopSideLocation LoopSide,  // Plant loop side index for where called from
                                              int &CompIndex,                              // Chiller number pointer
                                              bool const FirstHVACIteration,
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -123,30 +123,30 @@ namespace ChillerElectricEIR {
         int ChillerEIRFTIndex; // Index for the energy input ratio modifier curve
         // (function of leaving chilled water temperature and
         //  entering condenser fluid temperature)
-        int ChillerEIRFPLRIndex;      // Index for the EIR vs part-load ratio curve
-        int ChillerCapFTError;        // Used for negative capacity as a function of temp warnings
-        int ChillerCapFTErrorIndex;   // Used for negative capacity as a function of temp warnings
-        int ChillerEIRFTError;        // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFTErrorIndex;   // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFPLRError;      // Used for negative EIR as a function of PLR warnings
-        int ChillerEIRFPLRErrorIndex; // Used for negative EIR as a function of PLR warnings
-        Real64 ChillerEIRFPLRMin;     // Minimum value of PLR from EIRFPLR curve
-        Real64 ChillerEIRFPLRMax;     // Maximum value of PLR from EIRFPLR curve
-        int DeltaTErrCount;           // Evaporator delta T equals 0 for variable flow chiller warning messages
-        int DeltaTErrCountIndex;      // Index to evaporator delta T = 0 for variable flow chiller warning messages
-        int CWLoopNum;                // chilled water plant loop index number
-        int CWLoopSideNum;            // chilled water plant loop side index
-        int CWBranchNum;              // chilled water plant loop branch index
-        int CWCompNum;                // chilled water plant loop component index
-        int CDLoopNum;                // condenser water plant loop index number
-        int CDLoopSideNum;            // condenser water plant loop side index
-        int CDBranchNum;              // condenser water plant loop branch index
-        int CDCompNum;                // condenser water plant loop component index
-        int HRLoopNum;                // heat recovery water plant loop index
-        int HRLoopSideNum;            // heat recovery water plant loop side index
-        int HRBranchNum;              // heat recovery water plant loop branch index
-        int HRCompNum;                // heat recovery water plant loop component index
-        int BasinHeaterSchedulePtr;   // Pointer to basin heater schedule
+        int ChillerEIRFPLRIndex;                   // Index for the EIR vs part-load ratio curve
+        int ChillerCapFTError;                     // Used for negative capacity as a function of temp warnings
+        int ChillerCapFTErrorIndex;                // Used for negative capacity as a function of temp warnings
+        int ChillerEIRFTError;                     // Used for negative EIR as a function of temp warnings
+        int ChillerEIRFTErrorIndex;                // Used for negative EIR as a function of temp warnings
+        int ChillerEIRFPLRError;                   // Used for negative EIR as a function of PLR warnings
+        int ChillerEIRFPLRErrorIndex;              // Used for negative EIR as a function of PLR warnings
+        Real64 ChillerEIRFPLRMin;                  // Minimum value of PLR from EIRFPLR curve
+        Real64 ChillerEIRFPLRMax;                  // Maximum value of PLR from EIRFPLR curve
+        int DeltaTErrCount;                        // Evaporator delta T equals 0 for variable flow chiller warning messages
+        int DeltaTErrCountIndex;                   // Index to evaporator delta T = 0 for variable flow chiller warning messages
+        int CWLoopNum;                             // chilled water plant loop index number
+        DataPlant::LoopSideLocation CWLoopSideNum; // chilled water plant loop side index
+        int CWBranchNum;                           // chilled water plant loop branch index
+        int CWCompNum;                             // chilled water plant loop component index
+        int CDLoopNum;                             // condenser water plant loop index number
+        DataPlant::LoopSideLocation CDLoopSideNum; // condenser water plant loop side index
+        int CDBranchNum;                           // condenser water plant loop branch index
+        int CDCompNum;                             // condenser water plant loop component index
+        int HRLoopNum;                             // heat recovery water plant loop index
+        DataPlant::LoopSideLocation HRLoopSideNum; // heat recovery water plant loop side index
+        int HRBranchNum;                           // heat recovery water plant loop branch index
+        int HRCompNum;                             // heat recovery water plant loop component index
+        int BasinHeaterSchedulePtr;                // Pointer to basin heater schedule
         int CondMassFlowIndex;
         std::string MsgBuffer1;  // - buffer to print warning messages on following time step
         std::string MsgBuffer2;  // - buffer to print warning messages on following time step
@@ -196,12 +196,12 @@ namespace ChillerElectricEIR {
         Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
         Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
         bool IPLVFlag;
-        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlType EquipFlowCtrl;
 
         // Default Constructor
         ElectricEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Invalid), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
               EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRate(0.0), CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), EvapOutletTemp(0.0), CondInletNodeNum(0),
@@ -212,8 +212,9 @@ namespace ChillerElectricEIR {
               HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0), HeatRecInletLimitSchedNum(0), ChillerCapFTIndex(0), ChillerEIRFTIndex(0),
               ChillerEIRFPLRIndex(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0), ChillerEIRFTErrorIndex(0),
               ChillerEIRFPLRError(0), ChillerEIRFPLRErrorIndex(0), ChillerEIRFPLRMin(0.0), ChillerEIRFPLRMax(0.0), DeltaTErrCount(0),
-              DeltaTErrCountIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0),
-              CDCompNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), BasinHeaterSchedulePtr(0), CondMassFlowIndex(0),
+              DeltaTErrCountIndex(0), CWLoopNum(0), CWLoopSideNum(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CDLoopNum(0),
+              CDLoopSideNum(DataPlant::LoopSideLocation::Invalid), CDBranchNum(0), CDCompNum(0), HRLoopNum(0),
+              HRLoopSideNum(DataPlant::LoopSideLocation::Invalid), HRBranchNum(0), HRCompNum(0), BasinHeaterSchedulePtr(0), CondMassFlowIndex(0),
               MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), ErrCount1(0), PossibleSubcooling(false), FaultyChillerSWTFlag(false),
               FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
               FaultyChillerFoulingFactor(1.0), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), oneTimeFlag(true), MyEnvrnFlag(true),
@@ -222,7 +223,7 @@ namespace ChillerElectricEIR {
               ChillerCyclingRatio(0.0), BasinHeaterPower(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0),
               CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
               HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0), IPLVFlag(true),
-              EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              EquipFlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid)
         {
         }
 

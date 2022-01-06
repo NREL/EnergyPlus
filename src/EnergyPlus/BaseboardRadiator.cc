@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -263,9 +263,9 @@ namespace BaseboardRadiator {
         static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
         int constexpr iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
         int constexpr iHeatDesignCapacityNumericNum(1); // get input index to water baseboard Radiator system electric heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to water baseboard Radiator system electric heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -343,7 +343,7 @@ namespace BaseboardRadiator {
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                      NodeInputManager::compFluidStream::Primary,
+                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsNotParent);
                 // get outlet node number
                 baseboard->Baseboard(BaseboardNum).WaterOutletNode = GetOnlySingleNode(state,
@@ -353,7 +353,7 @@ namespace BaseboardRadiator {
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       NodeInputManager::compFluidStream::Primary,
+                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsNotParent);
 
                 TestCompSet(state,

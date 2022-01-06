@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -76,7 +77,7 @@ namespace SimAirServingZones {
     // component types addressed by this module
     enum class CompType
     {
-        Unassigned = -1,
+        Invalid = -1,
         OAMixer_Num,
         Fan_Simple_CV,
         Fan_Simple_VAV,
@@ -109,7 +110,8 @@ namespace SimAirServingZones {
         ZoneVRFasAirLoopEquip,
         PVT_AirBased,
         VRFTerminalUnit,
-        CoilSystemWater
+        CoilSystemWater,
+        Num
     };
 
     void ManageAirLoops(EnergyPlusData &state,
@@ -161,9 +163,9 @@ namespace SimAirServingZones {
                              int AirLoopNum,              // Primary air loop number
                              int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
                              HVACSystemData *CompPointer, // equipment actual pointer
-                             int const &airLoopNum,       // index to AirloopHVAC
-                             int const &branchNum,        // index to AirloopHVAC branch
-                             int const &compNum           // index to AirloopHVAC branch component
+                             int airLoopNum,              // index to AirloopHVAC
+                             int branchNum,               // index to AirloopHVAC branch
+                             int compNum                  // index to AirloopHVAC branch component
     );
 
     void UpdateBranchConnections(EnergyPlusData &state,
@@ -250,7 +252,7 @@ struct SimAirServingZonesData : BaseGlobalStruct
     Array1D_int TermUnitSizingNumsCool;
     Array1D_int TermUnitSizingNumsHeat;
     Array1D_int SupNode;
-    Array1D_int SupNodeType;
+    Array1D<DataZoneEquipment::AirNodeType> SupNodeType;
 
     int TUInNode = 0;            // inlet node number of a terminal unit
     Real64 SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system

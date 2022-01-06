@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -187,7 +187,7 @@ void ReformulatedEIRChillerSpecs::simulate(
         this->control(state, CurLoad, RunFlag, FirstHVACIteration);
         this->update(state, CurLoad, RunFlag);
     } else if (calledFromLocation.loopNum == this->CDLoopNum) {
-        int LoopSide = this->CDLoopSideNum;
+        DataPlant::LoopSideLocation LoopSide = this->CDLoopSideNum;
         PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                             calledFromLocation.loopNum,
                                                             LoopSide,
@@ -343,7 +343,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(7),
@@ -352,7 +352,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -384,7 +384,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           NodeInputManager::compFluidStream::Secondary,
+                                                                           NodeInputManager::CompFluidStream::Secondary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(9),
@@ -393,7 +393,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            NodeInputManager::compFluidStream::Secondary,
+                                                                            NodeInputManager::CompFluidStream::Secondary,
                                                                             DataLoopNode::ObjectIsNotParent);
 
         BranchNodeConnections::TestCompSet(state,
@@ -538,7 +538,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                                  NodeInputManager::compFluidStream::Tertiary,
+                                                                                  NodeInputManager::CompFluidStream::Tertiary,
                                                                                   DataLoopNode::ObjectIsNotParent);
             if (thisChiller.HeatRecInletNodeNum == 0) {
                 ShowSevereError(state,
@@ -554,7 +554,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                                                   NodeInputManager::compFluidStream::Tertiary,
+                                                                                   NodeInputManager::CompFluidStream::Tertiary,
                                                                                    DataLoopNode::ObjectIsNotParent);
             if (thisChiller.HeatRecOutletNodeNum == 0) {
                 ShowSevereError(state,
@@ -618,7 +618,7 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Sensor,
-                                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                              DataLoopNode::ObjectIsNotParent);
                 } else {
                     thisChiller.HeatRecSetPointNodeNum = 0;
@@ -992,7 +992,7 @@ void ReformulatedEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
                 // need call to EMS to check node
                 bool fatalError = false; // but not really fatal yet, but should be.
                 EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->EvapOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, fatalError);
+                    state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, fatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                 if (fatalError) {
                     if (!this->ModulatedFlowErrDone) {
@@ -1154,7 +1154,7 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
     // Initialize heat recovery flow rates at node
     if (this->HeatRecActive) {
         int LoopNum = this->HRLoopNum;
-        int LoopSideNum = this->HRLoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum = this->HRLoopSideNum;
         int BranchIndex = this->HRBranchNum;
         int CompIndex = this->HRCompNum;
 
@@ -2053,7 +2053,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     this->QEvaporator = 0.0;
     this->QHeatRecovery = 0.0;
     int PlantLoopNum = this->CWLoopNum;
-    int LoopSideNum = this->CWLoopSideNum;
+    DataPlant::LoopSideLocation LoopSideNum = this->CWLoopSideNum;
     int BranchNum = this->CWBranchNum;
     int CompNum = this->CWCompNum;
 
@@ -2070,13 +2070,13 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
     //  if the component control is SERIESACTIVE we set the component flow to inlet flow so that
     //  flow resolver will not shut down the branch
     if (MyLoad >= 0 || !RunFlag) {
-        if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive ||
+        if (this->EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive ||
             state.dataPlnt->PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
             this->EvapMassFlowRate = state.dataLoopNodes->Node(this->EvapInletNodeNum).MassFlowRate;
         }
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             if (state.dataPlnt->PlantLoop(this->CDLoopNum).LoopSide(this->CDLoopSideNum).Branch(this->CDBranchNum).Comp(this->CDCompNum).FlowCtrl ==
-                DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
+                DataBranchAirLoopPlant::ControlType::SeriesActive) {
                 this->CondMassFlowRate = state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate;
             }
         }
@@ -2536,7 +2536,7 @@ void ReformulatedEIRChillerSpecs::checkMinMaxCurveBoundaries(EnergyPlusData &sta
 
     // Do not print out warnings if chiller not operating or FirstIteration/WarmupFlag/FlowLock
     int PlantLoopNum = this->CWLoopNum;
-    int LoopSideNum = this->CWLoopSideNum;
+    DataPlant::LoopSideLocation LoopSideNum = this->CWLoopSideNum;
     int BranchNum = this->CWBranchNum;
     int CompNum = this->CWCompNum;
 

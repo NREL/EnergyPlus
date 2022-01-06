@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -130,7 +130,7 @@ void ControlCompOutput(EnergyPlusData &state,
                        Optional_int_const Action,             // 1=reverse; 2=normal
                        Optional_int_const EquipIndex,         // Identifier for equipment of Outdoor Air Unit "ONLY"
                        Optional_int_const LoopNum,            // for plant components, plant loop index
-                       Optional_int_const LoopSide,           // for plant components, plant loop side index
+                       DataPlant::LoopSideLocation LoopSide,  // for plant components, plant loop side index
                        Optional_int_const BranchIndex,        // for plant components, plant branch index
                        Optional_int_const ControlledZoneIndex // controlled zone index for the zone containing the component
 )
@@ -1521,19 +1521,19 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
             print(state.files.bnd, "{}\n", Format_706);
             print(state.files.bnd, "#Nodes on Supply Air Path,{}\n", state.dataZoneEquip->SupplyAirPath(BCount).NumNodes);
             for (Count2 = 1; Count2 <= state.dataZoneEquip->SupplyAirPath(BCount).NumNodes; ++Count2) {
-                if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == PathInlet) {
+                if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::PathInlet) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Inlet Node,{},{},{}\n",
                           Count2,
                           state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
-                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == Intermediate) {
+                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::Intermediate) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Through Node,{},{},{}\n",
                           Count2,
                           state.dataLoopNodes->NodeID(state.dataZoneEquip->SupplyAirPath(BCount).Node(Count2)),
                           PrimaryAirLoopName);
-                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == Outlet) {
+                } else if (state.dataZoneEquip->SupplyAirPath(BCount).NodeType(Count2) == DataZoneEquipment::AirNodeType::Outlet) {
                     print(state.files.bnd,
                           "   Supply Air Path Node,Outlet Node,{},{},{}\n",
                           Count2,

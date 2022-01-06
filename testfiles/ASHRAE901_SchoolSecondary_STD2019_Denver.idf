@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.6;
+  Version,22.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2187,13 +2187,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Bathrooms_ZN_1_FLR_1 SHW_default Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Bathrooms_ZN_1_FLR_1 SHW_default Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2215,13 +2208,6 @@
     Until: 24:00,0.2;        !- Field 3
 
   Schedule:Compact,
-    Bathrooms_ZN_1_FLR_2 SHW_default Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
-
-  Schedule:Compact,
     Bathrooms_ZN_1_FLR_2 SHW_default Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
@@ -2241,13 +2227,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,0.2;        !- Field 3
-
-  Schedule:Compact,
-    Kitchen_ZN_1_FLR_1 SHW_default Temp Sched,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,60;         !- Field 3
 
   Schedule:Compact,
     Kitchen_ZN_1_FLR_1 SHW_default Hot Supply Temp Sched,  !- Name
@@ -29351,7 +29330,7 @@
     WaterUse,                !- End-Use Subcategory
     7.39764e-05,             !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Bathrooms_ZN_1_FLR_1 SHW_default Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Bathrooms_ZN_1_FLR_1 SHW_default Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Bathrooms_ZN_1_FLR_1,    !- Zone Name
@@ -29363,7 +29342,7 @@
     WaterUse,                !- End-Use Subcategory
     7.39764e-05,             !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Bathrooms_ZN_1_FLR_2 SHW_default Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Bathrooms_ZN_1_FLR_2 SHW_default Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Bathrooms_ZN_1_FLR_2,    !- Zone Name
@@ -29375,7 +29354,7 @@
     WaterUse,                !- End-Use Subcategory
     3.33647118454045E-4,     !- Peak Flow Rate {m3/s}
     BLDG_SWH_SCH,            !- Flow Rate Fraction Schedule Name
-    Kitchen_ZN_1_FLR_1 SHW_default Temp Sched,  !- Target Temperature Schedule Name
+    ,                        !- Target Temperature Schedule Name
     Kitchen_ZN_1_FLR_1 SHW_default Hot Supply Temp Sched,  !- Hot Water Supply Temperature Schedule Name
     ,                        !- Cold Water Supply Temperature Schedule Name
     Kitchen_ZN_1_FLR_1,      !- Zone Name

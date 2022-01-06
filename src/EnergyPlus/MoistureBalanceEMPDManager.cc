@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -259,7 +259,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
     for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (!state.dataSurface->Surface(SurfNum).HeatTransSurf || state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window)
             continue; // Heat transfer surface only and not a window
-        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::iHeatTransferModel::EMPD) continue;
+        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::EMPD) continue;
         ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
         if (state.dataMaterial->Material(MatNum).EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {

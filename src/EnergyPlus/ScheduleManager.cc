@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2384,6 +2384,8 @@ namespace ScheduleManager {
                     case ScheduleInterpolation::No:
                         NoAverageLinear = "No";
                         break;
+                    default:
+                        assert(false);
                     }
                     for (Hr = 1; Hr <= 24; ++Hr) {
                         for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,7 +83,7 @@ namespace PlantValves {
         Real64 MixedMassFlowRate = 0.0; // Flow rate downstream of mixer [kg/s]
         // loop topology variables
         int LoopNum = 0;
-        int LoopSideNum = 0;
+        DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid;
         int BranchNum = 0;
         int CompNum = 0;
         bool compDelayedInitFlag = true;

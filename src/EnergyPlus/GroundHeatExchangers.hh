@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -223,7 +223,7 @@ namespace GroundHeatExchangers {
         bool on;          // simulate the machine at it's operating part load ratio
         std::string name; // user identifier
         int loopNum;
-        int loopSideNum;
+        DataPlant::LoopSideLocation loopSideNum;
         int branchNum;
         int compNum;
         int inletNodeNum;  // Node number on the inlet side of the plant
@@ -267,11 +267,11 @@ namespace GroundHeatExchangers {
         bool needToSetupOutputVars;
 
         GLHEBase()
-            : available(false), on(false), loopNum(0), loopSideNum(0), branchNum(0), compNum(0), inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
-              designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
-              aveFluidTemp(0.0), QGLHE(0.0), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0), totalTubeLength(0.0),
-              timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1), updateCurSimTime(true),
-              triggerDesignDayReset(false), needToSetupOutputVars(true)
+            : available(false), on(false), loopNum(0), loopSideNum(DataPlant::LoopSideLocation::Invalid), branchNum(0), compNum(0), inletNodeNum(0),
+              outletNodeNum(0), designFlow(0.0), designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0),
+              outletTemp(0.0), inletTemp(0.0), aveFluidTemp(0.0), QGLHE(0.0), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0),
+              HXResistance(0.0), totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
+              updateCurSimTime(true), triggerDesignDayReset(false), needToSetupOutputVars(true)
         {
         }
 
@@ -311,7 +311,7 @@ namespace GroundHeatExchangers {
 
         virtual void getAnnualTimeConstant() = 0;
 
-        virtual void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) = 0;
+        virtual void initEnvironment(EnergyPlusData &state, Real64 CurTime) = 0;
 
         void setupOutput(EnergyPlusData &state);
     };
@@ -321,6 +321,7 @@ namespace GroundHeatExchangers {
         Invalid = -1,
         UniformHeatFlux,
         UniformBoreholeWallTemp,
+        Num
     };
 
     struct GLHEVert : GLHEBase // LCOV_EXCL_LINE
@@ -358,11 +359,11 @@ namespace GroundHeatExchangers {
 
         static std::vector<Real64> distances(MyCartesian const &point_i, MyCartesian const &point_j);
 
-        Real64 calcResponse(std::vector<Real64> const &dists, Real64 const &currTime);
+        Real64 calcResponse(std::vector<Real64> const &dists, Real64 currTime);
 
-        Real64 integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
+        Real64 integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 currTime);
 
-        Real64 doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
+        Real64 doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 currTime);
 
         void calcShortTimestepGFunctions(EnergyPlusData &state);
 
@@ -404,7 +405,7 @@ namespace GroundHeatExchangers {
 
         void combineShortAndLongTimestepGFunctions();
 
-        void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime) override;
+        void initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
 
@@ -473,7 +474,7 @@ namespace GroundHeatExchangers {
 
         void readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state) override;
 
-        void initEnvironment(EnergyPlusData &state, Real64 const &CurTime) override;
+        void initEnvironment(EnergyPlusData &state, Real64 CurTime) override;
 
         void oneTimeInit(EnergyPlusData &state) override;
 

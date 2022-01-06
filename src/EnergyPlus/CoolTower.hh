@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,17 +63,20 @@ struct EnergyPlusData;
 
 namespace CoolTower {
 
-    enum class FlowCtrlEnum
+    enum class FlowCtrl
     {
-        Unassigned,
+        Invalid = -1,
         FlowSchedule,
-        WindDriven
+        WindDriven,
+        Num
     };
 
     enum class WaterSupplyMode
     {
+        Invalid = -1,
         FromMains,
-        FromTank
+        FromTank,
+        Num
     };
 
     struct CoolTowerParams
@@ -86,7 +89,7 @@ namespace CoolTower {
         int SchedPtr;                         // Index to schedule
         int ZonePtr;                          // Point to this zone
         int PumpSchedPtr;                     // Index to schedule for water pump
-        FlowCtrlEnum FlowCtrlType;            // Type of cooltower operation
+        FlowCtrl FlowCtrlType;                // Type of cooltower operation
         WaterSupplyMode CoolTWaterSupplyMode; // Type of water source
         std::string CoolTWaterSupplyName;     // Name of water source
         int CoolTWaterSupTankID;              // Index to water storage tank
@@ -125,7 +128,7 @@ namespace CoolTower {
 
         // Default Constructor
         CoolTowerParams()
-            : SchedPtr(0), ZonePtr(0), PumpSchedPtr(0), FlowCtrlType(FlowCtrlEnum::Unassigned), CoolTWaterSupplyMode(WaterSupplyMode::FromMains),
+            : SchedPtr(0), ZonePtr(0), PumpSchedPtr(0), FlowCtrlType(FlowCtrl::Invalid), CoolTWaterSupplyMode(WaterSupplyMode::FromMains),
               CoolTWaterSupTankID(0), CoolTWaterTankDemandARRID(0), TowerHeight(0.0), OutletArea(0.0), OutletVelocity(0.0), MaxAirVolFlowRate(0.0),
               AirMassFlowRate(0.0), CoolTAirMass(0.0), MinZoneTemp(0.0), FracWaterLoss(0.0), FracFlowSched(0.0), MaxWaterFlowRate(0.0),
               ActualWaterFlowRate(0.0), RatedPumpPower(0.0), SenHeatLoss(0.0), SenHeatPower(0.0), LatHeatLoss(0.0), LatHeatPower(0.0),

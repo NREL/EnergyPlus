@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -211,10 +211,10 @@ namespace PlantManager {
         EXPECT_EQ(1, state->dataSetPointManager->NumOutAirSetPtMgrs); // SetpointManager:OutdoorAirReset
         EXPECT_EQ(2, state->dataSetPointManager->NumAllSetPtMgrs);
         // Schedule Setpoint Manager assigned at a plant loop supply outlet node
-        EXPECT_EQ(state->dataSetPointManager->SchSetPtMgr(1).CtrlVarType, "TEMPERATURE");
+        EXPECT_EQ(state->dataSetPointManager->SchSetPtMgr(1).ctrlVarType, "TEMPERATURE");
         EXPECT_EQ(state->dataSetPointManager->SchSetPtMgr(1).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY OUTLET");
         // OAReset Setpoint Manager assigned at a plant loop supply inlet node
-        EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "TEMPERATURE");
+        EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).ctrlVarType, "TEMPERATURE");
         EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlNodeListName, "CHILLED WATER LOOP SUPPLY INLET");
     }
 } // namespace PlantManager

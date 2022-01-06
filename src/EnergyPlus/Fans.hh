@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -289,8 +289,8 @@ namespace Fans {
     );
 
     int getFanInNodeIndex(EnergyPlusData &state,
-                          int const &FanIndex, // fan index
-                          bool &ErrorsFound    // set to true if problem
+                          int FanIndex,     // fan index
+                          bool &ErrorsFound // set to true if problem
     );
 
     int GetFanOutletNode(EnergyPlusData &state,
@@ -340,7 +340,7 @@ namespace Fans {
     void SetFanAirLoopNumber(EnergyPlusData &state, int FanIndex, int AirLoopNum);
 
     void FanInputsForDesHeatGain(EnergyPlusData &state,
-                                 int const &fanIndex,
+                                 int fanIndex,
                                  Real64 &deltaP,
                                  Real64 &motEff,
                                  Real64 &totEff,

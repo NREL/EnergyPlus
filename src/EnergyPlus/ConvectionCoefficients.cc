@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -5823,9 +5823,9 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                  EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes;
                  ++EquipNum) {
 
-                switch (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipType_Num(EquipNum)) {
-                case AirDistUnit_Num:
-                case PurchasedAir_Num:
+                switch (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipTypeEnum(EquipNum)) {
+                case DataZoneEquipment::ZoneEquip::AirDistUnit:
+                case DataZoneEquipment::ZoneEquip::PurchasedAir:
                     if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .EquipData(EquipNum)
                                         .OutletNodeNums)))
@@ -5858,15 +5858,15 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         }
                     }
                     break;
-                case WindowAC_Num:
-                case PkgTermHPAirToAir_Num:
-                case PkgTermACAirToAir_Num:
-                case ZoneDXDehumidifier_Num:
-                case PkgTermHPWaterToAir_Num:
-                case FanCoil4Pipe_Num:
-                case UnitVentilator_Num:
-                case UnitHeater_Num:
-                case OutdoorAirUnit_Num:
+                case DataZoneEquipment::ZoneEquip::WindowAC:
+                case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir:
+                case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir:
+                case DataZoneEquipment::ZoneEquip::ZoneDXDehumidifier:
+                case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir:
+                case DataZoneEquipment::ZoneEquip::FanCoil4Pipe:
+                case DataZoneEquipment::ZoneEquip::UnitVentilator:
+                case DataZoneEquipment::ZoneEquip::UnitHeater:
+                case DataZoneEquipment::ZoneEquip::OutdoorAirUnit:
                     if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .EquipData(EquipNum)
                                         .OutletNodeNums)))
@@ -5898,11 +5898,11 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         }
                     }
                     break;
-                case CoolingPanel_Num:
-                case BBSteam_Num:
-                case BBWaterConvective_Num:
-                case BBElectricConvective_Num:
-                case BBWater_Num:
+                case DataZoneEquipment::ZoneEquip::CoolingPanel:
+                case DataZoneEquipment::ZoneEquip::BBSteam:
+                case DataZoneEquipment::ZoneEquip::BBWaterConvective:
+                case DataZoneEquipment::ZoneEquip::BBElectricConvective:
+                case DataZoneEquipment::ZoneEquip::BBWater:
                     if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                         EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                         FlowRegimeStack[EquipOnCount] = ConvectionConstants::InConvFlowRegime::B;
@@ -5914,8 +5914,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 .CoolingPriority(EquipNum);
                     }
                     break;
-                case BBElectric_Num:
-                case HiTempRadiant_Num:
+                case DataZoneEquipment::ZoneEquip::BBElectric:
+                case DataZoneEquipment::ZoneEquip::HiTempRadiant:
                     if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                         EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                         FlowRegimeStack[EquipOnCount] = ConvectionConstants::InConvFlowRegime::B;
@@ -5927,8 +5927,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 .CoolingPriority(EquipNum);
                     }
                     break;
-                case VentilatedSlab_Num:
-                case LoTempRadiant_Num:
+                case DataZoneEquipment::ZoneEquip::VentilatedSlab:
+                case DataZoneEquipment::ZoneEquip::LoTempRadiant:
                     if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InFloorActiveElement) {
                         for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
                             if (!state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfLoop)) continue;
@@ -6071,8 +6071,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
     }
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         A1{{
             {ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Positive
              ConvectionConstants::InConvClass::A1_StableHoriz,     // HorizontalDown, Zero
@@ -6091,8 +6091,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
              ConvectionConstants::InConvClass::A1_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         A2{{
             {ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Positive
              ConvectionConstants::InConvClass::A2_StableHoriz,         // HorizontalDown, Zero
@@ -6111,8 +6111,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
              ConvectionConstants::InConvClass::A2_StableHoriz}         // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         A3{{
             {ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Positive
              ConvectionConstants::InConvClass::A3_StableHoriz,     // HorizontalDown, Zero
@@ -6131,8 +6131,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
              ConvectionConstants::InConvClass::A3_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         B{{
             {ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Positive
              ConvectionConstants::InConvClass::B_StableHoriz,     // HorizontalDown, Zero
@@ -6151,8 +6151,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
              ConvectionConstants::InConvClass::B_StableHoriz}     // HorizontalUp, Negative
         }};
 
-    constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
-                         (int)ConvectionConstants::SurfConvOrientation::Num>
+    static constexpr std::array<std::array<ConvectionConstants::InConvClass, (int)ConvectionConstants::ConvSurfDeltaT::Num>,
+                                (int)ConvectionConstants::SurfConvOrientation::Num>
         D{{
             {ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Positive
              ConvectionConstants::InConvClass::D_StableHoriz,     // HorizontalDown, Zero
@@ -7568,11 +7568,11 @@ Real64 CalcAwbiHattonHeatedWall(Real64 const DeltaTemp,        // [C] temperatur
     return Hc;
 }
 
-Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const &DeltaTemp,     // [C] temperature difference between surface and air
-                                               Real64 const &Height,        // [m] characteristic size
-                                               Real64 const &SurfTemp,      // [C] surface temperature
-                                               Real64 const &SupplyAirTemp, // [C] temperature of supply air into zone
-                                               Real64 const &AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
+Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
+                                               Real64 const Height,        // [m] characteristic size
+                                               Real64 const SurfTemp,      // [C] surface temperature
+                                               Real64 const SupplyAirTemp, // [C] temperature of supply air into zone
+                                               Real64 const AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
 )
 {
 
@@ -7609,10 +7609,10 @@ Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const &DeltaTemp,     // [
 }
 
 Real64 CalcBeausoleilMorrisonMixedAssistedWall(EnergyPlusData &state,
-                                               Real64 const &DeltaTemp, // [C] temperature difference between surface and air
-                                               Real64 const &Height,    // [m] characteristic size
-                                               Real64 const &SurfTemp,  // [C] surface temperature
-                                               int const ZoneNum        // index of zone for messaging
+                                               Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                               Real64 const Height,    // [m] characteristic size
+                                               Real64 const SurfTemp,  // [C] surface temperature
+                                               int const ZoneNum       // index of zone for messaging
 )
 {
     auto &Zone(state.dataHeatBal->Zone);
@@ -7651,11 +7651,11 @@ Real64 CalcBeausoleilMorrisonMixedAssistedWall(EnergyPlusData &state,
     }
 }
 
-Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const &DeltaTemp,     // [C] temperature difference between surface and air
-                                               Real64 const &Height,        // [m] characteristic size
-                                               Real64 const &SurfTemp,      // [C] surface temperature
-                                               Real64 const &SupplyAirTemp, // [C] temperature of supply air into zone
-                                               Real64 const &AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
+Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
+                                               Real64 const Height,        // [m] characteristic size
+                                               Real64 const SurfTemp,      // [C] surface temperature
+                                               Real64 const SupplyAirTemp, // [C] temperature of supply air into zone
+                                               Real64 const AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
 )
 {
 
@@ -7707,10 +7707,10 @@ Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const &DeltaTemp,     // [
 }
 
 Real64 CalcBeausoleilMorrisonMixedOpposingWall(EnergyPlusData &state,
-                                               Real64 const &DeltaTemp, // [C] temperature difference between surface and air
-                                               Real64 const &Height,    // [m] characteristic size
-                                               Real64 const &SurfTemp,  // [C] surface temperature
-                                               int const ZoneNum        // index of zone for messaging
+                                               Real64 const DeltaTemp, // [C] temperature difference between surface and air
+                                               Real64 const Height,    // [m] characteristic size
+                                               Real64 const SurfTemp,  // [C] surface temperature
+                                               int const ZoneNum       // index of zone for messaging
 )
 {
     auto &Zone(state.dataHeatBal->Zone);
@@ -7751,11 +7751,11 @@ Real64 CalcBeausoleilMorrisonMixedOpposingWall(EnergyPlusData &state,
     }
 }
 
-Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                              Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                              Real64 const &SurfTemp,          // [C] surface temperature
-                                              Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
-                                              Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                              Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                              Real64 const SurfTemp,          // [C] surface temperature
+                                              Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
+                                              Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
 )
 {
 
@@ -7787,10 +7787,10 @@ Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const &DeltaTemp,         /
 }
 
 Real64 CalcBeausoleilMorrisonMixedStableFloor(EnergyPlusData &state,
-                                              Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                              Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                              Real64 const &SurfTemp,          // [C] surface temperature
-                                              int const ZoneNum                // index of zone for messaging
+                                              Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                              Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                              Real64 const SurfTemp,          // [C] surface temperature
+                                              int const ZoneNum               // index of zone for messaging
 )
 {
     auto &Zone(state.dataHeatBal->Zone);
@@ -7831,11 +7831,11 @@ Real64 CalcBeausoleilMorrisonMixedStableFloor(EnergyPlusData &state,
     }
 }
 
-Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                Real64 const &SurfTemp,          // [C] surface temperature
-                                                Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                Real64 const SurfTemp,          // [C] surface temperature
+                                                Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
 )
 {
 
@@ -7869,10 +7869,10 @@ Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const &DeltaTemp,        
 }
 
 Real64 CalcBeausoleilMorrisonMixedUnstableFloor(EnergyPlusData &state,
-                                                Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                Real64 const &SurfTemp,          // [C] surface temperature
-                                                int const ZoneNum                // index of zone for messaging
+                                                Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                Real64 const SurfTemp,          // [C] surface temperature
+                                                int const ZoneNum               // index of zone for messaging
 )
 {
     auto &Zone(state.dataHeatBal->Zone);
@@ -7914,11 +7914,11 @@ Real64 CalcBeausoleilMorrisonMixedUnstableFloor(EnergyPlusData &state,
     }
 }
 
-Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                Real64 const &SurfTemp,          // [C] surface temperature
-                                                Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                Real64 const SurfTemp,          // [C] surface temperature
+                                                Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
 )
 {
 
@@ -7950,10 +7950,10 @@ Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const &DeltaTemp,        
 }
 
 Real64 CalcBeausoleilMorrisonMixedStableCeiling(EnergyPlusData &state,
-                                                Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                Real64 const &SurfTemp,          // [C] surface temperature
-                                                int const ZoneNum                // index of zone for messaging
+                                                Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                Real64 const SurfTemp,          // [C] surface temperature
+                                                int const ZoneNum               // index of zone for messaging
 )
 {
     auto &Zone(state.dataHeatBal->Zone);
@@ -7994,11 +7994,11 @@ Real64 CalcBeausoleilMorrisonMixedStableCeiling(EnergyPlusData &state,
     }
 }
 
-Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                  Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                  Real64 const &SurfTemp,          // [C] surface temperature
-                                                  Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                  Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                  Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                  Real64 const SurfTemp,          // [C] surface temperature
+                                                  Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                  Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
 )
 {
 
@@ -8031,10 +8031,10 @@ Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const &DeltaTemp,      
 }
 
 Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(EnergyPlusData &state,
-                                                  Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
-                                                  Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                  Real64 const &SurfTemp,          // [C] surface temperature
-                                                  int const ZoneNum                // index of zone for messaging
+                                                  Real64 const DeltaTemp,         // [C] temperature difference between surface and air
+                                                  Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                  Real64 const SurfTemp,          // [C] surface temperature
+                                                  int const ZoneNum               // index of zone for messaging
 )
 {
     auto &Zone(state.dataHeatBal->Zone);

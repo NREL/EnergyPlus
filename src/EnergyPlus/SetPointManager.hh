@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,42 +67,48 @@ struct EnergyPlusData;
 
 namespace SetPointManager {
 
-    enum class CtrlNodeType : int
+    enum class CtrlNodeType
     {
-        control,
-        reference
+        Invalid = -1,
+        Control,
+        Reference,
+        Num
     };
 
     enum class SupplyFlowTempStrategy
     {
+        Invalid = -1,
         MaxTemp,
         MinTemp,
-        Unknown
+        Num
     };
     enum class ControlStrategy
     {
+        Invalid = -1,
         TempFirst,
         FlowFirst,
-        Unknown
+        Num
     };
     enum class ReferenceTempType
     {
+        Invalid = -1,
         WetBulb,
         DryBulb,
-        Unknown
+        Num
     };
     enum class ReferenceGroundTempObjectType
     {
+        Invalid = -1,
         BuildingSurface,
         Shallow,
         Deep,
         FCFactorMethod,
-        Unknown
+        Num
     };
 
-    enum class iCtrlVarType
+    enum class CtrlVarType
     {
-        Unknown,
+        Invalid = -1,
         Temp,
         MaxTemp,
         MinTemp,
@@ -111,38 +117,44 @@ namespace SetPointManager {
         MinHumRat,
         MassFlow,
         MaxMassFlow,
-        MinMassFlow
+        MinMassFlow,
+        Num
     };
+
     int constexpr NumValidCtrlTypes = 9;
-    inline const char *controlTypeName(iCtrlVarType cvt)
+
+    inline const char *controlTypeName(CtrlVarType cvt)
     {
         switch (cvt) {
-        case iCtrlVarType::Temp:
+        case CtrlVarType::Temp:
             return "Temperature";
-        case iCtrlVarType::MaxTemp:
+        case CtrlVarType::MaxTemp:
             return "MaximumTemperature";
-        case iCtrlVarType::MinTemp:
+        case CtrlVarType::MinTemp:
             return "MinimumTemperature";
-        case iCtrlVarType::HumRat:
+        case CtrlVarType::HumRat:
             return "HumidityRatio";
-        case iCtrlVarType::MaxHumRat:
+        case CtrlVarType::MaxHumRat:
             return "MaximumHumidityRatio";
-        case iCtrlVarType::MinHumRat:
+        case CtrlVarType::MinHumRat:
             return "MinimumHumidityRatio";
-        case iCtrlVarType::MassFlow:
+        case CtrlVarType::MassFlow:
             return "MassFlowRate";
-        case iCtrlVarType::MaxMassFlow:
+        case CtrlVarType::MaxMassFlow:
             return "MaximumMassFlowRate";
-        case iCtrlVarType::MinMassFlow:
+        case CtrlVarType::MinMassFlow:
             return "MinimumMassFlowRate";
-        case iCtrlVarType::Unknown:
+        case CtrlVarType::Invalid:
             return "*UNKNOWN*";
+        default:
+            assert(false);
         }
         return "*UNKNOWN*"; // not sure how we would get here, the switch block cases are exhaustive
     }
 
     enum class SetPointManagerType
     {
+        Invalid = -1,
         Scheduled,
         ScheduledDual,
         OutsideAir,
@@ -173,9 +185,11 @@ namespace SetPointManager {
         ReturnWaterResetChW,
         ReturnWaterResetHW,
         TESScheduled,
-        Unknown
+        Num
     };
+
     int constexpr NumValidSPMTypes = 30;
+
     inline const char *managerTypeName(SetPointManagerType t)
     {
         switch (t) {
@@ -239,8 +253,10 @@ namespace SetPointManager {
             return "SetpointManager:ReturnTemperature:HotWater";
         case SetPointManagerType::TESScheduled:
             return "SetpointManager:ScheduledTES";
-        case SetPointManagerType::Unknown:
+        case SetPointManagerType::Invalid:
             return "*UNKNOWN*";
+        default:
+            assert(false);
         }
         return "*UNKNOWN*"; // not sure how we would get here, the switch block cases are exhaustive
     }
@@ -248,9 +264,9 @@ namespace SetPointManager {
     struct SPBase
     {
         std::string Name;
-        iCtrlVarType CtrlTypeMode; // set to iCtrlVarType::*
-        std::string CtrlVarType;
-        SPBase() : CtrlTypeMode(iCtrlVarType::Unknown)
+        CtrlVarType CtrlTypeMode; // set to CtrlVarType::*
+        std::string ctrlVarType;
+        SPBase() : CtrlTypeMode(CtrlVarType::Invalid)
         {
         }
     };
@@ -267,7 +283,7 @@ namespace SetPointManager {
         int RefNode;                 // index to reference node
 
         // Default Constructor
-        DataSetPointManager() : SPMType(SetPointManagerType::Unknown), SPMIndex(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
+        DataSetPointManager() : SPMType(SetPointManagerType::Invalid), SPMIndex(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
         {
         }
     };
@@ -521,7 +537,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineWarmestSetPointManager()
-            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Invalid), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -543,7 +559,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineColdestSetPointManager()
-            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Invalid), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -569,7 +585,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefWarmestSetPtManagerTempFlow()
-            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(ControlStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0), MinTurndown(0.0),
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(ControlStrategy::Invalid), NumCtrlNodes(0), SetPt(0.0), MinTurndown(0.0),
               Turndown(0.0), CritZoneNum(0), SimReady(false)
         {
         }
@@ -732,7 +748,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineFollowOATempSetPointManager()
-            : RefTypeMode(ReferenceTempType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefTypeMode(ReferenceTempType::Invalid), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -754,7 +770,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineFollowSysNodeTempSetPointManager()
-            : RefNodeNum(0), RefTypeMode(ReferenceTempType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefNodeNum(0), RefTypeMode(ReferenceTempType::Invalid), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -779,7 +795,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineGroundTempSetPointManager()
-            : RefTypeMode(ReferenceGroundTempObjectType::Unknown), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : RefTypeMode(ReferenceGroundTempObjectType::Invalid), Offset(0.0), MinSetTemp(0.0), MaxSetTemp(0.0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -984,7 +1000,7 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineScheduledTESSetPointManager()
-            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::CtrlType::Unassigned),
+            : SchedPtr(0), SchedPtrCharge(0), CtrlNodeNum(0), NonChargeCHWTemp(0.0), ChargeCHWTemp(0.0), CompOpType(DataPlant::CtrlType::Invalid),
               SetPt(0.0)
         {
         }
@@ -1011,24 +1027,24 @@ namespace SetPointManager {
 
     void UpdateOAPretreatSetPoints(EnergyPlusData &state);
 
-    int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
+    int getSPMBasedOnNode(EnergyPlusData &state, int NodeNum, CtrlVarType SetPtType, SetPointManagerType SMPType, CtrlNodeType ctrlOrRefNode);
 
-    bool IsNodeOnSetPtManager(EnergyPlusData &state, int NodeNum, iCtrlVarType SetPtType);
+    bool IsNodeOnSetPtManager(EnergyPlusData &state, int NodeNum, CtrlVarType SetPtType);
 
-    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int NodeNum, iCtrlVarType iCtrlVarType);
+    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int NodeNum, CtrlVarType CtrlVarType);
 
     void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int NodeNum);
 
     void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state);
 
-    iCtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int CntrlNodeNum);
+    CtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int CntrlNodeNum);
 
     void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
                                       int SchedPtr,
                                       int SchedPtrCharge,
                                       Real64 NonChargeCHWTemp,
                                       Real64 ChargeCHWTemp,
-                                      DataPlant::CtrlType const &CompOpType,
+                                      DataPlant::CtrlType CompOpType,
                                       int ControlNodeNum);
 
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int MixedAirSPMNum);

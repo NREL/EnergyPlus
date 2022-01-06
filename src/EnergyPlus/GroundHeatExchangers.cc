@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,7 +124,7 @@ using namespace GroundTemperatureManager;
 // MODULE PARAMETER DEFINITIONS
 constexpr Real64 hrsPerMonth(730.0); // Number of hours in month
 constexpr Real64 maxTSinHr(60);      // Max number of time step in a hour
-constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
+static constexpr std::array<std::string_view, 2> GFuncCalcMethodsStrs = {"UHFCALC", "UBHWTCALC"};
 
 //******************************************************************************
 
@@ -152,7 +152,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                              this->name,
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             NodeInputManager::compFluidStream::Primary,
+                                                             NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
     // get outlet node num
@@ -163,7 +163,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                               this->name,
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
 
     this->available = true;
@@ -290,7 +290,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                              objName,
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             NodeInputManager::compFluidStream::Primary,
+                                                             NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
     // get outlet node num
@@ -302,7 +302,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                               objName,
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              NodeInputManager::compFluidStream::Primary,
+                                                              NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
     this->available = true;
     this->on = true;
@@ -876,7 +876,7 @@ std::vector<Real64> GLHEVert::distances(MyCartesian const &point_i, MyCartesian 
 
 //******************************************************************************
 
-Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &currTime)
+Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const currTime)
 {
     Real64 pointToPointResponse = erfc(dists[0] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[0];
     Real64 pointToReflectedResponse = erfc(dists[1] / (2 * sqrt(this->soil.diffusivity * currTime))) / dists[1];
@@ -886,7 +886,7 @@ Real64 GLHEVert::calcResponse(std::vector<Real64> const &dists, Real64 const &cu
 
 //******************************************************************************
 
-Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const currTime)
 {
 
     // This code could be optimized in a number of ways.
@@ -919,7 +919,7 @@ Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSi
 
 //******************************************************************************
 
-Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const currTime)
 {
 
     // Similar optimizations as discussed above could happen here
@@ -1111,11 +1111,13 @@ void GLHEVert::calcShortTimestepGFunctions(EnergyPlusData &state)
 
     enum class CellType
     {
+        Invalid = -1,
         FLUID,
         CONVECTION,
         PIPE,
         GROUT,
-        SOIL
+        SOIL,
+        Num
     };
 
     struct Cell
@@ -3125,7 +3127,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const &CurTime)
+void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 const CurTime)
 {
 
     constexpr const char *RoutineName("initEnvironment");
@@ -3222,7 +3224,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 
 //******************************************************************************
 
-void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
+void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
 {
 
     constexpr const char *RoutineName("initEnvironment");

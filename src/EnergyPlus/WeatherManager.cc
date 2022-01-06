@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3668,7 +3668,7 @@ namespace WeatherManager {
                         }
                     } else {
                         bool error = false;
-                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line, error);
+                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                         if (error) {
                             ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                         }
@@ -3677,7 +3677,7 @@ namespace WeatherManager {
                     }
                 } else {
                     bool error = false;
-                    SnowDepth = UtilityRoutines::ProcessNumber(Line, error);
+                    SnowDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                     if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
@@ -3687,7 +3687,7 @@ namespace WeatherManager {
                 }
             } else {
                 bool error = false;
-                AerosolOptDepth = UtilityRoutines::ProcessNumber(Line, error);
+                AerosolOptDepth = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
                 if (error) {
                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                 }
@@ -3698,7 +3698,7 @@ namespace WeatherManager {
             }
         } else {
             bool error = false;
-            PrecipWater = UtilityRoutines::ProcessNumber(Line, error);
+            PrecipWater = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
             if (error) {
                 ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
             }
@@ -4547,19 +4547,19 @@ namespace WeatherManager {
         Real64 const DayCorrection(DataGlobalConstants::Pi * 2.0 / 366.0);
 
         // Fitted coefficients of Fourier series | Sine of declination coefficients
-        static Array1D<Real64> const SineSolDeclCoef(
-            9, {0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096});
+        static constexpr std::array<Real64, 9> SineSolDeclCoef = {
+            0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096};
         // Fitted coefficients of Fourier Series | Equation of Time coefficients
-        static Array1D<Real64> const EqOfTimeCoef(
-            9, {0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992});
+        static constexpr std::array<Real64, 9> EqOfTimeCoef = {
+            0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992};
         // Fitted coefficients of Fourier Series | ASHRAE A Factor coefficients
-        static Array1D<Real64> const ASHRAE_A_Coef(9, {1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198});
+        static constexpr std::array<Real64, 9> ASHRAE_A_Coef = {1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198};
         // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
-        static Array1D<Real64> const ASHRAE_B_Coef(
-            9, {0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867});
+        static constexpr std::array<Real64, 9> ASHRAE_B_Coef = {
+            0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867};
         // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
-        static Array1D<Real64> const ASHRAE_C_Coef(
-            9, {0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515});
+        static constexpr std::array<Real64, 9> ASHRAE_C_Coef = {
+            0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515};
 
         // Day of Year in Radians (Computed from Input DayOfYear)
         Real64 X = DayCorrection * DayOfYear; // Convert Julian date (Day of Year) to angle X
@@ -4568,28 +4568,28 @@ namespace WeatherManager {
         Real64 SinX = std::sin(X);
         Real64 CosX = std::cos(X);
 
-        SineSolarDeclination = SineSolDeclCoef(1) + SineSolDeclCoef(2) * SinX + SineSolDeclCoef(3) * CosX + SineSolDeclCoef(4) * (SinX * CosX * 2.0) +
-                               SineSolDeclCoef(5) * (pow_2(CosX) - pow_2(SinX)) +
-                               SineSolDeclCoef(6) * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
-                               SineSolDeclCoef(7) * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
-                               SineSolDeclCoef(8) * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
-                               SineSolDeclCoef(9) * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
+        SineSolarDeclination = SineSolDeclCoef[0] + SineSolDeclCoef[1] * SinX + SineSolDeclCoef[2] * CosX + SineSolDeclCoef[3] * (SinX * CosX * 2.0) +
+                               SineSolDeclCoef[4] * (pow_2(CosX) - pow_2(SinX)) +
+                               SineSolDeclCoef[5] * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
+                               SineSolDeclCoef[6] * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
+                               SineSolDeclCoef[7] * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
+                               SineSolDeclCoef[8] * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
         CosineSolarDeclination = std::sqrt(1.0 - pow_2(SineSolarDeclination));
 
-        EquationOfTime = EqOfTimeCoef(1) + EqOfTimeCoef(2) * SinX + EqOfTimeCoef(3) * CosX + EqOfTimeCoef(4) * (SinX * CosX * 2.0) +
-                         EqOfTimeCoef(5) * (pow_2(CosX) - pow_2(SinX)) +
-                         EqOfTimeCoef(6) * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
-                         EqOfTimeCoef(7) * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
-                         EqOfTimeCoef(8) * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
-                         EqOfTimeCoef(9) * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
+        EquationOfTime = EqOfTimeCoef[0] + EqOfTimeCoef[1] * SinX + EqOfTimeCoef[2] * CosX + EqOfTimeCoef[3] * (SinX * CosX * 2.0) +
+                         EqOfTimeCoef[4] * (pow_2(CosX) - pow_2(SinX)) +
+                         EqOfTimeCoef[5] * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
+                         EqOfTimeCoef[6] * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
+                         EqOfTimeCoef[7] * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
+                         EqOfTimeCoef[8] * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
 
         AnnVarSolConstant = 1.000047 + 0.000352615 * SinX + 0.0334454 * CosX;
 
-        A = ASHRAE_A_Coef(1) + ASHRAE_A_Coef(2) * SinX + ASHRAE_A_Coef(3) * CosX + ASHRAE_A_Coef(4) * (SinX * CosX * 2.0) +
-            ASHRAE_A_Coef(5) * (pow_2(CosX) - pow_2(SinX)) + ASHRAE_A_Coef(6) * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
-            ASHRAE_A_Coef(7) * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
-            ASHRAE_A_Coef(8) * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
-            ASHRAE_A_Coef(9) * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
+        A = ASHRAE_A_Coef[0] + ASHRAE_A_Coef[1] * SinX + ASHRAE_A_Coef[2] * CosX + ASHRAE_A_Coef[3] * (SinX * CosX * 2.0) +
+            ASHRAE_A_Coef[4] * (pow_2(CosX) - pow_2(SinX)) + ASHRAE_A_Coef[5] * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
+            ASHRAE_A_Coef[6] * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
+            ASHRAE_A_Coef[7] * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
+            ASHRAE_A_Coef[8] * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
 
         // Compute B and C coefficients
 
@@ -4600,17 +4600,17 @@ namespace WeatherManager {
             CosX = std::cos(X);
         }
 
-        B = ASHRAE_B_Coef(1) + ASHRAE_B_Coef(2) * SinX + ASHRAE_B_Coef(3) * CosX + ASHRAE_B_Coef(4) * (SinX * CosX * 2.0) +
-            ASHRAE_B_Coef(5) * (pow_2(CosX) - pow_2(SinX)) + ASHRAE_B_Coef(6) * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
-            ASHRAE_B_Coef(7) * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
-            ASHRAE_B_Coef(8) * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
-            ASHRAE_B_Coef(9) * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
+        B = ASHRAE_B_Coef[0] + ASHRAE_B_Coef[1] * SinX + ASHRAE_B_Coef[2] * CosX + ASHRAE_B_Coef[3] * (SinX * CosX * 2.0) +
+            ASHRAE_B_Coef[4] * (pow_2(CosX) - pow_2(SinX)) + ASHRAE_B_Coef[5] * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
+            ASHRAE_B_Coef[6] * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
+            ASHRAE_B_Coef[7] * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
+            ASHRAE_B_Coef[8] * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
 
-        C = ASHRAE_C_Coef(1) + ASHRAE_C_Coef(2) * SinX + ASHRAE_C_Coef(3) * CosX + ASHRAE_C_Coef(4) * (SinX * CosX * 2.0) +
-            ASHRAE_C_Coef(5) * (pow_2(CosX) - pow_2(SinX)) + ASHRAE_C_Coef(6) * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
-            ASHRAE_C_Coef(7) * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
-            ASHRAE_C_Coef(8) * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
-            ASHRAE_C_Coef(9) * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
+        C = ASHRAE_C_Coef[0] + ASHRAE_C_Coef[1] * SinX + ASHRAE_C_Coef[2] * CosX + ASHRAE_C_Coef[3] * (SinX * CosX * 2.0) +
+            ASHRAE_C_Coef[4] * (pow_2(CosX) - pow_2(SinX)) + ASHRAE_C_Coef[5] * (SinX * (pow_2(CosX) - pow_2(SinX)) + CosX * (SinX * CosX * 2.0)) +
+            ASHRAE_C_Coef[6] * (CosX * (pow_2(CosX) - pow_2(SinX)) - SinX * (SinX * CosX * 2.0)) +
+            ASHRAE_C_Coef[7] * (2.0 * (SinX * CosX * 2.0) * (pow_2(CosX) - pow_2(SinX))) +
+            ASHRAE_C_Coef[8] * (pow_2(pow_2(CosX) - pow_2(SinX)) - pow_2(SinX * CosX * 2.0));
     }
 
     void CalculateSunDirectionCosines(EnergyPlusData &state,
@@ -6157,14 +6157,14 @@ namespace WeatherManager {
                 state.dataWeatherManager->SpecialDays(Count).WeekDay = 0;
                 state.dataWeatherManager->SpecialDays(Count).CompDate = PMonth * 32 + PDay;
                 state.dataWeatherManager->SpecialDays(Count).WthrFile = false;
-            } else if (dateType != DateType::InvalidDate) {
+            } else if (dateType != DateType::Invalid) {
                 state.dataWeatherManager->SpecialDays(Count).DateType = dateType;
                 state.dataWeatherManager->SpecialDays(Count).Month = PMonth;
                 state.dataWeatherManager->SpecialDays(Count).Day = PDay;
                 state.dataWeatherManager->SpecialDays(Count).WeekDay = PWeekDay;
                 state.dataWeatherManager->SpecialDays(Count).CompDate = 0;
                 state.dataWeatherManager->SpecialDays(Count).WthrFile = false;
-            } else if (dateType == DateType::InvalidDate) {
+            } else if (dateType == DateType::Invalid) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + ": " + AlphArray(1) + " Invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(2) + '=' + AlphArray(2));
@@ -6308,7 +6308,7 @@ namespace WeatherManager {
                                            state.dataWeatherManager->IDFDST.StWeekDay,
                                            state.dataWeatherManager->IDFDST.StDateType,
                                            ErrorsFound);
-                if (state.dataWeatherManager->IDFDST.StDateType == DateType::InvalidDate) {
+                if (state.dataWeatherManager->IDFDST.StDateType == DateType::Invalid) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + '=' +
                                         state.dataIPShortCut->cAlphaArgs(1));
@@ -6321,7 +6321,7 @@ namespace WeatherManager {
                                            state.dataWeatherManager->IDFDST.EnWeekDay,
                                            state.dataWeatherManager->IDFDST.EnDateType,
                                            ErrorsFound);
-                if (state.dataWeatherManager->IDFDST.EnDateType == DateType::InvalidDate) {
+                if (state.dataWeatherManager->IDFDST.EnDateType == DateType::Invalid) {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + ": Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' +
                                         state.dataIPShortCut->cAlphaArgs(2));
@@ -6402,8 +6402,8 @@ namespace WeatherManager {
                                                                                {DDHumIndType::WBProfMul, "WetBulbProfileMultiplierSchedule []"}};
 
         // Below are the 2009 fractions, HOF, Chap 14, Table 6
-        static Array1D<Real64> const DefaultTempRangeMult(24, {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
-                                                               0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82});
+        static constexpr std::array<Real64, 24> DefaultTempRangeMult = {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
+                                                                        0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string units;
@@ -6721,14 +6721,14 @@ namespace WeatherManager {
                 }
             } else {
                 // Default dry-bulb temperature Range
-                Real64 LastHrValue = DefaultTempRangeMult(24);
+                Real64 LastHrValue = DefaultTempRangeMult[23];
                 for (int hour = 1; hour <= 24; ++hour) {
                     for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         Real64 WNow = state.dataWeatherManager->Interpolation(ts);
                         Real64 WPrev = 1.0 - WNow;
-                        state.dataWeatherManager->DDDBRngModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult(hour) * WNow;
+                        state.dataWeatherManager->DDDBRngModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult[hour - 1] * WNow;
                     }
-                    LastHrValue = DefaultTempRangeMult(hour);
+                    LastHrValue = DefaultTempRangeMult[hour - 1];
                 }
             }
 
@@ -7028,14 +7028,14 @@ namespace WeatherManager {
 
             } else if (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType == DDHumIndType::WBProfDef) {
                 // re WetBulbProfileDefaultMultipliers
-                Real64 LastHrValue = DefaultTempRangeMult(24);
+                Real64 LastHrValue = DefaultTempRangeMult[23];
                 for (int hour = 1; hour <= 24; ++hour) {
                     for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         Real64 WNow = state.dataWeatherManager->Interpolation(ts);
                         Real64 WPrev = 1.0 - WNow;
-                        state.dataWeatherManager->DDHumIndModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult(hour) * WNow;
+                        state.dataWeatherManager->DDHumIndModifier(ts, hour, EnvrnNum) = LastHrValue * WPrev + DefaultTempRangeMult[hour - 1] * WNow;
                     }
-                    LastHrValue = DefaultTempRangeMult(hour);
+                    LastHrValue = DefaultTempRangeMult[hour - 1];
                 }
             }
 
@@ -8426,7 +8426,7 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).StartMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).StartDay = PDay;
@@ -8442,7 +8442,7 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
@@ -8456,7 +8456,7 @@ namespace WeatherManager {
                         Line.erase(0, Pos + 1);
                     } else { // Pos=0, probably last one
                         General::ProcessDateString(state, Line, PMonth, PDay, PWeekDay, dateType, ErrorsFound);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             if (PMonth != 0 && PDay != 0) {
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndMonth = PMonth;
                                 state.dataWeatherManager->TypicalExtremePeriods(i).EndDay = PDay;
@@ -8636,7 +8636,7 @@ namespace WeatherManager {
                         // call ProcessDateString with local bool (unused)
                         bool errflag1;
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, errflag1);
-                        if (dateType != DateType::InvalidDate) {
+                        if (dateType != DateType::Invalid) {
                             // ErrorsFound is still false after ProcessDateString
                             if (PMonth == 0 && PDay == 0) {
                                 state.dataWeatherManager->EPWDaylightSaving = false;
@@ -8659,7 +8659,7 @@ namespace WeatherManager {
                     } else if (i == 3) {
                         General::ProcessDateString(state, Line.substr(0, Pos), PMonth, PDay, PWeekDay, dateType, ErrorsFound);
                         if (state.dataWeatherManager->EPWDaylightSaving) {
-                            if (dateType != DateType::InvalidDate) {
+                            if (dateType != DateType::Invalid) {
                                 state.dataWeatherManager->EPWDST.EnDateType = dateType;
                                 state.dataWeatherManager->EPWDST.EnMon = PMonth;
                                 state.dataWeatherManager->EPWDST.EnDay = PDay;
@@ -8703,7 +8703,7 @@ namespace WeatherManager {
                                     state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
-                                } else if (dateType != DateType::InvalidDate) {
+                                } else if (dateType != DateType::Invalid) {
                                     state.dataWeatherManager->SpecialDays(CurCount).DateType = dateType;
                                     state.dataWeatherManager->SpecialDays(CurCount).Month = PMonth;
                                     state.dataWeatherManager->SpecialDays(CurCount).Day = PDay;
@@ -8712,7 +8712,7 @@ namespace WeatherManager {
                                     state.dataWeatherManager->SpecialDays(CurCount).Duration = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).DayType = 1;
                                     state.dataWeatherManager->SpecialDays(CurCount).WthrFile = true;
-                                } else if (dateType == DateType::InvalidDate) {
+                                } else if (dateType == DateType::Invalid) {
                                     ShowSevereError(state, "Invalid SpecialDay Date Field(WeatherFile)=" + Line.substr(0, Pos));
                                     ErrorsFound = true;
                                 }

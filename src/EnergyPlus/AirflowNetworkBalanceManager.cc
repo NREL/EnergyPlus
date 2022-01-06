@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2623,7 +2623,7 @@ namespace AirflowNetworkBalanceManager {
                                                     "AirflowNetwork:Multizone:Surface",
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     ObjectIsParent);
                         state.dataAirflowNetwork->MultizoneExternalNodeData(i).OutAirNodeNum = NodeNum;       // Name of outdoor air node
                         state.dataAirflowNetwork->MultizoneExternalNodeData(i).height = Node(NodeNum).Height; // Nodal height
@@ -7180,7 +7180,7 @@ namespace AirflowNetworkBalanceManager {
         state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
         state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
 
-        state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpTypeEnum::BtwxtMethod;
+        state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpType::BtwxtMethod;
 
         state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
         state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
@@ -7229,25 +7229,22 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
     using namespace DataSurfaces;
 
     //  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
-    //  index 2 is side ratio (0.25,1.0,4.0),
-    static Array2D<Real64> const CPHighRiseWall(
-        3,
-        12,
-        reshape2<Real64, int>({0.60, 0.54, 0.23,  -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23,  0.54,
-                               0.60, 0.48, 0.04,  -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04,  0.48,
-                               0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44},
-                              {3, 12})); // Surface-averaged wind-pressure coefficient array for walls // Explicit reshape2 template args
-                                         // are work-around for VC++2013 bug
+    //  index 2 is side ratio (0.25,1.0,4.0)
+    // Surface-averaged wind-pressure coefficient array for walls
+    static constexpr std::array<std::array<Real64, 12>, 3> CPHighRiseWall = {{
+        {0.60, 0.54, 0.23, -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23, 0.54},
+        {0.60, 0.48, 0.04, -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04, 0.48},
+        {0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44},
+    }};
+
     //  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
-    //  index 2 is side ratio (0.25,0.5,1.0),
-    static Array2D<Real64> const CPHighRiseRoof(
-        3,
-        12,
-        reshape2<Real64, int>({-0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69,
-                               -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52,
-                               -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55},
-                              {3, 12})); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args
-                                         // are work-around for VC++2013 bug
+    //  index 2 is side ratio (0.25,0.5,1.0)
+    // Surface-averaged wind-pressure coefficient array for roof
+    static constexpr std::array<std::array<Real64, 12>, 3> CPHighRiseRoof = {{
+        {-0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69},
+        {-0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52},
+        {-0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55},
+    }};
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FacadeNum;         // Facade number
@@ -7390,8 +7387,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
                         ISR = 2;
                         WtSR = (4.0 - SR) / 3.0;
                     }
-                    vals[windDirNum - 1] = WtSR * (WtAng * CPHighRiseWall(ISR, IAng) + (1.0 - WtAng) * CPHighRiseWall(ISR, IAng + 1)) +
-                                           (1.0 - WtSR) * (WtAng * CPHighRiseWall(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseWall(ISR + 1, IAng + 1));
+                    vals[windDirNum - 1] = WtSR * (WtAng * CPHighRiseWall[ISR - 1][IAng - 1] + (1.0 - WtAng) * CPHighRiseWall[ISR - 1][IAng]) +
+                                           (1.0 - WtSR) * (WtAng * CPHighRiseWall[ISR][IAng - 1] + (1.0 - WtAng) * CPHighRiseWall[ISR][IAng]);
                 }
 
                 // Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
@@ -7407,8 +7404,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
                         ISR = 2;
                         WtSR = (1.0 - SR) / 0.5;
                     }
-                    vals[windDirNum - 1] = WtSR * (WtAng * CPHighRiseRoof(ISR, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR, IAng + 1)) +
-                                           (1.0 - WtSR) * (WtAng * CPHighRiseRoof(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR + 1, IAng + 1));
+                    vals[windDirNum - 1] = WtSR * (WtAng * CPHighRiseRoof[ISR - 1][IAng - 1] + (1.0 - WtAng) * CPHighRiseRoof[ISR - 1][IAng]) +
+                                           (1.0 - WtSR) * (WtAng * CPHighRiseRoof[ISR][IAng - 1] + (1.0 - WtAng) * CPHighRiseRoof[ISR][IAng]);
                 }
 
             } // End of wind direction loop
@@ -7474,8 +7471,8 @@ void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusDat
             WtAng = 1.0 - DelAng / 30.0;
             // Wind-pressure coefficients for roof (assumed same for low-rise and high-rise buildings)
             valsByFacade[FacadeNum - 1][windDirNum - 1] =
-                WtSR * (WtAng * CPHighRiseRoof(ISR, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR, IAng + 1)) +
-                (1.0 - WtSR) * (WtAng * CPHighRiseRoof(ISR + 1, IAng) + (1.0 - WtAng) * CPHighRiseRoof(ISR + 1, IAng + 1));
+                WtSR * (WtAng * CPHighRiseRoof[ISR - 1][IAng - 1] + (1.0 - WtAng) * CPHighRiseRoof[ISR - 1][IAng]) +
+                (1.0 - WtSR) * (WtAng * CPHighRiseRoof[ISR][IAng - 1] + (1.0 - WtAng) * CPHighRiseRoof[ISR][IAng]);
         }
         AirflowNetworkBalanceManager::CalcSingleSidedCps(state,
                                                          valsByFacade); // run the advanced single sided subroutine if at least one zone calls for it
@@ -10572,7 +10569,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                         if (state.dataAirflowNetwork->AirflowNetworkNodeData(Node2).EPlusTypeNum == iEPlusNodeType::ZIN) {
                             if (state.dataAirflowNetwork->AirflowNetworkCompData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum)
-                                    .EPlusTypeNum == iEPlusComponentType::Unassigned)
+                                    .EPlusTypeNum == iEPlusComponentType::Invalid)
                                 continue;
                         }
                         NodeMass = Node(state.dataAirflowNetwork->AirflowNetworkNodeData(Node3).EPlusNodeNum).MassFlowRate;
@@ -11293,7 +11290,7 @@ namespace AirflowNetworkBalanceManager {
         // Eliminate node not related to AirLoopHVAC
         for (k = 1; k <= state.dataBranchNodeConnections->NumOfNodeConnections; ++k) {
             if (NodeFound(state.dataBranchNodeConnections->NodeConnections(k).NodeNumber)) continue;
-            if (state.dataBranchNodeConnections->NodeConnections(k).FluidStream == NodeInputManager::compFluidStream::Secondary) {
+            if (state.dataBranchNodeConnections->NodeConnections(k).FluidStream == NodeInputManager::CompFluidStream::Secondary) {
                 NodeFound(state.dataBranchNodeConnections->NodeConnections(k).NodeNumber) = true;
             }
         }
@@ -11882,7 +11879,7 @@ namespace AirflowNetworkBalanceManager {
             j = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum;
             if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum == iComponentTypeNum::CVF) {
                 if (state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0])
-                        .EPlusTypeNum == iEPlusNodeType::Unassigned)
+                        .EPlusTypeNum == iEPlusNodeType::Invalid)
                     state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[0])
                         .EPlusTypeNum = iEPlusNodeType::FIN;
                 state.dataAirflowNetwork->AirflowNetworkNodeData(state.dataAirflowNetwork->AirflowNetworkLinkageData(i).NodeNums[1]).EPlusTypeNum =
@@ -12049,13 +12046,13 @@ namespace AirflowNetworkBalanceManager {
         // Assigning inlet and outlet nodes for a splitter
         for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfNodes; ++i) {
             if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusNodeNum == state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1)) {
-                if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum == iEPlusNodeType::Unassigned)
+                if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum == iEPlusNodeType::Invalid)
                     state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum = iEPlusNodeType::SPI;
             }
             for (j = 1; j <= state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2); ++j) {
                 if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusNodeNum ==
                     state.dataAirflowNetworkBalanceManager->SplitterNodeNumbers(j + 2)) {
-                    if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum == iEPlusNodeType::Unassigned)
+                    if (state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum == iEPlusNodeType::Invalid)
                         state.dataAirflowNetwork->AirflowNetworkNodeData(i).EPlusTypeNum = iEPlusNodeType::SPO;
                 }
             }
@@ -12325,9 +12322,6 @@ namespace AirflowNetworkBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine validate zone exhaust fan and associated surface
 
-        // Using/Aliasing
-        using DataZoneEquipment::ZoneExhaustFan_Num;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("ValidateExhaustFanInput: "); // include trailing blank space
 
@@ -12425,7 +12419,7 @@ namespace AirflowNetworkBalanceManager {
             for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
                 for (EquipTypeNum = 1; EquipTypeNum <= state.dataZoneEquip->ZoneEquipList(j).NumOfEquipTypes; ++EquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(j).EquipType_Num(EquipTypeNum) == ZoneExhaustFan_Num) {
+                    if (state.dataZoneEquip->ZoneEquipList(j).EquipTypeEnum(EquipTypeNum) == DataZoneEquipment::ZoneEquip::ZoneExhaustFan) {
                         found = false;
                         for (k = 1; k <= state.dataZoneEquip->ZoneEquipConfig(j).NumExhaustNodes; ++k) {
                             for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfExhFan; ++i) {
@@ -12638,7 +12632,7 @@ namespace AirflowNetworkBalanceManager {
 
             // Default Constructor
             AFNExtSurfacesProp()
-                : SurfNum(0), MSDNum(0), ZoneNum(0), MZDZoneNum(0), ExtNodeNum(0), facadeNum(0), curve(0), CompTypeNum(iComponentTypeNum::Unassigned),
+                : SurfNum(0), MSDNum(0), ZoneNum(0), MZDZoneNum(0), ExtNodeNum(0), facadeNum(0), curve(0), CompTypeNum(iComponentTypeNum::Invalid),
                   NodeHeight(0.0), OpeningArea(0.0), Height(0.0), Width(0.0), DischCoeff(0.0)
             {
             }

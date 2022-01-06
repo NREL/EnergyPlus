@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -671,7 +671,7 @@ namespace SimulationManager {
         auto &deviationFromSetPtThresholdHtg = state.dataHVACGlobal->deviationFromSetPtThresholdHtg;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
+        static constexpr std::array<int, 12> Div60 = {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60};
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string Alphas(10);
@@ -875,16 +875,16 @@ namespace SimulationManager {
             } else if (mod(60, state.dataGlobal->NumOfTimeStepInHour) != 0) {
                 MinInt = 9999;
                 for (Num = 1; Num <= 12; ++Num) {
-                    if (std::abs(state.dataGlobal->NumOfTimeStepInHour - Div60(Num)) > MinInt) continue;
-                    MinInt = state.dataGlobal->NumOfTimeStepInHour - Div60(Num);
+                    if (std::abs(state.dataGlobal->NumOfTimeStepInHour - Div60[Num - 1]) > MinInt) continue;
+                    MinInt = state.dataGlobal->NumOfTimeStepInHour - Div60[Num - 1];
                     Which = Num;
                 }
                 ShowWarningError(state,
                                  format("{}: Requested number ({}) not evenly divisible into 60, defaulted to nearest ({}).",
                                         CurrentModuleObject,
                                         state.dataGlobal->NumOfTimeStepInHour,
-                                        Div60(Which)));
-                state.dataGlobal->NumOfTimeStepInHour = Div60(Which);
+                                        Div60[Which - 1]));
+                state.dataGlobal->NumOfTimeStepInHour = Div60[Which - 1];
             }
             if (CondFDAlgo && state.dataGlobal->NumOfTimeStepInHour < 20) {
                 ShowWarningError(state,
@@ -2309,13 +2309,13 @@ namespace SimulationManager {
               "{}\n",
               "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
         for (int Count = 1; Count <= state.dataHVACGlobal->NumPlantLoops; ++Count) {
-            for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 //  Plant Supply Side Loop
-                // Demandside and supplyside is parametrized in DataPlant
+                // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
                 const auto LoopString = [&]() {
-                    if (LoopSideNum == DemandSide) {
+                    if (LoopSideNum == LoopSideLocation::Demand) {
                         return "Demand";
-                    } else if (LoopSideNum == SupplySide) {
+                    } else if (LoopSideNum == LoopSideLocation::Supply) {
                         return "Supply";
                     } else {
                         return "";
@@ -2429,13 +2429,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameIn);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameIn);
 
         } //  Plant Demand Side Loop
 
@@ -2465,13 +2465,13 @@ namespace SimulationManager {
               "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
 
         for (int Count = state.dataHVACGlobal->NumPlantLoops + 1; Count <= state.dataPlnt->TotNumLoops; ++Count) {
-            for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 //  Plant Supply Side Loop
-                // Demandside and supplyside is parametrized in DataPlant
+                // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
                 const auto LoopString = [&]() {
-                    if (LoopSideNum == DemandSide) {
+                    if (LoopSideNum == LoopSideLocation::Demand) {
                         return "Demand";
-                    } else if (LoopSideNum == SupplySide) {
+                    } else if (LoopSideNum == LoopSideLocation::Supply) {
                         return "Supply";
                     } else {
                         return "";
@@ -2587,13 +2587,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameIn);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameIn);
 
         } //  Plant Demand Side Loop
 

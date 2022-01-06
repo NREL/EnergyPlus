@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -73,59 +74,63 @@ namespace PackagedTerminalHeatPump {
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // Last mode of operation
-    enum class iCompMode
+    enum class CompMode
     {
-        Unassigned,
+        Invalid = -1,
         CoolingMode, // last compressor operating mode was in cooling
         HeatingMode, // last compressor operating mode was in heating
+        Num
     };
 
     // Airflow control for constant fan mode
-    enum class iAirflowCtrlMode
+    enum class AirflowCtrlMode
     {
-        Unassigned,
+        Invalid = -1,
         UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
         UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+        Num
     };
 
     // Unit type
-    enum class iPTHPType
+    enum class PTHPType
     {
-        Unassigned,
+        Invalid = -1,
         PTHPUnit,   // equivalent to PackagedTerminal:HeatPump:AirToAir
         PTACUnit,   // equivalent to PackagedTerminal:AirConditioner
         PTWSHPUnit, // equivalent to WaterToAirHeatPump
+        Num
     };
 
     // control type
-    enum class iCtrlType
+    enum class PTHPCtrlType
     {
-        Unassigned,
+        Invalid = -1,
         None,       // no special capacity control
         CCM_ASHRAE, // capacity control based on ASHRAE Standard 90.1
+        Num
     };
 
     struct PTUnitData
     {
         // Members
         // input data
-        iPTHPType UnitType_Num;          // parameter equivalent to type of unit
-        int ZoneEquipType;               // Type of PT unit
-        bool useVSCoilModel;             // does PT use VS coil models
-        int SchedPtr;                    // index number to availability schedule
-        Real64 MaxCoolAirVolFlow;        // supply air volumetric flow rate during cooling operation [m3/s]
-        Real64 MaxHeatAirVolFlow;        // supply air volumetric flow rate during heating operation [m3/s]
-        Real64 MaxNoCoolHeatAirVolFlow;  // supply air volumetric flow rate when no cooling or heating [m3/s]
-        Real64 CoolOutAirVolFlow;        // OA volumetric flow rate during cooling operation [m3/s]
-        Real64 HeatOutAirVolFlow;        // OA volumetric flow rate during heating operation [m3/s]
-        Real64 NoCoolHeatOutAirVolFlow;  // OA volumetric flow rate when no cooling or heating [m3/s]
-        Real64 CoolOutAirMassFlow;       // OA mass flow rate during cooling operation [kg/s]
-        Real64 HeatOutAirMassFlow;       // OA mass flow rate during heating operation [kg/s]
-        Real64 NoCoolHeatOutAirMassFlow; // OA mass flow rate when no cooling or heating [kg/s]
-        int OutsideAirNode;              // OAmixer outside air node number
-        int AirReliefNode;               // OAmixer relief air node number
-        std::string OAMixType;           // type of outside air mixer
-        std::string OAMixName;           // name of OAmixer
+        PTHPType UnitType_Num;                      // parameter equivalent to type of unit
+        DataZoneEquipment::ZoneEquip ZoneEquipType; // Type of PT unit
+        bool useVSCoilModel;                        // does PT use VS coil models
+        int SchedPtr;                               // index number to availability schedule
+        Real64 MaxCoolAirVolFlow;                   // supply air volumetric flow rate during cooling operation [m3/s]
+        Real64 MaxHeatAirVolFlow;                   // supply air volumetric flow rate during heating operation [m3/s]
+        Real64 MaxNoCoolHeatAirVolFlow;             // supply air volumetric flow rate when no cooling or heating [m3/s]
+        Real64 CoolOutAirVolFlow;                   // OA volumetric flow rate during cooling operation [m3/s]
+        Real64 HeatOutAirVolFlow;                   // OA volumetric flow rate during heating operation [m3/s]
+        Real64 NoCoolHeatOutAirVolFlow;             // OA volumetric flow rate when no cooling or heating [m3/s]
+        Real64 CoolOutAirMassFlow;                  // OA mass flow rate during cooling operation [kg/s]
+        Real64 HeatOutAirMassFlow;                  // OA mass flow rate during heating operation [kg/s]
+        Real64 NoCoolHeatOutAirMassFlow;            // OA mass flow rate when no cooling or heating [kg/s]
+        int OutsideAirNode;                         // OAmixer outside air node number
+        int AirReliefNode;                          // OAmixer relief air node number
+        std::string OAMixType;                      // type of outside air mixer
+        std::string OAMixName;                      // name of OAmixer
         int OAMixIndex;
         std::string FanName;        // name of fan
         std::string FanType;        // type of fan
@@ -189,43 +194,43 @@ namespace PackagedTerminalHeatPump {
         int ATMixerSecNode;      // secondary air inlet node number for the air terminal mixer
         int ATMixerOutNode;      // outlet air node number for the air terminal mixer
         // Report data
-        Real64 TotHeatEnergyRate;        // total heating output [W]
-        Real64 TotHeatEnergy;            // total heating output [J]
-        Real64 TotCoolEnergyRate;        // total cooling output [W]
-        Real64 TotCoolEnergy;            // total cooling output [J]
-        Real64 SensHeatEnergyRate;       // sensible heating output [W]
-        Real64 SensHeatEnergy;           // sensible heating output [J]
-        Real64 SensCoolEnergyRate;       // sensible cooling output [W]
-        Real64 SensCoolEnergy;           // sensible cooling output [J]
-        Real64 LatHeatEnergyRate;        // latent heating output [W]
-        Real64 LatHeatEnergy;            // latent heating output [J]
-        Real64 LatCoolEnergyRate;        // latent cooling output [W]
-        Real64 LatCoolEnergy;            // latent cooling output [J]
-        Real64 ElecPower;                // electricity consumed [W]
-        Real64 ElecConsumption;          // electricity consumed [J]
-        Real64 CompPartLoadRatio;        // compressor part-load ratio for time step
-        iCompMode LastMode;              // last mode of operation, coolingmode or heatingmode
-        iAirflowCtrlMode AirFlowControl; // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
-        iCtrlType ControlType;           // Setpoint, Load based or ASHRAE (SZVAV) control
-        bool validASHRAECoolCoil;        // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
-        bool validASHRAEHeatCoil;        // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
-        bool simASHRAEModel;             // flag denoting that ASHRAE model (SZVAV) should be used
-        Real64 CompPartLoadFrac;         // compressor part load ratio
-        int PlantCoilOutletNode;         // outlet node for water coil
-        int SuppCoilLoopNum;             // plant loop index for water heating coil
-        int SuppCoilLoopSide;            // plant loop side  index for water heating coil
-        int SuppCoilBranchNum;           // plant loop branch index for water heating coil
-        int SuppCoilCompNum;             // plant loop component index for water heating coil
-        Real64 MaxSuppCoilFluidFlow;     // water or steam mass flow rate supp. heating coil [kg/s]
-        int HotWaterCoilMaxIterIndex;    // Index to recurring warning message
-        int HotWaterCoilMaxIterIndex2;   // Index to recurring warning message
-        Real64 ActualFanVolFlowRate;     // Volumetric flow rate from fan object
-        Real64 HeatingSpeedRatio;        // Fan speed ratio in heating mode
-        Real64 CoolingSpeedRatio;        // Fan speed ratio in cooling mode
-        Real64 NoHeatCoolSpeedRatio;     // Fan speed ratio when no cooling or heating
+        Real64 TotHeatEnergyRate;                     // total heating output [W]
+        Real64 TotHeatEnergy;                         // total heating output [J]
+        Real64 TotCoolEnergyRate;                     // total cooling output [W]
+        Real64 TotCoolEnergy;                         // total cooling output [J]
+        Real64 SensHeatEnergyRate;                    // sensible heating output [W]
+        Real64 SensHeatEnergy;                        // sensible heating output [J]
+        Real64 SensCoolEnergyRate;                    // sensible cooling output [W]
+        Real64 SensCoolEnergy;                        // sensible cooling output [J]
+        Real64 LatHeatEnergyRate;                     // latent heating output [W]
+        Real64 LatHeatEnergy;                         // latent heating output [J]
+        Real64 LatCoolEnergyRate;                     // latent cooling output [W]
+        Real64 LatCoolEnergy;                         // latent cooling output [J]
+        Real64 ElecPower;                             // electricity consumed [W]
+        Real64 ElecConsumption;                       // electricity consumed [J]
+        Real64 CompPartLoadRatio;                     // compressor part-load ratio for time step
+        CompMode LastMode;                            // last mode of operation, coolingmode or heatingmode
+        AirflowCtrlMode AirFlowControl;               // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
+        PTHPCtrlType controlType;                     // Setpoint, Load based or ASHRAE (SZVAV) control
+        bool validASHRAECoolCoil;                     // cooling coil model that conforms to ASHRAE 90.1 requirements and methodology
+        bool validASHRAEHeatCoil;                     // heating coil model that conforms to ASHRAE 90.1 requirements and methodology
+        bool simASHRAEModel;                          // flag denoting that ASHRAE model (SZVAV) should be used
+        Real64 CompPartLoadFrac;                      // compressor part load ratio
+        int PlantCoilOutletNode;                      // outlet node for water coil
+        int SuppCoilLoopNum;                          // plant loop index for water heating coil
+        DataPlant::LoopSideLocation SuppCoilLoopSide; // plant loop side  index for water heating coil
+        int SuppCoilBranchNum;                        // plant loop branch index for water heating coil
+        int SuppCoilCompNum;                          // plant loop component index for water heating coil
+        Real64 MaxSuppCoilFluidFlow;                  // water or steam mass flow rate supp. heating coil [kg/s]
+        int HotWaterCoilMaxIterIndex;                 // Index to recurring warning message
+        int HotWaterCoilMaxIterIndex2;                // Index to recurring warning message
+        Real64 ActualFanVolFlowRate;                  // Volumetric flow rate from fan object
+        Real64 HeatingSpeedRatio;                     // Fan speed ratio in heating mode
+        Real64 CoolingSpeedRatio;                     // Fan speed ratio in cooling mode
+        Real64 NoHeatCoolSpeedRatio;                  // Fan speed ratio when no cooling or heating
         int AvailStatus;
         // starting added varibles for variable speed water source heat pump, Bo Shen, ORNL, March 2012
-        iCompMode HeatCoolMode;              // System operating mode (0 = floating, 1 = cooling, 2 = heating)
+        CompMode HeatCoolMode;               // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         int NumOfSpeedCooling;               // The number of speeds for cooling
         int NumOfSpeedHeating;               // The number of speeds for heating
         Real64 IdleSpeedRatio;               // idle air fan ratio
@@ -250,65 +255,65 @@ namespace PackagedTerminalHeatPump {
         Real64 ControlZoneMassFlowFrac; //
 
         // variables used in SZVAV model:
-        std::string Name;                // name of unit
-        std::string UnitType;            // type of unit
-        int MaxIterIndex;                // used in PLR calculations for sensible load
-        int NodeNumOfControlledZone;     // node number of control zone
-        int RegulaFalsiFailedIndex;      // used in PLR calculations for sensible load
-        Real64 FanPartLoadRatio;         // fan part-load ratio for time step
-        Real64 CoolCoilWaterFlowRatio;   // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
-        Real64 HeatCoilWaterFlowRatio;   // holds ratio of max heat coil water flow rate, may be < 1 when FlowLock is true
-        int ControlZoneNum;              // index of unit in ZoneEquipConfig
-        int AirInNode;                   // Parent inlet air node number
-        int AirOutNode;                  // Parent outlet air node number
-        Real64 MaxCoolAirMassFlow;       // Maximum coil air mass flow for cooling [kg/s]
-        Real64 MaxHeatAirMassFlow;       // Maximum coil air mass flow for heating [kg/s]
-        Real64 MaxNoCoolHeatAirMassFlow; // Maximum coil air mass flow for no cooling or heating [kg/s]
-        Real64 DesignMinOutletTemp;      // DOAS DX Cooling or SZVAV coil outlet air minimum temperature [C]
-        Real64 DesignMaxOutletTemp;      // Maximum supply air temperature from heating coil [C]
-        Real64 LowSpeedCoolFanRatio;     // cooling mode ratio of low speed fan flow to full flow rate
-        Real64 LowSpeedHeatFanRatio;     // heating mode ratio of low speed fan flow to full flow rate
-        Real64 MaxCoolCoilFluidFlow;     // water flow rate for cooling coil [kg/s] - NOT USED in PTHP
-        Real64 MaxHeatCoilFluidFlow;     // water or steam mass flow rate for heating coil [kg/s]
-        int CoolCoilLoopNum;             // plant loop index for water cooling coil - NOT USED in PTHP
-        int CoolCoilLoopSide;            // plant loop side  index for water cooling coil - NOT USED in PTHP
-        int CoolCoilBranchNum;           // plant loop branch index for water cooling coil - NOT USED in PTHP
-        int CoolCoilCompNum;             // plant loop component index for water cooling coil - NOT USED in PTHP
-        int HeatCoilLoopNum;             // plant loop index for water heating coil
-        int HeatCoilLoopSide;            // plant loop side  index for water heating coil
-        int HeatCoilBranchNum;           // plant loop branch index for water heating coil
-        int HeatCoilCompNum;             // plant loop component index for water heating coil
-        int CoolCoilFluidInletNode;      // water cooling coil water inlet node number NOT USED in PTHP
-        int CoolCoilFluidOutletNodeNum;  // water cooling coil water outlet node number NOT USED in PTHP
-        int CoolCoilInletNodeNum;        // cooling coil air inlet node number
-        int CoolCoilOutletNodeNum;       // cooling coil air outlet node number
-        int HeatCoilFluidInletNode;      // heating coil fluid (e.g., water or steam) inlet node number
-        int HeatCoilFluidOutletNodeNum;  // heating coil fluid (e.g., water or steam) outlet node number
-        int HeatCoilInletNodeNum;        // heating coil air inlet node number
-        int HeatCoilOutletNodeNum;       // heating coil air outlet node number
+        std::string Name;                             // name of unit
+        std::string UnitType;                         // type of unit
+        int MaxIterIndex;                             // used in PLR calculations for sensible load
+        int NodeNumOfControlledZone;                  // node number of control zone
+        int RegulaFalsiFailedIndex;                   // used in PLR calculations for sensible load
+        Real64 FanPartLoadRatio;                      // fan part-load ratio for time step
+        Real64 CoolCoilWaterFlowRatio;                // holds ratio of max cool coil water flow rate, may be < 1 when FlowLock is true
+        Real64 HeatCoilWaterFlowRatio;                // holds ratio of max heat coil water flow rate, may be < 1 when FlowLock is true
+        int ControlZoneNum;                           // index of unit in ZoneEquipConfig
+        int AirInNode;                                // Parent inlet air node number
+        int AirOutNode;                               // Parent outlet air node number
+        Real64 MaxCoolAirMassFlow;                    // Maximum coil air mass flow for cooling [kg/s]
+        Real64 MaxHeatAirMassFlow;                    // Maximum coil air mass flow for heating [kg/s]
+        Real64 MaxNoCoolHeatAirMassFlow;              // Maximum coil air mass flow for no cooling or heating [kg/s]
+        Real64 DesignMinOutletTemp;                   // DOAS DX Cooling or SZVAV coil outlet air minimum temperature [C]
+        Real64 DesignMaxOutletTemp;                   // Maximum supply air temperature from heating coil [C]
+        Real64 LowSpeedCoolFanRatio;                  // cooling mode ratio of low speed fan flow to full flow rate
+        Real64 LowSpeedHeatFanRatio;                  // heating mode ratio of low speed fan flow to full flow rate
+        Real64 MaxCoolCoilFluidFlow;                  // water flow rate for cooling coil [kg/s] - NOT USED in PTHP
+        Real64 MaxHeatCoilFluidFlow;                  // water or steam mass flow rate for heating coil [kg/s]
+        int CoolCoilLoopNum;                          // plant loop index for water cooling coil - NOT USED in PTHP
+        DataPlant::LoopSideLocation CoolCoilLoopSide; // plant loop side  index for water cooling coil - NOT USED in PTHP
+        int CoolCoilBranchNum;                        // plant loop branch index for water cooling coil - NOT USED in PTHP
+        int CoolCoilCompNum;                          // plant loop component index for water cooling coil - NOT USED in PTHP
+        int HeatCoilLoopNum;                          // plant loop index for water heating coil
+        DataPlant::LoopSideLocation HeatCoilLoopSide; // plant loop side  index for water heating coil
+        int HeatCoilBranchNum;                        // plant loop branch index for water heating coil
+        int HeatCoilCompNum;                          // plant loop component index for water heating coil
+        int CoolCoilFluidInletNode;                   // water cooling coil water inlet node number NOT USED in PTHP
+        int CoolCoilFluidOutletNodeNum;               // water cooling coil water outlet node number NOT USED in PTHP
+        int CoolCoilInletNodeNum;                     // cooling coil air inlet node number
+        int CoolCoilOutletNodeNum;                    // cooling coil air outlet node number
+        int HeatCoilFluidInletNode;                   // heating coil fluid (e.g., water or steam) inlet node number
+        int HeatCoilFluidOutletNodeNum;               // heating coil fluid (e.g., water or steam) outlet node number
+        int HeatCoilInletNodeNum;                     // heating coil air inlet node number
+        int HeatCoilOutletNodeNum;                    // heating coil air outlet node number
 
         // end of the additional variables for variable speed water source heat pump
 
         // Default Constructor
         PTUnitData()
-            : UnitType_Num(iPTHPType::Unassigned), ZoneEquipType(0), useVSCoilModel(false), SchedPtr(0), MaxCoolAirVolFlow(0.0),
-              MaxHeatAirVolFlow(0.0), MaxNoCoolHeatAirVolFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),
-              CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutsideAirNode(0), AirReliefNode(0), OAMixIndex(0),
-              FanType_Num(0), FanIndex(0), FanSchedPtr(0), FanAvailSchedPtr(0), DXCoolCoilType_Num(0), CoolCoilCompIndex(0), DXCoolCoilIndexNum(0),
-              CondenserNodeNum(0), DXHeatCoilIndexNum(0), DXHeatCoilType_Num(0), ACHeatCoilCap(0.0), ACHeatCoilIndex(0), SuppCoilFluidInletNode(0),
-              HWCoilSteamOutletNode(0), SuppHeatCoilType_Num(0), ACHeatCoilType_Num(0), SuppHeatCoilIndex(0), SupHeatCoilCap(0),
-              SupCoilAirInletNode(0), MaxSATSupHeat(0.0), MaxOATSupHeat(0.0), OpMode(0), FanPlace(0), CoolConvergenceTol(0.0),
-              HeatConvergenceTol(0.0), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), IterErrIndex(0), WaterCyclingMode(0),
-              PTObjectIndex(0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), OnCyclePowerFraction(0.0), FanDelayTime(0.0),
+            : UnitType_Num(PTHPType::Invalid), ZoneEquipType(DataZoneEquipment::ZoneEquip::Invalid), useVSCoilModel(false), SchedPtr(0),
+              MaxCoolAirVolFlow(0.0), MaxHeatAirVolFlow(0.0), MaxNoCoolHeatAirVolFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0),
+              NoCoolHeatOutAirVolFlow(0.0), CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), OutsideAirNode(0),
+              AirReliefNode(0), OAMixIndex(0), FanType_Num(0), FanIndex(0), FanSchedPtr(0), FanAvailSchedPtr(0), DXCoolCoilType_Num(0),
+              CoolCoilCompIndex(0), DXCoolCoilIndexNum(0), CondenserNodeNum(0), DXHeatCoilIndexNum(0), DXHeatCoilType_Num(0), ACHeatCoilCap(0.0),
+              ACHeatCoilIndex(0), SuppCoilFluidInletNode(0), HWCoilSteamOutletNode(0), SuppHeatCoilType_Num(0), ACHeatCoilType_Num(0),
+              SuppHeatCoilIndex(0), SupHeatCoilCap(0), SupCoilAirInletNode(0), MaxSATSupHeat(0.0), MaxOATSupHeat(0.0), OpMode(0), FanPlace(0),
+              CoolConvergenceTol(0.0), HeatConvergenceTol(0.0), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), IterErrIndex(0),
+              WaterCyclingMode(0), PTObjectIndex(0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), OnCyclePowerFraction(0.0), FanDelayTime(0.0),
               DesignHeatingCapacity(0.0), DesignCoolingCapacity(0.0), DesignSuppHeatingCapacity(0.0), ATMixerExists(false), ATMixerIndex(0),
               ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), TotHeatEnergyRate(0.0), TotHeatEnergy(0.0),
               TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0),
               LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0),
-              CompPartLoadRatio(0.0), LastMode(iCompMode::Unassigned), AirFlowControl(iAirflowCtrlMode::Unassigned),
-              ControlType(iCtrlType::Unassigned), validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false),
-              CompPartLoadFrac(0.0), PlantCoilOutletNode(0), SuppCoilLoopNum(0), SuppCoilLoopSide(0), SuppCoilBranchNum(0), SuppCoilCompNum(0),
+              CompPartLoadRatio(0.0), LastMode(CompMode::Invalid), AirFlowControl(AirflowCtrlMode::Invalid), controlType(PTHPCtrlType::Invalid),
+              validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false), CompPartLoadFrac(0.0), PlantCoilOutletNode(0),
+              SuppCoilLoopNum(0), SuppCoilLoopSide(DataPlant::LoopSideLocation::Invalid), SuppCoilBranchNum(0), SuppCoilCompNum(0),
               MaxSuppCoilFluidFlow(0.0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0),
-              CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(iCompMode::Unassigned), NumOfSpeedCooling(0),
+              CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(CompMode::Invalid), NumOfSpeedCooling(0),
               NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
               HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
               CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
@@ -319,10 +324,10 @@ namespace PackagedTerminalHeatPump {
               MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsiFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
-              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0),
-              HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilFluidInletNode(0),
-              CoolCoilFluidOutletNodeNum(0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilFluidInletNode(0),
-              HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0)
+              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilLoopNum(0), CoolCoilLoopSide(DataPlant::LoopSideLocation::Invalid),
+              CoolCoilBranchNum(0), CoolCoilCompNum(0), HeatCoilLoopNum(0), HeatCoilLoopSide(DataPlant::LoopSideLocation::Invalid),
+              HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0), CoolCoilInletNodeNum(0),
+              CoolCoilOutletNodeNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0)
         {
         }
     };
@@ -427,13 +432,13 @@ namespace PackagedTerminalHeatPump {
 
     void ReportPTUnit(EnergyPlusData &state, int PTUnitNum); // number of the current AC unit being simulated
 
-    int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
+    int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int PTUnitCompIndex, DataZoneEquipment::ZoneEquip PTUnitType);
 
-    int GetPTUnitOutAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
+    int GetPTUnitOutAirNode(EnergyPlusData &state, int PTUnitCompIndex, DataZoneEquipment::ZoneEquip PTUnitType);
 
-    int GetPTUnitReturnAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
+    int GetPTUnitReturnAirNode(EnergyPlusData &state, int PTUnitCompIndex, DataZoneEquipment::ZoneEquip PTUnitType);
 
-    int GetPTUnitMixedAirNode(EnergyPlusData &state, int PTUnitCompIndex, int PTUnitType);
+    int GetPTUnitMixedAirNode(EnergyPlusData &state, int PTUnitCompIndex, DataZoneEquipment::ZoneEquip PTUnitType);
 
     //******************************************************************************
 

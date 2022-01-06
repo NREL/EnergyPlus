@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,18 +80,13 @@ namespace DataPlant {
     constexpr Real64 CriteriaDelta_Temperature(0.010);
     constexpr Real64 CriteriaDelta_HeatTransferRate(0.100);
 
-    // Parameters for loop side location
-    constexpr int DemandSupply_No(0);
-    constexpr int DemandSide(1);
-    constexpr int SupplySide(2);
-
     // Parameters for tolerance
     constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     constexpr Real64 DeltaTempTol(0.0001); // minimum significant loop temperature difference
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
 
-    constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNames{
+    static constexpr std::array<std::string_view, static_cast<int>(PlantEquipmentType::Num)> PlantEquipTypeNames{
         "Boiler:HotWater",
         "Boiler:Steam",
         "Chiller:Absorption",
@@ -189,7 +184,7 @@ namespace DataPlant {
         "HeatPump:PlantLoop:EIR:Cooling",
         "HeatPump:PlantLoop:EIR:Heating"};
 
-    constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
+    static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
         "BOILER:STEAM",
         "CHILLER:ABSORPTION",
@@ -287,7 +282,7 @@ namespace DataPlant {
         "HEATPUMP:PLANTLOOP:EIR:COOLING",
         "HEATPUMP:PLANTLOOP:EIR:HEATING"};
 
-    constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
+    static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant,
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant,
         LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
@@ -300,16 +295,6 @@ namespace DataPlant {
         LoopType::Plant, LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,
         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Both,
         LoopType::Both,  LoopType::Both,  LoopType::Both,  LoopType::Plant, LoopType::Plant, LoopType::Plant, LoopType::Both,  LoopType::Both};
-
-    extern Array1D<Real64> const ConvergenceHistoryARR;
-
-    // These all are going to be hard coded for now, but when we move to C++20 we will have constexpr methods available to fix this
-    // const Real64 sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
-    // const Real64 square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
-    // const Real64 sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
-    constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
-    constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
-    constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
 
 } // namespace DataPlant
 
@@ -328,10 +313,8 @@ struct DataPlantData : BaseGlobalStruct
     int PlantManageHalfLoopCalls = 0; // tracks number of half loop calls
     Array1D<DataPlant::PlantLoopData> PlantLoop;
     Array1D<DataPlant::PlantAvailMgrData> PlantAvailMgr;
-    Array1D<DataPlant::ReportLoopData> VentRepPlantSupplySide;
-    Array1D<DataPlant::ReportLoopData> VentRepPlantDemandSide;
-    Array1D<DataPlant::ReportLoopData> VentRepCondSupplySide;
-    Array1D<DataPlant::ReportLoopData> VentRepCondDemandSide;
+    std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepPlant;
+    std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepCond;
     Array1D<DataPlant::PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
 
     void clear_state() override
@@ -348,10 +331,10 @@ struct DataPlantData : BaseGlobalStruct
         this->PlantManageHalfLoopCalls = 0;
         this->PlantLoop.deallocate();
         this->PlantAvailMgr.deallocate();
-        this->VentRepPlantSupplySide.deallocate();
-        this->VentRepPlantDemandSide.deallocate();
-        this->VentRepCondSupplySide.deallocate();
-        this->VentRepCondDemandSide.deallocate();
+        this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
+        this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Supply)].deallocate();
+        this->VentRepCond[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
+        this->VentRepCond[static_cast<int>(DataPlant::LoopSideLocation::Supply)].deallocate();
         this->PlantCallingOrderInfo.deallocate();
     }
 };

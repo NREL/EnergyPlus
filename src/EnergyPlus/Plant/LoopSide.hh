@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -140,8 +140,8 @@ namespace DataPlant {
         Real64 ThisSideLoadAlterations;
         // these are intended to be temporary
         int myLoopNum;
-        int myLoopSideNum;
-        int myOtherLoopSideNum;
+        DataPlant::LoopSideLocation myLoopSideNum;
+        DataPlant::LoopSideLocation myOtherLoopSideNum;
 
         // Default Constructor
         HalfLoopData()
@@ -158,7 +158,8 @@ namespace DataPlant {
               flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0), hasConstSpeedBranchPumps(false),
               InitialDemandToLoopSetPoint(0.0), CurrentAlterationsToDemand(0.0), UpdatedDemandToLoopSetPoint(0.0),
               LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), refrigIndex(0), LoopSetPtDemandAtInlet(0.0),
-              ThisSideLoadAlterations(0.0), myLoopNum(0), myLoopSideNum(0), myOtherLoopSideNum(0)
+              ThisSideLoadAlterations(0.0), myLoopNum(0), myLoopSideNum(DataPlant::LoopSideLocation::Invalid),
+              myOtherLoopSideNum(DataPlant::LoopSideLocation::Invalid)
         {
         }
 
@@ -179,11 +180,11 @@ namespace DataPlant {
 
         void DisableAnyBranchPumpsConnectedToUnloadedEquipment();
 
-        void DoFlowAndLoadSolutionPass(EnergyPlusData &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
+        void DoFlowAndLoadSolutionPass(EnergyPlusData &state, LoopSideLocation OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
 
         Real64 CalcOtherSideDemand(EnergyPlusData &state, Real64 ThisLoopSideFlow);
 
-        Real64 SetupLoopFlowRequest(EnergyPlusData &state, int OtherSide);
+        Real64 SetupLoopFlowRequest(EnergyPlusData &state, const LoopSideLocation OtherSide);
 
         Real64 EvaluateLoopSetPointLoad(EnergyPlusData &state, int FirstBranchNum, int LastBranchNum, Real64 ThisLoopSideFlow);
 

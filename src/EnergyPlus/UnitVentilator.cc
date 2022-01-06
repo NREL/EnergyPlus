@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -448,7 +448,7 @@ namespace UnitVentilator {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           NodeInputManager::compFluidStream::Primary,
+                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsParent);
             state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode = GetOnlySingleNode(state,
                                                                                             Alphas(7),
@@ -457,7 +457,7 @@ namespace UnitVentilator {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
 
             // Get AirTerminal mixer data
@@ -475,7 +475,7 @@ namespace UnitVentilator {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists = true;
             }
             state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
-                state, DataZoneEquipment::UnitVentilator_Num, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+                state, DataZoneEquipment::ZoneEquip::UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr == 0) {
                 ShowSevereError(
                     state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\",");
@@ -491,7 +491,7 @@ namespace UnitVentilator {
                                                                                                Alphas(1),
                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                                               NodeInputManager::compFluidStream::Primary,
+                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             }
 
@@ -643,7 +643,7 @@ namespace UnitVentilator {
                                       Alphas(1),
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                      NodeInputManager::compFluidStream::Primary,
+                                      NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 if (!lAlphaBlanks(8)) {
                     CheckAndAddAirNodeNumber(state, state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode, IsValid);
@@ -659,7 +659,7 @@ namespace UnitVentilator {
                                                                                                    Alphas(1),
                                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                                    DataLoopNode::NodeConnectionType::ReliefAir,
-                                                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                                    ObjectIsNotParent);
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutNode = GetOnlySingleNode(state,
@@ -669,7 +669,7 @@ namespace UnitVentilator {
                                                                                                     Alphas(1),
                                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
             } else {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode;
@@ -1361,7 +1361,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -1370,7 +1370,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
             } else {
@@ -1380,7 +1380,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -1389,7 +1389,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
             }
@@ -1402,7 +1402,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -1411,7 +1411,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::objectVectorOOFanSystemModel,
+                        DataAirSystems::ObjectVectorOOFanSystemModel,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
             } else {
@@ -1421,7 +1421,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent) {
@@ -1430,7 +1430,7 @@ namespace UnitVentilator {
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilTypeCh,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).FanName,
-                        DataAirSystems::structArrayLegacyFanModels,
+                        DataAirSystems::StructArrayLegacyFanModels,
                         state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index);
                 }
             }
@@ -1463,7 +1463,6 @@ namespace UnitVentilator {
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::UnitVentilator_Num;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1502,12 +1501,13 @@ namespace UnitVentilator {
 
         if (allocated(ZoneComp)) {
             if (state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
                     state.dataUnitVentilators->UnitVent(UnitVentNum).AvailManagerListName;
-                ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
                 state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum) = false;
             }
-            state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus = ZoneComp(UnitVentilator_Num).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
+            state.dataUnitVentilators->UnitVent(UnitVentNum).AvailStatus =
+                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
         }
 
         if (state.dataUnitVentilators->MyPlantScanFlag(UnitVentNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -1909,13 +1909,13 @@ namespace UnitVentilator {
         DoWaterCoilSizing = false;
         CoilNum = 0;
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).Fan_Index;
         // unit ventilator is always blow thru
-        state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
 
         if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == BothOption) {
             state.dataSize->ZoneCoolingOnlyFan = true;
@@ -2929,7 +2929,6 @@ namespace UnitVentilator {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitVentilator_Num;
         using General::SolveRoot;
         using HeatingCoils::CheckHeatingCoilSchedule;
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
@@ -3713,7 +3712,6 @@ namespace UnitVentilator {
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
         auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-        using DataZoneEquipment::UnitVentilator_Num;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PlantUtilities::SetComponentFlowRate;

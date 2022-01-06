@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,9 +63,11 @@ struct EnergyPlusData;
 
 namespace DataSurfaceColors {
 
+    static constexpr std::array<int, 15> defaultcolorno = {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5};
+
     enum class ColorNo
     {
-        Unassigned = -1,
+        Invalid = -1,
         Text,
         Wall,
         Window,
@@ -81,7 +83,7 @@ namespace DataSurfaceColors {
         TDDDiffuser,
         DaylSensor1,
         DaylSensor2,
-        NUM
+        Num,
     };
 
     bool MatchAndSetColorTextString(EnergyPlusData &state,
@@ -96,29 +98,11 @@ namespace DataSurfaceColors {
 
 struct SurfaceColorData : BaseGlobalStruct
 {
-    Array1D_int const defaultcolorno = Array1D_int({0, 14}, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5});
-    Array1D_int DXFcolorno = Array1D_int({0, 14}, SurfaceColorData::defaultcolorno);
-
-    Array1D_string const colorkeys = Array1D_string({0, 14},
-                                                    {"Text",
-                                                     "Walls",
-                                                     "Windows",
-                                                     "GlassDoors",
-                                                     "Doors",
-                                                     "Roofs",
-                                                     "Floors",
-                                                     "DetachedBuildingShades",
-                                                     "DetachedFixedShades",
-                                                     "AttachedBuildingShades",
-                                                     "Photovoltaics",
-                                                     "TubularDaylightDomes",
-                                                     "TubularDaylightDiffusers",
-                                                     "DaylightReferencePoint1",
-                                                     "DaylightReferencePoint2"});
+    std::array<int, 15> DXFcolorno = DataSurfaceColors::defaultcolorno;
 
     void clear_state() override
     {
-        this->DXFcolorno = Array1D_int({0, 14}, SurfaceColorData::defaultcolorno);
+        this->DXFcolorno = DataSurfaceColors::defaultcolorno;
     }
 };
 

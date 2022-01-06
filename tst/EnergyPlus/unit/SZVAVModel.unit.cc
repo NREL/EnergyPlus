@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.CoolCoilFluidInletNode = 0;
     thisUnit.CoolCoilFluidOutletNodeNum = 0;
     thisUnit.CoolCoilLoopNum = 0;
-    thisUnit.CoolCoilLoopSide = 0;
+    thisUnit.CoolCoilLoopSide = DataPlant::LoopSideLocation::Invalid;
     thisUnit.CoolCoilBranchNum = 0;
     thisUnit.CoolCoilCompNum = 0;
     thisUnit.CoolCoilInletNodeNum = 2;
@@ -202,7 +202,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.HeatCoilFluidInletNode = 0;
     thisUnit.HeatCoilFluidOutletNodeNum = 0;
     thisUnit.HeatCoilLoopNum = 0;
-    thisUnit.HeatCoilLoopSide = 0;
+    thisUnit.HeatCoilLoopSide = DataPlant::LoopSideLocation::Invalid;
     thisUnit.HeatCoilBranchNum = 0;
     thisUnit.HeatCoilCompNum = 0;
     thisUnit.HeatCoilInletNodeNum = 4;
@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataPTHP->PTUnit(1) = thisUnit;
     state->dataPTHP->PTUnit(1).simASHRAEModel = true;
     state->dataPTHP->PTUnit(1).MinOATCompressorCooling = -10.0;
-    state->dataPTHP->PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::iPTHPType::PTHPUnit;
+    state->dataPTHP->PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::PTHPType::PTHPUnit;
     state->dataPTHP->PTUnit(1).FanName = "TEST FAN";
     state->dataPTHP->PTUnit(1).FanType = "Fan:OnOff";
     state->dataPTHP->PTUnit(1).DXCoolCoilName = "COOLINGCOIL";
@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                         "PTUnit",
                                         DataLoopNode::NodeFluidType::Air,
                                         DataLoopNode::NodeConnectionType::Inlet,
-                                        NodeInputManager::compFluidStream::Primary,
+                                        NodeInputManager::CompFluidStream::Primary,
                                         DataLoopNode::ObjectIsNotParent);
 
     state->dataLoopNodes->Node(5).Temp = 24.0;
@@ -676,7 +676,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
     CWCoil.WaterLoopNum = 1;
-    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     CWCoil.WaterLoopBranchNum = 1;
     CWCoil.WaterLoopCompNum = 1;
     // electric heating coil
@@ -685,12 +685,11 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-        loop.LoopSide.allocate(2);
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -700,10 +699,10 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     CWLoop.FluidName = "ChilledWater";
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
-    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
 
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;

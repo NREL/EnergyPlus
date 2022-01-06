@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -293,9 +293,9 @@ namespace SteamBaseboardRadiator {
         int constexpr MinDistribSurfaces(1);            // Minimum number of surfaces that a baseboard heater can radiate to
         int constexpr iHeatCAPMAlphaNum(2);             // get input index to steam baseboard Radiator system heating capacity sizing method
         int constexpr iHeatDesignCapacityNumericNum(1); // get input index to steam baseboard Radiator system electric heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
             1); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             2); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -555,7 +555,7 @@ namespace SteamBaseboardRadiator {
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
 
             // Get outlet node number
@@ -567,7 +567,7 @@ namespace SteamBaseboardRadiator {
                                   state.dataIPShortCut->cAlphaArgs(1),
                                   DataLoopNode::NodeFluidType::Steam,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  NodeInputManager::compFluidStream::Primary,
+                                  NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state,
                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
@@ -675,7 +675,7 @@ namespace SteamBaseboardRadiator {
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBSteam_Num &&
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBSteam &&
                         state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) ==
                             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
@@ -1654,15 +1654,16 @@ namespace SteamBaseboardRadiator {
         return SumHATsurf;
     }
 
-    void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
-                                             DataPlant::PlantEquipmentType BaseboardType, // type index
-                                             std::string const &BaseboardName,            // component name
-                                             [[maybe_unused]] int const EquipFlowCtrl,    // Flow control mode for the equipment
-                                             [[maybe_unused]] int const LoopNum,          // Plant loop index for where called from
-                                             [[maybe_unused]] int const LoopSide,         // Plant loop side index for where called from
-                                             int &CompIndex,                              // Chiller number pointer
-                                             [[maybe_unused]] bool const FirstHVACIteration,
-                                             bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
+    void
+    UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
+                                        DataPlant::PlantEquipmentType BaseboardType,                 // type index
+                                        std::string const &BaseboardName,                            // component name
+                                        [[maybe_unused]] int const EquipFlowCtrl,                    // Flow control mode for the equipment
+                                        [[maybe_unused]] int const LoopNum,                          // Plant loop index for where called from
+                                        [[maybe_unused]] const DataPlant::LoopSideLocation LoopSide, // Plant loop side index for where called from
+                                        int &CompIndex,                                              // Chiller number pointer
+                                        [[maybe_unused]] bool const FirstHVACIteration,
+                                        bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
 

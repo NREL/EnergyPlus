@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -326,7 +326,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                   DataLoopNode::NodeFluidType::Water,
                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                  NodeInputManager::compFluidStream::Primary,
+                                                  NodeInputManager::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
         // Get outlet node number
@@ -337,7 +337,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Water,
                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                   NodeInputManager::compFluidStream::Primary,
+                                                   NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state,
                     cCMO_CoolingPanel_Simple,
@@ -464,24 +464,24 @@ void GetCoolingPanelInput(EnergyPlusData &state)
 
         // Process the temperature control type
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), MeanAirTemperature)) {
-            ThisCP.ControlType = Control::MAT;
+            ThisCP.controlType = ClgPanelCtrlType::MAT;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), MeanRadiantTemperature)) {
-            ThisCP.ControlType = Control::MRT;
+            ThisCP.controlType = ClgPanelCtrlType::MRT;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OperativeTemperature)) {
-            ThisCP.ControlType = Control::Operative;
+            ThisCP.controlType = ClgPanelCtrlType::Operative;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OutsideAirDryBulbTemperature)) {
-            ThisCP.ControlType = Control::ODB;
+            ThisCP.controlType = ClgPanelCtrlType::ODB;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), OutsideAirWetBulbTemperature)) {
-            ThisCP.ControlType = Control::OWB;
+            ThisCP.controlType = ClgPanelCtrlType::OWB;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), ZoneTotalLoad)) {
-            ThisCP.ControlType = Control::ZoneTotalLoad;
+            ThisCP.controlType = ClgPanelCtrlType::ZoneTotalLoad;
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), ZoneConvectiveLoad)) {
-            ThisCP.ControlType = Control::ZoneConvectiveLoad;
+            ThisCP.controlType = ClgPanelCtrlType::ZoneConvectiveLoad;
         } else {
             ShowWarningError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + " =" + state.dataIPShortCut->cAlphaArgs(6));
             ShowContinueError(state, "Occurs in " + std::string{RoutineName} + " = " + state.dataIPShortCut->cAlphaArgs(1));
             ShowContinueError(state, "Control reset to MAT control for this Simple Cooling Panel.");
-            ThisCP.ControlType = Control::MAT;
+            ThisCP.controlType = ClgPanelCtrlType::MAT;
         }
 
         ThisCP.ColdThrottlRange = state.dataIPShortCut->rNumericArgs(8);
@@ -575,7 +575,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         // search zone equipment list structure for zone index
         for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
             for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::CoolingPanel_Num &&
+                if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::CoolingPanel &&
                     state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ThisCP.EquipID) {
                     ThisCP.ZonePtr = ctrlZone;
                 }
@@ -1375,7 +1375,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     // vary the flow to meet the zone load calculated by the user-defined thermostat.  Temperature based controls vary the flow
     // based on a comparison between the control temperature and the setpoint schedule and throttling range.
 
-    if ((this->ControlType == Control::ZoneTotalLoad) || (this->ControlType == Control::ZoneConvectiveLoad)) {
+    if ((this->controlType == ClgPanelCtrlType::ZoneTotalLoad) || (this->controlType == ClgPanelCtrlType::ZoneConvectiveLoad)) {
 
         if (QZnReq < -SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
@@ -1389,7 +1389,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             // to meet the QZnReq.  For convective load control, the convective output of the device equals QZnReq which means that the load on
             // the panel is higher as is its output.  Total load control will miss the setpoint temperature but will likely get there with time.
             // Convective load control will hit the setpoint short term better but will result in overcooling in the long run probably.
-            if (this->ControlType == Control::ZoneConvectiveLoad) {
+            if (this->controlType == ClgPanelCtrlType::ZoneConvectiveLoad) {
                 QZnReq = QZnReq / this->FracConvect;
             }
 
@@ -1539,16 +1539,16 @@ void CoolingPanelParams::SetCoolingPanelControlTemp(EnergyPlusData &state, Real6
     // Using/Aliasing
 
     {
-        auto const SELECT_CASE_var(this->ControlType);
-        if (SELECT_CASE_var == Control::MAT) {
+        auto const SELECT_CASE_var(this->controlType);
+        if (SELECT_CASE_var == ClgPanelCtrlType::MAT) {
             ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-        } else if (SELECT_CASE_var == Control::MRT) {
+        } else if (SELECT_CASE_var == ClgPanelCtrlType::MRT) {
             ControlTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
-        } else if (SELECT_CASE_var == Control::Operative) {
+        } else if (SELECT_CASE_var == ClgPanelCtrlType::Operative) {
             ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
-        } else if (SELECT_CASE_var == Control::ODB) {
+        } else if (SELECT_CASE_var == ClgPanelCtrlType::ODB) {
             ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
-        } else if (SELECT_CASE_var == Control::OWB) {
+        } else if (SELECT_CASE_var == ClgPanelCtrlType::OWB) {
             ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
         } else { // Should never get here
             ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);

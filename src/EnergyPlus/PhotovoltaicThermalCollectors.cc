@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -347,7 +347,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).PlantOutletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -357,7 +357,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,
@@ -367,7 +367,7 @@ namespace PhotovoltaicThermalCollectors {
                                                    state.dataIPShortCut->cAlphaArgs(7),
                                                    "Water Nodes");
 
-                state.dataPhotovoltaicThermalCollector->PVT(Item).WLoopSideNum = DataPlant::DemandSupply_No;
+                state.dataPhotovoltaicThermalCollector->PVT(Item).WLoopSideNum = DataPlant::LoopSideLocation::Invalid;
             }
 
             if (state.dataPhotovoltaicThermalCollector->PVT(Item).WorkingFluidType == WorkingFluidEnum::AIR) {
@@ -379,7 +379,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).HVACOutletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -389,7 +389,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        NodeInputManager::compFluidStream::Primary,
+                                                        NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,
@@ -548,7 +548,7 @@ namespace PhotovoltaicThermalCollectors {
                             // need call to EMS to check node
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPhotovoltaicThermalCollector->PVT(PVTindex).HVACOutletNodeNum,
-                                                                        EMSManager::SPControlType::iTemperatureSetPoint,
+                                                                        EMSManager::SPControlType::TemperatureSetPoint,
                                                                         state.dataHVACGlobal->SetPointErrorFlag);
                             if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
@@ -694,7 +694,7 @@ namespace PhotovoltaicThermalCollectors {
             if (this->WLoopNum > 0) {
                 PltSizNum = state.dataPlnt->PlantLoop(this->WLoopNum).PlantSizNum;
             }
-            if (this->WLoopSideNum == DataPlant::SupplySide) {
+            if (this->WLoopSideNum == DataPlant::LoopSideLocation::Supply) {
                 if (PltSizNum > 0) {
                     if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         DesignVolFlowRateDes = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
@@ -718,7 +718,7 @@ namespace PhotovoltaicThermalCollectors {
                         }
                     }
                 }
-            } else if (this->WLoopSideNum == DataPlant::DemandSide) {
+            } else if (this->WLoopSideNum == DataPlant::LoopSideLocation::Demand) {
                 DesignVolFlowRateDes = this->AreaCol * SimplePVTWaterSizeFactor;
             }
             if (this->DesignVolFlowRateWasAutoSized) {
@@ -1261,7 +1261,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void simPVTfromOASys(EnergyPlusData &state, int const index, bool const FirstHVACIteration)
     {
-        PlantLocation dummyLoc(0, 0, 0, 0);
+        PlantLocation dummyLoc(0, DataPlant::LoopSideLocation::Invalid, 0, 0);
         Real64 dummyCurLoad(0.0);
         bool dummyRunFlag(true);
 

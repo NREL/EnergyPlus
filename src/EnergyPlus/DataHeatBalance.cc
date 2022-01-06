@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,39 +93,6 @@ using DataSurfaces::MaxSlatAngs;
 using namespace DataVectorTypes;
 using DataBSDFWindow::BSDFLayerAbsorpStruct;
 using DataBSDFWindow::BSDFWindowInputStruct;
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsCon(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {2.873e-3, 2.285e-3, 9.443e-4, 4.538e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 7.760e-5, 5.149e-5, 2.826e-5, 1.723e-5, 0.0,
-         0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
-        {3, 10})); // Gas conductivity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsVis(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {3.723e-6, 3.379e-6, 2.213e-6, 1.069e-6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.940e-8, 6.451e-8, 7.777e-8, 7.414e-8, 0.0,
-         0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
-        {3, 10})); // Gas viscosity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array2D<Real64> const GasCoeffsCp(
-    3,
-    10,
-    reshape2<Real64, int>(
-        {1002.737, 521.929, 248.091, 158.340, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.2324e-2, 0.0, 0.0, 0.0, 0.0,
-         0.0,      0.0,     0.0,     0.0,     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,       0.0, 0.0, 0.0, 0.0},
-        {3, 10})); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
-
-// Air       Argon     Krypton   Xenon
-Array1D<Real64> const GasWght(10, {28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas molecular weights for gases in a mixture
-
-// Gas specific heat ratios.  Used for gasses in low pressure
-Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
 // Functions
 
@@ -313,12 +280,14 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         case DataHeatBalance::MaterialGroup::GapEquivalentLayer:
             state.dataConstruction->Construct(ConstrNum).TypeIsWindow = true;
             break;
-        case DataHeatBalance::MaterialGroup::Unassigned:
+        case DataHeatBalance::MaterialGroup::Invalid:
         case DataHeatBalance::MaterialGroup::Air:
         case DataHeatBalance::MaterialGroup::RegularMaterial:
         case DataHeatBalance::MaterialGroup::EcoRoof:
         case DataHeatBalance::MaterialGroup::IRTMaterial:
             break; // Purposely not doing anything
+        default:
+            assert(false);
         }
     }
 
@@ -1003,7 +972,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // without Theta and Phi.
 
     // FUNCTION PARAMETER DEFINITIONS:
-    Real64 const Small(1.E-9); // Small Number used to approximate zero
+    Real64 constexpr Small(1.E-9); // Small Number used to approximate zero
 
     // FUNCTION PARAMETER DEFINITIONS:
     int ScNum;                        // Index to screen data

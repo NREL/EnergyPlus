@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -577,7 +577,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = static_cast<AirBalance>(
                 getEnumerationValue(DataHeatBalance::AirBalanceTypeNamesUC,
                                     UtilityRoutines::MakeUPPERCase(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
-            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Unassigned) {
+            if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Invalid) {
                 state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
                                  std::string{RoutineName} + cAlphaFieldNames(3) + " = " + cAlphaArgs(3) + " not valid choice for " +

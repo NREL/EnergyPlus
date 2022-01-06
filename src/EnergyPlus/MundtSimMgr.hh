@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,7 +76,7 @@ namespace MundtSimMgr {
         Array1D_bool SurfMask;                   // Limit of 60 surfaces at current sizing
 
         // Default Constructor
-        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Unassigned), Height(0.0), Temp(0.0)
+        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Invalid), Height(0.0), Temp(0.0)
         {
         }
     };

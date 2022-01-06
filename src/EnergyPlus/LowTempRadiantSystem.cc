@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -287,9 +287,9 @@ namespace LowTempRadiantSystem {
         auto constexpr VariableOff("VariableOff");
         int constexpr iHeatCAPMAlphaNum(5);             // get input index to Low Temperature Radiant system heating capacity sizing method
         int constexpr iHeatDesignCapacityNumericNum(1); // get input index to Low Temperature Radiant system electric heating capacity
-        int const iHeatCapacityPerFloorAreaNumericNum(
+        int constexpr iHeatCapacityPerFloorAreaNumericNum(
             2); // get input index to Low Temperature Radiant system electric heating capacity per floor area sizing
-        int const iHeatFracOfAutosizedCapacityNumericNum(
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
             3); //  get input index to Low Temperature Radiant system electric heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -741,7 +741,7 @@ namespace LowTempRadiantSystem {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                          NodeInputManager::compFluidStream::Primary,
+                                                          NodeInputManager::CompFluidStream::Primary,
                                                           ObjectIsNotParent);
 
             thisRadSys.HotWaterOutNode = GetOnlySingleNode(state,
@@ -751,7 +751,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                           NodeInputManager::compFluidStream::Primary,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            ObjectIsNotParent);
 
             if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
@@ -801,7 +801,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           NodeInputManager::compFluidStream::Secondary,
+                                                           NodeInputManager::CompFluidStream::Secondary,
                                                            ObjectIsNotParent);
 
             thisRadSys.ColdWaterOutNode = GetOnlySingleNode(state,
@@ -811,7 +811,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            NodeInputManager::compFluidStream::Secondary,
+                                                            NodeInputManager::CompFluidStream::Secondary,
                                                             ObjectIsNotParent);
 
             if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
@@ -1026,7 +1026,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           NodeInputManager::compFluidStream::Primary,
+                                                           NodeInputManager::CompFluidStream::Primary,
                                                            ObjectIsNotParent);
 
             thisCFloSys.HotWaterOutNode = GetOnlySingleNode(state,
@@ -1036,7 +1036,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            NodeInputManager::compFluidStream::Primary,
+                                                            NodeInputManager::CompFluidStream::Primary,
                                                             ObjectIsNotParent);
 
             if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
@@ -1083,7 +1083,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                            NodeInputManager::compFluidStream::Secondary,
+                                                            NodeInputManager::CompFluidStream::Secondary,
                                                             ObjectIsNotParent);
 
             thisCFloSys.ColdWaterOutNode = GetOnlySingleNode(state,
@@ -1093,7 +1093,7 @@ namespace LowTempRadiantSystem {
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                             NodeInputManager::compFluidStream::Secondary,
+                                                             NodeInputManager::CompFluidStream::Secondary,
                                                              ObjectIsNotParent);
 
             if ((!lAlphaBlanks(13)) || (!lAlphaBlanks(14))) {
@@ -1309,7 +1309,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Process the temperature control type
-            thisElecSys.ControlType =
+            thisElecSys.controlType =
                 thisElecSys.processRadiantSystemControlInput(state, Alphas(6), cAlphaFields(6), LowTempRadiantSystem::SystemType::ElectricSystem);
 
             // Process the setpoint type
@@ -1795,7 +1795,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    FluidToSlabHeatTransferTypes HydronicSystemBaseData::getFluidToSlabHeatTransferInput(EnergyPlusData &state, std::string const userInput)
+    FluidToSlabHeatTransferTypes HydronicSystemBaseData::getFluidToSlabHeatTransferInput(EnergyPlusData &state, std::string const &userInput)
     {
         if (UtilityRoutines::SameString(userInput, "ConvectionOnly")) {
             return FluidToSlabHeatTransferTypes::ConvectionOnly;
@@ -1812,7 +1812,7 @@ namespace LowTempRadiantSystem {
     LowTempRadiantControlTypes RadiantSystemBaseData::processRadiantSystemControlInput(EnergyPlusData &state,
                                                                                        std::string const &controlInput,
                                                                                        std::string const &controlInputField,
-                                                                                       LowTempRadiantSystem::SystemType const &typeOfRadiantSystem)
+                                                                                       LowTempRadiantSystem::SystemType const typeOfRadiantSystem)
     {
         if (UtilityRoutines::SameString(controlInput, "MeanAirTemperature")) {
             return LowTempRadiantControlTypes::MATControl;
@@ -1845,14 +1845,14 @@ namespace LowTempRadiantSystem {
                                                                                          std::string const &controlInputField)
     {
         if (UtilityRoutines::SameString(controlInput, "HalfFlowPower")) {
-            return LowTempRadiantSetpointTypes::halfFlowPower;
+            return LowTempRadiantSetpointTypes::HalfFlowPower;
         } else if (UtilityRoutines::SameString(controlInput, "ZeroFlowPower")) {
-            return LowTempRadiantSetpointTypes::zeroFlowPower;
+            return LowTempRadiantSetpointTypes::ZeroFlowPower;
         } else {
             ShowWarningError(state, "Invalid " + controlInputField + " = " + controlInput);
             ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
             ShowContinueError(state, "Setpoint type reset to HalfFlowPower for this Low Temperature Radiant System.");
-            return LowTempRadiantSetpointTypes::halfFlowPower;
+            return LowTempRadiantSetpointTypes::HalfFlowPower;
         }
     }
 
@@ -2727,10 +2727,12 @@ namespace LowTempRadiantSystem {
 
         enum class OperatingMode
         {
+            Invalid = -1,
             OFF,
             ClgHtg,
             ClgOnly,
-            HtgOnly
+            HtgOnly,
+            Num
         };
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3757,7 +3759,7 @@ namespace LowTempRadiantSystem {
     void VariableFlowRadiantSystemData::calculateLowTemperatureRadiantSystemComponents(
         EnergyPlusData &state,
         Real64 &LoadMet,
-        LowTempRadiantSystem::SystemType const &typeOfRadiantSystem) // Load met by the low temperature radiant system, in Watts
+        LowTempRadiantSystem::SystemType const typeOfRadiantSystem) // Load met by the low temperature radiant system, in Watts
     {
 
         // SUBROUTINE INFORMATION:
@@ -3940,7 +3942,7 @@ namespace LowTempRadiantSystem {
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
                 ConstrNum = Surface(SurfNum).Construction;
 
-                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF) {
+                if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
 
                     Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                     Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -3961,7 +3963,7 @@ namespace LowTempRadiantSystem {
                     state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                         EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
 
-                } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+                } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
 
                     state.dataHeatBalFanSys->QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
                 }
@@ -4176,7 +4178,7 @@ namespace LowTempRadiantSystem {
                                                                      this->DesignObjectPtr,
                                                                      typeOfRadiantSystem);
 
-                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF) {
+                            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
                                 Ca = state.dataHeatBalFanSys->RadSysTiHBConstCoef(SurfNum);
                                 Cb = state.dataHeatBalFanSys->RadSysTiHBToutCoef(SurfNum);
@@ -4192,7 +4194,7 @@ namespace LowTempRadiantSystem {
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                                     EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
-                            } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+                            } else if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
                                 state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                                     EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
                             }
@@ -4815,7 +4817,7 @@ namespace LowTempRadiantSystem {
         int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
         bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
         Real64 &LoadMet,          // Load met by the low temperature radiant system, in Watts
-        LowTempRadiantSystem::SystemType const &typeOfRadiantSystem)
+        LowTempRadiantSystem::SystemType const typeOfRadiantSystem)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5040,11 +5042,11 @@ namespace LowTempRadiantSystem {
 
                 if (!Iteration) {
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CTF)
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CTF)
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                             EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD)
+                    if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD)
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum) =
                             EpsMdotCp * (WaterTempIn - state.dataHeatBalFanSys->TCondFDSourceNode(SurfNum));
 
@@ -5453,7 +5455,7 @@ namespace LowTempRadiantSystem {
 
             // Determine the control temperature--what the setpoint/offtemp is being compared to for unit operation
 
-            ControlTemp = this->setRadiantSystemControlTemperature(state, ControlType);
+            ControlTemp = this->setRadiantSystemControlTemperature(state, controlType);
 
             if (ControlTemp < OffTemp) { // HEATING MODE
 
@@ -5796,9 +5798,9 @@ namespace LowTempRadiantSystem {
     {
         Real64 scheduleValue = ScheduleManager::GetCurrentScheduleValue(state, scheduleIndex);
         switch (SetpointControlType) {
-        case LowTempRadiantSetpointTypes::halfFlowPower:
+        case LowTempRadiantSetpointTypes::HalfFlowPower:
             return scheduleValue + 0.5 * throttlingRange;
-        case LowTempRadiantSetpointTypes::zeroFlowPower:
+        case LowTempRadiantSetpointTypes::ZeroFlowPower:
             return scheduleValue;
         default:
             ShowSevereError(state, "Illegal setpoint type in low temperature radiant system: " + this->Name);
@@ -5815,7 +5817,7 @@ namespace LowTempRadiantSystem {
                                                          Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
                                                          Real64 const NumCircs,      // Number of fluid circuits in this surface
                                                          int const DesignObjPtr,     // Design Object Pointer
-                                                         LowTempRadiantSystem::SystemType const &typeOfRadiantSystem)
+                                                         LowTempRadiantSystem::SystemType const typeOfRadiantSystem)
     {
 
         // SUBROUTINE INFORMATION:

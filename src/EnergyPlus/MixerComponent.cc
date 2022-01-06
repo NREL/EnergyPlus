@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -222,7 +222,7 @@ void GetMixerInput(EnergyPlusData &state)
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                                     NodeInputManager::compFluidStream::Primary,
+                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes = NumAlphas - 2;
 
@@ -263,7 +263,7 @@ void GetMixerInput(EnergyPlusData &state)
                                                                                                  AlphArray(1),
                                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 NodeInputManager::compFluidStream::Primary,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                  ObjectIsNotParent);
             if (lAlphaBlanks(2 + NodeNum)) {
                 ShowSevereError(state, cAlphaFields(2 + NodeNum) + " is Blank, " + CurrentModuleObject + " = " + AlphArray(1));
@@ -626,32 +626,25 @@ void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int 
     }
 }
 
-int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
+int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const InNodeNum)
 {
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int MixerNum;  // loop counter
-    int InNodeCtr; // loop counter
-    int thisMixer;
 
     if (state.dataMixerComponent->GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
         GetMixerInput(state);
         state.dataMixerComponent->GetZoneMixerIndexInputFlag = false;
     }
 
-    thisMixer = 0;
     if (state.dataMixerComponent->NumMixers > 0) {
-        for (MixerNum = 1; MixerNum <= state.dataMixerComponent->NumMixers; ++MixerNum) {
-            for (InNodeCtr = 1; InNodeCtr <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeCtr) {
-                if (InNodeNum != state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeCtr)) continue;
-                thisMixer = MixerNum;
-                break;
+        for (int MixerNum = 1; MixerNum <= state.dataMixerComponent->NumMixers; ++MixerNum) {
+            for (int InNodeCtr = 1; InNodeCtr <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeCtr) {
+                if (InNodeNum == state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeCtr)) {
+                    return MixerNum;
+                }
             }
-            if (thisMixer > 0) break;
         }
     }
 
-    return thisMixer;
+    return 0;
 }
 
 // End of Utility subroutines for the Mixer Component

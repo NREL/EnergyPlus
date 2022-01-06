@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,9 +63,6 @@ struct EnergyPlusData;
 
 namespace StandardRatings {
 
-    // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
-    extern Array1D<Real64> const IEERWeightingFactor; // EER Weighting factors (IEER)
-
     Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
 
     Real64 constexpr HeatingOutdoorCoilInletAirDBTempRated(8.33); // Outdoor air dry-bulb temp in degrees C (47F)
@@ -80,49 +77,20 @@ namespace StandardRatings {
     // Defrost strategy (heat pump only)
     enum class DefrostStrat
     {
-        Unassigned = -1,
+        Invalid = -1,
         ReverseCycle, // uses reverse cycle defrost strategy
-        Resistive     // uses electric resistance heater for defrost
+        Resistive,    // uses electric resistance heater for defrost
+        Num,
     };
 
     // Defrost control  (heat pump only)
     enum class HPdefrostControl : int
     {
-        Unassigned = -1,
-        Timed,   // defrost cycle is timed
-        OnDemand // defrost cycle occurs only when required
+        Invalid = -1,
+        Timed,    // defrost cycle is timed
+        OnDemand, // defrost cycle occurs only when required
+        Num
     };
-
-    extern Array1D_int const TotalNumOfTemperatureBins; // Total number of temperature
-    // bins for a region
-    extern Array1D<Real64> const StandardDesignHeatingRequirement;
-    // Standardized DHRs from ANSI/AHRI 210/240
-    extern Array1D<Real64> const OutdoorDesignTemperature;
-    // Outdoor design temperature for a region from ANSI/AHRI 210/240
-    extern Array1D<Real64> const OutdoorBinTemperature;
-    // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp;
-    // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp;
-
-    // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
-    extern Array1D<Real64> const OutdoorBinTemperatureSEER;
-    // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
-    extern Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp;
-
-    // ANSI/ASHRAE Standard 127-2012 -Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
-    // indoor dry bulb temperatures for tests A, B, C and D and Classes I, II, III, and IV
-    extern Array1D<Real64> const IndoorDBTempClassI2IV;
-    // outdoor dry bulb temperatures for tests A, B, C and D
-    extern Array1D<Real64> const OutdoorDBTempAllClassA2D;
 
     // Functions
 

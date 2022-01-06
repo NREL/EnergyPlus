@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1069,7 +1069,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                         int termUnitSizingIndex = AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
                         airLoopMaxFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                         if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num ==
-                            DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
+                            DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                             airLoopHeatingMaximumFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
                                                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                             airLoopHeatingMinimumFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
@@ -1104,7 +1104,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                 state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) / state.dataSize->VdzHtgByZone(termUnitSizingIndex);
 
                         } else if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num ==
-                                   DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
+                                   DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
                             airLoopHeatingMaximumFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
                                                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                             airLoopHeatingMinimumFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
@@ -2356,18 +2356,8 @@ void GetOARequirements(EnergyPlusData &state)
 
             state.dataSize->OARequirements(OAIndex).Name = Alphas(1);
 
-            ProcessInputOARequirements(state,
-                                       CurrentModuleObject,
-                                       OAIndex,
-                                       Alphas,
-                                       NumAlphas,
-                                       Numbers,
-                                       NumNumbers,
-                                       lNumericBlanks,
-                                       lAlphaBlanks,
-                                       cAlphaFields,
-                                       cNumericFields,
-                                       ErrorsFound);
+            ProcessInputOARequirements(
+                state, CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lAlphaBlanks, cAlphaFields, ErrorsFound);
         }
 
         Alphas.deallocate();
@@ -2422,6 +2412,10 @@ void GetOARequirements(EnergyPlusData &state)
                             ErrorsFound = true;
                         }
                     }
+                } else {
+                    ShowSevereError(state, std::string(RoutineName) + cCurrentModuleObject2 + "=" + thisOAReq.Name + " is empty.");
+                    ShowContinueError(state, "At least one pair of Space Name and Space Design Specification Outdoor Air Object Name is required.");
+                    ErrorsFound = true;
                 }
             }
 
@@ -2439,11 +2433,9 @@ void ProcessInputOARequirements(EnergyPlusData &state,
                                 int &NumAlphas,
                                 Array1D<Real64> const &Numbers,
                                 int &NumNumbers,
-                                [[maybe_unused]] Array1D_bool const &lNumericBlanks, // Unused
                                 Array1D_bool const &lAlphaBlanks,
                                 Array1D_string const &cAlphaFields,
-                                [[maybe_unused]] Array1D_string const &cNumericFields, // Unused
-                                bool &ErrorsFound                                      // If errors found in input
+                                bool &ErrorsFound // If errors found in input
 )
 {
 
@@ -4523,12 +4515,12 @@ void ReportSysSizing(EnergyPlusData &state,
                      std::string const &SysName,      // the name of the zone
                      std::string const &LoadType,     // either "Cooling" or "Heating"
                      std::string const &PeakLoadKind, // either "Sensible" or "Total"
-                     Real64 const &UserDesCap,        // User  Design Capacity
-                     Real64 const &CalcDesVolFlow,    // Calculated  Design Air Flow Rate
-                     Real64 const &UserDesVolFlow,    // User Design Air Flow Rate
+                     Real64 const UserDesCap,         // User  Design Capacity
+                     Real64 const CalcDesVolFlow,     // Calculated  Design Air Flow Rate
+                     Real64 const UserDesVolFlow,     // User Design Air Flow Rate
                      std::string const &DesDayName,   // the name of the design day that produced the peak
                      std::string const &DesDayDate,   // the date that produced the peak
-                     int const &TimeStepIndex         // time step of the peak
+                     int const TimeStepIndex          // time step of the peak
 )
 {
 

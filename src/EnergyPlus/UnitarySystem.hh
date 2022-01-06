@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -177,40 +177,47 @@ namespace UnitarySystems {
     struct UnitarySys : HVACSystemData
     {
 
-        enum class ControlType : int
+        enum class UnitarySysCtrlType : int
         {
+            Invalid = -1,
             None,
             Load,
             Setpoint,
-            CCMASHRAE
+            CCMASHRAE,
+            Num
         };
 
         enum class DehumCtrlType : int
         {
+            Invalid = -1,
             None,
             CoolReheat,
-            Multimode
+            Multimode,
+            Num
         };
 
         enum class FanPlace : int
         {
+            Invalid = -1,
             NotYetSet,
             BlowThru,
-            DrawThru
+            DrawThru,
+            Num
         };
 
-        // Airflow control for contant fan mode
-        enum class UseCompFlow : int
+        // Airflow control for constant fan mode
+        enum class UseCompFlow
         {
-            FlowNotYetSet,
-            UseCompressorOnFlow, // set compressor OFF air flow rate equal to compressor ON air flow rate
-            UseCompressorOffFlow // set compressor OFF air flow rate equal to user defined value
+            Invalid = -1,
+            On,  // set compressor OFF air flow rate equal to compressor ON air flow rate
+            Off, // set compressor OFF air flow rate equal to user defined value
+            Num
         };
 
         // Parent models simulated using UnitarySystem source code
-        enum class SysType : int
+        enum class SysType
         {
-            Unassigned = -1,
+            Invalid = -1,
             Unitary,          // AirloopHVAC:UnitarySystem
             CoilCoolingDX,    // CoilSystem:Cooling:DX
             CoilCoolingWater, // CoilSystem:Cooling:Water
@@ -222,7 +229,7 @@ namespace UnitarySystems {
         SysType m_sysType;
         bool m_ThisSysInputShouldBeGotten;
         int m_SysAvailSchedPtr; // Pointer to the availability schedule
-        ControlType m_ControlType;
+        UnitarySysCtrlType m_ControlType;
         DehumCtrlType m_DehumidControlType_Num;
         bool m_Humidistat;
         bool m_ValidASHRAECoolCoil;
@@ -332,11 +339,11 @@ namespace UnitarySystems {
         bool m_InitHeatPump; // Heat pump initialization flag (for error reporting)
 
         int m_HRLoopNum;
-        int m_HRLoopSideNum;
+        DataPlant::LoopSideLocation m_HRLoopSideNum{DataPlant::LoopSideLocation::Invalid};
         int m_HRBranchNum;
         int m_HRCompNum;
         int m_SuppCoilLoopNum;
-        int m_SuppCoilLoopSide;
+        DataPlant::LoopSideLocation m_SuppCoilLoopSide{DataPlant::LoopSideLocation::Invalid};
         int m_SuppCoilBranchNum;
         int m_SuppCoilCompNum;
         int m_SuppCoilFluidOutletNodeNum;
@@ -468,22 +475,22 @@ namespace UnitarySystems {
         int CoolCoilOutletNodeNum;       // Cooling coil air outlet node number
         int CoolCoilFluidOutletNodeNum;  // Cooling coil fluid outlet node number (from Plant Loop data)
         int CoolCoilLoopNum;             // Plant loop num of chilled water coil
-        int CoolCoilLoopSide;            // Supply side or demand side
-        int CoolCoilBranchNum;           // Branch of number of the cooling coil in the plant loop
-        int CoolCoilCompNum;             // Comp num of the cooling coil in the plant loop
-        int CoolCoilFluidInletNode;      // Cooling coil fluid inlet node
-        int HeatCoilLoopNum;             // Plant loop num of hot water or steam coil
-        int HeatCoilLoopSide;            // Supply side or demand side
-        int HeatCoilBranchNum;           // Branch of number of the heating coil in the plant loop
-        int HeatCoilCompNum;             // Comp num of the heating coil in the plant loop
-        int HeatCoilFluidInletNode;      // Heating coil fluid inlet node
-        int HeatCoilFluidOutletNodeNum;  // Heating coil fluid outlet node number (from Plant Loop data)
-        int HeatCoilInletNodeNum;        // Heating coil air inlet node number
-        int HeatCoilOutletNodeNum;       // Heating coil air outlet node number
-        bool ATMixerExists;              // true if AT mixer is connected to Unitary System
-        int ATMixerType;                 // type of AT mixer, inlet-side or supply-side
-        int ATMixerOutNode;              // AT mixer outlet node number
-        Real64 ControlZoneMassFlowFrac;  // fraction of air flow to the control zone
+        DataPlant::LoopSideLocation CoolCoilLoopSide{DataPlant::LoopSideLocation::Invalid}; // Supply side or demand side
+        int CoolCoilBranchNum;                                                              // Branch of number of the cooling coil in the plant loop
+        int CoolCoilCompNum;                                                                // Comp num of the cooling coil in the plant loop
+        int CoolCoilFluidInletNode;                                                         // Cooling coil fluid inlet node
+        int HeatCoilLoopNum;                                                                // Plant loop num of hot water or steam coil
+        DataPlant::LoopSideLocation HeatCoilLoopSide{DataPlant::LoopSideLocation::Invalid}; // Supply side or demand side
+        int HeatCoilBranchNum;                                                              // Branch of number of the heating coil in the plant loop
+        int HeatCoilCompNum;                                                                // Comp num of the heating coil in the plant loop
+        int HeatCoilFluidInletNode;                                                         // Heating coil fluid inlet node
+        int HeatCoilFluidOutletNodeNum; // Heating coil fluid outlet node number (from Plant Loop data)
+        int HeatCoilInletNodeNum;       // Heating coil air inlet node number
+        int HeatCoilOutletNodeNum;      // Heating coil air outlet node number
+        bool ATMixerExists;             // true if AT mixer is connected to Unitary System
+        int ATMixerType;                // type of AT mixer, inlet-side or supply-side
+        int ATMixerOutNode;             // AT mixer outlet node number
+        Real64 ControlZoneMassFlowFrac; // fraction of air flow to the control zone
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
@@ -684,8 +691,7 @@ namespace UnitarySystems {
                                             std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        void initUnitarySystems(
-            EnergyPlusData &state, int const &AirLoopNum, bool const &FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
+        void initUnitarySystems(EnergyPlusData &state, int AirLoopNum, bool FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp);
 
         void checkNodeSetPoint(EnergyPlusData &state,
                                int const AirLoopNum,       // number of the current air loop being simulated
@@ -871,7 +877,7 @@ namespace UnitarySystems {
         void simulateSys(EnergyPlusData &state,
                          std::string_view Name,
                          bool const firstHVACIteration,
-                         int const &AirLoopNum,
+                         int AirLoopNum,
                          int &CompIndex,
                          bool &HeatActive,
                          bool &CoolActive,
@@ -913,7 +919,7 @@ namespace UnitarySystems {
         void simulate(EnergyPlusData &state,
                       std::string_view Name,
                       bool const firstHVACIteration,
-                      int const &AirLoopNum,
+                      int AirLoopNum,
                       int &CompIndex,
                       bool &HeatActive,
                       bool &CoolActive,

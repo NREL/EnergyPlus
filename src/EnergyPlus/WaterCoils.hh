@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,12 +72,13 @@ namespace WaterCoils {
     constexpr Real64 MinWaterMassFlowFrac = 0.000001;
     constexpr Real64 MinAirMassFlow = 0.001;
 
-    enum class iCoilModel
+    enum class CoilModel
     {
-        Unassigned,
+        Invalid = -1,
         HeatingSimple,
         CoolingSimple,
         CoolingDetailed,
+        Num
     };
 
     struct WaterCoilEquipConditions
@@ -87,7 +88,7 @@ namespace WaterCoils {
         std::string WaterCoilTypeA;                  // Type of WaterCoil ie. Heating or Cooling
         std::string WaterCoilModelA;                 // Type of WaterCoil ie. Simple, Detailed, etc.
         DataPlant::PlantEquipmentType WaterCoilType; // Type of WaterCoil ie. Heating or Cooling
-        iCoilModel WaterCoilModel;                   // Type of WaterCoil ie. Simple, Detailed, etc.
+        CoilModel WaterCoilModel;                    // Type of WaterCoil ie. Simple, Detailed, etc.
         std::string Schedule;                        // WaterCoil Operation Schedule
         int SchedPtr;                                // Pointer to the correct schedule
         bool RequestingAutoSize;                     // True if this coil has appropriate autosize fields
@@ -189,10 +190,10 @@ namespace WaterCoils {
         int AirOutletNodeNum;
         int WaterInletNodeNum;
         int WaterOutletNodeNum;
-        int WaterLoopNum;       // Plant loop index
-        int WaterLoopSide;      // Plant loop side index
-        int WaterLoopBranchNum; // Plant loop branch index
-        int WaterLoopCompNum;   // Plant loop Comp index
+        int WaterLoopNum;                          // Plant loop index
+        DataPlant::LoopSideLocation WaterLoopSide; // Plant loop side index
+        int WaterLoopBranchNum;                    // Plant loop branch index
+        int WaterLoopCompNum;                      // Plant loop Comp index
         // begin variables for Water System interactions
         int CondensateCollectMode;         // where does water come from
         std::string CondensateCollectName; // name of water source e.g. water storage tank
@@ -224,7 +225,7 @@ namespace WaterCoils {
 
         // Default Constructor
         WaterCoilEquipConditions()
-            : WaterCoilType(DataPlant::PlantEquipmentType::Invalid), WaterCoilModel(iCoilModel::Unassigned), SchedPtr(0), RequestingAutoSize(false),
+            : WaterCoilType(DataPlant::PlantEquipmentType::Invalid), WaterCoilModel(CoilModel::Invalid), SchedPtr(0), RequestingAutoSize(false),
               InletAirMassFlowRate(0.0), OutletAirMassFlowRate(0.0), InletAirTemp(0.0), OutletAirTemp(0.0), InletAirHumRat(0.0), OutletAirHumRat(0.0),
               InletAirEnthalpy(0.0), OutletAirEnthalpy(0.0), TotWaterCoilLoad(0.0), SenWaterCoilLoad(0.0), TotWaterHeatingCoilEnergy(0.0),
               TotWaterCoolingCoilEnergy(0.0), SenWaterCoolingCoilEnergy(0.0), DesWaterHeatingCoilRate(0.0), TotWaterHeatingCoilRate(0.0),
@@ -242,11 +243,12 @@ namespace WaterCoils {
               DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0), HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0),
               UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0), SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0),
               RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0), LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0),
-              WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
-              CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
-              DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
-              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false), heatRecoveryCoil(false)
+              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterLoopNum(0), WaterLoopSide(DataPlant::LoopSideLocation::Invalid),
+              WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0),
+              CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0),
+              FaultyCoilFoulingFactor(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0),
+              UseDesignWaterDeltaTemp(false), ControllerName(""), ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false),
+              heatRecoveryCoil(false)
         {
         }
     };
@@ -482,9 +484,9 @@ namespace WaterCoils {
     );
 
     void CheckForSensorAndSetPointNode(EnergyPlusData &state,
-                                       int const SensorNodeNum,                     // controller sensor node number
-                                       HVACControllers::iCtrl const &ControlledVar, // controlled variable type
-                                       bool &NodeNotFound                           // true if matching air outlet node not found
+                                       int const SensorNodeNum,                    // controller sensor node number
+                                       HVACControllers::CtrlVarType ControlledVar, // controlled variable type
+                                       bool &NodeNotFound                          // true if matching air outlet node not found
     );
 
     Real64 TdbFnHRhPb(EnergyPlusData &state,
@@ -515,10 +517,10 @@ namespace WaterCoils {
     void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
                                              DataPlant::PlantEquipmentType const CoilType,
                                              std::string const &CoilName,
-                                             int const EquipFlowCtrl, // Flow control mode for the equipment
-                                             int const LoopNum,       // Plant loop index for where called from
-                                             int const LoopSide,      // Plant loop side index for where called from
-                                             int &CompIndex,          // Chiller number pointer
+                                             int const EquipFlowCtrl,                    // Flow control mode for the equipment
+                                             int const LoopNum,                          // Plant loop index for where called from
+                                             const DataPlant::LoopSideLocation LoopSide, // Plant loop side index for where called from
+                                             int &CompIndex,                             // Chiller number pointer
                                              bool const FirstHVACIteration,
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     );

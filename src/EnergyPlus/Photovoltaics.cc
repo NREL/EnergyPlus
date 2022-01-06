@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -344,7 +344,7 @@ namespace Photovoltaics {
                 }
             }
 
-            state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Unassigned;
+            state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Invalid;
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVSimplePerfObjectName)) {
                 state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Simple;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName)) {
@@ -366,7 +366,7 @@ namespace Photovoltaics {
             }
             state.dataPhotovoltaic->PVarray(PVnum).PerfObjName = state.dataIPShortCut->cAlphaArgs(4); // check later once perf objects are loaded
 
-            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Unassigned;
+            state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Invalid;
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Decoupled")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Decoupled;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "DecoupledUllebergDynamic")) {
@@ -1557,8 +1557,8 @@ namespace Photovoltaics {
         //       PRENTICE HALL, NEW JERSEY, 1992.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const DELTA(1.e-3);
-        Real64 const EPSILON(1.e-3);
+        Real64 constexpr DELTA(1.e-3);
+        Real64 constexpr EPSILON(1.e-3);
         static Real64 const RONE((std::sqrt(5.0) - 1.0) / 2.0);
         static Real64 const RTWO(RONE * RONE);
 

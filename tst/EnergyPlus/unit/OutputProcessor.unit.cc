@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1266,11 +1266,11 @@ namespace OutputProcessor {
     {
         std::map<OutputProcessor::SOVTimeStepType, OutputProcessor::TimeStepType> const resource_map = {
             // Zone
-            {OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::TimeStepType::TimeStepZone},
+            {OutputProcessor::SOVTimeStepType::Zone, OutputProcessor::TimeStepType::Zone},
             // System
-            {OutputProcessor::SOVTimeStepType::HVAC, OutputProcessor::TimeStepType::TimeStepSystem},
-            {OutputProcessor::SOVTimeStepType::System, OutputProcessor::TimeStepType::TimeStepSystem},
-            {OutputProcessor::SOVTimeStepType::Plant, OutputProcessor::TimeStepType::TimeStepSystem}};
+            {OutputProcessor::SOVTimeStepType::HVAC, OutputProcessor::TimeStepType::System},
+            {OutputProcessor::SOVTimeStepType::System, OutputProcessor::TimeStepType::System},
+            {OutputProcessor::SOVTimeStepType::Plant, OutputProcessor::TimeStepType::System}};
 
         for (auto const &indexGroup : resource_map) {
             EXPECT_TRUE(compare_enums(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first)));
@@ -1279,8 +1279,8 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_standardIndexTypeKey)
     {
-        EXPECT_EQ("Zone", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepZone));
-        EXPECT_EQ("HVAC", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepSystem));
+        EXPECT_EQ("Zone", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::Zone));
+        EXPECT_EQ("HVAC", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::System));
 
         // It's no longer possible to pass something that isn't part of the enum, that's kind of the point of using an enum!
         // EXPECT_EQ("UNKW", StandardTimeStepTypeKey(0));
@@ -1309,7 +1309,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_determineMeterIPUnits)
     {
-        OutputProcessor::RT_IPUnits ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
+        OutputProcessor::RT_IPUnits ipUnits = OutputProcessor::RT_IPUnits::Invalid;
         bool errorFound = false;
 
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound);
@@ -1342,12 +1342,12 @@ namespace OutputProcessor {
 
         state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-        ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
+        ipUnits = OutputProcessor::RT_IPUnits::Invalid;
         DetermineMeterIPUnits(*state, ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound); // was "badunits"
         EXPECT_TRUE(compare_enums(RT_IPUnits::OtherJ, ipUnits));
         EXPECT_TRUE(errorFound);
 
-        ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
+        ipUnits = OutputProcessor::RT_IPUnits::Invalid;
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound); // was "kWh"
         EXPECT_TRUE(compare_enums(RT_IPUnits::Electricity, ipUnits));
         EXPECT_TRUE(errorFound);
@@ -1841,7 +1841,7 @@ namespace OutputProcessor {
 
         // For now I don't accept anything else than TimeStepZone or TimeStepSystem, but to make it easier if we need to change that later
         // and to preserve the original test (passing int=3 before should have defaulted to Zone...)
-        OutputProcessor::TimeStepType aThirdTimeStepType = OutputProcessor::TimeStepType::TimeStepZone;
+        OutputProcessor::TimeStepType aThirdTimeStepType = OutputProcessor::TimeStepType::Zone;
         std::string aThirdTimeStepString = timeStepZoneString;
 
         WriteReportVariableDictionaryItem(*state,
@@ -1853,7 +1853,7 @@ namespace OutputProcessor {
                                           "1",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -1868,7 +1868,7 @@ namespace OutputProcessor {
                                           "2",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -1883,7 +1883,7 @@ namespace OutputProcessor {
                                           "3",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
@@ -1898,7 +1898,7 @@ namespace OutputProcessor {
                                           "4",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepSystem,
+                                          OutputProcessor::TimeStepType::System,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -1929,7 +1929,7 @@ namespace OutputProcessor {
                                           "6",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -1944,7 +1944,7 @@ namespace OutputProcessor {
                                           "7",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -1959,7 +1959,7 @@ namespace OutputProcessor {
                                           "8",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
@@ -1974,7 +1974,7 @@ namespace OutputProcessor {
                                           "9",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepSystem,
+                                          OutputProcessor::TimeStepType::System,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2004,7 +2004,7 @@ namespace OutputProcessor {
                                           "11",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2021,7 +2021,7 @@ namespace OutputProcessor {
                                           "12",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2038,7 +2038,7 @@ namespace OutputProcessor {
                                           "13",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
@@ -2055,7 +2055,7 @@ namespace OutputProcessor {
                                           "14",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepSystem,
+                                          OutputProcessor::TimeStepType::System,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2089,7 +2089,7 @@ namespace OutputProcessor {
                                           "16",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2107,7 +2107,7 @@ namespace OutputProcessor {
                                           "17",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2125,7 +2125,7 @@ namespace OutputProcessor {
                                           "18",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
@@ -2143,7 +2143,7 @@ namespace OutputProcessor {
                                           "19",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepSystem,
+                                          OutputProcessor::TimeStepType::System,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2179,7 +2179,7 @@ namespace OutputProcessor {
                                           "21",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2197,7 +2197,7 @@ namespace OutputProcessor {
                                           "22",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2215,7 +2215,7 @@ namespace OutputProcessor {
                                           "23",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
@@ -2233,7 +2233,7 @@ namespace OutputProcessor {
                                           "24",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepSystem,
+                                          OutputProcessor::TimeStepType::System,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2269,7 +2269,7 @@ namespace OutputProcessor {
                                           "26",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2287,7 +2287,7 @@ namespace OutputProcessor {
                                           "27",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2305,7 +2305,7 @@ namespace OutputProcessor {
                                           "28",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepZone,
+                                          OutputProcessor::TimeStepType::Zone,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           "scheduleName");
@@ -2323,7 +2323,7 @@ namespace OutputProcessor {
                                           "29",
                                           "keyedValue",
                                           "variableName",
-                                          OutputProcessor::TimeStepType::TimeStepSystem,
+                                          OutputProcessor::TimeStepType::System,
                                           OutputProcessor::Unit::m3_s,
                                           _,
                                           _);
@@ -2824,9 +2824,9 @@ namespace OutputProcessor {
                                                            {"J", "ELECTRICITY", "HEAT RECOVERY FOR HEATING", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "HEATRECOVERYFORHEATING", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "HEATRECOVERYHEATING", "endUseSub", "HVAC"},
-                                                           {"J", "ELECTRICITY", "ELECTRICEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELECTRICITY", "PURCHASEDELECTRICEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELECTRICITY", "SOLDELECTRICEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "ELECTRICITYEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "PURCHASEDELECTRICITYEMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELECTRICITY", "SOLDELECTRICITYEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "NATURALGASEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "FUELOILNO1EMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELECTRICITY", "FUELOILNO2EMISSIONS", "endUseSub", "HVAC"},
@@ -2913,12 +2913,12 @@ namespace OutputProcessor {
                                                      "endUseSub:HeatRecoveryForCooling:Electricity",
                                                      "HeatRecoveryForHeating:Electricity",
                                                      "endUseSub:HeatRecoveryForHeating:Electricity",
-                                                     "ElectricEmissions:Electricity",
-                                                     "endUseSub:ElectricEmissions:Electricity",
-                                                     "PurchasedElectricEmissions:Electricity",
-                                                     "endUseSub:PurchasedElectricEmissions:Electricity",
-                                                     "SoldElectricEmissions:Electricity",
-                                                     "endUseSub:SoldElectricEmissions:Electricity",
+                                                     "ElectricityEmissions:Electricity",
+                                                     "endUseSub:ElectricityEmissions:Electricity",
+                                                     "PurchasedElectricityEmissions:Electricity",
+                                                     "endUseSub:PurchasedElectricityEmissions:Electricity",
+                                                     "SoldElectricityEmissions:Electricity",
+                                                     "endUseSub:SoldElectricityEmissions:Electricity",
                                                      "NaturalGasEmissions:Electricity",
                                                      "endUseSub:NaturalGasEmissions:Electricity",
                                                      "FuelOilNo1Emissions:Electricity",
@@ -3027,15 +3027,15 @@ namespace OutputProcessor {
 
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
 
-        EXPECT_DOUBLE_EQ(timeStep, *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep);
-        EXPECT_DOUBLE_EQ(0.0, state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute);
+        EXPECT_DOUBLE_EQ(timeStep, *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep);
+        EXPECT_DOUBLE_EQ(0.0, state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute);
 
         timeStep = 2.0;
 
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        EXPECT_DOUBLE_EQ(timeStep, *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep);
-        EXPECT_DOUBLE_EQ(0.0, state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute);
+        EXPECT_DOUBLE_EQ(timeStep, *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep);
+        EXPECT_DOUBLE_EQ(0.0, state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_getReportVariableInput)
@@ -3436,30 +3436,30 @@ namespace OutputProcessor {
 
         AddToOutputVariableList(*state,
                                 "Site Outdoor Air Drybulb Temperature",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Real,
                                 OutputProcessor::Unit::C);
         AddToOutputVariableList(*state,
                                 "Site Outdoor Air Wetbulb Temperature",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Real,
                                 OutputProcessor::Unit::C);
         AddToOutputVariableList(*state,
                                 "Site Outdoor Air Humidity Ratio",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Real,
                                 OutputProcessor::Unit::kgWater_kgDryAir);
         AddToOutputVariableList(*state,
                                 "Site Outdoor Air Relative Humidity",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Real,
                                 OutputProcessor::Unit::Perc);
 
-        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType));
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::Zone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType));
         EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType));
         EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
@@ -3467,7 +3467,7 @@ namespace OutputProcessor {
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);
         EXPECT_TRUE(compare_enums(OutputProcessor::Unit::C, state->dataOutputProcessor->DDVariableTypes(1).units));
 
-        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(2).timeStepType));
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::Zone, state->dataOutputProcessor->DDVariableTypes(2).timeStepType));
         EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(2).storeType));
         EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(2).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(2).Next);
@@ -3475,7 +3475,7 @@ namespace OutputProcessor {
         EXPECT_EQ("Site Outdoor Air Wetbulb Temperature", state->dataOutputProcessor->DDVariableTypes(2).VarNameOnly);
         EXPECT_TRUE(compare_enums(OutputProcessor::Unit::C, state->dataOutputProcessor->DDVariableTypes(2).units));
 
-        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(3).timeStepType));
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::Zone, state->dataOutputProcessor->DDVariableTypes(3).timeStepType));
         EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(3).storeType));
         EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(3).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(3).Next);
@@ -3483,7 +3483,7 @@ namespace OutputProcessor {
         EXPECT_EQ("Site Outdoor Air Humidity Ratio", state->dataOutputProcessor->DDVariableTypes(3).VarNameOnly);
         EXPECT_TRUE(compare_enums(OutputProcessor::Unit::kgWater_kgDryAir, state->dataOutputProcessor->DDVariableTypes(3).units));
 
-        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(4).timeStepType));
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::Zone, state->dataOutputProcessor->DDVariableTypes(4).timeStepType));
         EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(4).storeType));
         EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(4).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(4).Next);
@@ -3524,7 +3524,7 @@ namespace OutputProcessor {
         EXPECT_EQ("", state->dataOutputProcessor->ReqRepVars(1).SchedName);
         EXPECT_EQ(true, state->dataOutputProcessor->ReqRepVars(1).Used);
 
-        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType));
+        EXPECT_TRUE(compare_enums(OutputProcessor::TimeStepType::Zone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType));
         EXPECT_TRUE(compare_enums(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType));
         EXPECT_TRUE(compare_enums(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType));
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
@@ -4300,8 +4300,8 @@ namespace OutputProcessor {
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 50;
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
@@ -4426,7 +4426,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(*state);
 
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4588,8 +4588,8 @@ namespace OutputProcessor {
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 50;
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
@@ -4730,7 +4730,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(*state);
 
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4901,8 +4901,8 @@ namespace OutputProcessor {
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 50;
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
@@ -5043,7 +5043,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(*state);
 
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -5159,8 +5159,8 @@ namespace OutputProcessor {
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 10;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 10;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 10;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 10;
 
         state->dataGlobal->WarmupFlag = true;
 
@@ -5184,33 +5184,33 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 1.1;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         PurchAir(1).TotHeatEnergy = 1.3;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         PurchAir(1).TotHeatEnergy = 1.5;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         PurchAir(1).TotHeatEnergy = 1.7;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         PurchAir(1).TotHeatEnergy = 1.9;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         PurchAir(1).TotHeatEnergy = 2.2;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         state->dataGlobal->WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone); // zone timestep
 
         compare_eso_stream(delimited_string(
             {
@@ -5244,15 +5244,15 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 100.0;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         PurchAir(1).TotHeatEnergy = 200.0;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
 
         PurchAir(1).TotHeatEnergy = 300.0;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone); // zone timestep
 
         compare_eso_stream(delimited_string(
             {
@@ -5308,8 +5308,8 @@ namespace OutputProcessor {
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 50;
 
         GetReportVariableInput(*state);
         SetupOutputVariable(*state,
@@ -5336,7 +5336,7 @@ namespace OutputProcessor {
                             1,
                             1);
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         GenOutputVariablesAuditReport(*state);
 
@@ -5392,8 +5392,8 @@ namespace OutputProcessor {
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 50;
 
         OutputReportTabular::GetInputTabularMonthly(*state);
         OutputReportTabular::InitializeTabularMonthly(*state);
@@ -5423,7 +5423,7 @@ namespace OutputProcessor {
                             1,
                             1);
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         state->dataOutputProcessor->NumExtraVars = 0;
         BuildKeyVarList(*state, "Air Loop 1|AirSupply InletNode", "SYSTEM NODE SETPOINT TEMPERATURE", 1, 2);
@@ -5732,61 +5732,49 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_unitStringFromDDitem)
     {
 
-        AddToOutputVariableList(*state,
-                                "energy variable 1",
-                                OutputProcessor::TimeStepType::TimeStepZone,
-                                StoreType::Averaged,
-                                VariableType::Integer,
-                                OutputProcessor::Unit::J);
-        AddToOutputVariableList(*state,
-                                "energy variable 2",
-                                OutputProcessor::TimeStepType::TimeStepZone,
-                                StoreType::Averaged,
-                                VariableType::Integer,
-                                OutputProcessor::Unit::J);
-        AddToOutputVariableList(*state,
-                                "energy variable 3",
-                                OutputProcessor::TimeStepType::TimeStepZone,
-                                StoreType::Averaged,
-                                VariableType::Integer,
-                                OutputProcessor::Unit::J);
+        AddToOutputVariableList(
+            *state, "energy variable 1", OutputProcessor::TimeStepType::Zone, StoreType::Averaged, VariableType::Integer, OutputProcessor::Unit::J);
+        AddToOutputVariableList(
+            *state, "energy variable 2", OutputProcessor::TimeStepType::Zone, StoreType::Averaged, VariableType::Integer, OutputProcessor::Unit::J);
+        AddToOutputVariableList(
+            *state, "energy variable 3", OutputProcessor::TimeStepType::Zone, StoreType::Averaged, VariableType::Integer, OutputProcessor::Unit::J);
 
         AddToOutputVariableList(*state,
                                 "humidity ratio variable 1",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Integer,
                                 OutputProcessor::Unit::kgWater_kgDryAir);
         AddToOutputVariableList(*state,
                                 "humidity ratio variable 2",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Integer,
                                 OutputProcessor::Unit::kgWater_kgDryAir);
 
         AddToOutputVariableList(*state,
                                 "flow variable 1",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Integer,
                                 OutputProcessor::Unit::kgWater_s);
         AddToOutputVariableList(*state,
                                 "flow variable 2",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Integer,
                                 OutputProcessor::Unit::kgWater_s);
 
         AddToOutputVariableList(*state,
                                 "user defined EMS variable 1",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Integer,
                                 OutputProcessor::Unit::customEMS,
                                 "ergs/century");
         AddToOutputVariableList(*state,
                                 "user defined EMS variable 2",
-                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::TimeStepType::Zone,
                                 StoreType::Averaged,
                                 VariableType::Integer,
                                 OutputProcessor::Unit::customEMS,

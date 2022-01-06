@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -322,7 +322,7 @@ void GetBoilerInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
         thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(6),
@@ -331,7 +331,7 @@ void GetBoilerInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -531,7 +531,7 @@ void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
                 EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->BoilerOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                    state, this->BoilerOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->ModulatedFlowErrDone) {
@@ -757,9 +757,9 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
 }
 
 void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
-                                  Real64 const MyLoad,                                        // W - hot water demand to be met by boiler
-                                  bool const RunFlag,                                         // TRUE if boiler operating
-                                  DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
+                                  Real64 const MyLoad,                                    // W - hot water demand to be met by boiler
+                                  bool const RunFlag,                                     // TRUE if boiler operating
+                                  DataBranchAirLoopPlant::ControlType const EquipFlowCtrl // Flow control mode for the equipment
 )
 {
     // SUBROUTINE INFORMATION:
@@ -807,7 +807,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
     // will not shut down the branch
     if (MyLoad <= 0.0 || !RunFlag) {
-        if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)
+        if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive)
             this->BoilerMassFlowRate = state.dataLoopNodes->Node(BoilerInletNode).MassFlowRate;
         return;
     }

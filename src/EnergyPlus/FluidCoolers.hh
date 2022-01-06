@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,8 +64,10 @@ namespace FluidCoolers {
 
     enum class PerfInputMethod
     {
+        Invalid = -1,
         NOMINAL_CAPACITY,
-        U_FACTOR
+        U_FACTOR,
+        Num
     };
 
     struct FluidCoolerspecs : PlantComponent
@@ -118,7 +120,7 @@ namespace FluidCoolers {
         int WMFRGreaterThanMaxAvailErrIndex;          // Index for water mass flow rate > minavail recurring message
         // loop topology variables
         int LoopNum;
-        int LoopSideNum;
+        DataPlant::LoopSideLocation LoopSideNum;
         int BranchNum;
         int CompNum;
         bool oneTimeInitFlag;
@@ -155,10 +157,10 @@ namespace FluidCoolers {
               FluidCoolerLowSpeedNomCapWasAutoSized(false), FluidCoolerLowSpeedNomCapSizingFactor(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               OutdoorAirInletNodeNum(0), HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0),
               OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0),
-              WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0),
-              BranchNum(0), CompNum(0), oneTimeInitFlag(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0),
-              WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0),
-              AirWetBulb(0.0), indexInArray(0)
+              WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0),
+              LoopSideNum(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), oneTimeInitFlag(true), beginEnvrnInit(true),
+              InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), WaterTemp(0.0),
+              AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0), indexInArray(0)
         {
         }
 

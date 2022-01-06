@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -981,7 +981,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                    thisPLHP.name,
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisPLHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                     loadSideOutletNodeName,
@@ -990,11 +990,11 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                     thisPLHP.name,
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    NodeInputManager::compFluidStream::Primary,
+                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsNotParent);
-                DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::blank;
-                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::blank;
-                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::blank;
+                DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
+                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::Blank;
+                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::Blank;
                 if (condenserType == "WATERSOURCE") {
                     thisPLHP.waterSource = true;
                     condenserNodeType = DataLoopNode::NodeFluidType::Water;
@@ -1019,7 +1019,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                      thisPLHP.name,
                                                                                      condenserNodeType,
                                                                                      condenserNodeConnectionType_Inlet,
-                                                                                     NodeInputManager::compFluidStream::Secondary,
+                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                      DataLoopNode::ObjectIsNotParent);
                 thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                       sourceSideOutletNodeName,
@@ -1028,7 +1028,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                       thisPLHP.name,
                                                                                       condenserNodeType,
                                                                                       condenserNodeConnectionType_Outlet,
-                                                                                      NodeInputManager::compFluidStream::Secondary,
+                                                                                      NodeInputManager::CompFluidStream::Secondary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (nodeErrorsFound) errorsFound = true;
                 BranchNodeConnections::TestCompSet(
@@ -1222,7 +1222,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                    this->name));
             ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
             errFlag = true;
-        } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
+        } else if (this->loadSideLocation.loopSideNum != DataPlant::LoopSideLocation::Supply) { // only check if !thisErrFlag
             ShowSevereError(state,
                             format("{}: Invalid connections for {} name = \"{}\"",
                                    routineName,
@@ -1256,7 +1256,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                        this->name));
                 ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
                 errFlag = true;
-            } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
+            } else if (this->sourceSideLocation.loopSideNum != DataPlant::LoopSideLocation::Demand) { // only check if !thisErrFlag
                 ShowSevereError(state,
                                 format("{}: Invalid connections for {} name = \"{}\"",
                                        routineName,
