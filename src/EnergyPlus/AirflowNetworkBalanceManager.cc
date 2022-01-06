@@ -10156,7 +10156,7 @@ namespace AirflowNetworkBalanceManager {
     }
 
     void UpdateAirflowNetwork(EnergyPlusData &state,
-                              Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
+                              const bool FirstHVACIteration) // True when solution technique on first iteration
     {
 
         // SUBROUTINE INFORMATION:
@@ -10366,8 +10366,8 @@ namespace AirflowNetworkBalanceManager {
                 break;
             }
         }
-        if (present(FirstHVACIteration)) {
-            if (FirstHVACIteration && OnOffFanFlag) {
+        if (FirstHVACIteration) {
+            if (OnOffFanFlag) {
                 state.dataAirflowNetworkBalanceManager->multiExchangeData = state.dataAirflowNetworkBalanceManager->exchangeData;
                 for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfZones; ++i) {
                     state.dataAirflowNetworkBalanceManager->nodeReport(i).PZ = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;

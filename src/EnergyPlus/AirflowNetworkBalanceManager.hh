@@ -153,7 +153,7 @@ namespace AirflowNetworkBalanceManager {
 
     void ReportAirflowNetwork(EnergyPlusData &state);
 
-    void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
+    void UpdateAirflowNetwork(EnergyPlusData &state, const bool FirstHVACIteration = false); // True when solution technique on first iteration
 
     void AirflowNetworkVentingControl(EnergyPlusData &state,
                                       int i,             // AirflowNetwork surface number
