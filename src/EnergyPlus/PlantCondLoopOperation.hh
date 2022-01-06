@@ -138,10 +138,7 @@ namespace PlantCondLoopOperation {
     );
 
     void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
-                                        int const LoopNum,
-                                        const DataPlant::LoopSideLocation LoopSideNum,
-                                        int const BranchNum,
-                                        int const CompNum,
+                                        PlantLocation const &plantLoc,
                                         int const CurCompLevelOpNum, // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
                                         int const CurSchemePtr,
                                         Real64 const LoopDemand,
