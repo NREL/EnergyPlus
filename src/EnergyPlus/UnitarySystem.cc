@@ -12869,11 +12869,13 @@ namespace UnitarySystems {
                         this->m_CoolingSpeedNum = speedNum;
                         state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
                             state, OperationMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
+                        // Cooling: break as outlet temp approaches DesOutTemp to within Acc from above
                         if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < Acc) break;
                     }
 
                     // make sure outlet temp is below set point before calling SolveRoot
-                    if ((state.dataLoopNodes->Node(OutletNode).Temp - DesOutTemp) < -Acc) {
+                    // Cooling: iterate only when outlet temp is below DesOutTemp by at least Acc
+                    if ((DesOutTemp - state.dataLoopNodes->Node(OutletNode).Temp) > Acc) {
                         std::array<Real64, 8> Par2 = {double(this->m_CoolingCoilIndex),
                                                       DesOutTemp,
                                                       // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
@@ -13246,10 +13248,12 @@ namespace UnitarySystems {
                                                                                                       this->m_CoolingSpeedRatio,
                                                                                                       this->m_FanOpMode,
                                                                                                       singleMode);
+                            // Cooling: break as outlet humrat approaches DesOutHumRat to within HumRatAcc from above
                             if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < HumRatAcc) break;
                         }
                         // make sure outlet HumRat is below set point before calling SolveRoot
-                        if ((state.dataLoopNodes->Node(OutletNode).HumRat - DesOutHumRat) < -HumRatAcc) {
+                        // Cooling: iterate only when outlet humrat is below DesOutHumRat by at least HumRatAcc
+                        if ((DesOutHumRat - state.dataLoopNodes->Node(OutletNode).HumRat) > HumRatAcc) {
                             std::array<Real64, 8> Par2 = {
                                 double(this->m_CoolingCoilIndex),
                                 DesOutHumRat,
