@@ -2368,7 +2368,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
@@ -2449,7 +2449,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
@@ -2499,7 +2499,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
                 ChangeInLoad = max(0.0, ChangeInLoad);
@@ -2618,7 +2618,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
@@ -2700,7 +2700,7 @@ void DistributePlantLoad(EnergyPlusData &state,
 
                 AdjustChangeInLoadForLastStageUpperRangeLimit(state, LoopNum, CurSchemePtr, ListPtr, ChangeInLoad);
 
-                AdjustChangeInLoadByEMSControls(state, LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad);
+                AdjustChangeInLoadByEMSControls(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
                 AdjustChangeInLoadByHowServed(state, {LoopNum, LoopSideNum, BranchNum, CompNum}, ChangeInLoad);
 
@@ -3631,10 +3631,7 @@ void ActivateEMSControls(
 }
 
 void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
-                                     int const LoopNum,
-                                     const LoopSideLocation LoopSideNum,
-                                     int const BranchNum,
-                                     int const CompNum,
+                                     PlantLocation const & plantLoc,
                                      Real64 &ChangeInLoad // positive magnitude of load change
 )
 {
@@ -3675,9 +3672,9 @@ void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // set up some nice references to avoid lookups
-    auto &this_loopside(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum));
-    auto &this_branch(this_loopside.Branch(BranchNum));
-    auto &this_comp(this_branch.Comp(CompNum));
+    auto &this_loopside(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum));
+    auto &this_branch(this_loopside.Branch(plantLoc.branchNum));
+    auto &this_comp(this_branch.Comp(plantLoc.compNum));
 
     if ((this_loopside.EMSCtrl) && (this_loopside.EMSValue <= 0.0)) {
         ChangeInLoad = 0.0;

@@ -172,10 +172,7 @@ namespace PlantCondLoopOperation {
                              bool &LoopShutDownFlag);
 
     void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
-                                         int const LoopNum,
-                                         const DataPlant::LoopSideLocation LoopSideNum,
-                                         int const BranchNum,
-                                         int const CompNum,
+                                         PlantLocation const & plantLoc,
                                          Real64 &ChangeInLoad // positive magnitude of load change
     );
 
