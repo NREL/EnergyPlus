@@ -72,10 +72,6 @@ namespace FanCoilUnits {
 
     Real64 constexpr Small5WLoad = 5.0; // load threshold 5.0 W
 
-    // coil operation
-    constexpr int On(1);  // normal coil operation
-    constexpr int Off(0); // signal coil shouldn't run
-
     // coil type units supported in this module
     constexpr int FanCoilUnit_4Pipe(1);
 

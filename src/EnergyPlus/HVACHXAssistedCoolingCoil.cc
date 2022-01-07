@@ -99,10 +99,10 @@ namespace HVACHXAssistedCoolingCoil {
     using namespace DataHVACGlobals;
 
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
-                                  std::string_view HXAssistedCoilName, // Name of HXAssistedCoolingCoil
-                                  bool const FirstHVACIteration,       // FirstHVACIteration flag
-                                  int const CompOp,                    // compressor operation; 1=on, 0=off
-                                  Real64 const PartLoadRatio,          // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
+                                  std::string_view HXAssistedCoilName,    // Name of HXAssistedCoolingCoil
+                                  bool const FirstHVACIteration,          // FirstHVACIteration flag
+                                  CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
+                                  Real64 const PartLoadRatio,             // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
                                   int const FanOpMode,                // Allows the parent object to control fan operation
                                   Optional_bool_const HXUnitEnable,   // flag to enable heat exchanger heat recovery
@@ -179,7 +179,7 @@ namespace HVACHXAssistedCoolingCoil {
             HXUnitOn = true;
         }
 
-        if (CompOp == Off) {
+        if (CompressorOp == CompressorOperation::Off) {
             HXUnitOn = false;
         }
 
@@ -190,7 +190,7 @@ namespace HVACHXAssistedCoolingCoil {
             AirFlowRatio = 1.0;
         }
         CalcHXAssistedCoolingCoil(
-            state, HXAssistedCoilNum, FirstHVACIteration, CompOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
+            state, HXAssistedCoilNum, FirstHVACIteration, CompressorOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
 
         // Update the current HXAssistedCoil output
         //  Call UpdateHXAssistedCoolingCoil(HXAssistedCoilNum), not required. Updates done by the HX and cooling coil components.
@@ -919,14 +919,14 @@ namespace HVACHXAssistedCoolingCoil {
     //******************************************************************************
 
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
-                                   int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil
-                                   bool const FirstHVACIteration,       // FirstHVACIteration flag
-                                   int const CompOp,                    // compressor operation; 1=on, 0=off
-                                   Real64 const PartLoadRatio,          // Cooling coil part load ratio
-                                   bool const HXUnitOn,                 // Flag to enable heat exchanger
-                                   int const FanOpMode,                 // Allows parent object to control fan operation
-                                   Optional<Real64 const> OnOffAirFlow, // Ratio of compressor ON air mass flow to AVERAGE over time step
-                                   Optional_bool_const EconomizerFlag   // OA (or airloop) econommizer status
+                                   int const HXAssistedCoilNum,            // Index number for HXAssistedCoolingCoil
+                                   bool const FirstHVACIteration,          // FirstHVACIteration flag
+                                   CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
+                                   Real64 const PartLoadRatio,             // Cooling coil part load ratio
+                                   bool const HXUnitOn,                    // Flag to enable heat exchanger
+                                   int const FanOpMode,                    // Allows parent object to control fan operation
+                                   Optional<Real64 const> OnOffAirFlow,    // Ratio of compressor ON air mass flow to AVERAGE over time step
+                                   Optional_bool_const EconomizerFlag      // OA (or airloop) econommizer status
     )
     {
 
@@ -1004,7 +1004,7 @@ namespace HVACHXAssistedCoolingCoil {
             if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 SimDXCoil(state,
                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
-                          CompOp,
+                          CompressorOp,
                           FirstHVACIteration,
                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
                           FanOpMode,
@@ -1018,8 +1018,8 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
                 Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
                 Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-                int CompOn = CompOp;
-                if (PartLoadRatio == 0.0) CompOn = 0;
+                CompressorOperation CompressorOn = CompressorOp;
+                if (PartLoadRatio == 0.0) CompressorOn = CompressorOperation::Off;
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
@@ -1027,7 +1027,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                           MaxONOFFCyclesperHour,
                                                           HPTimeConstant,
                                                           FanDelayTime,
-                                                          CompOn,
+                                                          CompressorOn,
                                                           PartLoadRatio,
                                                           state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds,
                                                           QZnReq,
