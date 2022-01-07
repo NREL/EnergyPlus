@@ -618,9 +618,7 @@ void SimHVAC(EnergyPlusData &state)
     // this default control algorithm.
 
     // Using/Aliasing
-    using DataPlant::DemandSide;
     using DataPlant::NumConvergenceHistoryTerms;
-    using DataPlant::SupplySide;
     using EMSManager::ManageEMS;
     using General::CreateSysTimeIntervalString;
     using NonZoneEquipmentManager::ManageNonZoneEquipment;
@@ -650,8 +648,6 @@ void SimHVAC(EnergyPlusData &state)
     auto &MaxErrCount = state.dataHVACMgr->MaxErrCount;
     auto &ErrEnvironmentName = state.dataHVACMgr->ErrEnvironmentName;
     int LoopNum;
-    int LoopSide;
-    int ThisLoopSide;
 
     int AirSysNum;
     int StackDepth;
@@ -936,7 +932,7 @@ void SimHVAC(EnergyPlusData &state)
 
     // Test plant loop for errors
     for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-        for (LoopSide = DemandSide; LoopSide <= SupplySide; ++LoopSide) {
+        for (DataPlant::LoopSideLocation LoopSide : DataPlant::LoopSideKeys) {
             CheckPlantMixerSplitterConsistency(state, LoopNum, LoopSide, FirstHVACIteration);
             CheckForRunawayPlantTemps(state, LoopNum, LoopSide);
         }
@@ -1384,7 +1380,7 @@ void SimHVAC(EnergyPlusData &state)
                         ShowContinueError(state, "Supply-to-Demand interface mass flow rate check value iteration history trace: " + HistoryTrace);
 
                         // now work with history logs for mass flow to detect issues
-                        for (ThisLoopSide = 1; ThisLoopSide <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide); ++ThisLoopSide) {
+                        for (auto ThisLoopSide : DataPlant::LoopSideKeys) {
 
                             auto &mdotHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory;
                             auto &mdotHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory;
@@ -1561,7 +1557,7 @@ void SimHVAC(EnergyPlusData &state)
                         ShowContinueError(state, "Supply-to-Demand interface temperature check value iteration history trace: " + HistoryTrace);
 
                         // now work with history logs for mass flow to detect issues
-                        for (ThisLoopSide = 1; ThisLoopSide <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide); ++ThisLoopSide) {
+                        for (auto ThisLoopSide : DataPlant::LoopSideKeys) {
 
                             auto &tempHistInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory;
                             auto &tempHistOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory;

@@ -383,7 +383,6 @@ void GetTESCoilInput(EnergyPlusData &state)
         if (ZoneIndexTrial > 0) { // tank is inside a zone so setup internal gains
             SetupZoneInternalGain(state,
                                   ZoneIndexTrial,
-                                  "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                   state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                   DataHeatBalance::IntGainType::PackagedTESCoilTank,
                                   &state.dataPackagedThermalStorageCoil->TESCoil(item).QdotAmbient);
@@ -2198,7 +2197,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     auto &MyWarmupFlag = state.dataPackagedThermalStorageCoil->MyWarmupFlag;
     bool errFlag;
     int plloopnum;
-    int lsnum;
+    DataPlant::LoopSideLocation lsnum;
     int brnum;
     int cpnum;
     Real64 tmpSchedValue;

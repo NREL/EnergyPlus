@@ -1726,18 +1726,19 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
     // Setup the plant itself manually
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PipingSystemPipeCircuit;
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
-    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::PipingSystemPipeCircuit;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Name = "MY PIPE CIRCUIT";
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumIn = 1;
 
     // Dummy surface
     state->dataSurface->TotSurfaces = 1;
@@ -1770,7 +1771,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation)
 
     // second call, turn off initLoopEquip so it tries to do a simulation
     initLoopEquip = false;
-    EnergyPlus::PlantLocation myLocation = EnergyPlus::PlantLocation(1, 2, 1, 1);
+    EnergyPlus::PlantLocation myLocation = EnergyPlus::PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
     Real64 curLoad = 0.0;
     thisCircuit->simulate(*state, myLocation, true, curLoad, true);
 

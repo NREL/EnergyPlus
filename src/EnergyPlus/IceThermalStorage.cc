@@ -1372,14 +1372,15 @@ namespace IceThermalStorage {
                                                this->PlantCompNum);
 
             if ((state.dataPlnt->PlantLoop(this->PlantLoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
-                (this->PlantLoopSideNum == DataPlant::SupplySide)) {
+                (this->PlantLoopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
-                for (CompNum = 1;
-                     CompNum <=
-                     state.dataPlnt->PlantLoop(this->PlantLoopNum).LoopSide(DataPlant::SupplySide).Branch(this->PlantBranchNum).TotalComponents;
+                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(this->PlantLoopNum)
+                                                 .LoopSide(DataPlant::LoopSideLocation::Supply)
+                                                 .Branch(this->PlantBranchNum)
+                                                 .TotalComponents;
                      ++CompNum) {
                     state.dataPlnt->PlantLoop(this->PlantLoopNum)
-                        .LoopSide(DataPlant::SupplySide)
+                        .LoopSide(DataPlant::LoopSideLocation::Supply)
                         .Branch(this->PlantBranchNum)
                         .Comp(CompNum)
                         .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
@@ -1447,13 +1448,17 @@ namespace IceThermalStorage {
                                                this->BranchNum,
                                                this->CompNum);
             if ((state.dataPlnt->PlantLoop(this->LoopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
-                (this->LoopSideNum == DataPlant::SupplySide)) {
+                (this->LoopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
                 for (int compNum = 1;
-                     compNum <= state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).TotalComponents;
+                     compNum <=
+                     state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(this->BranchNum).TotalComponents;
                      ++compNum) {
-                    state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).Comp(compNum).FlowPriority =
-                        DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+                    state.dataPlnt->PlantLoop(this->LoopNum)
+                        .LoopSide(DataPlant::LoopSideLocation::Supply)
+                        .Branch(this->BranchNum)
+                        .Comp(compNum)
+                        .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                 }
             }
             this->MyLoad = 0.0;

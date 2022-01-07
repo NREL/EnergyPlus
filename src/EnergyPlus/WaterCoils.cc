@@ -6822,10 +6822,10 @@ Real64 GetWaterCoilCapacity(EnergyPlusData &state,
 void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
                                          DataPlant::PlantEquipmentType const CoilType,
                                          std::string const &CoilName,
-                                         [[maybe_unused]] int const EquipFlowCtrl, // Flow control mode for the equipment
-                                         int const LoopNum,                        // Plant loop index for where called from
-                                         int const LoopSide,                       // Plant loop side index for where called from
-                                         int &CompIndex,                           // Chiller number pointer
+                                         [[maybe_unused]] int const EquipFlowCtrl,   // Flow control mode for the equipment
+                                         int const LoopNum,                          // Plant loop index for where called from
+                                         const DataPlant::LoopSideLocation LoopSide, // Plant loop side index for where called from
+                                         int &CompIndex,                             // Chiller number pointer
                                          [[maybe_unused]] bool const FirstHVACIteration,
                                          bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
 )

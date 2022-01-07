@@ -223,7 +223,7 @@ namespace GroundHeatExchangers {
         bool on;          // simulate the machine at it's operating part load ratio
         std::string name; // user identifier
         int loopNum;
-        int loopSideNum;
+        DataPlant::LoopSideLocation loopSideNum;
         int branchNum;
         int compNum;
         int inletNodeNum;  // Node number on the inlet side of the plant
@@ -267,11 +267,11 @@ namespace GroundHeatExchangers {
         bool needToSetupOutputVars;
 
         GLHEBase()
-            : available(false), on(false), loopNum(0), loopSideNum(0), branchNum(0), compNum(0), inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
-              designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
-              aveFluidTemp(0.0), QGLHE(0.0), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0), totalTubeLength(0.0),
-              timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1), updateCurSimTime(true),
-              triggerDesignDayReset(false), needToSetupOutputVars(true)
+            : available(false), on(false), loopNum(0), loopSideNum(DataPlant::LoopSideLocation::Invalid), branchNum(0), compNum(0), inletNodeNum(0),
+              outletNodeNum(0), designFlow(0.0), designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0),
+              outletTemp(0.0), inletTemp(0.0), aveFluidTemp(0.0), QGLHE(0.0), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0),
+              HXResistance(0.0), totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
+              updateCurSimTime(true), triggerDesignDayReset(false), needToSetupOutputVars(true)
         {
         }
 

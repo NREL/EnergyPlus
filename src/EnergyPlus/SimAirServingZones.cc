@@ -2402,8 +2402,8 @@ void ConnectReturnNodes(EnergyPlusData &state)
                 }
                 // Loop over components in return path and each component's inlet nodes
                 for (int compNum = 1; compNum <= thisRetPath.NumOfComponents; ++compNum) {
-                    DataZoneEquipment::AirLoopHVAC compType = thisRetPath.ComponentTypeEnum(compNum);
-                    if (compType == DataZoneEquipment::AirLoopHVAC::ZoneMixer) {
+                    DataZoneEquipment::AirLoopHVACZone compType = thisRetPath.ComponentTypeEnum(compNum);
+                    if (compType == DataZoneEquipment::AirLoopHVACZone::Mixer) {
                         auto const &thisMixer(state.dataMixerComponent->MixerCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisMixer.InletNode(inNode)) {
@@ -2412,7 +2412,7 @@ void ConnectReturnNodes(EnergyPlusData &state)
                                 break; // leave component inlet node loop
                             }
                         }
-                    } else if (compType == DataZoneEquipment::AirLoopHVAC::ZoneReturnPlenum) {
+                    } else if (compType == DataZoneEquipment::AirLoopHVACZone::ReturnPlenum) {
                         auto const &thisPlenum(state.dataZonePlenum->ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
                         for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisPlenum.InletNode(inNode)) {
@@ -3203,7 +3203,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
 
     // Evaluate water coils with new actuated variables
     if (HXAssistedWaterCoil) {
-        SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil);
+        SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
     } else {
         SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
     }
@@ -3277,7 +3277,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
 
             // Re-evaluate air loop components with new actuated variables
             if (HXAssistedWaterCoil) {
-                SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
             }
@@ -3575,8 +3575,17 @@ void SimAirLoopComponent(EnergyPlusData &state,
             //  CASE(DXCoil_CoolingHXAsst)  ! 'CoilSystem:Cooling:DX:HeatExchangerAssisted'
             //    CALL SimHXAssistedCoolingCoil(CompName,FirstHVACIteration,CoilOn,0.0,CompIndex,ContFanCycCoil)
         } else if (SELECT_CASE_var == CompType::WaterCoil_CoolingHXAsst) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-            SimHXAssistedCoolingCoil(
-                state, CompName, FirstHVACIteration, CoilOn, DataPrecisionGlobals::constant_zero, CompIndex, ContFanCycCoil, _, _, _, QActual);
+            SimHXAssistedCoolingCoil(state,
+                                     CompName,
+                                     FirstHVACIteration,
+                                     CompressorOperation::On,
+                                     DataPrecisionGlobals::constant_zero,
+                                     CompIndex,
+                                     ContFanCycCoil,
+                                     _,
+                                     _,
+                                     _,
+                                     QActual);
             if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
 
         } else if (SELECT_CASE_var == CompType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water'

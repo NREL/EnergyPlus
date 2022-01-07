@@ -3086,7 +3086,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         for (CompNum = 1; CompNum <= state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).NumOfComponents; ++CompNum) {
 
             switch (state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentTypeEnum(CompNum)) {
-            case DataZoneEquipment::AirLoopHVAC::ZoneSplitter: { // 'AirLoopHVAC:ZoneSplitter'
+            case DataZoneEquipment::AirLoopHVACZone::Splitter: { // 'AirLoopHVAC:ZoneSplitter'
 
                 if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
                       state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
@@ -3100,11 +3100,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
                 break;
             }
-            case DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum: { // 'AirLoopHVAC:SupplyPlenum'
+            case DataZoneEquipment::AirLoopHVACZone::SupplyPlenum: { // 'AirLoopHVAC:SupplyPlenum'
 
                 SimAirZonePlenum(state,
                                  state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
-                                 DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum,
+                                 DataZoneEquipment::AirLoopHVACZone::SupplyPlenum,
                                  state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum),
                                  FirstHVACIteration,
                                  FirstCall,
@@ -3593,7 +3593,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             // Store available capacities for load distribution calculations
             if (FirstHVACIteration &&
-                (state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading)) {
+                (state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).LoadDistScheme != DataZoneEquipment::LoadDist::Sequential)) {
                 if (SysOutputProvided > 0.0) {
                     state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum).HeatingCapacity(EquipPtr) = SysOutputProvided;
                 } else {
@@ -3620,7 +3620,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             {
                 auto const SELECT_CASE_var(state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentTypeEnum(CompNum));
 
-                if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneSplitter) { // 'AirLoopHVAC:ZoneSplitter'
+                if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVACZone::Splitter) { // 'AirLoopHVAC:ZoneSplitter'
 
                     if (!(state.dataAirflowNetwork->AirflowNetworkFanActivated &&
                           state.dataAirflowNetwork->SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone)) {
@@ -3632,11 +3632,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                            state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum));
                     }
 
-                } else if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum) { // 'AirLoopHVAC:SupplyPlenum'
+                } else if (SELECT_CASE_var == DataZoneEquipment::AirLoopHVACZone::SupplyPlenum) { // 'AirLoopHVAC:SupplyPlenum'
 
                     SimAirZonePlenum(state,
                                      state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
-                                     DataZoneEquipment::AirLoopHVAC::ZoneSupplyPlenum,
+                                     DataZoneEquipment::AirLoopHVACZone::SupplyPlenum,
                                      state.dataZoneEquip->SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum),
                                      FirstHVACIteration,
                                      FirstCall,
@@ -3787,7 +3787,7 @@ void InitSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool con
             moisture.SequencedOutputRequiredToDehumidSP = moisture.OutputRequiredToDehumidifyingSP; // array assignment
         } else if (FirstHVACIteration) {
             auto loadDistType = state.dataZoneEquip->ZoneEquipList(state.dataHeatBal->Zone(ZoneNum).ZoneEqNum).LoadDistScheme;
-            if ((loadDistType == DataZoneEquipment::LoadDist::SequentialLoading) || (loadDistType == DataZoneEquipment::LoadDist::UniformLoading)) {
+            if ((loadDistType == DataZoneEquipment::LoadDist::Sequential) || (loadDistType == DataZoneEquipment::LoadDist::Uniform)) {
                 // init each sequenced demand to the full output
                 energy.SequencedOutputRequired = energy.TotalOutputRequired;                        // array assignment
                 energy.SequencedOutputRequiredToHeatingSP = energy.OutputRequiredToHeatingSP;       // array assignment
@@ -3796,8 +3796,8 @@ void InitSystemOutputRequired(EnergyPlusData &state, int const ZoneNum, bool con
                 moisture.SequencedOutputRequired = moisture.TotalOutputRequired;                    // array assignment
                 moisture.SequencedOutputRequiredToHumidSP = moisture.OutputRequiredToHumidifyingSP; // array assignment
                 moisture.SequencedOutputRequiredToDehumidSP = moisture.OutputRequiredToDehumidifyingSP; // array assignment
-            } else if ((loadDistType == DataZoneEquipment::LoadDist::UniformPLRLoading) ||
-                       (loadDistType == DataZoneEquipment::LoadDist::SequentialUniformPLRLoading)) {
+            } else if ((loadDistType == DataZoneEquipment::LoadDist::UniformPLR) ||
+                       (loadDistType == DataZoneEquipment::LoadDist::SequentialUniformPLR)) {
                 // init each sequenced demand to the zone design load in order to get available capacities from equipment
                 if (energy.TotalOutputRequired >= 0.0) {
                     energy.SequencedOutputRequired = state.dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad; // array assignment
@@ -3846,8 +3846,8 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
 
     int ctrlZoneNum = state.dataHeatBal->Zone(ActualZoneNum).ZoneEqNum;
     // Do nothing on FirstHVACIteration if not UniformLoading and not SequentialLoading
-    if (FirstHVACIteration && (state.dataZoneEquip->ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::UniformLoading) &&
-        (state.dataZoneEquip->ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading)) {
+    if (FirstHVACIteration && (state.dataZoneEquip->ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::Uniform) &&
+        (state.dataZoneEquip->ZoneEquipList(ctrlZoneNum).LoadDistScheme != DataZoneEquipment::LoadDist::Sequential)) {
         return;
     }
 
@@ -3861,7 +3861,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
     int numOperating = 0;
 
     switch (thisZEqList.LoadDistScheme) {
-    case DataZoneEquipment::LoadDist::SequentialLoading:
+    case DataZoneEquipment::LoadDist::Sequential:
         // Nothing to do here for this case
         {
             // Set the load (with load fraction) for the first equipment in priority order
@@ -3891,7 +3891,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
 
             break;
         }
-    case DataZoneEquipment::LoadDist::UniformLoading:
+    case DataZoneEquipment::LoadDist::Uniform:
         // Distribute load uniformly across all active equipment
         if (thisZEqList.NumAvailHeatEquip > 0) {
             heatLoadRatio = 1.0 / thisZEqList.NumAvailHeatEquip;
@@ -3939,7 +3939,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
             }
         }
         break;
-    case DataZoneEquipment::LoadDist::UniformPLRLoading:
+    case DataZoneEquipment::LoadDist::UniformPLR:
         // Distribute load at uniform PLR across all active equipment
         if (energy.TotalOutputRequired >= 0.0) {
             for (int equipNum = 1.0; equipNum <= thisZEqList.NumOfEquipTypes; ++equipNum) {
@@ -4012,7 +4012,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
             }
         }
         break;
-    case DataZoneEquipment::LoadDist::SequentialUniformPLRLoading:
+    case DataZoneEquipment::LoadDist::SequentialUniformPLR:
         // Determine how many pieces of equipment are required to meet the current load,
         // then distribute load at uniform PLR across all active equipment
         if (energy.TotalOutputRequired >= 0.0) {
@@ -4112,7 +4112,7 @@ void DistributeSystemOutputRequired(EnergyPlusData &state, int const ActualZoneN
     }
     // For every load distribution scheme except SequentialLoad
     //  set the remaining loads to the first equipment type's load to support equipment types that don't use the sequenced loads
-    if (thisZEqList.LoadDistScheme != DataZoneEquipment::LoadDist::SequentialLoading) {
+    if (thisZEqList.LoadDistScheme != DataZoneEquipment::LoadDist::Sequential) {
         energy.RemainingOutputRequired = energy.SequencedOutputRequired(1);
         moisture.RemainingOutputRequired = moisture.SequencedOutputRequired(1);
         energy.RemainingOutputReqToHeatSP = energy.SequencedOutputRequiredToHeatingSP(1);
@@ -4219,7 +4219,7 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
     // Sensible output updates
     auto &thisZEqList(state.dataZoneEquip->ZoneEquipList(ctrlZoneNum));
     switch (thisZEqList.LoadDistScheme) {
-    case DataZoneEquipment::LoadDist::SequentialLoading: {
+    case DataZoneEquipment::LoadDist::Sequential: {
         // Subtract the system output from the unadjusted loads required
         energy.UnadjRemainingOutputRequired -= SysOutputProvided;
         energy.UnadjRemainingOutputReqToHeatSP -= SysOutputProvided;
@@ -4297,9 +4297,9 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
         }
 
     } break;
-    case DataZoneEquipment::LoadDist::UniformLoading:
-    case DataZoneEquipment::LoadDist::UniformPLRLoading:
-    case DataZoneEquipment::LoadDist::SequentialUniformPLRLoading:
+    case DataZoneEquipment::LoadDist::Uniform:
+    case DataZoneEquipment::LoadDist::UniformPLR:
+    case DataZoneEquipment::LoadDist::SequentialUniformPLR:
         // For every load distribution scheme except SequentialLoad, do not touch the sequenced loads,
         // but set the remaining loads to the next equipment type's load to support equipment types that don't use the sequenced loads
         if (present(EquipPriorityNum)) {

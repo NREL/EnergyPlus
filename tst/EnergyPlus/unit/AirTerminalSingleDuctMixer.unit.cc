@@ -7623,7 +7623,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     thisFanCoil.CCoilName_Index = 2;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
     CWCoil.WaterLoopNum = 2;
-    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     CWCoil.WaterLoopBranchNum = 1;
     CWCoil.WaterLoopCompNum = 1;
     // hot water coil
@@ -7631,16 +7631,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     thisFanCoil.HCoilName_Index = 1;
     state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
     HWCoil.WaterLoopNum = 1;
-    HWCoil.WaterLoopSide = 1;
+    HWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     HWCoil.WaterLoopBranchNum = 1;
     HWCoil.WaterLoopCompNum = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-        loop.LoopSide.allocate(2);
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -7650,10 +7649,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     CWLoop.FluidName = "Water";
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
-    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
     auto &CWLoopSizingData(state->dataSize->PlantSizData(2));
     // Chilled Water Loop
     CWLoop.PlantSizNum = 2;
@@ -7667,10 +7666,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     HWLoop.FluidName = "Water";
     HWLoop.FluidIndex = 1;
     HWLoop.FluidName = "WATER";
-    HWLoop.LoopSide(1).Branch(1).Comp(1).Name = HWCoil.Name;
-    HWLoop.LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-    HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
-    HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
+    HWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = HWCoil.Name;
+    HWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+    HWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
+    HWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
     auto &HWLoopSizingData(state->dataSize->PlantSizData(1));
     // Hot Water Loop
     HWLoop.PlantSizNum = 1;
@@ -8056,7 +8055,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     thisFanCoil.CCoilName_Index = 2;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
     CWCoil.WaterLoopNum = 2;
-    CWCoil.WaterLoopSide = 1;
+    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     CWCoil.WaterLoopBranchNum = 1;
     CWCoil.WaterLoopCompNum = 1;
     // hot water coil
@@ -8064,16 +8063,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     thisFanCoil.HCoilName_Index = 1;
     state->dataLoopNodes->Node(HWCoil.WaterInletNodeNum).Temp = 60.0;
     HWCoil.WaterLoopNum = 1;
-    HWCoil.WaterLoopSide = 1;
+    HWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
     HWCoil.WaterLoopBranchNum = 1;
     HWCoil.WaterLoopCompNum = 1;
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-        auto &loop(state->dataPlnt->PlantLoop(l));
-        loop.LoopSide.allocate(2);
-        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(1));
+
+        auto &loopside(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(l).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 1;
         loopsidebranch.Comp.allocate(1);
     }
@@ -8083,10 +8081,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     CWLoop.FluidName = "Water";
     CWLoop.FluidIndex = 1;
     CWLoop.FluidName = "WATER";
-    CWLoop.LoopSide(1).Branch(1).Comp(1).Name = CWCoil.Name;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
-    CWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = CWCoil.Name;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterCooling;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = CWCoil.WaterInletNodeNum;
+    CWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = CWCoil.WaterOutletNodeNum;
     auto &CWLoopSizingData(state->dataSize->PlantSizData(2));
     // Chilled Water Loop
     CWLoop.PlantSizNum = 2;
@@ -8100,10 +8098,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     HWLoop.FluidName = "Water";
     HWLoop.FluidIndex = 1;
     HWLoop.FluidName = "WATER";
-    HWLoop.LoopSide(1).Branch(1).Comp(1).Name = HWCoil.Name;
-    HWLoop.LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-    HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
-    HWLoop.LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
+    HWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = HWCoil.Name;
+    HWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
+    HWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = HWCoil.WaterInletNodeNum;
+    HWLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = HWCoil.WaterOutletNodeNum;
     auto &HWLoopSizingData(state->dataSize->PlantSizData(1));
     // Hot Water Loop
     HWLoop.PlantSizNum = 1;
