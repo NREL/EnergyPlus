@@ -2059,14 +2059,9 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
 
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         this->CondMassFlowRate = this->CondMassFlowRateMax;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->CondMassFlowRate,
-                                             this->CondInletNodeNum,
-                                             this->CondOutletNodeNum,
-                                             this->CDPlantLoc);
-        PlantUtilities::PullCompInterconnectTrigger(state,                                                   this->CWPlantLoc,                                                    this->CondMassFlowIndex,                                                    this->CDPlantLoc,
-                                                    DataPlant::CriteriaType::MassFlowRate,
-                                                    this->CondMassFlowRate);
+        PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
+        PlantUtilities::PullCompInterconnectTrigger(
+            state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);
 
         if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) return;
     }
