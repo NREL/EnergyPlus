@@ -1364,16 +1364,11 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
     }
     // Initialize heat recovery flow rates at node
     if (this->HeatRecActive) {
-        int LoopNum = this->HRPlantLoc.loopNum;
-        DataPlant::LoopSideLocation LoopSideNum = this->HRPlantLoc.loopSideNum;
-        int BranchIndex = this->HRPlantLoc.branchNum;
-        int CompIndex = this->HRPlantLoc.compNum;
         if (RunFlag) {
             mdot = this->DesignHeatRecMassFlowRate;
         } else {
             mdot = 0.0;
         }
-
         PlantUtilities::SetComponentFlowRate(
             state, mdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
     }
