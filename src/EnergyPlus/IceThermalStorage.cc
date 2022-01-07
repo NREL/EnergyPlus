@@ -1319,12 +1319,7 @@ namespace IceThermalStorage {
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::TS_IceDetailed,
                                                     this->plantLoc,
-                                                    errFlag,
-                                                    Optional<const Real64>(),
-                                                    Optional<const Real64>(),
-                                                    ObjexxFCL::Optional_int(),
-                                                    ObjexxFCL::Optional_int_const(),
-                                                    ObjexxFCL::Optional_int_const());
+                                                    errFlag);
 
             if (errFlag) {
                 ShowFatalError(state, "DetailedIceStorageData: oneTimeInit: Program terminated due to previous condition(s).");

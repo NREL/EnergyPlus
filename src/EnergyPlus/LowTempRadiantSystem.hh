@@ -205,7 +205,7 @@ namespace LowTempRadiantSystem {
         bool HeatingSystem = false;  // .TRUE. when the system is able to heat (parameters are valid)
         int HotWaterInNode = 0;      // hot water inlet node
         int HotWaterOutNode = 0;     // hot water outlet node
-        PlantLocation HWplantLoc{};
+        PlantLocation HWPlantLoc{};
         bool CoolingSystem = false; // .TRUE. when the system is able to cool (parameters are valid)
         int ColdWaterInNode = 0;    // cold water inlet node
         int ColdWaterOutNode = 0;   // cold water outlet node
