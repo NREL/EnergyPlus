@@ -345,10 +345,11 @@ TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // call the factory with a valid name to trigger reading inputs
+    // May not need for direct wrapper input processing call (need when caling factory)
     state->dataPlantCentralGSHP->getWrapperInputFlag = true;
 
-    auto compPtr = PlantCentralGSHP::WrapperSpecs::factory(*state, "CHW_LOOP HEATPUMP1");
+    // call the central heat pump system input processing function
+    PlantCentralGSHP::GetWrapperInput(*state);
 
     // verify that under this scenario of not finding a schedule match, ScheduleAlwaysOn is the treated default
     EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).CHSchedPtr, DataGlobalConstants::ScheduleAlwaysOn);
