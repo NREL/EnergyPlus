@@ -192,11 +192,11 @@ void SimulateFanComponents(EnergyPlusData &state,
     if (Fan(FanNum).FanType_Num == FanType_SimpleConstVolume) {
         SimSimpleFan(state, FanNum);
     } else if (Fan(FanNum).FanType_Num == FanType_SimpleVAV) {
+        Real64 deltaPress = Fan(FanNum).DeltaPress;
         if (present(PressureRise)) {
-            SimVariableVolumeFan(state, FanNum, PressureRise);
-        } else {
-            SimVariableVolumeFan(state, FanNum);
+            deltaPress = PressureRise;
         }
+        SimVariableVolumeFan(state, FanNum, deltaPress);
     } else if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
         SimOnOffFan(state, FanNum, SpeedRatio);
     } else if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
@@ -1671,7 +1671,7 @@ void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     }
 }
 
-void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise)
+void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, const Real64 PressureRise)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1729,6 +1729,7 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real
 
     NVPerfNum = Fan(FanNum).NVPerfNum;
     MaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
+    DeltaPress = PressureRise;
 
     if (state.dataHVACGlobal->NightVentOn && NVPerfNum > 0) {
         DeltaPress = NightVentPerf(NVPerfNum).DeltaPress;
@@ -1737,11 +1738,6 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real
         MotInAirFrac = NightVentPerf(NVPerfNum).MotInAirFrac;
         MaxAirMassFlowRate = NightVentPerf(NVPerfNum).MaxAirMassFlowRate;
     } else {
-        if (present(PressureRise)) {
-            DeltaPress = PressureRise;
-        } else {
-            DeltaPress = Fan(FanNum).DeltaPress;
-        }
         FanEff = Fan(FanNum).FanEff;
         MotEff = Fan(FanNum).MotEff;
         MotInAirFrac = Fan(FanNum).MotInAirFrac;
