@@ -2064,7 +2064,7 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
+                  DataLoopNode::NodeConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
                   DataLoopNode::NodeConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
@@ -2127,7 +2127,7 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Non-Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType,
+                  DataLoopNode::NodeConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
                   DataLoopNode::NodeConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
@@ -2760,8 +2760,11 @@ namespace SimulationManager {
         ErrorsFound = false;
         print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
-            NumChildren = GetNumChildren(
-                state, state.dataBranchNodeConnections->ParentNodeList(Loop).CType, state.dataBranchNodeConnections->ParentNodeList(Loop).CName);
+
+            auto ctypeStr = std::string(
+                DataLoopNode::NodeConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).CType)]);
+
+            NumChildren = GetNumChildren(state, ctypeStr, state.dataBranchNodeConnections->ParentNodeList(Loop).CName);
             if (NumChildren > 0) {
                 ChildCType.allocate(NumChildren);
                 ChildCName.allocate(NumChildren);
@@ -2776,7 +2779,7 @@ namespace SimulationManager {
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
                 GetChildrenData(state,
-                                state.dataBranchNodeConnections->ParentNodeList(Loop).CType,
+                                ctypeStr,
                                 state.dataBranchNodeConnections->ParentNodeList(Loop).CName,
                                 NumChildren,
                                 ChildCType,
@@ -2790,7 +2793,7 @@ namespace SimulationManager {
 
                 print(state.files.debug,
                       " Parent Node,{}:{},{},{}\n",
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).CType,
+                      ctypeStr,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).CName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
@@ -2812,7 +2815,7 @@ namespace SimulationManager {
                 if (Loop > 1) print(state.files.debug, "{}\n", std::string(60, '='));
                 print(state.files.debug,
                       " Parent Node (no children),{}:{},{},{}\n",
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).CType,
+                      ctypeStr,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).CName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
