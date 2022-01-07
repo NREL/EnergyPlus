@@ -2089,13 +2089,13 @@ namespace EvaporativeFluidCoolers {
         Real64 inletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
         this->OutletWaterTemp = inletWaterTemp;
         AirFlowRate = 0.0;
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme);
-            if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
-            } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
-            }
+
+        auto loopSide = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum);
+        auto calcScheme = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme;
+        if  (calcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+            TempSetPoint = loopSide.TempSetPoint;
+        } else if (calcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
+            TempSetPoint = loopSide.TempSetPointHi;
         }
 
         // Added for fluid bypass. First assume no fluid bypass
