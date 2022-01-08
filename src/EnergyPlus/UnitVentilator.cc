@@ -147,8 +147,6 @@ namespace UnitVentilator {
     int constexpr VariablePercent = 1;
     int constexpr FixedTemperature = 2;
     int constexpr FixedOAControl = 3;
-    // coil operation
-    int constexpr On = 1; // normal coil operation
 
     int constexpr NoneOption = 0;
     int constexpr BothOption = 1;
@@ -3785,7 +3783,7 @@ namespace UnitVentilator {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                              FirstHVACIteration,
-                                             On,
+                                             DataHVACGlobals::CompressorOperation::On,
                                              0.0,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index,
                                              ContFanCycCoil);
@@ -3909,7 +3907,7 @@ namespace UnitVentilator {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                              FirstHVACIteration,
-                                             On,
+                                             DataHVACGlobals::CompressorOperation::On,
                                              PartLoadRatio,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index,
                                              FanOpMode);
