@@ -278,7 +278,7 @@ namespace DataWater {
         std::array<Real64, 12> MonthlyTotalPrecInRainCol = {0.0}; // Monthly total rain in rain collector
         std::array<Real64, 12> MonthlyTotalPrecInRoofIrr = {0.0}; // Monthly total rain in roof irrigation
         std::array<Real64, 12> MonthlyTotalPrecInWeather = {0.0}; // Monthly total rain in weather file
-        std::array<int, 12> numRainyHoursInWeather = {0};       // Monthly number of rainy hours
+        std::array<int, 12> numRainyHoursInWeather = {0};         // Monthly number of rainy hours
 
         // Default Constructor
         SiteRainFallDataStruct()
