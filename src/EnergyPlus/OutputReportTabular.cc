@@ -17526,7 +17526,7 @@ void SetupUnitConversions(EnergyPlusData &state)
     //    na
     auto &ort(state.dataOutRptTab);
 
-    ort->UnitConvSize = 115;
+    ort->UnitConvSize = 117;
     ort->UnitConv.allocate(ort->UnitConvSize);
     ort->UnitConv(1).siName = "%";
     ort->UnitConv(2).siName = "°C";
@@ -17643,6 +17643,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).siName = "NM";
     ort->UnitConv(114).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
     ort->UnitConv(115).siName = "PERSON/M2";
+    ort->UnitConv(116).siName = "MM";
+    ort->UnitConv(117).siName = "MM";
 
     ort->UnitConv(1).ipName = "%";
     ort->UnitConv(2).ipName = "F";
@@ -17759,6 +17761,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).ipName = "lbf-ft";
     ort->UnitConv(114).ipName = "Btu/W-h";
     ort->UnitConv(115).ipName = "person/ft2";
+    ort->UnitConv(116).ipName = "in";
+    ort->UnitConv(117).ipName = "ft";
 
     ort->UnitConv(1).mult = 1.0;
     ort->UnitConv(2).mult = 1.8;
@@ -17875,6 +17879,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(113).mult = 0.737562149277;
     ort->UnitConv(114).mult = 1.0;
     ort->UnitConv(115).mult = 0.09290304;
+    ort->UnitConv(116).mult = 0.03937;
+    ort->UnitConv(117).mult = 0.003281;
 
     ort->UnitConv(2).offset = 32.0;
     ort->UnitConv(11).offset = 32.0;
@@ -17947,6 +17953,8 @@ void SetupUnitConversions(EnergyPlusData &state)
     ort->UnitConv(93).several = true;
     ort->UnitConv(94).several = true;
     ort->UnitConv(95).several = true;
+    ort->UnitConv(116).several = true;
+    ort->UnitConv(117).several = true;
 }
 
 std::string GetUnitSubString(std::string const &inString) // Input String
