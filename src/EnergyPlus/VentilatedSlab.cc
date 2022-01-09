@@ -85,7 +85,6 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -590,7 +589,7 @@ namespace VentilatedSlab {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                          "\"  Core Diameter is not needed for the series slabs configuration- ignored.");
-                    ShowContinueError(state, "...It has been asigned on SlabGroup.");
+                    ShowContinueError(state, "...It has been assigned on SlabGroup.");
                 }
             }
 
@@ -599,7 +598,7 @@ namespace VentilatedSlab {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                          "\"  Core Length is not needed for the series slabs configuration- ignored.");
-                    ShowContinueError(state, "...It has been asigned on SlabGroup.");
+                    ShowContinueError(state, "...It has been assigned on SlabGroup.");
                 }
             }
 
@@ -608,7 +607,7 @@ namespace VentilatedSlab {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                          "\"  Core Numbers is not needed for the series slabs configuration- ignored.");
-                    ShowContinueError(state, "...It has been asigned on SlabGroup.");
+                    ShowContinueError(state, "...It has been assigned on SlabGroup.");
                 }
             }
 
@@ -3869,7 +3868,7 @@ namespace VentilatedSlab {
         int FanOutletNode; // unit air outlet node
         int OAInletNode;   // unit air outlet node
         int MixoutNode;    // unit air outlet node
-        int ReturnAirNode; // discription
+        int ReturnAirNode; // description
         int ZoneAirInNode; // supply air node
         // For Phase 3
         Real64 CNumDS;
@@ -4303,25 +4302,6 @@ namespace VentilatedSlab {
                     if (RadSurfNum == 1) {
                         if (((state.dataVentilatedSlab->OperatingMode == HeatingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) <= 0.0)) ||
                             ((state.dataVentilatedSlab->OperatingMode == CoolingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) >= 0.0))) {
-                            // IF (.not. WarmupFlag) THEN
-                            //  TempComparisonErrorCount = TempComparisonErrorCount + 1
-                            //  IF (TempComparisonErrorCount <= NumOfVentSlabs) THEN
-                            //    CALL ShowWarningError(state, 'Radaint Heat exchange is negative in Heating Mode or posive in Cooling Mode')
-                            //    CALL ShowContinueError(state, 'Flow to the following ventilated slab will be shut-off to avoid heating in cooling
-                            //    mode or cooling &
-                            //                            in heating mode')
-                            //    CALL ShowContinueError(state, 'Ventilated Slab Name = '//TRIM(VentSlab(Item)%Name))
-                            //    CALL ShowContinueError(state, 'Surface Name  = '//TRIM(VentSlab(Item)%SurfaceName(RadSurfNum)))
-                            //    CALL ShowContinueError(state, 'All node temperature are reseted at the surface temperature of control zone = '// &
-                            //                           RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(1),1,2),2))
-                            //    CALL ShowContinueErrorTimeStamp(state, ' ')
-                            //  ELSE
-                            //    CALL ShowRecurringWarningErrorAtEnd(state, 'Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
-                            //                 ']  shut-off occurrence continues due to temperature comparison error.',  &
-                            //                 VentSlab(Item)%CondErrCount)
-                            //  END IF
-                            // END IF
-
                             state.dataLoopNodes->Node(SlabInNode).MassFlowRate = 0.0;
                             state.dataLoopNodes->Node(FanOutletNode).MassFlowRate = 0.0;
                             state.dataLoopNodes->Node(OAInletNode).MassFlowRate = 0.0;
@@ -4425,7 +4405,7 @@ namespace VentilatedSlab {
                 }
                 TotalVentSlabRadPower *= ZoneMult;
 
-                // Intenal Node Temperature Check
+                // Internal Node Temperature Check
 
                 MSlabAirInTemp = state.dataLoopNodes->Node(SlabInNode).Temp;
 
