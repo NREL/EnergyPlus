@@ -15684,8 +15684,8 @@ void GetDXCoilIndex(EnergyPlusData &state,
                     std::string const &DXCoilName,
                     int &DXCoilIndex,
                     bool &ErrorsFound,
-                    Optional_string_const ThisObjectType,
-                    Optional_bool_const SuppressWarning)
+                    std::string_view const ThisObjectType,
+                    bool const SuppressWarning)
 {
 
     // SUBROUTINE INFORMATION:
@@ -15703,11 +15703,10 @@ void GetDXCoilIndex(EnergyPlusData &state,
 
     DXCoilIndex = UtilityRoutines::FindItemInList(DXCoilName, state.dataDXCoils->DXCoil);
     if (DXCoilIndex == 0) {
-        if (present(SuppressWarning)) {
+        if (!SuppressWarning) {
             //     No warning printed if only searching for the existence of a DX Coil
-        } else {
-            if (present(ThisObjectType)) {
-                ShowSevereError(state, ThisObjectType + ", GetDXCoilIndex: DX Coil not found=" + DXCoilName);
+            if (!ThisObjectType.empty()) {
+                ShowSevereError(state, fmt::format("{}, GetDXCoilIndex: DX Coil not found={}", ThisObjectType, DXCoilName));
             } else {
                 ShowSevereError(state, "GetDXCoilIndex: DX Coil not found=" + DXCoilName);
             }
@@ -15717,7 +15716,11 @@ void GetDXCoilIndex(EnergyPlusData &state,
 }
 
 std::string
-GetDXCoilName(EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
+GetDXCoilName(EnergyPlusData &state,
+              int &DXCoilIndex,
+              bool &ErrorsFound,
+              std::string_view const ThisObjectType,
+              bool const SuppressWarning)
 {
 
     // SUBROUTINE INFORMATION:
@@ -15734,20 +15737,18 @@ GetDXCoilName(EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Option
     }
 
     if (DXCoilIndex == 0) {
-        if (present(SuppressWarning)) {
+        if (!SuppressWarning) {
             //     No warning printed if only searching for the existence of a DX Coil
-        } else {
-            if (present(ThisObjectType)) {
-                ShowSevereError(state, ThisObjectType + ", GetDXCoilIndex: DX Coil not found ");
+            if (!ThisObjectType.empty()) {
+                ShowSevereError(state, fmt::format("{}, GetDXCoilIndex: DX Coil not found ", ThisObjectType));
             } else {
                 ShowSevereError(state, "GetDXCoilIndex: DX Coil not found ");
             }
         }
         ErrorsFound = true;
-        return " ";
+        return " "; // This does not seem great
 
     } else {
-
         return state.dataDXCoils->DXCoil(DXCoilIndex).Name;
     }
 }
@@ -18391,7 +18392,7 @@ void CalcVRFCoilCapModFac(EnergyPlusData &state,
     if (present(CoilIndex)) {
         CoilNum = CoilIndex;
     } else {
-        GetDXCoilIndex(state, CoilName, CoilNum, ErrorsFound, ObjexxFCL::Optional_string_const(), ObjexxFCL::Optional_bool_const());
+        GetDXCoilIndex(state, CoilName, CoilNum, ErrorsFound, {}, true);
     }
 
     BFC_rate = state.dataDXCoils->DXCoil(CoilNum).RateBFVRFIUEvap;

@@ -798,8 +798,7 @@ void GetPTUnit(EnergyPlusData &state)
                            state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
                            state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                            errFlag,
-                           state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType,
-                           ObjexxFCL::Optional_bool_const());
+                           state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType);
             HeatCoilInletNodeNum = GetDXCoilInletNode(
                 state, state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName, errFlag);
             HeatCoilOutletNodeNum = GetDXCoilOutletNode(
@@ -855,8 +854,7 @@ void GetPTUnit(EnergyPlusData &state)
                                state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                errFlag,
-                               state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
-                               ObjexxFCL::Optional_bool_const());
+                               state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType);
                 CoolCoilInletNodeNum = GetDXCoilInletNode(
                     state, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                 CoolCoilOutletNodeNum = GetDXCoilOutletNode(
@@ -875,8 +873,7 @@ void GetPTUnit(EnergyPlusData &state)
                         state, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
                     state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                     errFlag,
-                    "Coil:Cooling:DX:SingleSpeed",
-                    ObjexxFCL::Optional_bool_const());
+                    "Coil:Cooling:DX:SingleSpeed");
                 CoolCoilInletNodeNum = GetHXDXCoilInletNode(
                     state, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                 CoolCoilOutletNodeNum = GetHXDXCoilOutletNode(
@@ -1922,8 +1919,7 @@ void GetPTUnit(EnergyPlusData &state)
                                state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
                                state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                errFlag,
-                               state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType,
-                               ObjexxFCL::Optional_bool_const());
+                               state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType);
                 CoolCoilInletNodeNum = GetDXCoilInletNode(
                     state, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                 CoolCoilOutletNodeNum = GetDXCoilOutletNode(
@@ -1944,8 +1940,7 @@ void GetPTUnit(EnergyPlusData &state)
                         state, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
                     state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                     errFlag,
-                    "Coil:Cooling:DX:SingleSpeed",
-                    ObjexxFCL::Optional_bool_const());
+                    "Coil:Cooling:DX:SingleSpeed");
                 CoolCoilInletNodeNum = GetHXDXCoilInletNode(
                     state, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                 CoolCoilOutletNodeNum = GetHXDXCoilOutletNode(

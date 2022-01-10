@@ -1376,8 +1376,7 @@ namespace DesiccantDehumidifiers {
                                    DesicDehum(DesicDehumNum).CoolingCoilName,
                                    DesicDehum(DesicDehumNum).DXCoilIndex,
                                    ErrorsFound2,
-                                   DesicDehum(DesicDehumNum).CoolingCoilType,
-                                   ObjexxFCL::Optional_bool_const());
+                                   DesicDehum(DesicDehumNum).CoolingCoilType);
                     if (ErrorsFound2)
                         ShowContinueError(
                             state, "...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).CoolingCoilName + "\"");

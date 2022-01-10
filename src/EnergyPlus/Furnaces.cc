@@ -2097,9 +2097,7 @@ namespace Furnaces {
                     GetDXCoilIndex(state,
                                    CoolingCoilName,
                                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                   IsNotOK,
-                                   ObjexxFCL::Optional_string_const(),
-                                   ObjexxFCL::Optional_bool_const());
+                                   IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3236,9 +3234,7 @@ namespace Furnaces {
                     GetDXCoilIndex(state,
                                    HeatingCoilName,
                                    state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                   IsNotOK,
-                                   ObjexxFCL::Optional_string_const(),
-                                   ObjexxFCL::Optional_bool_const());
+                                   IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, "...occurs " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3330,9 +3326,7 @@ namespace Furnaces {
                     GetDXCoilIndex(state,
                                    CoolingCoilName,
                                    state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                   errFlag,
-                                   ObjexxFCL::Optional_string_const(),
-                                   ObjexxFCL::Optional_bool_const());
+                                   errFlag);
                     CoolingCoilInletNode = GetDXCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilOutletNode = GetDXCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {

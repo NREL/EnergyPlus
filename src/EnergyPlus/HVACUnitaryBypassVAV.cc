@@ -716,8 +716,7 @@ namespace HVACUnitaryBypassVAV {
                                                 CBVAV(CBVAVNum).DXCoolCoilName,
                                                 CBVAV(CBVAVNum).DXCoolCoilIndexNum,
                                                 DXCoilErrFlag,
-                                                CBVAV(CBVAVNum).DXCoolCoilType,
-                                                ObjexxFCL::Optional_bool_const());
+                                                CBVAV(CBVAVNum).DXCoolCoilType);
                         if (DXCoilErrFlag) ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                         //         Mine outdoor condenser node from DX coil object
@@ -769,8 +768,7 @@ namespace HVACUnitaryBypassVAV {
                                                         state, CBVAV(CBVAVNum).DXCoolCoilType, CBVAV(CBVAVNum).DXCoolCoilName, DXCoilErrFlag),
                                                     CBVAV(CBVAVNum).DXCoolCoilIndexNum,
                                                     DXCoilErrFlag,
-                                                    "Coil:Cooling:DX:SingleSpeed",
-                                                    ObjexxFCL::Optional_bool_const());
+                                                    "Coil:Cooling:DX:SingleSpeed");
                             if (DXCoilErrFlag)
                                 ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
@@ -815,8 +813,7 @@ namespace HVACUnitaryBypassVAV {
                                                 CBVAV(CBVAVNum).DXCoolCoilName,
                                                 CBVAV(CBVAVNum).DXCoolCoilIndexNum,
                                                 DXCoilErrFlag,
-                                                CBVAV(CBVAVNum).DXCoolCoilType,
-                                                ObjexxFCL::Optional_bool_const());
+                                                CBVAV(CBVAVNum).DXCoolCoilType);
                         if (DXCoilErrFlag) ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                         //         Mine outdoor condenser node from multimode DX coil object
@@ -919,8 +916,7 @@ namespace HVACUnitaryBypassVAV {
                                             CBVAV(CBVAVNum).HeatCoilName,
                                             CBVAV(CBVAVNum).DXHeatCoilIndexNum,
                                             DXCoilErrFlag,
-                                            CBVAV(CBVAVNum).HeatCoilType,
-                                            ObjexxFCL::Optional_bool_const());
+                                            CBVAV(CBVAVNum).HeatCoilType);
                     if (DXCoilErrFlag) ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:VariableSpeed")) {

@@ -3847,9 +3847,7 @@ namespace UnitarySystems {
                 DXCoils::GetDXCoilIndex(state,
                                         loc_m_HeatingCoilName,
                                         this->m_HeatingCoilIndex,
-                                        errFlag,
-                                        ObjexxFCL::Optional_string_const(),
-                                        ObjexxFCL::Optional_bool_const());
+                                        errFlag);
                 if (errFlag) {
                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                     errorsFound = true;
@@ -3959,7 +3957,7 @@ namespace UnitarySystems {
             this->m_DXHeatingCoil = true;
             errFlag = false;
             DXCoils::GetDXCoilIndex(
-                state, loc_m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, loc_heatingCoilType, ObjexxFCL::Optional_bool_const());
+                state, loc_m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, loc_heatingCoilType);
             if (errFlag) {
                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                 errorsFound = true;
@@ -4445,9 +4443,7 @@ namespace UnitarySystems {
                     DXCoils::GetDXCoilIndex(state,
                                             loc_m_CoolingCoilName,
                                             this->m_CoolingCoilIndex,
-                                            isNotOK,
-                                            ObjexxFCL::Optional_string_const(),
-                                            ObjexxFCL::Optional_bool_const());
+                                            isNotOK);
                     if (isNotOK) {
                         ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                         errorsFound = true;
@@ -4668,9 +4664,7 @@ namespace UnitarySystems {
                     DXCoils::GetDXCoilIndex(state,
                                             loc_m_CoolingCoilName,
                                             this->m_CoolingCoilIndex,
-                                            isNotOK,
-                                            ObjexxFCL::Optional_string_const(),
-                                            ObjexxFCL::Optional_bool_const());
+                                            isNotOK);
                     if (isNotOK) {
                         ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                         errorsFound = true;
@@ -5017,7 +5011,7 @@ namespace UnitarySystems {
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
                 errFlag = false;
                 DXCoils::GetDXCoilIndex(
-                    state, loc_m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, loc_coolingCoilType, ObjexxFCL::Optional_bool_const());
+                    state, loc_m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, loc_coolingCoilType);
                 if (errFlag) {
                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                     errorsFound = true;
