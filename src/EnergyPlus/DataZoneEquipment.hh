@@ -163,6 +163,9 @@ namespace DataZoneEquipment {
         Num
     };
 
+    constexpr std::array<std::string_view, static_cast<int>(LoadDist::Num)> LoadDistTypeNames = {
+        "SequentialLoad", "UniformLoad", "UniformPLR", "SequentialUniformPLR"};
+
     enum class LightReturnExhaustConfig : int
     {
         Invalid = -1,
