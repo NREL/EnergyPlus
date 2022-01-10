@@ -91,7 +91,10 @@ The reference to the schedule object specifying the hot water temperature setpoi
 
 \paragraph{Field: Deadband Temperature Difference}\label{field-deadband-temperature-difference-000}
 
-The delta temperature difference {[}Δ°C{]} between the setpoint and the ``cut-in'' temperature at which the heater will turn on. In other words, the ``cut-in'' temperature is Setpoint -- Deadband.
+The delta temperature difference {[}$\Delta{^\circ}C${]} between the setpoint and the ``cut-in'' temperature at which the heater will turn on. In other words, the ``cut-in'' temperature is Setpoint -- Deadband.
+
+One note here is that how this \emph{Deadband Temperature Difference} is used is dependent on the ``\emph{Source Side Flow Control Mode}''{[}\ref{field-source-side-flow-control-mode}{]} choice. If \emph{Source Side Flow Control Mode} is \emph{IndirectHeatPrimarySetpoint} or
+\emph{IndirectHeatAlternateSetpoint}, the targedted ``cut-in'' temperature is the related Setpoint -- Deadband as described above. However, when the \emph{Source Side Flow Control Mode} setting is \emph{StorageTank}, the deadband is not used in getting the ``cut-in'' temperature---so in this case it is just directly using the correponding Setpoint temperature without subtracting off the Deadband Temperature Difference.
 
 \paragraph{Field: Maximum Temperature Limit}\label{field-maximum-temperature-limit}
 
