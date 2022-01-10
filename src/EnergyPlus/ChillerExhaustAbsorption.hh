@@ -135,6 +135,7 @@ namespace ChillerExhaustAbsorption {
         GeneratorType CompType_Num;              // Numeric designator for CompType (TypeOf)
         int ExhTempLTAbsLeavingTempIndex;        // index for exhaust potential less than thermal energy needed during cooling
         int ExhTempLTAbsLeavingHeatingTempIndex; // index for exhaust potential less than thermal energy needed during heating
+        int lCondWaterMassFlowRate_Index;          // index for condenser water mass flow rate too low recurring severe warning 
         std::string TypeOf;                      // Generator type
         std::string ExhaustSourceName;           // Generator type Name
         bool envrnInit;
@@ -192,7 +193,7 @@ namespace ChillerExhaustAbsorption {
               isWaterCooled(false), CHWLowLimitTemp(0.0), ExhaustAirInletNodeNum(0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0),
               DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0),
               PossibleSubcooling(false), CWPlantLoc{}, CDPlantLoc{}, HWPlantLoc{}, CompType_Num(GeneratorType::Invalid),
-              ExhTempLTAbsLeavingTempIndex(0), ExhTempLTAbsLeavingHeatingTempIndex(0), envrnInit(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0),
+              ExhTempLTAbsLeavingTempIndex(0), ExhTempLTAbsLeavingHeatingTempIndex(0), lCondWaterMassFlowRate_Index(0), envrnInit(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0),
               CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0),
               ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0), CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0),
               ElectricPower(0.0), ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0),

@@ -1791,9 +1791,23 @@ void ExhaustAbsorberSpecs::calcChiller(EnergyPlusData &state, Real64 &MyLoad)
             if (lCondWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                 lCondSupplyTemp = lCondReturnTemp + lTowerLoad / (lCondWaterMassFlowRate * Cp_CD);
             } else {
-                ShowSevereError(state, "CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=" + this->Name);
-                ShowContinueErrorTimeStamp(state, "");
-                // ShowFatalError(state, "Program Terminates due to previous error condition.");
+                if (lCondWaterMassFlowRate_Index == 0) {
+                    ShowSevereError(state, "CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=" + this->Name);
+                    ShowContinueErrorTimeStamp(state, "");
+                    // ShowFatalError(state, "Program Terminates due to previous error condition.");
+                }
+                ShowRecurringSevereErrorAtEnd(state,
+                                              "CalcExhaustAbsorberChillerModel: Condenser flow = 0, for Exhaust Absorber Chiller=" + this->Name +
+                                                  ": Condenser flow rate = 0 sever error warning continues...", // Message automatically written to
+                                                                                                                // "error file" at end of simulation
+                                              lCondWaterMassFlowRate_Index // Recurring message index, if zero, next available index is assigned
+                                              // Optional<Real64 const> ReportMaxOf, // Track and report the max of the values passed to this argument
+                                              // Optional<Real64 const> ReportMinOf, // Track and report the min of the values passed to this argument
+                                              // Optional<Real64 const> ReportSumOf, // Track and report the sum of the values passed to this argument
+                                              // std::string const &ReportMaxUnits,  // optional char string (<=15 length) of units for max value
+                                              // std::string const &ReportMinUnits,  // optional char string (<=15 length) of units for min value
+                                              // std::string const &ReportSumUnits   // optional char string (<=15 length) of units for sum value
+                );
             }
         } else {
             lCondSupplyTemp = lCondReturnTemp; // if air cooled condenser just set supply and return to same temperature
