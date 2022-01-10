@@ -96,7 +96,7 @@ void GetNodeNums(EnergyPlusData &state,
                  CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                  bool const ObjectIsParent,                                 // True/False
                  Optional_bool_const IncrementFluidStream,                  // True/False
-                 Optional_string_const InputFieldName                       // Input Field Name
+                 std::string_view const InputFieldName                      // Input Field Name
 )
 {
 
@@ -146,7 +146,9 @@ void GetNodeNums(EnergyPlusData &state,
                     state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != DataLoopNode::NodeFluidType::Blank) {
                     if (state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != NodeFluidType) {
                         ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
-                        if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
+                        if (!InputFieldName.empty()) {
+                            ShowContinueError(state, fmt::format("...Ref field={}", InputFieldName));
+                        }
                         ShowContinueError(
                             state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NodeNumbers(Loop)));
                         ShowContinueError(
@@ -750,7 +752,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
                       DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
                       CompFluidStream const NodeFluidStream,                     // Which Fluid Stream
                       bool const ObjectIsParent,                                 // True/False
-                      Optional_string_const InputFieldName                       // Input Field Name
+                      std::string_view const InputFieldName                      // Input Field Name
 )
 {
 
@@ -804,7 +806,9 @@ int GetOnlySingleNode(EnergyPlusData &state,
 
     if (NumNodes > 1) {
         ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
-        if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
+        if (!InputFieldName.empty()) {
+            ShowContinueError(state, fmt::format("...Ref field={}", InputFieldName));
+        }
         ShowContinueError(state, "Only 1st Node used from NodeList=\"" + NodeName + "\".");
         ShowContinueError(state, "...a Nodelist may not be valid in this context.");
         errFlag = true;

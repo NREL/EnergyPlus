@@ -1079,8 +1079,11 @@ namespace HVACHXAssistedCoolingCoil {
     //        End of Reporting subroutines for the HXAssistedCoil Module
     // *****************************************************************************
 
-    void GetHXDXCoilIndex(
-        EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
+    void GetHXDXCoilIndex(EnergyPlusData &state,
+                          std::string const &HXDXCoilName,
+                          int &HXDXCoilIndex,
+                          bool &ErrorsFound,
+                          std::string_view const CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1108,8 +1111,8 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (HXDXCoilIndex == 0) {
-            if (present(CurrentModuleObject)) {
-                ShowSevereError(state, CurrentModuleObject() + ", GetHXDXCoilIndex: HX Assisted Cooling Coil not found=" + HXDXCoilName);
+            if (!CurrentModuleObject.empty()) {
+                ShowSevereError(state, fmt::format("{}, GetHXDXCoilIndex: HX Assisted Cooling Coil not found={}", CurrentModuleObject, HXDXCoilName));
             } else {
                 ShowSevereError(state, "GetHXDXCoilIndex: HX Assisted Cooling Coil not found=" + HXDXCoilName);
             }

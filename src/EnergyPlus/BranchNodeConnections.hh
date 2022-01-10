@@ -76,7 +76,7 @@ namespace BranchNodeConnections {
                                 NodeInputManager::CompFluidStream FluidStream, // Count on Fluid Streams
                                 bool IsParent,                                 // True when node is a parent node
                                 bool &errFlag,                                 // Will be True if errors already detected or if errors found here
-                                Optional_string_const InputFieldName = _       // Input Field Name
+                                std::string_view const InputFieldName = {}     // Input Field Name
     );
 
     void OverrideNodeConnectionType(EnergyPlusData &state,

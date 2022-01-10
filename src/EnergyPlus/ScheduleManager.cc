@@ -4258,11 +4258,11 @@ namespace ScheduleManager {
     }
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
-                                     int const ScheduleIndex,        // Which Day Schedule being tested
-                                     Real64 const Minimum,           // Minimum desired value
-                                     std::string const &MinString,   // Minimum indicator ('>', '>=')
-                                     Optional<Real64 const> Maximum, // Maximum desired value
-                                     Optional_string_const MaxString // Maximum indicator ('<', ',=')
+                                     int const ScheduleIndex, // Which Day Schedule being tested
+                                     Real64 const Minimum,    // Minimum desired value
+                                     bool const exclusiveMin, // Minimum indicator ('>', '>=')
+                                     Real64 const Maximum,    // Maximum desired value
+                                     bool const exclusiveMax  // Maximum indicator ('<', ',=')
     )
     {
 
@@ -4327,22 +4327,16 @@ namespace ScheduleManager {
         MinValueOk = true;
         MaxValueOk = true;
 
-        if (MinString == ">") {
+        if (exclusiveMin) {
             MinValueOk = (MinValue > Minimum);
         } else {
             MinValueOk = (FLT_EPSILON >= Minimum - MinValue);
         }
 
-        if (present(Maximum)) {
-            if (present(MaxString)) {
-                if (MaxString() == "<") {
-                    MaxValueOk = (MaxValue < Maximum);
-                } else {
-                    MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
-                }
-            } else {
-                MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
-            }
+        if (exclusiveMax) {
+            MaxValueOk = (MaxValue < Maximum);
+        } else {
+            MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
         }
 
         CheckDayScheduleValueMinMax = (MinValueOk && MaxValueOk);
@@ -4351,11 +4345,9 @@ namespace ScheduleManager {
     }
 
     bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
-                                     int const ScheduleIndex,        // Which Day Schedule being tested
-                                     Real32 const Minimum,           // Minimum desired value
-                                     std::string const &MinString,   // Minimum indicator ('>', '>=')
-                                     Optional<Real32 const> Maximum, // Maximum desired value
-                                     Optional_string_const MaxString // Maximum indicator ('<', ',=')
+                                     int const ScheduleIndex, // Which Day Schedule being tested
+                                     Real64 const Minimum,    // Minimum desired value
+                                     bool const exclusiveMin  // Minimum indicator ('>', '>=')
     )
     {
 
@@ -4397,47 +4389,30 @@ namespace ScheduleManager {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
-        Real64 MaxValue(0.0); // For total maximum
         bool MinValueOk;
-        bool MaxValueOk;
 
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
-            MaxValue = 1.0;
         } else if (ScheduleIndex == 0) {
             MinValue = 0.0;
-            MaxValue = 0.0;
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumDaySchedules) {
             ShowFatalError(state, "CheckDayScheduleValueMinMax called with ScheduleIndex out of range");
         }
 
         if (ScheduleIndex > 0) {
             MinValue = minval(state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue);
-            MaxValue = maxval(state.dataScheduleMgr->DaySchedule(ScheduleIndex).TSValue);
         }
 
         //  Min/max for schedule has been set.  Test.
         MinValueOk = true;
-        MaxValueOk = true;
-        if (MinString == ">") {
+
+        if (true) { //(exclusiveMin) {
             MinValueOk = (MinValue > Minimum);
         } else {
             MinValueOk = (FLT_EPSILON >= Minimum - MinValue);
         }
 
-        if (present(Maximum)) {
-            if (present(MaxString)) {
-                if (MaxString() == "<") {
-                    MaxValueOk = (MaxValue < Maximum);
-                } else {
-                    MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
-                }
-            } else {
-                MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
-            }
-        }
-
-        CheckDayScheduleValueMinMax = (MinValueOk && MaxValueOk);
+        CheckDayScheduleValueMinMax = MinValueOk;
 
         return CheckDayScheduleValueMinMax;
     }

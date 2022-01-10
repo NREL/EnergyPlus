@@ -84,7 +84,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
                             NodeInputManager::CompFluidStream const FluidStream, // Count on Fluid Streams
                             bool const IsParent,                                 // True when node is a parent node
                             bool &errFlag,                                       // Will be True if errors already detected or if errors found here
-                            Optional_string_const InputFieldName                 // Input Field Name
+                            std::string_view const InputFieldName                // Input Field Name
 )
 {
 
@@ -153,7 +153,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
     }
 
     if (has_prefixi(ObjectType, "AirTerminal:")) {
-        if (present(InputFieldName)) {
+        if (!InputFieldName.empty()) {
             ++state.dataBranchNodeConnections->NumOfAirTerminalNodes;
             if (state.dataBranchNodeConnections->NumOfAirTerminalNodes > 1 &&
                 state.dataBranchNodeConnections->NumOfAirTerminalNodes > state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes) {
@@ -172,7 +172,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
             if (Found != 0) { // Nodename already used
                 ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
                 ShowContinueError(state, "NodeName=\"" + std::string{NodeName} + "\", entered as type=" + std::string{ConnectionType});
-                ShowContinueError(state, "In Field=" + InputFieldName());
+                ShowContinueError(state, fmt::format("In Field={}", InputFieldName));
                 ShowContinueError(state,
                                   "Already used in " + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectType + "=\"" +
                                       state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectName + "\".");

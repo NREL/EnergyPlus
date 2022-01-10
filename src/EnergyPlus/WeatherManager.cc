@@ -6637,7 +6637,7 @@ namespace WeatherManager {
                         }
                         if (state.dataIPShortCut->cAlphaArgs(3) == "MultiplierSchedule") {
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, ">=", 1.0, "<=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, false, 1.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6649,7 +6649,7 @@ namespace WeatherManager {
                             }
                         } else if (state.dataIPShortCut->cAlphaArgs(3) == "DifferenceSchedule") { // delta, must be > 0.0
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, ">=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).TempRangeSchPtr, 0.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6966,7 +6966,7 @@ namespace WeatherManager {
                         switch (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndType) {
                         case DDHumIndType::RelHumSch:
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=", 100.0, "<=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, false, 100.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6980,7 +6980,7 @@ namespace WeatherManager {
                         case DDHumIndType::WBProfMul:
                             // multiplier: use schedule value, check 0 <= v <= 1
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=", 1.0, "<=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, false, 1.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -6993,7 +6993,7 @@ namespace WeatherManager {
                             break;
                         case DDHumIndType::WBProfDif:
                             if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, ">=")) {
+                                    state, state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndSchPtr, 0.0, false)) {
                                 ShowSevereError(state,
                                                 state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                     state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -7106,7 +7106,7 @@ namespace WeatherManager {
                                                 state.dataIPShortCut->cAlphaArgs(11));
                         }
                         if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                state, state.dataWeatherManager->DesDayInput(EnvrnNum).BeamSolarSchPtr, 0.0, ">=")) {
+                                state, state.dataWeatherManager->DesDayInput(EnvrnNum).BeamSolarSchPtr, 0.0, false)) {
                             ShowSevereError(state,
                                             state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                 state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -7160,7 +7160,7 @@ namespace WeatherManager {
                                                 state.dataIPShortCut->cAlphaArgs(12));
                         }
                         if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                state, state.dataWeatherManager->DesDayInput(EnvrnNum).DiffuseSolarSchPtr, 0.0, ">=")) {
+                                state, state.dataWeatherManager->DesDayInput(EnvrnNum).DiffuseSolarSchPtr, 0.0, false)) {
                             ShowSevereError(state,
                                             state.dataIPShortCut->cCurrentModuleObject + "=\"" +
                                                 state.dataWeatherManager->DesDayInput(EnvrnNum).Title + "\", invalid data.");
