@@ -95,8 +95,8 @@ namespace PlantChillers {
         Real64 CondVolFlowRate;                    // m**3/s - design nominal water volumetric flow rate through the condenser
         bool CondVolFlowRateWasAutoSized;          // true if previous was autosized
         Real64 CondMassFlowRateMax;                // kg/s - design water mass flow rate through condenser
-        PlantLocation CWPlantLoc{};                             // chilled water plant loop component index
-        PlantLocation CDPlantLoc{};                             // condenser water plant loop component index
+        PlantLocation CWPlantLoc;                             // chilled water plant loop component index
+        PlantLocation CDPlantLoc;                             // condenser water plant loop component index
         Real64 SizFac;                             // sizing factor
         Real64 BasinHeaterPowerFTempDiff;          // Basin heater capacity per degree C below setpoint (W/C)
         Real64 BasinHeaterSetPointTemp;            // Setpoint temperature for basin heater operation (C)
@@ -203,7 +203,7 @@ namespace PlantChillers {
         Real64 HeatRecMaxCapacityLimit;            // Capacity limit for Heat recovery, one time calc [W]
         int HeatRecSetPointNodeNum;                // index for system node with the heat recover leaving setpoint
         int HeatRecInletLimitSchedNum;             // index for schedule for the inlet high limit for heat recovery operation
-        PlantLocation HRPlantLoc{};                             // heat recovery water plant loop component index
+        PlantLocation HRPlantLoc;                             // heat recovery water plant loop component index
         std::string EndUseSubcategory;             // identifier use for the end use subcategory
         Real64 CondOutletHumRat;                   // kg/kg - condenser outlet humditiy ratio, air side
         Real64 ActualCOP;

@@ -126,7 +126,7 @@ namespace UnitVentilator {
         int HotControlNode;                     // hot water control node
         int HotCoilOutNodeNum;                  // outlet of coil
         Real64 HotControlOffset;                // control tolerance
-        PlantLocation HWplantLoc{};             // index for plant location for hot water coil
+        PlantLocation HWplantLoc;             // index for plant location for hot water coil
         bool CCoilPresent;                      // .TRUE. if unit ventilator has a cooling coil
         std::string CCoilName;                  // name of cooling coil
         std::string CCoilTypeCh;                // type of cooling coil as character string (same as on idf file)
@@ -181,13 +181,13 @@ namespace UnitVentilator {
               MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0),
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
-              MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
-              CCoilPresent(false), CCoil_Index(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
-              MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
-              ColdControlOffset(0.0), CWPlantLoc{}, HeatPower(0.0),
-              HeatEnergy(0.0), TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0),
-              AvailStatus(0), FanPartLoadRatio(0.0), PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0),
-              ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)
+              MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
+              HotControlOffset(0.0), HWplantLoc{}, CCoilPresent(false), CCoil_Index(0), CoolingCoilType(DataPlant::PlantEquipmentType::Invalid),
+              CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
+              MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWPlantLoc{}, HeatPower(0.0), HeatEnergy(0.0),
+              TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0),
+              FanPartLoadRatio(0.0), PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0),
+              ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)
         {
         }
     };

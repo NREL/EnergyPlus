@@ -123,7 +123,7 @@ namespace PhotovoltaicThermalCollectors {
         // Members
         std::string Name;                         // Name of PVT collector
         DataPlant::PlantEquipmentType Type;       // Plant Side Connection: 'Type' assigned in DataPlant
-        PlantLocation WPlantLoc{};                      // Water plant loop component location
+        PlantLocation WPlantLoc;                      // Water plant loop component location
         bool EnvrnInit;                           // manage begin environment inits
         bool SizingInit;                          // manage when sizing is complete
         std::string PVTModelName;                 // Name of PVT performance object
@@ -153,7 +153,7 @@ namespace PhotovoltaicThermalCollectors {
 
         // Default Constructor
         PVTCollectorStruct()
-            : Type(DataPlant::PlantEquipmentType::Invalid), EnvrnInit(true),
+            : Type(DataPlant::PlantEquipmentType::Invalid), WPlantLoc{}, EnvrnInit(true),
               SizingInit(true), PVTModelType(0), SurfNum(0), PVnum(0), PVfound(false), WorkingFluidType(WorkingFluidEnum::LIQUID),
               PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0), HVACOutletNodeNum(0), DesignVolFlowRate(0.0),
               DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0), AreaCol(0.0), BypassDamperOff(true),

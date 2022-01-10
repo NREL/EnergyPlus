@@ -105,7 +105,7 @@ namespace SteamBaseboardRadiator {
         Real64 Energy;                           // Maximum heating energy [J]
         Real64 ConvEnergy;                       // Convective heating energy [J]
         Real64 RadEnergy;                        // Radiant heating energy [J]
-        PlantLocation plantLoc{};
+        PlantLocation plantLoc;
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;

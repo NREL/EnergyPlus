@@ -124,7 +124,7 @@ namespace ICEngineElectricGenerator {
         Real64 ElecPowerGenerated;                 // Electric Power Generated (W)
         Real64 ElecEnergyGenerated;                // Amount of Electric Energy Generated (J)
         Real64 HeatRecMaxTemp;                     // Max Temp that can be produced in heat recovery
-        PlantLocation HRPlantLoc{};                             // cooling water plant loop component index, for heat recovery
+        PlantLocation HRPlantLoc;                             // cooling water plant loop component index, for heat recovery
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;

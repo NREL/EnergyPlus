@@ -270,8 +270,8 @@ namespace PackagedTerminalHeatPump {
         Real64 LowSpeedHeatFanRatio;                  // heating mode ratio of low speed fan flow to full flow rate
         Real64 MaxCoolCoilFluidFlow;                  // water flow rate for cooling coil [kg/s] - NOT USED in PTHP
         Real64 MaxHeatCoilFluidFlow;                  // water or steam mass flow rate for heating coil [kg/s]
-        PlantLocation CoolCoilPlantLoc{};          // Component location for water cooling coil - NOT USED in PTHP
-        PlantLocation HeatCoilPlantLoc{};          // Component location for water heating coil
+        PlantLocation CoolCoilPlantLoc;          // Component location for water cooling coil - NOT USED in PTHP
+        PlantLocation HeatCoilPlantLoc;          // Component location for water heating coil
         int CoolCoilFluidInletNode;                   // water cooling coil water inlet node number NOT USED in PTHP
         int CoolCoilFluidOutletNodeNum;               // water cooling coil water outlet node number NOT USED in PTHP
         int CoolCoilInletNodeNum;                     // cooling coil air inlet node number
@@ -312,7 +312,7 @@ namespace PackagedTerminalHeatPump {
               MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsiFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
-              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilFluidInletNode(0),
+              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilPlantLoc{}, HeatCoilPlantLoc{}, CoolCoilFluidInletNode(0),
               CoolCoilFluidOutletNodeNum(0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilFluidInletNode(0),
               HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0)
         {

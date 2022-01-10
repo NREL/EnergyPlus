@@ -192,7 +192,7 @@ namespace IceThermalStorage {
         // (User input for this parameter in GJ--need to convert to W-hr)
         int PlantInNodeNum;  // Plant inlet node number for ice storage unit
         int PlantOutNodeNum; // Plant outlet node number for ice storage unit
-        PlantLocation plantLoc{};
+        PlantLocation plantLoc;
         Real64 DesignMassFlowRate;
         int MapNum;                           // Number to Map structure
         std::string DischargeCurveName;       // Curve name for discharging (used to find the curve index)
@@ -239,7 +239,7 @@ namespace IceThermalStorage {
 
         // Default Constructor
         DetailedIceStorageData()
-            : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0),
+            : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), plantLoc{},
               DesignMassFlowRate(0.0), MapNum(0),
               DischargeCurveNum(0), ChargeCurveNum(0), CurveFitTimeStep(1.0), DischargeParaElecLoad(0.0), ChargeParaElecLoad(0.0), TankLossCoeff(0.0),
               FreezingTemp(0.0), CompLoad(0.0), IceFracChange(0.0), IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0),

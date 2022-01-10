@@ -134,7 +134,7 @@ namespace VariableSpeedCoils {
         int AirOutletNodeNum;                 // Node Number of the Air Outlet
         int WaterInletNodeNum;                // Node Number of the Water Onlet
         int WaterOutletNodeNum;               // Node Number of the Water Outlet
-        PlantLocation plantLoc{};
+        PlantLocation plantLoc;
         // set by parent object and "pushed" to this structure in SetVSWSHPData subroutine
         bool FindCompanionUpStreamCoil; // Flag to get the companion coil in Init
         bool IsDXCoilInZone;            // true means dx coil is in zone instead of outside
@@ -288,7 +288,7 @@ namespace VariableSpeedCoils {
               OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), QWasteHeat(0.0), Energy(0.0),
               EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
               RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), FindCompanionUpStreamCoil(true), IsDXCoilInZone(false),
+              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), plantLoc{}, FindCompanionUpStreamCoil(true), IsDXCoilInZone(false),
               CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
               // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
               MSHPDesignSpecIndex(-1), MSErrIndex(DataGlobalConstants::MaxSpeedLevels, 0),

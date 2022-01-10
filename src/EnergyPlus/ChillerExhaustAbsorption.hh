@@ -129,9 +129,9 @@ namespace ChillerExhaustAbsorption {
         int CondErrCount;          // error count for poor Condenser Supply Estimate
         bool PossibleSubcooling;   // Flag to determine whether plant is overcooled
         // loop topology variables
-        PlantLocation CWPlantLoc{};                             // chilled water plant loop component index
-        PlantLocation CDPlantLoc{};                             // condenser water plant loop component index
-        PlantLocation HWPlantLoc{};                             // hot water plant loop component index
+        PlantLocation CWPlantLoc;                             // chilled water plant loop component index
+        PlantLocation CDPlantLoc;                             // condenser water plant loop component index
+        PlantLocation HWPlantLoc;                             // hot water plant loop component index
         GeneratorType CompType_Num;                // Numeric designator for CompType (TypeOf)
         int ExhTempLTAbsLeavingTempIndex;          // index for exhaust potential less than thermal energy needed during cooling
         int ExhTempLTAbsLeavingHeatingTempIndex;   // index for exhaust potential less than thermal energy needed during heating

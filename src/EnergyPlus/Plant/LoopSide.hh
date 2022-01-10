@@ -138,7 +138,7 @@ namespace DataPlant {
         // report variables
         Real64 LoopSetPtDemandAtInlet;
         Real64 ThisSideLoadAlterations;
-        PlantLocation plantLoc{};
+        PlantLocation plantLoc;
         // Default Constructor
         HalfLoopData()
             : SimLoopSideNeeded(true), SimZoneEquipNeeded(true), SimAirLoopsNeeded(true), SimNonZoneEquipNeeded(true), SimElectLoadCentrNeeded(true),
@@ -154,7 +154,7 @@ namespace DataPlant {
               flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0), hasConstSpeedBranchPumps(false),
               InitialDemandToLoopSetPoint(0.0), CurrentAlterationsToDemand(0.0), UpdatedDemandToLoopSetPoint(0.0),
               LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), refrigIndex(0), LoopSetPtDemandAtInlet(0.0),
-              ThisSideLoadAlterations(0.0)
+              ThisSideLoadAlterations(0.0), plantLoc{}
         {
         }
 

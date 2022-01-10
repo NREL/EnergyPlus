@@ -525,7 +525,7 @@ namespace FuelCellElectricGenerator {
         FCInverterDataStruct Inverter;             // data for Inverter module
         std::string NameStackCooler;               // name of Inverter Module
         FCStackCoolerDataStruct StackCooler;       // data for Inverter module
-        PlantLocation CWPlantLoc{};                             // cooling water plant loop component index
+        PlantLocation CWPlantLoc;                             // cooling water plant loop component index
         FCReportDataStruct Report;                 // data for reporting as E+ output variables
         // calculated whole-system level variables
         Real64 ACPowerGen; // Net output from SOFC unit

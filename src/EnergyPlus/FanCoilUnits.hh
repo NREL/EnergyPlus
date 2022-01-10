@@ -224,8 +224,8 @@ namespace FanCoilUnits {
         int CoolCoilFluidOutletNodeNum;               // chilled water coil outlet plant node
         int HeatCoilFluidInletNode;                   // hot water control node
         int HeatCoilFluidOutletNodeNum;               // hot water coil outlet plant node
-        PlantLocation CoolCoilPlantLoc{};// index for plant location for chilled water coil
-        PlantLocation HeatCoilPlantLoc{};// index for plant location for hot water coil
+        PlantLocation CoolCoilPlantLoc;// index for plant location for chilled water coil
+        PlantLocation HeatCoilPlantLoc;// index for plant location for hot water coil
         int CoolCoilInletNodeNum;                     // index of cooling coil inlet node number
         int CoolCoilOutletNodeNum;                    // index of cooling coil outlet node number
         int HeatCoilInletNodeNum;                     // index of heating coil inlet node number
@@ -255,7 +255,7 @@ namespace FanCoilUnits {
               DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0), FirstPass(true), fanAvailSchIndex(0), MaxCoolCoilFluidFlow(0.0),
               MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), MaxNoCoolHeatAirMassFlow(0.0), MaxCoolAirMassFlow(0.0),
               MaxHeatAirMassFlow(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0),
-              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilInletNodeNum(0),
+              HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0),CoolCoilPlantLoc{}, HeatCoilPlantLoc{}, CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilInletNodeNum(0),
               HeatCoilOutletNodeNum(0), ControlZoneNum(0), NodeNumOfControlledZone(0), ATMixerExists(false), ATMixerOutNode(0), FanPartLoadRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneMassFlowFrac(1.0), MaxIterIndex(0), RegulaFalsiFailedIndex(0)
         {

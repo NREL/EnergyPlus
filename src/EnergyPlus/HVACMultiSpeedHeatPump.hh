@@ -144,7 +144,7 @@ namespace HVACMultiSpeedHeatPump {
         int HeatRecOutletNodeNum;                  // Node number on heat recovery water outlet
         Real64 MaxHeatRecOutletTemp;               // Maximum outlet water temperature for heat recovery
         Real64 DesignHeatRecMassFlowRate;          // Design water mass flow rate through heat recovery loop [kg/s]
-        PlantLocation HRPlantLoc{};                             // plant loop component for heat recovery
+        PlantLocation HRPlantLoc;                             // plant loop component for heat recovery
         Real64 AuxElecPower;                       // Auxiliary Electric Power
         Real64 IdleVolumeAirRate;                  // Supply air volumetric flow rate when no cooling or heating is needed
         Real64 IdleMassFlowRate;                   // Supply air mass flow rate when no cooling or heating is needed
@@ -196,9 +196,9 @@ namespace HVACMultiSpeedHeatPump {
         int HotWaterCoilOutletNode;
         std::string HotWaterCoilName;
         int HotWaterCoilNum;
-        PlantLocation plantLoc{};                                  // plant loop component location for hot water and steam heating coil
-        PlantLocation SuppPlantLoc{};                              // plant loop component location for hot water and steam supplemental heating coil
-        PlantLocation HotWaterPlantLoc{};                          // plant loop component location for hot water and steam heating coil
+        PlantLocation plantLoc;                                  // plant loop component location for hot water and steam heating coil
+        PlantLocation SuppPlantLoc;                              // plant loop component location for hot water and steam supplemental heating coil
+        PlantLocation HotWaterPlantLoc;                          // plant loop component location for hot water and steam heating coil
         int HotWaterCoilMaxIterIndex;                 // Index to recurring warning message
         int HotWaterCoilMaxIterIndex2;                // Index to recurring warning message
         int StageNum;                                 // Stage number specified by staged thermostat
@@ -228,14 +228,14 @@ namespace HVACMultiSpeedHeatPump {
               FanVolFlow(0.0), FanSchedPtr(0), OpMode(0), HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0), HeatCoilIndex(0), CoolCoilType(0),
               DXCoolCoilIndex(0), SuppHeatCoilType(0), SuppHeatCoilNum(0), DesignSuppHeatingCapacity(0.0), SuppMaxAirTemp(0.0), SuppMaxOATemp(0.0),
               AuxOnCyclePower(0.0), AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
-              HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), AuxElecPower(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0),
+              HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRPlantLoc{}, AuxElecPower(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0),
               NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(ModeOfOperation::Invalid), HeatCoolMode(ModeOfOperation::Invalid), AirLoopNumber(0),
               NumControlledZones(0), ZoneInletNode(0), CompPartLoadRatio(0.0), FanPartLoadRatio(0.0), TotCoolEnergyRate(0.0), TotHeatEnergyRate(0.0),
               SensCoolEnergyRate(0.0), SensHeatEnergyRate(0.0), LatCoolEnergyRate(0.0), LatHeatEnergyRate(0.0), ElecPower(0.0), LoadMet(0.0),
               HeatRecoveryRate(0.0), HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0),
               AirFlowControl(AirflowControl::Invalid), ErrIndexCyc(0), ErrIndexVar(0), LoadLoss(0.0), SuppCoilAirInletNode(0),
               SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0), SuppCoilControlNode(0), MaxSuppCoilFluidFlow(0.0),
-              SuppCoilOutletNode(0), CoilAirInletNode(0), CoilControlNode(0), MaxCoilFluidFlow(0.0), CoilOutletNode(0), HotWaterCoilControlNode(0),
+              SuppCoilOutletNode(0), CoilAirInletNode(0), CoilControlNode(0), MaxCoilFluidFlow(0.0), CoilOutletNode(0), HotWaterCoilControlNode(0), plantLoc{}, SuppPlantLoc{}, HotWaterPlantLoc{},
               HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), StageNum(0), Staged(false), CoolCountAvail(0), CoolIndexAvail(0),
               HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), MyEnvrnFlag(true),
               MySizeFlag(true), MyCheckFlag(true), MyFlowFracFlag(true), MyPlantScantFlag(true), MyStagedFlag(true), EMSOverrideCoilSpeedNumOn(false),

@@ -557,7 +557,7 @@ namespace HVACSingleDuctInduc {
                 ScanPlantLoopsForObject(state,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HCoil,
                                         state.dataHVACSingleDuctInduc->IndUnit(IUNum).HeatingCoilType,
-                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc,
+                                        state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -666,16 +666,16 @@ namespace HVACSingleDuctInduc {
             if (HotConNode > 0 && !state.dataHVACSingleDuctInduc->MyPlantScanFlag(IUNum)) {
 
                 rho = GetDensityGlycol(state,
-                                       state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
-                                       state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidIndex,
                                        RoutineName);
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxHotWaterFlow =
                     rho * state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolHotWaterFlow;
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinHotWaterFlow =
                     rho * state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinVolHotWaterFlow;
                 // get component outlet node from plant structure
-                HWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc)
+                HWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc)
                                    .NodeNumOut;
                 InitComponentNodes(state,
                                    state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinHotWaterFlow,
@@ -925,15 +925,15 @@ namespace HVACSingleDuctInduc {
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesHeatingLoad = DesCoilLoad;
                                 Cp = GetSpecificHeatGlycol(
                                     state,
-                                    state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum).FluidName,
+                                    state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
                                     DataGlobalConstants::HWInitConvTemp,
-                                    state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum).FluidIndex,
+                                    state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
 
                                 rho = GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc.loopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
@@ -1221,7 +1221,7 @@ namespace HVACSingleDuctInduc {
         SecNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).SecAirInNode;
         OutletNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode;
         HotControlNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWControlNode;
-        HWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc)
+        HWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc)
                            .NodeNumOut;
         ColdControlNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWControlNode;
         CWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc)
@@ -1239,14 +1239,14 @@ namespace HVACSingleDuctInduc {
                              MaxHotWaterFlow,
                              HotControlNode,
                              HWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc);
 
         MinHotWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MinHotWaterFlow;
         SetComponentFlowRate(state,
                              MinHotWaterFlow,
                              HotControlNode,
                              HWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc);
 
         MaxColdWaterFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxColdWaterFlow;
         SetComponentFlowRate(state,
@@ -1467,7 +1467,7 @@ namespace HVACSingleDuctInduc {
         SecAirMassFlow = InducRat * PriAirMassFlow;
         TotAirMassFlow = PriAirMassFlow + SecAirMassFlow;
         HotControlNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWControlNode;
-        HWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc)
+        HWOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc)
                            .NodeNumOut;
 
         ColdControlNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWControlNode;
@@ -1479,7 +1479,7 @@ namespace HVACSingleDuctInduc {
                              mdotHW,
                              HotControlNode,
                              HWOutletNode,
-                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWplantLoc);
+                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc);
 
         //  Node(HotControlNode)%MassFlowRate = HWFlow
 

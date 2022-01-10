@@ -211,9 +211,9 @@ namespace Furnaces {
         Real64 DehumidInducedHeatingDemandRate;             // Additional heating demand on supplemental heater
         // when heat pumps operate on dehumidification mode
         int CoilOutletNode;                       // outlet node for hot water and steam heating coil
-        PlantLocation plantLoc{};             // plant loop component location for water and steam heating coil
+        PlantLocation plantLoc;             // plant loop component location for water and steam heating coil
         int SuppCoilOutletNode;                   // outlet node for hot water and steam supplemental heating coil
-        PlantLocation SuppPlantLoc{};         // plant loop component location for water and steam supplemental heating coil
+        PlantLocation SuppPlantLoc;         // plant loop component location for water and steam supplemental heating coil
         int HotWaterCoilMaxIterIndex;             // Index to recurring warning message
         int HotWaterCoilMaxIterIndex2;            // Index to recurring warning message
         bool EMSOverrideSensZoneLoadRequest;      // if true, then EMS is calling to override zone load
@@ -270,7 +270,7 @@ namespace Furnaces {
               WSHPHeatRegulaFalsiFailedIndex(0), DXHeatingMaxIterIndex(0), DXHeatingRegulaFalsiFailedIndex(0), HeatingMaxIterIndex(0),
               HeatingMaxIterIndex2(0), HeatingRegulaFalsiFailedIndex(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
               NoHeatCoolSpeedRatio(1.0), ZoneInletNode(0), SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0),
-              DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
+              DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), plantLoc{}, SuppPlantLoc{}, HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
               EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0), EMSOverrideMoistZoneLoadRequest(false),
               EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Invalid), NumOfSpeedCooling(0), NumOfSpeedHeating(0),
               IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
