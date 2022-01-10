@@ -3696,7 +3696,7 @@ namespace UnitarySystems {
                         errorsFound = true;
                     } else { // mine data from fan object
                         // Get the fan index
-                        Fans::GetFanIndex(state, loc_m_FanName, this->m_FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                        Fans::GetFanIndex(state, loc_m_FanName, this->m_FanIndex, errFlag);
                         if (errFlag) {
                             ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;

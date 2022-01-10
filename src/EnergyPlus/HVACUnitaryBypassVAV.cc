@@ -619,7 +619,7 @@ namespace HVACUnitaryBypassVAV {
                         state, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanType_Num, FanErrFlag, CurrentModuleObject, CBVAV(CBVAVNum).Name);
                     CBVAV(CBVAVNum).FanInletNodeNum = Fans::GetFanInletNode(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, FanErrFlag);
                     fanOutletNode = Fans::GetFanOutletNode(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, ErrorsFound);
-                    Fans::GetFanIndex(state, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanIndex, FanErrFlag, ObjexxFCL::Optional_string_const());
+                    Fans::GetFanIndex(state, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanIndex, FanErrFlag);
                     Fans::GetFanVolFlow(state, CBVAV(CBVAVNum).FanIndex, CBVAV(CBVAVNum).FanVolFlow);
                 }
             }

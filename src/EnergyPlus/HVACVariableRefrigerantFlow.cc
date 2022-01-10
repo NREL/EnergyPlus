@@ -3628,7 +3628,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(state, FanName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
                         ErrorsFound = true;

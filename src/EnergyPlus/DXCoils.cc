@@ -15520,7 +15520,7 @@ void GetFanIndexForTwoSpeedCoil(
                     if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
                         SimAirServingZones::CompType::Fan_Simple_VAV) {
                         SupplyFanName = state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
-                        Fans::GetFanIndex(state, SupplyFanName, SupplyFanIndex, ErrorsFound, ObjexxFCL::Optional_string_const());
+                        Fans::GetFanIndex(state, SupplyFanName, SupplyFanIndex, ErrorsFound);
                         SupplyFan_TypeNum = DataHVACGlobals::FanType_SimpleVAV;
                         break;
                         // these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19

@@ -261,7 +261,11 @@ namespace Fans {
 
     void ReportFan(EnergyPlusData &state, int FanNum);
 
-    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
+    void GetFanIndex(EnergyPlusData &state,
+                     std::string const &FanName,
+                     int &FanIndex,
+                     bool &ErrorsFound,
+                     std::string_view const ThisObjectType = {});
 
     void GetFanVolFlow(EnergyPlusData &state, int FanIndex, Real64 &FanVolFlow);
 
@@ -271,8 +275,8 @@ namespace Fans {
                     std::string const &FanName,               // Fan name
                     int &FanType,                             // returned fantype number
                     bool &ErrorsFound,                        // error indicator
-                    Optional_string_const ThisObjectType = _, // parent object type (for error message)
-                    Optional_string_const ThisObjectName = _  // parent object name (for error message)
+                    std::string_view const ThisObjectType = {}, // parent object type (for error message)
+                    std::string_view const ThisObjectName = {}  // parent object name (for error message)
     );
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,

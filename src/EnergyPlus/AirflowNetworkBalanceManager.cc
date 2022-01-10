@@ -467,7 +467,7 @@ namespace AirflowNetworkBalanceManager {
                 // This breaks the component model, need to fix
                 bool fanErrorFound = false;
                 int fanIndex;
-                GetFanIndex(state, thisObjectName, fanIndex, fanErrorFound, ObjexxFCL::Optional_string_const());
+                GetFanIndex(state, thisObjectName, fanIndex, fanErrorFound);
                 if (fanErrorFound) {
                     ShowSevereError(state,
                                     std::string{RoutineName} + ": " + CurrentModuleObject + " = " + thisObjectName +
@@ -1388,7 +1388,7 @@ namespace AirflowNetworkBalanceManager {
 
                 } else {
 
-                    GetFanIndex(state, fan_name, fanIndex, FanErrorFound, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, fan_name, fanIndex, FanErrorFound);
 
                     if (FanErrorFound) {
                         ShowSevereError(state, "...occurs in " + CurrentModuleObject + " = " + state.dataAirflowNetwork->DisSysCompCVFData(i).name);

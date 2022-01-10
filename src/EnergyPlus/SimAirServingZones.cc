@@ -2038,8 +2038,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                     GetFanIndex(state,
                                                 PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
                                                 SupFanIndex,
-                                                ErrorsFound,
-                                                ObjexxFCL::Optional_string_const());
+                                                ErrorsFound);
                                     supFanModelType = StructArrayLegacyFanModels;
                                     goto EndOfAirLoop;
                                 }
@@ -2047,16 +2046,14 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                 GetFanIndex(state,
                                             PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
                                             RetFanIndex,
-                                            ErrorsFound,
-                                            ObjexxFCL::Optional_string_const());
+                                            ErrorsFound);
                                 retFanModelType = StructArrayLegacyFanModels;
                             }
                         } else {
                             GetFanIndex(state,
                                         PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
                                         SupFanIndex,
-                                        ErrorsFound,
-                                        ObjexxFCL::Optional_string_const());
+                                        ErrorsFound);
                             supFanModelType = StructArrayLegacyFanModels;
                             goto EndOfAirLoop;
                         }

@@ -2657,8 +2657,7 @@ void GetPTUnit(EnergyPlusData &state)
                     GetFanIndex(state,
                                 state.dataPTHP->PTUnit(PTUnitNum).FanName,
                                 state.dataPTHP->PTUnit(PTUnitNum).FanIndex,
-                                errFlag,
-                                ObjexxFCL::Optional_string_const());
+                                errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                         ErrorsFound = true;
