@@ -2064,13 +2064,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  DataLoopNode::NodeConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  DataLoopNode::NodeConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
+                  DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
             // Build ParentNodeLists
-            if ((state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::NodeConnectionType::Inlet) ||
-                (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::NodeConnectionType::Outlet)) {
+            if ((state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::ConnectionType::Inlet) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::ConnectionType::Outlet)) {
                 bool ParentComponentFound = false;
                 for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
                     if (state.dataBranchNodeConnections->ParentNodeList(Loop1).CType !=
@@ -2081,11 +2081,11 @@ namespace SimulationManager {
                     ParentComponentFound = true;
 
                     switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
-                    case DataLoopNode::NodeConnectionType::Inlet:
+                    case DataLoopNode::ConnectionType::Inlet:
                         state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
-                    case DataLoopNode::NodeConnectionType::Outlet:
+                    case DataLoopNode::ConnectionType::Outlet:
                         state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                     default:
@@ -2100,11 +2100,11 @@ namespace SimulationManager {
                         state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
 
                     switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
-                    case DataLoopNode::NodeConnectionType::Inlet:
+                    case DataLoopNode::ConnectionType::Inlet:
                         state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
-                    case DataLoopNode::NodeConnectionType::Outlet:
+                    case DataLoopNode::ConnectionType::Outlet:
                         state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
@@ -2127,9 +2127,9 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Non-Parent Node Connection,{},{},{},{},{}\n",
                   state.dataBranchNodeConnections->NodeConnections(Loop).NodeName,
-                  DataLoopNode::NodeConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
+                  DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  DataLoopNode::NodeConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
+                  DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
         }
 
@@ -2761,8 +2761,8 @@ namespace SimulationManager {
         print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
 
-            auto ctypeStr = std::string(
-                DataLoopNode::NodeConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).CType)]);
+            auto ctypeStr =
+                std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).CType)]);
 
             NumChildren = GetNumChildren(state, ctypeStr, state.dataBranchNodeConnections->ParentNodeList(Loop).CName);
             if (NumChildren > 0) {

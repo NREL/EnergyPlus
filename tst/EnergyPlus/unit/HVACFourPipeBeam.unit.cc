@@ -230,7 +230,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
                                                                                             "Zone",
                                                                                             "BeamTest",
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::ZoneNode,
+                                                                                            DataLoopNode::ConnectionType::ZoneNode,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             DataLoopNode::ObjectIsNotParent,
                                                                                             "Test zone node");

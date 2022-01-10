@@ -346,7 +346,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).PlantOutletNodeNum =
@@ -356,7 +356,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
@@ -378,7 +378,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).HVACOutletNodeNum =
@@ -388,7 +388,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 

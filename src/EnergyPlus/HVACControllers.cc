@@ -613,7 +613,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                 CurrentModuleObject,
                                                                 AlphArray(1),
                                                                 DataLoopNode::NodeFluidType::Blank,
-                                                                DataLoopNode::NodeConnectionType::Sensor,
+                                                                DataLoopNode::ConnectionType::Sensor,
                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                 ObjectIsNotParent);
             ControllerProps(Num).ActuatedNode = GetOnlySingleNode(state,
@@ -622,7 +622,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                   CurrentModuleObject,
                                                                   AlphArray(1),
                                                                   DataLoopNode::NodeFluidType::Blank,
-                                                                  DataLoopNode::NodeConnectionType::Actuator,
+                                                                  DataLoopNode::ConnectionType::Actuator,
                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                   ObjectIsNotParent);
             ControllerProps(Num).Offset = NumArray(1);

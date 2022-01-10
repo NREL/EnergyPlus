@@ -324,7 +324,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID =
@@ -334,7 +334,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
@@ -349,7 +349,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -361,7 +361,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 

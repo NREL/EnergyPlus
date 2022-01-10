@@ -287,7 +287,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                         "PTUnit",
                                         "PTUnit",
                                         DataLoopNode::NodeFluidType::Air,
-                                        DataLoopNode::NodeConnectionType::Inlet,
+                                        DataLoopNode::ConnectionType::Inlet,
                                         NodeInputManager::CompFluidStream::Primary,
                                         DataLoopNode::ObjectIsNotParent);
 

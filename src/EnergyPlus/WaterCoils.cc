@@ -371,7 +371,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                        CurrentModuleObject,
                                                                                        AlphArray(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
@@ -380,7 +380,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                         CurrentModuleObject,
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
@@ -389,7 +389,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                      CurrentModuleObject,
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                                     DataLoopNode::ConnectionType::Inlet,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
@@ -398,7 +398,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                       CurrentModuleObject,
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                                      DataLoopNode::ConnectionType::Outlet,
                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsNotParent);
 
@@ -597,7 +597,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                        CurrentModuleObject,
                                                                                        AlphArray(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
@@ -606,7 +606,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                         CurrentModuleObject,
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
@@ -615,7 +615,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                      CurrentModuleObject,
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                                     DataLoopNode::ConnectionType::Inlet,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
@@ -624,7 +624,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                       CurrentModuleObject,
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                                      DataLoopNode::ConnectionType::Outlet,
                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsNotParent);
 
@@ -797,7 +797,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                        CurrentModuleObject,
                                                                                        AlphArray(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                                        ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
@@ -806,7 +806,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                         CurrentModuleObject,
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                                         ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
@@ -815,7 +815,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                      CurrentModuleObject,
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                                     DataLoopNode::ConnectionType::Inlet,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsNotParent);
         state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
@@ -824,7 +824,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
                                                                                       CurrentModuleObject,
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                                      DataLoopNode::ConnectionType::Outlet,
                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsNotParent);
 

@@ -332,7 +332,7 @@ namespace WindowAC {
                                                                                 CurrentModuleObject,
                                                                                 Alphas(1),
                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                                                DataLoopNode::ConnectionType::Inlet,
                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                 ObjectIsParent);
 
@@ -342,7 +342,7 @@ namespace WindowAC {
                                                                                  CurrentModuleObject,
                                                                                  Alphas(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Outlet,
+                                                                                 DataLoopNode::ConnectionType::Outlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
 

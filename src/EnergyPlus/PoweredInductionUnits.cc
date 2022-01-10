@@ -351,7 +351,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(3));
@@ -362,7 +362,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(4));
@@ -373,7 +373,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                   state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::NodeConnectionType::Outlet,
+                                                                                  DataLoopNode::ConnectionType::Outlet,
                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsParent,
                                                                                   state.dataIPShortCut->cAlphaFieldNames(5));
@@ -384,7 +384,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                       state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Internal,
+                                                                                      DataLoopNode::ConnectionType::Internal,
                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent,
                                                                                       state.dataIPShortCut->cAlphaFieldNames(6));
@@ -588,7 +588,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(3));
@@ -599,7 +599,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                     cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     ObjectIsParent,
                                                                                     state.dataIPShortCut->cAlphaFieldNames(4));
@@ -610,7 +610,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                   cCurrentModuleObject,
                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                  DataLoopNode::NodeConnectionType::Outlet,
+                                                                                  DataLoopNode::ConnectionType::Outlet,
                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                   ObjectIsParent,
                                                                                   state.dataIPShortCut->cAlphaFieldNames(5));
@@ -621,7 +621,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                                       cCurrentModuleObject,
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Internal,
+                                                                                      DataLoopNode::ConnectionType::Internal,
                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent,
                                                                                       state.dataIPShortCut->cAlphaFieldNames(6));

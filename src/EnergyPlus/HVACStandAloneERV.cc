@@ -484,7 +484,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               CurrentModuleObject,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirOutletNode =
@@ -494,7 +494,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               CurrentModuleObject,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirInletNode =
@@ -504,7 +504,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               CurrentModuleObject,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Secondary,
                               ObjectIsParent);
         state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirOutletNode =
@@ -514,7 +514,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                               CurrentModuleObject,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::ReliefAir,
+                              DataLoopNode::ConnectionType::ReliefAir,
                               NodeInputManager::CompFluidStream::Secondary,
                               ObjectIsParent);
 

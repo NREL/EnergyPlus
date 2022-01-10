@@ -487,7 +487,7 @@ void GetAirPathData(EnergyPlusData &state)
                                                                                  CurrentModuleObject,
                                                                                  Alphas(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
         if (!lAlphaBlanks(7)) {
@@ -497,7 +497,7 @@ void GetAirPathData(EnergyPlusData &state)
                                                                                        CurrentModuleObject,
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Outlet,
+                                                                                       DataLoopNode::ConnectionType::Outlet,
                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsParent);
         } else {
@@ -606,7 +606,7 @@ void GetAirPathData(EnergyPlusData &state)
                     DataLoopNode::NodeFluidType::Air,
                     CurrentModuleObject,
                     PrimaryAirSystems(AirSysNum).Name,
-                    DataLoopNode::NodeConnectionType::Inlet,
+                    DataLoopNode::ConnectionType::Inlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
                     _,
@@ -647,7 +647,7 @@ void GetAirPathData(EnergyPlusData &state)
                     DataLoopNode::NodeFluidType::Air,
                     CurrentModuleObject,
                     PrimaryAirSystems(AirSysNum).Name,
-                    DataLoopNode::NodeConnectionType::Outlet,
+                    DataLoopNode::ConnectionType::Outlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsParent,
                     _,

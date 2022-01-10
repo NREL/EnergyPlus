@@ -1036,7 +1036,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
                                       CurrentModuleObject,
                                       AlphArray(1),
                                       DataLoopNode::NodeFluidType::Water,
-                                      DataLoopNode::NodeConnectionType::Sensor,
+                                      DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 // For DO Loop below -- Check for lower limit > upper limit.(invalid)
@@ -1411,7 +1411,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                           CurrentModuleObject,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
-                                          DataLoopNode::NodeConnectionType::Sensor,
+                                          DataLoopNode::ConnectionType::Sensor,
                                           NodeInputManager::CompFluidStream::Primary,
                                           ObjectIsNotParent);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeName =
@@ -1423,7 +1423,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                           CurrentModuleObject,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
-                                          DataLoopNode::NodeConnectionType::Sensor,
+                                          DataLoopNode::ConnectionType::Sensor,
                                           NodeInputManager::CompFluidStream::Primary,
                                           ObjectIsNotParent);
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate =

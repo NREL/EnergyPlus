@@ -210,7 +210,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                DataLoopNode::ConnectionType::Inlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
@@ -220,7 +220,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                DataLoopNode::ConnectionType::Outlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,

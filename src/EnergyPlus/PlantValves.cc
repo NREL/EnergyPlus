@@ -178,7 +178,7 @@ namespace PlantValves {
                                                                                          CurrentModuleObject,
                                                                                          Alphas(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                                         DataLoopNode::NodeConnectionType::Inlet,
+                                                                                         DataLoopNode::ConnectionType::Inlet,
                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                          ObjectIsNotParent);
             // Get Plant Outlet Node
@@ -188,7 +188,7 @@ namespace PlantValves {
                                                                                           CurrentModuleObject,
                                                                                           Alphas(1),
                                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                                                          DataLoopNode::ConnectionType::Outlet,
                                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
@@ -199,7 +199,7 @@ namespace PlantValves {
                                                                                            CurrentModuleObject,
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                                           DataLoopNode::NodeConnectionType::Sensor,
+                                                                                           DataLoopNode::ConnectionType::Sensor,
                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsNotParent);
             // Get Mixed water Setpoint
@@ -209,7 +209,7 @@ namespace PlantValves {
                                                                                             CurrentModuleObject,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::NodeConnectionType::SetPoint,
+                                                                                            DataLoopNode::ConnectionType::SetPoint,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsNotParent);
 
@@ -220,7 +220,7 @@ namespace PlantValves {
                                                                                               CurrentModuleObject,
                                                                                               Alphas(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                              DataLoopNode::NodeConnectionType::Sensor,
+                                                                                              DataLoopNode::ConnectionType::Sensor,
                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                               ObjectIsNotParent);
 

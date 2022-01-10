@@ -447,7 +447,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
@@ -460,7 +460,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
@@ -725,7 +725,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
@@ -748,7 +748,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }

@@ -174,7 +174,7 @@ namespace ICEngineElectricGenerator {
                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Electric,
-                                                    DataLoopNode::NodeConnectionType::Electric,
+                                                    DataLoopNode::ConnectionType::Electric,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -247,7 +247,7 @@ namespace ICEngineElectricGenerator {
                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum == 0) {
@@ -262,7 +262,7 @@ namespace ICEngineElectricGenerator {
                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum == 0) {

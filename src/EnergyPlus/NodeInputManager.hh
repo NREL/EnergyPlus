@@ -101,7 +101,7 @@ namespace NodeInputManager {
                      DataLoopNode::NodeFluidType const nodeFluidType,           // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
                      std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
-                     DataLoopNode::NodeConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
+                     DataLoopNode::ConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
                      CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                      bool const ObjectIsParent,                                 // True/False
                      Optional_bool_const IncrementFluidStream = _,              // True/False
@@ -123,7 +123,7 @@ namespace NodeInputManager {
                           std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
                           std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                           DataLoopNode::NodeFluidType const nodeFluidType,           // Fluidtype for checking/setting node FluidType
-                          DataLoopNode::NodeConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
+                          DataLoopNode::ConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
                           CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                           bool const ObjectIsParent,                                 // True/False
                           Optional_string_const InputFieldName = _                   // Input Field Name

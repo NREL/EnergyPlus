@@ -1517,7 +1517,7 @@ namespace PlantPipingSystemsManager {
                                                                            ObjName_Circuit,
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
@@ -1538,7 +1538,7 @@ namespace PlantPipingSystemsManager {
                                                                             ObjName_Circuit,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {
@@ -1655,7 +1655,7 @@ namespace PlantPipingSystemsManager {
                                                                            ObjName_HorizTrench,
                                                                            thisTrenchName,
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.InletNodeNum == 0) {
@@ -1668,7 +1668,7 @@ namespace PlantPipingSystemsManager {
                                                                             ObjName_HorizTrench,
                                                                             thisTrenchName,
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             if (thisCircuit.OutletNodeNum == 0) {

@@ -312,7 +312,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                              CurrentModuleObject,
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::ZoneNode,
+                                                                                             DataLoopNode::ConnectionType::ZoneNode,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent); // all zone air state variables are
         if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
@@ -677,7 +677,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     DataLoopNode::NodeFluidType::Air,
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                    DataLoopNode::NodeConnectionType::ZoneInlet,
+                    DataLoopNode::ConnectionType::ZoneInlet,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
@@ -729,7 +729,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     DataLoopNode::NodeFluidType::Air,
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                    DataLoopNode::NodeConnectionType::ZoneExhaust,
+                    DataLoopNode::ConnectionType::ZoneExhaust,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
@@ -769,7 +769,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     DataLoopNode::NodeFluidType::Air,
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                    DataLoopNode::NodeConnectionType::ZoneReturn,
+                    DataLoopNode::ConnectionType::ZoneReturn,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
@@ -822,7 +822,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     DataLoopNode::NodeFluidType::Air,
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
-                    DataLoopNode::NodeConnectionType::Sensor,
+                    DataLoopNode::ConnectionType::Sensor,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent);
 
@@ -926,7 +926,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                      CurrentModuleObject,
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                                     DataLoopNode::ConnectionType::Inlet,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      ObjectIsParent);
 
@@ -996,7 +996,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                       CurrentModuleObject,
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                                      DataLoopNode::ConnectionType::Outlet,
                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                       ObjectIsParent);
 

@@ -456,7 +456,7 @@ namespace HVACUnitaryBypassVAV {
                                                                             CurrentModuleObject,
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsParent);
 
@@ -469,7 +469,7 @@ namespace HVACUnitaryBypassVAV {
                                                                              CurrentModuleObject,
                                                                              Alphas(1),
                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsParent);
 
@@ -479,7 +479,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Internal,
+                                                                                        DataLoopNode::ConnectionType::Internal,
                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                         DataLoopNode::ObjectIsParent);
 
@@ -490,7 +490,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               CurrentModuleObject,
                                                                                               Alphas(1),
                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::NodeConnectionType::Internal,
+                                                                                              DataLoopNode::ConnectionType::Internal,
                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                               DataLoopNode::ObjectIsParent);
                 CBVAV(CBVAVNum).PlenumMixerInletAirNode = NodeInputManager::GetOnlySingleNode(state,
@@ -499,7 +499,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               CurrentModuleObject,
                                                                                               Alphas(1) + "_PlenumMixerInlet",
                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                                                              DataLoopNode::ConnectionType::Outlet,
                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                               DataLoopNode::ObjectIsParent);
             }
@@ -525,7 +525,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Internal,
+                                                                                    DataLoopNode::ConnectionType::Internal,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsParent);
 
@@ -535,7 +535,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1) + "_Mixer",
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsParent);
 
@@ -545,7 +545,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1) + "_Splitter",
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                         DataLoopNode::ObjectIsParent);
 

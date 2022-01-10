@@ -253,7 +253,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cCurrentModuleObject,
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -262,7 +262,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
@@ -301,7 +301,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                   DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
@@ -317,7 +317,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -327,7 +327,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -336,7 +336,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
@@ -362,7 +362,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Blank,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -371,7 +371,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Blank,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
@@ -460,7 +460,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cCurrentModuleObject,
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                      DataLoopNode::NodeConnectionType::Inlet,
+                                                                                      DataLoopNode::ConnectionType::Inlet,
                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
@@ -474,7 +474,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Outlet,
+                                                                                       DataLoopNode::ConnectionType::Outlet,
                                                                                        NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
@@ -541,7 +541,7 @@ namespace PlantChillers {
                                                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
-                                                                                                 DataLoopNode::NodeConnectionType::Sensor,
+                                                                                                 DataLoopNode::ConnectionType::Sensor,
                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
                     } else {
@@ -2352,7 +2352,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cCurrentModuleObject,
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -2361,7 +2361,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
@@ -2399,7 +2399,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                   DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
@@ -2416,7 +2416,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -2426,7 +2426,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -2435,7 +2435,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
@@ -2461,7 +2461,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Blank,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -2470,7 +2470,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Blank,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
@@ -2594,7 +2594,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cCurrentModuleObject,
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                      DataLoopNode::NodeConnectionType::Inlet,
+                                                                                      DataLoopNode::ConnectionType::Inlet,
                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
@@ -2608,7 +2608,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Outlet,
+                                                                                       DataLoopNode::ConnectionType::Outlet,
                                                                                        NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
@@ -4507,7 +4507,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cCurrentModuleObject,
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -4516,7 +4516,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
@@ -4554,7 +4554,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                   DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
@@ -4570,7 +4570,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else { // WaterCooled CondenserType
@@ -4580,7 +4580,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Blank,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -4589,7 +4589,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Blank,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
@@ -4692,7 +4692,7 @@ namespace PlantChillers {
                                                                                       state.dataIPShortCut->cCurrentModuleObject,
                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                      DataLoopNode::NodeConnectionType::Inlet,
+                                                                                      DataLoopNode::ConnectionType::Inlet,
                                                                                       NodeInputManager::CompFluidStream::Tertiary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecInletNodeNum == 0) {
@@ -4706,7 +4706,7 @@ namespace PlantChillers {
                                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Outlet,
+                                                                                       DataLoopNode::ConnectionType::Outlet,
                                                                                        NodeInputManager::CompFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 if (thisChiller.HeatRecOutletNodeNum == 0) {
@@ -6580,7 +6580,7 @@ namespace PlantChillers {
                                                                                state.dataIPShortCut->cCurrentModuleObject,
                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsNotParent);
             thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -6589,7 +6589,7 @@ namespace PlantChillers {
                                                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
@@ -6627,7 +6627,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                   DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 bool Okay;
@@ -6644,7 +6644,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
@@ -6654,7 +6654,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -6663,7 +6663,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager ::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
@@ -6689,7 +6689,7 @@ namespace PlantChillers {
                                                                                    state.dataIPShortCut->cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Blank,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -6698,7 +6698,7 @@ namespace PlantChillers {
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                     DataLoopNode::NodeFluidType::Blank,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,

@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
                            "BadNode",
                            "Type1",
                            "Object1",
-                           DataLoopNode::NodeConnectionType::ZoneNode,
+                           DataLoopNode::ConnectionType::ZoneNode,
                            NodeInputManager::CompFluidStream::Primary,
                            false,
                            errFlag);
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
                            "BadNode",
                            "Type1",
                            "Object1",
-                           DataLoopNode::NodeConnectionType::ZoneNode,
+                           DataLoopNode::ConnectionType::ZoneNode,
                            NodeInputManager::CompFluidStream::Primary,
                            false,
                            errFlag);
@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
                            "GoodNode",
                            "Type2",
                            "Object2",
-                           DataLoopNode::NodeConnectionType::Sensor,
+                           DataLoopNode::ConnectionType::Sensor,
                            NodeInputManager::CompFluidStream::Primary,
                            false,
                            errFlag);
@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
                            "BadNode",
                            "Type3",
                            "Object3",
-                           DataLoopNode::NodeConnectionType::ZoneNode,
+                           DataLoopNode::ConnectionType::ZoneNode,
                            NodeInputManager::CompFluidStream::Primary,
                            false,
                            errFlag);
@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
                            "GoodNode",
                            "Type4",
                            "Object4",
-                           DataLoopNode::NodeConnectionType::Outlet,
+                           DataLoopNode::ConnectionType::Outlet,
                            NodeInputManager::CompFluidStream::Primary,
                            false,
                            errFlag);

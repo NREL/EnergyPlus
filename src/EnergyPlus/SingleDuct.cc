@@ -440,7 +440,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -451,7 +451,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -564,7 +564,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent,
                               cAlphaFields(9));
@@ -848,7 +848,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -859,7 +859,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -934,7 +934,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent,
                               cAlphaFields(7));
@@ -1158,7 +1158,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent,
                               cAlphaFields(3));
@@ -1169,7 +1169,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsParent,
                               cAlphaFields(4));
@@ -1391,7 +1391,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -1402,7 +1402,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -1593,7 +1593,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -1604,7 +1604,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -1855,7 +1855,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Outlet,
+                              DataLoopNode::ConnectionType::Outlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(3));
@@ -1866,7 +1866,7 @@ void GetSysInput(EnergyPlusData &state)
                               state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
-                              DataLoopNode::NodeConnectionType::Inlet,
+                              DataLoopNode::ConnectionType::Inlet,
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFields(4));
@@ -6143,7 +6143,7 @@ void GetATMixers(EnergyPlusData &state)
                                                                                          cCurrentModuleObject,
                                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                          ObjectIsNotParent,
                                                                                          state.dataIPShortCut->cAlphaFieldNames(4));
@@ -6154,7 +6154,7 @@ void GetATMixers(EnergyPlusData &state)
                                                                                    cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                    ObjectIsNotParent,
                                                                                    state.dataIPShortCut->cAlphaFieldNames(5));
@@ -6164,7 +6164,7 @@ void GetATMixers(EnergyPlusData &state)
                                                                                    cCurrentModuleObject,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                    ObjectIsNotParent,
                                                                                    state.dataIPShortCut->cAlphaFieldNames(6));

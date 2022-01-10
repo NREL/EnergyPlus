@@ -197,7 +197,7 @@ namespace EvaporativeFluidCoolers {
                                                                             state.dataIPShortCut->cCurrentModuleObject,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             thisEFC.WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -206,7 +206,7 @@ namespace EvaporativeFluidCoolers {
                                                                              state.dataIPShortCut->cCurrentModuleObject,
                                                                              AlphArray(1),
                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
@@ -253,7 +253,7 @@ namespace EvaporativeFluidCoolers {
                                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                                      thisEFC.Name,
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                     DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEFC.OutdoorAirInletNodeNum)) {
@@ -503,7 +503,7 @@ namespace EvaporativeFluidCoolers {
                                                                             state.dataIPShortCut->cCurrentModuleObject,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
             thisEFC.WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -512,7 +512,7 @@ namespace EvaporativeFluidCoolers {
                                                                              state.dataIPShortCut->cCurrentModuleObject,
                                                                              AlphArray(1),
                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
@@ -579,7 +579,7 @@ namespace EvaporativeFluidCoolers {
                                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                                      thisEFC.Name,
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                     DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEFC.OutdoorAirInletNodeNum)) {

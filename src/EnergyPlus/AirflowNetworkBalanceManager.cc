@@ -2622,7 +2622,7 @@ namespace AirflowNetworkBalanceManager {
                                                     CurrentModuleObject,
                                                     "AirflowNetwork:Multizone:Surface",
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     ObjectIsParent);
                         state.dataAirflowNetwork->MultizoneExternalNodeData(i).OutAirNodeNum = NodeNum;       // Name of outdoor air node
@@ -11212,7 +11212,7 @@ namespace AirflowNetworkBalanceManager {
         bool ErrorsFound(false);
         bool IsNotOK(false);
         bool errFlag(false);
-        Array1D<DataLoopNode::NodeConnectionType> NodeConnectionType; // Specifies the type of node connection
+        Array1D<DataLoopNode::ConnectionType> NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
 
         bool HPWHFound(false);          // Flag for HPWH identification
@@ -11382,7 +11382,7 @@ namespace AirflowNetworkBalanceManager {
             } else {
                 //   skip nodes for air cooled condensers
                 for (j = 1; j <= isize(NodeConnectionType); ++j) {
-                    if (NodeConnectionType(j) == DataLoopNode::NodeConnectionType::OutsideAirReference) {
+                    if (NodeConnectionType(j) == DataLoopNode::ConnectionType::OutsideAirReference) {
                         NodeFound(i) = true;
                     }
                 }

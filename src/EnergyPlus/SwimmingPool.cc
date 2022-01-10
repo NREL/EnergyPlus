@@ -329,7 +329,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                  CurrentModuleObject,
                                                                                                  Alphas(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
-                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
         state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
@@ -338,7 +338,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                   CurrentModuleObject,
                                                                                                   Alphas(1),
                                                                                                   DataLoopNode::NodeFluidType::Water,
-                                                                                                  DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                  DataLoopNode::ConnectionType::Outlet,
                                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                                   DataLoopNode::ObjectIsNotParent);
         if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {

@@ -1319,7 +1319,7 @@ namespace InternalHeatGains {
                                                                               lightsModuleObject,
                                                                               thisLights.Name,
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::ZoneExhaust,
+                                                                              DataLoopNode::ConnectionType::ZoneExhaust,
                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
                             if (!exhaustNodeError) { // GetOnlySingleNode will throw error messages if this is a NodeList Name and for other issues
@@ -2931,7 +2931,7 @@ namespace InternalHeatGains {
                                                                               itEqModuleObject,
                                                                               AlphaName(1),
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::Sensor,
+                                                                              DataLoopNode::ConnectionType::Sensor,
                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                               ObjectIsNotParent);
                         }

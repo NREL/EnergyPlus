@@ -369,7 +369,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                                                cCurrentModuleObject,
                                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode = GetOnlySingleNode(state,
@@ -378,7 +378,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                                                 cCurrentModuleObject,
                                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                                 ObjectIsNotParent);
 

@@ -980,7 +980,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                    cCurrentModuleObject,
                                                                                    thisPLHP.name,
                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisPLHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
@@ -989,22 +989,22 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                     cCurrentModuleObject,
                                                                                     thisPLHP.name,
                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::Blank;
-                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::Blank;
-                DataLoopNode::NodeConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::Blank;
+                DataLoopNode::ConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Blank;
+                DataLoopNode::ConnectionType condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Blank;
                 if (condenserType == "WATERSOURCE") {
                     thisPLHP.waterSource = true;
                     condenserNodeType = DataLoopNode::NodeFluidType::Water;
-                    condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::Inlet;
-                    condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::Outlet;
+                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
+                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
                 } else if (condenserType == "AIRSOURCE") {
                     thisPLHP.airSource = true;
                     condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                    condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::OutsideAir;
-                    condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType::OutsideAir;
+                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
+                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
                 } else {
                     // Again, this should be protected by the input processor
                     ShowErrorMessage(state,

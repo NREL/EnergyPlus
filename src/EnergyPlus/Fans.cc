@@ -381,7 +381,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cCurrentModuleObject,
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                     DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -390,7 +390,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                      DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
 
@@ -480,7 +480,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cCurrentModuleObject,
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                     DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -489,7 +489,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                      DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
 
@@ -568,7 +568,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cCurrentModuleObject,
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                     DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -577,7 +577,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                      DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
 
@@ -733,7 +733,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cCurrentModuleObject,
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                     DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -742,7 +742,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                      DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
 
@@ -846,7 +846,7 @@ void GetFanInput(EnergyPlusData &state)
                                                      cCurrentModuleObject,
                                                      cAlphaArgs(1),
                                                      DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                     DataLoopNode::ConnectionType::Inlet,
                                                      NodeInputManager::CompFluidStream::Primary,
                                                      ObjectIsNotParent); // Air inlet node name
         Fan(FanNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -855,7 +855,7 @@ void GetFanInput(EnergyPlusData &state)
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Air,
-                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                      DataLoopNode::ConnectionType::Outlet,
                                                       NodeInputManager::CompFluidStream::Primary,
                                                       ObjectIsNotParent); // Air outlet node name
 

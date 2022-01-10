@@ -522,7 +522,7 @@ namespace HWBaseboardRadiator {
                                                                          cCMO_BBRadiator_Water,
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                         DataLoopNode::NodeConnectionType::Inlet,
+                                                                         DataLoopNode::ConnectionType::Inlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
@@ -533,7 +533,7 @@ namespace HWBaseboardRadiator {
                                                                           cCMO_BBRadiator_Water,
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                                          DataLoopNode::ConnectionType::Outlet,
                                                                           NodeInputManager::CompFluidStream::Primary,
                                                                           ObjectIsNotParent);
             TestCompSet(state,

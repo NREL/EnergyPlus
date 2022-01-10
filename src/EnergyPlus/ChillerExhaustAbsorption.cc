@@ -360,7 +360,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                            cCurrentModuleObject,
                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Water,
-                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                           DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.ChillSupplyNodeNum = GetOnlySingleNode(state,
@@ -369,7 +369,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                            cCurrentModuleObject,
                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Water,
-                                                           DataLoopNode::NodeConnectionType::Outlet,
+                                                           DataLoopNode::ConnectionType::Outlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            DataLoopNode::ObjectIsNotParent);
         TestCompSet(state,
@@ -385,7 +385,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                           cCurrentModuleObject,
                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Water,
-                                                          DataLoopNode::NodeConnectionType::Inlet,
+                                                          DataLoopNode::ConnectionType::Inlet,
                                                           NodeInputManager::CompFluidStream::Tertiary,
                                                           DataLoopNode::ObjectIsNotParent);
         thisChiller.HeatSupplyNodeNum = GetOnlySingleNode(state,
@@ -394,7 +394,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                           cCurrentModuleObject,
                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Water,
-                                                          DataLoopNode::NodeConnectionType::Outlet,
+                                                          DataLoopNode::ConnectionType::Outlet,
                                                           NodeInputManager::CompFluidStream::Tertiary,
                                                           DataLoopNode::ObjectIsNotParent);
         TestCompSet(state,
@@ -482,7 +482,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                               cCurrentModuleObject,
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::NodeConnectionType::Inlet,
+                                                              DataLoopNode::ConnectionType::Inlet,
                                                               NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             thisChiller.CondSupplyNodeNum = GetOnlySingleNode(state,
@@ -491,7 +491,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                               cCurrentModuleObject,
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                              DataLoopNode::ConnectionType::Outlet,
                                                               NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             TestCompSet(state,
@@ -507,7 +507,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
                                                               cCurrentModuleObject,
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Air,
-                                                              DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                              DataLoopNode::ConnectionType::OutsideAirReference,
                                                               NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
             // Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )

@@ -170,7 +170,7 @@ namespace GeneratorFuelSupply {
                                                                                         cCurrentModuleObject,
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Sensor,
+                                                                                        DataLoopNode::ConnectionType::Sensor,
                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                         ObjectIsNotParent);
 

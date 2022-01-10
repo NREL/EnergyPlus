@@ -687,9 +687,9 @@ namespace BranchInputManager {
                 RegisterNodeConnection(state,
                                        OutletNodeNum,
                                        state.dataLoopNodes->NodeID(OutletNodeNum),
-                                       DataLoopNode::NodeConnectionObjectType::ConnectorMixer,
+                                       DataLoopNode::ConnectionObjectType::ConnectorMixer,
                                        MixerName,
-                                       DataLoopNode::NodeConnectionType::Outlet,
+                                       DataLoopNode::ConnectionType::Outlet,
                                        NodeInputManager::CompFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
@@ -719,9 +719,9 @@ namespace BranchInputManager {
                         RegisterNodeConnection(state,
                                                InletNodeNums(Loop),
                                                state.dataLoopNodes->NodeID(InletNodeNums(Loop)),
-                                               DataLoopNode::NodeConnectionObjectType::ConnectorMixer,
+                                               DataLoopNode::ConnectionObjectType::ConnectorMixer,
                                                MixerName,
-                                               DataLoopNode::NodeConnectionType::Inlet,
+                                               DataLoopNode::ConnectionType::Inlet,
                                                NodeInputManager::CompFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
@@ -845,9 +845,9 @@ namespace BranchInputManager {
                 RegisterNodeConnection(state,
                                        InletNodeNum,
                                        state.dataLoopNodes->NodeID(InletNodeNum),
-                                       DataLoopNode::NodeConnectionObjectType::ConnectorSplitter,
+                                       DataLoopNode::ConnectionObjectType::ConnectorSplitter,
                                        SplitterName,
-                                       DataLoopNode::NodeConnectionType::Inlet,
+                                       DataLoopNode::ConnectionType::Inlet,
                                        NodeInputManager::CompFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
@@ -878,9 +878,9 @@ namespace BranchInputManager {
                         RegisterNodeConnection(state,
                                                OutletNodeNums(Loop),
                                                state.dataLoopNodes->NodeID(OutletNodeNums(Loop)),
-                                               DataLoopNode::NodeConnectionObjectType::ConnectorSplitter,
+                                               DataLoopNode::ConnectionObjectType::ConnectorSplitter,
                                                SplitterName,
-                                               DataLoopNode::NodeConnectionType::Outlet,
+                                               DataLoopNode::ConnectionType::Outlet,
                                                NodeInputManager::CompFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
@@ -1124,7 +1124,7 @@ namespace BranchInputManager {
         int Comp;                                        // Loop Counter
         bool IsNotOK;                                    // Flag to verify name
         int NumInComps;                                  // Number of components actually verified (no SPLITTER or MIXER allowed)
-        DataLoopNode::NodeConnectionType ConnectionType; // Used to pass variable node connection type to GetNodeNums
+        DataLoopNode::ConnectionType ConnectionType; // Used to pass variable node connection type to GetNodeNums
         int NumNodes;                                    // Number of Nodes from NodeInputManager
 
         std::string CurrentModuleObject = "Branch";
@@ -1170,9 +1170,9 @@ namespace BranchInputManager {
             state.dataBranchInputManager->Branch(BCount).Component(Comp).InletNodeName = Alphas(Loop + 2);
             // If first component on branch, then inlet node is inlet to branch, otherwise node is internal
             if (Loop == 3) {
-                ConnectionType = DataLoopNode::NodeConnectionType::Inlet;
+                ConnectionType = DataLoopNode::ConnectionType::Inlet;
             } else {
-                ConnectionType = DataLoopNode::NodeConnectionType::Internal;
+                ConnectionType = DataLoopNode::ConnectionType::Internal;
             }
             if (!lAlphaBlanks(Loop + 2)) {
                 GetNodeNums(state,
@@ -1212,9 +1212,9 @@ namespace BranchInputManager {
             state.dataBranchInputManager->Branch(BCount).Component(Comp).OutletNodeName = Alphas(Loop + 3);
             // If last component on branch, then outlet node is outlet from branch, otherwise node is internal
             if (Loop == NumAlphas - 3) {
-                ConnectionType = DataLoopNode::NodeConnectionType::Outlet;
+                ConnectionType = DataLoopNode::ConnectionType::Outlet;
             } else {
-                ConnectionType = DataLoopNode::NodeConnectionType::Internal;
+                ConnectionType = DataLoopNode::ConnectionType::Internal;
             }
             if (!lAlphaBlanks(Loop + 3)) {
                 GetNodeNums(state,

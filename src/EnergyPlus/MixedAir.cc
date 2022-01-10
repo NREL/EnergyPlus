@@ -2151,7 +2151,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
                                                                                CurrentModuleObject,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::NodeConnectionType::Outlet,
+                                                                               DataLoopNode::ConnectionType::Outlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                ObjectIsNotParent);
             //  Set connection type to 'Inlet', because this is not necessarily directly from
@@ -2162,7 +2162,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
                                                                                  CurrentModuleObject,
                                                                                  AlphArray(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  ObjectIsNotParent);
             state.dataMixedAir->OAMixer(OutAirNum).RelNode = GetOnlySingleNode(state,
@@ -2171,7 +2171,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
                                                                                CurrentModuleObject,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::NodeConnectionType::ReliefAir,
+                                                                               DataLoopNode::ConnectionType::ReliefAir,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                ObjectIsNotParent);
             state.dataMixedAir->OAMixer(OutAirNum).RetNode = GetOnlySingleNode(state,
@@ -2180,7 +2180,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
                                                                                CurrentModuleObject,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                ObjectIsNotParent);
             // Check for dupes in the four nodes.
@@ -2304,7 +2304,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
                                                                             CurrentModuleObject,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Sensor,
+                                                                            DataLoopNode::ConnectionType::Sensor,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
     state.dataMixedAir->OAController(OutAirNum).OANode = GetOnlySingleNode(state,
@@ -2313,7 +2313,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
                                                                            CurrentModuleObject,
                                                                            AlphArray(1),
                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                           DataLoopNode::NodeConnectionType::Actuator,
+                                                                           DataLoopNode::ConnectionType::Actuator,
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            ObjectIsNotParent);
     if (!CheckOutAirNodeNumber(state, state.dataMixedAir->OAController(OutAirNum).OANode)) {
@@ -2413,7 +2413,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
                                                                             CurrentModuleObject,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Actuator,
+                                                                            DataLoopNode::ConnectionType::Actuator,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
     state.dataMixedAir->OAController(OutAirNum).RetNode = GetOnlySingleNode(state,
@@ -2422,7 +2422,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
                                                                             CurrentModuleObject,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Sensor,
+                                                                            DataLoopNode::ConnectionType::Sensor,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             ObjectIsNotParent);
     state.dataMixedAir->OAController(OutAirNum).MinOASch = AlphArray(11);

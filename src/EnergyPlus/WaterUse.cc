@@ -442,7 +442,7 @@ namespace WaterUse {
                                                             state.dataIPShortCut->cCurrentModuleObject,
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                            DataLoopNode::ConnectionType::Inlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode =
@@ -452,7 +452,7 @@ namespace WaterUse {
                                                             state.dataIPShortCut->cCurrentModuleObject,
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                            DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 

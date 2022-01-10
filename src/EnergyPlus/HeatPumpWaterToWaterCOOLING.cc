@@ -330,7 +330,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                               "HeatPump:WaterToWater Cooling",
                                                                                               AlphArray(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                              DataLoopNode::NodeConnectionType::Inlet,
+                                                                                              DataLoopNode::ConnectionType::Inlet,
                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                               ObjectIsNotParent);
 
@@ -340,7 +340,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                                "HeatPump:WaterToWater Cooling",
                                                                                                AlphArray(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Outlet,
+                                                                                               DataLoopNode::ConnectionType::Outlet,
                                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
 
@@ -350,7 +350,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                             "HeatPump:WaterToWater Cooling",
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                                             NodeInputManager::CompFluidStream::Secondary,
                                                                                             ObjectIsNotParent);
 
@@ -360,7 +360,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                              "HeatPump:WaterToWater Cooling",
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                                              NodeInputManager::CompFluidStream::Secondary,
                                                                                              ObjectIsNotParent);
 

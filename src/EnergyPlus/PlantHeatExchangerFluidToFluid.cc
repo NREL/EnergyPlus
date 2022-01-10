@@ -245,7 +245,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                     cCurrentModuleObject,
                                                     cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).DemandSideLoop.outletNodeNum =
@@ -255,7 +255,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                     cCurrentModuleObject,
                                                     cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
@@ -272,7 +272,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                     cCurrentModuleObject,
                                                     cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    DataLoopNode::ConnectionType::Inlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SupplySideLoop.outletNodeNum =
@@ -282,7 +282,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                     cCurrentModuleObject,
                                                     cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
@@ -363,7 +363,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                         cCurrentModuleObject,
                                                         cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Sensor,
+                                                        DataLoopNode::ConnectionType::Sensor,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 // check that node actually has setpoints on it
@@ -458,7 +458,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                         cCurrentModuleObject,
                                                         cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Actuator,
+                                                        DataLoopNode::ConnectionType::Actuator,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
             } else {
@@ -477,7 +477,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                                                         cCurrentModuleObject,
                                                         cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::NodeConnectionType::Actuator,
+                                                        DataLoopNode::ConnectionType::Actuator,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
             } else {

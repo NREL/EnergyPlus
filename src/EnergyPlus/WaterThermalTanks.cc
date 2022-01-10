@@ -790,7 +790,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                DataLoopNode::ConnectionType::Inlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsParent);
 
@@ -801,7 +801,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                DataLoopNode::ConnectionType::Outlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsParent);
 
@@ -1280,7 +1280,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                           state.dataIPShortCut->cCurrentModuleObject,
                                                                           HPWH.Name,
                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::NodeConnectionType::Inlet,
+                                                                          DataLoopNode::ConnectionType::Inlet,
                                                                           NodeInputManager::CompFluidStream::Secondary,
                                                                           DataLoopNode::ObjectIsParent);
             HPWH.InletNodeName1 = hpwhAlpha[4];
@@ -1290,7 +1290,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cCurrentModuleObject,
                                                                            HPWH.Name,
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Outlet,
+                                                                           DataLoopNode::ConnectionType::Outlet,
                                                                            NodeInputManager::CompFluidStream::Secondary,
                                                                            DataLoopNode::ObjectIsParent);
             HPWH.OutletNodeName1 = hpwhAlpha[5];
@@ -1436,7 +1436,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                       state.dataIPShortCut->cCurrentModuleObject,
                                                                       HPWH.Name,
                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                      DataLoopNode::NodeConnectionType::Inlet,
+                                                                      DataLoopNode::ConnectionType::Inlet,
                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                       DataLoopNode::ObjectIsParent);
             HPWH.WHUseOutletNode = NodeInputManager::GetOnlySingleNode(state,
@@ -1445,7 +1445,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                        HPWH.Name,
                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                       DataLoopNode::NodeConnectionType::Outlet,
+                                                                       DataLoopNode::ConnectionType::Outlet,
                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                        DataLoopNode::ObjectIsParent);
         }
@@ -1543,7 +1543,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                           state.dataIPShortCut->cCurrentModuleObject,
                                                                           HPWH.Name,
                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::NodeConnectionType::Inlet,
+                                                                          DataLoopNode::ConnectionType::Inlet,
                                                                           NodeInputManager::CompFluidStream::Secondary,
                                                                           DataLoopNode::ObjectIsParent);
             HPWH.OutletNodeName1 = "DUMMY CONDENSER OUTLET " + Coil.Name;
@@ -1553,7 +1553,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cCurrentModuleObject,
                                                                            HPWH.Name,
                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::NodeConnectionType::Outlet,
+                                                                           DataLoopNode::ConnectionType::Outlet,
                                                                            NodeInputManager::CompFluidStream::Secondary,
                                                                            DataLoopNode::ObjectIsParent);
         }
@@ -1795,7 +1795,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cCurrentModuleObject + " inlet air mixer",
                                                                              HPWH.Name,
                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsNotParent);
             } else {
@@ -1820,7 +1820,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                                  state.dataIPShortCut->cCurrentModuleObject + "-OUTLET AIR SPLITTER",
                                                                                  HPWH.Name,
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             } else {
@@ -1845,7 +1845,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cCurrentModuleObject + "-INLET AIR MIXER",
                                                                             HPWH.Name,
                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
 
@@ -1855,7 +1855,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cCurrentModuleObject + "-OUTLET AIR SPLITTER",
                                                                              HPWH.Name,
                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsNotParent);
 
@@ -1865,7 +1865,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                       state.dataIPShortCut->cCurrentModuleObject,
                                                                       HPWH.Name,
                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                      DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                      DataLoopNode::ConnectionType::OutsideAirReference,
                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                       DataLoopNode::ObjectIsParent);
             if (!hpwhAlpha[9 + nAlphaOffset].empty()) {
@@ -1884,7 +1884,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                       state.dataIPShortCut->cCurrentModuleObject,
                                                                       HPWH.Name,
                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                      DataLoopNode::NodeConnectionType::ReliefAir,
+                                                                      DataLoopNode::ConnectionType::ReliefAir,
                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                       DataLoopNode::ObjectIsParent);
 
@@ -1899,7 +1899,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                                 state.dataIPShortCut->cCurrentModuleObject,
                                                                                 HPWH.Name,
                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                                 DataLoopNode::ObjectIsParent);
 
@@ -1909,7 +1909,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                                  HPWH.Name,
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Outlet,
+                                                                                 DataLoopNode::ConnectionType::Outlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsParent);
 
@@ -1921,7 +1921,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                                     HPWH.Name,
                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsParent);
 
@@ -1931,7 +1931,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                                      HPWH.Name,
                                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::NodeConnectionType::Outlet,
+                                                                                     DataLoopNode::ConnectionType::Outlet,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      DataLoopNode::ObjectIsParent);
                 } else { // HPWH is located outdoors
@@ -1941,7 +1941,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cCurrentModuleObject,
                                                                               HPWH.Name,
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                              DataLoopNode::ConnectionType::OutsideAirReference,
                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                               DataLoopNode::ObjectIsParent);
                     if (!hpwhAlphaBlank[9 + nAlphaOffset]) {
@@ -1960,7 +1960,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cCurrentModuleObject,
                                                                               HPWH.Name,
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::ReliefAir,
+                                                                              DataLoopNode::ConnectionType::ReliefAir,
                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                               DataLoopNode::ObjectIsParent);
                 }
@@ -2562,7 +2562,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                 DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             if (!state.dataIPShortCut->cAlphaArgs(11).empty()) {
@@ -2684,7 +2684,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
             Tank.InletNodeName1 = state.dataIPShortCut->cAlphaArgs(14);
@@ -2694,7 +2694,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                     DataLoopNode::NodeConnectionType::Outlet,
+                                                                     DataLoopNode::ConnectionType::Outlet,
                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                      DataLoopNode::ObjectIsNotParent);
             Tank.OutletNodeName1 = state.dataIPShortCut->cAlphaArgs(15);
@@ -2725,7 +2725,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                        DataLoopNode::ObjectIsNotParent);
             Tank.InletNodeName2 = state.dataIPShortCut->cAlphaArgs(16);
@@ -2735,7 +2735,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
                                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                         DataLoopNode::ObjectIsNotParent);
             Tank.OutletNodeName2 = state.dataIPShortCut->cAlphaArgs(17);
@@ -3056,7 +3056,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             if (!state.dataIPShortCut->cAlphaArgs(13).empty()) {
@@ -3240,7 +3240,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
             Tank.InletNodeName1 = state.dataIPShortCut->cAlphaArgs(16);
@@ -3250,7 +3250,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                     DataLoopNode::NodeConnectionType::Outlet,
+                                                                     DataLoopNode::ConnectionType::Outlet,
                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                      DataLoopNode::ObjectIsNotParent);
             Tank.OutletNodeName1 = state.dataIPShortCut->cAlphaArgs(17);
@@ -3281,7 +3281,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                        DataLoopNode::ObjectIsNotParent);
             Tank.InletNodeName2 = state.dataIPShortCut->cAlphaArgs(18);
@@ -3291,7 +3291,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                         DataLoopNode::ObjectIsNotParent);
             Tank.OutletNodeName2 = state.dataIPShortCut->cAlphaArgs(19);
@@ -3483,7 +3483,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                 DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
@@ -3600,7 +3600,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
             Tank.InletNodeName1 = state.dataIPShortCut->cAlphaArgs(7);
@@ -3610,7 +3610,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                     DataLoopNode::NodeConnectionType::Outlet,
+                                                                     DataLoopNode::ConnectionType::Outlet,
                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                      DataLoopNode::ObjectIsNotParent);
             Tank.OutletNodeName1 = state.dataIPShortCut->cAlphaArgs(8);
@@ -3623,7 +3623,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                        DataLoopNode::ObjectIsNotParent);
             Tank.InletNodeName2 = state.dataIPShortCut->cAlphaArgs(10);
@@ -3633,7 +3633,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
                                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                         DataLoopNode::ObjectIsNotParent);
             Tank.OutletNodeName2 = state.dataIPShortCut->cAlphaArgs(11);
@@ -3809,7 +3809,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                                                                                  state.dataIPShortCut->cCurrentModuleObject,
                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                  DataLoopNode::ObjectIsNotParent);
             if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
@@ -3939,7 +3939,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                                                                     state.dataIPShortCut->cCurrentModuleObject,
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
             Tank.InletNodeName1 = state.dataIPShortCut->cAlphaArgs(8);
@@ -3949,7 +3949,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cCurrentModuleObject,
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                     DataLoopNode::NodeConnectionType::Outlet,
+                                                                     DataLoopNode::ConnectionType::Outlet,
                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                      DataLoopNode::ObjectIsNotParent);
             Tank.OutletNodeName1 = state.dataIPShortCut->cAlphaArgs(9);
@@ -3962,7 +3962,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                                                                        state.dataIPShortCut->cCurrentModuleObject,
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                        DataLoopNode::ObjectIsNotParent);
             Tank.InletNodeName2 = state.dataIPShortCut->cAlphaArgs(11);
@@ -3972,7 +3972,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
                                                                         state.dataIPShortCut->cCurrentModuleObject,
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                         DataLoopNode::ObjectIsNotParent);
             Tank.OutletNodeName2 = state.dataIPShortCut->cAlphaArgs(12);
@@ -4295,7 +4295,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                                                                        Tank.Type,
                                                                                        Tank.Name,
                                                                                        DataLoopNode::NodeFluidType::Water,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Secondary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                             Tank.InletNodeName2 = HPWH.OutletNodeName1;
@@ -4305,7 +4305,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                                                                                         Tank.Type,
                                                                                         Tank.Name,
                                                                                         DataLoopNode::NodeFluidType::Water,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                                         NodeInputManager::CompFluidStream::Secondary,
                                                                                         DataLoopNode::ObjectIsNotParent);
                             Tank.OutletNodeName2 = HPWH.InletNodeName1;

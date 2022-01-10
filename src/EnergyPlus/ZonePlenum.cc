@@ -345,7 +345,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                              CurrentModuleObject,
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::ZoneNode,
+                                                                                             DataLoopNode::ConnectionType::ZoneNode,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent);
         // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
@@ -358,7 +358,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                             CurrentModuleObject,
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsNotParent);
 
@@ -372,7 +372,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                     DataLoopNode::NodeFluidType::Air,
                     "AirLoopHVAC:ReturnPlenum",
                     state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName,
-                    DataLoopNode::NodeConnectionType::InducedAir,
+                    DataLoopNode::ConnectionType::InducedAir,
                     NodeInputManager::CompFluidStream::Primary,
                     ObjectIsNotParent,
                     _,
@@ -475,7 +475,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                                         CurrentModuleObject,
                                                                                                         AlphArray(1),
                                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                                         ObjectIsNotParent);
         }
@@ -573,7 +573,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                              CurrentModuleObject,
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::ZoneNode,
+                                                                                             DataLoopNode::ConnectionType::ZoneNode,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent);
         // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
@@ -586,7 +586,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                            CurrentModuleObject,
                                                                                            AlphArray(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsNotParent);
 
@@ -637,7 +637,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                                                          CurrentModuleObject,
                                                                                                          AlphArray(1),
                                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                                          ObjectIsNotParent);
         }

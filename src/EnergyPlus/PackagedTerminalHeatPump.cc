@@ -633,7 +633,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         CurrentModuleObject,
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsParent);
 
@@ -643,7 +643,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          CurrentModuleObject,
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsParent);
 
@@ -1574,7 +1574,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Actuator,
+                                                DataLoopNode::ConnectionType::Actuator,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
@@ -1585,7 +1585,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
-                                                DataLoopNode::NodeConnectionType::Actuator,
+                                                DataLoopNode::ConnectionType::Actuator,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             }
@@ -1658,7 +1658,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         CurrentModuleObject,
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsParent);
 
@@ -1668,7 +1668,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          CurrentModuleObject,
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsParent);
 
@@ -2486,7 +2486,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Actuator,
+                                                DataLoopNode::ConnectionType::Actuator,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
@@ -2497,7 +2497,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
-                                                DataLoopNode::NodeConnectionType::Actuator,
+                                                DataLoopNode::ConnectionType::Actuator,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             }
@@ -2576,7 +2576,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                         CurrentModuleObject,
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                         ObjectIsParent);
 
@@ -2586,7 +2586,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                          CurrentModuleObject,
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                          ObjectIsParent);
 
@@ -2964,7 +2964,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                                                    CurrentModuleObject,
                                                                                    Alphas(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                   DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                    ObjectIsNotParent);
             // need better verification.
@@ -3311,7 +3311,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Actuator,
+                                                DataLoopNode::ConnectionType::Actuator,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             } else if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
@@ -3322,7 +3322,7 @@ void GetPTUnit(EnergyPlusData &state)
                                                 state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                 state.dataPTHP->PTUnit(PTUnitNum).Name,
                                                 DataLoopNode::NodeFluidType::Steam,
-                                                DataLoopNode::NodeConnectionType::Actuator,
+                                                DataLoopNode::ConnectionType::Actuator,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 ObjectIsParent);
             }

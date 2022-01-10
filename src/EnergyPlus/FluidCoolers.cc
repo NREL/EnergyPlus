@@ -229,7 +229,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                                                 cCurrentModuleObject,
                                                 AlphArray(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                DataLoopNode::ConnectionType::Inlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum =
@@ -239,7 +239,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                                                 cCurrentModuleObject,
                                                 AlphArray(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                DataLoopNode::ConnectionType::Outlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -275,7 +275,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                                                     cCurrentModuleObject,
                                                     state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                    DataLoopNode::ConnectionType::OutsideAirReference,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum)) {
@@ -327,7 +327,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                                                 cCurrentModuleObject,
                                                 AlphArray(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                DataLoopNode::ConnectionType::Inlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum =
@@ -337,7 +337,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                                                 cCurrentModuleObject,
                                                 AlphArray(1),
                                                 DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                DataLoopNode::ConnectionType::Outlet,
                                                 NodeInputManager::CompFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
@@ -394,7 +394,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                                                     cCurrentModuleObject,
                                                     state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                    DataLoopNode::ConnectionType::OutsideAirReference,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum)) {

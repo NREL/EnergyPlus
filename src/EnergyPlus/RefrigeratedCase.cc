@@ -2667,7 +2667,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                                                    DataLoopNode::ConnectionType::Inlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 RefrigRack(RackNum).OutletNode = NodeInputManager::GetOnlySingleNode(state,
@@ -2676,7 +2676,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                      CurrentModuleObject,
                                                                                      Alphas(1),
                                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                                     DataLoopNode::NodeConnectionType::Outlet,
+                                                                                     DataLoopNode::ConnectionType::Outlet,
                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                      DataLoopNode::ObjectIsNotParent);
                 // Check node connections
@@ -2822,7 +2822,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                             CurrentModuleObject,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                            DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             DataLoopNode::ObjectIsParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, RefrigRack(RackNum).OutsideAirNodeNum)) {
@@ -3130,7 +3130,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                 CurrentModuleObject,
                                                                 Alphas(1),
                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                DataLoopNode::ConnectionType::OutsideAirReference,
                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                 DataLoopNode::ObjectIsParent);
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
@@ -3305,7 +3305,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                              CurrentModuleObject,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                             DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              DataLoopNode::ObjectIsParent);
                     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
@@ -3474,7 +3474,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                    CurrentModuleObject,
                                                                                    Alphas(1),
                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 Condenser(CondNum).OutletNode = NodeInputManager::GetOnlySingleNode(state,
@@ -3483,7 +3483,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 // Check node connections
@@ -3814,7 +3814,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                                CurrentModuleObject,
                                                                                                Alphas(1),
                                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                               DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                                DataLoopNode::ObjectIsParent);
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(state, GasCooler(GCNum).InletAirNodeNum)) {

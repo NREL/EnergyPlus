@@ -151,7 +151,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                              this->moduleName,
                                                              this->name,
                                                              DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::NodeConnectionType::Inlet,
+                                                             DataLoopNode::ConnectionType::Inlet,
                                                              NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
@@ -162,7 +162,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                               this->moduleName,
                                                               this->name,
                                                               DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                              DataLoopNode::ConnectionType::Outlet,
                                                               NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
 
@@ -289,7 +289,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                              this->moduleName,
                                                              objName,
                                                              DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::NodeConnectionType::Inlet,
+                                                             DataLoopNode::ConnectionType::Inlet,
                                                              NodeInputManager::CompFluidStream::Primary,
                                                              ObjectIsNotParent);
 
@@ -301,7 +301,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                               this->moduleName,
                                                               objName,
                                                               DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                              DataLoopNode::ConnectionType::Outlet,
                                                               NodeInputManager::CompFluidStream::Primary,
                                                               ObjectIsNotParent);
     this->available = true;

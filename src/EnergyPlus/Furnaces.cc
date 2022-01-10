@@ -1063,7 +1063,7 @@ namespace Furnaces {
                                                                                             CurrentModuleObject,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
@@ -1072,7 +1072,7 @@ namespace Furnaces {
                                                                                              CurrentModuleObject,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
@@ -1683,7 +1683,7 @@ namespace Furnaces {
                                                                                             CurrentModuleObject,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
@@ -1692,7 +1692,7 @@ namespace Furnaces {
                                                                                              CurrentModuleObject,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
@@ -3047,7 +3047,7 @@ namespace Furnaces {
                                                                                             CurrentModuleObject,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
 
@@ -3057,7 +3057,7 @@ namespace Furnaces {
                                                                                              CurrentModuleObject,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
@@ -4061,7 +4061,7 @@ namespace Furnaces {
                                                                                             CurrentModuleObject,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                            DataLoopNode::ConnectionType::Inlet,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
 
@@ -4071,7 +4071,7 @@ namespace Furnaces {
                                                                                              CurrentModuleObject,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsParent);
 
@@ -4521,7 +4521,7 @@ namespace Furnaces {
                                                                                              CurrentModuleObject,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                             DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                              NodeInputManager::CompFluidStream::Primary,
                                                                                              ObjectIsNotParent);
                 // need better verification.

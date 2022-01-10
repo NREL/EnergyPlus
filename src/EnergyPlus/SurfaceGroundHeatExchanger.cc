@@ -255,7 +255,7 @@ namespace SurfaceGroundHeatExchanger {
                                                                                                      cCurrentModuleObject,
                                                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                                                     DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                     DataLoopNode::ConnectionType::Inlet,
                                                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                                                      ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum == 0) {
@@ -272,7 +272,7 @@ namespace SurfaceGroundHeatExchanger {
                                                                                                       cCurrentModuleObject,
                                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                                       DataLoopNode::NodeFluidType::Water,
-                                                                                                      DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                      DataLoopNode::ConnectionType::Outlet,
                                                                                                       NodeInputManager::CompFluidStream::Primary,
                                                                                                       ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum == 0) {

@@ -147,7 +147,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                    input_data.name,
                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsNotParent);
     this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
@@ -156,7 +156,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                     state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                     input_data.name,
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     DataLoopNode::ObjectIsNotParent);
 
@@ -166,7 +166,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                    state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                    input_data.name,
                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                                   DataLoopNode::ConnectionType::Inlet,
                                                                    NodeInputManager::CompFluidStream::Secondary,
                                                                    DataLoopNode::ObjectIsNotParent);
 
@@ -186,7 +186,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
                                                                     state.dataCoilCooingDX->coilCoolingDXObjectName,
                                                                     input_data.name,
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                     NodeInputManager::CompFluidStream::Secondary,
                                                                     DataLoopNode::ObjectIsNotParent);
 

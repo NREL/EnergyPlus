@@ -321,7 +321,7 @@ namespace UnitHeater {
                                                                                        CurrentModuleObject,
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsParent);
 
@@ -331,7 +331,7 @@ namespace UnitHeater {
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                                                        DataLoopNode::ConnectionType::Outlet,
                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                         ObjectIsParent);
 

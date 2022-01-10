@@ -563,7 +563,7 @@ namespace OutdoorAirUnit {
                                                                     CurrentModuleObject,
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                     ObjectIsParent);
             if (!lAlphaBlanks(14)) {
@@ -573,7 +573,7 @@ namespace OutdoorAirUnit {
                                                                        CurrentModuleObject,
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                                       DataLoopNode::ConnectionType::Inlet,
                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                        ObjectIsParent);
             } else {
@@ -591,7 +591,7 @@ namespace OutdoorAirUnit {
                                                                      CurrentModuleObject,
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     DataLoopNode::NodeConnectionType::Internal,
+                                                                     DataLoopNode::ConnectionType::Internal,
                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
 
@@ -602,7 +602,7 @@ namespace OutdoorAirUnit {
                                                                      CurrentModuleObject,
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
-                                                                     DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                     DataLoopNode::ConnectionType::OutsideAirReference,
                                                                      NodeInputManager::CompFluidStream::Primary,
                                                                      ObjectIsNotParent);
 

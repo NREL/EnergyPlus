@@ -325,7 +325,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                                                   cCMO_CoolingPanel_Simple,
                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                   DataLoopNode::NodeFluidType::Water,
-                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                  DataLoopNode::ConnectionType::Inlet,
                                                   NodeInputManager::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
@@ -336,7 +336,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                                                    cCMO_CoolingPanel_Simple,
                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::NodeConnectionType::Outlet,
+                                                   DataLoopNode::ConnectionType::Outlet,
                                                    NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state,

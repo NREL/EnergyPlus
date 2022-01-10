@@ -452,7 +452,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                        CurrentModuleObject,
                                                        Alpha(1),
                                                        this_loop.FluidType,
-                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                       DataLoopNode::ConnectionType::Inlet,
                                                        NodeInputManager::CompFluidStream::Primary,
                                                        ObjectIsParent);
         this_supply_side.NodeNumOut = GetOnlySingleNode(state,
@@ -461,7 +461,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                         CurrentModuleObject,
                                                         Alpha(1),
                                                         this_loop.FluidType,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         ObjectIsParent);
         this_demand_side.NodeNumIn = GetOnlySingleNode(state,
@@ -470,7 +470,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                        CurrentModuleObject,
                                                        Alpha(1),
                                                        this_loop.FluidType,
-                                                       DataLoopNode::NodeConnectionType::Inlet,
+                                                       DataLoopNode::ConnectionType::Inlet,
                                                        NodeInputManager::CompFluidStream::Primary,
                                                        ObjectIsParent);
         this_demand_side.NodeNumOut = GetOnlySingleNode(state,
@@ -479,7 +479,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                         CurrentModuleObject,
                                                         Alpha(1),
                                                         this_loop.FluidType,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         ObjectIsParent);
 
@@ -493,7 +493,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                           CurrentModuleObject,
                                                           Alpha(1),
                                                           this_loop.FluidType,
-                                                          DataLoopNode::NodeConnectionType::Sensor,
+                                                          DataLoopNode::ConnectionType::Sensor,
                                                           NodeInputManager::CompFluidStream::Primary,
                                                           ObjectIsParent);
 

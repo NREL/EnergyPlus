@@ -194,7 +194,7 @@ namespace FourPipeBeam {
                                                    cCurrentModuleObject,
                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Air,
-                                                   DataLoopNode::NodeConnectionType::Inlet,
+                                                   DataLoopNode::ConnectionType::Inlet,
                                                    NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent,
                                                    state.dataIPShortCut->cAlphaFieldNames(5));
@@ -204,7 +204,7 @@ namespace FourPipeBeam {
                                                     cCurrentModuleObject,
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    DataLoopNode::ConnectionType::Outlet,
                                                     NodeInputManager::CompFluidStream::Primary,
                                                     ObjectIsNotParent,
                                                     state.dataIPShortCut->cAlphaFieldNames(6));
@@ -232,7 +232,7 @@ namespace FourPipeBeam {
                                                       cCurrentModuleObject,
                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
-                                                      DataLoopNode::NodeConnectionType::Inlet,
+                                                      DataLoopNode::ConnectionType::Inlet,
                                                       NodeInputManager::CompFluidStream::Secondary,
                                                       ObjectIsParent,
                                                       state.dataIPShortCut->cAlphaFieldNames(7));
@@ -242,7 +242,7 @@ namespace FourPipeBeam {
                                                        cCurrentModuleObject,
                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
-                                                       DataLoopNode::NodeConnectionType::Outlet,
+                                                       DataLoopNode::ConnectionType::Outlet,
                                                        NodeInputManager::CompFluidStream::Secondary,
                                                        ObjectIsParent,
                                                        state.dataIPShortCut->cAlphaFieldNames(8));
@@ -271,7 +271,7 @@ namespace FourPipeBeam {
                                                       cCurrentModuleObject,
                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
-                                                      DataLoopNode::NodeConnectionType::Inlet,
+                                                      DataLoopNode::ConnectionType::Inlet,
                                                       NodeInputManager::CompFluidStream::Secondary,
                                                       ObjectIsParent,
                                                       state.dataIPShortCut->cAlphaFieldNames(9));
@@ -281,7 +281,7 @@ namespace FourPipeBeam {
                                                        cCurrentModuleObject,
                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
-                                                       DataLoopNode::NodeConnectionType::Outlet,
+                                                       DataLoopNode::ConnectionType::Outlet,
                                                        NodeInputManager::CompFluidStream::Secondary,
                                                        ObjectIsParent,
                                                        state.dataIPShortCut->cAlphaFieldNames(10));

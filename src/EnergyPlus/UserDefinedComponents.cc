@@ -622,7 +622,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                                DataLoopNode::ConnectionType::Inlet,
                                                                 static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop),
                                                                 DataLoopNode::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).OutletNodeNum =
@@ -632,7 +632,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                DataLoopNode::ConnectionType::Outlet,
                                                                 static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop),
                                                                 DataLoopNode::ObjectIsNotParent);
 
@@ -807,7 +807,7 @@ namespace UserDefinedComponents {
                                                             cCurrentModuleObject,
                                                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                            DataLoopNode::ConnectionType::OutsideAirReference,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     // model input related internal variables
@@ -846,7 +846,7 @@ namespace UserDefinedComponents {
                                                             cCurrentModuleObject,
                                                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::ReliefAir,
+                                                            DataLoopNode::ConnectionType::ReliefAir,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     // outlet air node results
@@ -1084,7 +1084,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                                DataLoopNode::ConnectionType::Inlet,
                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                 DataLoopNode::ObjectIsNotParent);
 
@@ -1123,7 +1123,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                DataLoopNode::ConnectionType::Outlet,
                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                 DataLoopNode::ObjectIsNotParent);
                         SetupEMSActuator(state,
@@ -1175,7 +1175,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                                DataLoopNode::ConnectionType::Inlet,
                                                                 NodeInputManager::CompFluidStream::Secondary,
                                                                 DataLoopNode::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.OutletNodeNum =
@@ -1185,7 +1185,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                DataLoopNode::ConnectionType::Outlet,
                                                                 NodeInputManager::CompFluidStream::Secondary,
                                                                 DataLoopNode::ObjectIsNotParent);
 
@@ -1472,7 +1472,7 @@ namespace UserDefinedComponents {
                                                         cCurrentModuleObject,
                                                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 // model input related internal variables
@@ -1532,7 +1532,7 @@ namespace UserDefinedComponents {
                                                         cCurrentModuleObject,
                                                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 SetupEMSActuator(state,
@@ -1565,7 +1565,7 @@ namespace UserDefinedComponents {
                                                             cCurrentModuleObject,
                                                             state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                            DataLoopNode::ConnectionType::Inlet,
                                                             NodeInputManager::CompFluidStream::Secondary,
                                                             DataLoopNode::ObjectIsNotParent);
                     // model input related internal variables
@@ -1607,7 +1607,7 @@ namespace UserDefinedComponents {
                                                             cCurrentModuleObject,
                                                             state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                            DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Secondary,
                                                             DataLoopNode::ObjectIsNotParent);
                     SetupEMSActuator(state,
@@ -1651,7 +1651,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                                DataLoopNode::ConnectionType::Inlet,
                                                                 static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).OutletNodeNum =
@@ -1661,7 +1661,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                DataLoopNode::ConnectionType::Outlet,
                                                                 static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent);
                         BranchNodeConnections::TestCompSet(
@@ -1920,7 +1920,7 @@ namespace UserDefinedComponents {
                                                         cCurrentModuleObject,
                                                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent,
                                                         cAlphaFieldNames(4));
@@ -1981,7 +1981,7 @@ namespace UserDefinedComponents {
                                                         cCurrentModuleObject,
                                                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                                         DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        DataLoopNode::ConnectionType::Outlet,
                                                         NodeInputManager::CompFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent,
                                                         cAlphaFieldNames(5));
@@ -2065,7 +2065,7 @@ namespace UserDefinedComponents {
                                                             cCurrentModuleObject,
                                                             state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                            DataLoopNode::ConnectionType::Inlet,
                                                             NodeInputManager::CompFluidStream::Secondary,
                                                             DataLoopNode::ObjectIsNotParent,
                                                             cAlphaFieldNames(6));
@@ -2108,7 +2108,7 @@ namespace UserDefinedComponents {
                                                             cCurrentModuleObject,
                                                             state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                            DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Secondary,
                                                             DataLoopNode::ObjectIsNotParent,
                                                             cAlphaFieldNames(7));
@@ -2153,7 +2153,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType::Inlet,
+                                                                DataLoopNode::ConnectionType::Inlet,
                                                                 static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent,
                                                                 cAlphaFieldNames(aArgCount));
@@ -2164,7 +2164,7 @@ namespace UserDefinedComponents {
                                                                 cCurrentModuleObject,
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                DataLoopNode::ConnectionType::Outlet,
                                                                 static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent,
                                                                 cAlphaFieldNames(aArgCount + 1));

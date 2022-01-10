@@ -619,7 +619,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "FAN",
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::NodeConnectionType::Internal,
+                                            DataLoopNode::ConnectionType::Internal,
                                             NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
@@ -630,7 +630,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "OA MIXER",
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::NodeConnectionType::Inlet,
+                                            DataLoopNode::ConnectionType::Inlet,
                                             NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
@@ -640,7 +640,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                                                                            "OA MIXER",
                                                                                                            "SZRHtest",
                                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                                           DataLoopNode::NodeConnectionType::Internal,
+                                                                                                           DataLoopNode::ConnectionType::Internal,
                                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                                            DataLoopNode::ObjectIsNotParent,
                                                                                                            "AHU node");
@@ -657,7 +657,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "OAsysinlet",
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::NodeConnectionType::Inlet,
+                                            DataLoopNode::ConnectionType::Inlet,
                                             NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
@@ -672,7 +672,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "FAN",
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::NodeConnectionType::Internal,
+                                            DataLoopNode::ConnectionType::Internal,
                                             NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
@@ -684,7 +684,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                             "FAN",
                                             "SZRHtest",
                                             DataLoopNode::NodeFluidType::Air,
-                                            DataLoopNode::NodeConnectionType::Internal,
+                                            DataLoopNode::ConnectionType::Internal,
                                             NodeInputManager::CompFluidStream::Primary,
                                             DataLoopNode::ObjectIsNotParent,
                                             "AHU node");
@@ -702,7 +702,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                           "Zone",
                                                           "SZRHspmTest",
                                                           DataLoopNode::NodeFluidType::Air,
-                                                          DataLoopNode::NodeConnectionType::ZoneNode,
+                                                          DataLoopNode::ConnectionType::ZoneNode,
                                                           NodeInputManager::CompFluidStream::Primary,
                                                           DataLoopNode::ObjectIsNotParent,
                                                           "Test zone node");
@@ -713,7 +713,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
                                                             "Zone",
                                                             "SZRHspmTest",
                                                             DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::NodeConnectionType::ZoneInlet,
+                                                            DataLoopNode::ConnectionType::ZoneInlet,
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent,
                                                             "Test zone inlet node");

@@ -92,7 +92,7 @@ void GetNodeNums(EnergyPlusData &state,
                  DataLoopNode::NodeFluidType nodeFluidType,                 // Fluidtype for checking/setting node FluidType
                  std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
                  std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
-                 DataLoopNode::NodeConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
+                 DataLoopNode::ConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
                  CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                  bool const ObjectIsParent,                                 // True/False
                  Optional_bool_const IncrementFluidStream,                  // True/False
@@ -118,7 +118,7 @@ void GetNodeNums(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ThisOne; // Indicator for this Name
-    DataLoopNode::NodeConnectionType ConnectionType;
+    DataLoopNode::ConnectionType ConnectionType;
     int Loop;
     NodeInputManager::CompFluidStream FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
 
@@ -178,9 +178,9 @@ void GetNodeNums(EnergyPlusData &state,
     for (Loop = 1; Loop <= NumNodes; ++Loop) {
 
         switch (nodeConnectionType) {
-        case DataLoopNode::NodeConnectionType::Num:
-        case DataLoopNode::NodeConnectionType::Invalid:
-            ConnectionType = NodeConnectionType::Invalid;
+        case DataLoopNode::ConnectionType::Num:
+        case DataLoopNode::ConnectionType::Invalid:
+            ConnectionType = ConnectionType::Invalid;
             break;
         default:
             ConnectionType = nodeConnectionType;
@@ -755,7 +755,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
                       std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
                       std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                       DataLoopNode::NodeFluidType const nodeFluidType,           // Fluidtype for checking/setting node FluidType
-                      DataLoopNode::NodeConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
+                      DataLoopNode::ConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
                       CompFluidStream const NodeFluidStream,                     // Which Fluid Stream
                       bool const ObjectIsParent,                                 // True/False
                       Optional_string_const InputFieldName                       // Input Field Name
@@ -821,8 +821,8 @@ int GetOnlySingleNode(EnergyPlusData &state,
     }
     if (NumNodes > 0) {
         auto nodeConnType(static_cast<int>(nodeConnectionType));
-        if (nodeConnType >= 1 && nodeConnType < static_cast<int>(NodeConnectionType::Num)) {
-            ConnectionType = DataLoopNode::NodeConnectionTypeNames[nodeConnType];
+        if (nodeConnType >= 1 && nodeConnType < static_cast<int>(ConnectionType::Num)) {
+            ConnectionType = DataLoopNode::ConnectionTypeNames[nodeConnType];
         } else {
             ConnectionType = format("{}-unknown", nodeConnectionType);
         }

@@ -2306,7 +2306,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                cCurrentModuleObject,
                                                                                                state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                                                                               DataLoopNode::ConnectionType::OutsideAirReference,
                                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
                     if (!CheckOutAirNodeNumber(state, state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum)) {
@@ -2323,7 +2323,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                cCurrentModuleObject,
                                                                                                state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                                NodeInputManager::CompFluidStream::Secondary,
                                                                                                ObjectIsNotParent);
                 } else {
@@ -2338,7 +2338,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                              cCurrentModuleObject,
                                                                                              state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                                              DataLoopNode::NodeFluidType::Water,
-                                                                                             DataLoopNode::NodeConnectionType::Outlet,
+                                                                                             DataLoopNode::ConnectionType::Outlet,
                                                                                              NodeInputManager::CompFluidStream::Secondary,
                                                                                              ObjectIsNotParent);
             TestCompSet(
@@ -3520,7 +3520,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                         cCurrentModuleObject,
                                                                                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                                         NodeInputManager::CompFluidStream::Primary,
                                                                                         ObjectIsParent);
 
@@ -3530,7 +3530,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                          cCurrentModuleObject,
                                                                                          state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                                         DataLoopNode::ConnectionType::Outlet,
                                                                                          NodeInputManager::CompFluidStream::Primary,
                                                                                          ObjectIsParent);
 

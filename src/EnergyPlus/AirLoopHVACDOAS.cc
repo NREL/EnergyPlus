@@ -166,7 +166,7 @@ namespace AirLoopHVACDOAS {
                                                                               cCurrentModuleObject,
                                                                               thisObjectName,
                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                                              DataLoopNode::ConnectionType::Outlet,
                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                               DataLoopNode::ObjectIsParent);
 

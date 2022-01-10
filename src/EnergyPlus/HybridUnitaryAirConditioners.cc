@@ -587,7 +587,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                   cCurrentModuleObject,
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::NodeConnectionType::Inlet,
+                                  DataLoopNode::ConnectionType::Inlet,
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode =
@@ -597,7 +597,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                   cCurrentModuleObject,
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::NodeConnectionType::OutsideAir,
+                                  DataLoopNode::ConnectionType::OutsideAir,
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode =
@@ -607,7 +607,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                   cCurrentModuleObject,
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::NodeConnectionType::Outlet,
+                                  DataLoopNode::ConnectionType::Outlet,
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode =
@@ -617,7 +617,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                   cCurrentModuleObject,
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::NodeConnectionType::ReliefAir,
+                                  DataLoopNode::ConnectionType::ReliefAir,
                                   NodeInputManager::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");

@@ -981,7 +981,7 @@ namespace SystemAvailabilityManager {
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::Blank,
-                                      DataLoopNode::NodeConnectionType::Sensor,
+                                      DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
@@ -996,7 +996,7 @@ namespace SystemAvailabilityManager {
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::Blank,
-                                      DataLoopNode::NodeConnectionType::Sensor,
+                                      DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
@@ -1064,7 +1064,7 @@ namespace SystemAvailabilityManager {
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::Blank,
-                                      DataLoopNode::NodeConnectionType::Sensor,
+                                      DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
@@ -1119,7 +1119,7 @@ namespace SystemAvailabilityManager {
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::Blank,
-                                      DataLoopNode::NodeConnectionType::Sensor,
+                                      DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
@@ -1174,7 +1174,7 @@ namespace SystemAvailabilityManager {
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::Blank,
-                                      DataLoopNode::NodeConnectionType::Sensor,
+                                      DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
@@ -1240,7 +1240,7 @@ namespace SystemAvailabilityManager {
                                       cCurrentModuleObject,
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::Blank,
-                                      DataLoopNode::NodeConnectionType::Sensor,
+                                      DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,

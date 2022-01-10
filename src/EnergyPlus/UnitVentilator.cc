@@ -445,7 +445,7 @@ namespace UnitVentilator {
                                                                                            CurrentModuleObject,
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                           DataLoopNode::NodeConnectionType::Inlet,
+                                                                                           DataLoopNode::ConnectionType::Inlet,
                                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                                            ObjectIsParent);
             state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode = GetOnlySingleNode(state,
@@ -454,7 +454,7 @@ namespace UnitVentilator {
                                                                                             CurrentModuleObject,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::NodeConnectionType::Outlet,
+                                                                                            DataLoopNode::ConnectionType::Outlet,
                                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                                             ObjectIsParent);
 
@@ -488,7 +488,7 @@ namespace UnitVentilator {
                                                                                                CurrentModuleObject + "-OA MIXER",
                                                                                                Alphas(1),
                                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                                NodeInputManager::CompFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             }
@@ -640,7 +640,7 @@ namespace UnitVentilator {
                                       CurrentModuleObject + "-OA MIXER",
                                       Alphas(1),
                                       DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::NodeConnectionType::OutsideAirReference,
+                                      DataLoopNode::ConnectionType::OutsideAirReference,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 if (!lAlphaBlanks(8)) {
@@ -656,7 +656,7 @@ namespace UnitVentilator {
                                                                                                    CurrentModuleObject + "-OA MIXER",
                                                                                                    Alphas(1),
                                                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                                                   DataLoopNode::NodeConnectionType::ReliefAir,
+                                                                                                   DataLoopNode::ConnectionType::ReliefAir,
                                                                                                    NodeInputManager::CompFluidStream::Primary,
                                                                                                    ObjectIsNotParent);
 
@@ -666,7 +666,7 @@ namespace UnitVentilator {
                                                                                                     CurrentModuleObject + "-OA MIXER",
                                                                                                     Alphas(1),
                                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                    DataLoopNode::ConnectionType::Outlet,
                                                                                                     NodeInputManager::CompFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
             } else {

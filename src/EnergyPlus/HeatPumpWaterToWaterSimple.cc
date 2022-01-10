@@ -350,7 +350,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                                                  HPEqFitCoolingUC,
                                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
-                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                  ObjectIsNotParent);
 
@@ -360,7 +360,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                                                   HPEqFitCoolingUC,
                                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                                   DataLoopNode::NodeFluidType::Water,
-                                                                                                  DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                  DataLoopNode::ConnectionType::Outlet,
                                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                                   ObjectIsNotParent);
 
@@ -370,7 +370,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                                                HPEqFitCoolingUC,
                                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                                NodeInputManager::CompFluidStream::Secondary,
                                                                                                ObjectIsNotParent);
 
@@ -380,7 +380,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                                                 HPEqFitCoolingUC,
                                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                                 NodeInputManager::CompFluidStream::Secondary,
                                                                                                 ObjectIsNotParent);
 
@@ -522,7 +522,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                                                  HPEqFitHeatingUC,
                                                                                                  state.dataIPShortCut->cAlphaArgs(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
-                                                                                                 DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                 DataLoopNode::ConnectionType::Inlet,
                                                                                                  NodeInputManager::CompFluidStream::Primary,
                                                                                                  ObjectIsNotParent);
 
@@ -532,7 +532,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                                                   HPEqFitHeatingUC,
                                                                                                   state.dataIPShortCut->cAlphaArgs(1),
                                                                                                   DataLoopNode::NodeFluidType::Water,
-                                                                                                  DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                  DataLoopNode::ConnectionType::Outlet,
                                                                                                   NodeInputManager::CompFluidStream::Primary,
                                                                                                   ObjectIsNotParent);
 
@@ -542,7 +542,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                                                HPEqFitHeatingUC,
                                                                                                state.dataIPShortCut->cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::NodeConnectionType::Inlet,
+                                                                                               DataLoopNode::ConnectionType::Inlet,
                                                                                                NodeInputManager::CompFluidStream::Secondary,
                                                                                                ObjectIsNotParent);
 
@@ -552,7 +552,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                                                 HPEqFitHeatingUC,
                                                                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                                DataLoopNode::NodeConnectionType::Outlet,
+                                                                                                DataLoopNode::ConnectionType::Outlet,
                                                                                                 NodeInputManager::CompFluidStream::Secondary,
                                                                                                 ObjectIsNotParent);
 

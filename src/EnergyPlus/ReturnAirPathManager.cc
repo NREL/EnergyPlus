@@ -157,7 +157,7 @@ namespace ReturnAirPathManager {
                                                                                               cCurrentModuleObject,
                                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::NodeConnectionType::Outlet,
+                                                                                              DataLoopNode::ConnectionType::Outlet,
                                                                                               NodeInputManager::CompFluidStream::Primary,
                                                                                               ObjectIsParent);
 
