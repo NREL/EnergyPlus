@@ -129,6 +129,7 @@ SetpointManager:SystemNodeReset,
 \end{lstlisting}
 
 ## Input Description ##
+A new `SetpointManager:SystemNodeReset` object will be added as follows:
 
 ```
 SetpointManager:SystemNodeReset,
@@ -223,8 +224,10 @@ This new feature revises modules: SetpointManager.
 A new object called SetpointManager:SystemNodeReset, as shown in the Input Description Section, will be added to the idd file.
 
 ## Setpoint Manager ##
-This code change adds a new structure called `DefineSystemNdResetSetPointManager` to the heading file (`SetPointManager.hh`).
+This code change adds a new structure called `DefineSystemNdResetSetPointManager` to the heading file (`SetPointManager.hh`) and the other changes are made to `SetPointManager.cc`.
 
-Then, the inputs will be grabbed through the `GetSetPointManagerInputData` function, similar with other SetpointManager objects. The following are the cases that the error gets produced: (1) when the invalid control variable is inputted, (2) the maximum temperature or humidity ratio setpoint is higher than the minimum temperature or humidity ratio setpoint.
+The inputs will be grabbed through the `GetSetPointManagerInputData` function, similar with other SetpointManager objects. The following are the cases that the error gets produced: (1) when the invalid control variable is inputted, (2) the maximum temperature or humidity ratio setpoint is higher than the minimum temperature or humidity ratio setpoint.
 
 The new function called `DefineSystemNdResetSetPointManager::calculate` will determine which input parameters will be used for setpoint calculation depending on the selected control variable. In addition, the function called `DefineSystemNdResetSetPointManager::CalcSetPoint` will calculate the setpoint using the logic introduced in the pseudo code above.
+
+The calculated setpoint gets applied through the `UpdateSetPointManagers` function, similar with other SetpointManager objects.
