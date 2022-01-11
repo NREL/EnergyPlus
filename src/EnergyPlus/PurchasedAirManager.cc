@@ -205,7 +205,7 @@ void GetPurchasedAir(EnergyPlusData &state)
     // Set up output variables.
 
     // Using/Aliasing
-    using NodeInputManager::CheckUniqueNodes;
+    using NodeInputManager::CheckUniqueNodeNames;
     using NodeInputManager::EndUniqueNodeCheck;
     using NodeInputManager::GetOnlySingleNode;
     using NodeInputManager::InitUniqueNodeCheck;
@@ -286,13 +286,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                            ObjectIsNotParent);
             UniqueNodeError = false;
-            CheckUniqueNodes(state,
-                             state.dataIPShortCut->cAlphaFieldNames(3),
-                             "NodeName",
-                             UniqueNodeError,
-                             state.dataIPShortCut->cAlphaArgs(3),
-                             _,
-                             state.dataIPShortCut->cAlphaArgs(1));
+            CheckUniqueNodeNames(state,
+                                 state.dataIPShortCut->cAlphaFieldNames(3),
+                                 UniqueNodeError,
+                                 state.dataIPShortCut->cAlphaArgs(3),
+                                 state.dataIPShortCut->cAlphaArgs(1));
             if (UniqueNodeError) ErrorsFound = true;
             // If new (optional) exhaust air node name is present, then register it as inlet
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
@@ -318,13 +316,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     ObjectIsNotParent);
                 }
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 state.dataIPShortCut->cAlphaFieldNames(4),
-                                 "NodeName",
-                                 UniqueNodeError,
-                                 state.dataIPShortCut->cAlphaArgs(4),
-                                 _,
-                                 state.dataIPShortCut->cAlphaArgs(1));
+                CheckUniqueNodeNames(state,
+                                     state.dataIPShortCut->cAlphaFieldNames(4),
+                                     UniqueNodeError,
+                                     state.dataIPShortCut->cAlphaArgs(4),
+                                     state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
@@ -532,13 +528,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ShowContinueError(state, "Adding OutdoorAir:Node=" + state.dataIPShortCut->cAlphaArgs(13));
                 }
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 state.dataIPShortCut->cAlphaFieldNames(13),
-                                 "NodeName",
-                                 UniqueNodeError,
-                                 state.dataIPShortCut->cAlphaArgs(13),
-                                 _,
-                                 state.dataIPShortCut->cAlphaArgs(1));
+                CheckUniqueNodeNames(state,
+                                     state.dataIPShortCut->cAlphaFieldNames(13),
+                                     UniqueNodeError,
+                                     state.dataIPShortCut->cAlphaArgs(13),
+                                     state.dataIPShortCut->cAlphaArgs(1));
                 if (UniqueNodeError) ErrorsFound = true;
 
                 // get Demand controlled ventilation type

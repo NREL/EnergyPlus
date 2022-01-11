@@ -4406,7 +4406,7 @@ namespace ScheduleManager {
         //  Min/max for schedule has been set.  Test.
         MinValueOk = true;
 
-        if (true) { //(exclusiveMin) {
+        if (exclusiveMin) {
             MinValueOk = (MinValue > Minimum);
         } else {
             MinValueOk = (FLT_EPSILON >= Minimum - MinValue);
