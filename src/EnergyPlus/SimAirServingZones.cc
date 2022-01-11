@@ -604,7 +604,7 @@ void GetAirPathData(EnergyPlusData &state)
                     NodeNums,
                     ErrInList,
                     DataLoopNode::NodeFluidType::Air,
-                    CurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::AirLoopHVAC,
                     PrimaryAirSystems(AirSysNum).Name,
                     DataLoopNode::ConnectionType::Inlet,
                     NodeInputManager::CompFluidStream::Primary,
@@ -612,8 +612,6 @@ void GetAirPathData(EnergyPlusData &state)
                     _,
                     cAlphaFields(8));
         if (ErrInList) {
-            //      CALL ShowContinueError(state, RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(PrimaryAirSystem(AirSysNum)%Name)//  &
-            //                         '", invalid '//TRIM(cAlphaFields(8))//'.')
             ErrorsFound = true;
         }
         // Allow at most 3 supply nodes (for a 3 deck system)
@@ -645,7 +643,7 @@ void GetAirPathData(EnergyPlusData &state)
                     NodeNums,
                     ErrInList,
                     DataLoopNode::NodeFluidType::Air,
-                    CurrentModuleObject,
+                    DataLoopNode::ConnectionObjectType::AirLoopHVAC,
                     PrimaryAirSystems(AirSysNum).Name,
                     DataLoopNode::ConnectionType::Outlet,
                     NodeInputManager::CompFluidStream::Primary,
@@ -653,8 +651,6 @@ void GetAirPathData(EnergyPlusData &state)
                     _,
                     cAlphaFields(9));
         if (ErrInList) {
-            //      CALL ShowContinueError(state, RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(PrimaryAirSystem(AirSysNum)%Name)//  &
-            //                         '", invalid '//TRIM(cAlphaFields(9))//'.')
             ErrorsFound = true;
         }
         if (NumNodes != AirToZoneNodeInfo(AirSysNum).NumSupplyNodes) {

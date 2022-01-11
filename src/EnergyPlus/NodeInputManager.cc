@@ -84,6 +84,7 @@ using namespace BranchNodeConnections;
 
 constexpr const char *fluidNameSteam("STEAM");
 
+// temporary overload to facilitate the transition to passing ObjectType as enum instead of as string
 void GetNodeNums(EnergyPlusData &state,
                  std::string const &Name,                               // Name for which to obtain information
                  int &NumNodes,                                         // Number of nodes accompanying this Name
@@ -97,6 +98,38 @@ void GetNodeNums(EnergyPlusData &state,
                  bool const ObjectIsParent,                             // True/False
                  Optional_bool_const IncrementFluidStream,              // True/False
                  Optional_string_const InputFieldName                   // Input Field Name
+)
+{
+    auto objType = static_cast<DataLoopNode::ConnectionObjectType>(
+        getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(NodeObjectType)));
+    GetNodeNums(state,
+                Name,
+                NumNodes,
+                NodeNumbers,
+                ErrorsFound,
+                nodeFluidType,
+                objType,
+                NodeObjectName,
+                nodeConnectionType,
+                NodeFluidStream,
+                ObjectIsParent,
+                IncrementFluidStream,
+                InputFieldName);
+}
+
+void GetNodeNums(EnergyPlusData &state,
+                 std::string const &Name,                                 // Name for which to obtain information
+                 int &NumNodes,                                           // Number of nodes accompanying this Name
+                 Array1D_int &NodeNumbers,                                // Node Numbers accompanying this Name
+                 bool &ErrorsFound,                                       // True when errors are found...
+                 DataLoopNode::NodeFluidType nodeFluidType,               // Fluidtype for checking/setting node FluidType
+                 DataLoopNode::ConnectionObjectType const NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
+                 std::string const &NodeObjectName,                       // Node Object Name (i.e. "MyChiller")
+                 DataLoopNode::ConnectionType const nodeConnectionType,   // Node Connection Type (see DataLoopNode)
+                 CompFluidStream const NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
+                 bool const ObjectIsParent,                               // True/False
+                 Optional_bool_const IncrementFluidStream,                // True/False
+                 Optional_string_const InputFieldName                     // Input Field Name
 )
 {
 
@@ -116,6 +149,8 @@ void GetNodeNums(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetNodeNums: ");
 
+    std::string objTypeStr = std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)]);
+
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ThisOne; // Indicator for this Name
     DataLoopNode::ConnectionType ConnectionType;
@@ -130,7 +165,7 @@ void GetNodeNums(EnergyPlusData &state,
     if (nodeFluidType != DataLoopNode::NodeFluidType::Air && nodeFluidType != DataLoopNode::NodeFluidType::Water &&
         nodeFluidType != DataLoopNode::NodeFluidType::Electric && nodeFluidType != DataLoopNode::NodeFluidType::Steam &&
         nodeFluidType != DataLoopNode::NodeFluidType::Blank) {
-        ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
+        ShowSevereError(state, std::string{RoutineName} + objTypeStr + "=\"" + NodeObjectName + "\", invalid fluid type.");
         ShowContinueError(state, format("..Invalid FluidType={}", nodeFluidType));
         ErrorsFound = true;
         ShowFatalError(state, "Preceding issue causes termination.");
@@ -145,7 +180,7 @@ void GetNodeNums(EnergyPlusData &state,
                 if (nodeFluidType != DataLoopNode::NodeFluidType::Blank &&
                     state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != DataLoopNode::NodeFluidType::Blank) {
                     if (state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != nodeFluidType) {
-                        ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
+                        ShowSevereError(state, std::string{RoutineName} + objTypeStr + "=\"" + NodeObjectName + "\", invalid data.");
                         if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
                         ShowContinueError(
                             state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NodeNumbers(Loop)));
@@ -193,24 +228,16 @@ void GetNodeNums(EnergyPlusData &state,
             if (IncrementFluidStream) FluidStreamNum = static_cast<NodeInputManager::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
         }
 
-        // temporary - refactor once we're passing enum objectType everywhere
-        auto objType = static_cast<DataLoopNode::ConnectionObjectType>(
-            getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(NodeObjectType)));
-
-        if (objType == DataLoopNode::ConnectionObjectType::Invalid) {
-            ErrorsFound = true;
-        } else {
-            RegisterNodeConnection(state,
-                                   NodeNumbers(Loop),
-                                   state.dataLoopNodes->NodeID(NodeNumbers(Loop)),
-                                   objType,
-                                   NodeObjectName,
-                                   ConnectionType,
-                                   FluidStreamNum,
-                                   ObjectIsParent,
-                                   ErrorsFound,
-                                   InputFieldName);
-        }
+        RegisterNodeConnection(state,
+                               NodeNumbers(Loop),
+                               state.dataLoopNodes->NodeID(NodeNumbers(Loop)),
+                               NodeObjectType,
+                               NodeObjectName,
+                               ConnectionType,
+                               FluidStreamNum,
+                               ObjectIsParent,
+                               ErrorsFound,
+                               InputFieldName);
     }
 }
 

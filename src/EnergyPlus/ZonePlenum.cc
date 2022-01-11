@@ -370,7 +370,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                     NodeNums,
                     NodeListError,
                     DataLoopNode::NodeFluidType::Air,
-                    "AirLoopHVAC:ReturnPlenum",
+                    DataLoopNode::ConnectionObjectType::AirLoopHVACReturnPlenum,
                     state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZonePlenumName,
                     DataLoopNode::ConnectionType::InducedAir,
                     NodeInputManager::CompFluidStream::Primary,

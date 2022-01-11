@@ -224,7 +224,7 @@ namespace OutAirNodeManager {
                                 NodeNums,
                                 ErrInList,
                                 DataLoopNode::NodeFluidType::Air,
-                                CurrentModuleObject,
+                                DataLoopNode::ConnectionObjectType::OutdoorAirNodeList,
                                 CurrentModuleObject,
                                 DataLoopNode::ConnectionType::OutsideAir,
                                 static_cast<NodeInputManager::CompFluidStream>(NextFluidStreamNum),
@@ -281,7 +281,7 @@ namespace OutAirNodeManager {
                             NodeNums,
                             ErrInList,
                             DataLoopNode::NodeFluidType::Air,
-                            CurrentModuleObject,
+                            DataLoopNode::ConnectionObjectType::OutdoorAirNode,
                             CurrentModuleObject,
                             DataLoopNode::ConnectionType::OutsideAir,
                             static_cast<NodeInputManager::CompFluidStream>(NextFluidStreamNum),
@@ -413,7 +413,7 @@ namespace OutAirNodeManager {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // Provide a entry into the OutAirNode List for checking from other routines.
+        // Provide an entry into the OutAirNode List for checking from other routines.
 
         // METHODOLOGY EMPLOYED:
         // na
@@ -530,7 +530,7 @@ namespace OutAirNodeManager {
                             TmpNums,
                             errFlag,
                             DataLoopNode::NodeFluidType::Air,
-                            "OutdoorAir:Node",
+                            DataLoopNode::ConnectionObjectType::OutdoorAirNode,
                             "OutdoorAir:Node",
                             DataLoopNode::ConnectionType::OutsideAir,
                             static_cast<NodeInputManager::CompFluidStream>(state.dataOutAirNodeMgr->NumOutsideAirNodes),

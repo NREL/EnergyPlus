@@ -93,19 +93,35 @@ namespace NodeInputManager {
         }
     };
 
+    // temporary overload to facilitate the transition to passing ObjectType as enum instead of as string
     void GetNodeNums(EnergyPlusData &state,
-                     std::string const &Name,                               // Name for which to obtain information
-                     int &NumNodes,                                         // Number of nodes accompanying this Name
-                     Array1D_int &NodeNumbers,                              // Node Numbers accompanying this Name
-                     bool &ErrorsFound,                                     // True when errors are found...
-                     DataLoopNode::NodeFluidType const nodeFluidType,       // Fluidtype for checking/setting node FluidType
-                     std::string const &NodeObjectType,                     // Node Object Type (i.e. "Chiller:Electric")
-                     std::string const &NodeObjectName,                     // Node Object Name (i.e. "MyChiller")
-                     DataLoopNode::ConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
-                     CompFluidStream const NodeFluidStream,                 // Which Fluid Stream (1,2,3,...)
-                     bool const ObjectIsParent,                             // True/False
-                     Optional_bool_const IncrementFluidStream = _,          // True/False
-                     Optional_string_const InputFieldName = _               // Input Field Name
+                     std::string const &Name,                         // Name for which to obtain information
+                     int &NumNodes,                                   // Number of nodes accompanying this Name
+                     Array1D_int &NodeNumbers,                        // Node Numbers accompanying this Name
+                     bool &ErrorsFound,                               // True when errors are found...
+                     DataLoopNode::NodeFluidType nodeFluidType,       // Fluidtype for checking/setting node FluidType
+                     std::string const &NodeObjectType,               // Node Object Type (i.e. "Chiller:Electric")
+                     std::string const &NodeObjectName,               // Node Object Name (i.e. "MyChiller")
+                     DataLoopNode::ConnectionType nodeConnectionType, // Node Connection Type (see DataLoopNode)
+                     CompFluidStream NodeFluidStream,                 // Which Fluid Stream (1,2,3,...)
+                     bool ObjectIsParent,                             // True/False
+                     Optional_bool_const IncrementFluidStream = _,    // True/False
+                     Optional_string_const InputFieldName = _         // Input Field Name
+    );
+
+    void GetNodeNums(EnergyPlusData &state,
+                     std::string const &Name,                                 // Name for which to obtain information
+                     int &NumNodes,                                           // Number of nodes accompanying this Name
+                     Array1D_int &NodeNumbers,                                // Node Numbers accompanying this Name
+                     bool &ErrorsFound,                                       // True when errors are found...
+                     DataLoopNode::NodeFluidType const nodeFluidType,         // Fluidtype for checking/setting node FluidType
+                     DataLoopNode::ConnectionObjectType const NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
+                     std::string const &NodeObjectName,                       // Node Object Name (i.e. "MyChiller")
+                     DataLoopNode::ConnectionType const nodeConnectionType,   // Node Connection Type (see DataLoopNode)
+                     CompFluidStream const NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
+                     bool const ObjectIsParent,                               // True/False
+                     Optional_bool_const IncrementFluidStream = _,            // True/False
+                     Optional_string_const InputFieldName = _                 // Input Field Name
     );
 
     void SetupNodeVarsForReporting(EnergyPlusData &state);
