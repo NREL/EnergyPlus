@@ -109,7 +109,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
     // Using/Aliasing
     using BranchNodeConnections::SetUpCompSets;
-    using NodeInputManager::CheckUniqueNodes;
+    using NodeInputManager::CheckUniqueNodeNames;
+    using NodeInputManager::CheckUniqueNodeNumbers;
     using NodeInputManager::EndUniqueNodeCheck;
     using NodeInputManager::GetNodeNums;
     using NodeInputManager::GetOnlySingleNode;
@@ -321,7 +322,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         } else {
             UniqueNodeError = false;
-            CheckUniqueNodes(state, cAlphaFields(5), "NodeName", UniqueNodeError, AlphArray(5), _, AlphArray(1));
+            CheckUniqueNodeNames(state, cAlphaFields(5), UniqueNodeError, AlphArray(5), AlphArray(1));
             if (UniqueNodeError) {
                 // ShowContinueError(state,  "Occurs for " + trim( cAlphaFields( 1 ) ) + " = " + trim( AlphArray( 1 ) ) );
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -693,13 +694,11 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(NodeNum) = NodeNums(NodeNum);
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 "Zone Air Inlet Nodes",
-                                 "NodeNumber",
-                                 UniqueNodeError,
-                                 _,
-                                 NodeNums(NodeNum),
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                CheckUniqueNodeNumbers(state,
+                                       "Zone Air Inlet Nodes",
+                                       UniqueNodeError,
+                                       NodeNums(NodeNum),
+                                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
@@ -741,13 +740,11 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(NodeNum) = NodeNums(NodeNum);
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 "Zone Air Exhaust Nodes",
-                                 "NodeNumber",
-                                 UniqueNodeError,
-                                 _,
-                                 NodeNums(NodeNum),
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                CheckUniqueNodeNumbers(state,
+                                       "Zone Air Exhaust Nodes",
+                                       UniqueNodeError,
+                                       NodeNums(NodeNum),
+                                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
                     // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
@@ -794,13 +791,11 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(NodeNum) = NodeNums(NodeNum);
                 UniqueNodeError = false;
-                CheckUniqueNodes(state,
-                                 "Zone Return Air Nodes",
-                                 "NodeNumber",
-                                 UniqueNodeError,
-                                 _,
-                                 NodeNums(NodeNum),
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                CheckUniqueNodeNumbers(state,
+                                       "Zone Return Air Nodes",
+                                        UniqueNodeError,
+                                        NodeNums(NodeNum),
+                                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
                     // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;

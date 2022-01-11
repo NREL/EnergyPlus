@@ -131,13 +131,17 @@ namespace NodeInputManager {
 
     void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 
-    void CheckUniqueNodes(EnergyPlusData &state,
-                          std::string const &NodeTypes,
-                          std::string const &CheckType,
-                          bool &ErrorsFound,
-                          Optional_string_const CheckName = _,
-                          Optional_int_const CheckNumber = _,
-                          Optional_string_const ObjectName = _);
+    void CheckUniqueNodeNames(EnergyPlusData &state,
+                              std::string const &NodeTypes,
+                              bool &ErrorsFound,
+                              std::string const &CheckName,
+                              std::string const &ObjectName);
+
+     void CheckUniqueNodeNumbers(EnergyPlusData &state,
+                                 std::string const &NodeTypes,
+                                 bool &ErrorsFound,
+                                 int const CheckNumber,
+                                 std::string const ObjectName);
 
     void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 
