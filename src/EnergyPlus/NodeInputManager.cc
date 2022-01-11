@@ -192,16 +192,25 @@ void GetNodeNums(EnergyPlusData &state,
         if (present(IncrementFluidStream)) {
             if (IncrementFluidStream) FluidStreamNum = static_cast<NodeInputManager::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
         }
-        RegisterNodeConnection(state,
-                               NodeNumbers(Loop),
-                               state.dataLoopNodes->NodeID(NodeNumbers(Loop)),
-                               NodeObjectType,
-                               NodeObjectName,
-                               ConnectionType,
-                               FluidStreamNum,
-                               ObjectIsParent,
-                               ErrorsFound,
-                               InputFieldName);
+
+        // temporary - refactor once we're passing enum objectType everywhere
+        auto objType = static_cast<DataLoopNode::ConnectionObjectType>(
+            getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(NodeObjectType)));
+
+        if (objType == DataLoopNode::ConnectionObjectType::Invalid) {
+            ErrorsFound = true;
+        } else {
+            RegisterNodeConnection(state,
+                                   NodeNumbers(Loop),
+                                   state.dataLoopNodes->NodeID(NodeNumbers(Loop)),
+                                   objType,
+                                   NodeObjectName,
+                                   ConnectionType,
+                                   FluidStreamNum,
+                                   ObjectIsParent,
+                                   ErrorsFound,
+                                   InputFieldName);
+        }
     }
 }
 

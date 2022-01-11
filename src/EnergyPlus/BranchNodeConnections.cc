@@ -76,24 +76,6 @@ namespace EnergyPlus::BranchNodeConnections {
 using namespace DataLoopNode;
 using namespace DataBranchNodeConnections;
 
-// temporary overload to facilitate the transition to passing ObjectType as enum instead of as string
-void RegisterNodeConnection(EnergyPlusData &state,
-                            int const NodeNumber,                                // Number for this Node
-                            std::string_view const NodeName,                     // Name of this Node
-                            std::string_view const ObjectType,                   // Type of object this Node is connected to (e.g. Chiller:Electric)
-                            std::string_view const ObjectName,                   // Name of object this Node is connected to (e.g. MyChiller)
-                            DataLoopNode::ConnectionType const ConnectionType,   // Connection Type for this Node (must be valid)
-                            NodeInputManager::CompFluidStream const FluidStream, // Count on Fluid Streams
-                            bool const IsParent,                                 // True when node is a parent node
-                            bool &errFlag,                                       // Will be True if errors already detected or if errors found here
-                            Optional_string_const const &InputFieldName          // Input Field Name
-)
-{
-    auto objType = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(ObjectType)));
-    RegisterNodeConnection(state, NodeNumber, NodeName, objType, ObjectName, ConnectionType, FluidStream, IsParent, errFlag, InputFieldName);
-}
-
 void RegisterNodeConnection(EnergyPlusData &state,
                             int const NodeNumber,                                // Number for this Node
                             std::string_view const NodeName,                     // Name of this Node
@@ -120,14 +102,13 @@ void RegisterNodeConnection(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName = "RegisterNodeConnection: ";
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool ErrorsFoundHere;
-    int Count;
-    bool MakeNew;
-    int Found;
+    bool ErrorsFoundHere = false;
 
-    ErrorsFoundHere = false;
-
+    if ((ObjectType == DataLoopNode::ConnectionObjectType::Invalid) || (ObjectType == DataLoopNode::ConnectionObjectType::Num)) {
+        ShowSevereError(state, "Developer Error: Invalid ObjectType");
+        ShowContinueError(state, format("Occurs for Node={}, ObjectName={}", std::string{NodeName}, std::string{ObjectName}));
+        ErrorsFoundHere = true;
+    }
     std::string objTypeStr = std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(ObjectType)]);
 
     if ((ConnectionType == DataLoopNode::ConnectionType::Invalid) || (ConnectionType == DataLoopNode::ConnectionType::Num)) {
@@ -137,8 +118,8 @@ void RegisterNodeConnection(EnergyPlusData &state,
         ErrorsFoundHere = true;
     }
 
-    MakeNew = true;
-    for (Count = 1; Count <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Count) {
+    bool MakeNew = true;
+    for (int Count = 1; Count <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Count) {
         if (state.dataBranchNodeConnections->NodeConnections(Count).NodeNumber != NodeNumber) continue;
         if (state.dataBranchNodeConnections->NodeConnections(Count).ObjectType != ObjectType) continue;
         if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->NodeConnections(Count).ObjectName, ObjectName)) continue;
@@ -185,10 +166,10 @@ void RegisterNodeConnection(EnergyPlusData &state,
             }
 
             // Check out AirTerminal inlet/outlet nodes
-            Found = UtilityRoutines::FindItemInList(NodeName,
-                                                    state.dataBranchNodeConnections->AirTerminalNodeConnections,
-                                                    &EqNodeConnectionDef::NodeName,
-                                                    state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
+            bool Found = UtilityRoutines::FindItemInList(NodeName,
+                                                         state.dataBranchNodeConnections->AirTerminalNodeConnections,
+                                                         &EqNodeConnectionDef::NodeName,
+                                                         state.dataBranchNodeConnections->NumOfAirTerminalNodes - 1);
             if (Found != 0) { // Nodename already used
                 ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
                 ShowContinueError(state,
