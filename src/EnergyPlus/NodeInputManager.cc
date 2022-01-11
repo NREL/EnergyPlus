@@ -85,18 +85,18 @@ using namespace BranchNodeConnections;
 constexpr const char *fluidNameSteam("STEAM");
 
 void GetNodeNums(EnergyPlusData &state,
-                 std::string const &Name,                                   // Name for which to obtain information
-                 int &NumNodes,                                             // Number of nodes accompanying this Name
-                 Array1D_int &NodeNumbers,                                  // Node Numbers accompanying this Name
-                 bool &ErrorsFound,                                         // True when errors are found...
-                 DataLoopNode::NodeFluidType nodeFluidType,                 // Fluidtype for checking/setting node FluidType
-                 std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
-                 std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
+                 std::string const &Name,                               // Name for which to obtain information
+                 int &NumNodes,                                         // Number of nodes accompanying this Name
+                 Array1D_int &NodeNumbers,                              // Node Numbers accompanying this Name
+                 bool &ErrorsFound,                                     // True when errors are found...
+                 DataLoopNode::NodeFluidType nodeFluidType,             // Fluidtype for checking/setting node FluidType
+                 std::string const &NodeObjectType,                     // Node Object Type (i.e. "Chiller:Electric")
+                 std::string const &NodeObjectName,                     // Node Object Name (i.e. "MyChiller")
                  DataLoopNode::ConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
-                 CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
-                 bool const ObjectIsParent,                                 // True/False
-                 Optional_bool_const IncrementFluidStream,                  // True/False
-                 Optional_string_const InputFieldName                       // Input Field Name
+                 CompFluidStream const NodeFluidStream,                 // Which Fluid Stream (1,2,3,...)
+                 bool const ObjectIsParent,                             // True/False
+                 Optional_bool_const IncrementFluidStream,              // True/False
+                 Optional_string_const InputFieldName                   // Input Field Name
 )
 {
 
@@ -752,13 +752,13 @@ int AssignNodeNumber(EnergyPlusData &state,
 int GetOnlySingleNode(EnergyPlusData &state,
                       std::string const &NodeName,
                       bool &errFlag,
-                      std::string const &NodeObjectType,                         // Node Object Type (i.e. "Chiller:Electric")
-                      std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
-                      DataLoopNode::NodeFluidType const nodeFluidType,           // Fluidtype for checking/setting node FluidType
+                      std::string const &NodeObjectType,                     // Node Object Type (i.e. "Chiller:Electric")
+                      std::string const &NodeObjectName,                     // Node Object Name (i.e. "MyChiller")
+                      DataLoopNode::NodeFluidType const nodeFluidType,       // Fluidtype for checking/setting node FluidType
                       DataLoopNode::ConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
-                      CompFluidStream const NodeFluidStream,                     // Which Fluid Stream
-                      bool const ObjectIsParent,                                 // True/False
-                      Optional_string_const InputFieldName                       // Input Field Name
+                      CompFluidStream const NodeFluidStream,                 // Which Fluid Stream
+                      bool const ObjectIsParent,                             // True/False
+                      Optional_string_const InputFieldName                   // Input Field Name
 )
 {
 

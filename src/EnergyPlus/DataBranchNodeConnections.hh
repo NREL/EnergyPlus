@@ -79,13 +79,13 @@ namespace DataBranchNodeConnections {
     struct NodeConnectionDef
     {
         // Members
-        int NodeNumber;                                  // Node number of this node connection
-        std::string NodeName;                            // Node Name of this node connection
-        DataLoopNode::ConnectionObjectType ObjectType;   // Object/Component Type of this node connection
-        std::string ObjectName;                          // Name of the Object/Component Type of this node connection
-        DataLoopNode::ConnectionType ConnectionType; // Connection Type (must be valid) for this node connection
-        NodeInputManager::CompFluidStream FluidStream;   // Fluid Stream for this node connection
-        bool ObjectIsParent;                             // Indicator whether the object is a parent or not
+        int NodeNumber;                                // Node number of this node connection
+        std::string NodeName;                          // Node Name of this node connection
+        DataLoopNode::ConnectionObjectType ObjectType; // Object/Component Type of this node connection
+        std::string ObjectName;                        // Name of the Object/Component Type of this node connection
+        DataLoopNode::ConnectionType ConnectionType;   // Connection Type (must be valid) for this node connection
+        NodeInputManager::CompFluidStream FluidStream; // Fluid Stream for this node connection
+        bool ObjectIsParent;                           // Indicator whether the object is a parent or not
 
         // Default Constructor
         NodeConnectionDef()
@@ -113,11 +113,11 @@ namespace DataBranchNodeConnections {
     struct EqNodeConnectionDef
     {
         // Members
-        std::string NodeName;                            // Node Name of this node connection
-        DataLoopNode::ConnectionObjectType ObjectType;   // Object/Component Type of this node connection
-        std::string ObjectName;                          // Name of the Object/Component Type of this node connection
-        std::string InputFieldName;                      // Input Field Name for this connection
-        DataLoopNode::ConnectionType ConnectionType; // Connection Type (must be valid) for this node connection
+        std::string NodeName;                          // Node Name of this node connection
+        DataLoopNode::ConnectionObjectType ObjectType; // Object/Component Type of this node connection
+        std::string ObjectName;                        // Name of the Object/Component Type of this node connection
+        std::string InputFieldName;                    // Input Field Name for this connection
+        DataLoopNode::ConnectionType ConnectionType;   // Connection Type (must be valid) for this node connection
 
         // Default Constructor
         EqNodeConnectionDef() : ObjectType(DataLoopNode::ConnectionObjectType::Invalid), ConnectionType(DataLoopNode::ConnectionType::Invalid)

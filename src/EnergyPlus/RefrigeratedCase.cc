@@ -3123,16 +3123,15 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         Condenser(CondNum).CondenserRejectHeatToZone = true;
                         state.dataRefrigCase->RefrigPresentInZone(Condenser(CondNum).InletAirZoneNum) = true;
                     } else { // not in a conditioned zone, so see if it's outside
-                        Condenser(CondNum).InletAirNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
-                                                                Alphas(4),
-                                                                ErrorsFound,
-                                                                CurrentModuleObject,
-                                                                Alphas(1),
-                                                                DataLoopNode::NodeFluidType::Air,
-                                                                DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                NodeInputManager::CompFluidStream::Primary,
-                                                                DataLoopNode::ObjectIsParent);
+                        Condenser(CondNum).InletAirNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                                                 Alphas(4),
+                                                                                                 ErrorsFound,
+                                                                                                 CurrentModuleObject,
+                                                                                                 Alphas(1),
+                                                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                                                 DataLoopNode::ConnectionType::OutsideAirReference,
+                                                                                                 NodeInputManager::CompFluidStream::Primary,
+                                                                                                 DataLoopNode::ObjectIsParent);
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
                             // not outside and not a zone
                             ShowSevereError(state,

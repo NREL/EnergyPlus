@@ -94,15 +94,8 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 {
     bool errFlag = false;
-    RegisterNodeConnection(*state,
-                           1,
-                           "BadNode",
-                           "Type1",
-                           "Object1",
-                           DataLoopNode::ConnectionType::ZoneNode,
-                           NodeInputManager::CompFluidStream::Primary,
-                           false,
-                           errFlag);
+    RegisterNodeConnection(
+        *state, 1, "BadNode", "Type1", "Object1", DataLoopNode::ConnectionType::ZoneNode, NodeInputManager::CompFluidStream::Primary, false, errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
@@ -114,42 +107,14 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
 {
     bool errFlag = false;
-    RegisterNodeConnection(*state,
-                           1,
-                           "BadNode",
-                           "Type1",
-                           "Object1",
-                           DataLoopNode::ConnectionType::ZoneNode,
-                           NodeInputManager::CompFluidStream::Primary,
-                           false,
-                           errFlag);
-    RegisterNodeConnection(*state,
-                           2,
-                           "GoodNode",
-                           "Type2",
-                           "Object2",
-                           DataLoopNode::ConnectionType::Sensor,
-                           NodeInputManager::CompFluidStream::Primary,
-                           false,
-                           errFlag);
-    RegisterNodeConnection(*state,
-                           1,
-                           "BadNode",
-                           "Type3",
-                           "Object3",
-                           DataLoopNode::ConnectionType::ZoneNode,
-                           NodeInputManager::CompFluidStream::Primary,
-                           false,
-                           errFlag);
-    RegisterNodeConnection(*state,
-                           2,
-                           "GoodNode",
-                           "Type4",
-                           "Object4",
-                           DataLoopNode::ConnectionType::Outlet,
-                           NodeInputManager::CompFluidStream::Primary,
-                           false,
-                           errFlag);
+    RegisterNodeConnection(
+        *state, 1, "BadNode", "Type1", "Object1", DataLoopNode::ConnectionType::ZoneNode, NodeInputManager::CompFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(
+        *state, 2, "GoodNode", "Type2", "Object2", DataLoopNode::ConnectionType::Sensor, NodeInputManager::CompFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(
+        *state, 1, "BadNode", "Type3", "Object3", DataLoopNode::ConnectionType::ZoneNode, NodeInputManager::CompFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(
+        *state, 2, "GoodNode", "Type4", "Object4", DataLoopNode::ConnectionType::Outlet, NodeInputManager::CompFluidStream::Primary, false, errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);

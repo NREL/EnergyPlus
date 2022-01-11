@@ -633,16 +633,15 @@ namespace UnitVentilator {
             // object type for the non parent nodes
             //  Set connection type to 'OutdoorAir', because this is hardwired to OA conditions
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
-                state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode =
-                    GetOnlySingleNode(state,
-                                      Alphas(8),
-                                      ErrorsFound,
-                                      CurrentModuleObject,
-                                      Alphas(1) + "-OA MIXER",
-                                      DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::ConnectionType::OutsideAirReference,
-                                      NodeInputManager::CompFluidStream::Primary,
-                                      ObjectIsNotParent);
+                state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode = GetOnlySingleNode(state,
+                                                                                                    Alphas(8),
+                                                                                                    ErrorsFound,
+                                                                                                    CurrentModuleObject,
+                                                                                                    Alphas(1) + "-OA MIXER",
+                                                                                                    DataLoopNode::NodeFluidType::Air,
+                                                                                                    DataLoopNode::ConnectionType::OutsideAirReference,
+                                                                                                    NodeInputManager::CompFluidStream::Primary,
+                                                                                                    ObjectIsNotParent);
                 if (!lAlphaBlanks(8)) {
                     CheckAndAddAirNodeNumber(state, state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode, IsValid);
                     if (!IsValid) {
