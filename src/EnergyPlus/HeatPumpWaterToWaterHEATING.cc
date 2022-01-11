@@ -383,7 +383,7 @@ void GetGshpInput(EnergyPlusData &state)
 
     state.dataHPWaterToWaterHtg->GSHPRefrigIndex = FindRefrigerant(state, GSHPRefrigerant);
     if (state.dataHPWaterToWaterHtg->GSHPRefrigIndex == 0) {
-        ShowFatalError(state, "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant);
+        ShowFatalError(state, "Refrigerant for " + ModuleCompName + " not found, should have been=" + GSHPRefrigerant);
     }
 
     // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
