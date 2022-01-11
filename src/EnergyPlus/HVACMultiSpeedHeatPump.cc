@@ -2034,7 +2034,7 @@ namespace HVACMultiSpeedHeatPump {
                 ScanPlantLoopsForObject(state,
                                         MSHeatPump(MSHeatPumpNum).SuppHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                        MSHeatPump(MSHeatPumpNum).plantLoc,
+                                        MSHeatPump(MSHeatPumpNum).SuppPlantLoc,
                                         errFlag,
                                         _,
                                         _,
