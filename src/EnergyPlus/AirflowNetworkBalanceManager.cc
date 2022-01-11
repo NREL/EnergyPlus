@@ -2619,7 +2619,7 @@ namespace AirflowNetworkBalanceManager {
                         NodeNum = GetOnlySingleNode(state,
                                                     Alphas(1),
                                                     ErrorsFound,
-                                                    CurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::OutdoorAirNode,
                                                     "AirflowNetwork:Multizone:Surface",
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::Inlet,

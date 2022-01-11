@@ -92,13 +92,13 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
 //    This module simulates the performance of the Exhaust fired double effect
 //    absorption chiller.
 // METHODOLOGY EMPLOYED:
-//    Once the PlantLoopManager determines that the exhasut fired absorber chiller
+//    Once the PlantLoopManager determines that the exhaust fired absorber chiller
 //    is available to meet a loop cooling demand, it calls SimExhaustAbsorption
-//    which in turn calls the appropriate Exhaut Fired Absorption Chiller model.
+//    which in turn calls the appropriate Exhaust Fired Absorption Chiller model.
 // REFERENCES:
 //    DOE-2.1e Supplement
 //    PG&E CoolToolsGas Mod
-//    Performnace curves obtained from manufcaturer
+//    Performance curves obtained from manufacturer
 // OTHER NOTES:
 //    The curves on this model follow the DOE-2 approach of using
 //    electric and heat input ratios.  In addition, the temperature
@@ -357,7 +357,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         thisChiller.ChillReturnNodeNum = GetOnlySingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(2),
                                                            Get_ErrorsFound,
-                                                           cCurrentModuleObject,
+                                                           DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDoubleEffect,
                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::ConnectionType::Inlet,
@@ -366,7 +366,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         thisChiller.ChillSupplyNodeNum = GetOnlySingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(3),
                                                            Get_ErrorsFound,
-                                                           cCurrentModuleObject,
+                                                           DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDoubleEffect,
                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::ConnectionType::Outlet,
@@ -382,7 +382,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         thisChiller.HeatReturnNodeNum = GetOnlySingleNode(state,
                                                           state.dataIPShortCut->cAlphaArgs(6),
                                                           Get_ErrorsFound,
-                                                          cCurrentModuleObject,
+                                                          DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDoubleEffect,
                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::ConnectionType::Inlet,
@@ -391,7 +391,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
         thisChiller.HeatSupplyNodeNum = GetOnlySingleNode(state,
                                                           state.dataIPShortCut->cAlphaArgs(7),
                                                           Get_ErrorsFound,
-                                                          cCurrentModuleObject,
+                                                          DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDoubleEffect,
                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::ConnectionType::Outlet,
@@ -479,7 +479,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             thisChiller.CondReturnNodeNum = GetOnlySingleNode(state,
                                                               state.dataIPShortCut->cAlphaArgs(4),
                                                               Get_ErrorsFound,
-                                                              cCurrentModuleObject,
+                                                              DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDoubleEffect,
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::ConnectionType::Inlet,
@@ -488,7 +488,7 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             thisChiller.CondSupplyNodeNum = GetOnlySingleNode(state,
                                                               state.dataIPShortCut->cAlphaArgs(5),
                                                               Get_ErrorsFound,
-                                                              cCurrentModuleObject,
+                                                              DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDoubleEffect,
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::ConnectionType::Outlet,
@@ -504,13 +504,13 @@ void GetExhaustAbsorberInput(EnergyPlusData &state)
             thisChiller.CondReturnNodeNum = GetOnlySingleNode(state,
                                                               state.dataIPShortCut->cAlphaArgs(4),
                                                               Get_ErrorsFound,
-                                                              cCurrentModuleObject,
+                                                              DataLoopNode::ConnectionObjectType::ChillerHeaterAbsorptionDoubleEffect,
                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::ConnectionType::OutsideAirReference,
                                                               NodeInputManager::CompFluidStream::Secondary,
                                                               DataLoopNode::ObjectIsNotParent);
-            // Condenser outlet node not used for air or evap cooled condenser so ingore cAlphaArgs( 5 )
+            // Condenser outlet node not used for air or evap cooled condenser so ignore cAlphaArgs( 5 )
             // Connection not required for air or evap cooled condenser so no call to TestCompSet here
             CheckAndAddAirNodeNumber(state, thisChiller.CondReturnNodeNum, Okay);
             if (!Okay) {
