@@ -1283,13 +1283,13 @@ void GetChildrenData(EnergyPlusData &state,
 }
 
 void SetUpCompSets(EnergyPlusData &state,
-                   std::string_view ParentType,      // Parent Object Type
-                   std::string_view ParentName,      // Parent Object Name
-                   std::string_view CompType,        // Component Type
-                   std::string_view CompName,        // Component Name
-                   std::string_view InletNode,       // Inlet Node Name
-                   std::string_view OutletNode,      // Outlet Node Name
-                   Optional_string_const Description // Description
+                   std::string_view ParentType,       // Parent Object Type
+                   std::string_view ParentName,       // Parent Object Name
+                   std::string_view CompType,         // Component Type
+                   std::string_view CompName,         // Component Name
+                   std::string_view InletNode,        // Inlet Node Name
+                   std::string_view OutletNode,       // Outlet Node Name
+                   std::string_view const Description // Description
 )
 {
 
@@ -1348,7 +1348,9 @@ void SetUpCompSets(EnergyPlusData &state,
             // Assume this is a further definition for this compset
             state.dataBranchNodeConnections->CompSets(Count).ParentCType = ParentTypeUC;
             state.dataBranchNodeConnections->CompSets(Count).ParentCName = ParentName;
-            if (present(Description)) state.dataBranchNodeConnections->CompSets(Count).Description = Description;
+            if (!Description.empty()) {
+                state.dataBranchNodeConnections->CompSets(Count).Description = Description;
+            }
             Found = Count;
             break;
         }
@@ -1458,7 +1460,7 @@ void SetUpCompSets(EnergyPlusData &state,
             UtilityRoutines::MakeUPPERCase(InletNode); // TODO: Fix this....
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).OutletNodeName =
             UtilityRoutines::MakeUPPERCase(OutletNode); // TODO: Fix this....
-        if (present(Description)) {
+        if (!Description.empty()) {
             state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).Description = Description;
         } else {
             state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).Description = "UNDEFINED";

@@ -2634,29 +2634,25 @@ namespace WeatherManager {
                                                                               format("{:.0R}", AtmPress),
                                                                               state.dataEnvrn->WeatherFileLocationTitle);
                     if (DirectRad < 9999.0)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "Direct Radiation",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              ">= 0",
-                                                                              (DirectRad >= 0.0),
-                                                                              _,
-                                                                              _,
-                                                                              _,
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
+                        state.dataInputProcessing->inputProcessor->lowerRangeCheck(state,
+                                                                                   ErrorsFound,
+                                                                                   "Direct Radiation",
+                                                                                   "WeatherFile",
+                                                                                   "Severe",
+                                                                                   ">= 0",
+                                                                                   (DirectRad >= 0.0),
+                                                                                   {},
+                                                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (DiffuseRad < 9999.0)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "Diffuse Radiation",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              ">= 0",
-                                                                              (DiffuseRad >= 0.0),
-                                                                              _,
-                                                                              _,
-                                                                              _,
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
+                        state.dataInputProcessing->inputProcessor->lowerRangeCheck(state,
+                                                                                   ErrorsFound,
+                                                                                   "Diffuse Radiation",
+                                                                                   "WeatherFile",
+                                                                                   "Severe",
+                                                                                   ">= 0",
+                                                                                   (DiffuseRad >= 0.0),
+                                                                                   {},
+                                                                                   state.dataEnvrn->WeatherFileLocationTitle);
                     if (WindDir < 999.0)
                         state.dataInputProcessing->inputProcessor->rangeCheck(state,
                                                                               ErrorsFound,
@@ -6595,7 +6591,7 @@ namespace WeatherManager {
                                                                       (testval >= -90.0),
                                                                       "<= 70",
                                                                       (testval <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6688,7 +6684,7 @@ namespace WeatherManager {
                                                                               (testval >= -90.0),
                                                                               "<= 70",
                                                                               (testval <= 70.0),
-                                                                              _,
+                                                                              {},
                                                                               state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                         if (errFlag) {
                             ErrorsFound = true;
@@ -6743,7 +6739,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= -90.0),
                                                                       "<= 70",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     //        CALL ShowContinueError(state, TRIM(state.dataIPShortCut->cCurrentModuleObject)//': Occured in
@@ -6776,7 +6772,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= -90.0),
                                                                       "<= 70",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 70.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6808,7 +6804,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= 0.0),
                                                                       "<= .03",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 0.03),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
@@ -6840,7 +6836,7 @@ namespace WeatherManager {
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue >= 0.0),
                                                                       "<= 130000",
                                                                       (state.dataWeatherManager->DesDayInput(EnvrnNum).HumIndValue <= 130000.0),
-                                                                      _,
+                                                                      {},
                                                                       state.dataWeatherManager->DesDayInput(EnvrnNum).Title);
                 if (errFlag) {
                     ErrorsFound = true;
