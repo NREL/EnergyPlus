@@ -58,7 +58,6 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
@@ -75,7 +74,6 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -394,7 +392,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ProcAirInNode = GetOnlySingleNode(state,
                                                                         Alphas(3),
                                                                         ErrorsFound,
-                                                                        CurrentModuleObject,
+                                                                        DataLoopNode::ConnectionObjectType::DehumidifierDesiccantNoFans,
                                                                         Alphas(1),
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::ConnectionType::Inlet,
@@ -404,7 +402,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ProcAirOutNode = GetOnlySingleNode(state,
                                                                          Alphas(4),
                                                                          ErrorsFound,
-                                                                         CurrentModuleObject,
+                                                                         DataLoopNode::ConnectionObjectType::DehumidifierDesiccantNoFans,
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::ConnectionType::Outlet,
@@ -414,7 +412,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).RegenAirInNode = GetOnlySingleNode(state,
                                                                          Alphas(5),
                                                                          ErrorsFound,
-                                                                         CurrentModuleObject,
+                                                                         DataLoopNode::ConnectionObjectType::DehumidifierDesiccantNoFans,
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::ConnectionType::Inlet,
@@ -424,7 +422,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).RegenFanInNode = GetOnlySingleNode(state,
                                                                          Alphas(6),
                                                                          ErrorsFound,
-                                                                         CurrentModuleObject,
+                                                                         DataLoopNode::ConnectionObjectType::DehumidifierDesiccantNoFans,
                                                                          Alphas(1),
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::ConnectionType::Internal,
@@ -820,7 +818,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ProcAirInNode = GetOnlySingleNode(state,
                                                                         ProcAirInlet,
                                                                         ErrorsFound,
-                                                                        DesicDehum(DesicDehumNum).DehumType,
+                                                                        DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                                                         DesicDehum(DesicDehumNum).Name,
                                                                         DataLoopNode::NodeFluidType::Air,
                                                                         DataLoopNode::ConnectionType::Inlet,
@@ -839,7 +837,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ProcAirOutNode = GetOnlySingleNode(state,
                                                                          ProcAirOutlet,
                                                                          ErrorsFound,
-                                                                         DesicDehum(DesicDehumNum).DehumType,
+                                                                         DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                                                          DesicDehum(DesicDehumNum).Name,
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::ConnectionType::Outlet,
@@ -865,7 +863,7 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ControlNodeNum = GetOnlySingleNode(state,
                                                                          Alphas(5),
                                                                          ErrorsFound,
-                                                                         DesicDehum(DesicDehumNum).DehumType,
+                                                                         DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                                                          DesicDehum(DesicDehumNum).Name,
                                                                          DataLoopNode::NodeFluidType::Air,
                                                                          DataLoopNode::ConnectionType::Sensor,
@@ -1227,7 +1225,7 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).RegenAirInNode = GetOnlySingleNode(state,
                                                                              RegenFanInlet,
                                                                              ErrorsFound,
-                                                                             DesicDehum(DesicDehumNum).DehumType,
+                                                                             DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                                                              DesicDehum(DesicDehumNum).Name,
                                                                              DataLoopNode::NodeFluidType::Air,
                                                                              DataLoopNode::ConnectionType::Inlet,
@@ -1236,7 +1234,7 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).RegenAirOutNode = GetOnlySingleNode(state,
                                                                               RegenAirOutlet,
                                                                               ErrorsFound,
-                                                                              DesicDehum(DesicDehumNum).DehumType,
+                                                                              DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                                                               DesicDehum(DesicDehumNum).Name,
                                                                               DataLoopNode::NodeFluidType::Air,
                                                                               DataLoopNode::ConnectionType::Outlet,
@@ -1281,7 +1279,7 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).RegenAirOutNode = GetOnlySingleNode(state,
                                                                               RegenFanOutlet,
                                                                               ErrorsFound,
-                                                                              DesicDehum(DesicDehumNum).DehumType,
+                                                                              DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                                                               DesicDehum(DesicDehumNum).Name,
                                                                               DataLoopNode::NodeFluidType::Air,
                                                                               DataLoopNode::ConnectionType::Outlet,
@@ -1291,7 +1289,7 @@ namespace DesiccantDehumidifiers {
                     DesicDehum(DesicDehumNum).RegenAirInNode = GetOnlySingleNode(state,
                                                                                  RegenCoilInlet,
                                                                                  ErrorsFound,
-                                                                                 DesicDehum(DesicDehumNum).DehumType,
+                                                                                 DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                                                                  DesicDehum(DesicDehumNum).Name,
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::ConnectionType::Inlet,
@@ -1312,7 +1310,7 @@ namespace DesiccantDehumidifiers {
                     DesicDehum(DesicDehumNum).RegenAirInNode = GetOnlySingleNode(state,
                                                                                  RegenAirInlet,
                                                                                  ErrorsFound,
-                                                                                 DesicDehum(DesicDehumNum).DehumType,
+                                                                                 DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                                                                  DesicDehum(DesicDehumNum).Name,
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::ConnectionType::Inlet,
@@ -1466,7 +1464,7 @@ namespace DesiccantDehumidifiers {
                         GetOnlySingleNode(state,
                                           DesicDehum(DesicDehumNum).CoolingCoilName + " Condenser Inlet Node",
                                           ErrorsFound,
-                                          DesicDehum(DesicDehumNum).DehumType,
+                                          DataLoopNode::ConnectionObjectType::DehumidifierDesiccantSystem,
                                           DesicDehum(DesicDehumNum).Name,
                                           DataLoopNode::NodeFluidType::Air,
                                           DataLoopNode::ConnectionType::OutsideAirReference,

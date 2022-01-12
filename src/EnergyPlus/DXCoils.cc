@@ -984,7 +984,7 @@ void GetDXCoils(EnergyPlusData &state)
         state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
                                                                            Alphas(3),
                                                                            ErrorsFound,
-                                                                           CurrentModuleObject,
+                                                                           DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed,
                                                                            Alphas(1),
                                                                            DataLoopNode::NodeFluidType::Air,
                                                                            DataLoopNode::ConnectionType::Inlet,
@@ -994,7 +994,7 @@ void GetDXCoils(EnergyPlusData &state)
         state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
                                                                             Alphas(4),
                                                                             ErrorsFound,
-                                                                            CurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed,
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::ConnectionType::Outlet,
@@ -1221,15 +1221,16 @@ void GetDXCoils(EnergyPlusData &state)
         if (lAlphaBlanks(10)) {
             state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) = 0;
         } else {
-            state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) = GetOnlySingleNode(state,
-                                                                                              Alphas(10),
-                                                                                              ErrorsFound,
-                                                                                              CurrentModuleObject,
-                                                                                              state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                                              ObjectIsNotParent);
+            state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1) =
+                GetOnlySingleNode(state,
+                                  Alphas(10),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed,
+                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::OutsideAirReference,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
 
             if (!CheckOutAirNodeNumber(state, state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1))) {
                 ShowWarningError(
@@ -1479,25 +1480,27 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        state.dataDXCoils->DXCoil(DXCoilNum).AirInNode = GetOnlySingleNode(state,
-                                                                           Alphas(3),
-                                                                           ErrorsFound,
-                                                                           CurrentModuleObject,
-                                                                           Alphas(1),
-                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                           DataLoopNode::ConnectionType::Inlet,
-                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                           ObjectIsNotParent);
+        state.dataDXCoils->DXCoil(DXCoilNum).AirInNode =
+            GetOnlySingleNode(state,
+                              Alphas(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::CoilCoolingDXTwoStageWithHumidityControlMode,
+                              Alphas(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Inlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
 
-        state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode = GetOnlySingleNode(state,
-                                                                            Alphas(4),
-                                                                            ErrorsFound,
-                                                                            CurrentModuleObject,
-                                                                            Alphas(1),
-                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                            DataLoopNode::ConnectionType::Outlet,
-                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                            ObjectIsNotParent);
+        state.dataDXCoils->DXCoil(DXCoilNum).AirOutNode =
+            GetOnlySingleNode(state,
+                              Alphas(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::CoilCoolingDXTwoStageWithHumidityControlMode,
+                              Alphas(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Outlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
