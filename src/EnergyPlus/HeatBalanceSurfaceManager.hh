@@ -70,6 +70,43 @@ namespace DataHeatBalance {
 
 namespace HeatBalanceSurfaceManager {
 
+    constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::WinShadingType::Num)> WindowShadingTypeNames = {
+        "No Shade",  // 0
+        "Shade Off", // 1
+        "Interior Shade",
+        "Switchable Glazing",
+        "Exterior Shade",
+        "Exterior Screen",
+        "Interior Blind",
+        "Exterior Blind",
+        "Between Glass Shade",
+        "Between Glass Blind",
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::WindowShadingControlType::Num)> WindowShadingControlTypeNames = {
+        "Uncontrolled",
+        "AlwaysOn",
+        "AlwaysOff",
+        "OnIfScheduleAllows",
+        "OnIfHighSolarOnWindow",
+        "OnIfHighHorizontalSolar",
+        "OnIfHighOutdoorAirTemperature",
+        "OnIfHighZoneAirTemperature",
+        "OnIfHighZoneCooling",
+        "OnIfHighGlare",
+        "MeetDaylightIlluminanceSetpoint",
+        "OnNightIfLowOutdoorTempAndOffDay",
+        "OnNightIfLowInsideTempAndOffDay",
+        "OnNightIfHeatingAndOffDay",
+        "OnNightIfLowOutdoorTempAndOnDayIfCooling",
+        "OnNightIfHeatingAndOnDayIfCooling",
+        "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+        "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+        "OnIfHighZoneAirTempAndHighSolarOnWindow",
+        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
+
     // Initialization routines for module
 
     // Algorithms for the module

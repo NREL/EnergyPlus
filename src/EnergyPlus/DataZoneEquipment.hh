@@ -96,7 +96,7 @@ namespace DataZoneEquipment {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVACZone::Num)> AirLoopHVACTypeNamesCC = {
+    constexpr std::array<std::string_view, static_cast<int>(AirLoopHVACZone::Num)> AirLoopHVACTypeNames = {
         "AirLoopHVAC:ZoneSplitter", "AirLoopHVAC:SupplyPlenum", "AirLoopHVAC:ZoneMixer", "AirLoopHVAC:ReturnPlenum"};
 
     constexpr std::array<std::string_view, static_cast<int>(AirLoopHVACZone::Num)> AirLoopHVACTypeNamesUC = {
