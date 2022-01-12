@@ -1914,15 +1914,24 @@ namespace HWBaseboardRadiator {
             return;
         }
 
-        PullCompInterconnectTrigger(state,                                   HWBaseboard(BaseboardNum).plantLoc,                                    HWBaseboard(BaseboardNum).BBLoadReSimIndex,                                    HWBaseboard(BaseboardNum).plantLoc,
+        PullCompInterconnectTrigger(state,
+                                    HWBaseboard(BaseboardNum).plantLoc,
+                                    HWBaseboard(BaseboardNum).BBLoadReSimIndex,
+                                    HWBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::HeatTransferRate,
                                     HWBaseboard(BaseboardNum).Power);
 
-        PullCompInterconnectTrigger(state,                                   HWBaseboard(BaseboardNum).plantLoc,                                    HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,                                    HWBaseboard(BaseboardNum).plantLoc,
+        PullCompInterconnectTrigger(state,
+                                    HWBaseboard(BaseboardNum).plantLoc,
+                                    HWBaseboard(BaseboardNum).BBMassFlowReSimIndex,
+                                    HWBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::MassFlowRate,
                                     HWBaseboard(BaseboardNum).WaterMassFlowRate);
 
-        PullCompInterconnectTrigger(state,                                   HWBaseboard(BaseboardNum).plantLoc,                                    HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,                                    HWBaseboard(BaseboardNum).plantLoc,
+        PullCompInterconnectTrigger(state,
+                                    HWBaseboard(BaseboardNum).plantLoc,
+                                    HWBaseboard(BaseboardNum).BBInletTempFlowReSimIndex,
+                                    HWBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::Temperature,
                                     HWBaseboard(BaseboardNum).WaterOutletTemp);
     }
