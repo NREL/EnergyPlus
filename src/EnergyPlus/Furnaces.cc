@@ -3228,10 +3228,7 @@ namespace Furnaces {
 
                 } else { // mine data from DX heating coil
 
-                    GetDXCoilIndex(state,
-                                   HeatingCoilName,
-                                   state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex,
-                                   IsNotOK);
+                    GetDXCoilIndex(state, HeatingCoilName, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, "...occurs " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;

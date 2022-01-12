@@ -402,8 +402,7 @@ namespace OutdoorAirUnit {
                     OutAirUnit(OAUnitNum).SFanAvailSchedPtr =
                         GetFanAvailSchPtr(state, cFanTypes(OutAirUnit(OAUnitNum).SFanType), OutAirUnit(OAUnitNum).SFanName, errFlag);
                     // get fan index
-                    GetFanIndex(
-                        state, OutAirUnit(OAUnitNum).SFanName, OutAirUnit(OAUnitNum).SFan_Index, ErrorsFound);
+                    GetFanIndex(state, OutAirUnit(OAUnitNum).SFanName, OutAirUnit(OAUnitNum).SFan_Index, ErrorsFound);
                 } else {
                     ErrorsFound = true;
                 }
