@@ -2094,10 +2094,7 @@ namespace Furnaces {
                 } else { // mine data from DX cooling coil
 
                     // Get DX cooling coil index
-                    GetDXCoilIndex(state,
-                                   CoolingCoilName,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                   IsNotOK);
+                    GetDXCoilIndex(state, CoolingCoilName, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3323,10 +3320,7 @@ namespace Furnaces {
 
                     // Get the cooling coil node numbers
                     errFlag = false;
-                    GetDXCoilIndex(state,
-                                   CoolingCoilName,
-                                   state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex,
-                                   errFlag);
+                    GetDXCoilIndex(state, CoolingCoilName, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, errFlag);
                     CoolingCoilInletNode = GetDXCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilOutletNode = GetDXCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {

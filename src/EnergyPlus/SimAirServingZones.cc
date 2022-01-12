@@ -2035,25 +2035,16 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         if (PrimaryAirSystems(AirLoopNum).OASysExists && !PrimaryAirSystems(AirLoopNum).isAllOA) {
                             if (FoundOASys) {
                                 if (PrimaryAirSystems(AirLoopNum).Branch(BranchNum).DuctType != 3) {
-                                    GetFanIndex(state,
-                                                PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                SupFanIndex,
-                                                ErrorsFound);
+                                    GetFanIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                                     supFanModelType = StructArrayLegacyFanModels;
                                     goto EndOfAirLoop;
                                 }
                             } else {
-                                GetFanIndex(state,
-                                            PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                            RetFanIndex,
-                                            ErrorsFound);
+                                GetFanIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
                                 retFanModelType = StructArrayLegacyFanModels;
                             }
                         } else {
-                            GetFanIndex(state,
-                                        PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                        SupFanIndex,
-                                        ErrorsFound);
+                            GetFanIndex(state, PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                             supFanModelType = StructArrayLegacyFanModels;
                             goto EndOfAirLoop;
                         }

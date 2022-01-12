@@ -2507,7 +2507,7 @@ void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanInde
 
     FanIndex = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (FanIndex == 0) {
-        if (!ThisObjectType.empty()){
+        if (!ThisObjectType.empty()) {
             ShowSevereError(state, fmt::format("{}, GetFanIndex: Fan not found={}", ThisObjectType, FanName));
         } else {
             ShowSevereError(state, "GetFanIndex: Fan not found=" + FanName);
@@ -2587,8 +2587,7 @@ void GetFanType(EnergyPlusData &state,
     FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
     if (FanIndex == 0) {
         if ((!ThisObjectType.empty()) && (!ThisObjectName.empty())) {
-            ShowSevereError(state, fmt::format("GetFanType: {}=\"{}\", invalid Fan specified=\"{}\".",
-                ThisObjectType, ThisObjectName, FanName));
+            ShowSevereError(state, fmt::format("GetFanType: {}=\"{}\", invalid Fan specified=\"{}\".", ThisObjectType, ThisObjectName, FanName));
         } else if (!ThisObjectType.empty()) {
             ShowSevereError(state, fmt::format("{}, GetFanType: Fan not found={}", ThisObjectType, FanName));
         } else {

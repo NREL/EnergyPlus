@@ -3842,10 +3842,7 @@ namespace UnitarySystems {
             } else { // mine data from DX heating coil
 
                 // Get DX heating coil index
-                DXCoils::GetDXCoilIndex(state,
-                                        loc_m_HeatingCoilName,
-                                        this->m_HeatingCoilIndex,
-                                        errFlag);
+                DXCoils::GetDXCoilIndex(state, loc_m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag);
                 if (errFlag) {
                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                     errorsFound = true;
@@ -3954,8 +3951,7 @@ namespace UnitarySystems {
         } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
             this->m_DXHeatingCoil = true;
             errFlag = false;
-            DXCoils::GetDXCoilIndex(
-                state, loc_m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, loc_heatingCoilType);
+            DXCoils::GetDXCoilIndex(state, loc_m_HeatingCoilName, this->m_HeatingCoilIndex, errFlag, loc_heatingCoilType);
             if (errFlag) {
                 ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                 errorsFound = true;
@@ -4438,10 +4434,7 @@ namespace UnitarySystems {
                     }
 
                     // Get DX cooling coil index
-                    DXCoils::GetDXCoilIndex(state,
-                                            loc_m_CoolingCoilName,
-                                            this->m_CoolingCoilIndex,
-                                            isNotOK);
+                    DXCoils::GetDXCoilIndex(state, loc_m_CoolingCoilName, this->m_CoolingCoilIndex, isNotOK);
                     if (isNotOK) {
                         ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                         errorsFound = true;
@@ -4659,10 +4652,7 @@ namespace UnitarySystems {
                 } else { // mine data from DX cooling coil
 
                     // Get DX cooling coil index
-                    DXCoils::GetDXCoilIndex(state,
-                                            loc_m_CoolingCoilName,
-                                            this->m_CoolingCoilIndex,
-                                            isNotOK);
+                    DXCoils::GetDXCoilIndex(state, loc_m_CoolingCoilName, this->m_CoolingCoilIndex, isNotOK);
                     if (isNotOK) {
                         ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                         errorsFound = true;
@@ -5008,8 +4998,7 @@ namespace UnitarySystems {
 
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
                 errFlag = false;
-                DXCoils::GetDXCoilIndex(
-                    state, loc_m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, loc_coolingCoilType);
+                DXCoils::GetDXCoilIndex(state, loc_m_CoolingCoilName, this->m_CoolingCoilIndex, errFlag, loc_coolingCoilType);
                 if (errFlag) {
                     ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                     errorsFound = true;

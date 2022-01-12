@@ -2649,10 +2649,7 @@ void GetPTUnit(EnergyPlusData &state)
                 if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == FanType_SimpleOnOff) {
 
                     errFlag = false;
-                    GetFanIndex(state,
-                                state.dataPTHP->PTUnit(PTUnitNum).FanName,
-                                state.dataPTHP->PTUnit(PTUnitNum).FanIndex,
-                                errFlag);
+                    GetFanIndex(state, state.dataPTHP->PTUnit(PTUnitNum).FanName, state.dataPTHP->PTUnit(PTUnitNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                         ErrorsFound = true;

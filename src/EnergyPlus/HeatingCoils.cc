@@ -1183,8 +1183,7 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:SingleSpeed")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = HeatObjTypes::COIL_DX_COOLING;
-                GetDXCoilIndex(
-                    state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                GetDXCoilIndex(state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1230,8 +1229,7 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:TwoSpeed")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = HeatObjTypes::COIL_DX_MULTISPEED;
-                GetDXCoilIndex(
-                    state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                GetDXCoilIndex(state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1253,8 +1251,7 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = HeatObjTypes::COIL_DX_MULTIMODE;
-                GetDXCoilIndex(
-                    state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                GetDXCoilIndex(state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =

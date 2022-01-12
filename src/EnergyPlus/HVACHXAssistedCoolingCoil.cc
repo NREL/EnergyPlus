@@ -1079,11 +1079,8 @@ namespace HVACHXAssistedCoolingCoil {
     //        End of Reporting subroutines for the HXAssistedCoil Module
     // *****************************************************************************
 
-    void GetHXDXCoilIndex(EnergyPlusData &state,
-                          std::string const &HXDXCoilName,
-                          int &HXDXCoilIndex,
-                          bool &ErrorsFound,
-                          std::string_view const CurrentModuleObject)
+    void GetHXDXCoilIndex(
+        EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, std::string_view const CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:

@@ -871,11 +871,8 @@ void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     state.dataNodeInputMgr->CurCheckContextName = ContextName;
 }
 
-void CheckUniqueNodeNames(EnergyPlusData &state,
-                          std::string const &NodeTypes,
-                          bool &ErrorsFound,
-                          std::string const &CheckName,
-                          std::string const &ObjectName)
+void CheckUniqueNodeNames(
+    EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, std::string const &CheckName, std::string const &ObjectName)
 {
 
     // SUBROUTINE INFORMATION:
@@ -917,11 +914,8 @@ void CheckUniqueNodeNames(EnergyPlusData &state,
     }
 }
 
-void CheckUniqueNodeNumbers(EnergyPlusData &state,
-                            std::string const &NodeTypes,
-                            bool &ErrorsFound,
-                            int const CheckNumber,
-                            std::string const ObjectName)
+void CheckUniqueNodeNumbers(
+    EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, int const CheckNumber, std::string const ObjectName)
 {
 
     // SUBROUTINE INFORMATION:
@@ -961,7 +955,6 @@ void CheckUniqueNodeNumbers(EnergyPlusData &state,
             state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = state.dataLoopNodes->NodeID(CheckNumber);
         }
     }
-
 }
 
 void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)

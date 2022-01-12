@@ -793,9 +793,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 UniqueNodeError = false;
                 CheckUniqueNodeNumbers(state,
                                        "Zone Return Air Nodes",
-                                        UniqueNodeError,
-                                        NodeNums(NodeNum),
-                                        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
+                                       UniqueNodeError,
+                                       NodeNums(NodeNum),
+                                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
                 if (UniqueNodeError) {
                     // ShowContinueError(state,  "Occurs for Zone = " + trim( AlphArray( 1 ) ) );
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;

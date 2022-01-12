@@ -712,11 +712,8 @@ namespace HVACUnitaryBypassVAV {
                     } else {
 
                         DXCoilErrFlag = false;
-                        DXCoils::GetDXCoilIndex(state,
-                                                CBVAV(CBVAVNum).DXCoolCoilName,
-                                                CBVAV(CBVAVNum).DXCoolCoilIndexNum,
-                                                DXCoilErrFlag,
-                                                CBVAV(CBVAVNum).DXCoolCoilType);
+                        DXCoils::GetDXCoilIndex(
+                            state, CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
                         if (DXCoilErrFlag) ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                         //         Mine outdoor condenser node from DX coil object
@@ -809,11 +806,8 @@ namespace HVACUnitaryBypassVAV {
                     } else {
 
                         DXCoilErrFlag = false;
-                        DXCoils::GetDXCoilIndex(state,
-                                                CBVAV(CBVAVNum).DXCoolCoilName,
-                                                CBVAV(CBVAVNum).DXCoolCoilIndexNum,
-                                                DXCoilErrFlag,
-                                                CBVAV(CBVAVNum).DXCoolCoilType);
+                        DXCoils::GetDXCoilIndex(
+                            state, CBVAV(CBVAVNum).DXCoolCoilName, CBVAV(CBVAVNum).DXCoolCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).DXCoolCoilType);
                         if (DXCoilErrFlag) ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                         //         Mine outdoor condenser node from multimode DX coil object
@@ -912,11 +906,8 @@ namespace HVACUnitaryBypassVAV {
                         DXCoils::GetCoilInletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
                     CBVAV(CBVAVNum).HeatingCoilOutletNode =
                         DXCoils::GetCoilOutletNode(state, CBVAV(CBVAVNum).HeatCoilType, CBVAV(CBVAVNum).HeatCoilName, DXCoilErrFlag);
-                    DXCoils::GetDXCoilIndex(state,
-                                            CBVAV(CBVAVNum).HeatCoilName,
-                                            CBVAV(CBVAVNum).DXHeatCoilIndexNum,
-                                            DXCoilErrFlag,
-                                            CBVAV(CBVAVNum).HeatCoilType);
+                    DXCoils::GetDXCoilIndex(
+                        state, CBVAV(CBVAVNum).HeatCoilName, CBVAV(CBVAVNum).DXHeatCoilIndexNum, DXCoilErrFlag, CBVAV(CBVAVNum).HeatCoilType);
                     if (DXCoilErrFlag) ShowContinueError(state, "...occurs in " + CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
 
                 } else if (UtilityRoutines::SameString(Alphas(16), "Coil:Heating:DX:VariableSpeed")) {

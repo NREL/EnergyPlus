@@ -261,11 +261,7 @@ namespace Fans {
 
     void ReportFan(EnergyPlusData &state, int FanNum);
 
-    void GetFanIndex(EnergyPlusData &state,
-                     std::string const &FanName,
-                     int &FanIndex,
-                     bool &ErrorsFound,
-                     std::string_view const ThisObjectType = {});
+    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, std::string_view const ThisObjectType = {});
 
     void GetFanVolFlow(EnergyPlusData &state, int FanIndex, Real64 &FanVolFlow);
 

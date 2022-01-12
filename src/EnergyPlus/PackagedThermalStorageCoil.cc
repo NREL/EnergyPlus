@@ -5410,11 +5410,8 @@ void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoil
         DataGlobalConstants::SecInHour;
 }
 
-void GetTESCoilIndex(EnergyPlusData &state,
-                     std::string const &CoilName,
-                     int &CoilIndex,
-                     bool &ErrorsFound,
-                     std::string_view const CurrentModuleObject)
+void GetTESCoilIndex(
+    EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string_view const CurrentModuleObject)
 {
 
     // SUBROUTINE INFORMATION:

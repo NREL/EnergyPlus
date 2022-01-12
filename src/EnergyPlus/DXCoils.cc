@@ -15719,11 +15719,7 @@ void GetDXCoilIndex(EnergyPlusData &state,
 }
 
 std::string
-GetDXCoilName(EnergyPlusData &state,
-              int &DXCoilIndex,
-              bool &ErrorsFound,
-              std::string_view const ThisObjectType,
-              bool const SuppressWarning)
+GetDXCoilName(EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, std::string_view const ThisObjectType, bool const SuppressWarning)
 {
 
     // SUBROUTINE INFORMATION:
