@@ -2143,9 +2143,8 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     if (!(UtilityRoutines::SameString(state.dataAirflowNetwork->AirflowNetworkSimu.HeightOption, "ExternalNode") ||
                           UtilityRoutines::SameString(state.dataAirflowNetwork->AirflowNetworkSimu.HeightOption, "OpeningHeight"))) {
-                        ShowSevereError(state,
-                                        format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(4) + " = " + Alphas(4) +
-                                            " is invalid.");
+                        ShowSevereError(
+                            state, format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(4) + " = " + Alphas(4) + " is invalid.");
                         ShowContinueError(state,
                                           "Valid choices are ExternalNode or OpeningHeight. " + CurrentModuleObject + ": " + cAlphaFields(1) + " = " +
                                               state.dataAirflowNetwork->AirflowNetworkSimu.AirflowNetworkSimuName);
@@ -2157,8 +2156,8 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetwork->AirflowNetworkSimu.iWPCCnt = iWPCCntr::SurfAvg;
                 if (!(UtilityRoutines::SameString(state.dataAirflowNetwork->AirflowNetworkSimu.BldgType, "LowRise") ||
                       UtilityRoutines::SameString(state.dataAirflowNetwork->AirflowNetworkSimu.BldgType, "HighRise"))) {
-                    ShowSevereError(
-                        state, format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(5) + " = " + Alphas(5) + " is invalid.");
+                    ShowSevereError(state,
+                                    format(RoutineName) + CurrentModuleObject + " object, " + cAlphaFields(5) + " = " + Alphas(5) + " is invalid.");
                     ShowContinueError(state,
                                       "Valid choices are LowRise or HighRise. " + CurrentModuleObject + ": " + cAlphaFields(1) + " = " +
                                           state.dataAirflowNetwork->AirflowNetworkSimu.AirflowNetworkSimuName);
@@ -2327,9 +2326,8 @@ namespace AirflowNetworkBalanceManager {
             ShowSevereError(state,
                             format(RoutineName) + "For an AirflowNetwork Simulation, at least one " + CurrentModuleObject +
                                 " object is required but none were found.");
-            ShowFatalError(state,
-                           format(RoutineName) + "Errors found getting " + CurrentModuleObject +
-                               " object. Previous error(s) cause program termination.");
+            ShowFatalError(
+                state, format(RoutineName) + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination.");
         }
 
         // ==> Zone data validation
@@ -2395,8 +2393,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             if (state.dataAirflowNetwork->MultizoneZoneData(i).OpenFactor > 1.0 || state.dataAirflowNetwork->MultizoneZoneData(i).OpenFactor < 0.0) {
-                ShowWarningError(state,
-                                 format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(1) + " is out of range [0.0,1.0]");
+                ShowWarningError(state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(1) + " is out of range [0.0,1.0]");
                 ShowContinueError(
                     state, format("..Input value = {:.2R}, Value will be set to 1.0", state.dataAirflowNetwork->MultizoneZoneData(i).OpenFactor));
                 state.dataAirflowNetwork->MultizoneZoneData(i).OpenFactor = 1.0;
@@ -2422,8 +2419,8 @@ namespace AirflowNetworkBalanceManager {
                         state.dataAirflowNetwork->MultizoneZoneData(i).LowValueTemp = 0.0;
                     }
                     if (state.dataAirflowNetwork->MultizoneZoneData(i).UpValueTemp <= state.dataAirflowNetwork->MultizoneZoneData(i).LowValueTemp) {
-                        ShowWarningError(
-                            state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(3) + " <= " + cNumericFields(2));
+                        ShowWarningError(state,
+                                         format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(3) + " <= " + cNumericFields(2));
                         ShowContinueError(state,
                                           format("..Input value for {} = {:.1R}, Value will be reset to 100.0",
                                                  cNumericFields(3),
@@ -2450,8 +2447,8 @@ namespace AirflowNetworkBalanceManager {
                         state.dataAirflowNetwork->MultizoneZoneData(i).LowValueEnth = 0.0;
                     }
                     if (state.dataAirflowNetwork->MultizoneZoneData(i).UpValueEnth <= state.dataAirflowNetwork->MultizoneZoneData(i).LowValueEnth) {
-                        ShowWarningError(
-                            state, format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(5) + " <= " + cNumericFields(4));
+                        ShowWarningError(state,
+                                         format(RoutineName) + CurrentModuleObject + " object, " + cNumericFields(5) + " <= " + cNumericFields(4));
                         ShowContinueError(state,
                                           format("..Input value for {}= {:.1R}, Value will be reset to 300000.0",
                                                  cNumericFields(5),
@@ -2526,8 +2523,8 @@ namespace AirflowNetworkBalanceManager {
                     state.dataAirflowNetwork->MultizoneExternalNodeData(i).height = Numbers(1); // Nodal height
                     if (UtilityRoutines::SameString(state.dataAirflowNetwork->AirflowNetworkSimu.HeightOption, "ExternalNode") && lNumericBlanks(1)) {
                         ShowWarningError(state,
-                                         format(RoutineName) + CurrentModuleObject + " object =" + Alphas(1) + ". The input of " +
-                                             cNumericFields(1) + " is required, but a blank is found.");
+                                         format(RoutineName) + CurrentModuleObject + " object =" + Alphas(1) + ". The input of " + cNumericFields(1) +
+                                             " is required, but a blank is found.");
                         ShowContinueError(state, format("The default value is assigned as {:.1R}", Numbers(1)));
                     }
                     state.dataAirflowNetwork->MultizoneExternalNodeData(i).ExtNum =
@@ -2543,9 +2540,8 @@ namespace AirflowNetworkBalanceManager {
                         if (UtilityRoutines::SameString(Alphas(3), "Yes")) {
                             state.dataAirflowNetwork->MultizoneExternalNodeData(i).symmetricCurve = true;
                         } else if (!UtilityRoutines::SameString(Alphas(3), "No")) {
-                            ShowWarningError(state,
-                                             format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(3) + " = " +
-                                                 Alphas(3));
+                            ShowWarningError(
+                                state, format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(3) + " = " + Alphas(3));
                             ShowContinueError(state, "The default value is assigned as No.");
                         }
                     }
@@ -2553,9 +2549,8 @@ namespace AirflowNetworkBalanceManager {
                         if (UtilityRoutines::SameString(Alphas(4), "Relative")) {
                             state.dataAirflowNetwork->MultizoneExternalNodeData(i).useRelativeAngle = true;
                         } else if (!UtilityRoutines::SameString(Alphas(4), "Absolute")) {
-                            ShowWarningError(state,
-                                             format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(4) + " = " +
-                                                 Alphas(4));
+                            ShowWarningError(
+                                state, format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(4) + " = " + Alphas(4));
                             ShowContinueError(state, "The default value is assigned as Absolute.");
                         }
                     }
@@ -2598,8 +2593,8 @@ namespace AirflowNetworkBalanceManager {
                                 state.dataAirflowNetwork->MultizoneExternalNodeData(i).symmetricCurve = true;
                             } else if (!UtilityRoutines::SameString(Alphas(7), "No")) {
                                 ShowWarningError(state,
-                                                 format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(7) +
-                                                     " = " + Alphas(7));
+                                                 format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(7) + " = " +
+                                                     Alphas(7));
                                 ShowContinueError(state, "The default value is assigned as No.");
                             }
                         }
@@ -2609,8 +2604,8 @@ namespace AirflowNetworkBalanceManager {
                                 state.dataAirflowNetwork->MultizoneExternalNodeData(i).useRelativeAngle = true;
                             } else if (!UtilityRoutines::SameString(Alphas(8), "Absolute")) {
                                 ShowWarningError(state,
-                                                 format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(8) +
-                                                     " = " + Alphas(8));
+                                                 format(RoutineName) + CurrentModuleObject + " object, Invalid input " + cAlphaFields(8) + " = " +
+                                                     Alphas(8));
                                 ShowContinueError(state, "The default value is assigned as Absolute.");
                             }
                         }
@@ -3125,9 +3120,8 @@ namespace AirflowNetworkBalanceManager {
                     if (found) {
                         state.dataAirflowNetwork->MultizoneSurfaceData(i).NodeNums[1] = j;
                     } else {
-                        ShowSevereError(state,
-                                        format(RoutineName) + CurrentModuleObject + " = " +
-                                            state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName);
+                        ShowSevereError(
+                            state, format(RoutineName) + CurrentModuleObject + " = " + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName);
                         ShowContinueError(state,
                                           "An adjacent zone = " + Zone(state.dataSurface->Surface(n).Zone).Name +
                                               " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE");
@@ -3140,8 +3134,8 @@ namespace AirflowNetworkBalanceManager {
                   state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).ExtWind)) {
                 if (state.dataAirflowNetwork->MultizoneSurfaceData(i).NodeNums[1] == 0 &&
                     state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).ExtBoundCond < 0) {
-                    ShowSevereError(
-                        state, format(RoutineName) + CurrentModuleObject + " = " + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName);
+                    ShowSevereError(state,
+                                    format(RoutineName) + CurrentModuleObject + " = " + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName);
                     ShowContinueError(
                         state,
                         "Outside boundary condition and object are " +
@@ -3257,8 +3251,8 @@ namespace AirflowNetworkBalanceManager {
             if (has_Opening) {
                 if (state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).Sides == 3) {
                     ShowWarningError(state,
-                                     format(RoutineName) + CurrentModuleObject + "=\"" +
-                                         state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\".");
+                                     format(RoutineName) + CurrentModuleObject + "=\"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName +
+                                         "\".");
                     ShowContinueError(state,
                                       "The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent "
                                       "width and height.");
@@ -3267,8 +3261,8 @@ namespace AirflowNetworkBalanceManager {
                 if ((state.dataSurface->Surface(state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) &&
                     (state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSurfCtrNum != VentControlType::Const)) {
                     ShowWarningError(state,
-                                     format(RoutineName) + CurrentModuleObject + "=\"" +
-                                         state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName + "\" is an air boundary surface.");
+                                     format(RoutineName) + CurrentModuleObject + "=\"" + state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfName +
+                                         "\" is an air boundary surface.");
                     ShowContinueError(state, "Ventilation Control Mode = " + Alphas(4) + " is not valid. Resetting to Constant.");
                     state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSurfCtrNum = VentControlType::Const;
                     state.dataAirflowNetwork->MultizoneSurfaceData(i).IndVentControl = true;
@@ -3333,9 +3327,8 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueTemp <=
                         state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueTemp) {
-                        ShowWarningError(state,
-                                         format(RoutineName) + CurrentModuleObject +
-                                             " object, Upper Temperature <= Lower Temperature difference value.");
+                        ShowWarningError(
+                            state, format(RoutineName) + CurrentModuleObject + " object, Upper Temperature <= Lower Temperature difference value.");
                         ShowContinueError(state,
                                           format("..Input value = {:.1R}, Value will be reset to 100.0",
                                                  state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueTemp));
@@ -3371,8 +3364,7 @@ namespace AirflowNetworkBalanceManager {
                         state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth = 0.0;
                     }
                     if (state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth >= 300000.0) {
-                        ShowWarningError(state,
-                                         format(RoutineName) + CurrentModuleObject + " object, Low Enthalpy difference value >= 300000.0");
+                        ShowWarningError(state, format(RoutineName) + CurrentModuleObject + " object, Low Enthalpy difference value >= 300000.0");
                         ShowContinueError(state,
                                           format("..Input value = {:.1R}, Value will be reset to 0.0",
                                                  state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth));
@@ -3381,8 +3373,8 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueEnth <=
                         state.dataAirflowNetwork->MultizoneSurfaceData(i).LowValueEnth) {
-                        ShowWarningError(
-                            state, format(RoutineName) + CurrentModuleObject + " object, Upper Enthalpy <= Lower Enthalpy difference value.");
+                        ShowWarningError(state,
+                                         format(RoutineName) + CurrentModuleObject + " object, Upper Enthalpy <= Lower Enthalpy difference value.");
                         ShowContinueError(state,
                                           format("..Input value = {:.1R}, Value will be set to 300000.0",
                                                  state.dataAirflowNetwork->MultizoneSurfaceData(i).UpValueEnth));
@@ -3391,22 +3383,10 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                 } break;
-                case VentControlType::Const: {
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-                } break;
-                case VentControlType::ASH55: {
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-                } break;
-                case VentControlType::CEN15251: {
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-                } break;
-                case VentControlType::NoVent: {
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
-                    state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
-                } break;
+                case VentControlType::Const:
+                case VentControlType::ASH55:
+                case VentControlType::CEN15251:
+                case VentControlType::NoVent:
                 case VentControlType::ZoneLevel: {
                     state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchNum = 0;
                     state.dataAirflowNetwork->MultizoneSurfaceData(i).VentSchName = "";
@@ -3460,8 +3440,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             }
             if (n < 5 && state.dataGlobal->DisplayExtraWarnings) {
-                ShowWarningError(state,
-                                 format(RoutineName) + "SurfaceAverageCalculation is entered for field = Wind Pressure Coefficient Type.");
+                ShowWarningError(state, format(RoutineName) + "SurfaceAverageCalculation is entered for field = Wind Pressure Coefficient Type.");
                 ShowContinueError(state,
                                   "The AirflowNetwork model provides wind pressure coefficients for 4 vertical exterior orientations and "
                                   "1 horizontal roof.");
@@ -3509,8 +3488,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
-        if (ErrorsFound)
-            ShowFatalError(state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
+        if (ErrorsFound) ShowFatalError(state, format(RoutineName) + "Errors found getting inputs. Previous error(s) cause program termination.");
 
         // Write wind pressure coefficients in the EIO file
         print(state.files.eio, "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)\n");
@@ -3594,15 +3572,15 @@ namespace AirflowNetworkBalanceManager {
         }
         for (int i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfZones; ++i) {
             if (ZoneCheck(i) == 0) {
-                ShowSevereError(
-                    state, format(RoutineName) + "AirflowNetwork:Multizone:Zone = " + state.dataAirflowNetwork->MultizoneZoneData(i).ZoneName);
+                ShowSevereError(state,
+                                format(RoutineName) + "AirflowNetwork:Multizone:Zone = " + state.dataAirflowNetwork->MultizoneZoneData(i).ZoneName);
                 ShowContinueError(state, " does not have any surfaces defined in " + CurrentModuleObject);
                 ShowContinueError(state, "Each zone should have at least two surfaces defined in " + CurrentModuleObject);
                 ErrorsFound = true;
             }
             if (ZoneCheck(i) == 1) {
-                ShowSevereError(
-                    state, format(RoutineName) + "AirflowNetwork:Multizone:Zone = " + state.dataAirflowNetwork->MultizoneZoneData(i).ZoneName);
+                ShowSevereError(state,
+                                format(RoutineName) + "AirflowNetwork:Multizone:Zone = " + state.dataAirflowNetwork->MultizoneZoneData(i).ZoneName);
                 ShowContinueError(state, " has only one surface defined in " + CurrentModuleObject);
                 ShowContinueError(state, " Each zone should have at least two surfaces defined in " + CurrentModuleObject);
                 ErrorsFound = true;
@@ -3624,9 +3602,8 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 if (!SurfaceFound) {
-                    ShowWarningError(state,
-                                     format(RoutineName) +
-                                         "AirflowNetwork:Multizone:Zone = " + state.dataAirflowNetwork->MultizoneZoneData(i).ZoneName);
+                    ShowWarningError(
+                        state, format(RoutineName) + "AirflowNetwork:Multizone:Zone = " + state.dataAirflowNetwork->MultizoneZoneData(i).ZoneName);
                     ShowContinueError(state,
                                       "has more than one surface defined in " + CurrentModuleObject + ", but has the same boundary conditions");
                     ShowContinueError(state, "Please check inputs of " + CurrentModuleObject);
@@ -3712,9 +3689,8 @@ namespace AirflowNetworkBalanceManager {
                                Errorfound1);
                 if (Errorfound1) ErrorsFound = true;
                 if (state.dataAirflowNetwork->IntraZoneNodeData(i).RAFNNodeNum == 0) {
-                    ShowSevereError(state,
-                                    format(RoutineName) + CurrentModuleObject + "='" + Alphas(1) + "' invalid name " + cAlphaFields(2) + "='" +
-                                        Alphas(2));
+                    ShowSevereError(
+                        state, format(RoutineName) + CurrentModuleObject + "='" + Alphas(1) + "' invalid name " + cAlphaFields(2) + "='" + Alphas(2));
                     ErrorsFound = true;
                 }
                 state.dataAirflowNetwork->IntraZoneNodeData(i).AFNZoneNum =
@@ -3874,8 +3850,8 @@ namespace AirflowNetworkBalanceManager {
                         if (state.dataAirflowNetwork->AirflowNetworkSimu.iWPCCnt == iWPCCntr::SurfAvg) {
                             if (!lAlphaBlanks(3)) {
                                 ShowWarningError(state,
-                                                 format(RoutineName) + CurrentModuleObject + "='" + Alphas(1) + " The input of " +
-                                                     cAlphaFields(3) + " is not needed, ");
+                                                 format(RoutineName) + CurrentModuleObject + "='" + Alphas(1) + " The input of " + cAlphaFields(3) +
+                                                     " is not needed, ");
                                 ShowContinueError(state,
                                                   " since AirflowNetwork Wind Pressure Coefficient Type = SURFACE-AVERAGE CALCULATION. The "
                                                   "simulation continues...");
@@ -3895,8 +3871,8 @@ namespace AirflowNetworkBalanceManager {
                 if (state.dataAirflowNetwork->IntraZoneLinkageData(i).NodeNums[1] <= state.dataAirflowNetwork->AirflowNetworkNumOfZones &&
                     state.dataAirflowNetwork->IntraZoneLinkageData(i).NodeNums[0] <= state.dataAirflowNetwork->AirflowNetworkNumOfZones) {
                     ShowSevereError(state,
-                                    format(RoutineName) + CurrentModuleObject + "='" + Alphas(1) + "': Invalid node inputs " + Alphas(2) +
-                                        " and " + Alphas(3) + " are zone nodes");
+                                    format(RoutineName) + CurrentModuleObject + "='" + Alphas(1) + "': Invalid node inputs " + Alphas(2) + " and " +
+                                        Alphas(3) + " are zone nodes");
                     ErrorsFound = true;
                 }
                 if (state.dataAirflowNetwork->IntraZoneLinkageData(i).NodeNums[0] <= state.dataAirflowNetwork->AirflowNetworkNumOfZones &&
@@ -4260,11 +4236,10 @@ namespace AirflowNetworkBalanceManager {
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers > 1) {
             ShowSevereError(state,
-                            format(RoutineName) + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " +
-                                CurrentModuleObject + " object per simulation is allowed when using AirflowNetwork Distribution Systems.");
-            ShowFatalError(state,
-                           format(RoutineName) + "Errors found getting " + CurrentModuleObject +
-                               " object. Previous error(s) cause program termination.");
+                            format(RoutineName) + "More " + CurrentModuleObject + " are found. Currently only one( \"1\") " + CurrentModuleObject +
+                                " object per simulation is allowed when using AirflowNetwork Distribution Systems.");
+            ShowFatalError(
+                state, format(RoutineName) + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination.");
         }
 
         if (state.dataAirflowNetworkBalanceManager->NumOfPressureControllers > 0) {
@@ -5473,7 +5448,7 @@ namespace AirflowNetworkBalanceManager {
                 if (state.dataAirflowNetwork->DisSysCompHXData(i).CoilParentExists && count != 2) {
                     ShowSevereError(state,
                                     format(RoutineName) + "The inputs of component name field as a heat exchanger in "
-                                                               "AIRFLOWNETWORK:DISTRIBUTION:LINKAGE is not correct");
+                                                          "AIRFLOWNETWORK:DISTRIBUTION:LINKAGE is not correct");
                     ShowContinueError(state,
                                       "The entered name of heat exchanger is " + state.dataAirflowNetwork->DisSysCompHXData(i).name +
                                           " in AirflowNetwork:Distribution:Component:HeatExchanger objects");
@@ -5483,7 +5458,7 @@ namespace AirflowNetworkBalanceManager {
                 if ((!state.dataAirflowNetwork->DisSysCompHXData(i).CoilParentExists) && count != 1) {
                     ShowSevereError(state,
                                     format(RoutineName) + "The inputs of component name field as a heat exchanger in "
-                                                               "AIRFLOWNETWORK:DISTRIBUTION:LINKAGE is not correct");
+                                                          "AIRFLOWNETWORK:DISTRIBUTION:LINKAGE is not correct");
                     ShowContinueError(state,
                                       "The entered name of heat exchanger is " + state.dataAirflowNetwork->DisSysCompHXData(i).name +
                                           " in AirflowNetwork:Distribution:Component:HeatExchanger objects");
