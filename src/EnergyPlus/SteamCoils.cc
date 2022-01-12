@@ -841,7 +841,7 @@ namespace SteamCoils {
                         // SteamCoil(CoilNum)%MaxSteamVolFlowRate = DesCoilLoad/(SteamDensity * LatentHeatSteam)
                         //            CpWater  =  GetSpecificHeatGlycol('WATER',  &
                         //                                              TempSteamIn, &
-                        //                                              PlantLoop(SteamCoil(CoilNum)%plantLoc.loopNum)%FluidIndex, &
+                        //                                              PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                         //                                             'SizeSteamCoil')
                         CpWater = GetSatSpecificHeatRefrig(
                             state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
@@ -861,7 +861,7 @@ namespace SteamCoils {
                                                  state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
                 }
                 state.dataSize->DataDesicRegCoil = false; // reset all globals to 0 to ensure correct sizing for other child components
-                // Coil report, set fan info for airplantLoc.loopNum
+                // Coil report, set fan info for airloopnum
                 switch (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType) {
                 case DataAirSystems::StructArrayLegacyFanModels: {
                     int SupFanNum = state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum;
@@ -932,7 +932,7 @@ namespace SteamCoils {
                             // SteamCoil(CoilNum)%MaxSteamVolFlowRate = DesCoilLoad/(SteamDensity * LatentHeatSteam)
                             //           CpWater  =  GetSpecificHeatGlycol('WATER',  &
                             //                                             TempSteamIn, &
-                            //                                             PlantLoop(SteamCoil(CoilNum)%plantLoc.loopNum)%FluidIndex, &
+                            //                                             PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                             //                                            'SizeSteamCoil')
                             CpWater = GetSatSpecificHeatRefrig(
                                 state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
@@ -1164,7 +1164,7 @@ namespace SteamCoils {
 
                     //          CpWater = GetSpecificHeatGlycol('WATER',  &
                     //                                           TempSteamIn, &
-                    //                                           PlantLoop(SteamCoil(CoilNum)%plantLoc.loopNum)%FluidIndex, &
+                    //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                     //                                           'CalcSteamAirCoil')
 
                     CpWater = GetSatSpecificHeatRefrig(
@@ -1278,7 +1278,7 @@ namespace SteamCoils {
 
                     //          CpWater = GetSpecificHeatGlycol('WATER',  &
                     //                                           TempSteamIn, &
-                    //                                           PlantLoop(SteamCoil(CoilNum)%plantLoc.loopNum)%FluidIndex, &
+                    //                                           PlantLoop(SteamCoil(CoilNum)%LoopNum)%FluidIndex, &
                     //                                           'CalcSteamAirCoil')
                     CpWater = GetSatSpecificHeatRefrig(
                         state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineNameSizeSteamCoil);
