@@ -114,7 +114,7 @@ SetpointManager:SystemNodeReset,
   Supply Air Temp Nodes,      !- Setpoint Node or NodeList Name
 
 SetpointManager:SystemNodeReset,
-  Supply Humidity Temp Manager,  !- Name
+  Supply Humidity Manager,       !- Name
   Humidity Ratio,                !- Control Variable
   ,                              !- Maximum Supply Temperature Setpoint {C}
   ,                              !- Minimum Supply Temperature Setpoint {C}
@@ -228,6 +228,4 @@ This code change adds a new structure called `DefineSystemNdResetSetPointManager
 
 The inputs will be grabbed through the `GetSetPointManagerInputData` function, similar with other SetpointManager objects. The following are the cases that the error gets produced: (1) when the invalid control variable is inputted, (2) the maximum temperature or humidity ratio setpoint is higher than the minimum temperature or humidity ratio setpoint.
 
-The new function called `DefineSystemNdResetSetPointManager::calculate` will determine which input parameters will be used for setpoint calculation depending on the selected control variable. In addition, the function called `DefineSystemNdResetSetPointManager::CalcSetPoint` will calculate the setpoint using the logic introduced in the pseudo code above.
-
-The calculated setpoint gets applied through the `UpdateSetPointManagers` function, similar with other SetpointManager objects.
+The new function called `DefineSystemNdResetSetPointManager::calculate` will determine which input parameters will be used for setpoint calculation depending on the selected control variable. In addition, the function called `DefineSystemNdResetSetPointManager::CalcSetPoint` will calculate the setpoint using the logic introduced in the pseudo code above. The calculated setpoint gets applied through `InitSetPointManagers`, `SimSetPointManagers`, and `UpdateSetPointManagers` functions, similar with other SetpointManager objects.
