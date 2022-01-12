@@ -375,11 +375,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
             if (!lAlphaBlanks(2)) {
                 thisZoneEquipList.LoadDistScheme = static_cast<LoadDist>(getEnumerationValue(LoadDistTypeNames, AlphArray(2)));
-                if (thisZoneEquipList.LoadDistScheme == LoadDist::Invalid) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\", Invalid choice.");
-                    ShowContinueError(state, "..." + cAlphaFields(2) + "=\"" + AlphArray(2) + "\".");
-                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-                }
             }
             constexpr int nAlphasInExtensible = 4;
             constexpr int nNumsInExtensible = 2;
@@ -949,9 +944,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) =
                     static_cast<AirLoopHVACZone>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
-                if (state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) == AirLoopHVACZone::Invalid) {
-                    ShowSevereError(state, CurrentModuleObject + ": Invalid input =\"" + AlphArray(Counter));
-                }
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->SupplyAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
@@ -1022,9 +1014,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 }
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) =
                     static_cast<AirLoopHVACZone>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
-                if (state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) == AirLoopHVACZone::Invalid) {
-                    ShowSevereError(state, CurrentModuleObject + ": Invalid input =\"" + AlphArray(Counter));
-                }
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->ReturnAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");
