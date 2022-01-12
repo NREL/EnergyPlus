@@ -1606,12 +1606,7 @@ namespace VentilatedSlab {
                                         state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName,
                                         state.dataVentilatedSlab->VentSlab(Item).CoolingCoilType,
                                         state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc,
-                                        errFlag,
-                                        Optional<const Real64>(),
-                                        Optional<const Real64>(),
-                                        ObjexxFCL::Optional_int(),
-                                        ObjexxFCL::Optional_int_const(),
-                                        ObjexxFCL::Optional_int_const());
+                                        errFlag);
                 if (errFlag) {
                     ShowContinueError(state,
                                       "Reference Unit=\"" + state.dataVentilatedSlab->VentSlab(Item).Name + "\", type=ZoneHVAC:VentilatedSlab");

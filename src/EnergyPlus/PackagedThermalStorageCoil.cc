@@ -2220,12 +2220,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name,
                                     DataPlant::PlantEquipmentType::PackagedTESCoolingCoil,
                                     plantLoc,
-                                    errFlag,
-                                    Optional<const Real64>(),
-                                    Optional<const Real64>(),
-                                    ObjexxFCL::Optional_int(),
-                                    ObjexxFCL::Optional_int_const(),
-                                    ObjexxFCL::Optional_int_const());
+                                    errFlag);
 
             // double check node names match
             if (errFlag) {

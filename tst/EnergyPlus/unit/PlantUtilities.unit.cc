@@ -511,12 +511,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
                                             "comp_name",
                                             DataPlant::PlantEquipmentType::Boiler_Simple,
                                             plantLoc,
-                                            errorFlag,
-                                            Optional<const Real64>(),
-                                            Optional<const Real64>(),
-                                            ObjexxFCL::Optional_int(),
-                                            ObjexxFCL::Optional_int_const(),
-                                            ObjexxFCL::Optional_int_const());
+                                            errorFlag);
     EXPECT_EQ(1, plantLoc.loopNum);
     EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, plantLoc.loopSideNum));
     EXPECT_EQ(1, plantLoc.branchNum);
@@ -528,11 +523,6 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
                                             "comp_name_not_here",
                                             DataPlant::PlantEquipmentType::Boiler_Simple,
                                             plantLoc,
-                                            errorFlag,
-                                            Optional<const Real64>(),
-                                            Optional<const Real64>(),
-                                            ObjexxFCL::Optional_int(),
-                                            ObjexxFCL::Optional_int_const(),
-                                            ObjexxFCL::Optional_int_const());
+                                            errorFlag);
     EXPECT_TRUE(errorFlag);
 }

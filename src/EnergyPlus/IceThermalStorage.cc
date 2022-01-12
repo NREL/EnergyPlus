@@ -1319,12 +1319,7 @@ namespace IceThermalStorage {
                                                     this->Name,
                                                     DataPlant::PlantEquipmentType::TS_IceDetailed,
                                                     this->plantLoc,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+                                                    errFlag);
 
             if (errFlag) {
                 ShowFatalError(state, "DetailedIceStorageData: oneTimeInit: Program terminated due to previous condition(s).");

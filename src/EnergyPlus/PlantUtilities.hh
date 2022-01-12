@@ -175,11 +175,11 @@ namespace PlantUtilities {
                                  DataPlant::PlantEquipmentType CompType,
                                  PlantLocation &plantLoc,
                                  bool &errFlag,
-                                 Optional<Real64 const> LowLimitTemp,
-                                 Optional<Real64 const> HighLimitTemp,
-                                 Optional_int CountMatchPlantLoops,
-                                 Optional_int_const InletNodeNumber,
-                                 Optional_int_const SingleLoopSearch);
+                                 Optional<Real64 const> LowLimitTemp = _,
+                                 Optional<Real64 const> HighLimitTemp = _,
+                                 Optional_int CountMatchPlantLoops = _,
+                                 Optional_int_const InletNodeNumber = _,
+                                 Optional_int_const SingleLoopSearch = _);
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                                   std::string_view const CallerName,        // really used for error messages
