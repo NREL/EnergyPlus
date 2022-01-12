@@ -147,8 +147,6 @@ namespace UnitVentilator {
     int constexpr VariablePercent = 1;
     int constexpr FixedTemperature = 2;
     int constexpr FixedOAControl = 3;
-    // coil operation
-    int constexpr On = 1; // normal coil operation
 
     int constexpr NoneOption = 0;
     int constexpr BothOption = 1;
@@ -487,8 +485,8 @@ namespace UnitVentilator {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode = GetOnlySingleNode(state,
                                                                                                Alphas(6),
                                                                                                ErrorsFound,
-                                                                                               CurrentModuleObject + "-OA MIXER",
-                                                                                               Alphas(1),
+                                                                                               CurrentModuleObject,
+                                                                                               Alphas(1) + "-OA MIXER",
                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                DataLoopNode::NodeConnectionType::Inlet,
                                                                                                NodeInputManager::CompFluidStream::Primary,
@@ -639,8 +637,8 @@ namespace UnitVentilator {
                     GetOnlySingleNode(state,
                                       Alphas(8),
                                       ErrorsFound,
-                                      CurrentModuleObject + "-OA MIXER",
-                                      Alphas(1),
+                                      CurrentModuleObject,
+                                      Alphas(1) + "-OA MIXER",
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::NodeConnectionType::OutsideAirReference,
                                       NodeInputManager::CompFluidStream::Primary,
@@ -655,8 +653,8 @@ namespace UnitVentilator {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).AirReliefNode = GetOnlySingleNode(state,
                                                                                                    Alphas(9),
                                                                                                    ErrorsFound,
-                                                                                                   CurrentModuleObject + "-OA MIXER",
-                                                                                                   Alphas(1),
+                                                                                                   CurrentModuleObject,
+                                                                                                   Alphas(1) + "-OA MIXER",
                                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                                    DataLoopNode::NodeConnectionType::ReliefAir,
                                                                                                    NodeInputManager::CompFluidStream::Primary,
@@ -665,8 +663,8 @@ namespace UnitVentilator {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutNode = GetOnlySingleNode(state,
                                                                                                     Alphas(10),
                                                                                                     ErrorsFound,
-                                                                                                    CurrentModuleObject + "-OA MIXER",
-                                                                                                    Alphas(1),
+                                                                                                    CurrentModuleObject,
+                                                                                                    Alphas(1) + "-OA MIXER",
                                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
                                                                                                     NodeInputManager::CompFluidStream::Primary,
@@ -3785,7 +3783,7 @@ namespace UnitVentilator {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                              FirstHVACIteration,
-                                             On,
+                                             DataHVACGlobals::CompressorOperation::On,
                                              0.0,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index,
                                              ContFanCycCoil);
@@ -3909,7 +3907,7 @@ namespace UnitVentilator {
                     SimHXAssistedCoolingCoil(state,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilName,
                                              FirstHVACIteration,
-                                             On,
+                                             DataHVACGlobals::CompressorOperation::On,
                                              PartLoadRatio,
                                              state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_Index,
                                              FanOpMode);
