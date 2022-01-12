@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -207,7 +207,7 @@ void GetBoilerInput(EnergyPlusData &state)
                                             state.dataIPShortCut->cCurrentModuleObject + " Name");
         auto &thisBoiler = state.dataBoilers->Boiler(BoilerNum);
         thisBoiler.Name = state.dataIPShortCut->cAlphaArgs(1);
-        thisBoiler.TypeNum = DataPlant::TypeOf_Boiler_Simple;
+        thisBoiler.Type = DataPlant::PlantEquipmentType::Boiler_Simple;
 
         // Validate fuel type input
         bool FuelTypeError(false);
@@ -322,7 +322,7 @@ void GetBoilerInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                            NodeInputManager::compFluidStream::Primary,
+                                                                            NodeInputManager::CompFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
         thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(6),
@@ -331,7 +331,7 @@ void GetBoilerInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                             NodeInputManager::compFluidStream::Primary,
+                                                                             NodeInputManager::CompFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -474,7 +474,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state,
                                             this->Name,
-                                            DataPlant::TypeOf_Boiler_Simple,
+                                            DataPlant::PlantEquipmentType::Boiler_Simple,
                                             this->LoopNum,
                                             this->LoopSideNum,
                                             this->BranchNum,
@@ -531,7 +531,7 @@ void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
                 EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->BoilerOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                    state, this->BoilerOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->ModulatedFlowErrDone) {
@@ -585,10 +585,10 @@ void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boi
     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) && this->ModulatedFlowSetToLoop) {
         // fix for clumsy old input that worked because loop setpoint was spread.
         //  could be removed with transition, testing , model change, period of being obsolete.
-        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint =
                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
-        } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
+        } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
             state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo =
                 state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
         }
@@ -757,9 +757,9 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
 }
 
 void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
-                                  Real64 const MyLoad,                                        // W - hot water demand to be met by boiler
-                                  bool const RunFlag,                                         // TRUE if boiler operating
-                                  DataBranchAirLoopPlant::ControlTypeEnum const EquipFlowCtrl // Flow control mode for the equipment
+                                  Real64 const MyLoad,                                    // W - hot water demand to be met by boiler
+                                  bool const RunFlag,                                     // TRUE if boiler operating
+                                  DataBranchAirLoopPlant::ControlType const EquipFlowCtrl // Flow control mode for the equipment
 )
 {
     // SUBROUTINE INFORMATION:
@@ -807,7 +807,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
     // will not shut down the branch
     if (MyLoad <= 0.0 || !RunFlag) {
-        if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive)
+        if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive)
             this->BoilerMassFlowRate = state.dataLoopNodes->Node(BoilerInletNode).MassFlowRate;
         return;
     }
@@ -833,7 +833,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // Initialize the delta temperature to zero
     Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference, set in all necessary code paths so no initialization required
 
-    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
+    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) {
         // Either set the flow to the Constant value or calculate the flow for the variable volume
         if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
             // Then find the flow rate and outlet temp
@@ -852,9 +852,9 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
             // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
             // Then find the flow rate and outlet temp
 
-            if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+            if (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
                 BoilerDeltaTemp = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPoint - state.dataLoopNodes->Node(BoilerInletNode).Temp;
-            } else { // DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand
+            } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
                 BoilerDeltaTemp = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPointLo - state.dataLoopNodes->Node(BoilerInletNode).Temp;
             }
 

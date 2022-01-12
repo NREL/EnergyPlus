@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,15 +155,15 @@ namespace ChillerIndirectAbsorption {
         int MinGenInletTempCtr;                        // Low generator temp warning message counter
         int MinGenInletTempIndex;                      // Low generator temp warning message index
         int CWLoopNum;                                 // chilled water plant loop index number
-        int CWLoopSideNum;                             // chilled water plant loop side index
+        DataPlant::LoopSideLocation CWLoopSideNum;     // chilled water plant loop side index
         int CWBranchNum;                               // chilled water plant loop branch index
         int CWCompNum;                                 // chilled water plant loop component index
         int CDLoopNum;                                 // condenser water plant loop index number
-        int CDLoopSideNum;                             // condenser water plant loop side index
+        DataPlant::LoopSideLocation CDLoopSideNum;     // condenser water plant loop side index
         int CDBranchNum;                               // condenser water plant loop branch index
         int CDCompNum;                                 // condenser water plant loop component index
         int GenLoopNum;                                // generator plant loop index number
-        int GenLoopSideNum;                            // generator plant loop side index
+        DataPlant::LoopSideLocation GenLoopSideNum;    // generator plant loop side index
         int GenBranchNum;                              // generator plant loop branch index
         int GenCompNum;                                // generator plant loop component index
         bool FaultyChillerSWTFlag;                     // True if the chiller has SWT sensor fault
@@ -191,7 +191,7 @@ namespace ChillerIndirectAbsorption {
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         ReportVars Report;
-        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlType EquipFlowCtrl;
 
         // Default Constructor
         IndirectAbsorberSpecs()
@@ -203,15 +203,17 @@ namespace ChillerIndirectAbsorption {
               GeneratorDeltaTempWasAutoSized(true), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), GeneratorInputCurvePtr(0), PumpPowerCurvePtr(0), CapFCondenserTempPtr(0),
               CapFEvaporatorTempPtr(0), CapFGeneratorTempPtr(0), HeatInputFCondTempPtr(0), HeatInputFEvapTempPtr(0), ErrCount2(0),
-              GenHeatSourceType(DataLoopNode::NodeFluidType::blank), SteamFluidIndex(0), Available(false), ON(false),
-              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), MinCondInletTempCtr(0),
-              MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-              CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0),
-              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0),
-              EvapMassFlowRate(0.0), GenMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0),
-              PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
+              GenHeatSourceType(DataLoopNode::NodeFluidType::Blank), SteamFluidIndex(0), Available(false), ON(false),
+              FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), MinCondInletTempCtr(0),
+              MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0), CWLoopNum(0),
+              CWLoopSideNum(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), CDLoopNum(0),
+              CDLoopSideNum(DataPlant::LoopSideLocation::Invalid), CDBranchNum(0), CDCompNum(0), GenLoopNum(0),
+              GenLoopSideNum(DataPlant::LoopSideLocation::Invalid), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false),
+              FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0),
+              GenMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0),
+              PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
               CondenserEnergy(0.0), ChillerONOFFCyclingFrac(0.0), EnergyLossToEnvironment(0.0), GenInputOutputNodesUsed(false), MyOneTimeFlag(true),
-              MyEnvrnFlag(true), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              MyEnvrnFlag(true), EquipFlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid)
         {
         }
 

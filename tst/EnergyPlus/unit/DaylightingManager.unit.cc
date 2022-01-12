@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,7 +73,10 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Construction;
@@ -151,8 +154,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(
-        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
     EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
@@ -259,8 +261,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(
-        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
     EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
@@ -424,13 +425,13 @@ TEST_F(EnergyPlusFixture, DaylightingManager_doesDayLightingUseDElight_Test)
     EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
     state->dataDaylightingData->daylightControl.allocate(3);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
-    state->dataDaylightingData->daylightControl(3).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(3).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
 
     EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
-    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::iDaylightingMethod::DElightDaylighting;
+    state->dataDaylightingData->daylightControl(2).DaylightMethod = DataDaylighting::DaylightingMethod::DElight;
 
     EXPECT_TRUE(doesDayLightingUseDElight(*state));
 }
@@ -869,7 +870,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int const HoursInDay(24);
+    int constexpr HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -1627,8 +1628,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->daylightControl(1).Name);
     EXPECT_EQ("WEST ZONE", state->dataDaylightingData->daylightControl(1).ZoneName);
-    EXPECT_TRUE(
-        compare_enums(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->daylightControl(1).DaylightMethod));
+    EXPECT_TRUE(compare_enums(DataDaylighting::DaylightingMethod::SplitFlux, state->dataDaylightingData->daylightControl(1).DaylightMethod));
     EXPECT_TRUE(compare_enums(DataDaylighting::LtgCtrlType::Continuous, state->dataDaylightingData->daylightControl(1).LightControlType));
 
     EXPECT_EQ(0.3, state->dataDaylightingData->daylightControl(1).MinPowerFraction);
@@ -2197,7 +2197,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int const HoursInDay(24);
+    int constexpr HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -2226,12 +2226,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     std::string eiooutput = delimited_string(
         {
-            "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
-            "Zone/Window Adjacency Daylighting Counts, WEST ZONE,1,0",
-            "Zone/Window Adjacency Daylighting Counts, EAST ZONE,1,0",
-            "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
-            "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
-            "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
+            "! <Enclosure/Window Adjacency Daylighting Counts>, Enclosure Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent "
+            "Enclosures",
+            "Enclosure/Window Adjacency Daylighting Counts, WEST ZONE,1,0",
+            "Enclosure/Window Adjacency Daylighting Counts, EAST ZONE,1,0",
+            "! <Enclosure/Window Adjacency Daylighting Matrix>, Enclosure Name, Number of Adjacent Enclosures with Windows,Adjacent Enclosure Names "
+            "- 1st 100 (max)",
+            "Enclosure/Window Adjacency Daylighting Matrix, WEST ZONE,0",
+            "Enclosure/Window Adjacency Daylighting Matrix, EAST ZONE,0",
         },
         delim);
 
@@ -2278,23 +2280,24 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     eiooutput = delimited_string(
         {
-            "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
-            " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            "! <Sky Daylight Factors>, Sky Type, MonthAndDay, Daylighting Control Name, Enclosure Name, Window Name, Reference Point, Daylight "
+            "Factor",
+            " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE_DAYLCTRL,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE_DAYLCTRL,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
         },
         delim);
 
@@ -2303,11 +2306,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     std::string const dfsoutput = delimited_string(
         {
 
-            "This file contains daylight factors for all exterior windows of daylight zones.",
-            "MonthAndDay,Zone Name,Window Name,Window State",
+            "This file contains daylight factors for all exterior windows of daylight enclosures.",
+            "MonthAndDay,Enclosure Name,Zone Name,Window Name,Window State",
             "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight "
             "Factor for Overcast Sky",
-            "01/21,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
+            "01/21,WEST ZONE,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
             "1,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "2,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "3,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
@@ -2332,7 +2335,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
             "22,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "23,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "24,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-            "01/21,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
+            "01/21,EAST ZONE,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
             "1,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
             "1,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
             "1,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
@@ -2962,7 +2965,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-    int const HoursInDay(24);
+    int constexpr HoursInDay(24);
     state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
         state->dataSurface->SurfSunCosHourly(hour) = 0.0;
@@ -3027,4 +3030,300 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
 
     EXPECT_EQ(expectedResultName, state->dataDaylightingData->IllumMap(1).Name);
     EXPECT_EQ(expectedResultPtsHeader, state->dataDaylightingData->IllumMap(MapNum).pointsHeader);
+}
+TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
+{
+    std::string const idf_objects = delimited_string({
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
+
+        "  SizingPeriod:DesignDay,",
+        "    Denver Stapleton Intl Arpt Ann Clg 1% Condns DB=>MWB,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    32.6,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    15.6,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    83411.,                  !- Barometric Pressure {Pa}",
+        "    4,                       !- Wind Speed {m/s}",
+        "    120,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.00;                    !- Sky Clearness",
+
+        "  Site:Location,",
+        "    Denver Stapleton Intl Arpt CO USA WMO=724690,  !- Name",
+        "    39.77,                   !- Latitude {deg}",
+        "    -104.87,                 !- Longitude {deg}",
+        "    -7.00,                   !- Time Zone {hr}",
+        "    1611.00;                 !- Elevation {m}",
+
+        "  Zone,                                                                                                           ",
+        "    East Zone,               !- Name                                                                              ",
+        "    0.0000000E+00,           !- Direction of Relative North {deg}                                                 ",
+        "    0.0000000E+00,           !- X Origin {m}                                                                      ",
+        "    0.0000000E+00,           !- Y Origin {m}                                                                      ",
+        "    0.0000000E+00,           !- Z Origin {m}                                                                      ",
+        "    1,                       !- Type                                                                              ",
+        "    1,                       !- Multiplier                                                                        ",
+        "    autocalculate,           !- Ceiling Height {m}                                                                ",
+        "    autocalculate;           !- Volume {m3}                                                                       ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Wall001,           !- Name                                                                              ",
+        "    Wall,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.0000000E+00,0.0000000E+00,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                              ",
+        "    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                         ",
+        "    6.096000,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                              ",
+        "    6.096000,0.0000000E+00,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                                   ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Wall002,           !- Name                                                                              ",
+        "    Wall,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.0000000E+00,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                                   ",
+        "    0.0000000E+00,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+        "    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                         ",
+        "    0.0000000E+00,0.0000000E+00,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                              ",
+        "                                                                                                                  ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Wall003,           !- Name                                                                              ",
+        "    Wall,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    6.096000,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                                        ",
+        "    6.096000,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                                   ",
+        "    0.0000000E+00,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                              ",
+        "    0.0000000E+00,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                                   ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Wall004,           !- Name                                                                              ",
+        "    Wall,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    6.096000,0.0000000E+00,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                                   ",
+        "    6.096000,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+        "    6.096000,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                                   ",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                                        ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Flr001,            !- Name                                                                              ",
+        "    Floor,                   !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    NoSun,                   !- Sun Exposure                                                                      ",
+        "    NoWind,                  !- Wind Exposure                                                                     ",
+        "    1.000000,                !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 1 {m}                                         ",
+        "    0.0000000E+00,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+        "    6.096000,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}                                                   ",
+        "    6.096000,0.0000000E+00,0.0000000E+00;  !- X,Y,Z ==> Vertex 4 {m}                                              ",
+        "                                                                                                                  ",
+        "  BuildingSurface:Detailed,                                                                                       ",
+        "    Zn001:Roof001,           !- Name                                                                              ",
+        "    Roof,                    !- Surface Type                                                                      ",
+        "    WALL80,                  !- Construction Name                                                                 ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    ,                        !- Space Name                                                                        ",
+        "    Outdoors,                !- Outside Boundary Condition                                                        ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    SunExposed,              !- Sun Exposure                                                                      ",
+        "    WindExposed,             !- Wind Exposure                                                                     ",
+        "    0.0000000E+00,           !- View Factor to Ground                                                             ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.0000000E+00,6.096000,3.048000,  !- X,Y,Z ==> Vertex 1 {m}                                                   ",
+        "    0.0000000E+00,0.0000000E+00,3.048000,  !- X,Y,Z ==> Vertex 2 {m}                                              ",
+        "    6.096000,0.0000000E+00,3.048000,  !- X,Y,Z ==> Vertex 3 {m}                                                   ",
+        "    6.096000,6.096000,3.048000;  !- X,Y,Z ==> Vertex 4 {m}                                                        ",
+        "                                                                                                                  ",
+        "  FenestrationSurface:Detailed,                                                                                   ",
+        "    Zn001:Wall001:Win001,    !- Name                                                                              ",
+        "    Window,                  !- Surface Type                                                                      ",
+        "    WIN-CON-SINGLEPANE,      !- Construction Name                                                                 ",
+        "    Zn001:Wall001,           !- Building Surface Name                                                             ",
+        "    ,                        !- Outside Boundary Condition Object                                                 ",
+        "    0.5000000,               !- View Factor to Ground                                                             ",
+        "    ,                        !- Frame and Divider Name                                                            ",
+        "    1.0,                     !- Multiplier                                                                        ",
+        "    4,                       !- Number of Vertices                                                                ",
+        "    0.548000,0.0000000E+00,2.5000,  !- X,Y,Z ==> Vertex 1 {m}                                                     ",
+        "    0.548000,0.0000000E+00,0.5000,  !- X,Y,Z ==> Vertex 2 {m}                                                     ",
+        "    5.548000,0.0000000E+00,0.5000,  !- X,Y,Z ==> Vertex 3 {m}                                                     ",
+        "    5.548000,0.0000000E+00,2.5000;  !- X,Y,Z ==> Vertex 4 {m}                                                     ",
+        "                                                                                                                  ",
+        "  Construction,                                                                                                   ",
+        "    WALL80,               !- Name                                                                                 ",
+        "    C4 - 4 IN COMMON BRICK;  !- Layer 1                                                                           ",
+        "                                                                                                                  ",
+        "  Material,                                                                                                       ",
+        "    C4 - 4 IN COMMON BRICK,  !- Name                                                                              ",
+        "    Rough,                   !- Roughness                                                                         ",
+        "    0.1014984,               !- Thickness {m}                                                                     ",
+        "    0.7264224,               !- Conductivity {W/m-K}                                                              ",
+        "    1922.216,                !- Density {kg/m3}                                                                   ",
+        "    836.8000,                !- Specific Heat {J/kg-K}                                                            ",
+        "    0.9000000,               !- Thermal Absorptance                                                               ",
+        "    0.7600000,               !- Solar Absorptance                                                                 ",
+        "    0.7600000;               !- Visible Absorptance                                                               ",
+        "                                                                                                                  ",
+        "  Construction,                                                                                                   ",
+        "    WIN-CON-SINGLEPANE,      !- Name                                                                              ",
+        "    SINGLEPANE;              !- Outside Layer                                                                     ",
+        "                                                                                                                  ",
+        "  WindowMaterial:Glazing,                                                                                         ",
+        "    SINGLEPANE,              !- Name                                                                              ",
+        "    SpectralAverage,         !- Optical Data Type                                                                 ",
+        "    ,                        !- Window Glass Spectral Data Set Name                                               ",
+        "    0.003,                   !- Thickness {m}                                                                     ",
+        "    0.90,                    !- Solar Transmittance at Normal Incidence                                           ",
+        "    0.031,                   !- Front Side Solar Reflectance at Normal Incidence                                  ",
+        "    0.031,                   !- Back Side Solar Reflectance at Normal Incidence                                   ",
+        "    0.90,                    !- Visible Transmittance at Normal Incidence                                         ",
+        "    0.05,                    !- Front Side Visible Reflectance at Normal Incidence                                ",
+        "    0.05,                    !- Back Side Visible Reflectance at Normal Incidence                                 ",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence                                        ",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity                                      ",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity                                       ",
+        "    0.9;                     !- Conductivity {W/m-K}                                                              ",
+        "  Daylighting:Controls,                                                                                           ",
+        "    East Zone_DaylCtrl,      !- Name                                                                              ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    SplitFlux,               !- Daylighting Method                                                                ",
+        "    ,                        !- Availability Schedule Name                                                        ",
+        "    Continuous,              !- Lighting Control Type                                                             ",
+        "    0.3,                     !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control      ",
+        "    0.2,                     !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control     ",
+        "    ,                        !- Number of Stepped Control Steps                                                   ",
+        "    1.0,                     !- Probability Lighting will be Reset When Needed in Manual Stepped Control          ",
+        "    East Zone_DaylRefPt1,    !- Glare Calculation Daylighting Reference Point Name                                ",
+        "    180.0,                   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}",
+        "    20.0,                    !- Maximum Allowable Discomfort Glare Index                                          ",
+        "    ,                        !- DElight Gridding Resolution {m2}                                                  ",
+        "    East Zone_DaylRefPt1,    !- Daylighting Reference Point 1 Name                                                ",
+        "    0.5,                     !- Fraction of Zone Controlled by Reference Point 1                                  ",
+        "    500.,                    !- Illuminance Setpoint at Reference Point 1 {lux}                                   ",
+        "    East Zone_DaylRefPt2,    !- Daylighting Reference Point 1 Name                                                ",
+        "    0.5,                     !- Fraction of Zone Controlled by Reference Point 1                                  ",
+        "    500.;                    !- Illuminance Setpoint at Reference Point 1 {lux}                                   ",
+        "                                                                                                                  ",
+        "  Daylighting:ReferencePoint,                                                                                     ",
+        "    East Zone_DaylRefPt1,    !- Name                                                                              ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    2.048,                   !- X-Coordinate of Reference Point {m}                                               ",
+        "    3.048,                   !- Y-Coordinate of Reference Point {m}                                               ",
+        "    0.9;                     !- Z-Coordinate of Reference Point {m}                                               ",
+        "                                                                                                                  ",
+        "  Daylighting:ReferencePoint,                                                                                     ",
+        "    East Zone_DaylRefPt2,    !- Name                                                                              ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    2.048,                   !- X-Coordinate of Reference Point {m}                                               ",
+        "    3.048,                   !- Y-Coordinate of Reference Point {m}                                               ",
+        "    0.9;                     !- Z-Coordinate of Reference Point {m}                                               ",
+
+        "  Output:IlluminanceMap,                                                                                     ",
+        "    East Zone Illuminance Map,    !- Name                                                                              ",
+        "    East Zone,               !- Zone Name                                                                         ",
+        "    0.9,                     !- Z height {m}                                               ",
+        "    0.1,                     !- X Minimum Coordinate {m}                                               ",
+        "    6.0,                     !- X Maximum Coordinate {m}                                               ",
+        "    10,                      !- Number of X Grid Points                                               ",
+        "    0.1,                     !- Y Minimum Coordinate {m}                                               ",
+        "    6.0,                     !- Y Maximum Coordinate {m}                                               ",
+        "    10;                      !- Number of Y Grid Points                                               ",
+
+        "  Lights,                                                                                                         ",
+        "    East Zone Lights 1,      !- Name                                                                              ",
+        "    East Zone,               !- Zone or ZoneList Name                                                             ",
+        "    Office Lighting,         !- Schedule Name                                                                     ",
+        "    LightingLevel,           !- Design Level Calculation Method                                                   ",
+        "    1464.375,                !- Lighting Level {W}                                                                ",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}                                                  ",
+        "    ,                        !- Watts per Person {W/person}                                                       ",
+        "    0.0000000E+00,           !- Return Air Fraction                                                               ",
+        "    0.2000000,               !- Fraction Radiant                                                                  ",
+        "    0.2000000,               !- Fraction Visible                                                                  ",
+        "    1.0,                     !- Fraction Replaceable                                                              ",
+        "    GeneralLights;           !- End-Use Subcategory                                                               ",
+        "  Schedule:Constant, Office Lighting, AnyNumber, 1.0;",
+        "ScheduleTypeLimits,",
+        "    AnyNumber;              !- Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    SimulationManager::ManageSimulation(*state);
+    EXPECT_EQ(100, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt.size());
+
+    // re-set the hour of the day to mid-day
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 12;
+    state->dataGlobal->CurrentTime = 12.0;
+    state->dataHeatBalMgr->CountWarmupDayPoints = 0;
+    state->dataGlobal->EndDayFlag = false;
+    state->dataWeatherManager->Envrn = 1;
+    WeatherManager::ManageWeather(*state);
+    HeatBalanceManager::ManageHeatBalance(*state);
+    EXPECT_NEAR(16051, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(5), 1);
+    EXPECT_NEAR(203, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(10), 1);
+    EXPECT_NEAR(1294, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(15), 1);
+    EXPECT_NEAR(412, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(20), 1);
+    EXPECT_NEAR(257, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(51), 1);
+    EXPECT_NEAR(316, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(55), 1);
+    EXPECT_NEAR(255, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(60), 1);
+    EXPECT_NEAR(209, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(91), 1);
+    EXPECT_NEAR(209, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(100), 1);
 }

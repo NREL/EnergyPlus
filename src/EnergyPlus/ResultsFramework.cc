@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -161,7 +161,7 @@ namespace ResultsFramework {
                        const OutputProcessor::ReportingFrequency reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       const OutputProcessor::Unit &units)
+                       const OutputProcessor::Unit units)
         : varName(VarName), m_timeStepType(timeStepType), rptID(ReportID), Units(units)
     {
         setReportFrequency(reportFrequency);
@@ -171,7 +171,7 @@ namespace ResultsFramework {
                        const OutputProcessor::ReportingFrequency reportFrequency,
                        const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
-                       const OutputProcessor::Unit &units,
+                       const OutputProcessor::Unit units,
                        const std::string &customUnits)
         : varName(VarName), m_timeStepType(timeStepType), rptID(ReportID), Units(units), m_customUnits(customUnits)
     {
@@ -203,8 +203,8 @@ namespace ResultsFramework {
         iReportFreq = reportFrequency;
         switch (iReportFreq) {
         case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
-            if (m_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) sReportFreq = "Detailed - Zone";
-            if (m_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) sReportFreq = "Detailed - HVAC";
+            if (m_timeStepType == OutputProcessor::TimeStepType::Zone) sReportFreq = "Detailed - Zone";
+            if (m_timeStepType == OutputProcessor::TimeStepType::System) sReportFreq = "Detailed - HVAC";
             break;
         case OutputProcessor::ReportingFrequency::TimeStep: // at 'EndTimeStepFlag'
             sReportFreq = "TimeStep";
@@ -224,6 +224,8 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // once per environment 'EndEnvrnFlag'
             sReportFreq = "Yearly";
             break;
+        default:
+            assert(false);
         }
     }
 
@@ -252,7 +254,7 @@ namespace ResultsFramework {
         return Units;
     }
 
-    void Variable::setUnits(const OutputProcessor::Unit &units)
+    void Variable::setUnits(const OutputProcessor::Unit units)
     {
         Units = units;
     }
@@ -298,7 +300,7 @@ namespace ResultsFramework {
                                    const OutputProcessor::ReportingFrequency reportFrequency,
                                    const OutputProcessor::TimeStepType timeStepType,
                                    const int ReportID,
-                                   const OutputProcessor::Unit &units)
+                                   const OutputProcessor::Unit units)
         : Variable(VarName, reportFrequency, timeStepType, ReportID, units)
     {
     }
@@ -307,7 +309,7 @@ namespace ResultsFramework {
                                    const OutputProcessor::ReportingFrequency reportFrequency,
                                    const OutputProcessor::TimeStepType timeStepType,
                                    const int ReportID,
-                                   const OutputProcessor::Unit &units,
+                                   const OutputProcessor::Unit units,
                                    const std::string &customUnits)
         : Variable(VarName, reportFrequency, timeStepType, ReportID, units, customUnits)
     {
@@ -317,10 +319,10 @@ namespace ResultsFramework {
     MeterVariable::MeterVariable(const std::string &VarName,
                                  const OutputProcessor::ReportingFrequency reportFrequency,
                                  const int ReportID,
-                                 const OutputProcessor::Unit &units,
+                                 const OutputProcessor::Unit units,
                                  const bool MeterOnly,
                                  const bool Accumulative)
-        : Variable(VarName, reportFrequency, OutputProcessor::TimeStepType::TimeStepZone, ReportID, units)
+        : Variable(VarName, reportFrequency, OutputProcessor::TimeStepType::Zone, ReportID, units)
     {
         acc = Accumulative;
         meter_only = MeterOnly;
@@ -982,12 +984,12 @@ namespace ResultsFramework {
                 }
                 switch (reportFrequency) {
                 case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
-                    if ((timeStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
-                        (RVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+                    if ((timeStepType == OutputProcessor::TimeStepType::Zone) &&
+                        (RVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::Zone)) {
                         RIDetailedZoneTSData.setRDataFrameEnabled(true);
                         RIDetailedZoneTSData.addVariable(var);
-                    } else if ((timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
-                               (RVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepSystem)) {
+                    } else if ((timeStepType == OutputProcessor::TimeStepType::System) &&
+                               (RVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::System)) {
                         RIDetailedHVACTSData.setRDataFrameEnabled(true);
                         RIDetailedHVACTSData.addVariable(var);
                     }
@@ -1016,15 +1018,17 @@ namespace ResultsFramework {
                     RIYearlyTSData.setRDataFrameEnabled(true);
                     RIYearlyTSData.addVariable(var);
                     break;
+                default:
+                    assert(false);
                 }
             }
         }
         // set the scanned variables to true or false
         switch (reportFrequency) {
         case OutputProcessor::ReportingFrequency::EachCall:
-            if (timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
+            if (timeStepType == OutputProcessor::TimeStepType::Zone) {
                 RIDetailedZoneTSData.setRVariablesScanned(true);
-            } else if (timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+            } else if (timeStepType == OutputProcessor::TimeStepType::System) {
                 RIDetailedHVACTSData.setRVariablesScanned(true);
             }
             break;
@@ -1046,6 +1050,8 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // at end of year
             RIYearlyTSData.setRVariablesScanned(true);
             break;
+        default:
+            assert(false);
         }
     }
 
@@ -1068,12 +1074,12 @@ namespace ResultsFramework {
                                    IVariableTypes(Loop).units);
                 switch (reportFrequency) {
                 case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
-                    if ((timeStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
-                        (IVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
+                    if ((timeStepType == OutputProcessor::TimeStepType::Zone) &&
+                        (IVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::Zone)) {
                         RIDetailedZoneTSData.setIDataFrameEnabled(true);
                         RIDetailedZoneTSData.addVariable(var);
-                    } else if ((timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
-                               (IVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepSystem)) {
+                    } else if ((timeStepType == OutputProcessor::TimeStepType::System) &&
+                               (IVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::System)) {
                         RIDetailedHVACTSData.setIDataFrameEnabled(true);
                         RIDetailedHVACTSData.addVariable(var);
                     }
@@ -1102,6 +1108,8 @@ namespace ResultsFramework {
                     RIYearlyTSData.setIDataFrameEnabled(true);
                     RIYearlyTSData.addVariable(var);
                     break;
+                default:
+                    assert(false);
                 }
             }
         }
@@ -1109,9 +1117,9 @@ namespace ResultsFramework {
         // set the scanned variables to true or false
         switch (reportFrequency) {
         case OutputProcessor::ReportingFrequency::EachCall:
-            if (timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
+            if (timeStepType == OutputProcessor::TimeStepType::Zone) {
                 RIDetailedZoneTSData.setIVariablesScanned(true);
-            } else if (timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+            } else if (timeStepType == OutputProcessor::TimeStepType::System) {
                 RIDetailedHVACTSData.setIVariablesScanned(true);
             }
             break;
@@ -1133,6 +1141,8 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // once per environment 'EndEnvrnFlag'
             RIYearlyTSData.setIVariablesScanned(true);
             break;
+        default:
+            assert(false);
         }
     }
 
@@ -1257,6 +1267,8 @@ namespace ResultsFramework {
                 }
             }
             break;
+        default:
+            assert(false);
         }
 
         // set the scanned variables to true or false
@@ -1282,6 +1294,8 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // at Yearly
             YRMeters.setRVariablesScanned(true);
             break;
+        default:
+            assert(false);
         }
     }
 

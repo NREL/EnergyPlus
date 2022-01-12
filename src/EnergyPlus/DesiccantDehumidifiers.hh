@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -66,30 +67,34 @@ namespace DesiccantDehumidifiers {
 
     enum class DesicDehumType // Desiccant dehumidifier type
     {
-        Unassigned,
+        Invalid = -1,
         Solid,
-        Generic
+        Generic,
+        Num
     };
 
     enum class DesicDehumCtrlType
     {
-        Unassigned,
+        Invalid = -1,
         FixedHumratBypass, // FIXED LEAVING HUMRAT SETPOINT:BYPASS
-        NodeHumratBypass   // NODE LEAVING HUMRAT SETPOINT:BYPASS
+        NodeHumratBypass,  // NODE LEAVING HUMRAT SETPOINT:BYPASS
+        Num
     };
 
     enum class Selection
     {
-        Unassigned,
-        No, // Condenser waste heat NOT reclaimed for desiccant regeneration
-        Yes // Condenser waste heat reclaimed for desiccant regeneration
+        Invalid = -1,
+        No,  // Condenser waste heat NOT reclaimed for desiccant regeneration
+        Yes, // Condenser waste heat reclaimed for desiccant regeneration
+        Num
     };
 
     enum class PerformanceModel
     {
-        Unassigned,
+        Invalid = -1,
         Default,
-        UserCurves
+        UserCurves,
+        Num
     };
 
     //  Desiccant heat exchanger type
@@ -112,7 +117,7 @@ namespace DesiccantDehumidifiers {
         // (initially set to conditions entering regen heating coil)
         int RegenAirOutNode;            // regen air outlet node of dehumidifier
         int RegenFanInNode;             // regen fan inlet node
-        DesicDehumCtrlType ControlType; // type of controls
+        DesicDehumCtrlType controlType; // type of controls
         Real64 HumRatSet;               // humidity ratio setpoint [kg water / kg air]
         Real64 NomProcAirVolFlow;       // nominal process air flow rate [m3/s]
         Real64 NomProcAirVel;           // nominal process air velocity [m/s]
@@ -170,71 +175,72 @@ namespace DesiccantDehumidifiers {
         int RegenFanErrorIndex3;       // recurring error message index for incorrect regen fan flow
         int RegenFanErrorIndex4;       // recurring error message index for incorrect regen fan flow
         // structure elements unique to generic desiccant dehumidifier
-        std::string HXType;                  // type of desiccant heat exchanger
-        std::string HXName;                  // name of desiccant heat exchanger
-        int HXTypeNum;                       // parameter number of desiccant heat exchanger
-        std::string ExhaustFanCurveObject;   // exhaust fan curve object
-        std::string CoolingCoilType;         // type of cooling coil used with desiccant heat exchanger
-        std::string CoolingCoilName;         // name of cooling coil used with desiccant heat exchanger
-        int coolingCoil_TypeNum;             // type of cooling coil, DataHVACGlobals coil type constants
-        Selection Preheat;                   // determine condenser waste heat usage for pre heating regen air
-        Real64 RegenSetPointTemp;            // heating set-point for regeneration air [C]
-        Real64 ExhaustFanMaxVolFlowRate;     // exhaust fan maximum allowable air flow rate [m3/s]
-        Real64 ExhaustFanMaxMassFlowRate;    // exhaust fan maximum allowable air mass flow rate [kg/s]
-        Real64 ExhaustFanMaxPower;           // exhaust fan maximum allowable power [W]
-        Real64 ExhaustFanPower;              // exhaust fan power for reporting [W]
-        Real64 ExhaustFanElecConsumption;    // exhaust fan electric consumption for reporting [J]
-        Real64 CompanionCoilCapacity;        // DX coil capacity for dehumidifier companion cooling coil [W]
-        int RegenFanPlacement;               // placement of the fan used for regeneration air flow
-        int ControlNodeNum;                  // node number of control node
-        int ExhaustFanCurveIndex;            // exhaust fan curve object index
-        int CompIndex;                       // index of HX component to call simheatrecovery
-        int CoolingCoilOutletNode;           // node number of cooling coil outlet node
-        int RegenFanOutNode;                 // fan outlet node number mined from regen fan object
-        int RegenCoilInletNode;              // regen heating coil inlet node number mined from regen heater object
-        int RegenCoilOutletNode;             // regen heating coil outlet node number mined from regen heater object
-        int HXProcInNode;                    // process inlet node num mined from desiccant heat exchanger object
-        int HXProcOutNode;                   // process outlet node num mined from desiccant heat exchanger object
-        int HXRegenInNode;                   // regen inlet node number mined from desiccant heat exchanger object
-        int HXRegenOutNode;                  // regen outlet node number mined from desiccant heat exchanger object
-        int CondenserInletNode;              // regen outlet node number mined from desiccant heat exchanger object
-        int DXCoilIndex;                     // DX Coil index mined from coil object
-        int ErrCount;                        // error count
-        int ErrIndex1;                       // error index
-        Selection CoilUpstreamOfProcessSide; // used to determine if process inlet is pre-cooled
-        bool RegenInletIsOutsideAirNode;     // regen inlet is connected to an outside air node
-        int RegenCoilType_Num;               // type number of regen coil
-        int CoilControlNode;                 // heating coil hot water or steam inlet node
-        int CoilOutletNode;                  // outlet node for water coil
-        int LoopNum;                         // plant loop index for water heating coil
-        int LoopSide;                        // plant loop side  index for water heating coil
-        int BranchNum;                       // plant loop branch index for water heating coil
-        int CompNum;                         // plant loop component index for water heating coil
-        int HotWaterCoilMaxIterIndex;        // Index to recurring warning message
-        int HotWaterCoilMaxIterIndex2;       // Index to recurring warning message
-        Real64 MaxCoilFluidFlow;             // hot water or steam mass flow rate regen. heating coil [kg/s]
-        Real64 RegenCoilCapacity;            // hot water or steam coil operating capacity [W]
+        std::string HXType;                   // type of desiccant heat exchanger
+        std::string HXName;                   // name of desiccant heat exchanger
+        int HXTypeNum;                        // parameter number of desiccant heat exchanger
+        std::string ExhaustFanCurveObject;    // exhaust fan curve object
+        std::string CoolingCoilType;          // type of cooling coil used with desiccant heat exchanger
+        std::string CoolingCoilName;          // name of cooling coil used with desiccant heat exchanger
+        int coolingCoil_TypeNum;              // type of cooling coil, DataHVACGlobals coil type constants
+        Selection Preheat;                    // determine condenser waste heat usage for pre heating regen air
+        Real64 RegenSetPointTemp;             // heating set-point for regeneration air [C]
+        Real64 ExhaustFanMaxVolFlowRate;      // exhaust fan maximum allowable air flow rate [m3/s]
+        Real64 ExhaustFanMaxMassFlowRate;     // exhaust fan maximum allowable air mass flow rate [kg/s]
+        Real64 ExhaustFanMaxPower;            // exhaust fan maximum allowable power [W]
+        Real64 ExhaustFanPower;               // exhaust fan power for reporting [W]
+        Real64 ExhaustFanElecConsumption;     // exhaust fan electric consumption for reporting [J]
+        Real64 CompanionCoilCapacity;         // DX coil capacity for dehumidifier companion cooling coil [W]
+        int RegenFanPlacement;                // placement of the fan used for regeneration air flow
+        int ControlNodeNum;                   // node number of control node
+        int ExhaustFanCurveIndex;             // exhaust fan curve object index
+        int CompIndex;                        // index of HX component to call simheatrecovery
+        int CoolingCoilOutletNode;            // node number of cooling coil outlet node
+        int RegenFanOutNode;                  // fan outlet node number mined from regen fan object
+        int RegenCoilInletNode;               // regen heating coil inlet node number mined from regen heater object
+        int RegenCoilOutletNode;              // regen heating coil outlet node number mined from regen heater object
+        int HXProcInNode;                     // process inlet node num mined from desiccant heat exchanger object
+        int HXProcOutNode;                    // process outlet node num mined from desiccant heat exchanger object
+        int HXRegenInNode;                    // regen inlet node number mined from desiccant heat exchanger object
+        int HXRegenOutNode;                   // regen outlet node number mined from desiccant heat exchanger object
+        int CondenserInletNode;               // regen outlet node number mined from desiccant heat exchanger object
+        int DXCoilIndex;                      // DX Coil index mined from coil object
+        int ErrCount;                         // error count
+        int ErrIndex1;                        // error index
+        Selection CoilUpstreamOfProcessSide;  // used to determine if process inlet is pre-cooled
+        bool RegenInletIsOutsideAirNode;      // regen inlet is connected to an outside air node
+        int RegenCoilType_Num;                // type number of regen coil
+        int CoilControlNode;                  // heating coil hot water or steam inlet node
+        int CoilOutletNode;                   // outlet node for water coil
+        int LoopNum;                          // plant loop index for water heating coil
+        DataPlant::LoopSideLocation LoopSide; // plant loop side  index for water heating coil
+        int BranchNum;                        // plant loop branch index for water heating coil
+        int CompNum;                          // plant loop component index for water heating coil
+        int HotWaterCoilMaxIterIndex;         // Index to recurring warning message
+        int HotWaterCoilMaxIterIndex2;        // Index to recurring warning message
+        Real64 MaxCoilFluidFlow;              // hot water or steam mass flow rate regen. heating coil [kg/s]
+        Real64 RegenCoilCapacity;             // hot water or steam coil operating capacity [W]
 
         // Default Constructor
         DesiccantDehumidifierData()
-            : PerformanceModel_Num(PerformanceModel::Unassigned), ProcAirInNode(0), ProcAirOutNode(0), RegenAirInNode(0), RegenAirOutNode(0),
-              RegenFanInNode(0), ControlType(DesicDehumCtrlType::Unassigned), HumRatSet(0.0), NomProcAirVolFlow(0.0), NomProcAirVel(0.0),
+            : PerformanceModel_Num(PerformanceModel::Invalid), ProcAirInNode(0), ProcAirOutNode(0), RegenAirInNode(0), RegenAirOutNode(0),
+              RegenFanInNode(0), controlType(DesicDehumCtrlType::Invalid), HumRatSet(0.0), NomProcAirVolFlow(0.0), NomProcAirVel(0.0),
               NomRotorPower(0.0), RegenCoilIndex(0), RegenFanIndex(0), regenFanType_Num(0), ProcDryBulbCurvefTW(0), ProcDryBulbCurvefV(0),
               ProcHumRatCurvefTW(0), ProcHumRatCurvefV(0), RegenEnergyCurvefTW(0), RegenEnergyCurvefV(0), RegenVelCurvefTW(0), RegenVelCurvefV(0),
               NomRegenTemp(121.0), MinProcAirInTemp(-73.3), MaxProcAirInTemp(65.6), MinProcAirInHumRat(0.0), MaxProcAirInHumRat(0.21273), SchedPtr(0),
               NomProcAirMassFlow(0.0), NomRegenAirMassFlow(0.0), ProcAirInTemp(0.0), ProcAirInHumRat(0.0), ProcAirInEnthalpy(0.0),
               ProcAirInMassFlowRate(0.0), ProcAirOutTemp(0.0), ProcAirOutHumRat(0.0), ProcAirOutEnthalpy(0.0), ProcAirOutMassFlowRate(0.0),
               RegenAirInTemp(0.0), RegenAirInHumRat(0.0), RegenAirInEnthalpy(0.0), RegenAirInMassFlowRate(0.0), RegenAirVel(0.0),
-              DehumTypeCode(DesicDehumType::Unassigned), WaterRemove(0.0), WaterRemoveRate(0.0), SpecRegenEnergy(0.0), QRegen(0.0), RegenEnergy(0.0),
+              DehumTypeCode(DesicDehumType::Invalid), WaterRemove(0.0), WaterRemoveRate(0.0), SpecRegenEnergy(0.0), QRegen(0.0), RegenEnergy(0.0),
               ElecUseEnergy(0.0), ElecUseRate(0.0), PartLoad(0.0), RegenCapErrorIndex1(0), RegenCapErrorIndex2(0), RegenCapErrorIndex3(0),
               RegenCapErrorIndex4(0), RegenFanErrorIndex1(0), RegenFanErrorIndex2(0), RegenFanErrorIndex3(0), RegenFanErrorIndex4(0), HXTypeNum(0),
-              coolingCoil_TypeNum(0), Preheat(Selection::Unassigned), RegenSetPointTemp(0.0), ExhaustFanMaxVolFlowRate(0.0),
+              coolingCoil_TypeNum(0), Preheat(Selection::Invalid), RegenSetPointTemp(0.0), ExhaustFanMaxVolFlowRate(0.0),
               ExhaustFanMaxMassFlowRate(0.0), ExhaustFanMaxPower(0.0), ExhaustFanPower(0.0), ExhaustFanElecConsumption(0.0),
               CompanionCoilCapacity(0.0), RegenFanPlacement(0), ControlNodeNum(0), ExhaustFanCurveIndex(0), CompIndex(0), CoolingCoilOutletNode(0),
               RegenFanOutNode(0), RegenCoilInletNode(0), RegenCoilOutletNode(0), HXProcInNode(0), HXProcOutNode(0), HXRegenInNode(0),
-              HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0), ErrIndex1(0), CoilUpstreamOfProcessSide(Selection::Unassigned),
-              RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0), CoilControlNode(0), CoilOutletNode(0), LoopNum(0), LoopSide(0), BranchNum(0),
-              CompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxCoilFluidFlow(0.0), RegenCoilCapacity(0.0)
+              HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0), ErrIndex1(0), CoilUpstreamOfProcessSide(Selection::Invalid),
+              RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0), CoilControlNode(0), CoilOutletNode(0), LoopNum(0),
+              LoopSide(DataPlant::LoopSideLocation::Invalid), BranchNum(0), CompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
+              MaxCoilFluidFlow(0.0), RegenCoilCapacity(0.0)
         {
         }
     };

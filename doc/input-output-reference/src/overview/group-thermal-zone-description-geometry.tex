@@ -13,13 +13,13 @@ named \textless{}Zone Name\textgreater{}-Remainder will be created.
 Input references to Space Names must have a matching Space object. 
 Default space names may not be referenced in the input except for \hyperref[outputvariable]{Output:Variable} keys).
 
-Space geometry is specified by attaching surfaces to a space using the ``Space Name'' field. If a Space has only floor surface(s) assigned to it, the Space is assumed to share the same enclosure with other such Spaces in the same Zone (and with any surfaces that are not explicitly assinged to a space). If a Space also has other types of surfaces (non-floor) then the Space forms its own enclosure unless it is connected to other spaces with air boundaries (see \hyperref[constructionairboundary]{Construction:AirBoundary}).
+Space geometry is specified by attaching surfaces to a space using the ``Space Name'' field. If a Space has only floor surface(s) and internal mass assigned to it, the Space is assumed to share the same enclosure with other such Spaces in the same Zone (and with any surfaces that are not explicitly assinged to a space). If a Space also has other types of surfaces (e.g. wall, ceiling, or roof) then the Space forms its own enclosure unless it is connected to other spaces with air boundaries (see \hyperref[constructionairboundary]{Construction:AirBoundary}).
 
 \subsubsection{Inputs}\label{space-inputs-048}
 
 \paragraph{Field: Name}\label{space-object-name}
 
-The name of the Space object. Must be unique across Zone and Space names.
+The name of the Space object. This name must be unique across Zone, Space, ZoneList, and SpaceList names.
 
 \paragraph{Field: Zone Name}\label{space-zone-name}
 
@@ -49,9 +49,9 @@ Space lists are not exclusive. A Space can be referenced by more than one SpaceL
 
 \subsubsection{Inputs}\label{inputs-1-045space}
 
-\paragraph{Field: Space List Name}\label{field-space-list-name-000}
+\paragraph{Field: Name}\label{field-space-list-name-000}
 
-The name of the SpaceList object. Must be unique across SpaceLists and Spaces.
+The name of the SpaceList object. This name must be unique across Zone, Space, ZoneList, and SpaceList names.
 
 \paragraph{Field: Space \textless{}\#\textgreater{} Name}\label{field-space-name}
 
@@ -82,7 +82,7 @@ Default space names may not be referenced in the input except for \hyperref[outp
 
 \paragraph{Field: Name}\label{zone-object-name}
 
-The name of the Zone object. Must be unique across Zone and Space names.
+The name of the Zone object. This name must be unique across Zone, Space, ZoneList, and SpaceList names.
 
 \paragraph{Field: Direction of Relative North}\label{field-direction-of-relative-north}
 
@@ -200,6 +200,7 @@ The outdoor wind speed calculated at the height above ground of the zone centroi
   Zone,Sum,Space Total Internal Total Heating Energy {[}J{]}
 \item
   Zone,Average,Space Total Internal Total Heating Rate {[}W{]}
+\end{itemize}
 
 \subsection{Zone Thermal Output(s)}\label{zone-thermal-outputs}
 
@@ -454,9 +455,9 @@ Zone lists are not exclusive. A zone can be referenced be more than one ZoneList
 
 \subsubsection{Inputs}\label{inputs-1-045}
 
-\paragraph{Field: Zone List Name}\label{field-zone-list-name-000}
+\paragraph{Field: Name}\label{field-zone-list-name-000}
 
-The name of the ZoneList object. Must be unique across ZoneLists.
+The name of the ZoneList object. This name must be unique across Zone, Space, ZoneList, and SpaceList names.
 
 \paragraph{Field: Zone \textless{}\#\textgreater{} Name}\label{field-zone-1---zone-20-name}
 
@@ -750,7 +751,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-012}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-012}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}
 
@@ -802,7 +807,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-1-009}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-1-009}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-1}
 
@@ -854,7 +863,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-2-007}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-2-007}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-2}
 
@@ -904,7 +917,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-3-006}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-3-006}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object}
 
@@ -962,8 +979,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-4-006}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
 
+\paragraph{Field: Space Name}\label{field-space-name-4-006}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-4}
 
 The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
@@ -1012,8 +1032,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-5-005}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
 
+\paragraph{Field: Space Name}\label{field-space-name-5-005}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-5}
 
 The Azimuth Angle indicates the direction of the outward normal for the roof. The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
@@ -1062,7 +1085,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-6-004}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-6-004}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-1}
 
@@ -1120,7 +1147,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-7-004}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-7-004}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-7}
 
@@ -1170,7 +1201,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-8-003}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-8-003}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Azimuth Angle}\label{field-azimuth-angle-8}
 
@@ -1220,7 +1255,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-9-001}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-9-001}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition Object}\label{field-outside-boundary-condition-object-2}
 
@@ -1751,7 +1790,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-10-000}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-10-000}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition}\label{field-outside-boundary-condition}
 
@@ -1864,7 +1907,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-11-000}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-11-000}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition}\label{field-outside-boundary-condition-1}
 
@@ -1973,7 +2020,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-12-000}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-12-000}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space named <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition}\label{field-outside-boundary-condition-2}
 
@@ -2142,7 +2193,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone Name}\label{field-zone-name-13}
 
-This is the zone name to which the surface belongs.
+This is the zone name to which the surface belongs. This field is required.
+
+\paragraph{Field: Space Name}\label{field-space-name-13}
+
+This is the space name to which the surface belongs. If this field is left blank, it will be automatically assigned to a space name <Zone Name> or <Zone Name>-Remainder. See \hyperref[space]{Space} for more details.
 
 \paragraph{Field: Outside Boundary Condition}\label{field-outside-boundary-condition-3}
 
@@ -2440,7 +2495,7 @@ Determine when \textbf{condensation} occurs & Print the variables ``Surface Wind
 
 \subsection{InternalMass}\label{internalmass}
 
-Any surface that would logically be described as an interior wall, floor or ceiling can just as easily be described as Internal Mass. Internal Mass surface types only exchange energy with the zone in which they are described; they do not see any other zones. There are two approaches to using internal mass. The first approach is to have several pieces of internal mass with each piece having a different construction type. The other approach is to choose an average construction type and combine all of the interior surfaces into a single internal mass. Similar to internal surfaces with an adiabatic boundary condition, the zone will only exchange energy with the inside of the Internal Mass construction. If both sides of the surface exchange energy with the zone then the user should input twice the area when defining the Internal Mass object. Note that furniture and other large objects within a zone can be described using internal mass. However, simplifying calculations using internal mass must be used with caution when the ``FullInteriorAndExterior'' or ``FullInteriorAndExteriorWithReflections'' Solar Distribution model (see Building parameters) is chosen. A single Internal Mass object can be applied to a set of zones. This requires specifying a zone list name instead of a zone name in the input field \textit{Zone or ZoneList Name}.
+Any surface that would logically be described as an interior wall, floor or ceiling can just as easily be described as Internal Mass. Internal Mass surface types only exchange energy with the zone in which they are described; they do not see any other zones. There are two approaches to using internal mass. The first approach is to have several pieces of internal mass with each piece having a different construction type. The other approach is to choose an average construction type and combine all of the interior surfaces into a single internal mass. Similar to internal surfaces with an adiabatic boundary condition, the zone will only exchange energy with the inside of the Internal Mass construction. If both sides of the surface exchange energy with the zone then the user should input twice the area when defining the Internal Mass object. Note that furniture and other large objects within a zone can be described using internal mass. However, simplifying calculations using internal mass must be used with caution when the ``FullInteriorAndExterior'' or ``FullInteriorAndExteriorWithReflections'' Solar Distribution model (see Building parameters) is chosen. A single Internal Mass object can be applied to a set of zones or spaces by specifying a \hyperref[zonelist]{ZoneList} or \hyperref[spacelist]{SpaceList} name.
 
 \subsubsection{Inputs}\label{inputs-25-004}
 
@@ -2468,7 +2523,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 \paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-14}
 
-This field is the name of the zone (ref: Zone) or ZoneList (ref: ZoneList) and represents a particular internal mass object in a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this internal mass object is applied to each of the zones in the zone list. The name of the actual internal mass object in each zone becomes <Zone Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+This field is the name of the \hyperref[zone]{Zone} or \hyperref[zonelist]{ZoneList} in which the internal mass will be added. When the ZoneList option is used then this internal mass object is applied to each of zone in the list. The name of the actual internal mass object in each zone becomes <Zone Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
+
+\paragraph{Field: Space or SpaceList Name}\label{field-space-or-spacelist-name-14}
+
+This field is the name of the \hyperref[space]{Space} or \hyperref[spacelist]{SpaceList} in which the internal mass will be added. When the SpaceList option is used then this internal mass object is applied to each space in the list. The name of the actual internal mass object in each space becomes <Space Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run. This field is ignored when a ZoneList Name is specified for Zone or ZoneList Name. If a Space Name is used, then the Space must be part of Zone Name. If a SpaceList Name is used, then the Zone Name is ignored (even though it is a required field), and the surface is assigned to the corresponding Zone(s) for each Space in the SpaceList.
 
 \paragraph{Field: Surface Area}\label{field-surface-area}
 

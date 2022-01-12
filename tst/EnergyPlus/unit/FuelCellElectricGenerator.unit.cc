@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -799,11 +799,11 @@ TEST_F(EnergyPlusFixture, FuelCellTest)
     EXPECT_TRUE(has_err_output(true));
 
     auto &generatorController = state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
-    EXPECT_TRUE(compare_enums(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num));
+    EXPECT_TRUE(compare_enums(GeneratorType::FuelCell, generatorController->generatorType));
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
-    EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
+    EXPECT_EQ("GENERATOR:FUELCELL", GeneratorTypeNamesUC[static_cast<int>(generatorController->generatorType)]);
 
-    EXPECT_EQ(DataPlant::TypeOf_Generator_FCExhaust, generatorController->compPlantTypeOf_Num);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Generator_FCExhaust, generatorController->compPlantType));
 
     // Note: plantInfoFound (and cogenLocation) are only set when mode is FollowThermal or FollowThermalLimitElectric
     // Here it's 'Baseload'
@@ -1746,11 +1746,11 @@ TEST_F(EnergyPlusFixture, DISABLED_FuelCellTest_Zero_Cp_Fix)
     EXPECT_TRUE(simulation_err);
 
     auto &generatorController = state->dataElectPwrSvcMgr->facilityElectricServiceObj->elecLoadCenterObjs[0]->elecGenCntrlObj[0];
-    EXPECT_TRUE(compare_enums(GeneratorType::FuelCell, generatorController->compGenTypeOf_Num));
+    EXPECT_TRUE(compare_enums(GeneratorType::FuelCell, generatorController->generatorType));
     EXPECT_EQ("GENERATOR FUEL CELL 1", generatorController->name);
-    EXPECT_EQ("GENERATOR:FUELCELL", generatorController->typeOfName);
+    EXPECT_EQ("GENERATOR:FUELCELL", GeneratorTypeNamesUC[static_cast<int>(generatorController->generatorType)]);
 
-    EXPECT_EQ(DataPlant::TypeOf_Generator_FCExhaust, generatorController->compPlantTypeOf_Num);
+    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Generator_FCExhaust, generatorController->compPlantType));
 
     // Note: plantInfoFound (and cogenLocation) are only set when mode is FollowThermal or FollowThermalLimitElectric
     // Here it's 'Baseload'

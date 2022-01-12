@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,11 +64,12 @@ struct EnergyPlusData;
 
 namespace PlantCentralGSHP {
 
-    enum class iCondType
+    enum class CondenserType
     {
-        Unassigned,
+        Invalid = -1,
         WaterCooled,
         SmartMixing,
+        Num
     };
 
     struct CGSHPNodeData
@@ -179,7 +180,7 @@ namespace PlantCentralGSHP {
         bool HeatSetPointErrDone;         // true if setpoint warning issued
         bool PossibleSubcooling;          // flag to indicate chiller is doing less cooling that requested
         int ChillerHeaterNum;             // Chiller heater number
-        iCondType CondenserType;          // Type of Condenser - only water cooled is allowed
+        CondenserType condenserType;      // Type of Condenser - only water cooled is allowed
         int ChillerCapFTCoolingIDX;       // Cooling capacity function of temperature curve index
         int ChillerEIRFTCoolingIDX;       // Elec Input to Cooling Output ratio function of temperature curve index
         int ChillerEIRFPLRCoolingIDX;     // Elec Input to cooling output ratio function of PLR curve index
@@ -253,7 +254,7 @@ namespace PlantCentralGSHP {
 
         ChillerHeaterSpecs()
             : ConstantFlow(false), VariableFlow(false), CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), CoolSetPointErrDone(false),
-              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), CondenserType(iCondType::Unassigned),
+              HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), condenserType(CondenserType::Invalid),
               ChillerCapFTCoolingIDX(0), ChillerEIRFTCoolingIDX(0), ChillerEIRFPLRCoolingIDX(0), ChillerCapFTHeatingIDX(0), ChillerEIRFTHeatingIDX(0),
               ChillerEIRFPLRHeatingIDX(0), ChillerCapFTIDX(0), ChillerEIRFTIDX(0), ChillerEIRFPLRIDX(0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
               CondInletNodeNum(0), CondOutletNodeNum(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0),
@@ -324,7 +325,7 @@ namespace PlantCentralGSHP {
         bool VariableFlowCH;        // True if all chiller heaters are variable flow control
         int SchedPtr;               // Schedule value for ancillary power control
         int CHSchedPtr;             // Schedule value for individual chiller heater control
-        iCondType ControlMode;      // SmartMixing or FullyMixing
+        CondenserType ControlMode;  // SmartMixing or FullyMixing
         int CHWInletNodeNum;        // Node number on the inlet side of the plant (Chilled Water side)
         int CHWOutletNodeNum;       // Node number on the outlet side of the plant (Chilled Water side)
         int HWInletNodeNum;         // Node number on the inlet side of the plant (Hot Water side)
@@ -342,31 +343,31 @@ namespace PlantCentralGSHP {
         Real64 WrapperHeatingLoad;  // Heating demand for the central heat pump system
         Real64 AncillaryPower;      // Wrapper Ancillary Power
         Array1D<WrapperComponentSpecs> WrapperComp;
-        Array1D<ChillerHeaterSpecs> ChillerHeater; // Dimension to number of machines
-        bool CoolSetPointErrDone;                  // true if setpoint warning issued
-        bool HeatSetPointErrDone;                  // true if setpoint warning issued
-        bool CoolSetPointSetToLoop;                // True if the setpoint is missing at the outlet node
-        bool HeatSetPointSetToLoop;                // True if the setpoint is missing at the outlet node
-        int ChillerHeaterNums;                     // Total number of chiller heater units
-        int CWLoopNum;                             // Chilled water plant loop index number
-        int CWLoopSideNum;                         // Chilled water plant loop side index
-        int CWBranchNum;                           // Chilled water plant loop branch index
-        int CWCompNum;                             // Chilled water plant loop component index
-        int HWLoopNum;                             // Hot water plant loop index number
-        int HWLoopSideNum;                         // Hot water plant loop side index
-        int HWBranchNum;                           // Hot water plant loop branch index
-        int HWCompNum;                             // Hot water plant loop component index
-        int GLHELoopNum;                           // Geo-field water plant loop index number
-        int GLHELoopSideNum;                       // Geo-field water plant loop side index
-        int GLHEBranchNum;                         // Geo-field water plant loop branch index
-        int GLHECompNum;                           // Geo-field water plant loop component index
-        int CHWMassFlowIndex;                      // Chilled water flow index
-        int HWMassFlowIndex;                       // Hot water flow index
-        int GLHEMassFlowIndex;                     // Condenser side flow index
-        Real64 SizingFactor;                       // Sizing factor to adjust the capacity
-        Real64 CHWVolFlowRate;                     // Chilled water volume flow rate [kg/s]
-        Real64 HWVolFlowRate;                      // Hot water volume flow rate [kg/s]
-        Real64 GLHEVolFlowRate;                    // Geo-field volume flow rate [kg/s]
+        Array1D<ChillerHeaterSpecs> ChillerHeater;   // Dimension to number of machines
+        bool CoolSetPointErrDone;                    // true if setpoint warning issued
+        bool HeatSetPointErrDone;                    // true if setpoint warning issued
+        bool CoolSetPointSetToLoop;                  // True if the setpoint is missing at the outlet node
+        bool HeatSetPointSetToLoop;                  // True if the setpoint is missing at the outlet node
+        int ChillerHeaterNums;                       // Total number of chiller heater units
+        int CWLoopNum;                               // Chilled water plant loop index number
+        DataPlant::LoopSideLocation CWLoopSideNum;   // Chilled water plant loop side index
+        int CWBranchNum;                             // Chilled water plant loop branch index
+        int CWCompNum;                               // Chilled water plant loop component index
+        int HWLoopNum;                               // Hot water plant loop index number
+        DataPlant::LoopSideLocation HWLoopSideNum;   // Hot water plant loop side index
+        int HWBranchNum;                             // Hot water plant loop branch index
+        int HWCompNum;                               // Hot water plant loop component index
+        int GLHELoopNum;                             // Geo-field water plant loop index number
+        DataPlant::LoopSideLocation GLHELoopSideNum; // Geo-field water plant loop side index
+        int GLHEBranchNum;                           // Geo-field water plant loop branch index
+        int GLHECompNum;                             // Geo-field water plant loop component index
+        int CHWMassFlowIndex;                        // Chilled water flow index
+        int HWMassFlowIndex;                         // Hot water flow index
+        int GLHEMassFlowIndex;                       // Condenser side flow index
+        Real64 SizingFactor;                         // Sizing factor to adjust the capacity
+        Real64 CHWVolFlowRate;                       // Chilled water volume flow rate [kg/s]
+        Real64 HWVolFlowRate;                        // Hot water volume flow rate [kg/s]
+        Real64 GLHEVolFlowRate;                      // Geo-field volume flow rate [kg/s]
         bool MyWrapperFlag;
         bool MyWrapperEnvrnFlag;
         bool SimulClgDominant;
@@ -376,15 +377,16 @@ namespace PlantCentralGSHP {
         bool mySizesReported;
 
         WrapperSpecs()
-            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(iCondType::Unassigned), CHWInletNodeNum(0), CHWOutletNodeNum(0),
+            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(CondenserType::Invalid), CHWInletNodeNum(0), CHWOutletNodeNum(0),
               HWInletNodeNum(0), HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0),
               HWMassFlowRate(0.0), GLHEMassFlowRate(0.0), CHWMassFlowRateMax(0.0), HWMassFlowRateMax(0.0), GLHEMassFlowRateMax(0.0),
               WrapperCoolingLoad(0.0), WrapperHeatingLoad(0.0), AncillaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false),
-              CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0),
-              CWCompNum(0), HWLoopNum(0), HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), GLHELoopNum(0), GLHELoopSideNum(0), GLHEBranchNum(0),
-              GLHECompNum(0), CHWMassFlowIndex(0), HWMassFlowIndex(0), GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0),
-              HWVolFlowRate(0.0), GLHEVolFlowRate(0.0), MyWrapperFlag(true), MyWrapperEnvrnFlag(true), SimulClgDominant(false),
-              SimulHtgDominant(false), setupOutputVarsFlag(true), mySizesReported(false)
+              CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWLoopNum(0),
+              CWLoopSideNum(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), HWLoopNum(0),
+              HWLoopSideNum(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), GLHELoopNum(0),
+              GLHELoopSideNum(DataPlant::LoopSideLocation::Invalid), GLHEBranchNum(0), GLHECompNum(0), CHWMassFlowIndex(0), HWMassFlowIndex(0),
+              GLHEMassFlowIndex(0), SizingFactor(1.0), CHWVolFlowRate(0.0), HWVolFlowRate(0.0), GLHEVolFlowRate(0.0), MyWrapperFlag(true),
+              MyWrapperEnvrnFlag(true), SimulClgDominant(false), SimulHtgDominant(false), setupOutputVarsFlag(true), mySizesReported(false)
         {
         }
 

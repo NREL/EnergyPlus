@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,15 +79,34 @@ bool MatchAndSetColorTextString(EnergyPlusData &state,
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    bool WasSet = false;
-    int found = UtilityRoutines::FindItem(String, state.dataSurfColor->colorkeys, static_cast<int>(ColorNo::NUM));
-    if (found != 0) {
-        if (ColorType == "DXF") {
-            state.dataSurfColor->DXFcolorno(found) = SetValue;
-            WasSet = true;
-        }
-    }
-    return WasSet;
+    static constexpr std::array<std::string_view, static_cast<int>(DataSurfaceColors::ColorNo::Num)> colorkeys = {
+        "TEXT",
+        "WALLS",
+        "WINDOWS",
+        "GLASSDOORS",
+        "DOORS",
+        "ROOFS",
+        "FLOORS",
+        "DETACHEDBUILDINGSHADES",
+        "DETACHEDFIXEDSHADES",
+        "ATTACHEDBUILDINGSHADES",
+        "PHOTOVOLTAICS",
+        "TUBULARDAYLIGHTDOMES",
+        "TUBULARDAYLIGHTDIFFUSERS",
+        "DAYLIGHTREFERENCEPOINT1",
+        "DAYLIGHTREFERENCEPOINT2",
+    };
+
+    // ColorType must be "DXF"
+    if (ColorType != "DXF") return false;
+
+    // try to find enum value
+    int foundIdx = getEnumerationValue(colorkeys, UtilityRoutines::MakeUPPERCase(String));
+    if (foundIdx == -1) return false;
+
+    // if we've made it here, we found the value
+    state.dataSurfColor->DXFcolorno[foundIdx] = SetValue;
+    return true;
 }
 
 void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType)
@@ -112,7 +131,7 @@ void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Opt
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
-    state.dataSurfColor->DXFcolorno = state.dataSurfColor->defaultcolorno;
+    state.dataSurfColor->DXFcolorno = DataSurfaceColors::defaultcolorno;
 
     // first see if there is a scheme name
     int numptr = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);

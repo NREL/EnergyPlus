@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -195,7 +195,7 @@ namespace FourPipeBeam {
                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                    DataLoopNode::NodeFluidType::Air,
                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                   NodeInputManager::compFluidStream::Primary,
+                                                   NodeInputManager::CompFluidStream::Primary,
                                                    ObjectIsNotParent,
                                                    state.dataIPShortCut->cAlphaFieldNames(5));
         thisBeam->airOutNodeNum = GetOnlySingleNode(state,
@@ -205,7 +205,7 @@ namespace FourPipeBeam {
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    NodeInputManager::compFluidStream::Primary,
+                                                    NodeInputManager::CompFluidStream::Primary,
                                                     ObjectIsNotParent,
                                                     state.dataIPShortCut->cAlphaFieldNames(6));
         if (state.dataIPShortCut->lAlphaFieldBlanks(7) && state.dataIPShortCut->lAlphaFieldBlanks(8)) { // no chilled water nodes, no beam cooling
@@ -233,7 +233,7 @@ namespace FourPipeBeam {
                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                      NodeInputManager::compFluidStream::Secondary,
+                                                      NodeInputManager::CompFluidStream::Secondary,
                                                       ObjectIsParent,
                                                       state.dataIPShortCut->cAlphaFieldNames(7));
             thisBeam->cWOutNodeNum = GetOnlySingleNode(state,
@@ -243,7 +243,7 @@ namespace FourPipeBeam {
                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                       NodeInputManager::compFluidStream::Secondary,
+                                                       NodeInputManager::CompFluidStream::Secondary,
                                                        ObjectIsParent,
                                                        state.dataIPShortCut->cAlphaFieldNames(8));
         }
@@ -272,7 +272,7 @@ namespace FourPipeBeam {
                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                       DataLoopNode::NodeFluidType::Water,
                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                      NodeInputManager::compFluidStream::Secondary,
+                                                      NodeInputManager::CompFluidStream::Secondary,
                                                       ObjectIsParent,
                                                       state.dataIPShortCut->cAlphaFieldNames(9));
             thisBeam->hWOutNodeNum = GetOnlySingleNode(state,
@@ -282,7 +282,7 @@ namespace FourPipeBeam {
                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                        DataLoopNode::NodeFluidType::Water,
                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                       NodeInputManager::compFluidStream::Secondary,
+                                                       NodeInputManager::CompFluidStream::Secondary,
                                                        ObjectIsParent,
                                                        state.dataIPShortCut->cAlphaFieldNames(10));
         }
@@ -559,7 +559,6 @@ namespace FourPipeBeam {
     {
 
         // Using
-        using DataPlant::TypeOf_FourPipeBeamAirTerminal;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -575,7 +574,7 @@ namespace FourPipeBeam {
             if (this->beamCoolingPresent) {
                 ScanPlantLoopsForObject(state,
                                         this->name,
-                                        TypeOf_FourPipeBeamAirTerminal,
+                                        DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal,
                                         this->cWLocation.loopNum,
                                         this->cWLocation.loopSideNum,
                                         this->cWLocation.branchNum,
@@ -593,7 +592,7 @@ namespace FourPipeBeam {
             if (this->beamHeatingPresent) {
                 ScanPlantLoopsForObject(state,
                                         this->name,
-                                        TypeOf_FourPipeBeamAirTerminal,
+                                        DataPlant::PlantEquipmentType::FourPipeBeamAirTerminal,
                                         this->hWLocation.loopNum,
                                         this->hWLocation.loopSideNum,
                                         this->hWLocation.branchNum,

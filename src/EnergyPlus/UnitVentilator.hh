@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -108,7 +109,7 @@ namespace UnitVentilator {
         std::string HCoilName;    // name of heating coil
         std::string HCoilTypeCh;  // type of heating coil character string (same as type on idf file).
         int HCoil_Index;
-        int HCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType HeatingCoilType;
         int HCoil_FluidIndex;
         std::string HCoilSchedName; // availability schedule for the heating coil
         int HCoilSchedPtr;          // index to schedule
@@ -118,40 +119,40 @@ namespace UnitVentilator {
         Real64 MaxHotWaterFlow;    // kg/s
         Real64 MaxHotSteamFlow;
         Real64 MinHotSteamFlow;
-        Real64 MinVolHotWaterFlow; // m3/s
-        Real64 MinVolHotSteamFlow; // m3/s
-        Real64 MinHotWaterFlow;    // kg/s
-        int HotControlNode;        // hot water control node
-        int HotCoilOutNodeNum;     // outlet of coil
-        Real64 HotControlOffset;   // control tolerance
-        int HWLoopNum;             // index for plant loop with hot water coil
-        int HWLoopSide;            // index for plant loop side for hot water coil
-        int HWBranchNum;           // index for plant branch for hot water coil
-        int HWCompNum;             // index for plant component for hot water coil
-        bool CCoilPresent;         // .TRUE. if unit ventilator has a cooling coil
-        std::string CCoilName;     // name of cooling coil
-        std::string CCoilTypeCh;   // type of cooling coil as character string (same as on idf file)
+        Real64 MinVolHotWaterFlow;              // m3/s
+        Real64 MinVolHotSteamFlow;              // m3/s
+        Real64 MinHotWaterFlow;                 // kg/s
+        int HotControlNode;                     // hot water control node
+        int HotCoilOutNodeNum;                  // outlet of coil
+        Real64 HotControlOffset;                // control tolerance
+        int HWLoopNum;                          // index for plant loop with hot water coil
+        DataPlant::LoopSideLocation HWLoopSide; // index for plant loop side for hot water coil
+        int HWBranchNum;                        // index for plant branch for hot water coil
+        int HWCompNum;                          // index for plant component for hot water coil
+        bool CCoilPresent;                      // .TRUE. if unit ventilator has a cooling coil
+        std::string CCoilName;                  // name of cooling coil
+        std::string CCoilTypeCh;                // type of cooling coil as character string (same as on idf file)
         int CCoil_Index;
         std::string CCoilPlantName; // name of cooling coil for plant
         std::string CCoilPlantType; // type of cooling coil for plant
-        int CCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType CoolingCoilType;
         int CCoilType; // type of cooling coil:
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
         std::string CCoilSchedName; // availability schedule for the cooling coil
         int CCoilSchedPtr;          // index to schedule
         Real64 CCoilSchedValue;
-        Real64 MaxVolColdWaterFlow; // m3/s
-        Real64 MaxColdWaterFlow;    // kg/s
-        Real64 MinVolColdWaterFlow; // m3/s
-        Real64 MinColdWaterFlow;    // kg/s
-        int ColdControlNode;        // chilled water control node
-        int ColdCoilOutNodeNum;     // chilled water coil out node
-        Real64 ColdControlOffset;   // control tolerance
-        int CWLoopNum;              // index for plant loop with chilled water coil
-        int CWLoopSide;             // index for plant loop side for chilled water coil
-        int CWBranchNum;            // index for plant branch for chilled water coil
-        int CWCompNum;              // index for plant component for chilled water coil
+        Real64 MaxVolColdWaterFlow;             // m3/s
+        Real64 MaxColdWaterFlow;                // kg/s
+        Real64 MinVolColdWaterFlow;             // m3/s
+        Real64 MinColdWaterFlow;                // kg/s
+        int ColdControlNode;                    // chilled water control node
+        int ColdCoilOutNodeNum;                 // chilled water coil out node
+        Real64 ColdControlOffset;               // control tolerance
+        int CWLoopNum;                          // index for plant loop with chilled water coil
+        DataPlant::LoopSideLocation CWLoopSide; // index for plant loop side for chilled water coil
+        int CWBranchNum;                        // index for plant branch for chilled water coil
+        int CWCompNum;                          // index for plant component for chilled water coil
         // Report data
         Real64 HeatPower;  // unit heating output in watts
         Real64 HeatEnergy; // unit heating output in J
@@ -182,16 +183,17 @@ namespace UnitVentilator {
             : SchedPtr(0), AirInNode(0), AirOutNode(0), FanOutletNode(0), FanType_Num(0), Fan_Index(0), FanSchedPtr(0), FanAvailSchedPtr(0),
               OpMode(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0),
               MaxOASchedPtr(0), TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0),
-              MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0), HCoil_PlantTypeNum(0),
-              HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0),
-              MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0),
-              HotCoilOutNodeNum(0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), CCoilPresent(false),
-              CCoil_Index(0), CCoil_PlantTypeNum(0), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
+              MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0),
+              HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
+              MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
+              MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
+              HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), CCoilPresent(false), CCoil_Index(0),
+              CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
               MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
-              ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0), HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0),
-              TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanPartLoadRatio(0.0),
-              PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0),
-              ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)
+              ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0), HeatPower(0.0),
+              HeatEnergy(0.0), TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0),
+              AvailStatus(0), FanPartLoadRatio(0.0), PartLoadFrac(0.0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0),
+              ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0), ATMixerOutNode(0), FirstPass(true)
         {
         }
     };
@@ -290,28 +292,8 @@ namespace UnitVentilator {
 struct UnitVentilatorsData : BaseGlobalStruct
 {
 
-    // Currrent Module Unit type
+    // Current Module Unit type
     std::string const cMO_UnitVentilator = "ZoneHVAC:UnitVentilator";
-
-    // Parameters for outside air control types:
-    int const Heating_ElectricCoilType = 1;
-    int const Heating_GasCoilType = 2;
-    int const Heating_WaterCoilType = 3;
-    int const Heating_SteamCoilType = 4;
-    int const Cooling_CoilWaterCooling = 1;
-    int const Cooling_CoilDetailedCooling = 2;
-    int const Cooling_CoilHXAssisted = 3;
-    // OA operation modes
-    int const VariablePercent = 1;
-    int const FixedTemperature = 2;
-    int const FixedOAControl = 3;
-    // coil operation
-    int const On = 1;  // normal coil operation
-    int const Off = 0; // signal coil shouldn't run
-    int const NoneOption = 0;
-    int const BothOption = 1;
-    int const HeatingOption = 2;
-    int const CoolingOption = 3;
 
     bool HCoilOn = false;        // TRUE if the heating coil  = gas or electric especially) should be running
     int NumOfUnitVents = 0;      // Number of unit ventilators in the input file

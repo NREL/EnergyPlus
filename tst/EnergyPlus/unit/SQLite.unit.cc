@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -469,8 +469,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_privateMethods)
     EXPECT_EQ("Unknown!!!", timestepTypeName(3));
     EXPECT_EQ("Unknown!!!", timestepTypeName(-1));
     // Let's ensure we never get an unexpected change of mapping between enum and the corresponding int value
-    EXPECT_EQ(1, static_cast<int>(OutputProcessor::TimeStepType::TimeStepZone));
-    EXPECT_EQ(2, static_cast<int>(OutputProcessor::TimeStepType::TimeStepSystem));
+    EXPECT_EQ(1, static_cast<int>(OutputProcessor::TimeStepType::Zone));
+    EXPECT_EQ(2, static_cast<int>(OutputProcessor::TimeStepType::System));
 
     // test reportingFreqName
     EXPECT_EQ("HVAC System Timestep", reportingFreqName(-1));
@@ -820,9 +820,9 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     std::string const onOff("ON/OFF");
     std::string const window("Window");
     std::string const wall("Wall");
-    double const one = 1.0;
-    double const zero = 0.0;
-    double const two = 2.0;
+    double constexpr one = 1.0;
+    double constexpr zero = 0.0;
+    double constexpr two = 2.0;
 
     state->dataSQLiteProcedures->sqlite->addScheduleData(1, alwaysOn, onOff, one, one);
     state->dataSQLiteProcedures->sqlite->addScheduleData(2, alwaysOff, onOff, zero, zero);

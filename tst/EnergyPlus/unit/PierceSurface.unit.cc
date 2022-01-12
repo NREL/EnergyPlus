@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Triangular)
 
 TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexOctagonal)
 {
-    int const N(8); // Number of vertices and edges
+    int constexpr N(8); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
     Real64 const wedge(TwoPi / N);
     DataSurfaces::SurfaceData floor;
@@ -326,7 +326,7 @@ TEST_F(EnergyPlusFixture, PierceSurfaceTest_Convex8Sides)
 
 TEST_F(EnergyPlusFixture, PierceSurfaceTest_ConvexNGon)
 {
-    int const N(32); // Number of vertices and edges
+    int constexpr N(32); // Number of vertices and edges
     Real64 const TwoPi(8.0 * std::atan(1.0));
     Real64 const wedge(TwoPi / N);
     DataSurfaces::SurfaceData floor;

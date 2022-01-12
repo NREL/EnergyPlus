@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -351,7 +351,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     auto &inputProcessor = state.dataInputProcessing->inputProcessor;
     auto &SetPointDualHeatCool = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool;
 
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TStat));
     NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     TStatObjects.allocate(NumTStatStatements);
 
@@ -777,7 +777,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                               "..specifies control type 1 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                                   TempControlledZone(TempControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -804,7 +804,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                               "..specifies control type 2 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglCoolSetPoint)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                                   TempControlledZone(TempControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -831,7 +831,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                               "..specifies control type 3 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHCSetPoint)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                                   TempControlledZone(TempControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -858,7 +858,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                               "..specifies control type 4 (" + ValidControlTypes(static_cast<int>(ComfortControl::DualSetPoint)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                                   TempControlledZone(TempControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -898,7 +898,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 1 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint)) +
                                           ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                           TempControlledZone(TempControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
 
@@ -909,7 +909,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 2 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglCoolSetPoint)) +
                                           ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                           TempControlledZone(TempControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
 
@@ -920,7 +920,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 3 (" + ValidControlTypes(static_cast<int>(ComfortControl::SglHCSetPoint)) +
                                           ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                           TempControlledZone(TempControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
 
@@ -931,7 +931,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 4 (" + ValidControlTypes(static_cast<int>(ComfortControl::DualSetPoint)) +
                                           ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + '=' +
                                           TempControlledZone(TempControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + TempControlledZone(TempControlledZoneNum).ZoneName);
 
@@ -943,7 +943,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
     if (allocated(TStatControlTypes)) TStatControlTypes.deallocate();
     // This starts the Humidity Control Get Input section
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::HStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::HStat));
     state.dataZoneCtrls->NumHumidityControlZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneCtrls->NumHumidityControlZones > 0) {
@@ -1006,7 +1006,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     } // HumidControlledZoneNum
 
     // Start to read Thermal comfort control objects
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TCTStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat));
     state.dataZoneCtrls->NumComfortTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     ComfortTStatObjects.allocate(state.dataZoneCtrls->NumComfortTStatStatements);
 
@@ -1633,7 +1633,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                   ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                                   ComfortControlledZone(ComfortControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -1661,7 +1661,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                   ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                                   ComfortControlledZone(ComfortControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -1689,7 +1689,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                   ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                                   ComfortControlledZone(ComfortControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -1717,7 +1717,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                                   ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) +
                                                   ") as the control type. Not valid for this zone.");
                             ShowContinueError(state,
-                                              "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                              "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                                   ComfortControlledZone(ComfortControlledZoneNum).Name);
                             ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
                             ErrorsFound = true;
@@ -1760,7 +1760,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 1 (" +
                                           ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) + ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                           ComfortControlledZone(ComfortControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
 
@@ -1771,7 +1771,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 2 (" +
                                           ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) + ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                           ComfortControlledZone(ComfortControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
 
@@ -1782,7 +1782,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 3 (" +
                                           ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger)) + ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                           ComfortControlledZone(ComfortControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
 
@@ -1793,7 +1793,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                       "...should include control type 4 (" +
                                           ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger)) + ") but does not.");
                     ShowContinueError(state,
-                                      "..reference " + cZControlTypes(static_cast<int>(ZControlTypes::TCTStat)) + '=' +
+                                      "..reference " + cZControlTypes(static_cast<int>(ZoneControlTypes::TCTStat)) + '=' +
                                           ComfortControlledZone(ComfortControlledZoneNum).Name);
                     ShowContinueError(state, "..reference ZONE=" + ComfortControlledZone(ComfortControlledZoneNum).ZoneName);
 
@@ -1922,7 +1922,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     print(state.files.eio, Header);
     print(state.files.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::OTTStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::OTTStat));
     state.dataZoneCtrls->NumOpTempControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneCtrls->NumOpTempControlledZones > 0) {
@@ -1949,7 +1949,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (found == 0) { // throw error
                     ShowSevereError(state,
                                     cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " +
-                                        cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + " reference not found.");
+                                        cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + " reference not found.");
                     ErrorsFound = true;
                 } else {
                     TempControlledZoneNum = found;
@@ -2152,7 +2152,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     }             // NumOpTempControlledZones > 0
 
     // Overcool dehumidificaton GetInput starts here
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TandHStat));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::TandHStat));
     state.dataZoneCtrls->NumTempAndHumidityControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
     if (state.dataZoneCtrls->NumTempAndHumidityControlledZones > 0) {
@@ -2179,7 +2179,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                 if (found == 0) { // throw error
                     ShowSevereError(state,
                                     cCurrentModuleObject + '=' + cAlphaArgs(1) + " invalid " +
-                                        cZControlTypes(static_cast<int>(ZControlTypes::TStat)) + " reference not found.");
+                                        cZControlTypes(static_cast<int>(ZoneControlTypes::TStat)) + " reference not found.");
                     ErrorsFound = true;
                 } else {
                     TempControlledZoneNum = found;
@@ -2357,7 +2357,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     }             // NumTempAndHumidityControlledZones > 0
 
     // Staged thermostat control inputs start
-    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::StagedDual));
+    cCurrentModuleObject = cZControlTypes(static_cast<int>(ZoneControlTypes::StagedDual));
     NumStageControlledZones = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     if (NumStageControlledZones > 0) state.dataZoneCtrls->StagedTStatObjects.allocate(NumStageControlledZones);
 
@@ -2742,10 +2742,10 @@ void CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state, Array1D<Real64>
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine calculate the zone operative temperature setpoint using adaptive comfort model.
+    // This subroutine calculates the zone operative temperature setpoint using adaptive comfort model.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int const summerDesignDayTypeIndex(9);
+    int constexpr summerDesignDayTypeIndex(9);
     Real64 GrossApproxAvgDryBulbDesignDay(0.0);
 
     auto &AdapComfortDailySetPointSchedule = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule;
@@ -2865,16 +2865,16 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataZoneEnergyDemand->Setback.dimension(NumOfZones, false);
         state.dataZoneEnergyDemand->DeadBandOrSetback.dimension(NumOfZones, false);
         state.dataZoneEnergyDemand->CurDeadBandOrSetback.dimension(NumOfZones, false);
-        state.dataHeatBal->SNLoadHeatEnergy.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->SNLoadCoolEnergy.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->SNLoadHeatRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->SNLoadCoolRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->SNLoadPredictedRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->SNLoadPredictedHSPRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->SNLoadPredictedCSPRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->MoisturePredictedRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->MoisturePredictedHumSPRate.dimension(NumOfZones, 0.0);
-        state.dataHeatBal->MoisturePredictedDehumSPRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneSNLoadHeatEnergy.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneSNLoadCoolEnergy.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneSNLoadHeatRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneSNLoadCoolRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneSNLoadPredictedRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneSNLoadPredictedHSPRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneSNLoadPredictedCSPRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneMoisturePredictedRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneMoisturePredictedHumSPRate.dimension(NumOfZones, 0.0);
+        state.dataHeatBal->ZoneMoisturePredictedDehumSPRate.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->WZoneTimeMinus1.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->WZoneTimeMinus2.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->WZoneTimeMinus3.dimension(NumOfZones, 0.0);
@@ -2899,15 +2899,15 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         state.dataHeatBalFanSys->ZoneT1.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZoneW1.dimension(NumOfZones, 0.0);
 
-        state.dataHeatBal->ListSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
-        state.dataHeatBal->ListSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
-        state.dataHeatBal->ListSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
-        state.dataHeatBal->ListSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+        state.dataHeatBal->ZoneListSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+        state.dataHeatBal->ZoneListSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+        state.dataHeatBal->ZoneListSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
+        state.dataHeatBal->ZoneListSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
 
-        state.dataHeatBal->GroupSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
-        state.dataHeatBal->GroupSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
-        state.dataHeatBal->GroupSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
-        state.dataHeatBal->GroupSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+        state.dataHeatBal->ZoneGroupSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+        state.dataHeatBal->ZoneGroupSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+        state.dataHeatBal->ZoneGroupSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
+        state.dataHeatBal->ZoneGroupSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
         state.dataHeatBalFanSys->AIRRAT.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZTM1.dimension(NumOfZones, 0.0);
         state.dataHeatBalFanSys->ZTM2.dimension(NumOfZones, 0.0);
@@ -2945,7 +2945,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->SNLoadHeatEnergy(Loop),
+                                state.dataHeatBal->ZoneSNLoadHeatEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(Loop).Name,
@@ -2960,7 +2960,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->SNLoadCoolEnergy(Loop),
+                                state.dataHeatBal->ZoneSNLoadCoolEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 Zone(Loop).Name,
@@ -2975,14 +2975,14 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->SNLoadHeatRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadHeatRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Air System Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->SNLoadCoolRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadCoolRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
@@ -3021,21 +3021,21 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->SNLoadPredictedRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadPredictedRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->SNLoadPredictedHSPRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadPredictedHSPRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->SNLoadPredictedCSPRate(Loop),
+                                state.dataHeatBal->ZoneSNLoadPredictedCSPRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
@@ -3068,21 +3068,21 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->MoisturePredictedRate(Loop),
+                                state.dataHeatBal->ZoneMoisturePredictedRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->MoisturePredictedHumSPRate(Loop),
+                                state.dataHeatBal->ZoneMoisturePredictedHumSPRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                 OutputProcessor::Unit::kgWater_s,
-                                state.dataHeatBal->MoisturePredictedDehumSPRate(Loop),
+                                state.dataHeatBal->ZoneMoisturePredictedDehumSPRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 Zone(Loop).Name);
@@ -3193,28 +3193,28 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ListSNLoadHeatEnergy(Loop),
+                                state.dataHeatBal->ZoneListSNLoadHeatEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->ListSNLoadCoolEnergy(Loop),
+                                state.dataHeatBal->ZoneListSNLoadCoolEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->ListSNLoadHeatRate(Loop),
+                                state.dataHeatBal->ZoneListSNLoadHeatRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->ListSNLoadCoolRate(Loop),
+                                state.dataHeatBal->ZoneListSNLoadCoolRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 ZoneList(Loop).Name);
@@ -3225,28 +3225,28 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->GroupSNLoadHeatEnergy(Loop),
+                                state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHeatBal->GroupSNLoadCoolEnergy(Loop),
+                                state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->GroupSNLoadHeatRate(Loop),
+                                state.dataHeatBal->ZoneGroupSNLoadHeatRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHeatBal->GroupSNLoadCoolRate(Loop),
+                                state.dataHeatBal->ZoneGroupSNLoadCoolRate(Loop),
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
@@ -3303,16 +3303,16 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         }
 
         state.dataZoneEnergyDemand->DeadBandOrSetback = false;
-        state.dataHeatBal->SNLoadHeatEnergy = 0.0;
-        state.dataHeatBal->SNLoadCoolEnergy = 0.0;
-        state.dataHeatBal->SNLoadHeatRate = 0.0;
-        state.dataHeatBal->SNLoadCoolRate = 0.0;
-        state.dataHeatBal->SNLoadPredictedRate = 0.0;
-        state.dataHeatBal->SNLoadPredictedHSPRate = 0.0;
-        state.dataHeatBal->SNLoadPredictedCSPRate = 0.0;
-        state.dataHeatBal->MoisturePredictedRate = 0.0;
-        state.dataHeatBal->MoisturePredictedHumSPRate = 0.0;
-        state.dataHeatBal->MoisturePredictedDehumSPRate = 0.0;
+        state.dataHeatBal->ZoneSNLoadHeatEnergy = 0.0;
+        state.dataHeatBal->ZoneSNLoadCoolEnergy = 0.0;
+        state.dataHeatBal->ZoneSNLoadHeatRate = 0.0;
+        state.dataHeatBal->ZoneSNLoadCoolRate = 0.0;
+        state.dataHeatBal->ZoneSNLoadPredictedRate = 0.0;
+        state.dataHeatBal->ZoneSNLoadPredictedHSPRate = 0.0;
+        state.dataHeatBal->ZoneSNLoadPredictedCSPRate = 0.0;
+        state.dataHeatBal->ZoneMoisturePredictedRate = 0.0;
+        state.dataHeatBal->ZoneMoisturePredictedHumSPRate = 0.0;
+        state.dataHeatBal->ZoneMoisturePredictedDehumSPRate = 0.0;
 
         state.dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
         state.dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
@@ -4625,9 +4625,9 @@ void CalcPredictedSystemLoad(EnergyPlusData &state, int const ZoneNum, Real64 RA
     ReportSensibleLoadsZoneMultiplier(ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired,
                                       ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP,
                                       ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP,
-                                      state.dataHeatBal->SNLoadPredictedRate(ZoneNum),
-                                      state.dataHeatBal->SNLoadPredictedHSPRate(ZoneNum),
-                                      state.dataHeatBal->SNLoadPredictedCSPRate(ZoneNum),
+                                      state.dataHeatBal->ZoneSNLoadPredictedRate(ZoneNum),
+                                      state.dataHeatBal->ZoneSNLoadPredictedHSPRate(ZoneNum),
+                                      state.dataHeatBal->ZoneSNLoadPredictedCSPRate(ZoneNum),
                                       LoadToHeatingSetPoint,
                                       LoadToCoolingSetPoint,
                                       state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum),
@@ -4898,7 +4898,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
         bool no_ht_EMPD_or_HAMT(true);
         for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
             auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-            if ((htAlgo == DataSurfaces::iHeatTransferModel::EMPD) || (htAlgo == DataSurfaces::iHeatTransferModel::HAMT)) {
+            if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
                 no_ht_EMPD_or_HAMT = false;
                 break;
             }
@@ -5022,9 +5022,9 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     ReportMoistLoadsZoneMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
                                    ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
                                    ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
-                                   state.dataHeatBal->MoisturePredictedRate(ZoneNum),
-                                   state.dataHeatBal->MoisturePredictedHumSPRate(ZoneNum),
-                                   state.dataHeatBal->MoisturePredictedDehumSPRate(ZoneNum),
+                                   state.dataHeatBal->ZoneMoisturePredictedRate(ZoneNum),
+                                   state.dataHeatBal->ZoneMoisturePredictedHumSPRate(ZoneNum),
+                                   state.dataHeatBal->ZoneMoisturePredictedDehumSPRate(ZoneNum),
                                    Zone(ZoneNum).Multiplier,
                                    Zone(ZoneNum).ListMultiplier);
 
@@ -5422,10 +5422,10 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
         MAT(ZoneNum) = ZT(ZoneNum);
 
         // Determine sensible load heating/cooling rate and energy
-        state.dataHeatBal->SNLoadHeatRate(ZoneNum) = max(SNLoad, 0.0);
-        state.dataHeatBal->SNLoadCoolRate(ZoneNum) = std::abs(min(SNLoad, 0.0));
-        state.dataHeatBal->SNLoadHeatEnergy(ZoneNum) = max(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour;
-        state.dataHeatBal->SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour);
+        state.dataHeatBal->ZoneSNLoadHeatRate(ZoneNum) = max(SNLoad, 0.0);
+        state.dataHeatBal->ZoneSNLoadCoolRate(ZoneNum) = std::abs(min(SNLoad, 0.0));
+        state.dataHeatBal->ZoneSNLoadHeatEnergy(ZoneNum) = max(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour;
+        state.dataHeatBal->ZoneSNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * DataGlobalConstants::SecInHour);
 
         // Final humidity calcs
         CorrectZoneHumRat(state, ZoneNum);
@@ -5904,7 +5904,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     bool no_ht_EMPD_or_HAMT(true);
     for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
         auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
-        if ((htAlgo == DataSurfaces::iHeatTransferModel::EMPD) || (htAlgo == DataSurfaces::iHeatTransferModel::HAMT)) {
+        if ((htAlgo == DataSurfaces::HeatTransferModel::EMPD) || (htAlgo == DataSurfaces::HeatTransferModel::HAMT)) {
             no_ht_EMPD_or_HAMT = false;
             break;
         }
@@ -7080,7 +7080,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - RefAirTemp);
 
         // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
-        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
+        if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
             state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyM;
             state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += state.dataHeatBalFiniteDiffMgr->SurfaceFD(SurfNum).EnthalpyF;
         }
@@ -7453,7 +7453,7 @@ void AdjustOperativeSetPointsforAdapComfort(EnergyPlusData &state, int const Tem
         }
     } else {
         int const envrnDayNum(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
-        int const summerDesignDayTypeIndex(9);
+        int constexpr summerDesignDayTypeIndex(9);
         // Adjust summer design day set point
         if (state.dataWeatherManager->DesDayInput(envrnDayNum).DayType == summerDesignDayTypeIndex) {
             ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(AdaptiveComfortModelTypeIndex - 1);
@@ -7873,8 +7873,8 @@ void GetComfortSetPoints(EnergyPlusData &state,
     // 0 = Solution; 1 = Set to Min; 2 Set to Max
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const Acc(0.001); // accuracy control for SolveRoot
-    int const MaxIter(500);  // iteration control for SolveRoot
+    Real64 constexpr Acc(0.001); // accuracy control for SolveRoot
+    int constexpr MaxIter(500);  // iteration control for SolveRoot
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 Tmin;            // Minimum drybulb setpoint temperature
@@ -8159,7 +8159,7 @@ void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData &state)
     int numDays;
     std::string monthAssumed;
     std::string monthAssumed2;
-    const int wednesday = 4;
+    constexpr int wednesday = 4;
 
     auto &SetPointSingleHeating = state.dataZoneTempPredictorCorrector->SetPointSingleHeating;
     auto &SetPointSingleCooling = state.dataZoneTempPredictorCorrector->SetPointSingleCooling;
@@ -8370,7 +8370,7 @@ void FillPredefinedTableOnThermostatSetpoints(EnergyPlusData &state)
 
 // returns the temperature value from a schedule at a certain time for the first day of the week in either January or July
 std::tuple<Real64, int, std::string>
-temperatureAndCountInSch(EnergyPlusData &state, int const &scheduleIndex, bool const &isSummer, int const &dayOfWeek, int const &hourOfDay)
+temperatureAndCountInSch(EnergyPlusData &state, int const scheduleIndex, bool const isSummer, int const dayOfWeek, int const hourOfDay)
 {
     // J.Glazer - Aug 2017
 
@@ -8412,7 +8412,7 @@ temperatureAndCountInSch(EnergyPlusData &state, int const &scheduleIndex, bool c
     int hourSelect = hourOfDay + state.dataWeatherManager->DSTIndex(jdateSelect);
 
     // get the value at the selected time
-    int const firstTimeStep = 1;
+    int constexpr firstTimeStep = 1;
     int weekSchIndexSelect = state.dataScheduleMgr->Schedule(scheduleIndex).WeekSchedulePointer(jdateSelect);
     int daySchIndexSelect = state.dataScheduleMgr->WeekSchedule(weekSchIndexSelect).DaySchedulePointer(dayOfWeek);
     Real64 valueAtSelectTime = state.dataScheduleMgr->DaySchedule(daySchIndexSelect).TSValue(firstTimeStep, hourSelect);

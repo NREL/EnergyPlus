@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -127,7 +128,7 @@ namespace VentilatedSlab {
         std::string HCoilName;    // name of heating coil
         std::string HCoilTypeCh;  // type of heating coil (character string)
         int HCoil_Index;
-        int HCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType HeatingCoilType;
         int HCoil_FluidIndex;
         std::string HCoilSchedName; // availability schedule for the heating coil
         int HCoilSchedPtr;          // index to schedule
@@ -137,21 +138,21 @@ namespace VentilatedSlab {
         Real64 MaxHotWaterFlow;    // kg/s
         Real64 MaxHotSteamFlow;
         Real64 MinHotSteamFlow;
-        Real64 MinVolHotWaterFlow;      // m3/s
-        Real64 MinVolHotSteamFlow;      // m3/s
-        Real64 MinHotWaterFlow;         // kg/s
-        int HotControlNode;             // hot water control node
-        int HotCoilOutNodeNum;          // outlet of coil
-        Real64 HotControlOffset;        // control tolerance
-        int HWLoopNum;                  // index for plant loop with hot water coil
-        int HWLoopSide;                 // index for plant loop side for hot water coil
-        int HWBranchNum;                // index for plant branch for hot water coil
-        int HWCompNum;                  // index for plant component for hot water coil
-        std::string HotAirHiTempSched;  // Schedule name for the highest Air temperature
-        int HotAirHiTempSchedPtr;       // Schedule index for the highest Air temperature
-        std::string HotAirLoTempSched;  // Schedule name for the lowest Air temperature
-        int HotAirLoTempSchedPtr;       // Schedule index for the lowest Air temperature
-        std::string HotCtrlHiTempSched; // Schedule name for the highest control temperature
+        Real64 MinVolHotWaterFlow;              // m3/s
+        Real64 MinVolHotSteamFlow;              // m3/s
+        Real64 MinHotWaterFlow;                 // kg/s
+        int HotControlNode;                     // hot water control node
+        int HotCoilOutNodeNum;                  // outlet of coil
+        Real64 HotControlOffset;                // control tolerance
+        int HWLoopNum;                          // index for plant loop with hot water coil
+        DataPlant::LoopSideLocation HWLoopSide; // index for plant loop side for hot water coil
+        int HWBranchNum;                        // index for plant branch for hot water coil
+        int HWCompNum;                          // index for plant component for hot water coil
+        std::string HotAirHiTempSched;          // Schedule name for the highest Air temperature
+        int HotAirHiTempSchedPtr;               // Schedule index for the highest Air temperature
+        std::string HotAirLoTempSched;          // Schedule name for the lowest Air temperature
+        int HotAirLoTempSchedPtr;               // Schedule index for the lowest Air temperature
+        std::string HotCtrlHiTempSched;         // Schedule name for the highest control temperature
         // (where the lowest Air temperature is requested)
         int HotCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
         // (where the lowest Air temperature is requested)
@@ -165,29 +166,29 @@ namespace VentilatedSlab {
         int CCoil_Index;
         std::string CCoilPlantName; // name of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
         std::string CCoilPlantType; // type of cooling coil (child<=CoilSystem:Cooling:Water:HeatExchangerAssisted)
-        int CCoil_PlantTypeNum;
+        DataPlant::PlantEquipmentType CoolingCoilType;
         int CCoilType; // type of cooling coil:
         // 'Coil:Cooling:Water:DetailedGeometry' or
         // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
         std::string CCoilSchedName; // availability schedule for the cooling coil
         int CCoilSchedPtr;          // index to schedule
         Real64 CCoilSchedValue;
-        Real64 MaxVolColdWaterFlow;      // m3/s
-        Real64 MaxColdWaterFlow;         // kg/s
-        Real64 MinVolColdWaterFlow;      // m3/s
-        Real64 MinColdWaterFlow;         // kg/s
-        int ColdControlNode;             // chilled water control node
-        int ColdCoilOutNodeNum;          // chilled water coil out nod
-        Real64 ColdControlOffset;        // control tolerance
-        int CWLoopNum;                   // index for plant loop with chilled water coil
-        int CWLoopSide;                  // index for plant loop side for chilled water coil
-        int CWBranchNum;                 // index for plant branch for chilled water coil
-        int CWCompNum;                   // index for plant component for chilled water coil
-        std::string ColdAirHiTempSched;  // Schedule name for the highest air temperature
-        int ColdAirHiTempSchedPtr;       // Schedule index for the highest Air temperature
-        std::string ColdAirLoTempSched;  // Schedule name for the lowest Air temperature
-        int ColdAirLoTempSchedPtr;       // Schedule index for the lowest Air temperature
-        std::string ColdCtrlHiTempSched; // Schedule name for the highest control temperature
+        Real64 MaxVolColdWaterFlow;             // m3/s
+        Real64 MaxColdWaterFlow;                // kg/s
+        Real64 MinVolColdWaterFlow;             // m3/s
+        Real64 MinColdWaterFlow;                // kg/s
+        int ColdControlNode;                    // chilled water control node
+        int ColdCoilOutNodeNum;                 // chilled water coil out nod
+        Real64 ColdControlOffset;               // control tolerance
+        int CWLoopNum;                          // index for plant loop with chilled water coil
+        DataPlant::LoopSideLocation CWLoopSide; // index for plant loop side for chilled water coil
+        int CWBranchNum;                        // index for plant branch for chilled water coil
+        int CWCompNum;                          // index for plant component for chilled water coil
+        std::string ColdAirHiTempSched;         // Schedule name for the highest air temperature
+        int ColdAirHiTempSchedPtr;              // Schedule index for the highest Air temperature
+        std::string ColdAirLoTempSched;         // Schedule name for the lowest Air temperature
+        int ColdAirLoTempSchedPtr;              // Schedule index for the lowest Air temperature
+        std::string ColdCtrlHiTempSched;        // Schedule name for the highest control temperature
         // (where the lowest Air temperature is requested)
         int ColdCtrlHiTempSchedPtr; // Schedule index for the highest control temperature
         // (where the lowest Air temperature is requested)
@@ -239,14 +240,16 @@ namespace VentilatedSlab {
               ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0), FanType_Num(0),
               ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0), MaxOASchedPtr(0),
               TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
-              MinOutAirMassFlow(0.0), SysConfg(0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0), HCoil_PlantTypeNum(0),
-              HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0),
-              MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0),
-              HotCoilOutNodeNum(0), HotControlOffset(0.0), HWLoopNum(0), HWLoopSide(0), HWBranchNum(0), HWCompNum(0), HotAirHiTempSchedPtr(0),
-              HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0), HotCtrlLoTempSchedPtr(0), CCoilPresent(false), CCoil_Index(0), CCoil_PlantTypeNum(0),
-              CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
-              MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0),
-              CWCompNum(0), ColdAirHiTempSchedPtr(0), ColdAirLoTempSchedPtr(0), ColdCtrlHiTempSchedPtr(0), ColdCtrlLoTempSchedPtr(0), CondErrIndex(0),
+              MinOutAirMassFlow(0.0), SysConfg(0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0),
+              HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), HCoilSchedPtr(0), HCoilSchedValue(0.0),
+              MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0),
+              MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0),
+              HWLoopNum(0), HWLoopSide(DataPlant::LoopSideLocation::Invalid), HWBranchNum(0), HWCompNum(0), HotAirHiTempSchedPtr(0),
+              HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0), HotCtrlLoTempSchedPtr(0), CCoilPresent(false), CCoil_Index(0),
+              CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), CCoilType(0), CCoilSchedPtr(0), CCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
+              MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
+              ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(DataPlant::LoopSideLocation::Invalid), CWBranchNum(0), CWCompNum(0),
+              ColdAirHiTempSchedPtr(0), ColdAirLoTempSchedPtr(0), ColdCtrlHiTempSchedPtr(0), ColdCtrlLoTempSchedPtr(0), CondErrIndex(0),
               EnrgyImbalErrIndex(0), RadSurfNum(0), MSlabIn(0), MSlabOut(0), DirectHeatLossPower(0.0), DirectHeatLossEnergy(0.0),
               DirectHeatGainPower(0.0), DirectHeatGainEnergy(0.0), TotalVentSlabRadPower(0.0), RadHeatingPower(0.0), RadHeatingEnergy(0.0),
               RadCoolingPower(0.0), RadCoolingEnergy(0.0), HeatCoilPower(0.0), HeatCoilEnergy(0.0), TotCoolCoilPower(0.0), TotCoolCoilEnergy(0.0),
@@ -340,42 +343,6 @@ namespace VentilatedSlab {
 struct VentilatedSlabData : BaseGlobalStruct
 {
 
-    std::string const cMO_VentilatedSlab = "ZoneHVAC:VentilatedSlab";
-
-    // Parameters for outside air control types:
-    int const Heating_ElectricCoilType = 1;
-    int const Heating_GasCoilType = 2;
-    int const Heating_WaterCoilType = 3;
-    int const Heating_SteamCoilType = 4;
-    int const Cooling_CoilWaterCooling = 1;
-    int const Cooling_CoilDetailedCooling = 2;
-    int const Cooling_CoilHXAssisted = 3;
-    int const VariablePercent = 1;
-    int const FixedTemperature = 2;
-    int const FixedOAControl = 3;
-    int const NotOperating = 0; // Parameter for use with OperatingMode variable, set for no heating/cooling
-    int const HeatingMode = 1;  // Parameter for use with OperatingMode variable, set for heating
-    int const CoolingMode = 2;  // Parameter for use with OperatingMode variable, set for cooling
-                                // Ventilated Slab Configurations
-    int const SlabOnly = 1;     // Air circulate through cores of slab only
-    int const SlabAndZone = 2;  // Circulated Air is introduced to zone
-    int const SeriesSlabs = 3;
-    //  Control Types
-    int const MATControl = 1;  // Controls system using mean air temperature
-    int const MRTControl = 2;  // Controls system using mean radiant temperature
-    int const OPTControl = 3;  // Controls system using operative temperature
-    int const ODBControl = 4;  // Controls system using outside air dry-bulb temperature
-    int const OWBControl = 5;  // Controls system using outside air wet-bulb temperature
-    int const SURControl = 6;  // Controls system using surface temperature !Phase2-A
-    int const DPTZControl = 7; // Controls system using dew-point temperature of zone!Phase2-A
-
-    // coil operation
-    int const On = 1;  // normal coil operation
-    int const Off = 0; // signal coil shouldn't run
-    int const NoneOption = 0;
-    int const BothOption = 1;
-    int const HeatingOption = 2;
-    int const CoolingOption = 3;
     int OperatingMode = 0; // Used to keep track of whether system is in heating or cooling mode
 
     // MODULE VARIABLE DECLARATIONS:
