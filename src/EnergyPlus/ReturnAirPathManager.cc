@@ -291,6 +291,53 @@ namespace ReturnAirPathManager {
         // USE STATEMENTS:
     }
 
+    void GetExhaustAirSystemInput(EnergyPlusData &state)
+    {
+        // 2022-01-11: before setting up a seperate set of files for exhaust systems (which will be done later
+        // use this function to develop the input processing function of exhaust systems
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR:          
+        //       DATE WRITTEN:    Jan 2022
+
+        // PURPOSE OF THIS SUBROUTINE: Process exhaust system inputs
+
+        // Using/Aliasing
+        using NodeInputManager::GetOnlySingleNode;
+        using namespace DataLoopNode;
+
+        // Locals
+        int PathNum;
+        int CompNum;
+        int NumAlphas;
+        int NumNums;
+        int IOStat;
+        int Counter;
+        //////////// hoisted into namespace ////////////////////////////////////////////////
+        // static bool ErrorsFound( false );
+        ////////////////////////////////////////////////////////////////////////////////////
+        bool IsNotOK; // Flag to verify name
+
+        bool ErrorsFound = false;
+
+        // 2022-01-12: This means a correponding data structure should be build for the exhaust path as well
+        // 2022-01-12: So here is another item to be built first: stateZoneEquip->ExhaustAirPath
+        if (allocated(state.dataZoneEquip->ExhaustAirSystem)) {
+            return;
+        }
+
+        // 2022-01-12: After setting the exhaust air system structs and a few related definitions
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
+        state.dataZoneEquip->NumExhaustAirSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+        // 2022-01-12: More processing code here: 
+        /* */
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
+        }
+    }
 } // namespace ReturnAirPathManager
 
 } // namespace EnergyPlus

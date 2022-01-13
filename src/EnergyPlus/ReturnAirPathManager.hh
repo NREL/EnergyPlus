@@ -69,6 +69,8 @@ namespace ReturnAirPathManager {
 
     void ReportReturnAirPath(int &ReturnAirPathNum); // unused1208
 
+    void GetExhaustAirSystemInput(EnergyPlusData &state);
+
 } // namespace ReturnAirPathManager
 
 struct ReturnAirPathMgr : BaseGlobalStruct
