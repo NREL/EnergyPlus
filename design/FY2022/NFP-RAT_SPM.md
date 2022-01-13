@@ -111,7 +111,7 @@ SetpointManager:SystemNodeReset,
   ,                           !- Maximum Return Humidity Ratio at Maximum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
   ,                           !- Minimum Return Humidity Ratio at Minimum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
   Return Air Node,            !- Return Node Name
-  Supply Air Temp Nodes,      !- Setpoint Node or NodeList Name
+  Supply Air Temp Nodes;      !- Setpoint Node or NodeList Name
 
 SetpointManager:SystemNodeReset,
   Supply Humidity Manager,       !- Name
@@ -125,7 +125,7 @@ SetpointManager:SystemNodeReset,
   0.003,                         !- Maximum Return Humidity Ratio at Maximum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
   0.010,                         !- Minimum Return Humidity Ratio at Minimum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
   Return Air Node,               !- Return Node Name
-  Supply Air Temp Nodes,         !- Setpoint Node or NodeList Name
+  Supply Air Temp Nodes;         !- Setpoint Node or NodeList Name
 \end{lstlisting}
 
 ## Input Description ##
