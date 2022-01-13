@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -126,11 +127,10 @@ namespace HVACInterfaceManager {
     //***************
 
     void UpdatePlantLoopInterface(EnergyPlusData &state,
-                                  int LoopNum,                                 // The 'inlet/outlet node' loop number
-                                  DataPlant::LoopSideLocation ThisLoopSideNum, // The 'outlet node' LoopSide number
-                                  int ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
-                                  int OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
-                                  bool &OutOfToleranceFlag,   // True when the other side of the loop need to be (re)simulated
+                                  PlantLocation const &plantLoc, // The 'outlet node' Location
+                                  int ThisLoopSideOutletNode,    // Node number for the inlet of the side that needs the outlet node data
+                                  int OtherLoopSideInletNode,    // Node number for the outlet of the side of the loop just simulated
+                                  bool &OutOfToleranceFlag,      // True when the other side of the loop need to be (re)simulated
                                   DataPlant::CommonPipeType CommonPipeType);
 
     //***************
@@ -138,8 +138,7 @@ namespace HVACInterfaceManager {
     void UpdateHalfLoopInletTemp(EnergyPlusData &state, int LoopNum, DataPlant::LoopSideLocation TankInletLoopSide, Real64 &TankOutletTemp);
 
     void UpdateCommonPipe(EnergyPlusData &state,
-                          int LoopNum,
-                          DataPlant::LoopSideLocation TankInletLoopSide,
+                          const PlantLocation &TankInletPlantLoc,
                           DataPlant::CommonPipeType CommonPipeType,
                           Real64 &MixedOutletTemp);
 
@@ -150,7 +149,7 @@ namespace HVACInterfaceManager {
                                 Real64 &MixedOutletTemp // inlet temperature to the common pipe passed in from the capacitance calculation
     );
 
-    void ManageTwoWayCommonPipe(EnergyPlusData &state, int LoopNum, const DataPlant::LoopSideLocation LoopSide, Real64 TankOutletTemp);
+    void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc, Real64 TankOutletTemp);
 
     void SetupCommonPipes(EnergyPlusData &state);
 

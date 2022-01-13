@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
     // unit test for autosizing boiler nominal capacity in Boiler:HotWater
     state->dataBoilers->Boiler.allocate(1);
     // Hardsized Hot Water Boiler
-    state->dataBoilers->Boiler(1).LoopNum = 1;
+    state->dataBoilers->Boiler(1).plantLoc.loopNum = 1;
     state->dataBoilers->Boiler(1).SizFac = 1.2;
     state->dataBoilers->Boiler(1).NomCap = 40000.0;
     state->dataBoilers->Boiler(1).NomCapWasAutoSized = false;
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
     // boiler nominal capacity in Boiler:HotWater
     state->dataBoilers->Boiler.allocate(1);
     // Autosized Hot Water Boiler
-    state->dataBoilers->Boiler(1).LoopNum = 1;
+    state->dataBoilers->Boiler(1).plantLoc.loopNum = 1;
     state->dataBoilers->Boiler(1).SizFac = 1.2;
     state->dataBoilers->Boiler(1).NomCap = DataSizing::AutoSize;
     state->dataBoilers->Boiler(1).NomCapWasAutoSized = true;
@@ -138,14 +138,14 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
 
     // calculate nominal capacity at 60.0 C hot water temperature
     Real64 rho = FluidProperties::GetDensityGlycol(*state,
-                                                   state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidName,
+                                                   state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).plantLoc.loopNum).FluidName,
                                                    60.0,
-                                                   state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidIndex,
+                                                   state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).plantLoc.loopNum).FluidIndex,
                                                    "Boiler_HotWaterAutoSizeTempTest");
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(*state,
-                                                       state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidName,
+                                                       state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).plantLoc.loopNum).FluidName,
                                                        60.0,
-                                                       state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).LoopNum).FluidIndex,
+                                                       state->dataPlnt->PlantLoop(state->dataBoilers->Boiler(1).plantLoc.loopNum).FluidIndex,
                                                        "Boiler_HotWaterAutoSizeTempTest");
 
     Real64 NomCapBoilerExpected =

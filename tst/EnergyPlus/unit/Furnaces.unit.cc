@@ -274,19 +274,19 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirOutletNodeNum = 3;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum = 5;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterOutletNodeNum = 6;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopNum = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).BranchNum = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.loopNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.branchNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.compNum = 1;
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirInletNodeNum = 3;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirOutletNodeNum = 2;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum = 7;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterOutletNodeNum = 8;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopNum = 2;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).BranchNum = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.loopNum = 2;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.branchNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.compNum = 1;
 
     // set up plant loop
     state->dataPlnt->TotNumLoops = 2;

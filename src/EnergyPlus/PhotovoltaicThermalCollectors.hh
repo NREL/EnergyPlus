@@ -55,6 +55,7 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -120,21 +121,18 @@ namespace PhotovoltaicThermalCollectors {
     struct PVTCollectorStruct : PlantComponent
     {
         // Members
-        std::string Name;                         // Name of PVT collector
-        DataPlant::PlantEquipmentType Type;       // Plant Side Connection: 'Type' assigned in DataPlant
-        int WLoopNum;                             // Water plant loop index number
-        DataPlant::LoopSideLocation WLoopSideNum; // Water plant loop side index
-        int WLoopBranchNum;                       // Water plant loop branch index
-        int WLoopCompNum;                         // Water plant loop component index
-        bool EnvrnInit;                           // manage begin environment inits
-        bool SizingInit;                          // manage when sizing is complete
-        std::string PVTModelName;                 // Name of PVT performance object
-        int PVTModelType;                         // model type indicator, only simple avail now
-        int SurfNum;                              // surface index
-        std::string PVname;                       // named Generator:Photovoltaic object
-        int PVnum;                                // PV index
-        bool PVfound;                             // init, need to delay get input until PV gotten
-        SimplePVTModelStruct Simple;              // performance data structure.
+        std::string Name;                   // Name of PVT collector
+        DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
+        PlantLocation WPlantLoc;            // Water plant loop component location
+        bool EnvrnInit;                     // manage begin environment inits
+        bool SizingInit;                    // manage when sizing is complete
+        std::string PVTModelName;           // Name of PVT performance object
+        int PVTModelType;                   // model type indicator, only simple avail now
+        int SurfNum;                        // surface index
+        std::string PVname;                 // named Generator:Photovoltaic object
+        int PVnum;                          // PV index
+        bool PVfound;                       // init, need to delay get input until PV gotten
+        SimplePVTModelStruct Simple;        // performance data structure.
         WorkingFluidEnum WorkingFluidType;
         int PlantInletNodeNum;
         int PlantOutletNodeNum;
@@ -155,11 +153,10 @@ namespace PhotovoltaicThermalCollectors {
 
         // Default Constructor
         PVTCollectorStruct()
-            : Type(DataPlant::PlantEquipmentType::Invalid), WLoopNum(0), WLoopSideNum(DataPlant::LoopSideLocation::Invalid), WLoopBranchNum(0),
-              WLoopCompNum(0), EnvrnInit(true), SizingInit(true), PVTModelType(0), SurfNum(0), PVnum(0), PVfound(false),
-              WorkingFluidType(WorkingFluidEnum::LIQUID), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0), HVACOutletNodeNum(0),
-              DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0), AreaCol(0.0),
-              BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true), MyOneTimeFlag(true),
+            : Type(DataPlant::PlantEquipmentType::Invalid), WPlantLoc{}, EnvrnInit(true), SizingInit(true), PVTModelType(0), SurfNum(0), PVnum(0),
+              PVfound(false), WorkingFluidType(WorkingFluidEnum::LIQUID), PlantInletNodeNum(0), PlantOutletNodeNum(0), HVACInletNodeNum(0),
+              HVACOutletNodeNum(0), DesignVolFlowRate(0.0), DesignVolFlowRateWasAutoSized(false), MaxMassFlowRate(0.0), MassFlowRate(0.0),
+              AreaCol(0.0), BypassDamperOff(true), CoolingUseful(false), HeatingUseful(false), MySetPointCheckFlag(true), MyOneTimeFlag(true),
               SetLoopIndexFlag(true)
         {
         }
