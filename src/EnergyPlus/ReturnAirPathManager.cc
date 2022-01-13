@@ -322,17 +322,93 @@ namespace ReturnAirPathManager {
 
         // 2022-01-12: This means a correponding data structure should be build for the exhaust path as well
         // 2022-01-12: So here is another item to be built first: stateZoneEquip->ExhaustAirPath
+        // 2022-01-13: Not sure if the following is needed with the json helper method?
         if (allocated(state.dataZoneEquip->ExhaustAirSystem)) {
             return;
         }
 
         // 2022-01-12: After setting the exhaust air system structs and a few related definitions
-        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-        cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
-        state.dataZoneEquip->NumExhaustAirSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        // auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        // cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
+        // state.dataZoneEquip->NumExhaustAirSystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         // 2022-01-12: More processing code here: 
-        /* */
+        // 2022-01-13: Use the json helper to process input
+        constexpr const char *RoutineName("GetExhaustAirSystemInput: ");
+        std::string cCurrentModuleObject = "AirLoopHVAC:ExhaustSystem";
+        auto &ip = state.dataInputProcessing->inputProcessor;
+        auto const instances = ip->epJSON.find(cCurrentModuleObject);
+        if (instances != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+            auto &instancesValue = instances.value();
+            int numExhaustSystems = instancesValue.size();
+            int exhSysNum = 0;
+
+            if (numExhaustSystems > 0) {
+                state.dataZoneEquip->ExhaustAirSystem.allocate(numExhaustSystems);
+            }
+
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++exhSysNum;
+                auto const &objectFields = instance.value();
+                auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(exhSysNum);
+                thisExhSys.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+
+                std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_manager_list_name");
+                int availMgrNum = UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager);
+                if (availMgrNum > 0) {
+                    // normal conditions
+                } else if (availMgrNum == 0) {
+                    // black or anything like that, treat as always avaialabe?
+                    /* */
+                }
+                else {
+                    availMgrNum = 0;
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                    ShowContinueError(state, "Avaiability Manager Name =" + availSchName + "not found.");
+                    // ErrorsFound = true;
+                }
+                // 2022-01-13: To do: Add related data structure to store Availability Manager  (and for all other fields as well)
+
+                std::string zoneMixerName = ip->getRealFieldValue(objectFields, objectSchemaProps, "airloophvac_zonemixer_name");
+                int zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state.data);
+                if (zoneMixerNum > 0) {
+                    // normal conditions
+                } else {
+                    zoneMixerNum = 0;
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                    ShowContinueError(state, "ZoneMixer Name =" + zoneMixerName + "not found.");
+                    ErrorsFound = true;
+                }
+
+                std::string centralfanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
+                int centralfanTypeNum = UtilityRoutines::FindItemInList(centralfanType, state.dataFans);
+                // 2022-01-13: To-do match fan object types and determine what to do
+                /* */
+
+
+                std::string centralfanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
+                int fanNum = UtilityRoutines::FindItemInList(centralfanName, state.dataFans);
+                if (fanNum > 0) {
+                    // normal conditions
+                } else if (fanNum == 0) {
+                    // black or anything like that, treat as always avaialabe?
+                    /* */
+                } else {
+                    fanNum = 0;
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                    ShowContinueError(state, "Fan Name =" + centralfanName + "not found.");
+                    ErrorsFound = true;
+                }
+            }
+            state.dataZoneEquip->NumReturnAirPaths = numExhaustSystems;
+
+        } else {
+            // If no exhaust systems are defined, then do something <or nothing>:
+            /* */
+        }
+
 
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting AirLoopHVAC:ExhaustSystem.  Preceding condition(s) causes termination.");
