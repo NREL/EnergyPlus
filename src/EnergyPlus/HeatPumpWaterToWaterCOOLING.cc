@@ -312,7 +312,7 @@ void GetGshpInput(EnergyPlusData &state)
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum = GetOnlySingleNode(state,
                                                                                               AlphArray(2),
                                                                                               ErrorsFound,
-                                                                                              "HeatPump:WaterToWater Cooling",
+                                                                                              ModuleCompName,
                                                                                               AlphArray(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Inlet,
@@ -322,7 +322,7 @@ void GetGshpInput(EnergyPlusData &state)
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(state,
                                                                                                AlphArray(3),
                                                                                                ErrorsFound,
-                                                                                               "HeatPump:WaterToWater Cooling",
+                                                                                               ModuleCompName,
                                                                                                AlphArray(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Outlet,
@@ -332,7 +332,7 @@ void GetGshpInput(EnergyPlusData &state)
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(state,
                                                                                             AlphArray(4),
                                                                                             ErrorsFound,
-                                                                                            "HeatPump:WaterToWater Cooling",
+                                                                                            ModuleCompName,
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
@@ -342,7 +342,7 @@ void GetGshpInput(EnergyPlusData &state)
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(state,
                                                                                              AlphArray(5),
                                                                                              ErrorsFound,
-                                                                                             "HeatPump:WaterToWater Cooling",
+                                                                                             ModuleCompName,
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
@@ -377,7 +377,7 @@ void GetGshpInput(EnergyPlusData &state)
 
     state.dataHPWaterToWaterClg->GSHPRefrigIndex = FindRefrigerant(state, GSHPRefrigerant);
     if (state.dataHPWaterToWaterClg->GSHPRefrigIndex == 0) {
-        ShowFatalError(state, "Refrigerant for HeatPump:WaterToWater Heating not found, should have been=" + GSHPRefrigerant);
+        ShowFatalError(state, "Refrigerant for " + ModuleCompName + " not found, should have been=" + GSHPRefrigerant);
         ShowFatalError(state, "FluidProperties:* objects for " + GSHPRefrigerant + " must be included in the idf file.");
     }
 
