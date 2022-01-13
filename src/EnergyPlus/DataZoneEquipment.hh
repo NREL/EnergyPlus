@@ -470,6 +470,23 @@ namespace DataZoneEquipment {
         }
     };
 
+    struct ExhaustAir
+    {
+        // Members
+        std::string Name;
+        int NumOfComponents;
+        int OutletNodeNum;
+        Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
+        Array1D<DataZoneEquipment::AirLoopHVACZone> ComponentTypeEnum;
+        Array1D_string ComponentName;
+        Array1D_int ComponentIndex;
+
+        // Default Constructor
+        ExhaustAir() : NumOfComponents(0), OutletNodeNum(0)
+        {
+        }
+    };
+
     void GetZoneEquipmentData(EnergyPlusData &state);
 
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
@@ -512,6 +529,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     int GetZoneEquipmentDataFound = 0;
     int NumSupplyAirPaths = 0;
     int NumReturnAirPaths = 0;
+    int NumExhaustAirSystems = 0;
     bool ZoneEquipInputsFilled = false;
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
@@ -526,6 +544,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
     Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
+    Array1D<DataZoneEquipment::ExhaustAir> ExhaustAirSystem;
 
     void clear_state() override
     {
@@ -533,6 +552,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->GetZoneEquipmentDataFound = 0;
         this->NumSupplyAirPaths = 0;
         this->NumReturnAirPaths = 0;
+        this->NumExhaustAirSystems = 0;
         this->ZoneEquipInputsFilled = false;
         this->ZoneEquipSimulatedOnce = false;
         this->NumOfZoneEquipLists = 0;
@@ -547,6 +567,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->ZoneEquipList.deallocate();
         this->SupplyAirPath.deallocate();
         this->ReturnAirPath.deallocate();
+        this->ExhaustAirSystem.deallocate();
     }
 };
 
