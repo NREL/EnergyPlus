@@ -1909,14 +1909,15 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         } break;
         default: {
             static constexpr std::string_view Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
+            Material::MaterialProperties &mp = state.dataMaterial->Material(Layer);
             print(state.files.eio,
                   Format_701,
-                  state.dataMaterial->Material(Layer).Name,
-                  state.dataMaterial->Material(Layer).Thickness,
-                  state.dataMaterial->Material(Layer).Conductivity,
-                  state.dataMaterial->Material(Layer).Density,
-                  state.dataMaterial->Material(Layer).SpecHeat,
-                  state.dataMaterial->Material(Layer).Resistance);
+                  mp.Name,
+                  mp.Thickness,
+                  mp.Conductivity,
+                  mp.Density,
+                  mp.SpecHeat,
+                  mp.Resistance);
         } break;
         }
     }
