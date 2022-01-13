@@ -94,8 +94,15 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 {
     bool errFlag = false;
-    RegisterNodeConnection(
-        *state, 1, "BadNode", "Type1", "Object1", DataLoopNode::ConnectionType::ZoneNode, NodeInputManager::CompFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state,
+                           1,
+                           "BadNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object1",
+                           DataLoopNode::ConnectionType::ZoneNode,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
@@ -107,21 +114,49 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
 {
     bool errFlag = false;
-    RegisterNodeConnection(
-        *state, 1, "BadNode", "Type1", "Object1", DataLoopNode::ConnectionType::ZoneNode, NodeInputManager::CompFluidStream::Primary, false, errFlag);
-    RegisterNodeConnection(
-        *state, 2, "GoodNode", "Type2", "Object2", DataLoopNode::ConnectionType::Sensor, NodeInputManager::CompFluidStream::Primary, false, errFlag);
-    RegisterNodeConnection(
-        *state, 1, "BadNode", "Type3", "Object3", DataLoopNode::ConnectionType::ZoneNode, NodeInputManager::CompFluidStream::Primary, false, errFlag);
-    RegisterNodeConnection(
-        *state, 2, "GoodNode", "Type4", "Object4", DataLoopNode::ConnectionType::Outlet, NodeInputManager::CompFluidStream::Primary, false, errFlag);
+    RegisterNodeConnection(*state,
+                           1,
+                           "BadNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object1",
+                           DataLoopNode::ConnectionType::ZoneNode,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           2,
+                           "GoodNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object2",
+                           DataLoopNode::ConnectionType::Sensor,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           1,
+                           "BadNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object3",
+                           DataLoopNode::ConnectionType::ZoneNode,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
+    RegisterNodeConnection(*state,
+                           2,
+                           "GoodNode",
+                           DataLoopNode::ConnectionObjectType::FanOnOff,
+                           "Object4",
+                           DataLoopNode::ConnectionType::Outlet,
+                           NodeInputManager::CompFluidStream::Primary,
+                           false,
+                           errFlag);
     bool ErrorsFound = false;
 
     CheckNodeConnections(*state, ErrorsFound);
     std::string const error_string =
         delimited_string({"   ** Severe  ** Node Connection Error, Node Name=\"BadNode\", The same zone node appears more than once.",
-                          "   **   ~~~   ** Reference Object=TYPE1, Object Name=Object1",
-                          "   **   ~~~   ** Reference Object=TYPE3, Object Name=Object3"});
+                          "   **   ~~~   ** Reference Object=Fan:OnOff, Object Name=Object1",
+                          "   **   ~~~   ** Reference Object=Fan:OnOff, Object Name=Object3"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_TRUE(ErrorsFound); // Node check will fail on Check 11 -- zone node name must be unique
