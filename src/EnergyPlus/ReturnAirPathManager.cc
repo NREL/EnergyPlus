@@ -372,24 +372,29 @@ namespace ReturnAirPathManager {
                 // 2022-01-13: To do: Add related data structure to store Availability Manager  (and for all other fields as well)
 
                 std::string zoneMixerName = ip->getRealFieldValue(objectFields, objectSchemaProps, "airloophvac_zonemixer_name");
-                int zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state.data);
-                if (zoneMixerNum > 0) {
-                    // normal conditions
-                } else {
-                    zoneMixerNum = 0;
+                // int zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state); // 2022-01-13: need some kind of function overload definition?
+                ValidateComponent(state,
+                                  "AirLoopHVAC:ZoneMixer",
+                                  zoneMixerName,
+                                  IsNotOK,
+                                  "AirLoopHVAC:ExhaustSystem");
+                if (IsNotOK) {
+                    // zoneMixerNum = 0;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
                     ShowContinueError(state, "ZoneMixer Name =" + zoneMixerName + "not found.");
                     ErrorsFound = true;
+                } else {
+                    // normal conditions
                 }
+                // 2022-01-13: To do: Add related data struct to store zoneMixer number (actually need a local zone num definition as well)
 
                 std::string centralfanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
-                int centralfanTypeNum = UtilityRoutines::FindItemInList(centralfanType, state.dataFans);
+                int centralfanTypeNum = UtilityRoutines::FindItemInList(centralfanType, state.dataFans); // 2022-01-13: need some kind of function overload definition?
                 // 2022-01-13: To-do match fan object types and determine what to do
                 /* */
 
-
                 std::string centralfanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
-                int fanNum = UtilityRoutines::FindItemInList(centralfanName, state.dataFans);
+                int fanNum = UtilityRoutines::FindItemInList(centralfanName, state.dataFans); // 2022-01-13: need some kind of function overload definition?
                 if (fanNum > 0) {
                     // normal conditions
                 } else if (fanNum == 0) {
