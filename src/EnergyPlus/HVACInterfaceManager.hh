@@ -127,10 +127,10 @@ namespace HVACInterfaceManager {
     //***************
 
     void UpdatePlantLoopInterface(EnergyPlusData &state,
-                                  PlantLocation const &plantLoc,     // The 'outlet node' Location
-                                  int ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
-                                  int OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
-                                  bool &OutOfToleranceFlag,   // True when the other side of the loop need to be (re)simulated
+                                  PlantLocation const &plantLoc, // The 'outlet node' Location
+                                  int ThisLoopSideOutletNode,    // Node number for the inlet of the side that needs the outlet node data
+                                  int OtherLoopSideInletNode,    // Node number for the outlet of the side of the loop just simulated
+                                  bool &OutOfToleranceFlag,      // True when the other side of the loop need to be (re)simulated
                                   DataPlant::CommonPipeType CommonPipeType);
 
     //***************

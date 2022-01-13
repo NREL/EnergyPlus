@@ -5429,8 +5429,8 @@ namespace Furnaces {
                     }
                 }
                 // fill outlet node for coil
-                state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataFurnaces->Furnace(FurnaceNum).plantLoc)
-                                                                             .NodeNumOut;
+                state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode =
+                    DataPlant::CompData::getPlantComponent(state, state.dataFurnaces->Furnace(FurnaceNum).plantLoc).NodeNumOut;
                 state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
                 state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
@@ -5494,8 +5494,7 @@ namespace Furnaces {
                 }
                 // fill outlet node for coil
                 state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode =
-                    DataPlant::CompData::getPlantComponent(state, state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc)
-                        .NodeNumOut;
+                    DataPlant::CompData::getPlantComponent(state, state.dataFurnaces->Furnace(FurnaceNum).SuppPlantLoc).NodeNumOut;
                 state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
                 state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
@@ -10387,12 +10386,12 @@ namespace Furnaces {
         Real64 HotWaterMdot;    // actual hot water mass flow rate
         std::array<Real64, 4> Par;
         int SolFlag;
-        auto &HeatingCoilName = state.dataFurnaces->HeatingCoilName;                   // name of heating coil
-        int CoilTypeNum(0);                                                            // heating coil type number
-        int HeatingCoilIndex(0);                                                       // heating coil index
-        int CoilControlNode(0);                                                        // control node for hot water and steam heating coils
-        int CoilOutletNode(0);                                                         // air outlet node of the heatiing coils
-        PlantLocation plantLoc{};                                              // plant loop location
+        auto &HeatingCoilName = state.dataFurnaces->HeatingCoilName; // name of heating coil
+        int CoilTypeNum(0);                                          // heating coil type number
+        int HeatingCoilIndex(0);                                     // heating coil index
+        int CoilControlNode(0);                                      // control node for hot water and steam heating coils
+        int CoilOutletNode(0);                                       // air outlet node of the heatiing coils
+        PlantLocation plantLoc{};                                    // plant loop location
 
         QActual = 0.0;
 

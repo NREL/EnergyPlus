@@ -186,7 +186,7 @@ namespace EvaporativeFluidCoolers {
         bool SuppliedByWaterSystem;
         // end water system variables
         // loop topology variables
-       PlantLocation plantLoc;
+        PlantLocation plantLoc;
         Real64 InletWaterTemp;    // CW temperature at evaporative fluid cooler inlet
         Real64 OutletWaterTemp;   // CW temperature at evaporative fluid cooler outlet
         int WaterInletNode;       // Node number at evaporative fluid cooler inlet

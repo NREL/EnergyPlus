@@ -1386,19 +1386,11 @@ namespace WaterUse {
             if (this->InletNode > 0) {
                 if (FirstHVACIteration) {
                     // Request the mass flow rate from the demand side manager
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         this->HotMassFlowRate,
-                                                         this->InletNode,
-                                                         this->OutletNode,
-                                                         this->plantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, this->HotMassFlowRate, this->InletNode, this->OutletNode, this->plantLoc);
 
                 } else {
                     Real64 DesiredHotWaterMassFlow = this->HotMassFlowRate;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         DesiredHotWaterMassFlow,
-                                                         this->InletNode,
-                                                         this->OutletNode,
-                                                         this->plantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, DesiredHotWaterMassFlow, this->InletNode, this->OutletNode, this->plantLoc);
                     // readjust if more than actual available mass flow rate determined by the demand side manager
                     if ((this->HotMassFlowRate != DesiredHotWaterMassFlow) && (this->HotMassFlowRate > 0.0)) { // plant didn't give what was asked for
 

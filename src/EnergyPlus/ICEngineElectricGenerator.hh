@@ -109,22 +109,22 @@ namespace ICEngineElectricGenerator {
         Real64 HeatRecOutletTemp;         // Outlet Temperature of the heat recovery fluid
         Real64 HeatRecMdotDesign;         // reporting: Heat Recovery Loop Mass flow rate
         Real64 HeatRecMdotActual;
-        Real64 QTotalHeatRecovered;                // total heat recovered (W)
-        Real64 QJacketRecovered;                   // heat recovered from jacket (W)
-        Real64 QLubeOilRecovered;                  // heat recovered from lube (W)
-        Real64 QExhaustRecovered;                  // exhaust gas heat recovered (W)
-        Real64 FuelEnergyUseRate;                  // Fuel Energy used (W)
-        Real64 TotalHeatEnergyRec;                 // total heat recovered (J)
-        Real64 JacketEnergyRec;                    // heat recovered from jacket (J)
-        Real64 LubeOilEnergyRec;                   // heat recovered from lube (J)
-        Real64 ExhaustEnergyRec;                   // exhaust gas heat recovered (J)
-        Real64 FuelEnergy;                         // Fuel Energy used (J)
-        Real64 FuelMdot;                           // Fuel Amount used (Kg/s)
-        Real64 ExhaustStackTemp;                   // Exhaust Stack Temperature (C)
-        Real64 ElecPowerGenerated;                 // Electric Power Generated (W)
-        Real64 ElecEnergyGenerated;                // Amount of Electric Energy Generated (J)
-        Real64 HeatRecMaxTemp;                     // Max Temp that can be produced in heat recovery
-        PlantLocation HRPlantLoc;                             // cooling water plant loop component index, for heat recovery
+        Real64 QTotalHeatRecovered; // total heat recovered (W)
+        Real64 QJacketRecovered;    // heat recovered from jacket (W)
+        Real64 QLubeOilRecovered;   // heat recovered from lube (W)
+        Real64 QExhaustRecovered;   // exhaust gas heat recovered (W)
+        Real64 FuelEnergyUseRate;   // Fuel Energy used (W)
+        Real64 TotalHeatEnergyRec;  // total heat recovered (J)
+        Real64 JacketEnergyRec;     // heat recovered from jacket (J)
+        Real64 LubeOilEnergyRec;    // heat recovered from lube (J)
+        Real64 ExhaustEnergyRec;    // exhaust gas heat recovered (J)
+        Real64 FuelEnergy;          // Fuel Energy used (J)
+        Real64 FuelMdot;            // Fuel Amount used (Kg/s)
+        Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
+        Real64 ElecPowerGenerated;  // Electric Power Generated (W)
+        Real64 ElecEnergyGenerated; // Amount of Electric Energy Generated (J)
+        Real64 HeatRecMaxTemp;      // Max Temp that can be produced in heat recovery
+        PlantLocation HRPlantLoc;   // cooling water plant loop component index, for heat recovery
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;

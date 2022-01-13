@@ -190,7 +190,7 @@ namespace WaterCoils {
         int AirOutletNodeNum;
         int WaterInletNodeNum;
         int WaterOutletNodeNum;
-        PlantLocation WaterPlantLoc;       // Plant location struct
+        PlantLocation WaterPlantLoc; // Plant location struct
         // begin variables for Water System interactions
         int CondensateCollectMode;         // where does water come from
         std::string CondensateCollectName; // name of water source e.g. water storage tank

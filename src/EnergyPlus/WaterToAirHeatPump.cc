@@ -1026,8 +1026,7 @@ namespace WaterToAirHeatPump {
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).HPTimeConstant = HPTimeConstant;
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).FanDelayTime = FanDelayTime;
 
-            PlantOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc)
-                                  .NodeNumOut;
+            PlantOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc).NodeNumOut;
             InitComponentNodes(
                 state, 0.0, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterMassFlowRate, WaterInletNode, PlantOutletNode);
 

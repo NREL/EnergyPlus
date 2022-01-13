@@ -165,7 +165,8 @@ namespace DataPlant {
                                                            thisPlantLoop.CommonPipeType);
 
             // Update the loop outlet node conditions
-            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).CheckLoopExitNode(state, FirstHVACIteration); // TODO: This is a loop level check, move out
+            state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
+                .CheckLoopExitNode(state, FirstHVACIteration); // TODO: This is a loop level check, move out
 
             state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
                 .UpdateLoopSideReportVars(state, this->InitialDemandToLoopSetPointSAVED, this->LoadToLoopSetPointThatWasntMet);
@@ -1722,10 +1723,7 @@ namespace DataPlant {
             for (int CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter) {
 
                 auto &this_comp(branch.Comp(CompCounter));
-                PlantLocation this_plantLoc = {this->plantLoc.loopNum,
-                                               this->plantLoc.loopSideNum,
-                                               BranchCounter,
-                                               CompCounter};
+                PlantLocation this_plantLoc = {this->plantLoc.loopNum, this->plantLoc.loopSideNum, BranchCounter, CompCounter};
                 auto const CurOpSchemeType(this_comp.CurOpSchemeType);
 
                 switch (CurOpSchemeType) {
@@ -1812,10 +1810,7 @@ namespace DataPlant {
             int const StartingComponent = branch.lastComponentSimulated + 1;
             int const EndingComponent = branch.TotalComponents;
             for (int CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter) {
-                PlantLocation this_plantLoc = {this->plantLoc.loopNum,
-                                               this->plantLoc.loopSideNum,
-                                               BranchCounter,
-                                               CompCounter};
+                PlantLocation this_plantLoc = {this->plantLoc.loopNum, this->plantLoc.loopSideNum, BranchCounter, CompCounter};
 
                 auto const CurOpSchemeType(branch.Comp(CompCounter).CurOpSchemeType);
 

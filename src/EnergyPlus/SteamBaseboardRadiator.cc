@@ -1721,15 +1721,24 @@ namespace SteamBaseboardRadiator {
             return;
         }
 
-        PullCompInterconnectTrigger(state,                                   state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+        PullCompInterconnectTrigger(state,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::HeatTransferRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power);
 
-        PullCompInterconnectTrigger(state,                                   state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+        PullCompInterconnectTrigger(state,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::MassFlowRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate);
 
-        PullCompInterconnectTrigger(state,                                   state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+        PullCompInterconnectTrigger(state,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::Temperature,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletTemp);
     }

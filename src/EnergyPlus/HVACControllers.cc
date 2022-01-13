@@ -793,11 +793,8 @@ void ResetController(EnergyPlusData &state, int const ControlNum, bool const DoW
     SensedNode = ControllerProps(ControlNum).SensedNode;
 
     NoFlowResetValue = 0.0;
-    SetActuatedBranchFlowRate(state,
-                              NoFlowResetValue,
-                              ControllerProps(ControlNum).ActuatedNode,
-                              ControllerProps(ControlNum).ActuatedNodePlantLoc,
-                              true);
+    SetActuatedBranchFlowRate(
+        state, NoFlowResetValue, ControllerProps(ControlNum).ActuatedNode, ControllerProps(ControlNum).ActuatedNodePlantLoc, true);
 
     //  ENDIF
 
@@ -1178,11 +1175,8 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         MyEnvrnFlag(ControlNum) = true;
     }
 
-    SetActuatedBranchFlowRate(state,
-                              ControllerProps(ControlNum).NextActuatedValue,
-                              ActuatedNode,
-                              ControllerProps(ControlNum).ActuatedNodePlantLoc,
-                              false);
+    SetActuatedBranchFlowRate(
+        state, ControllerProps(ControlNum).NextActuatedValue, ActuatedNode, ControllerProps(ControlNum).ActuatedNodePlantLoc, false);
 
     // Do the following initializations (every time step): This should be the info from
     // the previous components outlets or the node data in this section.

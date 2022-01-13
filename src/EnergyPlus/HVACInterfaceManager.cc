@@ -392,7 +392,7 @@ void rshift1(Array1D<Real64> &a)
 }
 
 void UpdatePlantLoopInterface(EnergyPlusData &state,
-                              PlantLocation const &plantLoc,     // The 'outlet node' Location
+                              PlantLocation const &plantLoc,    // The 'outlet node' Location
                               int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                               int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                               bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
@@ -439,7 +439,6 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     int LoopNum = plantLoc.loopNum;
     DataPlant::LoopSideLocation ThisLoopSideNum = plantLoc.loopSideNum;
     auto &convergence(state.dataConvergeParams->PlantConvergence(LoopNum));
-
 
     // reset out of tolerance flags
     convergence.PlantMassFlowNotConverged = false;
@@ -1138,7 +1137,8 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
                 }
 
                 // eq. 3
-                if ((PlantCommonPipe(plantLoc.loopNum).SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == SupplyLedPrimaryInletUpdate)) {
+                if ((PlantCommonPipe(plantLoc.loopNum).SupplySideInletPumpType == FlowType::Variable) &&
+                    (CurCallingCase == SupplyLedPrimaryInletUpdate)) {
                     // MdotPri is a variable to be calculated and flow request needs to be made
                     if (std::abs(TempCPPrimaryCntrlSetPoint) > DeltaTempTol) {
 
@@ -1148,7 +1148,7 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
                     } else {
                         MdotPri = MdotSec;
                     }
-                    PlantLocation thisPlantLoc =  {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0};
+                    PlantLocation thisPlantLoc = {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0};
                     SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, thisPlantLoc, false);
                 }
 
@@ -1181,7 +1181,8 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
                 }
 
                 // eq. 3
-                if ((PlantCommonPipe(plantLoc.loopNum).SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == DemandLedPrimaryInletUpdate)) {
+                if ((PlantCommonPipe(plantLoc.loopNum).SupplySideInletPumpType == FlowType::Variable) &&
+                    (CurCallingCase == DemandLedPrimaryInletUpdate)) {
                     // MdotPri is a variable to be calculated and flow request made
                     if (std::abs(TempPriOutTankOut - TempPriInlet) > DeltaTempTol) {
                         MdotPri = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempPriInlet);

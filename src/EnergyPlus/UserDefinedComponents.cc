@@ -2359,11 +2359,12 @@ namespace UserDefinedComponents {
                                                                          state.dataLoopNodes->Node(this->Loop(LoopNum).InletNodeNum).Temp,
                                                                          state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidIndex,
                                                                          RoutineName);
-        this->Loop(LoopNum).InletCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                             state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidName,
-                                                                             state.dataLoopNodes->Node(this->Loop(LoopNum).InletNodeNum).Temp,
-                                                                             state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidIndex,
-                                                                             RoutineName);
+        this->Loop(LoopNum).InletCp =
+            FluidProperties::GetSpecificHeatGlycol(state,
+                                                   state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidName,
+                                                   state.dataLoopNodes->Node(this->Loop(LoopNum).InletNodeNum).Temp,
+                                                   state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidIndex,
+                                                   RoutineName);
         this->Loop(LoopNum).InletMassFlowRate = state.dataLoopNodes->Node(this->Loop(LoopNum).InletNodeNum).MassFlowRate;
         this->Loop(LoopNum).InletTemp = state.dataLoopNodes->Node(this->Loop(LoopNum).InletNodeNum).Temp;
         if (this->Air.InletNodeNum > 0) {
@@ -2393,21 +2394,16 @@ namespace UserDefinedComponents {
         if (this->myOneTimeFlag) {
             if (this->PlantIsConnected) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        DataPlant::PlantEquipmentType::CoilUserDefined,
-                                                        this->Loop.plantLoc,
-                                                        errFlag);
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->Name, DataPlant::PlantEquipmentType::CoilUserDefined, this->Loop.plantLoc, errFlag);
                 if (errFlag) {
                     ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
                 // set user input for flow priority
-                DataPlant::CompData::getPlantComponent(state, this->Loop.plantLoc)
-                    .FlowPriority = this->Loop.FlowPriority;
+                DataPlant::CompData::getPlantComponent(state, this->Loop.plantLoc).FlowPriority = this->Loop.FlowPriority;
 
                 // set user input for how loads served
-                DataPlant::CompData::getPlantComponent(state, this->Loop.plantLoc)
-                    .HowLoadServed = this->Loop.HowLoadServed;
+                DataPlant::CompData::getPlantComponent(state, this->Loop.plantLoc).HowLoadServed = this->Loop.HowLoadServed;
             }
             this->myOneTimeFlag = false;
         }
@@ -2474,12 +2470,10 @@ namespace UserDefinedComponents {
                         ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
                     // set user input for flow priority
-                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc)
-                        .FlowPriority = this->Loop(loop).FlowPriority;
+                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc).FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
-                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc)
-                        .HowLoadServed = this->Loop(loop).HowLoadServed;
+                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc).HowLoadServed = this->Loop(loop).HowLoadServed;
                 }
             }
             this->myOneTimeFlag = false;
@@ -2517,11 +2511,12 @@ namespace UserDefinedComponents {
                                                                               state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
                                                                               state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
                                                                               RoutineName);
-                this->Loop(loop).InletCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                                  state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidName,
-                                                                                  state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
-                                                                                  state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
-                                                                                  RoutineName);
+                this->Loop(loop).InletCp =
+                    FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidName,
+                                                           state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
+                                                           state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
                 this->Loop(loop).InletTemp = state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp;
                 this->Loop(loop).InletMassFlowRate = state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).MassFlowRate;
             }
@@ -2557,12 +2552,10 @@ namespace UserDefinedComponents {
                         ShowFatalError(state, "InitPlantUserComponent: Program terminated due to previous condition(s).");
                     }
                     // set user input for flow priority
-                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc)
-                        .FlowPriority = this->Loop(loop).FlowPriority;
+                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc).FlowPriority = this->Loop(loop).FlowPriority;
 
                     // set user input for how loads served
-                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc)
-                        .HowLoadServed = this->Loop(loop).HowLoadServed;
+                    DataPlant::CompData::getPlantComponent(state, this->Loop(loop).plantLoc).HowLoadServed = this->Loop(loop).HowLoadServed;
                 }
             }
             this->myOneTimeFlag = false;
@@ -2600,11 +2593,12 @@ namespace UserDefinedComponents {
                                                                               state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
                                                                               state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
                                                                               RoutineName);
-                this->Loop(loop).InletCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                                  state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidName,
-                                                                                  state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
-                                                                                  state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
-                                                                                  RoutineName);
+                this->Loop(loop).InletCp =
+                    FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidName,
+                                                           state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
+                                                           state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
                 this->Loop(loop).InletTemp = state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp;
                 this->Loop(loop).InletMassFlowRate = state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).MassFlowRate;
             }
@@ -2657,13 +2651,11 @@ namespace UserDefinedComponents {
         }
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapLowOutLimit) {
-            DataPlant::CompData::getPlantComponent(state, this->Loop(LoopNum).plantLoc)
-                .MinOutletTemp = this->Loop(LoopNum).LowOutTempLimit;
+            DataPlant::CompData::getPlantComponent(state, this->Loop(LoopNum).plantLoc).MinOutletTemp = this->Loop(LoopNum).LowOutTempLimit;
         }
 
         if (this->Loop(LoopNum).HowLoadServed == DataPlant::HowMet::ByNominalCapHiOutLimit) {
-            DataPlant::CompData::getPlantComponent(state, this->Loop(LoopNum).plantLoc)
-                .MaxOutletTemp = this->Loop(LoopNum).HiOutTempLimit;
+            DataPlant::CompData::getPlantComponent(state, this->Loop(LoopNum).plantLoc).MaxOutletTemp = this->Loop(LoopNum).HiOutTempLimit;
         }
     }
     void UserPlantComponentStruct::oneTimeInit(EnergyPlusData &state)
@@ -2688,12 +2680,12 @@ namespace UserDefinedComponents {
                 }
 
                 // set user input for flow priority
-                DataPlant::CompData::getPlantComponent(state, this->Loop(ConnectionNum).plantLoc)
-                    .FlowPriority = this->Loop(ConnectionNum).FlowPriority;
+                DataPlant::CompData::getPlantComponent(state, this->Loop(ConnectionNum).plantLoc).FlowPriority =
+                    this->Loop(ConnectionNum).FlowPriority;
 
                 // set user input for how loads served
-                DataPlant::CompData::getPlantComponent(state, this->Loop(ConnectionNum).plantLoc)
-                    .HowLoadServed = this->Loop(ConnectionNum).HowLoadServed;
+                DataPlant::CompData::getPlantComponent(state, this->Loop(ConnectionNum).plantLoc).HowLoadServed =
+                    this->Loop(ConnectionNum).HowLoadServed;
             }
 
             this->myOneTimeFlag = false;
@@ -2729,11 +2721,8 @@ namespace UserDefinedComponents {
 
         if (this->PlantIsConnected) {
             // make mass flow requests
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->Loop.MassFlowRateRequest,
-                                                 this->Loop.InletNodeNum,
-                                                 this->Loop.OutletNodeNum,
-                                                 this->Loop.plantLoc);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->Loop.MassFlowRateRequest, this->Loop.InletNodeNum, this->Loop.OutletNodeNum, this->Loop.plantLoc);
             PlantUtilities::SafeCopyPlantNode(state, this->Loop.InletNodeNum, this->Loop.OutletNodeNum);
             // unload Actuators to node data structure
             state.dataLoopNodes->Node(this->Loop.OutletNodeNum).Temp = this->Loop.OutletTemp;

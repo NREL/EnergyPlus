@@ -1073,22 +1073,14 @@ namespace FourPipeBeam {
             (!this->airAvailable && !this->coolingAvailable && !this->heatingAvailable)) { // unit is off
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotHW,
-                                     this->hWInNodeNum,
-                                     this->hWOutNodeNum,
-                                     this->hWplantLoc);
+                SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             }
             this->hWTempOut = this->hWTempIn;
             // assume if there is still flow that unit has an internal bypass and convector does not still heat
             this->mDotCW = 0.0;
             this->cWTempOut = this->cWTempIn;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotCW,
-                                     this->cWInNodeNum,
-                                     this->cWOutNodeNum,
-                                     this->cWplantLoc);
+                SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             }
             // assume if there is still flow that unit has an internal bypass and convector does not still cool
             // don't even need to run calc
@@ -1099,21 +1091,13 @@ namespace FourPipeBeam {
             dOASMode = true;
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotHW,
-                                     this->hWInNodeNum,
-                                     this->hWOutNodeNum,
-                                     this->hWplantLoc);
+                SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             }
             // assume if there is still flow that unit has an internal bypass and convector does not still heat
             this->hWTempOut = this->hWTempIn;
             this->mDotCW = 0.0;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotCW,
-                                     this->cWInNodeNum,
-                                     this->cWOutNodeNum,
-                                     this->cWplantLoc);
+                SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             }
             // assume if there is still flow that unit has an internal bypass and convector does not still cool
             this->cWTempOut = this->cWTempIn;
@@ -1137,11 +1121,7 @@ namespace FourPipeBeam {
             // first calc with max chilled water flow
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotHW,
-                                     this->hWInNodeNum,
-                                     this->hWOutNodeNum,
-                                     this->hWplantLoc);
+                SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             }
             this->hWTempOut = this->hWTempIn;
             this->mDotCW = this->mDotDesignCW;
@@ -1172,11 +1152,7 @@ namespace FourPipeBeam {
             // first calc with max hot water flow
             this->mDotCW = 0.0;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotCW,
-                                     this->cWInNodeNum,
-                                     this->cWOutNodeNum,
-                                     this->cWplantLoc);
+                SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             }
             this->cWTempOut = this->cWTempIn;
             this->mDotHW = this->mDotDesignHW;
@@ -1207,22 +1183,14 @@ namespace FourPipeBeam {
         } else {
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotHW,
-                                     this->hWInNodeNum,
-                                     this->hWOutNodeNum,
-                                     this->hWplantLoc);
+                SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             }
             this->hWTempOut = this->hWTempIn;
             // assume if there is still flow that unit has an internal bypass and convector does not still heat
             this->mDotCW = 0.0;
             this->cWTempOut = this->cWTempIn;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotCW,
-                                     this->cWInNodeNum,
-                                     this->cWOutNodeNum,
-                                     this->cWplantLoc);
+                SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             }
             // assume if there is still flow that unit has an internal bypass and convector does not still cool
             // don't even need to run calc
@@ -1265,11 +1233,7 @@ namespace FourPipeBeam {
 
         if (this->coolingAvailable && this->mDotCW > DataHVACGlobals::VerySmallMassFlow) {
             // test chilled water flow against plant, it might not all be available
-            SetComponentFlowRate(state,
-                                 this->mDotCW,
-                                 this->cWInNodeNum,
-                                 this->cWOutNodeNum,
-                                 this->cWplantLoc);
+            SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             fModCoolCWMdot =
                 CurveManager::CurveValue(state, this->modCoolingQdotCWFlowFuncNum, ((this->mDotCW / this->totBeamLength) / this->mDotNormRatedCW));
             fModCoolDeltaT = CurveManager::CurveValue(
@@ -1303,22 +1267,14 @@ namespace FourPipeBeam {
         } else {
             this->mDotCW = 0.0;
             if (this->beamCoolingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotCW,
-                                     this->cWInNodeNum,
-                                     this->cWOutNodeNum,
-                                     this->cWplantLoc);
+                SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             }
             this->cWTempOut = this->cWTempIn;
             this->qDotBeamCooling = 0.0;
         }
         if (this->heatingAvailable && this->mDotHW > DataHVACGlobals::VerySmallMassFlow) {
             // test hot water flow against plant, it might not all be available
-            SetComponentFlowRate(state,
-                                 this->mDotHW,
-                                 this->hWInNodeNum,
-                                 this->hWOutNodeNum,
-                                 this->hWplantLoc);
+            SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             fModHeatHWMdot =
                 CurveManager::CurveValue(state, this->modHeatingQdotHWFlowFuncNum, ((this->mDotHW / this->totBeamLength) / this->mDotNormRatedHW));
             fModHeatDeltaT = CurveManager::CurveValue(
@@ -1352,11 +1308,7 @@ namespace FourPipeBeam {
         } else {
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
-                SetComponentFlowRate(state,
-                                     this->mDotHW,
-                                     this->hWInNodeNum,
-                                     this->hWOutNodeNum,
-                                     this->hWplantLoc);
+                SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             }
             this->hWTempOut = this->hWTempIn;
             this->qDotBeamHeating = 0.0;

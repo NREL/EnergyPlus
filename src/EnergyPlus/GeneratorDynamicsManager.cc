@@ -921,11 +921,7 @@ namespace GeneratorDynamicsManager {
 
         // make sure plant can provide, utility call may change flow
         if (state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc.loopNum > 0) { // protect early calls
-            SetComponentFlowRate(state,
-                                 MdotCW,
-                                 InletNode,
-                                 OutletNode,
-                                 state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc);
+            SetComponentFlowRate(state, MdotCW, InletNode, OutletNode, state.dataCHPElectGen->MicroCHP(GeneratorNum).CWPlantLoc);
         }
 
         FuncDetermineCWMdotForInternalFlowControl = MdotCW;

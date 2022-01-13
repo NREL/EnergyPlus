@@ -165,17 +165,17 @@ namespace HVACUnitaryBypassVAV {
         int HeatCoilIndex;    // DX heating coil index number
         int OpMode;           // mode of operation; 1=cycling fan, cycling compressor
         //                    2=continuous fan, cycling compressor
-        int CoilControlNode;                  // heating coil hot water or steam inlet node
-        int CoilOutletNode;                   // outlet node for hot water and steam coil
+        int CoilControlNode;              // heating coil hot water or steam inlet node
+        int CoilOutletNode;               // outlet node for hot water and steam coil
         PlantLocation plantLoc;           // plant loop component location object for water heating coil
-        int HotWaterCoilMaxIterIndex;         // Index to recurring warning message
-        int HotWaterCoilMaxIterIndex2;        // Index to recurring warning message
-        Real64 MaxHeatCoilFluidFlow;          // water or steam mass flow rate for heating coil [kg/s]
-        Real64 DesignHeatingCapacity;         // design heating capacity of the heating coil
-        Real64 DesignSuppHeatingCapacity;     // Operating capacity of supplemental Heating Coil [W]
-        Real64 MinOATCompressor;              // Minimum OAT for compressor operation [C]
-        Real64 MinLATCooling;                 // Minimum leaving air temp for compressor cooling operation [C]
-        Real64 MaxLATHeating;                 // Maximum leaving air temp for heating operation [C]
+        int HotWaterCoilMaxIterIndex;     // Index to recurring warning message
+        int HotWaterCoilMaxIterIndex2;    // Index to recurring warning message
+        Real64 MaxHeatCoilFluidFlow;      // water or steam mass flow rate for heating coil [kg/s]
+        Real64 DesignHeatingCapacity;     // design heating capacity of the heating coil
+        Real64 DesignSuppHeatingCapacity; // Operating capacity of supplemental Heating Coil [W]
+        Real64 MinOATCompressor;          // Minimum OAT for compressor operation [C]
+        Real64 MinLATCooling;             // Minimum leaving air temp for compressor cooling operation [C]
+        Real64 MaxLATHeating;             // Maximum leaving air temp for heating operation [C]
         // Report data
         Real64 TotHeatEnergyRate;       // Total heating output [W]
         Real64 TotHeatEnergy;           // Total heating output [J]

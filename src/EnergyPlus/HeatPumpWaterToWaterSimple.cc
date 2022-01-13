@@ -752,7 +752,8 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(
             state, this->Name, this->WWHPType, this->SourcePlantLoc, errFlag, _, _, _, this->SourceSideInletNodeNum, _);
-        PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->WWHPType, this->LoadPlantLoc, errFlag, _, _, _, this->LoadSideInletNodeNum, _);
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, this->WWHPType, this->LoadPlantLoc, errFlag, _, _, _, this->LoadSideInletNodeNum, _);
 
         if (!errFlag) {
             PlantUtilities::InterConnectTwoPlantLoopSides(state, this->LoadPlantLoc, this->SourcePlantLoc, this->WWHPType, true);
@@ -851,16 +852,9 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         this->reportLoadSideMassFlowRate = 0.0;
         this->reportSourceSideMassFlowRate = 0.0;
 
-        SetComponentFlowRate(state,
-                             this->reportLoadSideMassFlowRate,
-                             this->LoadSideInletNodeNum,
-                             this->LoadSideOutletNodeNum,
-                             this->LoadPlantLoc);
-        SetComponentFlowRate(state,
-                             this->reportSourceSideMassFlowRate,
-                             this->SourceSideInletNodeNum,
-                             this->SourceSideOutletNodeNum,
-                             this->SourcePlantLoc);
+        SetComponentFlowRate(state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
+        SetComponentFlowRate(
+            state, this->reportSourceSideMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->LoadPlantLoc,
                                                     this->CondMassFlowIndex,
@@ -873,16 +867,9 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
         this->reportLoadSideMassFlowRate = this->LoadSideDesignMassFlow;
         this->reportSourceSideMassFlowRate = this->SourceSideDesignMassFlow;
         // now check against and request in plant
-        SetComponentFlowRate(state,
-                             this->reportLoadSideMassFlowRate,
-                             this->LoadSideInletNodeNum,
-                             this->LoadSideOutletNodeNum,
-                             this->LoadPlantLoc);
-        SetComponentFlowRate(state,
-                             this->reportSourceSideMassFlowRate,
-                             this->SourceSideInletNodeNum,
-                             this->SourceSideOutletNodeNum,
-                             this->SourcePlantLoc);
+        SetComponentFlowRate(state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
+        SetComponentFlowRate(
+            state, this->reportSourceSideMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
         // if there's no flowin one, turn the entire "heat pump off"
         if (this->reportLoadSideMassFlowRate <= 0.0 || this->reportSourceSideMassFlowRate <= 0.0) {
 
@@ -890,22 +877,22 @@ void GshpSpecs::InitWatertoWaterHP(EnergyPlusData &state,
             this->reportSourceSideMassFlowRate = 0.0;
             this->MustRun = false;
 
-            SetComponentFlowRate(state,
-                                 this->reportLoadSideMassFlowRate,
-                                 this->LoadSideInletNodeNum,
-                                 this->LoadSideOutletNodeNum,
-                                 this->LoadPlantLoc);
-            SetComponentFlowRate(state,
-                                 this->reportSourceSideMassFlowRate,
-                                 this->SourceSideInletNodeNum,
-                                 this->SourceSideOutletNodeNum,
-                                 this->SourcePlantLoc);
-            PlantUtilities::PullCompInterconnectTrigger(state,                                                       this->LoadPlantLoc,                                                        this->CondMassFlowIndex,                                                        this->SourcePlantLoc,
+            SetComponentFlowRate(
+                state, this->reportLoadSideMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
+            SetComponentFlowRate(
+                state, this->reportSourceSideMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
+            PlantUtilities::PullCompInterconnectTrigger(state,
+                                                        this->LoadPlantLoc,
+                                                        this->CondMassFlowIndex,
+                                                        this->SourcePlantLoc,
                                                         DataPlant::CriteriaType::MassFlowRate,
                                                         this->reportSourceSideMassFlowRate);
             return;
         }
-        PlantUtilities::PullCompInterconnectTrigger(state,                                                   this->LoadPlantLoc,                                                    this->CondMassFlowIndex,                                                    this->SourcePlantLoc,
+        PlantUtilities::PullCompInterconnectTrigger(state,
+                                                    this->LoadPlantLoc,
+                                                    this->CondMassFlowIndex,
+                                                    this->SourcePlantLoc,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->reportSourceSideMassFlowRate);
     }

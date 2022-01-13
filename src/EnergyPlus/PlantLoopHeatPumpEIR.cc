@@ -162,16 +162,10 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
     if (!this->running) {
         this->loadSideMassFlowRate = 0.0;
         this->sourceSideMassFlowRate = 0.0;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->loadSideMassFlowRate,
-                                             this->loadSideNodes.inlet,
-                                             this->loadSideNodes.outlet,
-                                             this->loadSidePlantLoc);
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->sourceSideMassFlowRate,
-                                             this->sourceSideNodes.inlet,
-                                             this->sourceSideNodes.outlet,
-                                             this->sourceSidePlantLoc);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->loadSidePlantLoc,
                                                     this->condMassFlowRateTriggerIndex,
@@ -182,32 +176,20 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state)
     } else { // the heat pump must run
         this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
         this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->loadSideMassFlowRate,
-                                             this->loadSideNodes.inlet,
-                                             this->loadSideNodes.outlet,
-                                             this->loadSidePlantLoc);
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->sourceSideMassFlowRate,
-                                             this->sourceSideNodes.inlet,
-                                             this->sourceSideNodes.outlet,
-                                             this->sourceSidePlantLoc);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
 
         // if there's no flow in one, try to turn the entire heat pump off
         if (this->loadSideMassFlowRate <= 0.0 || this->sourceSideMassFlowRate <= 0.0) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
             this->running = false;
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->loadSideMassFlowRate,
-                                                 this->loadSideNodes.inlet,
-                                                 this->loadSideNodes.outlet,
-                                                 this->loadSidePlantLoc);
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->sourceSideMassFlowRate,
-                                                 this->sourceSideNodes.inlet,
-                                                 this->sourceSideNodes.outlet,
-                                                 this->sourceSidePlantLoc);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
         }
         PlantUtilities::PullCompInterconnectTrigger(state,
                                                     this->loadSidePlantLoc,
@@ -223,31 +205,22 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state)
     if (!this->running) {
         this->loadSideMassFlowRate = 0.0;
         this->sourceSideMassFlowRate = 0.0;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->loadSideMassFlowRate,
-                                             this->loadSideNodes.inlet,
-                                             this->loadSideNodes.outlet,
-                                             this->loadSidePlantLoc);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
         // Set flows if the heat pump is running
     } else { // the heat pump must run
         this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
         this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->loadSideMassFlowRate,
-                                             this->loadSideNodes.inlet,
-                                             this->loadSideNodes.outlet,
-                                             this->loadSidePlantLoc);
+        PlantUtilities::SetComponentFlowRate(
+            state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
 
         // if there's no flow in one, try to turn the entire heat pump off
         if (this->loadSideMassFlowRate <= 0.0) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
             this->running = false;
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->loadSideMassFlowRate,
-                                                 this->loadSideNodes.inlet,
-                                                 this->loadSideNodes.outlet,
-                                                 this->loadSidePlantLoc);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
         }
     }
 }
@@ -1205,9 +1178,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                 errFlag = true;
             } else {
 
-                PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                              this->loadSidePlantLoc,                                                              this->sourceSidePlantLoc,
-                                                              this->EIRHPType,
-                                                              true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->loadSidePlantLoc, this->sourceSidePlantLoc, this->EIRHPType, true);
             }
         } else if (this->airSource) {
             // nothing to do here ?

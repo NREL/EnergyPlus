@@ -115,11 +115,7 @@ namespace PlantValves {
         PlantUtilities::SafeCopyPlantNode(state, this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->plantLoc.loopNum > 0) {
-            PlantUtilities::SetComponentFlowRate(                state,
- mdot,
- this->PltInletNodeNum,
- this->PltOutletNodeNum,
- this->plantLoc);
+            PlantUtilities::SetComponentFlowRate(state, mdot, this->PltInletNodeNum, this->PltOutletNodeNum, this->plantLoc);
         }
     }
 

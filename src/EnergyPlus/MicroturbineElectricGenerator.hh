@@ -116,25 +116,25 @@ namespace MicroturbineElectricGenerator {
         Real64 ExhaustAirHumRat;           // Combustion exhaust air humidity ratio (kg/kg)
         //      Other required variables/calculated values
         GeneratorType CompType_Num;
-        Real64 RefCombustAirInletDensity;          // Reference combustion air inlet density (kg/m3)
-        Real64 MinPartLoadRat;                     // Min allowed operating frac full load
-        Real64 MaxPartLoadRat;                     // Max allowed operating frac full load
-        Real64 FuelEnergyUseRateHHV;               // Rate of Fuel Energy required to run microturbine, HHV basis (W)
-        Real64 FuelEnergyUseRateLHV;               // Rate of Fuel Energy required to run microturbine, LHV basis (W)
-        Real64 QHeatRecovered;                     // Recovered exhaust energy rate to heat water  (W)
-        Real64 ExhaustEnergyRec;                   // Recovered exhaust energy to heat water (J)
-        Real64 DesignHeatRecMassFlowRate;          // Design Water mass flow rate through heat recovery loop (kg/s)
-        bool HeatRecActive;                        // TRUE when heat recovery water inlet and outlet nodes are defined
-        Real64 HeatRecInletTemp;                   // Inlet Temperature of the heat recovery fluid (C)
-        Real64 HeatRecOutletTemp;                  // Outlet Temperature of the heat recovery fluid (C)
-        Real64 HeatRecMinMassFlowRate;             // Minimum heat recovery water mass flow rate (kg/s)
-        Real64 HeatRecMaxMassFlowRate;             // Maximum heat recovery water mass flow rate (kg/s)
-        Real64 HeatRecMdot;                        // Heat Recovery Loop Mass flow rate (kg/s)
-        PlantLocation HRPlantLoc;                             // cooling water plant loop component index, for heat recovery
-        Real64 FuelMdot;                           // Fuel Amount used (kg/s)
-        Real64 ElecPowerGenerated;                 // Electric power generated (W)
-        Real64 StandbyPowerRate;                   // Standby power rate this time step (W)
-        Real64 AncillaryPowerRate;                 // Ancillary power rate this time step (W)
+        Real64 RefCombustAirInletDensity; // Reference combustion air inlet density (kg/m3)
+        Real64 MinPartLoadRat;            // Min allowed operating frac full load
+        Real64 MaxPartLoadRat;            // Max allowed operating frac full load
+        Real64 FuelEnergyUseRateHHV;      // Rate of Fuel Energy required to run microturbine, HHV basis (W)
+        Real64 FuelEnergyUseRateLHV;      // Rate of Fuel Energy required to run microturbine, LHV basis (W)
+        Real64 QHeatRecovered;            // Recovered exhaust energy rate to heat water  (W)
+        Real64 ExhaustEnergyRec;          // Recovered exhaust energy to heat water (J)
+        Real64 DesignHeatRecMassFlowRate; // Design Water mass flow rate through heat recovery loop (kg/s)
+        bool HeatRecActive;               // TRUE when heat recovery water inlet and outlet nodes are defined
+        Real64 HeatRecInletTemp;          // Inlet Temperature of the heat recovery fluid (C)
+        Real64 HeatRecOutletTemp;         // Outlet Temperature of the heat recovery fluid (C)
+        Real64 HeatRecMinMassFlowRate;    // Minimum heat recovery water mass flow rate (kg/s)
+        Real64 HeatRecMaxMassFlowRate;    // Maximum heat recovery water mass flow rate (kg/s)
+        Real64 HeatRecMdot;               // Heat Recovery Loop Mass flow rate (kg/s)
+        PlantLocation HRPlantLoc;         // cooling water plant loop component index, for heat recovery
+        Real64 FuelMdot;                  // Fuel Amount used (kg/s)
+        Real64 ElecPowerGenerated;        // Electric power generated (W)
+        Real64 StandbyPowerRate;          // Standby power rate this time step (W)
+        Real64 AncillaryPowerRate;        // Ancillary power rate this time step (W)
         //     Warning message variables
         int PowerFTempElevErrorIndex;     // Index to power as a function of temp/elevation warning message
         int EffFTempErrorIndex;           // Index to efficiency as a function of temperature warning message

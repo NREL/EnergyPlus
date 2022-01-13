@@ -689,11 +689,8 @@ namespace BoilerSteam {
             Real64 const LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
             this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + (CpWater * BoilerDeltaTemp));
 
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->BoilerMassFlowRate,
-                                                 this->BoilerInletNodeNum,
-                                                 this->BoilerOutletNodeNum,
-                                                 this->plantLoc);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->BoilerMassFlowRate, this->BoilerInletNodeNum, this->BoilerOutletNodeNum, this->plantLoc);
 
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
@@ -768,11 +765,8 @@ namespace BoilerSteam {
                 BoilerDeltaTemp = this->BoilerOutletTemp - state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
                 this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + CpWater * BoilerDeltaTemp);
 
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     this->BoilerMassFlowRate,
-                                                     this->BoilerInletNodeNum,
-                                                     this->BoilerOutletNodeNum,
-                                                     this->plantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->BoilerMassFlowRate, this->BoilerInletNodeNum, this->BoilerOutletNodeNum, this->plantLoc);
             }
 
             // Checks Boiler Load on the basis of the machine limits.
@@ -788,11 +782,8 @@ namespace BoilerSteam {
                     BoilerDeltaTemp = this->BoilerOutletTemp - state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;
                     this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + CpWater * BoilerDeltaTemp);
 
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         this->BoilerMassFlowRate,
-                                                         this->BoilerInletNodeNum,
-                                                         this->BoilerOutletNodeNum,
-                                                         this->plantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, this->BoilerMassFlowRate, this->BoilerInletNodeNum, this->BoilerOutletNodeNum, this->plantLoc);
                 } else {
                     this->BoilerLoad = 0.0;
                     this->BoilerOutletTemp = state.dataLoopNodes->Node(this->BoilerInletNodeNum).Temp;

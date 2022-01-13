@@ -480,8 +480,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
 
     if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->FlowMode == DataPlant::FlowMode::Constant)) {
         // reset flow priority
-        DataPlant::CompData::getPlantComponent(state, this->plantLoc).FlowPriority =
-            DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+        DataPlant::CompData::getPlantComponent(state, this->plantLoc).FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
     }
 }
 
@@ -819,11 +818,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
         if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
             // Then find the flow rate and outlet temp
             this->BoilerMassFlowRate = BoilerMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(                state,
- this->BoilerMassFlowRate,
- BoilerInletNode,
- BoilerOutletNode,
- this->plantLoc);
+            PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc);
 
             if ((this->BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
                 BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
@@ -850,11 +845,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
             } else {
                 this->BoilerMassFlowRate = 0.0;
             }
-            PlantUtilities::SetComponentFlowRate(                state,
- this->BoilerMassFlowRate,
- BoilerInletNode,
- BoilerOutletNode,
- this->plantLoc);
+            PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc);
 
         } // End of Constant/Variable Flow If Block
 

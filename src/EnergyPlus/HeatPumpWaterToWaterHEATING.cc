@@ -156,8 +156,16 @@ void GshpPeHeatingSpecs::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]]
     if (this->plantScanFlag) {
         // Locate the heating on the plant loops for later usage
         bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, DataPlant::PlantEquipmentType::HPWaterPEHeating, this->SourcePlantLoc, errFlag, _, _, _, this->SourceSideInletNodeNum, _);
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::PlantEquipmentType::HPWaterPEHeating,
+                                                this->SourcePlantLoc,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                this->SourceSideInletNodeNum,
+                                                _);
         PlantUtilities::ScanPlantLoopsForObject(
             state, this->Name, DataPlant::PlantEquipmentType::HPWaterPEHeating, this->LoadPlantLoc, errFlag, _, _, _, this->LoadSideInletNodeNum, _);
         if (errFlag) {
@@ -589,18 +597,14 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     // Set flows if the heat pump is not running
     if (!this->MustRun) {
         this->LoadSideWaterMassFlowRate = 0.0;
-        SetComponentFlowRate(state,
-                             this->LoadSideWaterMassFlowRate,
-                             this->LoadSideInletNodeNum,
-                             this->LoadSideOutletNodeNum,
-                             this->LoadPlantLoc);
+        SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
         this->SourceSideWaterMassFlowRate = 0.0;
-        SetComponentFlowRate(state,
-                             this->SourceSideWaterMassFlowRate,
-                             this->SourceSideInletNodeNum,
-                             this->SourceSideOutletNodeNum,
-                             this->SourcePlantLoc);
-        PlantUtilities::PullCompInterconnectTrigger(state,                                                   this->LoadPlantLoc,                                                    this->CondMassFlowIndex,                                                    this->SourcePlantLoc,
+        SetComponentFlowRate(
+            state, this->SourceSideWaterMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
+        PlantUtilities::PullCompInterconnectTrigger(state,
+                                                    this->LoadPlantLoc,
+                                                    this->CondMassFlowIndex,
+                                                    this->SourcePlantLoc,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
         // now initialize simulation variables for "heat pump off"
@@ -610,41 +614,33 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     } else {    // the heat pump must run, request design flow
 
         this->LoadSideWaterMassFlowRate = this->LoadSideDesignMassFlow;
-        SetComponentFlowRate(state,
-                             this->LoadSideWaterMassFlowRate,
-                             this->LoadSideInletNodeNum,
-                             this->LoadSideOutletNodeNum,
-                             this->LoadPlantLoc);
+        SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
 
         this->SourceSideWaterMassFlowRate = this->SourceSideDesignMassFlow;
-        SetComponentFlowRate(state,
-                             this->SourceSideWaterMassFlowRate,
-                             this->SourceSideInletNodeNum,
-                             this->SourceSideOutletNodeNum,
-                             this->SourcePlantLoc);
+        SetComponentFlowRate(
+            state, this->SourceSideWaterMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
         // if there's no flow, turn the "heat pump off"
         if (this->LoadSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance ||
             this->SourceSideWaterMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
             this->LoadSideWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(state,
-                                 this->LoadSideWaterMassFlowRate,
-                                 this->LoadSideInletNodeNum,
-                                 this->LoadSideOutletNodeNum,
-                                 this->LoadPlantLoc);
+            SetComponentFlowRate(state, this->LoadSideWaterMassFlowRate, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum, this->LoadPlantLoc);
             this->SourceSideWaterMassFlowRate = 0.0;
-            SetComponentFlowRate(state,
-                                 this->SourceSideWaterMassFlowRate,
-                                 this->SourceSideInletNodeNum,
-                                 this->SourceSideOutletNodeNum,
-                                 this->SourcePlantLoc);
-            PlantUtilities::PullCompInterconnectTrigger(state,                                                       this->LoadPlantLoc,                                                        this->CondMassFlowIndex,                                                        this->SourcePlantLoc,
+            SetComponentFlowRate(
+                state, this->SourceSideWaterMassFlowRate, this->SourceSideInletNodeNum, this->SourceSideOutletNodeNum, this->SourcePlantLoc);
+            PlantUtilities::PullCompInterconnectTrigger(state,
+                                                        this->LoadPlantLoc,
+                                                        this->CondMassFlowIndex,
+                                                        this->SourcePlantLoc,
                                                         DataPlant::CriteriaType::MassFlowRate,
                                                         this->SourceSideWaterMassFlowRate);
             this->LoadSideWaterOutletTemp = this->LoadSideWaterInletTemp;
             this->SourceSideWaterOutletTemp = this->SourceSideWaterInletTemp;
             return;
         }
-        PlantUtilities::PullCompInterconnectTrigger(state,                                                   this->LoadPlantLoc,                                                    this->CondMassFlowIndex,                                                    this->SourcePlantLoc,
+        PlantUtilities::PullCompInterconnectTrigger(state,
+                                                    this->LoadPlantLoc,
+                                                    this->CondMassFlowIndex,
+                                                    this->SourcePlantLoc,
                                                     DataPlant::CriteriaType::MassFlowRate,
                                                     this->SourceSideWaterMassFlowRate);
     }

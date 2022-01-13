@@ -70,11 +70,11 @@ namespace PlantLoadProfile {
         virtual ~PlantProfileData() = default;
 
         // Members
-        std::string Name;                         // Name of Plant Load Profile object
-        DataPlant::PlantEquipmentType Type;       // Plant Side Connection: 'Type' assigned in DataPlant
+        std::string Name;                   // Name of Plant Load Profile object
+        DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
         PlantLocation plantLoc;             // water plant loop component location object
-        bool Init;                                // Flag for initialization:  TRUE means do the init
-        bool InitSizing;                          // Flag for initialization of plant sizing
+        bool Init;                          // Flag for initialization:  TRUE means do the init
+        bool InitSizing;                    // Flag for initialization of plant sizing
         int InletNode;
         Real64 InletTemp; // Inlet temperature (C)
         int OutletNode;

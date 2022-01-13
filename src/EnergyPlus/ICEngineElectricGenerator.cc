@@ -842,18 +842,11 @@ namespace ICEngineElectricGenerator {
                 } else {
                     mdot = 0.0;
                 }
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     mdot,
-                                                     this->HeatRecInletNodeNum,
-                                                     this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, mdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
 
             } else {
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     this->HeatRecMdotActual,
-                                                     this->HeatRecInletNodeNum,
-                                                     this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->HeatRecMdotActual, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
             }
         }
     }

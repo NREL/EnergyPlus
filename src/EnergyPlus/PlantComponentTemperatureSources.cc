@@ -196,11 +196,7 @@ namespace PlantComponentTemperatureSources {
             }
         }
 
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->MassFlowRate,
-                                             this->InletNodeNum,
-                                             this->OutletNodeNum,
-                                             this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 
         // at this point the mass flow rate, inlet temp, and boundary temp structure vars have been updated
         // the calc routine will update the outlet temp and heat transfer rate/energies

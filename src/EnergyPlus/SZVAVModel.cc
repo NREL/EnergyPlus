@@ -257,8 +257,7 @@ namespace SZVAVModel {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = minAirMassFlow;
             // set max water flow rate and check to see if plant limits flow
             if (coilPlantLoc.loopNum > 0)
-                PlantUtilities::SetComponentFlowRate(
-                    state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
             Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
             if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
@@ -272,11 +271,8 @@ namespace SZVAVModel {
             if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
                 if (coilPlantLoc.loopNum > 0) {
                     state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                         coilFluidInletNode,
-                                                         coilFluidOutletNode,
-                                                         coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                 }
                 return;
             }
@@ -292,11 +288,8 @@ namespace SZVAVModel {
                 }
 
                 if (coilPlantLoc.loopNum > 0)
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                         coilFluidInletNode,
-                                                         coilFluidOutletNode,
-                                                         coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
             }
 
         } else {
@@ -330,8 +323,7 @@ namespace SZVAVModel {
 
                     // set max water flow rate and check to see if plant limits flow
                     if (coilPlantLoc.loopNum > 0)
-                        PlantUtilities::SetComponentFlowRate(
-                            state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
+                        PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                     Par(10) = maxCoilFluidFlow; // max water flow rate
 
                     if ((CoolingLoad && (TempSensOutput < ZoneLoad)) || (HeatingLoad && (TempSensOutput > ZoneLoad))) {
@@ -388,8 +380,7 @@ namespace SZVAVModel {
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = maxAirMassFlow;
                 // set max water flow rate and check to see if plant limits flow
                 if (coilPlantLoc.loopNum > 0)
-                    PlantUtilities::SetComponentFlowRate(
-                        state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                 Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
                 if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
@@ -402,11 +393,8 @@ namespace SZVAVModel {
                 if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
                     if (coilPlantLoc.loopNum > 0) {
                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate = 0.0;
-                        PlantUtilities::SetComponentFlowRate(state,
-                                                             state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                             coilFluidInletNode,
-                                                             coilFluidOutletNode,
-                                                             coilPlantLoc);
+                        PlantUtilities::SetComponentFlowRate(
+                            state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                     }
                     return;
                 }
@@ -420,11 +408,8 @@ namespace SZVAVModel {
                 SZVAVModel.HeatCoilWaterFlowRatio = 0.0;
                 if (coilPlantLoc.loopNum > 0) {
                     state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                         coilFluidInletNode,
-                                                         coilFluidOutletNode,
-                                                         coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                 }
                 PackagedTerminalHeatPump::CalcPTUnit(
                     state, SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
@@ -447,11 +432,8 @@ namespace SZVAVModel {
             }
 
             if (coilPlantLoc.loopNum > 0)
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                     coilFluidInletNode,
-                                                     coilFluidOutletNode,
-                                                     coilPlantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
         }
 
         if (SolFlag < 0) {
@@ -668,8 +650,7 @@ namespace SZVAVModel {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = minAirMassFlow;
             // set max water flow rate and check to see if plant limits flow
             if (coilPlantLoc.loopNum > 0)
-                PlantUtilities::SetComponentFlowRate(
-                    state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
             Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
             if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
@@ -682,11 +663,8 @@ namespace SZVAVModel {
             if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
                 if (coilPlantLoc.loopNum > 0) {
                     state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                         coilFluidInletNode,
-                                                         coilFluidOutletNode,
-                                                         coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                 }
                 return;
             }
@@ -701,11 +679,8 @@ namespace SZVAVModel {
                 }
 
                 if (coilPlantLoc.loopNum > 0)
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                         coilFluidInletNode,
-                                                         coilFluidOutletNode,
-                                                         coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
             }
 
         } else {
@@ -737,8 +712,7 @@ namespace SZVAVModel {
 
                     // set max water flow rate and check to see if plant limits flow
                     if (coilPlantLoc.loopNum > 0)
-                        PlantUtilities::SetComponentFlowRate(
-                            state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
+                        PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                     Par(10) = maxCoilFluidFlow; // max water flow rate
 
                     if ((CoolingLoad && (TempSensOutput < ZoneLoad)) || (HeatingLoad && (TempSensOutput > ZoneLoad))) {
@@ -802,8 +776,7 @@ namespace SZVAVModel {
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = maxAirMassFlow;
                 // set max water flow rate and check to see if plant limits flow
                 if (coilPlantLoc.loopNum > 0)
-                    PlantUtilities::SetComponentFlowRate(
-                        state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                 Par(10) = maxCoilFluidFlow; // max water flow rate limited by plant
 
                 if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
@@ -815,11 +788,8 @@ namespace SZVAVModel {
                 if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
                     if (coilPlantLoc.loopNum > 0) {
                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate = 0.0;
-                        PlantUtilities::SetComponentFlowRate(state,
-                                                             state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                             coilFluidInletNode,
-                                                             coilFluidOutletNode,
-                                                             coilPlantLoc);
+                        PlantUtilities::SetComponentFlowRate(
+                            state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                     }
                     return;
                 }
@@ -831,11 +801,8 @@ namespace SZVAVModel {
                 PartLoadRatio = 0.0; // no coil capacity at full air flow
                 if (coilPlantLoc.loopNum > 0) {
                     state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                         coilFluidInletNode,
-                                                         coilFluidOutletNode,
-                                                         coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                 }
                 FanCoilUnits::Calc4PipeFanCoil(state, SysIndex, SZVAVModel.ControlZoneNum, FirstHVACIteration, TempSensOutput, PartLoadRatio);
                 if ((CoolingLoad && ZoneLoad < TempSensOutput) || (HeatingLoad && ZoneLoad > TempSensOutput)) {
@@ -864,11 +831,8 @@ namespace SZVAVModel {
             }
 
             if (coilPlantLoc.loopNum > 0)
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                     coilFluidInletNode,
-                                                     coilFluidOutletNode,
-                                                     coilPlantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
         }
 
         if (SolFlag < 0) {
@@ -1086,8 +1050,7 @@ namespace SZVAVModel {
             state.dataLoopNodes->Node(InletNode).MassFlowRate = minAirMassFlow;
             // set max water flow rate and check to see if plant limits flow
             if (coilPlantLoc.loopNum > 0)
-                PlantUtilities::SetComponentFlowRate(
-                    state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
             Par[10] = maxCoilFluidFlow; // max water flow rate limited by plant
 
             if (CoolingLoad) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
@@ -1125,11 +1088,8 @@ namespace SZVAVModel {
             if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
                 if (coilPlantLoc.loopNum > 0) {
                     state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                         coilFluidInletNode,
-                                                         coilFluidOutletNode,
-                                                         coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                 }
                 return;
             }
@@ -1146,11 +1106,8 @@ namespace SZVAVModel {
                 }
 
                 if (coilPlantLoc.loopNum > 0)
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                         coilFluidInletNode,
-                                                         coilFluidOutletNode,
-                                                         coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
             }
 
         } else {
@@ -1189,8 +1146,7 @@ namespace SZVAVModel {
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = maxAirMassFlow;
                 // set max water flow rate and check to see if plant limits flow
                 if (coilPlantLoc.loopNum > 0)
-                    PlantUtilities::SetComponentFlowRate(
-                        state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, maxCoilFluidFlow, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                 Par[10] = maxCoilFluidFlow; // max water flow rate limited by plant
 
                 if (CoolingLoad) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
@@ -1227,11 +1183,8 @@ namespace SZVAVModel {
                 if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
                     if (coilPlantLoc.loopNum > 0) {
                         state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate = 0.0;
-                        PlantUtilities::SetComponentFlowRate(state,
-                                                             state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                             coilFluidInletNode,
-                                                             coilFluidOutletNode,
-                                                             coilPlantLoc);
+                        PlantUtilities::SetComponentFlowRate(
+                            state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
                     }
                     return;
                 }
@@ -1250,11 +1203,8 @@ namespace SZVAVModel {
             }
 
             if (coilPlantLoc.loopNum > 0)
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate,
-                                                     coilFluidInletNode,
-                                                     coilFluidOutletNode,
-                                                     coilPlantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, state.dataLoopNodes->Node(coilFluidInletNode).MassFlowRate, coilFluidInletNode, coilFluidOutletNode, coilPlantLoc);
         }
 
         if (SolFlag < 0) {

@@ -307,11 +307,7 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     }
 
     // get actual mass flow to use, hold in MassFlowRate variable
-    PlantUtilities::SetComponentFlowRate(        state,
- TempPlantMassFlow,
- this->InletNodeNum,
- this->OutletNodeNum,
- this->plantLoc);
+    PlantUtilities::SetComponentFlowRate(state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 
     this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
     this->MassFlowRate = TempPlantMassFlow;
@@ -465,10 +461,8 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
         ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
     }
     // set limits on outlet node temps to plant loop limits
-    DataPlant::CompData::getPlantComponent(state, this->plantLoc).MinOutletTemp =
-        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
-    DataPlant::CompData::getPlantComponent(state, this->plantLoc).MaxOutletTemp =
-        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxTemp;
+    DataPlant::CompData::getPlantComponent(state, this->plantLoc).MinOutletTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
+    DataPlant::CompData::getPlantComponent(state, this->plantLoc).MaxOutletTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxTemp;
     // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxVolFlowRate);
 

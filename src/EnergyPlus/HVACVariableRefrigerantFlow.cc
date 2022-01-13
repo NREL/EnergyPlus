@@ -6027,8 +6027,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
             // fill fluid outlet node for hot water coil SuppHeatCoilFluidOutletNode
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode =
-                DataPlant::CompData::getPlantComponent(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc)
-                    .NodeNumOut;
+                DataPlant::CompData::getPlantComponent(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc).NodeNumOut;
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
 
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
@@ -6059,8 +6058,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
             // fill fluid outlet node for steam coil SuppHeatCoilFluidOutletNode
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode =
-                DataPlant::CompData::getPlantComponent(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc)
-                    .NodeNumOut;
+                DataPlant::CompData::getPlantComponent(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc).NodeNumOut;
             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
 
         } else { // VRF terminal unit not connected to plant
@@ -6677,11 +6675,12 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(
                         state, "Coil:Heating:Water", state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
                     if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                        rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopNum).FluidName,
-                                               DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopNum).FluidIndex,
-                                               RoutineName);
+                        rho = GetDensityGlycol(
+                            state,
+                            state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopNum).FluidName,
+                            DataGlobalConstants::HWInitConvTemp,
+                            state.dataPlnt->PlantLoop(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilPlantLoc.loopNum).FluidIndex,
+                            RoutineName);
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = CoilMaxVolFlowRate * rho;
                     }
                 }
@@ -15604,11 +15603,8 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                 this->SuppHeatPartLoadRatio = 0.0;
                 Real64 mdot = 0.0;
                 SuppHeatCoilLoad = 0.0;
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     mdot,
-                                                     this->SuppHeatCoilFluidInletNode,
-                                                     this->SuppHeatCoilFluidOutletNode,
-                                                     this->SuppHeatCoilPlantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, this->SuppHeatCoilFluidInletNode, this->SuppHeatCoilFluidOutletNode, this->SuppHeatCoilPlantLoc);
             }
             //     simulate water heating coil
             WaterCoils::SimulateWaterCoilComponents(state,

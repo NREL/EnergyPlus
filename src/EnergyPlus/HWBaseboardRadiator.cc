@@ -941,8 +941,16 @@ namespace HWBaseboardRadiator {
         if (SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(
-                    state, HWBaseboard(BaseboardNum).EquipID, HWBaseboard(BaseboardNum).EquipType,HWBaseboard(BaseboardNum).plantLoc, errFlag, _, _, _, _, _);
+                ScanPlantLoopsForObject(state,
+                                        HWBaseboard(BaseboardNum).EquipID,
+                                        HWBaseboard(BaseboardNum).EquipType,
+                                        HWBaseboard(BaseboardNum).plantLoc,
+                                        errFlag,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _);
                 if (errFlag) {
                     ShowFatalError(state, "InitHWBaseboard: Program terminated for previous conditions.");
                 }
@@ -1525,8 +1533,7 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = 0.0;
             QBBRadSource(BaseboardNum) = 0.0;
             HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy;
-            SetActuatedBranchFlowRate(state,                                      WaterMassFlowRate,                                      HWBaseboard(BaseboardNum).WaterInletNode,                                      HWBaseboard(BaseboardNum).plantLoc,
-                                      false);
+            SetActuatedBranchFlowRate(state, WaterMassFlowRate, HWBaseboard(BaseboardNum).WaterInletNode, HWBaseboard(BaseboardNum).plantLoc, false);
         }
 
         HWBaseboard(BaseboardNum).WaterOutletTemp = WaterOutletTemp;

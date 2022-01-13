@@ -293,7 +293,8 @@ void WaterThermalTankData::simulate(
         }
     }
     this->UseSideLoadRequested = std::abs(CurLoad);
-    if (this->UseSidePlantLoc.loopNum > 0 && this->UseSidePlantLoc.loopSideNum != DataPlant::LoopSideLocation::Invalid && !state.dataGlobal->KickOffSimulation) {
+    if (this->UseSidePlantLoc.loopNum > 0 && this->UseSidePlantLoc.loopSideNum != DataPlant::LoopSideLocation::Invalid &&
+        !state.dataGlobal->KickOffSimulation) {
         this->UseCurrentFlowLock = state.dataPlnt->PlantLoop(this->UseSidePlantLoc.loopNum).LoopSide(this->UseSidePlantLoc.loopSideNum).FlowLock;
     } else {
         this->UseCurrentFlowLock = DataPlant::FlowLock::Locked;
@@ -385,7 +386,8 @@ void HeatPumpWaterHeaterData::simulate(
         }
     }
     Tank.UseSideLoadRequested = std::abs(CurLoad);
-    if (Tank.UseSidePlantLoc.loopNum > 0 && Tank.UseSidePlantLoc.loopSideNum != DataPlant::LoopSideLocation::Invalid && !state.dataGlobal->KickOffSimulation) {
+    if (Tank.UseSidePlantLoc.loopNum > 0 && Tank.UseSidePlantLoc.loopSideNum != DataPlant::LoopSideLocation::Invalid &&
+        !state.dataGlobal->KickOffSimulation) {
         Tank.UseCurrentFlowLock = state.dataPlnt->PlantLoop(Tank.UseSidePlantLoc.loopNum).LoopSide(Tank.UseSidePlantLoc.loopSideNum).FlowLock;
     } else {
         Tank.UseCurrentFlowLock = DataPlant::FlowLock::Locked;
@@ -5957,9 +5959,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             PlantUtilities::ScanPlantLoopsForObject(
                 state, this->Name, this->WaterThermalTankType, this->SrcSidePlantLoc, errFlag, _, _, _, this->SourceInletNode, _);
             if (this->UseInletNode > 0) {
-                PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                              this->UseSidePlantLoc,                                                              this->SrcSidePlantLoc,
-                                                              this->WaterThermalTankType,
-                                                              true);
+                PlantUtilities::InterConnectTwoPlantLoopSides(state, this->UseSidePlantLoc, this->SrcSidePlantLoc, this->WaterThermalTankType, true);
             }
             if (errFlag) {
                 ShowFatalError(state, "InitWaterThermalTank: Program terminated due to previous condition(s).");
@@ -6076,8 +6076,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->SavedUseOutletTemp = 0.0;
 
             this->Mass = this->Volume * rho;
-            this->UseBranchControlType = DataPlant::CompData::getPlantComponent(state, this->UseSidePlantLoc)
-                                             .FlowCtrl;
+            this->UseBranchControlType = DataPlant::CompData::getPlantComponent(state, this->UseSidePlantLoc).FlowCtrl;
         }
 
         if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
@@ -6093,8 +6092,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             this->SourceMassFlowRate = 0.0;
             this->SavedSourceOutletTemp = 0.0;
 
-            this->SourceBranchControlType = DataPlant::CompData::getPlantComponent(state, this->SrcSidePlantLoc)
-                                                .FlowCtrl;
+            this->SourceBranchControlType = DataPlant::CompData::getPlantComponent(state, this->SrcSidePlantLoc).FlowCtrl;
         }
 
         if ((this->SourceInletNode > 0) && ((this->DesuperheaterNum > 0) || (this->HeatPumpNum > 0))) {
@@ -6351,11 +6349,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                                                       this->SavedUseOutletTemp,
                                                       DeadBandTemp,
                                                       this->SetPointTemp);
-        PlantUtilities::SetComponentFlowRate(state,
-                                             mdotUse,
-                                             this->UseInletNode,
-                                             this->UseOutletNode,
-                                             this->UseSidePlantLoc);
+        PlantUtilities::SetComponentFlowRate(state, mdotUse, this->UseInletNode, this->UseOutletNode, this->UseSidePlantLoc);
 
         this->UseInletTemp = state.dataLoopNodes->Node(this->UseInletNode).Temp;
         this->UseMassFlowRate = mdotUse;
@@ -6388,11 +6382,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
                                                          DeadBandTemp,
                                                          this->SetPointTemp);
         if (this->SrcSidePlantLoc.loopNum > 0) {
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 mdotSource,
-                                                 this->SourceInletNode,
-                                                 this->SourceOutletNode,
-                                                 this->SrcSidePlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, mdotSource, this->SourceInletNode, this->SourceOutletNode, this->SrcSidePlantLoc);
         } else { // not really plant connected (desuperheater or heat pump)
             state.dataLoopNodes->Node(this->SourceInletNode).MassFlowRate = mdotSource;
             state.dataLoopNodes->Node(this->SourceOutletNode).MassFlowRate = mdotSource;
@@ -10754,7 +10744,8 @@ void WaterThermalTankData::MinePlantStructForInfo(EnergyPlusData &state)
         if (state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).LoopSide(this->SrcSidePlantLoc.loopSideNum).Splitter.Exists) {
             if (any_eq(state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).LoopSide(this->SrcSidePlantLoc.loopSideNum).Splitter.NodeNumOut,
                        this->SourceInletNode)) { // this wh is on the splitter
-                if (state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).LoopSide(this->SrcSidePlantLoc.loopSideNum).Splitter.TotalOutletNodes > 1) {
+                if (state.dataPlnt->PlantLoop(this->SrcSidePlantLoc.loopNum).LoopSide(this->SrcSidePlantLoc.loopSideNum).Splitter.TotalOutletNodes >
+                    1) {
                     this->SourceSideSeries = false;
                 }
             }

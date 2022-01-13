@@ -74,17 +74,16 @@ namespace Pipes {
 
         // Members
         std::string Name;
-        DataPlant::PlantEquipmentType Type;   // type of pipe
-        int InletNodeNum;                     // Node number on the inlet side of the plant
-        int OutletNodeNum;                    // Node number on the inlet side of the plant
+        DataPlant::PlantEquipmentType Type; // type of pipe
+        int InletNodeNum;                   // Node number on the inlet side of the plant
+        int OutletNodeNum;                  // Node number on the inlet side of the plant
         PlantLocation plantLoc;             // Index of plant Comp location where this pipe resides
         bool CheckEquipName;
         bool EnvrnFlag;
 
         // Default Constructor
         LocalPipeData()
-            : Type(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), plantLoc{},
-              CheckEquipName(true), EnvrnFlag(true)
+            : Type(DataPlant::PlantEquipmentType::Invalid), InletNodeNum(0), OutletNodeNum(0), plantLoc{}, CheckEquipName(true), EnvrnFlag(true)
         {
         }
 

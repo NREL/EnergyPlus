@@ -1891,8 +1891,8 @@ namespace DesiccantDehumidifiers {
                 }
 
                 // fill outlet node for regenartion hot water or steam heating coil
-                DesicDehum(DesicDehumNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, DesicDehum(DesicDehumNum).plantLoc)
-                                                               .NodeNumOut;
+                DesicDehum(DesicDehumNum).CoilOutletNode =
+                    DataPlant::CompData::getPlantComponent(state, DesicDehum(DesicDehumNum).plantLoc).NodeNumOut;
                 MyPlantScanFlag(DesicDehumNum) = false;
 
             } else { // DesicDehum is not connected to plant

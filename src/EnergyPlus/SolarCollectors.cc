@@ -1015,11 +1015,7 @@ namespace SolarCollectors {
         this->MassFlowRate = this->MassFlowRateMax;
 
         // Request the mass flow rate from the plant component flow utility routine
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->MassFlowRate,
-                                             this->InletNode,
-                                             this->OutletNode,
-                                             this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNode, this->OutletNode, this->plantLoc);
 
         if (this->InitICS) {
 
@@ -1114,8 +1110,11 @@ namespace SolarCollectors {
         Real64 massFlowRate = this->MassFlowRate;
 
         // Specific heat of collector fluid (J/kg-K)
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                           inletTemp,
+                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
 
         // Gross area of collector (m2)
         Real64 area = state.dataSurface->Surface(SurfNum).Area;
@@ -1398,12 +1397,18 @@ namespace SolarCollectors {
         Real64 massFlowRate = this->MassFlowRate;
 
         // Specific heat of collector fluid (J/kg-K)
-        Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
+        Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(state,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                            inletTemp,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                            RoutineName);
 
         // density of collector fluid (kg/m3)
-        Real64 Rhow = FluidProperties::GetDensityGlycol(
-            state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
+        Real64 Rhow = FluidProperties::GetDensityGlycol(state,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                        inletTemp,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                        RoutineName);
 
         // calculate heat transfer coefficients and covers temperature:
         this->CalcHeatTransCoeffAndCoverTemp(state);

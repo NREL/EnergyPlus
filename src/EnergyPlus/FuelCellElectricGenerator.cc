@@ -3489,22 +3489,15 @@ namespace FuelCellElectricGenerator {
             // intialize flow rate in water loop, this is "requesting" flow
             Real64 mdot = this->ExhaustHX.WaterMassFlowRateDesign;
 
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 mdot,
-                                                 this->ExhaustHX.WaterInNode,
-                                                 this->ExhaustHX.WaterOutNode,
-                                                 this->CWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, mdot, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode, this->CWPlantLoc);
 
             this->ExhaustHX.WaterMassFlowRate = mdot;
             this->ExhaustHX.WaterInletTemp = state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp;
             this->TimeElapsed = timeElapsed;
         } else {
 
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->ExhaustHX.WaterMassFlowRate,
-                                                 this->ExhaustHX.WaterInNode,
-                                                 this->ExhaustHX.WaterOutNode,
-                                                 this->CWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(
+                state, this->ExhaustHX.WaterMassFlowRate, this->ExhaustHX.WaterInNode, this->ExhaustHX.WaterOutNode, this->CWPlantLoc);
 
             this->ExhaustHX.WaterInletTemp = state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp;
         }

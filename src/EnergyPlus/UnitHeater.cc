@@ -817,8 +817,7 @@ namespace UnitHeater {
                 }
 
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HotCoilOutNodeNum =
-                    DataPlant::CompData::getPlantComponent(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc)
-                        .NodeNumOut;
+                    DataPlant::CompData::getPlantComponent(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc).NodeNumOut;
             }
             state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) = false;
         } else if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && !state.dataGlobal->AnyPlantInModel) {
@@ -1234,11 +1233,12 @@ namespace UnitHeater {
                             }
 
                             if (DesCoilLoad >= SmallLoad) {
-                                rho = GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
-                                                       RoutineName);
+                                rho = GetDensityGlycol(
+                                    state,
+                                    state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,
+                                    DataGlobalConstants::HWInitConvTemp,
+                                    state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidIndex,
+                                    RoutineName);
                                 Cp = GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataUnitHeaters->UnitHeat(UnitHeatNum).HWplantLoc.loopNum).FluidName,

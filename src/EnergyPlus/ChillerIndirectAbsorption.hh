@@ -154,9 +154,9 @@ namespace ChillerIndirectAbsorption {
         int MinCondInletTempIndex;                     // Low condenser temp warning message index
         int MinGenInletTempCtr;                        // Low generator temp warning message counter
         int MinGenInletTempIndex;                      // Low generator temp warning message index
-        PlantLocation CWPlantLoc;                    // chilled water plant loop component index
-        PlantLocation CDPlantLoc;                    // condenser water plant loop component index
-        PlantLocation GenPlantLoc;                   // generator plant loop component index
+        PlantLocation CWPlantLoc;                      // chilled water plant loop component index
+        PlantLocation CDPlantLoc;                      // condenser water plant loop component index
+        PlantLocation GenPlantLoc;                     // generator plant loop component index
         bool FaultyChillerSWTFlag;                     // True if the chiller has SWT sensor fault
         int FaultyChillerSWTIndex;                     // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerSWTOffset;                 // Chiller SWT sensor offset

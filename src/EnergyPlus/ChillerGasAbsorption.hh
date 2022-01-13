@@ -130,9 +130,9 @@ namespace ChillerGasAbsorption {
         int CondErrCount;          // error count for poor Condenser Supply Estimate
         bool PossibleSubcooling;   // Flag to determine whether plant is overcooled
         // loop topology variables
-        PlantLocation CWplantLoc;  // chilled water plant loop component index
-        PlantLocation CDplantLoc;  // condenser water plant loop component index
-        PlantLocation HWplantLoc;                             // hot water plant loop component index
+        PlantLocation CWplantLoc; // chilled water plant loop component index
+        PlantLocation CDplantLoc; // condenser water plant loop component index
+        PlantLocation HWplantLoc; // hot water plant loop component index
         bool envrnFlag;
         Real64 oldCondSupplyTemp; // save the last iteration value of leaving condenser water temperature
 

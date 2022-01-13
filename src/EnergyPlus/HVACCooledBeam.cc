@@ -536,8 +536,16 @@ namespace HVACCooledBeam {
 
         if (CoolBeam(CBNum).PlantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(
-                state, CoolBeam(CBNum).Name, DataPlant::PlantEquipmentType::CooledBeamAirTerminal, CoolBeam(CBNum).CWPlantLoc, errFlag, _, _, _, _, _);
+            ScanPlantLoopsForObject(state,
+                                    CoolBeam(CBNum).Name,
+                                    DataPlant::PlantEquipmentType::CooledBeamAirTerminal,
+                                    CoolBeam(CBNum).CWPlantLoc,
+                                    errFlag,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _);
             if (errFlag) {
                 ShowFatalError(state, "InitCoolBeam: Program terminated for previous conditions.");
             }
@@ -950,17 +958,9 @@ namespace HVACCooledBeam {
         CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
         CpAirSys = PsyCpAirFnW(state.dataLoopNodes->Node(InAirNode).HumRat);
         MaxColdWaterFlow = CoolBeam(CBNum).MaxCoolWaterMassFlow;
-        SetComponentFlowRate(state,
-                             MaxColdWaterFlow,
-                             CoolBeam(CBNum).CWInNode,
-                             CoolBeam(CBNum).CWOutNode,
-                             CoolBeam(CBNum).CWPlantLoc);
+        SetComponentFlowRate(state, MaxColdWaterFlow, CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).CWOutNode, CoolBeam(CBNum).CWPlantLoc);
         MinColdWaterFlow = 0.0;
-        SetComponentFlowRate(state,
-                             MinColdWaterFlow,
-                             CoolBeam(CBNum).CWInNode,
-                             CoolBeam(CBNum).CWOutNode,
-                             CoolBeam(CBNum).CWPlantLoc);
+        SetComponentFlowRate(state, MinColdWaterFlow, CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).CWOutNode, CoolBeam(CBNum).CWPlantLoc);
 
         if (GetCurrentScheduleValue(state, CoolBeam(CBNum).SchedPtr) <= 0.0) UnitOn = false;
         if (MaxColdWaterFlow <= SmallMassFlow) UnitOn = false;
@@ -1088,11 +1088,7 @@ namespace HVACCooledBeam {
         mdot = CWFlow;
         auto &CoolBeam = state.dataHVACCooledBeam->CoolBeam;
 
-        SetComponentFlowRate(state,
-                             mdot,
-                             CoolBeam(CBNum).CWInNode,
-                             CoolBeam(CBNum).CWOutNode,
-                             CoolBeam(CBNum).CWPlantLoc);
+        SetComponentFlowRate(state, mdot, CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).CWOutNode, CoolBeam(CBNum).CWPlantLoc);
 
         CWFlowPerBeam = mdot / CoolBeam(CBNum).NumBeams;
         TWIn = CoolBeam(CBNum).TWIn;

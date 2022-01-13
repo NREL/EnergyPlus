@@ -1241,16 +1241,10 @@ namespace EvaporativeFluidCoolers {
             this->inletConds.AirWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
-        this->WaterMassFlowRate =
-            PlantUtilities::RegulateCondenserCompFlowReqOp(state,
-                                                           this->plantLoc,
-                                                           this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier);
+        this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
+            state, this->plantLoc, this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier);
 
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->WaterMassFlowRate,
-                                             this->WaterInletNodeNum,
-                                             this->WaterOutletNodeNum,
-                                             this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum, this->plantLoc);
     }
 
     void EvapFluidCoolerSpecs::SizeEvapFluidCooler(EnergyPlusData &state)
@@ -1658,8 +1652,11 @@ namespace EvaporativeFluidCoolers {
                                                                DataGlobalConstants::InitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                CalledFrom);
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                    state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, 35.0, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, CalledFrom);
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                   35.0,
+                                                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                   CalledFrom);
                 DesEvapFluidCoolerLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
                 Par[0] = DesEvapFluidCoolerLoad;
                 Par[1] = rho * this->DesignWaterFlowRate; // Design water mass flow rate
@@ -2092,7 +2089,7 @@ namespace EvaporativeFluidCoolers {
 
         auto loopSide = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum);
         auto calcScheme = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme;
-        if  (calcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
+        if (calcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
             TempSetPoint = loopSide.TempSetPoint;
         } else if (calcScheme == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
             TempSetPoint = loopSide.TempSetPointHi;
@@ -2611,7 +2608,8 @@ namespace EvaporativeFluidCoolers {
 
         state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->OutletWaterTemp;
 
-        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked || state.dataGlobal->WarmupFlag)
+        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
+            state.dataGlobal->WarmupFlag)
             return;
 
         // Check flow rate through evaporative fluid cooler and compare to design flow rate,

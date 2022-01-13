@@ -176,10 +176,10 @@ namespace MicroCHPElectricGenerator {
         int AirInletNodeID;
         std::string AirOutletNodeName;
         int AirOutletNodeID;
-        int FuelSupplyID;                          // index for fuel supply data structure
-        int DynamicsControlID;                     // index in GeneratorDynamics data where control issues are handled
-        int AvailabilitySchedID;                   // index for availability schedule
-        PlantLocation CWPlantLoc;                             // cooling water plant loop component index
+        int FuelSupplyID;         // index for fuel supply data structure
+        int DynamicsControlID;    // index in GeneratorDynamics data where control issues are handled
+        int AvailabilitySchedID;  // index for availability schedule
+        PlantLocation CWPlantLoc; // cooling water plant loop component index
         bool CheckEquipName;
         bool MySizeFlag;
         bool MyEnvrnFlag;

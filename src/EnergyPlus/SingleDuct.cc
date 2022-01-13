@@ -2544,8 +2544,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
                 ShowFatalError(state, "InitSys: Program terminated for previous conditions.");
             }
 
-            this->ReheatCoilOutletNode =
-                DataPlant::CompData::getPlantComponent(state, this->HWplantLoc).NodeNumOut;
+            this->ReheatCoilOutletNode = DataPlant::CompData::getPlantComponent(state, this->HWplantLoc).NodeNumOut;
 
             this->PlantLoopScanFlag = false;
         } else {
@@ -4088,7 +4087,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
 
                 // Initialize hot water flow rate to zero.
                 DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state,DummyMdot,this->ReheatControlNode,this->HWplantLoc, true);
+                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
                 if (FirstHVACIteration) {
@@ -4254,7 +4253,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
             if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
                 // Simulate reheat coil for the Const Volume system
                 DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state,DummyMdot,this->ReheatControlNode,this->HWplantLoc, true);
+                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
                 // call the reheat coil with the NO FLOW condition to make sure that the Node values
                 // are passed through to the coil outlet correctly
                 SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
@@ -4548,7 +4547,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                 // Initialize hot water flow rate to zero.
                 // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                 DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state,DummyMdot,this->ReheatControlNode,this->HWplantLoc, true);
+                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
                 if (FirstHVACIteration) {
@@ -4686,7 +4685,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
                 // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                 // Initialize hot water flow rate to zero.
                 DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state,DummyMdot,this->ReheatControlNode,this->HWplantLoc, true);
+                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
 
                 // call the reheat coil with the NO FLOW condition to make sure that the Node values
                 // are passed through to the coil outlet correctly
@@ -5278,7 +5277,7 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
                 // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                 // Initialize hot water flow rate to zero.
                 DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state,DummyMdot,this->ReheatControlNode,this->HWplantLoc, true);
+                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
 
                 // On the first HVAC iteration the system values are given to the controller, but after that
                 // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -5346,7 +5345,7 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
                 // Node(sd_airterminal(SysNum)%ReheatControlNode)%MassFlowRate = 0.0D0
                 // Initialize hot water flow rate to zero.
                 DummyMdot = 0.0;
-                SetActuatedBranchFlowRate(state,DummyMdot,this->ReheatControlNode,this->HWplantLoc, true);
+                SetActuatedBranchFlowRate(state, DummyMdot, this->ReheatControlNode, this->HWplantLoc, true);
 
                 // call the reheat coil with the NO FLOW condition to make sure that the Node values
                 // are passed through to the coil outlet correctly
@@ -5466,22 +5465,14 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
         if (SELECT_CASE_var == HeatingCoilType::SimpleHeating) { // COIL:WATER:SIMPLEHEATING
             mdot = HWFlow;
             if (this->HWplantLoc.loopNum > 0) {
-                SetComponentFlowRate(state,
-                                     mdot,
-                                     this->ReheatControlNode,
-                                     this->ReheatCoilOutletNode,
-                                     this->HWplantLoc);
+                SetComponentFlowRate(state, mdot, this->ReheatControlNode, this->ReheatCoilOutletNode, this->HWplantLoc);
             }
 
             SimulateWaterCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index);
         } else if (SELECT_CASE_var == HeatingCoilType::SteamAirHeating) { // HW Flow is steam mass flow here
             mdot = HWFlow;
             if (this->HWplantLoc.loopNum > 0) {
-                SetComponentFlowRate(state,
-                                     mdot,
-                                     this->ReheatControlNode,
-                                     this->ReheatCoilOutletNode,
-                                     this->HWplantLoc);
+                SetComponentFlowRate(state, mdot, this->ReheatControlNode, this->ReheatCoilOutletNode, this->HWplantLoc);
             }
             SimulateSteamCoilComponents(state, this->ReheatName, FirstHVACIteration, this->ReheatComp_Index, HCoilReq);
         } else if (SELECT_CASE_var == HeatingCoilType::Electric) { // COIL:ELECTRIC:HEATING

@@ -1997,8 +1997,8 @@ namespace HVACMultiSpeedHeatPump {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).plantLoc)
-                                                               .NodeNumOut;
+                MSHeatPump(MSHeatPumpNum).CoilOutletNode =
+                    DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).plantLoc).NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
 
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingSteam) {
@@ -2025,8 +2025,8 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).plantLoc)
-                                                               .NodeNumOut;
+                MSHeatPump(MSHeatPumpNum).CoilOutletNode =
+                    DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).plantLoc).NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
             }
             if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingWater) {
@@ -2057,8 +2057,8 @@ namespace HVACMultiSpeedHeatPump {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).SuppPlantLoc)
-                                                                   .NodeNumOut;
+                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode =
+                    DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).SuppPlantLoc).NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
 
             } else if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingSteam) {
@@ -2085,8 +2085,8 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // fill outlet node for coil
-                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).SuppPlantLoc)
-                                                                   .NodeNumOut;
+                MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode =
+                    DataPlant::CompData::getPlantComponent(state, MSHeatPump(MSHeatPumpNum).SuppPlantLoc).NodeNumOut;
                 MSHeatPump(MSHeatPumpNum).MyPlantScantFlag = false;
             }
         } else if (MSHeatPump(MSHeatPumpNum).MyPlantScantFlag && !state.dataGlobal->AnyPlantInModel) {
@@ -4442,11 +4442,12 @@ namespace HVACMultiSpeedHeatPump {
 
         if (HeatRecMassFlowRate > 0.0) {
 
-            CpHeatRec = GetSpecificHeatGlycol(state,
-                                              state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidName,
-                                              HeatRecInletTemp,
-                                              state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidIndex,
-                                              RoutineName);
+            CpHeatRec =
+                GetSpecificHeatGlycol(state,
+                                      state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidName,
+                                      HeatRecInletTemp,
+                                      state.dataPlnt->PlantLoop(state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).HRPlantLoc.loopNum).FluidIndex,
+                                      RoutineName);
 
             HeatRecOutletTemp = QHeatRec / (HeatRecMassFlowRate * CpHeatRec) + HeatRecInletTemp;
             if (HeatRecOutletTemp > state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum).MaxHeatRecOutletTemp) {

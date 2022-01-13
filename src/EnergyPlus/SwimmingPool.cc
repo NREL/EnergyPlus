@@ -545,11 +545,7 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     // initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature
     // radiant systems)
     Real64 mdot = 0.0;
-    PlantUtilities::SetComponentFlowRate(        state,
- mdot,
- this->WaterInletNode,
- this->WaterOutletNode,
- this->HWplantLoc);
+    PlantUtilities::SetComponentFlowRate(state, mdot, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
     this->WaterInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
 
     // get the schedule values for different scheduled parameters
@@ -945,11 +941,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     } else if (MassFlowRate < 0.0) {
         MassFlowRate = 0.0;
     }
-    PlantUtilities::SetComponentFlowRate(        state,
- MassFlowRate,
- this->WaterInletNode,
- this->WaterOutletNode,
- this->HWplantLoc);
+    PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
     this->WaterMassFlowRate = MassFlowRate;
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature

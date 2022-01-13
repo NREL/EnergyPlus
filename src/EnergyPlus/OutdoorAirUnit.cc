@@ -1343,12 +1343,13 @@ namespace OutdoorAirUnit {
                     if (OutAirUnit(OAUnitNum).OAEquip(compLoop).Type == CompType::SteamCoil_AirHeat) {
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow =
                             GetCoilMaxSteamFlowRate(state, OutAirUnit(OAUnitNum).OAEquip(compLoop).ComponentIndex, errFlag);
-                        Real64 rho = GetSatDensityRefrig(state,
-                                                         state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
-                                                         DataGlobalConstants::SteamInitConvTemp,
-                                                         1.0,
-                                                         state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
-                                                         RoutineName);
+                        Real64 rho =
+                            GetSatDensityRefrig(state,
+                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidName,
+                                                DataGlobalConstants::SteamInitConvTemp,
+                                                1.0,
+                                                state.dataPlnt->PlantLoop(OutAirUnit(OAUnitNum).OAEquip(compLoop).plantLoc.loopNum).FluidIndex,
+                                                RoutineName);
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MaxVolWaterFlow;
                         OutAirUnit(OAUnitNum).OAEquip(compLoop).MinWaterMassFlow = rho * OutAirUnit(OAUnitNum).OAEquip(compLoop).MinVolWaterFlow;
                         InitComponentNodes(state,

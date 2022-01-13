@@ -428,13 +428,9 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
     this->PondTemp = this->BulkTemperature;
 
     // Hypothetical design flow rate
-    Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(state,this->plantLoc, this->DesignMassFlowRate);
+    Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->DesignMassFlowRate);
 
-    PlantUtilities::SetComponentFlowRate(        state,
- DesignFlow,
- this->InletNodeNum,
- this->OutletNodeNum,
- this->plantLoc);
+    PlantUtilities::SetComponentFlowRate(state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 
     // get the current flow rate - module variable
     this->MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
@@ -842,8 +838,11 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
 
     // Calculate the water side outlet conditions and set the
     // appropriate conditions on the correct HVAC node.
-    Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(
-        state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, this->InletTemp, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
+    Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                            this->InletTemp,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                            RoutineName);
 
     PlantUtilities::SafeCopyPlantNode(state, InletNodeNum, OutletNodeNum);
 

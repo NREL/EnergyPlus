@@ -105,7 +105,7 @@ using DataHVACGlobals::SmallLoad;
 using FluidProperties::GetSpecificHeatGlycol;
 
 void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                 PlantLocation const &plantLoc,                  // PlantLoop data structure Location struct
+                                 PlantLocation const &plantLoc, // PlantLoop data structure Location struct
                                  Real64 &LoopDemand,
                                  Real64 &RemLoopDemand,
                                  bool const FirstHVACIteration,
@@ -1974,8 +1974,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         Type = static_cast<DataPlant::PlantEquipmentType>(
                             getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
                         errFlag1 = false;
-                        PlantUtilities::ScanPlantLoopsForObject(
-                            state, this_equip.Name, Type, plantLoc, errFlag1, _, _, NumSearchResults, _, LoopNum);
+                        PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, plantLoc, errFlag1, _, _, NumSearchResults, _, LoopNum);
 
                         if (errFlag1) {
                             ShowSevereError(state, "InitLoadDistribution: Equipment specified for operation scheme not found on correct loop");
@@ -2831,8 +2830,11 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
         CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
         ToutLowLimit = this_component.MinOutletTemp;
         Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
-        CurSpecHeat = GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
+        CurSpecHeat = GetSpecificHeatGlycol(state,
+                                            state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName,
+                                            Tinlet,
+                                            state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex,
+                                            RoutineName);
         QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
         //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned on
@@ -2916,8 +2918,11 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
             CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
             ToutLowLimit = this_component.MinOutletTemp;
             Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
-            CurSpecHeat = GetSpecificHeatGlycol(
-                state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
+            CurSpecHeat = GetSpecificHeatGlycol(state,
+                                                state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName,
+                                                Tinlet,
+                                                state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex,
+                                                RoutineName);
             QdotTmp = CurMassFlowRate * CurSpecHeat * (Tinlet - ToutLowLimit);
 
             //        !- Don't correct if Q is zero, as this could indicate a component which this hasn't been implemented or not yet turned
@@ -2934,8 +2939,11 @@ void AdjustChangeInLoadByHowServed(EnergyPlusData &state,
         CurMassFlowRate = state.dataLoopNodes->Node(this_component.NodeNumIn).MassFlowRate;
         ToutHiLimit = this_component.MaxOutletTemp;
         Tinlet = state.dataLoopNodes->Node(this_component.NodeNumIn).Temp;
-        CurSpecHeat = GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, Tinlet, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
+        CurSpecHeat = GetSpecificHeatGlycol(state,
+                                            state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName,
+                                            Tinlet,
+                                            state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex,
+                                            RoutineName);
         QdotTmp = CurMassFlowRate * CurSpecHeat * (ToutHiLimit - Tinlet);
 
         if (CurMassFlowRate > 0.0) {
@@ -3018,7 +3026,8 @@ void FindCompSPLoad(EnergyPlusData &state,
     DemandNode = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).DemandNodeNum;
     SetPtNode = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointNodeNum;
     TempIn = state.dataLoopNodes->Node(DemandNode).Temp;
-    rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
+    rho = GetDensityGlycol(
+        state, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidName, TempIn, state.dataPlnt->PlantLoop(plantLoc.loopNum).FluidIndex, RoutineName);
 
     DemandMdot = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).SetPointFlowRate * rho;
     // DemandMDot is a constant design flow rate, next based on actual current flow rate for accurate current demand?
@@ -3037,7 +3046,8 @@ void FindCompSPLoad(EnergyPlusData &state,
     case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
         if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::CoolingOp) {
             TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointHi;
-        } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::HeatingOp) {
+        } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType ==
+                   CtrlType::HeatingOp) {
             TempSetPt = state.dataLoopNodes->Node(SetPtNode).TempSetPointLo;
         } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::DualOp) {
             CurrentDemandForCoolingOp = DemandMdot * CurSpecHeat * (state.dataLoopNodes->Node(SetPtNode).TempSetPointHi - TempIn);
@@ -3079,7 +3089,8 @@ void FindCompSPLoad(EnergyPlusData &state,
                 this_component.ON = false;
                 this_component.MyLoad = 0.0;
             }
-        } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType == CtrlType::HeatingOp) {
+        } else if (state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(OpSchemePtr).EquipList(ListPtr).Comp(CompPtr).CtrlType ==
+                   CtrlType::HeatingOp) {
             if (CompDemand > LoopDemandTol) {
                 this_component.ON = true;
                 this_component.MyLoad = CompDemand;
@@ -3176,8 +3187,10 @@ void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
 
     // move actuated value to MyLoad
 
-    this_component.MyLoad = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(CurSchemePtr).EquipList(1).Comp(CompPtr).EMSActuatorDispatchedLoadValue;
-    this_component.EquipDemand = state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(CurSchemePtr).EquipList(1).Comp(CompPtr).EMSActuatorDispatchedLoadValue;
+    this_component.MyLoad =
+        state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(CurSchemePtr).EquipList(1).Comp(CompPtr).EMSActuatorDispatchedLoadValue;
+    this_component.EquipDemand =
+        state.dataPlnt->PlantLoop(plantLoc.loopNum).OpScheme(CurSchemePtr).EquipList(1).Comp(CompPtr).EMSActuatorDispatchedLoadValue;
     if (std::abs(this_component.MyLoad) > LoopDemandTol) {
         this_component.ON = true;
 
@@ -3502,8 +3515,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
     }
 }
 
-void ActivateEMSControls(
-    EnergyPlusData &state, PlantLocation const &plantLoc, bool &LoopShutDownFlag)
+void ActivateEMSControls(EnergyPlusData &state, PlantLocation const &plantLoc, bool &LoopShutDownFlag)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3625,7 +3637,7 @@ void ActivateEMSControls(
 }
 
 void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
-                                     PlantLocation const & plantLoc,
+                                     PlantLocation const &plantLoc,
                                      Real64 &ChangeInLoad // positive magnitude of load change
 )
 {

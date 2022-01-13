@@ -180,9 +180,9 @@ namespace PipeHeatTransfer {
         bool BeginSimEnvrn;                           // begin sim and begin environment flag
         bool FirstHVACupdateFlag;
         bool BeginEnvrnupdateFlag;
-        bool SolarExposed;                       // Flag to determine if solar is included at ground surface
-        Real64 SumTK;                            // Sum of thickness/conductivity over all material layers
-        Real64 ZoneHeatGainRate;                 // Lagged energy summation for zone heat gain {W}
+        bool SolarExposed;       // Flag to determine if solar is included at ground surface
+        Real64 SumTK;            // Sum of thickness/conductivity over all material layers
+        Real64 ZoneHeatGainRate; // Lagged energy summation for zone heat gain {W}
         PlantLocation plantLoc;
         bool CheckEquipName;
         std::shared_ptr<BaseGroundTempsModel> groundTempModel;
@@ -210,9 +210,9 @@ namespace PipeHeatTransfer {
               SoilMaterialNum(0), MonthOfMinSurfTemp(0), MinSurfTemp(0.0), SoilDensity(0.0), SoilDepth(0.0), SoilCp(0.0), SoilConductivity(0.0),
               SoilRoughness(DataSurfaces::SurfaceRoughness::Invalid), SoilThermAbs(0.0), SoilSolarAbs(0.0), CoefA1(0.0), CoefA2(0.0), FourierDS(0.0),
               SoilDiffusivity(0.0), SoilDiffusivityPerDay(0.0), BeginSimInit(true), BeginSimEnvrn(true), FirstHVACupdateFlag(true),
-              BeginEnvrnupdateFlag(true), SolarExposed(true), SumTK(0.0), ZoneHeatGainRate(0.0), plantLoc{}, CheckEquipName(true), FluidInletTemp(0.0),
-              FluidOutletTemp(0.0), MassFlowRate(0.0), FluidHeatLossRate(0.0), FluidHeatLossEnergy(0.0), PipeInletTemp(0.0), PipeOutletTemp(0.0),
-              EnvironmentHeatLossRate(0.0), EnvHeatLossEnergy(0.0), VolumeFlowRate(0.0)
+              BeginEnvrnupdateFlag(true), SolarExposed(true), SumTK(0.0), ZoneHeatGainRate(0.0), plantLoc{}, CheckEquipName(true),
+              FluidInletTemp(0.0), FluidOutletTemp(0.0), MassFlowRate(0.0), FluidHeatLossRate(0.0), FluidHeatLossEnergy(0.0), PipeInletTemp(0.0),
+              PipeOutletTemp(0.0), EnvironmentHeatLossRate(0.0), EnvHeatLossEnergy(0.0), VolumeFlowRate(0.0)
 
         {
         }

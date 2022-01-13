@@ -1159,11 +1159,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
             DesiredMassFlowRate = this->DesignHeatRecMassFlowRate;
         }
 
-        PlantUtilities::SetComponentFlowRate(state,
-                                             DesiredMassFlowRate,
-                                             this->HeatRecInletNodeNum,
-                                             this->HeatRecOutletNodeNum,
-                                             this->HRPlantLoc);
+        PlantUtilities::SetComponentFlowRate(state, DesiredMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
     } else { // not FirstHVACIteration
         if (!RunFlag) {
             state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate =
@@ -1178,24 +1174,14 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
                     this->DesignHeatRecMassFlowRate *
                     CurveManager::CurveValue(
                         state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     DesiredMassFlowRate,
-                                                     this->HeatRecInletNodeNum,
-                                                     this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, DesiredMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
             } else {
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     this->HeatRecMdot,
-                                                     this->HeatRecInletNodeNum,
-                                                     this->HeatRecOutletNodeNum,
-                                                     this->HRPlantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->HeatRecMdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
             }
         } else if (RunFlag && (!this->InternalFlowControl)) {
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 this->HeatRecMdot,
-                                                 this->HeatRecInletNodeNum,
-                                                 this->HeatRecOutletNodeNum,
-                                                 this->HRPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, this->HeatRecMdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
         }
     }
 }

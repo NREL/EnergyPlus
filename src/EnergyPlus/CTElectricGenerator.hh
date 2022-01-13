@@ -91,34 +91,34 @@ namespace CTElectricGenerator {
         // Coeffs Poly Fit
         int TempBasedExhaustTempCurve; // (TEX2GC) Curve Index for Ambient Temperature Based Exhaust Gas Temp to
         // Fuel Energy Input Coeffs Poly Fit
-        Real64 QLubeOilRecovered;                  // (ELUBE) Recovered Lube Oil Energy (W)
-        Real64 QExhaustRecovered;                  // (EEX) Recovered Exhaust heat  (W)
-        Real64 QTotalHeatRecovered;                // total heat recovered (W)
-        Real64 LubeOilEnergyRec;                   // Recovered Lube Oil Energy (J)
-        Real64 ExhaustEnergyRec;                   // Recovered Exhaust heat  (J)
-        Real64 TotalHeatEnergyRec;                 // total heat recovered (J)
-        int QLubeOilRecoveredCurve;                // (ELUBEGC) Curve Index for Recoverable Lube Oil heat Input Coef Poly Fit
-        Real64 UA;                                 // (UACGC) exhaust gas Heat Exchanger UA
-        Array1D<Real64> UACoef;                    // Heat Exchanger UA  Coeffs Poly Fit
-        Real64 MaxExhaustperCTPower;               // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
-        Real64 DesignHeatRecVolFlowRate;           // m3/s, Design Water mass flow rate through heat recovery loop
-        Real64 DesignHeatRecMassFlowRate;          // kg/s, Design Water mass flow rate through heat recovery loop
-        Real64 DesignMinExitGasTemp;               // Steam Saturation Temperature (C)
-        Real64 DesignAirInletTemp;                 // Design Turbine Air Inlet Temperature (C)
-        Real64 ExhaustStackTemp;                   // turbine exhaust gas temp (C)
-        bool HeatRecActive;                        // true when design max flow rate > 0
-        int HeatRecInletNodeNum;                   // Node number on the heat recovery inlet side of the condenser
-        int HeatRecOutletNodeNum;                  // Node number on the heat recovery outlet side of the condenser
-        Real64 HeatRecInletTemp;                   // Inlet Temperature of the heat recovery fluid
-        Real64 HeatRecOutletTemp;                  // Outlet Temperature of the heat recovery fluid
-        Real64 HeatRecMdot;                        // reporting: Heat Recovery Loop Mass flow rate
-        PlantLocation HRPlantLoc;                             // cooling water plant loop component index, for heat recovery
-        Real64 FuelMdot;                           // reporting: Fuel Amount used (kg/s)
-        Real64 FuelHeatingValue;                   // Heating Value for Fuel in (kJ/kg)
-        Real64 ElecPowerGenerated;                 // reporting: power generated (W)
-        Real64 ElecEnergyGenerated;                // reporting: power generated (W)
-        Real64 HeatRecMaxTemp;                     // Max Temp that can be produced in heat recovery
-        int OAInletNode;                           // optional inlet node index pointer for outdoor air for combustion
+        Real64 QLubeOilRecovered;         // (ELUBE) Recovered Lube Oil Energy (W)
+        Real64 QExhaustRecovered;         // (EEX) Recovered Exhaust heat  (W)
+        Real64 QTotalHeatRecovered;       // total heat recovered (W)
+        Real64 LubeOilEnergyRec;          // Recovered Lube Oil Energy (J)
+        Real64 ExhaustEnergyRec;          // Recovered Exhaust heat  (J)
+        Real64 TotalHeatEnergyRec;        // total heat recovered (J)
+        int QLubeOilRecoveredCurve;       // (ELUBEGC) Curve Index for Recoverable Lube Oil heat Input Coef Poly Fit
+        Real64 UA;                        // (UACGC) exhaust gas Heat Exchanger UA
+        Array1D<Real64> UACoef;           // Heat Exchanger UA  Coeffs Poly Fit
+        Real64 MaxExhaustperCTPower;      // MAX EXHAUST FLOW PER W POWER OUTPUT COEFF
+        Real64 DesignHeatRecVolFlowRate;  // m3/s, Design Water mass flow rate through heat recovery loop
+        Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
+        Real64 DesignMinExitGasTemp;      // Steam Saturation Temperature (C)
+        Real64 DesignAirInletTemp;        // Design Turbine Air Inlet Temperature (C)
+        Real64 ExhaustStackTemp;          // turbine exhaust gas temp (C)
+        bool HeatRecActive;               // true when design max flow rate > 0
+        int HeatRecInletNodeNum;          // Node number on the heat recovery inlet side of the condenser
+        int HeatRecOutletNodeNum;         // Node number on the heat recovery outlet side of the condenser
+        Real64 HeatRecInletTemp;          // Inlet Temperature of the heat recovery fluid
+        Real64 HeatRecOutletTemp;         // Outlet Temperature of the heat recovery fluid
+        Real64 HeatRecMdot;               // reporting: Heat Recovery Loop Mass flow rate
+        PlantLocation HRPlantLoc;         // cooling water plant loop component index, for heat recovery
+        Real64 FuelMdot;                  // reporting: Fuel Amount used (kg/s)
+        Real64 FuelHeatingValue;          // Heating Value for Fuel in (kJ/kg)
+        Real64 ElecPowerGenerated;        // reporting: power generated (W)
+        Real64 ElecEnergyGenerated;       // reporting: power generated (W)
+        Real64 HeatRecMaxTemp;            // Max Temp that can be produced in heat recovery
+        int OAInletNode;                  // optional inlet node index pointer for outdoor air for combustion
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;

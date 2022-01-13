@@ -544,14 +544,9 @@ namespace SurfaceGroundHeatExchanger {
 
         // If loop operation is controlled by an environmental variable (DBtemp, WBtemp, etc)
         // then shut branch down when equipment is not scheduled to run.
-        DesignFlow =
-            RegulateCondenserCompFlowReqOp(state,this->plantLoc, this->DesignMassFlowRate);
+        DesignFlow = RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->DesignMassFlowRate);
 
-        SetComponentFlowRate(            state,
- DesignFlow,
- this->InletNodeNum,
- this->OutletNodeNum,
- this->plantLoc);
+        SetComponentFlowRate(state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
 
         // get the current flow rate - module variable
         state.dataSurfaceGroundHeatExchangers->FlowRate = state.dataLoopNodes->Node(this->InletNodeNum).MassFlowRate;
@@ -1157,8 +1152,11 @@ namespace SurfaceGroundHeatExchanger {
                 this->InletTemp = max(this->InletTemp, 0.0);
             }
         }
-        CpWater = GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName, Temperature, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex, RoutineName);
+        CpWater = GetSpecificHeatGlycol(state,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                        Temperature,
+                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                        RoutineName);
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
         ReD = 4.0 * WaterMassFlow / (DataGlobalConstants::Pi * MUactual * this->TubeDiameter * this->TubeCircuits);

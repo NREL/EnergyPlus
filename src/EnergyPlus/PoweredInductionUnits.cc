@@ -888,8 +888,7 @@ void InitPIU(EnergyPlusData &state,
                 ShowFatalError(state, "InitPIU: Program terminated due to previous condition(s).");
             }
             state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum =
-                DataPlant::CompData::getPlantComponent(state, state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc)
-                    .NodeNumOut;
+                DataPlant::CompData::getPlantComponent(state, state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc).NodeNumOut;
         }
         MyPlantScanFlag(PIUNum) = false;
     } else if (MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
@@ -1521,16 +1520,18 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                             DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
-                            rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
-                                                   RoutineName);
-                            Cp = GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
-                                                       RoutineName);
+                            rho =
+                                GetDensityGlycol(state,
+                                                 state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
+                                                 DataGlobalConstants::HWInitConvTemp,
+                                                 state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
+                                                 RoutineName);
+                            Cp = GetSpecificHeatGlycol(
+                                state,
+                                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
+                                DataGlobalConstants::HWInitConvTemp,
+                                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
+                                RoutineName);
 
                             MaxVolHotWaterFlowDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
                         } else {

@@ -2118,13 +2118,10 @@ namespace CondenserLoopTowers {
             this->AirWetBulb = state.dataEnvrn->OutWetBulbTemp;
         }
 
-        this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state,this->plantLoc, this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
+        this->WaterMassFlowRate =
+            PlantUtilities::RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
 
-        PlantUtilities::SetComponentFlowRate(state,
-                                             this->WaterMassFlowRate,
-                                             this->WaterInletNodeNum,
-                                             this->WaterOutletNodeNum,
-                                             this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum, this->plantLoc);
 
         // Added for fluid bypass. 8/2008
         this->BypassFraction = 0.0;
@@ -5218,7 +5215,8 @@ namespace CondenserLoopTowers {
         }
 
         // Do not RETURN here if flow rate is less than SmallMassFlow. Check basin heater and then RETURN.
-        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) return; // TODO: WTF
+        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
+            return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             CalcBasinHeaterPower(
@@ -5462,7 +5460,8 @@ namespace CondenserLoopTowers {
         Real64 Ta = TempSetPoint - this->AirWetBulb;
 
         // Do not RETURN here if flow rate is less than MassFlowTolerance. Check basin heater and then RETURN.
-        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked) return; // TODO: WTF
+        if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
+            return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             CalcBasinHeaterPower(

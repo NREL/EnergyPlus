@@ -123,21 +123,21 @@ namespace ChillerElectricEIR {
         int ChillerEIRFTIndex; // Index for the energy input ratio modifier curve
         // (function of leaving chilled water temperature and
         //  entering condenser fluid temperature)
-        int ChillerEIRFPLRIndex;                   // Index for the EIR vs part-load ratio curve
-        int ChillerCapFTError;                     // Used for negative capacity as a function of temp warnings
-        int ChillerCapFTErrorIndex;                // Used for negative capacity as a function of temp warnings
-        int ChillerEIRFTError;                     // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFTErrorIndex;                // Used for negative EIR as a function of temp warnings
-        int ChillerEIRFPLRError;                   // Used for negative EIR as a function of PLR warnings
-        int ChillerEIRFPLRErrorIndex;              // Used for negative EIR as a function of PLR warnings
-        Real64 ChillerEIRFPLRMin;                  // Minimum value of PLR from EIRFPLR curve
-        Real64 ChillerEIRFPLRMax;                  // Maximum value of PLR from EIRFPLR curve
-        int DeltaTErrCount;                        // Evaporator delta T equals 0 for variable flow chiller warning messages
-        int DeltaTErrCountIndex;                   // Index to evaporator delta T = 0 for variable flow chiller warning messages
-        PlantLocation CWPlantLoc;                             // chilled water plant loop component index
-        PlantLocation CDPlantLoc;                             // condenser water plant loop component index
-        PlantLocation HRPlantLoc;                             // heat recovery water plant loop component index
-        int BasinHeaterSchedulePtr;                // Pointer to basin heater schedule
+        int ChillerEIRFPLRIndex;      // Index for the EIR vs part-load ratio curve
+        int ChillerCapFTError;        // Used for negative capacity as a function of temp warnings
+        int ChillerCapFTErrorIndex;   // Used for negative capacity as a function of temp warnings
+        int ChillerEIRFTError;        // Used for negative EIR as a function of temp warnings
+        int ChillerEIRFTErrorIndex;   // Used for negative EIR as a function of temp warnings
+        int ChillerEIRFPLRError;      // Used for negative EIR as a function of PLR warnings
+        int ChillerEIRFPLRErrorIndex; // Used for negative EIR as a function of PLR warnings
+        Real64 ChillerEIRFPLRMin;     // Minimum value of PLR from EIRFPLR curve
+        Real64 ChillerEIRFPLRMax;     // Maximum value of PLR from EIRFPLR curve
+        int DeltaTErrCount;           // Evaporator delta T equals 0 for variable flow chiller warning messages
+        int DeltaTErrCountIndex;      // Index to evaporator delta T = 0 for variable flow chiller warning messages
+        PlantLocation CWPlantLoc;     // chilled water plant loop component index
+        PlantLocation CDPlantLoc;     // condenser water plant loop component index
+        PlantLocation HRPlantLoc;     // heat recovery water plant loop component index
+        int BasinHeaterSchedulePtr;   // Pointer to basin heater schedule
         int CondMassFlowIndex;
         std::string MsgBuffer1;  // - buffer to print warning messages on following time step
         std::string MsgBuffer2;  // - buffer to print warning messages on following time step

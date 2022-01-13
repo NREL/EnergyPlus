@@ -2185,11 +2185,7 @@ namespace PlantPipingSystemsManager {
 
         // request design, set component flow will decide what to give us based on restrictions and flow lock status
         thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             thisCircuit->CurCircuitFlowRate,
-                                             InletNodeNum,
-                                             OutletNodeNum,
-                                             thisCircuit->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, thisCircuit->CurCircuitFlowRate, InletNodeNum, OutletNodeNum, thisCircuit->plantLoc);
     }
 
     void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit *thisCircuit)

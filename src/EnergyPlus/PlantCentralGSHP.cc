@@ -128,8 +128,8 @@ void WrapperSpecs::getDesignCapacities(
     MinLoad = 0.0;
     MaxLoad = 0.0;
     OptLoad = 0.0;
-    if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) {       // Chilled water loop
-        if (this->ControlMode == CondenserType::SmartMixing) { // control mode is SmartMixing
+    if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) { // Chilled water loop
+        if (this->ControlMode == CondenserType::SmartMixing) {    // control mode is SmartMixing
             for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
                 MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).MaxPartLoadRatCooling;
                 OptLoad += this->ChillerHeater(NumChillerHeater).RefCapCooling * this->ChillerHeater(NumChillerHeater).OptPartLoadRatCooling;
@@ -137,7 +137,7 @@ void WrapperSpecs::getDesignCapacities(
             }
         }
     } else if (calledFromLocation.loopNum == this->HWPlantLoc.loopNum) { // Hot water loop
-        if (this->ControlMode == CondenserType::SmartMixing) {  // control mode is SmartMixing
+        if (this->ControlMode == CondenserType::SmartMixing) {           // control mode is SmartMixing
             for (int NumChillerHeater = 1; NumChillerHeater <= this->ChillerHeaterNums; ++NumChillerHeater) {
                 MaxLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg * this->ChillerHeater(NumChillerHeater).MaxPartLoadRatClgHtg;
                 OptLoad += this->ChillerHeater(NumChillerHeater).RefCapClgHtg * this->ChillerHeater(NumChillerHeater).OptPartLoadRatClgHtg;
@@ -1575,26 +1575,21 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 this->GLHEInletNodeNum,
                                                 _);
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->GLHEPlantLoc,
-                                                      DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
-                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWPlantLoc, this->GLHEPlantLoc, DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump, true);
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->HWPlantLoc,                                                      this->GLHEPlantLoc,
-                                                      DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
-                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->HWPlantLoc, this->GLHEPlantLoc, DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump, true);
 
-        PlantUtilities::InterConnectTwoPlantLoopSides(state,                                                      this->CWPlantLoc,                                                      this->HWPlantLoc,
-                                                      DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
-                                                      true);
+        PlantUtilities::InterConnectTwoPlantLoopSides(
+            state, this->CWPlantLoc, this->HWPlantLoc, DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump, true);
 
         if (this->VariableFlowCH) {
             // Reset flow priority
             if (LoopNum == this->CWPlantLoc.loopNum) {
-                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
-                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc).FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             } else if (LoopNum == this->HWPlantLoc.loopNum) {
-                DataPlant::CompData::getPlantComponent(state, this->HWPlantLoc)
-                    .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+                DataPlant::CompData::getPlantComponent(state, this->HWPlantLoc).FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
             }
 
             // check if setpoint on outlet node - chilled water loop
@@ -1735,7 +1730,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
 
     // Switch over the mass flow rate to the condenser loop, i.e., ground heat exchanger
     if (LoopNum == this->CWPlantLoc.loopNum) { // called for on cooling loop
-        if (MyLoad < -1.0) {          // calling for cooling
+        if (MyLoad < -1.0) {                   // calling for cooling
             mdotCHW = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMax;
         } else {
             mdotCHW = 0.0;
@@ -1786,23 +1781,11 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
         }
     }
 
-    PlantUtilities::SetComponentFlowRate(        state,
- mdotCHW,
- this->CHWInletNodeNum,
- this->CHWOutletNodeNum,
- this->CWPlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, mdotCHW, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
 
-    PlantUtilities::SetComponentFlowRate(        state,
- mdotHW,
- this->HWInletNodeNum,
- this->HWOutletNodeNum,
- this->HWPlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, mdotHW, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
 
-    PlantUtilities::SetComponentFlowRate(state,
-                                         mdotGLHE,
-                                         this->GLHEInletNodeNum,
-                                         this->GLHEOutletNodeNum,
-                                         this->GLHEPlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, mdotGLHE, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
 }
 
 void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
@@ -2508,7 +2491,8 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("Chiller condenser temperature for curve fit are not decided, default value= cond_leaving ({:.3R}).",
                                              state.dataPlantCentralGSHP->ChillerCapFT));
-                    CondTempforCurve = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+                    CondTempforCurve =
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
                 }
 
                 Real64 MinPartLoadRat; // Min allowed operating fraction of full load
@@ -2983,27 +2967,15 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                 this->Report.HeatingRate = WrapperHeatRate;
                 this->Report.GLHERate = WrapperGLHERate;
             }
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 CHWInletMassFlowRate,
-                                                 this->CHWInletNodeNum,
-                                                 this->CHWOutletNodeNum,
-                                                 this->CWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, CHWInletMassFlowRate, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
 
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 HWInletMassFlowRate,
-                                                 this->HWInletNodeNum,
-                                                 this->HWOutletNodeNum,
-                                                 this->HWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
 
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 GLHEInletMassFlowRate,
-                                                 this->GLHEInletNodeNum,
-                                                 this->GLHEOutletNodeNum,
-                                                 this->GLHEPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, GLHEInletMassFlowRate, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
 
         } // End of cooling
 
-    } else if (LoopNum == this->HWPlantLoc.loopNum) {                   // Hot water loop
+    } else if (LoopNum == this->HWPlantLoc.loopNum) {          // Hot water loop
         if (this->ControlMode == CondenserType::SmartMixing) { // Chiller heater component
             if (CurHeatingLoad > 0.0 && HWInletMassFlowRate > 0.0) {
 
@@ -3307,23 +3279,12 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
                 } // End of calculations
 
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     CHWInletMassFlowRate,
-                                                     this->CHWInletNodeNum,
-                                                     this->CHWOutletNodeNum,
-                                                     this->CWPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, CHWInletMassFlowRate, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
 
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     HWInletMassFlowRate,
-                                                     this->HWInletNodeNum,
-                                                     this->HWOutletNodeNum,
-                                                     this->HWPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
 
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     GLHEInletMassFlowRate,
-                                                     this->GLHEInletNodeNum,
-                                                     this->GLHEOutletNodeNum,
-                                                     this->GLHEPlantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, GLHEInletMassFlowRate, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
 
                 // Local variables
                 this->Report.CHWInletTemp = CHWInletTemp;
@@ -3413,23 +3374,13 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                     this->Report.HeatingRate = WrapperHeatRate;
                     this->Report.GLHERate = WrapperGLHERate;
 
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         CHWInletMassFlowRate,
-                                                         this->CHWInletNodeNum,
-                                                         this->CHWOutletNodeNum,
-                                                         this->CWPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, CHWInletMassFlowRate, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
 
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         HWInletMassFlowRate,
-                                                         this->HWInletNodeNum,
-                                                         this->HWOutletNodeNum,
-                                                         this->HWPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
 
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         GLHEInletMassFlowRate,
-                                                         this->GLHEInletNodeNum,
-                                                         this->GLHEOutletNodeNum,
-                                                         this->GLHEPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, GLHEInletMassFlowRate, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
                 }
 
             } // Heating loop calculation

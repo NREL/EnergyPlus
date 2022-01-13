@@ -120,16 +120,16 @@ namespace UnitVentilator {
         Real64 MaxHotWaterFlow;    // kg/s
         Real64 MaxHotSteamFlow;
         Real64 MinHotSteamFlow;
-        Real64 MinVolHotWaterFlow;              // m3/s
-        Real64 MinVolHotSteamFlow;              // m3/s
-        Real64 MinHotWaterFlow;                 // kg/s
-        int HotControlNode;                     // hot water control node
-        int HotCoilOutNodeNum;                  // outlet of coil
-        Real64 HotControlOffset;                // control tolerance
-        PlantLocation HWplantLoc;             // index for plant location for hot water coil
-        bool CCoilPresent;                      // .TRUE. if unit ventilator has a cooling coil
-        std::string CCoilName;                  // name of cooling coil
-        std::string CCoilTypeCh;                // type of cooling coil as character string (same as on idf file)
+        Real64 MinVolHotWaterFlow; // m3/s
+        Real64 MinVolHotSteamFlow; // m3/s
+        Real64 MinHotWaterFlow;    // kg/s
+        int HotControlNode;        // hot water control node
+        int HotCoilOutNodeNum;     // outlet of coil
+        Real64 HotControlOffset;   // control tolerance
+        PlantLocation HWplantLoc;  // index for plant location for hot water coil
+        bool CCoilPresent;         // .TRUE. if unit ventilator has a cooling coil
+        std::string CCoilName;     // name of cooling coil
+        std::string CCoilTypeCh;   // type of cooling coil as character string (same as on idf file)
         int CCoil_Index;
         std::string CCoilPlantName; // name of cooling coil for plant
         std::string CCoilPlantType; // type of cooling coil for plant
@@ -140,14 +140,14 @@ namespace UnitVentilator {
         std::string CCoilSchedName; // availability schedule for the cooling coil
         int CCoilSchedPtr;          // index to schedule
         Real64 CCoilSchedValue;
-        Real64 MaxVolColdWaterFlow;             // m3/s
-        Real64 MaxColdWaterFlow;                // kg/s
-        Real64 MinVolColdWaterFlow;             // m3/s
-        Real64 MinColdWaterFlow;                // kg/s
-        int ColdControlNode;                    // chilled water control node
-        int ColdCoilOutNodeNum;                 // chilled water coil out node
-        Real64 ColdControlOffset;               // control tolerance
-        PlantLocation CWPlantLoc;                          // index for plant component for chilled water coil
+        Real64 MaxVolColdWaterFlow; // m3/s
+        Real64 MaxColdWaterFlow;    // kg/s
+        Real64 MinVolColdWaterFlow; // m3/s
+        Real64 MinColdWaterFlow;    // kg/s
+        int ColdControlNode;        // chilled water control node
+        int ColdCoilOutNodeNum;     // chilled water coil out node
+        Real64 ColdControlOffset;   // control tolerance
+        PlantLocation CWPlantLoc;   // index for plant component for chilled water coil
         // Report data
         Real64 HeatPower;  // unit heating output in watts
         Real64 HeatEnergy; // unit heating output in J

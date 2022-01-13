@@ -60,7 +60,7 @@ namespace EnergyPlus {
 namespace PlantCondLoopOperation {
 
     void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                     PlantLocation const &plantLoc,                             // PlantLoop data structure Location struct
+                                     PlantLocation const &plantLoc, // PlantLoop data structure Location struct
                                      Real64 &LoopDemand,
                                      Real64 &RemLoopDemand,
                                      bool const FirstHVACIteration,
@@ -158,12 +158,10 @@ namespace PlantCondLoopOperation {
 
     void SetupPlantEMSActuators(EnergyPlusData &state);
 
-    void ActivateEMSControls(EnergyPlusData &state,
-                             PlantLocation const &plantLoc,
-                             bool &LoopShutDownFlag);
+    void ActivateEMSControls(EnergyPlusData &state, PlantLocation const &plantLoc, bool &LoopShutDownFlag);
 
     void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
-                                         PlantLocation const & plantLoc,
+                                         PlantLocation const &plantLoc,
                                          Real64 &ChangeInLoad // positive magnitude of load change
     );
 

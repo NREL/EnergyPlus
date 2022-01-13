@@ -97,14 +97,14 @@ namespace SteamBaseboardRadiator {
         Real64 FracConvect;          // Fraction for convective heat addition
         Real64 FracDistribPerson;    // Fraction for radiant heat incident on people
         Array1D<Real64> FracDistribToSurf;
-        Real64 TotPower;                         // Convective system impact rate that the heater actually meets [W]
-        Real64 Power;                            // Maximum heating rate [W]
-        Real64 ConvPower;                        // Convective heating rate [W]
-        Real64 RadPower;                         // Radiant heating rate [W]
-        Real64 TotEnergy;                        // Convective system impact energy [J]
-        Real64 Energy;                           // Maximum heating energy [J]
-        Real64 ConvEnergy;                       // Convective heating energy [J]
-        Real64 RadEnergy;                        // Radiant heating energy [J]
+        Real64 TotPower;   // Convective system impact rate that the heater actually meets [W]
+        Real64 Power;      // Maximum heating rate [W]
+        Real64 ConvPower;  // Convective heating rate [W]
+        Real64 RadPower;   // Radiant heating rate [W]
+        Real64 TotEnergy;  // Convective system impact energy [J]
+        Real64 Energy;     // Maximum heating energy [J]
+        Real64 ConvEnergy; // Convective heating energy [J]
+        Real64 RadEnergy;  // Radiant heating energy [J]
         PlantLocation plantLoc;
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;

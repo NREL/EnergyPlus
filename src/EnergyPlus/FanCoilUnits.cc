@@ -1171,15 +1171,24 @@ namespace FanCoilUnits {
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
-                ScanPlantLoopsForObject(
-                    state, FanCoil(FanCoilNum).HCoilName, FanCoil(FanCoilNum).HCoilPlantTypeOf, FanCoil(FanCoilNum).HeatCoilPlantLoc, errFlag, _, _, _, _, _);
+                ScanPlantLoopsForObject(state,
+                                        FanCoil(FanCoilNum).HCoilName,
+                                        FanCoil(FanCoilNum).HCoilPlantTypeOf,
+                                        FanCoil(FanCoilNum).HeatCoilPlantLoc,
+                                        errFlag,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _);
 
                 if (errFlag) {
                     ShowContinueError(state, "Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
                 }
 
-                FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum = DataPlant::CompData::getPlantComponent(state, FanCoil(FanCoilNum).HeatCoilPlantLoc).NodeNumOut;
+                FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum =
+                    DataPlant::CompData::getPlantComponent(state, FanCoil(FanCoilNum).HeatCoilPlantLoc).NodeNumOut;
 
             } else if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Electric) {
                 // do nothing, valid type
@@ -1189,14 +1198,22 @@ namespace FanCoilUnits {
 
             if ((FanCoil(FanCoilNum).CCoilPlantType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                 (FanCoil(FanCoilNum).CCoilPlantType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
-                ScanPlantLoopsForObject(
-                    state, FanCoil(FanCoilNum).CCoilPlantName, FanCoil(FanCoilNum).CCoilPlantType, FanCoil(FanCoilNum).CoolCoilPlantLoc, errFlag, _, _, _, _, _);
+                ScanPlantLoopsForObject(state,
+                                        FanCoil(FanCoilNum).CCoilPlantName,
+                                        FanCoil(FanCoilNum).CCoilPlantType,
+                                        FanCoil(FanCoilNum).CoolCoilPlantLoc,
+                                        errFlag,
+                                        _,
+                                        _,
+                                        _,
+                                        _,
+                                        _);
                 if (errFlag) {
                     ShowContinueError(state, "Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
                 }
-                FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum = DataPlant::CompData::getPlantComponent(state, FanCoil(FanCoilNum).CoolCoilPlantLoc)
-                                                                     .NodeNumOut;
+                FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum =
+                    DataPlant::CompData::getPlantComponent(state, FanCoil(FanCoilNum).CoolCoilPlantLoc).NodeNumOut;
             } else {
                 ShowFatalError(state, "InitFanCoilUnits: FanCoil=" + FanCoil(FanCoilNum).Name + ", invalid cooling coil type. Program terminated.");
             }
@@ -2375,8 +2392,9 @@ namespace FanCoilUnits {
                                      FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                      FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
                                      FanCoil(FanCoilNum).CoolCoilPlantLoc);
-                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).LoopSide(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum).FlowLock ==
-                    DataPlant::FlowLock::Locked) {
+                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum)
+                        .LoopSide(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum)
+                        .FlowLock == DataPlant::FlowLock::Locked) {
                     ColdFlowLocked = true; // check for flow lock
                 }
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
@@ -2386,8 +2404,9 @@ namespace FanCoilUnits {
                                          FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                          FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
                                          FanCoil(FanCoilNum).HeatCoilPlantLoc);
-                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).LoopSide(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum).FlowLock ==
-                        DataPlant::FlowLock::Locked) {
+                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum)
+                            .LoopSide(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum)
+                            .FlowLock == DataPlant::FlowLock::Locked) {
                         HotFlowLocked = true; // save locked flow
                     }
                 }
@@ -2740,8 +2759,9 @@ namespace FanCoilUnits {
                                      FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                      FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
                                      FanCoil(FanCoilNum).CoolCoilPlantLoc);
-                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).LoopSide(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum).FlowLock ==
-                    DataPlant::FlowLock::Locked) {
+                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum)
+                        .LoopSide(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum)
+                        .FlowLock == DataPlant::FlowLock::Locked) {
                     ColdFlowLocked = true; // check for flow lock
                 }
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
@@ -2751,8 +2771,9 @@ namespace FanCoilUnits {
                                          FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                          FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
                                          FanCoil(FanCoilNum).HeatCoilPlantLoc);
-                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).LoopSide(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum).FlowLock ==
-                        DataPlant::FlowLock::Locked) {
+                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum)
+                            .LoopSide(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum)
+                            .FlowLock == DataPlant::FlowLock::Locked) {
                         HotFlowLocked = true; // save locked flow
                     }
                 }

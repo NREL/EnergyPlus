@@ -10812,8 +10812,7 @@ void RefrigCondenserData::simulate(EnergyPlusData &state,
 
     } // on flow type
     // check against plant, might get changed.
-    PlantUtilities::SetComponentFlowRate(
-        state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoc);
 
     this->VolFlowRate = this->MassFlowRate / rho;
 
@@ -10971,8 +10970,7 @@ void RefrigRackData::simulate(EnergyPlusData &state,
 
     } // on flow type
     // check against plant, might get changed.
-    PlantUtilities::SetComponentFlowRate(
-        state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, PlantInletNode, PlantOutletNode, PlantLoc);
 
     this->VolFlowRate = this->MassFlowRate / rho;
 
@@ -15633,11 +15631,8 @@ void ZeroHVACValues(EnergyPlusData &state)
         for (int RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
             if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
                 Real64 MassFlowRate = 0.0;
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     MassFlowRate,
-                                                     RefrigRack(RackNum).InletNode,
-                                                     RefrigRack(RackNum).OutletNode,
-                                                     RefrigRack(RackNum).plantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, MassFlowRate, RefrigRack(RackNum).InletNode, RefrigRack(RackNum).OutletNode, RefrigRack(RackNum).plantLoc);
             }
             if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if (RefrigRack(RackNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
@@ -15654,11 +15649,8 @@ void ZeroHVACValues(EnergyPlusData &state)
         for (int CondID = 1; CondID <= state.dataRefrigCase->NumRefrigCondensers; ++CondID) {
             if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
                 Real64 MassFlowRate = 0.0;
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     MassFlowRate,
-                                                     Condenser(CondID).InletNode,
-                                                     Condenser(CondID).OutletNode,
-                                                     Condenser(CondID).plantLoc);
+                PlantUtilities::SetComponentFlowRate(
+                    state, MassFlowRate, Condenser(CondID).InletNode, Condenser(CondID).OutletNode, Condenser(CondID).plantLoc);
             }
             if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if (Condenser(CondID).EvapWaterSupplyMode == WaterSupply::FromTank) {

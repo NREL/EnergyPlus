@@ -4186,8 +4186,8 @@ void InitPTUnit(EnergyPlusData &state,
             }
 
             // fill outlet node for coil
-            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc)
-                                                                        .NodeNumOut;
+            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode =
+                DataPlant::CompData::getPlantComponent(state, state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc).NodeNumOut;
             state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidOutletNodeNum = state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode;
             MyPlantScanFlag(PTUnitNum) = false;
 
@@ -4247,8 +4247,8 @@ void InitPTUnit(EnergyPlusData &state,
                 }
             }
             // fill outlet node for coil
-            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = DataPlant::CompData::getPlantComponent(state, state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc)
-                                                                        .NodeNumOut;
+            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode =
+                DataPlant::CompData::getPlantComponent(state, state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc).NodeNumOut;
             MyPlantScanFlag(PTUnitNum) = false;
         } else { // pthp not connected to plant
             MyPlantScanFlag(PTUnitNum) = false;

@@ -188,7 +188,8 @@ void SimPumps(EnergyPlusData &state,
     InitializePumps(state, PumpNum);
 
     // If all we need is to set outlet min/max avail, then just do it and get out.  Also, we only do min/max avail on flow query
-    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::PumpQuery) {
+    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopSideNum).FlowLock ==
+        DataPlant::FlowLock::PumpQuery) {
         SetupPumpMinMaxFlows(state, LoopNum, PumpNum);
         return;
     }
@@ -1496,8 +1497,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
         if (errFlag) {
             ShowFatalError(state, "InitializePumps: Program terminated due to previous condition(s).");
         }
-        DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc)
-            .CompNum = PumpNum;
+        DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc).CompNum = PumpNum;
 
         SizePump(state, PumpNum);
 
@@ -1567,8 +1567,8 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
 
         if (state.dataPumps->PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
             // reset flow priority appropriately (default was for Intermittent)
-            DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc)
-                .FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
+            DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc).FlowPriority =
+                DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
         }
 
         state.dataPumps->PumpEquip(PumpNum).PumpOneTimeFlag = false;
@@ -1912,8 +1912,8 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     //  ! If this is a variable speed pump
     if (BITF_TEST_ANY(BITF(state.dataPumps->PumpEquip(PumpNum).pumpType),
                       BITF(PumpType::VarSpeed) | BITF(PumpType::Bank_VarSpeed) | BITF(PumpType::Cond))) {
-        if (DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc)
-                .FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) {
+        if (DataPlant::CompData::getPlantComponent(state, state.dataPumps->PumpEquip(PumpNum).plantLoc).FlowCtrl ==
+            DataBranchAirLoopPlant::ControlType::SeriesActive) {
             state.dataPumps->PumpMassFlowRate = 0.0;
         }
     }
@@ -1922,11 +1922,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     state.dataPumps->PumpMassFlowRate = min(state.dataPumps->PumpEquip(PumpNum).MassFlowRateMax, state.dataPumps->PumpMassFlowRate);
     state.dataPumps->PumpMassFlowRate = max(state.dataPumps->PumpEquip(PumpNum).MassFlowRateMin, state.dataPumps->PumpMassFlowRate);
 
-    SetComponentFlowRate(state,
-                         state.dataPumps->PumpMassFlowRate,
-                         InletNode,
-                         OutletNode,
-                         state.dataPumps->PumpEquip(PumpNum).plantLoc);
+    SetComponentFlowRate(state, state.dataPumps->PumpMassFlowRate, InletNode, OutletNode, state.dataPumps->PumpEquip(PumpNum).plantLoc);
 
     // Get RPM value for reporting as output
     // RPM is calculated using pump affinity laws for rotation speed
@@ -2074,7 +2070,8 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
                 ShowContinueError(state, "Check efficiency inputs for this pump component.");
                 ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
             }
-            state.dataPumps->Power = VolFlowRate * state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).PressureDrop / TotalEffic;
+            state.dataPumps->Power =
+                VolFlowRate * state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).PressureDrop / TotalEffic;
         }
     }
 
@@ -2175,25 +2172,30 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
         // might be able to remove this next block
         if (state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum > 0) {
             for (DataPlant::LoopSideLocation Side : DataPlant::LoopSideKeys) {
-                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).LoopSide(Side).TotalBranches;
+                for (BranchNum = 1;
+                     BranchNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).LoopSide(Side).TotalBranches;
                      ++BranchNum) {
-                    for (CompNum = 1;
-                         CompNum <=
-                         state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).LoopSide(Side).Branch(BranchNum).TotalComponents;
+                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
+                                                     .LoopSide(Side)
+                                                     .Branch(BranchNum)
+                                                     .TotalComponents;
                          ++CompNum) {
-                        if (state.dataPumps->PumpEquip(PumpNum).InletNodeNum == state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
-                                                                                    .LoopSide(Side)
-                                                                                    .Branch(BranchNum)
-                                                                                    .Comp(CompNum)
-                                                                                    .NodeNumIn &&
+                        if (state.dataPumps->PumpEquip(PumpNum).InletNodeNum ==
+                                state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
+                                    .LoopSide(Side)
+                                    .Branch(BranchNum)
+                                    .Comp(CompNum)
+                                    .NodeNumIn &&
                             state.dataPumps->PumpEquip(PumpNum).OutletNodeNum ==
                                 state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
                                     .LoopSide(Side)
                                     .Branch(BranchNum)
                                     .Comp(CompNum)
                                     .NodeNumOut) {
-                            if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).LoopSide(Side).Branch(BranchNum).PumpSizFac >
-                                0.0) {
+                            if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
+                                    .LoopSide(Side)
+                                    .Branch(BranchNum)
+                                    .PumpSizFac > 0.0) {
                                 PumpSizFac = state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum)
                                                  .LoopSide(Side)
                                                  .Branch(BranchNum)
@@ -2490,7 +2492,8 @@ void GetRequiredMassFlowRate(EnergyPlusData &state,
     // Calculate maximum and minimum mass flow rate associated with maximun and minimum RPM
     if (state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum > 0) {
         if (state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).UsePressureForPumpCalcs &&
-            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).PressureSimType == DataPlant::PressSimType::FlowCorrection &&
+            state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).PressureSimType ==
+                DataPlant::PressSimType::FlowCorrection &&
             state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).plantLoc.loopNum).PressureDrop > 0.0) {
             state.dataPumps->PumpEquip(PumpNum).PumpMassFlowRateMaxRPM =
                 ResolveLoopFlowVsPressure(state,

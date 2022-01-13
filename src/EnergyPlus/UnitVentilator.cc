@@ -1529,8 +1529,7 @@ namespace UnitVentilator {
                 }
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum =
-                    DataPlant::CompData::getPlantComponent(state, state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc)
-                        .NodeNumOut;
+                    DataPlant::CompData::getPlantComponent(state, state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc).NodeNumOut;
             }
             if ((state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                 (state.dataUnitVentilators->UnitVent(UnitVentNum).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
@@ -1552,8 +1551,7 @@ namespace UnitVentilator {
                 }
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ColdCoilOutNodeNum =
-                    DataPlant::CompData::getPlantComponent(state, state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc)
-                        .NodeNumOut;
+                    DataPlant::CompData::getPlantComponent(state, state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc).NodeNumOut;
             } else {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPresent)
                     ShowFatalError(state,
@@ -2427,12 +2425,12 @@ namespace UnitVentilator {
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                                     DesHeatingLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 }
-                                rho =
-                                    GetDensityGlycol(state,
-                                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidName,
-                                                     DataGlobalConstants::HWInitConvTemp,
-                                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidIndex,
-                                                     RoutineName);
+                                rho = GetDensityGlycol(
+                                    state,
+                                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidName,
+                                    DataGlobalConstants::HWInitConvTemp,
+                                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidIndex,
+                                    RoutineName);
                                 Cp = GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).HWplantLoc.loopNum).FluidName,
@@ -2741,12 +2739,12 @@ namespace UnitVentilator {
                                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                                     DesCoolingLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                                 }
-                                rho =
-                                    GetDensityGlycol(state,
-                                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopNum).FluidName,
-                                                     5.,
-                                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopNum).FluidIndex,
-                                                     RoutineName);
+                                rho = GetDensityGlycol(
+                                    state,
+                                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopNum).FluidName,
+                                    5.,
+                                    state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopNum).FluidIndex,
+                                    RoutineName);
                                 Cp = GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataUnitVentilators->UnitVent(UnitVentNum).CWPlantLoc.loopNum).FluidName,

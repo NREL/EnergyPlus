@@ -469,17 +469,17 @@ namespace UnitarySystems {
         int CoolCoilInletNodeNum;        // Cooling coil air inlet node number
         int CoolCoilOutletNodeNum;       // Cooling coil air outlet node number
         int CoolCoilFluidOutletNodeNum;  // Cooling coil fluid outlet node number (from Plant Loop data)
-        PlantLocation CoolCoilPlantLoc;// Location of the cooling coil in the plant loop
-        int CoolCoilFluidInletNode;                                                         // Cooling coil fluid inlet node
-        PlantLocation HeatCoilPlantLoc;// Location of the heating coil in the plant loop
-        int HeatCoilFluidInletNode;                                                         // Heating coil fluid inlet node
-        int HeatCoilFluidOutletNodeNum; // Heating coil fluid outlet node number (from Plant Loop data)
-        int HeatCoilInletNodeNum;       // Heating coil air inlet node number
-        int HeatCoilOutletNodeNum;      // Heating coil air outlet node number
-        bool ATMixerExists;             // true if AT mixer is connected to Unitary System
-        int ATMixerType;                // type of AT mixer, inlet-side or supply-side
-        int ATMixerOutNode;             // AT mixer outlet node number
-        Real64 ControlZoneMassFlowFrac; // fraction of air flow to the control zone
+        PlantLocation CoolCoilPlantLoc;  // Location of the cooling coil in the plant loop
+        int CoolCoilFluidInletNode;      // Cooling coil fluid inlet node
+        PlantLocation HeatCoilPlantLoc;  // Location of the heating coil in the plant loop
+        int HeatCoilFluidInletNode;      // Heating coil fluid inlet node
+        int HeatCoilFluidOutletNodeNum;  // Heating coil fluid outlet node number (from Plant Loop data)
+        int HeatCoilInletNodeNum;        // Heating coil air inlet node number
+        int HeatCoilOutletNodeNum;       // Heating coil air outlet node number
+        bool ATMixerExists;              // true if AT mixer is connected to Unitary System
+        int ATMixerType;                 // type of AT mixer, inlet-side or supply-side
+        int ATMixerOutNode;              // AT mixer outlet node number
+        Real64 ControlZoneMassFlowFrac;  // fraction of air flow to the control zone
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;

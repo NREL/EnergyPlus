@@ -179,14 +179,14 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).WaterMassFlowRate = 0.0;
             // init hot water flow rate to zero
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state,                                      DummyMdot,                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,                                      baseboard->Baseboard(BaseboardNum).plantLoc,
-                                      false);
+            SetActuatedBranchFlowRate(
+                state, DummyMdot, baseboard->Baseboard(BaseboardNum).WaterInletNode, baseboard->Baseboard(BaseboardNum).plantLoc, false);
 
         } else {
             // init hot water flow rate to zero
             DummyMdot = 0.0;
-            SetActuatedBranchFlowRate(state,                                      DummyMdot,                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,                                      baseboard->Baseboard(BaseboardNum).plantLoc,
-                                      true);
+            SetActuatedBranchFlowRate(
+                state, DummyMdot, baseboard->Baseboard(BaseboardNum).WaterInletNode, baseboard->Baseboard(BaseboardNum).plantLoc, true);
 
             // On the first HVAC iteration the system values are given to the controller, but after that
             // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1164,8 +1164,8 @@ namespace BaseboardRadiator {
             baseboard->Baseboard(BaseboardNum).WaterOutletEnthalpy = baseboard->Baseboard(BaseboardNum).WaterInletEnthalpy;
             WaterMassFlowRate = 0.0;
 
-            SetActuatedBranchFlowRate(state,                                      WaterMassFlowRate,                                      baseboard->Baseboard(BaseboardNum).WaterInletNode,                                      baseboard->Baseboard(BaseboardNum).plantLoc,
-                                      false);
+            SetActuatedBranchFlowRate(
+                state, WaterMassFlowRate, baseboard->Baseboard(BaseboardNum).WaterInletNode, baseboard->Baseboard(BaseboardNum).plantLoc, false);
             AirMassFlowRate = 0.0;
         }
 

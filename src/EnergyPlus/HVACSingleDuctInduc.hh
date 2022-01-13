@@ -93,37 +93,37 @@ namespace HVACSingleDuctInduc {
         std::string HCoil;          // name of heating coil component
         int HCoil_Num;              // index to this coil
         DataPlant::PlantEquipmentType HeatingCoilType;
-        Real64 MaxVolHotWaterFlow;              // m3/s (autosizable)
-        Real64 MaxHotWaterFlow;                 // kg/s
-        Real64 MinVolHotWaterFlow;              // m3/s
-        Real64 MinHotWaterFlow;                 // kg/s
-        Real64 HotControlOffset;                // control tolerance
-        PlantLocation HWPlantLoc;          // index for plant location for hot water coil
-        int HWCoilFailNum1;                     // index for errors
-        int HWCoilFailNum2;                     // index for errors
-        std::string CCoilType;                  // type of cooling coil component
-        std::string CCoil;                      // name of cooling coil component
-        int CCoil_Num;                          // index to this coil
+        Real64 MaxVolHotWaterFlow; // m3/s (autosizable)
+        Real64 MaxHotWaterFlow;    // kg/s
+        Real64 MinVolHotWaterFlow; // m3/s
+        Real64 MinHotWaterFlow;    // kg/s
+        Real64 HotControlOffset;   // control tolerance
+        PlantLocation HWPlantLoc;  // index for plant location for hot water coil
+        int HWCoilFailNum1;        // index for errors
+        int HWCoilFailNum2;        // index for errors
+        std::string CCoilType;     // type of cooling coil component
+        std::string CCoil;         // name of cooling coil component
+        int CCoil_Num;             // index to this coil
         DataPlant::PlantEquipmentType CoolingCoilType;
-        Real64 MaxVolColdWaterFlow;             // m3/s (autosizable)
-        Real64 MaxColdWaterFlow;                // kg/s
-        Real64 MinVolColdWaterFlow;             // m3/s
-        Real64 MinColdWaterFlow;                // kg/s
-        Real64 ColdControlOffset;               // control tolerance
-        PlantLocation CWPlantLoc;                         // index for plant component for chilled water coil
-        int CWCoilFailNum1;                     // index for errors
-        int CWCoilFailNum2;                     // index for errors
-        std::string MixerName;                  // name of air mixer component
-        int Mixer_Num;                          // index to this mixer
-        Real64 MaxPriAirMassFlow;               // kg/s
-        Real64 MaxSecAirMassFlow;               // kg/s
-        int ADUNum;                             // index of corresponding air distribution unit
-        Real64 DesCoolingLoad;                  // used for reporting during coil sizing
-        Real64 DesHeatingLoad;                  // used for reporting during coil sizing
-        int CtrlZoneNum;                        // Pointer to CtrlZone data structure
-        int CtrlZoneInNodeIndex;                // which controlled zone inlet node number corresponds with this unit
-        int AirLoopNum;                         // index to airloop that this terminal unit is connected to
-        Real64 OutdoorAirFlowRate;              // zone outdoor air volume flow rate
+        Real64 MaxVolColdWaterFlow; // m3/s (autosizable)
+        Real64 MaxColdWaterFlow;    // kg/s
+        Real64 MinVolColdWaterFlow; // m3/s
+        Real64 MinColdWaterFlow;    // kg/s
+        Real64 ColdControlOffset;   // control tolerance
+        PlantLocation CWPlantLoc;   // index for plant component for chilled water coil
+        int CWCoilFailNum1;         // index for errors
+        int CWCoilFailNum2;         // index for errors
+        std::string MixerName;      // name of air mixer component
+        int Mixer_Num;              // index to this mixer
+        Real64 MaxPriAirMassFlow;   // kg/s
+        Real64 MaxSecAirMassFlow;   // kg/s
+        int ADUNum;                 // index of corresponding air distribution unit
+        Real64 DesCoolingLoad;      // used for reporting during coil sizing
+        Real64 DesHeatingLoad;      // used for reporting during coil sizing
+        int CtrlZoneNum;            // Pointer to CtrlZone data structure
+        int CtrlZoneInNodeIndex;    // which controlled zone inlet node number corresponds with this unit
+        int AirLoopNum;             // index to airloop that this terminal unit is connected to
+        Real64 OutdoorAirFlowRate;  // zone outdoor air volume flow rate
 
         // Default Constructor
         IndUnitData()

@@ -822,11 +822,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
     if (!this->A42Model.InternalFlowControl) {
 
         Real64 mdot = this->PlantMassFlowRateMax;
-        PlantUtilities::SetComponentFlowRate(            state,
- mdot,
- this->PlantInletNodeID,
- this->PlantOutletNodeID,
- this->CWPlantLoc);
+        PlantUtilities::SetComponentFlowRate(state, mdot, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc);
         this->PlantMassFlowRate = mdot;
     }
 }
@@ -921,11 +917,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             MdotAir = 0.0;
 
             MdotCW = 0.0;
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 MdotCW,
-                                                 this->PlantInletNodeID,
-                                                 this->PlantOutletNodeID,
-                                                 this->CWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, MdotCW, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc);
             this->PlantMassFlowRate = MdotCW;
 
         } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeStandby) {
@@ -943,11 +935,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
             MdotAir = 0.0;
 
             MdotCW = 0.0;
-            PlantUtilities::SetComponentFlowRate(state,
-                                                 MdotCW,
-                                                 this->PlantInletNodeID,
-                                                 this->PlantOutletNodeID,
-                                                 this->CWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, MdotCW, this->PlantInletNodeID, this->PlantOutletNodeID, this->CWPlantLoc);
             this->PlantMassFlowRate = MdotCW;
 
         } else if (SELECT_CASE_var == DataGenerators::OperatingMode::OpModeWarmUp) {
@@ -1206,8 +1194,11 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
         Teng = FuncDetermineEngineTemp(
             TcwOut, this->A42Model.MCeng, this->A42Model.UAhx, this->A42Model.UAskin, thisAmbientTemp, Qgenss, this->A42Model.TengLast, dt);
 
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName, TcwIn, state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex, RoutineName);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
+                                                           TcwIn,
+                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+                                                           RoutineName);
 
         TcwOut =
             FuncDetermineCoolantWaterExitTemp(TcwIn, this->A42Model.MCcw, this->A42Model.UAhx, MdotCW * Cp, Teng, this->A42Model.TempCWOutLast, dt);
@@ -1524,8 +1515,7 @@ void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
             if (!this->A42Model.InternalFlowControl) {
                 // IF this is on the supply side and not internal flow control then reset flow priority to lower
                 if (this->CWPlantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
-                    DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc)
-                        .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+                    DataPlant::CompData::getPlantComponent(state, this->CWPlantLoc).FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                 }
             }
 
