@@ -114,8 +114,6 @@ void UpdateHVACInterface(EnergyPlusData &state,
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged[0] = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged[0] = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged[0] = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged[0] = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged[0] = false;
 
         Real64 totDemandSideMassFlow = 0.0;
         Real64 totDemandSideMinAvail = 0.0;
@@ -129,7 +127,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue[0] =
             std::abs(totDemandSideMassFlow - state.dataLoopNodes->Node(InletNode).MassFlowRate);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue[0] > DataConvergParams::HVACFlowRateToler) {
@@ -154,13 +152,11 @@ void UpdateHVACInterface(EnergyPlusData &state,
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged[0] = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged[0] = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged[0] = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged[0] = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged[0] = false;
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - state.dataLoopNodes->Node(InletNode).MassFlowRate);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue[0] > DataConvergParams::HVACFlowRateToler) {
@@ -171,7 +167,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumDemandToSupplyTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumDemandToSupplyTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - state.dataLoopNodes->Node(InletNode).HumRat);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumDemandToSupplyTolValue[0] > DataConvergParams::HVACHumRatToler) {
@@ -182,7 +178,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempDemandToSupplyTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempDemandToSupplyTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Temp - state.dataLoopNodes->Node(InletNode).Temp);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempDemandToSupplyTolValue[0] > DataConvergParams::HVACTemperatureToler) {
@@ -192,7 +188,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyDemandToSupplyTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyDemandToSupplyTolValue[0] = std::abs(DeltaEnergy);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (std::abs(DeltaEnergy) > DataConvergParams::HVACEnergyToler) {
@@ -203,22 +199,20 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyDemandToSupplyTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyDemandToSupplyTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyDemandToSupplyTolValue[0] > DataConvergParams::HVACEnthalpyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged[0] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureDemandToSupplyTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureDemandToSupplyTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Press - state.dataLoopNodes->Node(InletNode).Press);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureDemandToSupplyTolValue[0] > DataConvergParams::HVACPressToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged[0] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
@@ -228,13 +222,11 @@ void UpdateHVACInterface(EnergyPlusData &state,
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged[1] = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged[1] = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged[1] = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged[1] = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged[1] = false;
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck1ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck1ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - state.dataLoopNodes->Node(InletNode).MassFlowRate);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACFlowRateToler) {
@@ -245,7 +237,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck1ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck1ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - state.dataLoopNodes->Node(InletNode).HumRat);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACHumRatToler) {
@@ -256,7 +248,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck1ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck1ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Temp - state.dataLoopNodes->Node(InletNode).Temp);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck1ToDemandTolValue[0] >
@@ -267,7 +259,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck1ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck1ToDemandTolValue[0] = DeltaEnergy;
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (std::abs(DeltaEnergy) > DataConvergParams::HVACEnergyToler) {
@@ -278,23 +270,21 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck1ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck1ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck1ToDemandTolValue[0] >
             DataConvergParams::HVACEnthalpyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged[1] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureSupplyDeck1ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureSupplyDeck1ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Press - state.dataLoopNodes->Node(InletNode).Press);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACPressToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged[1] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
@@ -304,13 +294,11 @@ void UpdateHVACInterface(EnergyPlusData &state,
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged[2] = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged[2] = false;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged[2] = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged[2] = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged[2] = false;
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck2ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck2ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - state.dataLoopNodes->Node(InletNode).MassFlowRate);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACFlowRateToler) {
@@ -321,7 +309,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck2ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck2ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - state.dataLoopNodes->Node(InletNode).HumRat);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACHumRatToler) {
@@ -332,7 +320,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck2ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck2ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Temp - state.dataLoopNodes->Node(InletNode).Temp);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck2ToDemandTolValue[0] >
@@ -343,7 +331,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck2ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck2ToDemandTolValue[0] = DeltaEnergy;
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (std::abs(DeltaEnergy) > DataConvergParams::HVACEnergyToler) {
@@ -354,23 +342,21 @@ void UpdateHVACInterface(EnergyPlusData &state,
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck2ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck2ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck2ToDemandTolValue[0] >
             DataConvergParams::HVACEnthalpyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged[2] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
         TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressueSupplyDeck2ToDemandTolValue;
         state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressueSupplyDeck2ToDemandTolValue[0] =
             std::abs(state.dataLoopNodes->Node(OutletNode).Press - state.dataLoopNodes->Node(InletNode).Press);
-        for (int logIndex = 2; logIndex <= DataConvergParams::ConvergLogStackDepth; logIndex++) {
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressueSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
         if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressueSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACPressToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged[2] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
     }

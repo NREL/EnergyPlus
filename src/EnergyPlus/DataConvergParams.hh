@@ -70,7 +70,6 @@ namespace DataConvergParams {
     constexpr Real64 HVACHumRatToler(0.0001);                   // Tolerance for humidity ratio comparisons (kg water/kg dryair)
     constexpr Real64 HVACHumRatSlopeToler(0.00001);             // Slope tolerance for humidity ratio, kg water/kg-dryair/iteration
     constexpr Real64 HVACHumRatOscillationToler(0.00000001);    // tolerance for detecting duplicate humidity ratio in stack
-    constexpr Real64 HVACQualityToler(0.01);                    // Tolerance for fluid quality comparisons (dimensionless)
     constexpr Real64 HVACPressToler(10.0);                      // Tolerance for pressure comparisons (in Pascals)
     constexpr Real64 HVACTemperatureToler(0.01);                // Tolerance for temperature comparisons (in degrees C or K)
     constexpr Real64 HVACTemperatureSlopeToler(0.001);          // Slope tolerance for Temperature, Deg C/iteration
@@ -81,7 +80,6 @@ namespace DataConvergParams {
     constexpr Real64 HVACCpApprox(1004.844); // Air Cp (20C,0.0Kg/Kg) Only for energy Tolerance Calculation
     // Only used to scale the answer for a more intuitive answer for comparison
 
-    constexpr Real64 PlantEnthalpyToler(0.10);  // Tolerance for enthalpy comparisons (in kJ/kgK)
     constexpr Real64 PlantFlowRateToler(0.001); // Tolerance for mass flow rate convergence (in kg/s) [~2 CFM]
     constexpr Real64 PlantFlowRateOscillationToler(0.0000001);
     constexpr Real64 PlantFlowRateSlopeToler(0.0001); // Slope tolerance for mass flow, kg/s/iteration
@@ -93,12 +91,9 @@ namespace DataConvergParams {
 
     constexpr Real64 PlantEnergyToler(10.0); // Tolerance for Energy comparisons (in Watts W)
 
-    constexpr Real64 PlantCpApprox(4180.0); // Approximate Cp used in Interface manager for
-    // Energy Tolerance Calculation, used to scale the answer
-    // for a more intuitive answer for comparison
+    // Energy Tolerance Calculation, used to scale the answer for a more intuitive answer for comparison
     constexpr Real64 PlantFlowFlowRateToler(0.01);    // Tolerance for mass flow rate convergence (in kg/s)
-    constexpr Real64 PlantLowFlowRateToler(0.000001); // Tolerance for low flow rate used for determining when
-    // plant pumps can be shut down
+    constexpr Real64 PlantLowFlowRateToler(0.000001); // Tolerance for low flow rate used for determining when plant pumps can be shut down
 
     constexpr int ConvergLogStackDepth(10);
 
@@ -113,30 +108,17 @@ namespace DataConvergParams {
 
     struct HVACNodeConvergLogStruct
     {
-        // Members
-        int NodeNum;
-        Array1D<Real64> HumidityRatio;
-        Array1D<Real64> MassFlowRate;
-        Array1D<Real64> Temperature;
-
-        // Default Constructor
-        HVACNodeConvergLogStruct()
-            : NodeNum(0), HumidityRatio(ConvergLogStackDepth), MassFlowRate(ConvergLogStackDepth), Temperature(ConvergLogStackDepth)
-        {
-        }
+        int NodeNum = 0;
+        std::array<Real64, ConvergLogStackDepth> HumidityRatio;
+        std::array<Real64, ConvergLogStackDepth> MassFlowRate;
+        std::array<Real64, ConvergLogStackDepth> Temperature;
     };
 
     struct HVACZoneInletConvergenceStruct
     {
-        // Members
         std::string ZoneName;
-        int NumInletNodes; // number of inlet nodes for zone
+        int NumInletNodes = 0; // number of inlet nodes for zone
         Array1D<HVACNodeConvergLogStruct> InletNode;
-
-        // Default Constructor
-        HVACZoneInletConvergenceStruct() : NumInletNodes(0)
-        {
-        }
     };
 
     struct HVACAirLoopIterationConvergenceStruct
@@ -157,18 +139,12 @@ namespace DataConvergParams {
         std::array<Real64, ConvergLogStackDepth> HVACEnergyDemandToSupplyTolValue = {0.0};    // Queue of convergence "results"
         std::array<Real64, ConvergLogStackDepth> HVACEnergySupplyDeck1ToDemandTolValue = {0.0};   // Queue of convergence "results"
         std::array<Real64, ConvergLogStackDepth> HVACEnergySupplyDeck2ToDemandTolValue = {0.0};   // Queue of convergence "results"
-        std::array<bool, 3> HVACEnthalpyNotConverged = {false};                                   // Flag to show energy convergence   or failure
         std::array<Real64, ConvergLogStackDepth> HVACEnthalpyDemandToSupplyTolValue = {0.0};      // Queue of convergence "results"
         std::array<Real64, ConvergLogStackDepth> HVACEnthalpySupplyDeck1ToDemandTolValue = {0.0}; // Queue of convergence "results"
         std::array<Real64, ConvergLogStackDepth> HVACEnthalpySupplyDeck2ToDemandTolValue = {0.0}; // Queue of convergence "results"
-        std::array<bool, 3> HVACPressureNotConverged = {false};                                   // Flag to show energy convergence   or failure
         std::array<Real64, ConvergLogStackDepth> HVACPressureDemandToSupplyTolValue = {0.0};      // Queue of convergence "results"
         std::array<Real64, ConvergLogStackDepth> HVACPressureSupplyDeck1ToDemandTolValue = {0.0}; // Queue of convergence "results"
         std::array<Real64, ConvergLogStackDepth> HVACPressueSupplyDeck2ToDemandTolValue = {0.0};  // Queue of convergence "results"
-        std::array<bool, 3> HVACQualityNotConverged = {false};                                    // Flag to show energy convergence   or failure
-        std::array<Real64, ConvergLogStackDepth> HVACQualityDemandToSupplyTolValue = {0.0};       // Queue of convergence "results"
-        std::array<Real64, ConvergLogStackDepth> HVACQualitSupplyDeck1ToDemandTolValue = {0.0};   // Queue of convergence "results"
-        std::array<Real64, ConvergLogStackDepth> HVACQualitySupplyDeck2ToDemandTolValue = {0.0};  // Queue of convergence "results"
     };
 
     struct PlantIterationConvergenceStruct
@@ -187,8 +163,6 @@ namespace DataConvergParams {
 struct ConvergParamsData : BaseGlobalStruct
 {
 
-    int AirLoopConvergFail = 0;
-
     Real64 MinTimeStepSys = (1.0 / 60.0); // =1 minute
     Real64 MinTimeStepTol = 1.0e-4;       // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
     Real64 MaxZoneTempDiff = 0.3;         // 0.3 C = (1% OF 300 C) = max allowable difference between
@@ -196,14 +170,12 @@ struct ConvergParamsData : BaseGlobalStruct
     int MaxPlantSubIterations = 8;        // Iteration Max for Plant Simulation sub iterations
     int MinPlantSubIterations = 2;        // Iteration Min for Plant Simulation sub iterations
 
-    // Object Data
     Array1D<DataConvergParams::HVACZoneInletConvergenceStruct> ZoneInletConvergence;
     Array1D<DataConvergParams::HVACAirLoopIterationConvergenceStruct> AirLoopConvergence;
     Array1D<DataConvergParams::PlantIterationConvergenceStruct> PlantConvergence;
 
     void clear_state() override
     {
-        this->AirLoopConvergFail = 0;
         this->MinTimeStepSys = (1.0 / 60.0); // =1 minute
         this->MinTimeStepTol = 1.0e-4;       // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
         this->MaxZoneTempDiff = 0.3;         // 0.3 C = (1% OF 300 C) = max allowable difference between
