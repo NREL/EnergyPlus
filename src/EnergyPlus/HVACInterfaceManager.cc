@@ -925,11 +925,11 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
     constexpr int MaxIterLimitCaseA(8);
     constexpr int MaxIterLimitCaseB(4);
 
-    auto &plantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe(plantLoc.loopNum));
-    auto &thisPlantLoop = state.dataPlnt->PlantLoop(plantLoc.loopNum);
-
     // one time setups
     if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
+
+    auto &plantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe(plantLoc.loopNum));
+    auto &thisPlantLoop = state.dataPlnt->PlantLoop(plantLoc.loopNum);
 
     // fill local node indexes
     int const NodeNumPriIn = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
