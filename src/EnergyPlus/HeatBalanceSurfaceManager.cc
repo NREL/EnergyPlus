@@ -814,14 +814,48 @@ void GatherForPredefinedReport(EnergyPlusData &state)
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "Yes");
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, state.dataSurface->WindowShadingControl(curWSC).Name);
                     // shading report
+                    std::vector<std::string> WindowShadingTypeStr = {
+                        "No Shade",  // 0
+                        "Shade Off", // 1
+                        "Interior Shade",
+                        "Switchable Glazing",
+                        "Exterior Shade",
+                        "Exterior Screen",
+                        "Interior Blind",
+                        "Exterior Blind",
+                        "Between Glass Shade",
+                        "Between Glass Blind",
+                    };
+                    std::vector<std::string> WindowShadingControlTypeStr = {"Uncontrolled",
+                                                                            "AlwaysOn",
+                                                                            "AlwaysOff",
+                                                                            "OnIfScheduleAllows",
+                                                                            "OnIfHighSolarOnWindow",
+                                                                            "OnIfHighHorizontalSolar",
+                                                                            "OnIfHighOutdoorAirTemperature",
+                                                                            "OnIfHighZoneAirTemperature",
+                                                                            "OnIfHighZoneCooling",
+                                                                            "OnIfHighGlare",
+                                                                            "MeetDaylightIlluminanceSetpoint",
+                                                                            "OnNightIfLowOutdoorTempAndOffDay",
+                                                                            "OnNightIfLowInsideTempAndOffDay",
+                                                                            "OnNightIfHeatingAndOffDay",
+                                                                            "OnNightIfLowOutdoorTempAndOnDayIfCooling",
+                                                                            "OnNightIfHeatingAndOnDayIfCooling",
+                                                                            "OffNightAndOnDayIfCoolingAndHighSolarOnWindow",
+                                                                            "OnNightAndOnDayIfCoolingAndHighSolarOnWindow",
+                                                                            "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
+                                                                            "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
+                                                                            "OnIfHighZoneAirTempAndHighSolarOnWindow",
+                                                                            "OnIfHighZoneAirTempAndHighHorizontalSolar"};
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscShading,
                                      surfName,
-                                     WindowShadingTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).ShadingType)]);
+                                     WindowShadingTypeStr[int(state.dataSurface->WindowShadingControl(curWSC).ShadingType)]);
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWscControl,
                                      surfName,
-                                     WindowShadingControlTypeNames[int(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType)]);
+                                     WindowShadingControlTypeStr[int(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType)]);
 
                     // output list of all possible shading contructions for shaded windows including those with storms
                     std::string names = "";
