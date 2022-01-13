@@ -109,7 +109,7 @@ bool MatchAndSetColorTextString(EnergyPlusData &state,
     return true;
 }
 
-void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, std::string const &ColorType)
+void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, std::string_view const ColorType)
 {
 
     // SUBROUTINE INFORMATION:
