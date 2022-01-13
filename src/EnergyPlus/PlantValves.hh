@@ -82,10 +82,7 @@ namespace PlantValves {
         Real64 SetPointTemp = 0.0;      // setpoint Temperatures [C] at control node.
         Real64 MixedMassFlowRate = 0.0; // Flow rate downstream of mixer [kg/s]
         // loop topology variables
-        int LoopNum = 0;
-        DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid;
-        int BranchNum = 0;
-        int CompNum = 0;
+        PlantLocation plantLoc{};
         bool compDelayedInitFlag = true;
 
         TemperValveData() = default;
