@@ -67,9 +67,9 @@ namespace EnergyPlus::DataSurfaceColors {
 // other surface reporting.
 
 bool MatchAndSetColorTextString(EnergyPlusData &state,
-                                std::string const &String,   // string to be matched
-                                int const SetValue,          // value to be used for the color
-                                std::string const &ColorType // for now, must be DXF
+                                std::string const &String,       // string to be matched
+                                int const SetValue,              // value to be used for the color
+                                std::string_view const ColorType // for now, must be DXF and probably not a string in the future
 )
 {
 
