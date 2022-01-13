@@ -949,7 +949,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) =
                     static_cast<AirLoopHVACZone>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
-                if (state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) == AirLoopHVACZone::Invalid) {
+                if (state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) == AirLoopHVACZone::Invalid) {
                     ShowSevereError(state, CurrentModuleObject + ": Invalid input =\"" + AlphArray(Counter));
                 }
             } else {
