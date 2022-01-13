@@ -971,8 +971,8 @@ void SimHVAC(EnergyPlusData &state)
 
                 for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
 
-                    auto & arrayRef = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACMassFlowNotConverged;
-                    if (std::any_of(std::begin(arrayRef), std::end(arrayRef), [](bool i) {return i;})) {
+                    auto &arrayRef = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACMassFlowNotConverged;
+                    if (std::any_of(std::begin(arrayRef), std::end(arrayRef), [](bool i) { return i; })) {
 
                         ShowContinueError(state,
                                           "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
@@ -1005,8 +1005,8 @@ void SimHVAC(EnergyPlusData &state)
                         }
                     } // mass flow rate not converged
 
-                    auto & arrayRef2 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumRatNotConverged;
-                    if (std::any_of(std::begin(arrayRef2), std::end(arrayRef2), [](bool i) {return i;})) {
+                    auto &arrayRef2 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACHumRatNotConverged;
+                    if (std::any_of(std::begin(arrayRef2), std::end(arrayRef2), [](bool i) { return i; })) {
 
                         ShowContinueError(state,
                                           "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
@@ -1038,8 +1038,8 @@ void SimHVAC(EnergyPlusData &state)
                         }
                     } // humidity ratio not converged
 
-                    auto & arrayRef3 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempNotConverged;
-                    if (std::any_of(std::begin(arrayRef3), std::end(arrayRef3), [](bool i) {return i;})) {
+                    auto &arrayRef3 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACTempNotConverged;
+                    if (std::any_of(std::begin(arrayRef3), std::end(arrayRef3), [](bool i) { return i; })) {
 
                         ShowContinueError(state,
                                           "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
@@ -1071,8 +1071,8 @@ void SimHVAC(EnergyPlusData &state)
                         }
                     } // Temps not converged
 
-                    auto & arrayRef4 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergyNotConverged;
-                    if (std::any_of(std::begin(arrayRef4), std::end(arrayRef4), [](bool i) {return i;})) {
+                    auto &arrayRef4 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACEnergyNotConverged;
+                    if (std::any_of(std::begin(arrayRef4), std::end(arrayRef4), [](bool i) { return i; })) {
 
                         ShowContinueError(state,
                                           "Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
