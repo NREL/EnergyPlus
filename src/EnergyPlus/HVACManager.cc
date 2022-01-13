@@ -1142,8 +1142,7 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 summation2 = 0.0;
                                 summation2 = std::accumulate(humRatInletNode.begin(), humRatInletNode.end(), 0.0);
                                 SlopeHumRat =
-                                    (sum_ConvergLogStackARR * summation2 -
-                                     double(DataConvergParams::ConvergLogStackDepth) * humRatInletNodDotProd) /
+                                    (sum_ConvergLogStackARR * summation2 - double(DataConvergParams::ConvergLogStackDepth) * humRatInletNodDotProd) /
                                     (square_sum_ConvergLogStackARR - double(DataConvergParams::ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
                                 if (std::abs(SlopeHumRat) > DataConvergParams::HVACHumRatSlopeToler) {
 
@@ -1230,8 +1229,7 @@ void SimHVAC(EnergyPlusData &state)
                                 Real64 summation3 = 0.0;
                                 summation3 = std::accumulate(mdotInletNode.begin(), mdotInletNode.end(), 0.0);
                                 SlopeMdot =
-                                    (sum_ConvergLogStackARR * summation3 -
-                                     double(DataConvergParams::ConvergLogStackDepth) * humRatInletNodDotProd) /
+                                    (sum_ConvergLogStackARR * summation3 - double(DataConvergParams::ConvergLogStackDepth) * humRatInletNodDotProd) /
                                     (square_sum_ConvergLogStackARR - double(DataConvergParams::ConvergLogStackDepth) * sum_square_ConvergLogStackARR);
                                 if (std::abs(SlopeMdot) > DataConvergParams::HVACFlowRateSlopeToler) {
                                     if (SlopeMdot < 0.0) { // check for monotonic decrease
