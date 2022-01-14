@@ -258,11 +258,8 @@ namespace WindowManager {
         }
     }
 
-    double GetIGUUValueForNFRCReport(EnergyPlusData &state,
-                                     const int surfNum,
-                                     const int constrNum,
-                                     const double windowWidth,
-                                     const double windowHeight)
+    double
+    GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const double windowWidth, const double windowHeight)
     {
         const auto tilt{90.0};
 
@@ -405,9 +402,7 @@ namespace WindowManager {
     //  CWCEHeatTransferFactory
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    CWCEHeatTransferFactory::CWCEHeatTransferFactory(EnergyPlusData &state,
-                                                     SurfaceData const &surface,
-                                                     int const t_SurfNum, int const t_ConstrNum)
+    CWCEHeatTransferFactory::CWCEHeatTransferFactory(EnergyPlusData &state, SurfaceData const &surface, int const t_SurfNum, int const t_ConstrNum)
         : m_Surface(surface), m_SurfNum(t_SurfNum), m_SolidLayerIndex(0), m_ConstructionNumber(t_ConstrNum), m_InteriorBSDFShade(false),
           m_ExteriorShade(false)
     {
@@ -874,9 +869,8 @@ namespace WindowManager {
         return {width, height, tilt};
     }
 
-    int CWCEHeatTransferFactory::getActiveConstructionNumber(EnergyPlusData &state,
-                                                             EnergyPlus::DataSurfaces::SurfaceData const &surface,
-                                                             int t_SurfNum)
+    int
+    CWCEHeatTransferFactory::getActiveConstructionNumber(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int t_SurfNum)
     {
         auto result{surface.Construction};
         const auto ShadeFlag = state.dataSurface->SurfWinShadingFlag(t_SurfNum);

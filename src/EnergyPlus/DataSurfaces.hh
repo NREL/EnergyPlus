@@ -675,12 +675,12 @@ namespace DataSurfaces {
         Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
 
         // Boundary conditions and interconnections
-        bool HeatTransSurf;                       // True if surface is a heat transfer surface,
-        int OutsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
-        int InsideHeatSourceTermSchedule;         // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
-                                                  // False if a (detached) shadowing (sub)surface
-        HeatTransferModel HeatTransferAlgorithm;  // used for surface-specific heat transfer algorithm.
-        std::string BaseSurfName;                 // Name of BaseSurf
+        bool HeatTransSurf;                      // True if surface is a heat transfer surface,
+        int OutsideHeatSourceTermSchedule;       // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
+        int InsideHeatSourceTermSchedule;        // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
+                                                 // False if a (detached) shadowing (sub)surface
+        HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
+        std::string BaseSurfName;                // Name of BaseSurf
         int BaseSurf;       // "Base surface" for this surface. Applies mainly to subsurfaces in which case it points back to the base surface number.
                             // Equals 0 for detached shading. BaseSurf equals surface number for all other surfaces.
         int NumSubSurfaces; // Number of subsurfaces this surface has (doors/windows)

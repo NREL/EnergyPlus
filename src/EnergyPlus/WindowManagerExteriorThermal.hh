@@ -118,10 +118,7 @@ namespace WindowManager {
     class CWCEHeatTransferFactory
     {
     public:
-        CWCEHeatTransferFactory(EnergyPlusData &state,
-                                EnergyPlus::DataSurfaces::SurfaceData const &surface,
-                                int t_SurfNum,
-                                int t_ConstrNum);
+        CWCEHeatTransferFactory(EnergyPlusData &state, EnergyPlus::DataSurfaces::SurfaceData const &surface, int t_SurfNum, int t_ConstrNum);
 
         std::shared_ptr<Tarcog::ISO15099::CSingleSystem> getTarcogSystem(EnergyPlusData &state, int const SurfNum, Real64 const t_HextConvCoeff);
 
