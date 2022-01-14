@@ -942,6 +942,7 @@ namespace Furnaces {
         std::string IHPCoilName;       // IHP cooling coil name
         int IHPCoilIndex(0);           // IHP cooling coil id
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
+        DataLoopNode::ConnectionObjectType currentModuleObjectType;
 
         state.dataFurnaces->GetFurnaceInputFlag = false;
         MaxNumbers = 0;
@@ -1017,10 +1018,12 @@ namespace Furnaces {
             //       Will still have 2 differently named objects for the user, but read in with 1 DO loop.
             if (HeatOnlyNum <= NumHeatOnly) {
                 CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatOnly";
+                currentModuleObjectType = DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryFurnaceHeatOnly;
                 FurnaceType_Num = Furnace_HeatOnly;
                 GetObjectNum = HeatOnlyNum;
             } else {
                 CurrentModuleObject = "AirLoopHVAC:UnitaryHeatOnly";
+                currentModuleObjectType = DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatOnly;
                 FurnaceType_Num = UnitarySys_HeatOnly;
                 GetObjectNum = HeatOnlyNum - NumHeatOnly;
             }
@@ -1060,7 +1063,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = GetOnlySingleNode(state,
                                                                                             Alphas(3),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject,
+                                                                                            currentModuleObjectType,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::ConnectionType::Inlet,
@@ -1069,7 +1072,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
                                                                                              Alphas(4),
                                                                                              ErrorsFound,
-                                                                                             CurrentModuleObject,
+                                                                                             currentModuleObjectType,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::ConnectionType::Outlet,
@@ -1637,10 +1640,12 @@ namespace Furnaces {
             //      Will still have 2 differently named objects for the user, but read in with 1 DO loop.
             if (HeatCoolNum <= NumHeatCool) {
                 CurrentModuleObject = "AirLoopHVAC:Unitary:Furnace:HeatCool";
+                currentModuleObjectType = DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryFurnaceHeatCool;
                 FurnaceType_Num = Furnace_HeatCool;
                 GetObjectNum = HeatCoolNum;
             } else {
                 CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool";
+                currentModuleObjectType = DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatCool;
                 FurnaceType_Num = UnitarySys_HeatCool;
                 GetObjectNum = HeatCoolNum - NumHeatCool;
             }
@@ -1680,7 +1685,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = GetOnlySingleNode(state,
                                                                                             Alphas(3),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject,
+                                                                                            currentModuleObjectType,
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::ConnectionType::Inlet,
@@ -1689,7 +1694,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
                                                                                              Alphas(4),
                                                                                              ErrorsFound,
-                                                                                             CurrentModuleObject,
+                                                                                             currentModuleObjectType,
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::ConnectionType::Outlet,
@@ -3041,25 +3046,27 @@ namespace Furnaces {
                 }
             }
 
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = GetOnlySingleNode(state,
-                                                                                            Alphas(3),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            Alphas(1),
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::ConnectionType::Inlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsParent);
+            state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpAirToAir,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsParent);
 
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
-                                                                                             Alphas(4),
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             Alphas(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::ConnectionType::Outlet,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsParent);
+            state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpAirToAir,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -4055,25 +4062,27 @@ namespace Furnaces {
                 }
             }
 
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = GetOnlySingleNode(state,
-                                                                                            Alphas(3),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            Alphas(1),
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::ConnectionType::Inlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsParent);
+            state.dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpWaterToAir,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsParent);
 
-            state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = GetOnlySingleNode(state,
-                                                                                             Alphas(4),
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             Alphas(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::ConnectionType::Outlet,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsParent);
+            state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpWaterToAir,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -4515,15 +4524,16 @@ namespace Furnaces {
             if (lAlphaBlanks(14)) {
                 state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = 0;
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum = GetOnlySingleNode(state,
-                                                                                             Alphas(14),
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             Alphas(1),
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsNotParent);
+                state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum =
+                    GetOnlySingleNode(state,
+                                      Alphas(14),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpWaterToAir,
+                                      Alphas(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::OutsideAirReference,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent);
                 // need better verification.
                 if (!CheckOutAirNodeNumber(state, state.dataFurnaces->Furnace(FurnaceNum).CondenserNodeNum)) {
                     ShowSevereError(state, "For " + CurrentModuleObject + " = " + Alphas(1));

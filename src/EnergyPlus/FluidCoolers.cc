@@ -226,7 +226,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
             NodeInputManager::GetOnlySingleNode(state,
                                                 AlphArray(2),
                                                 ErrorsFound,
-                                                cCurrentModuleObject,
+                                                DataLoopNode::ConnectionObjectType::FluidCoolerSingleSpeed,
                                                 AlphArray(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::ConnectionType::Inlet,
@@ -236,7 +236,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
             NodeInputManager::GetOnlySingleNode(state,
                                                 AlphArray(3),
                                                 ErrorsFound,
-                                                cCurrentModuleObject,
+                                                DataLoopNode::ConnectionObjectType::FluidCoolerSingleSpeed,
                                                 AlphArray(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::ConnectionType::Outlet,
@@ -272,7 +272,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(5),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::FluidCoolerSingleSpeed,
                                                     state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::OutsideAirReference,
@@ -324,7 +324,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
             NodeInputManager::GetOnlySingleNode(state,
                                                 AlphArray(2),
                                                 ErrorsFound,
-                                                cCurrentModuleObject,
+                                                DataLoopNode::ConnectionObjectType::FluidCoolerTwoSpeed,
                                                 AlphArray(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::ConnectionType::Inlet,
@@ -334,7 +334,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
             NodeInputManager::GetOnlySingleNode(state,
                                                 AlphArray(3),
                                                 ErrorsFound,
-                                                cCurrentModuleObject,
+                                                DataLoopNode::ConnectionObjectType::FluidCoolerTwoSpeed,
                                                 AlphArray(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::ConnectionType::Outlet,
@@ -391,7 +391,7 @@ void GetFluidCoolerInput(EnergyPlusData &state)
                 NodeInputManager::GetOnlySingleNode(state,
                                                     AlphArray(5),
                                                     ErrorsFound,
-                                                    cCurrentModuleObject,
+                                                    DataLoopNode::ConnectionObjectType::FluidCoolerTwoSpeed,
                                                     state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::ConnectionType::OutsideAirReference,
@@ -1935,7 +1935,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
     LoopMinTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
-    if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+    if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
         ++this->OutletWaterTempErrorCount;
 
         if (this->OutletWaterTempErrorCount < 2) {

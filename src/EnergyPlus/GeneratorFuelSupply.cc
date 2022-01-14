@@ -167,7 +167,7 @@ namespace GeneratorFuelSupply {
                 state.dataGenerator->FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(state,
                                                                                         AlphArray(3),
                                                                                         ErrorsFound,
-                                                                                        cCurrentModuleObject,
+                                                                                        DataLoopNode::ConnectionObjectType::GeneratorFuelSupply,
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::ConnectionType::Sensor,

@@ -274,6 +274,7 @@ namespace DataLoopNode {
         GeneratorFuelCellAirSupply,
         GeneratorFuelCellExhaustGasToWaterHeatExchanger,
         GeneratorFuelCellPowerModule,
+        GeneratorFuelCellStackCooler,
         GeneratorFuelCellWaterSupply,
         GeneratorFuelSupply,
         GeneratorInternalCombustionEngine,
@@ -394,7 +395,7 @@ namespace DataLoopNode {
         ZoneHVACWaterToAirHeatPump,
         ZoneHVACWindowAirConditioner,
         ZonePropertyLocalEnvironment,
-        Num
+        Num,
     };
 
     constexpr static std::array<std::string_view, static_cast<int>(ConnectionObjectType::Num)> ConnectionObjectTypeNames = {
@@ -527,6 +528,7 @@ namespace DataLoopNode {
         "Generator:FuelCell:AirSupply",
         "Generator:FuelCell:ExhaustGasToWaterHeatExchanger",
         "Generator:FuelCell:PowerModule",
+        "Generator:FuelCell:StackCooler",
         "Generator:FuelCell:WaterSupply",
         "Generator:FuelSupply",
         "Generator:InternalCombustionEngine",
@@ -779,6 +781,7 @@ namespace DataLoopNode {
         "GENERATOR:FUELCELL:AIRSUPPLY",
         "GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER",
         "GENERATOR:FUELCELL:POWERMODULE",
+        "GENERATOR:FUELCELL:STACKCOOLER",
         "GENERATOR:FUELCELL:WATERSUPPLY",
         "GENERATOR:FUELSUPPLY",
         "GENERATOR:INTERNALCOMBUSTIONENGINE",
