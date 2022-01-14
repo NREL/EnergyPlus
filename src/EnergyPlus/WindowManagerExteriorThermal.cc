@@ -405,8 +405,9 @@ namespace WindowManager {
     //  CWCEHeatTransferFactory
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    CWCEHeatTransferFactory::CWCEHeatTransferFactory(
-        EnergyPlusData &state, SurfaceData const &surface, int const t_SurfNum, int const t_ConstrNum)
+    CWCEHeatTransferFactory::CWCEHeatTransferFactory(EnergyPlusData &state,
+                                                     SurfaceData const &surface,
+                                                     int const t_SurfNum, int const t_ConstrNum)
         : m_Surface(surface), m_SurfNum(t_SurfNum), m_SolidLayerIndex(0), m_ConstructionNumber(t_ConstrNum), m_InteriorBSDFShade(false),
           m_ExteriorShade(false)
     {

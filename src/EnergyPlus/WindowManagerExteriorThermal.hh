@@ -111,7 +111,8 @@ namespace WindowManager {
                                         double windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
                                         double &uvalue,
-                                        double &shgc, double &vt);
+                                        double &shgc,
+                                        double &vt);
 
     // Class that is used to create layers for Windows-CalcEngine
     class CWCEHeatTransferFactory
