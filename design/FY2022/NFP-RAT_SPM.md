@@ -1,15 +1,14 @@
-Return Air Temperature & Humidity Reset Setpoint Manager
+Return Temperature & Humidity Ratio Reset Setpoint Manager
 ================
 
 **Jeremy Lerond, Wooyoung Jung, Jian Zhang PNNL**
 
  - Original Date: 10/27/2021
- - Revision Date: N/A
-
+ - Revision Date: 01/14/2022
 
 ## Justification for New Feature ##
 
-Currently, EnergyPlus does not support Supply Temperature or Humidity Ratio Setpoint Reset based on a system's Return Temperature or Humidity ratio. While this method is not often used for high-performance building, these reset control strategies are widely used in the industry. Hence, a request to add such setpoint managers to EnergyPlus has been made and this new feature will deliver such needs.
+Currently, EnergyPlus does not support Supply Temperature or Humidity Ratio Setpoint Reset based on a system's Return (i.e., Reference) Temperature or Humidity ratio. While this method is not often used for high-performance building, these reset control strategies are widely used in the industry. Hence, a request to add such setpoint managers to EnergyPlus has been made and this new feature will deliver such needs.
 
 The request can take two approaches: (1) an approach similar to the `SetpointManager:OutdoorAirReset` object, but looking at return temperature or humidity ratio to determine the setpoint, and (2) an approach similar to the `SetpointManager:ReturnTemperature:ChilledWater` object but applicable to an air loop as well. After discussing with industry experts and gathering supportive information, it was found that the former approach is the most widely used, the latter is mostly used for single-zone systems (which could use the `SetpointManager:SingleZone:Heating/Cooling` objects) or systems with very large air flows. Hence, this NFP will take the former approach.
 
@@ -37,7 +36,7 @@ A new subsection for the new SPM will be added to the I/O reference guide as fol
 
 \subsection{SetpointManager:SystemNodeReset}\label{setpointmanagersystemnodereset}
 
-The System Node Reset Setpoint Manager is used to place a temperature or humidity ratio setpoint on a system node or any other user-specified node according to the return temperature or humidity ratio of a system node using a reset rule. The reset rule is determined by two points: the maximum and the minimum supply temperature or humidity ratio setpoints (MaxSpTemp and MinSpTemp or MaxSpHumRat and MinSpHumRat). In general, the higher the return temperature or humidity ratio, the lower the supply temperature or humidity ratio. Specifically, the maximum supply temperature or humidity ratio setpoints start decreasing linearly to the minimum supply temperature or humidity ratio setpoints once the return temperature or humidity ratio becomes higher than a certain point, i.e., the maximum return temperature or humidity ratio at maximum supply temperature or humidity ratio setpoints (MaxRetTempAtMaxSpTemp or MaxRetHumRatAtMaxSpHumRat). Also, once the return temperature or humidity ratio becomes higher than a certain point, the return temperature or humidity setpoint becomes the minimum, i.e., the minimum return temperature at minimum supply temperature or humidity ratio setpoint (MinRetTempAtMinSpTemp or MinRetHumRatAtMinSpHumRat).
+The System Node Reset Setpoint Manager is used to place a temperature or humidity ratio setpoint on a system node or any other user-specified node according to the return (i.e., reference) temperature or humidity ratio of a system node using a reset rule. The reset rule is determined by two points: setpoints at low and high temperature or humidity ratio (MaxSpTemp and MinSpTemp or MaxSpHumRat and MinSpHumRat). In general, the higher the return temperature or humidity ratio, the lower the supply temperature or humidity ratio. Specifically, the maximum supply temperature or humidity ratio setpoints start decreasing linearly to the minimum supply temperature or humidity ratio setpoints once the return temperature or humidity ratio becomes higher than a certain point, i.e., the maximum return temperature or humidity ratio at maximum supply temperature or humidity ratio setpoints (MaxRetTempAtMaxSpTemp or MaxRetHumRatAtMaxSpHumRat). Also, once the return temperature or humidity ratio becomes higher than a certain point, the return temperature or humidity setpoint becomes the minimum, i.e., the minimum return temperature at minimum supply temperature or humidity ratio setpoint (MinRetTempAtMinSpTemp or MinRetHumRatAtMinSpHumRat).
 The return temperature or humidity ratio is obtained from the user-specified system node during the simulation. This setpoint manager can be used to place a temperature or humidity ratio setpoint on HVAC system nodes.
 
 The input consists of the setpoint manager name, the control variable (either temperature or humidity), a node list name of the nodes affected by the setpoint, the name of the return node name, and the data for the reset rule: the maximum and minimum temperature setpoints, the maximum return temperature at the maximum supply temperature setpoint, the temperature setpoint at the return high temperature, the return high temperature limit, the humidity ratio setpoint at the return low humidity ratio, the return low humidity limit, the humidity ratio setpoint at the return high humidity, the return high humidity limit.
@@ -53,43 +52,47 @@ A unique, user-assigned name for an instance of a return reset setpoint manager.
 The type of variable that will be controlled. There are two key choices for this type of set point manager:
 \begin{itemize}
   \item Temperature
-  \item Humidity Ratio
+  \item MaximumTemperature
+  \item MinimumTemperature
+  \item HumidityRatio
+  \item MaximumHumidityRatio
+  \item MinimumHumidityRatio
 
-\paragraph{Field: Maximum Supply Temperature Setpoint}\label{field-maximum-supply-temperature-setpoint}
+\paragraph{Field: Setpoint at Low Reference Temperature}\label{field-setpoint-at-low-reference-temperature}
 
-The maximum supply temperature setpoint in \(^{o}\)C for the reset rule. e
+The temperature setpoint in \(^{o}\)C at the low reference temperature for the reset rule. This input is required when Temperature, MaximumTemperature or MinimumTemperature is selected as the control variable.
 
-\paragraph{Field: Minimum Supply Temperature Setpoint}\label{field-minimum-supply-temperature-setpoint}
+\paragraph{Field: Setpoint at High Reference Temperature}\label{field-setpoint-at-low-reference-temperature}
 
-The minimum supply temperature setpoint in \(^{o}\)C for the reset rule.
+The temperature setpoint in \(^{o}\)C at the high reference temperature for the reset rule. This input is required when Temperature, MaximumTemperature or MinimumTemperature is selected as the control variable.
 
-\paragraph{Field: Maximum Return Temperature at Maximum Supply Temperature Setpoint}\label{field-maximum-return-temperature-at-maximum-supply-temperature-setpoint}
+\paragraph{Field: Low Reference Temperature}\label{field-low-reference-temperature}
 
-The maximum return temperature in \(^{o}\)C that the maximum supply temperature setpoint gets applied. In other words, when the return temperature is lower than this value, the maximum return temperature will be applied.
+The low reference temperature in \(^{o}\)C for the reset rule. In other words, when the reference temperature is lower than this value, the temperature setpoint is at its maximum.
 
-\paragraph{Field: Minimum Return Temperature at Minimum Supply Temperature Setpoint}\label{field-minimum-return-temperature-at-minimum-supply-temperature-setpoint}
+\paragraph{Field: High Reference Temperature}\label{field-high-reference-temperature}
 
-The minimum return temperature in \(^{o}\)C that the minimum supply temperature setpoint gets applied. In other words, when the return temperature is higher than this value, the minimum return temperature will be applied.
+The high reference temperature in \(^{o}\)C for the reset rule. In other words, when the reference temperature is higher than this value, the temperature setpoint is at its minimum.
 
-\paragraph{Field: Maximum Supply Humidity Ratio Setpoint}\label{field-maximum-supply-humidity-ratio-setpoint}
+\paragraph{Field: Setpoint at Low Reference Humidity Ratio}\label{field-setpoint-at-low-reference-humidity-ratio}
 
-The maximum supply humidity ratio setpoint in kgWater/kgDryAir for the reset rule.
+The humidity ratio setpoint in kgWater/kgDryAir at the low reference humidity ratio for the reset rule. This input is required when HumidityRatio, MaximumHumidityRatio or MinimumHumidityRatio is selected as the control variable.
 
-\paragraph{Field: Maximum Supply Humidity Ratio Setpoint}\label{field-maximum-supply-humidity-ratio-setpoint}
+\paragraph{Field: Setpoint at High Reference Humidity Ratio}\label{field-setpoint-at-high-reference-humidity-ratio}
 
-The minimum supply humidity ratio setpoint in kgWater/kgDryAir for the reset rule.
+The humidity ratio setpoint in kgWater/kgDryAir at the high reference humidity ratio for the reset rule. This input is required when HumidityRatio, MaximumHumidityRatio or MinimumHumidityRatio is selected as the control variable.
 
-\paragraph{Field: Maximum Return Humidity Ratio at Maximum Supply Humidity Ratio Setpoint}\label{field-maximum-return-humidity-ratio-at-maximum-supply-humidity-ratio-setpoint}
+\paragraph{Field: Low Reference Humidity Ratio}\label{field-low-reference-humidity-ratio}
 
-The maximum return humidity ratio in kgWater/kgDryAir where the maximum supply humidity ratio gets applied. In other words, when the return humidity ratio is lower than this value, the maximum return humidity ratio will be applied.
+The low reference humidity ratio in kgWater/kgDryAir for the reset rule. In other words, when the reference humidity ratio is lower than this value, the humidity ratio setpoint is at its maximum.
 
-\paragraph{Field: Minimum Return Humidity Ratio at Minimum Supply Humidity Ratio Setpoint}\label{field-return-high-humidity-ratio}
+\paragraph{Field: High Reference Humidity Ratio}\label{field-high-reference-humidity-ratio}
 
-The minimum return humidity ratio in kgWater/kgDryAir where the minimum supply humidity ratio gets applied. In other words, when the return humidity ratio is higher than this value, the minimum return humidity ratio will be applied.
+The high reference humidity ratio in kgWater/kgDryAir for the reset rule. In other words, when the reference humidity ratio is higher than this value, the humidity ratio setpoint is at it minimum.
 
-\paragraph{Field: Return Node Name}\label{field-return-node-name}
+\paragraph{Field: Reference Node Name}\label{field-reference-node-name}
 
-The name of a return system node which will be used as a reference to determine the setpoint established by this setpoint manager.
+The name of a reference system node which will be used as a reference to determine the setpoint established by this setpoint manager.
 
 \paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name}
 
@@ -102,29 +105,29 @@ Below are examples, showing the inputs for SetpointManager:SystemNodeReset.
 SetpointManager:SystemNodeReset,
   Supply Air Temp Manager,    !- Name
   Temperature,                !- Control Variable
-  16.7,                       !- Maximum Supply Temperature Setpoint {C}
-  20.0,                       !- Minimum Supply Temperature Setpoint {C}
-  12.8,                       !- Maximum Return Temperature at Maximum Supply Temperature Setpoint {C}
-  23.9,                       !- Minimum Return Temperature at Minimum Supply Temperature Setpoint {C}
-  ,                           !- Maximum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
-  ,                           !- Minimum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
-  ,                           !- Maximum Return Humidity Ratio at Maximum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
-  ,                           !- Minimum Return Humidity Ratio at Minimum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
-  Return Air Node,            !- Return Node Name
+  20.0,                       !- Setpoint at Low Reference Temperature {C}
+  16.7,                       !- Setpoint at High Reference Temperature {C}
+  12.8,                       !- Low Reference Temperature {C}
+  23.9,                       !- High Reference Temperature {C}
+  ,                           !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
+  ,                           !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
+  ,                           !- Low Reference Humidity Ratio {kgWater/kgDryAir}
+  ,                           !- High Reference Humidity Ratio {kgWater/kgDryAir}
+  Return Air Node,            !- Reference Node Name
   Supply Air Temp Nodes;      !- Setpoint Node or NodeList Name
 
 SetpointManager:SystemNodeReset,
   Supply Humidity Manager,       !- Name
   Humidity Ratio,                !- Control Variable
-  ,                              !- Maximum Supply Temperature Setpoint {C}
-  ,                              !- Minimum Supply Temperature Setpoint {C}
-  ,                              !- Maximum Return Temperature at Maximum Supply Temperature Setpoint {C}
-  ,                              !- Minimum Return Temperature at Minimum Supply Temperature Setpoint {C}
-  0.008,                         !- Maximum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
-  0.004,                         !- Minimum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
-  0.003,                         !- Maximum Return Humidity Ratio at Maximum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
-  0.010,                         !- Minimum Return Humidity Ratio at Minimum Supply Humidity Ratio Setpoint {kgWater/kgDryAir}
-  Return Air Node,               !- Return Node Name
+  ,                              !- Setpoint at Low Reference Temperature {C}
+  ,                              !- Setpoint at High Reference Temperature {C}
+  ,                              !- Low Reference Temperature {C}
+  ,                              !- High Reference Temperature {C}
+  0.008,                         !- Setpoint at Low Reference Humidity Ratio {kgWater/kgDryAir}
+  0.004,                         !- Setpoint at High Reference Humidity Ratio {kgWater/kgDryAir}
+  0.003,                         !- Low Reference Humidity Ratio {kgWater/kgDryAir}
+  0.010,                         !- High Reference Humidity Ratio {kgWater/kgDryAir}
+  Return Air Node,               !- Reference Node Name
   Supply Air Temp Nodes;         !- Setpoint Node or NodeList Name
 \end{lstlisting}
 
@@ -134,7 +137,7 @@ A new `SetpointManager:SystemNodeReset` object will be added as follows:
 ```
 SetpointManager:SystemNodeReset,
      \memo This Setpoint Manager is used to place a temperature or humidity ratio setpoint on a system node
-     \memo according to the return temperature or humidity ratio using a reset rule. The return temperature or humidity ratio
+     \memo according to the return (i.e, reference) temperature or humidity ratio using a reset rule. The return temperature or humidity ratio
      \memo is obtained by retrieving the temperature or humidity ratio of the user specified return system node.
   A1 , \field Name
        \required-field
@@ -142,32 +145,36 @@ SetpointManager:SystemNodeReset,
        \required-field
        \type choice
        \key Temperature
-       \key Humidity Ratio
-  N1 , \field Maximum Supply Temperature Setpoint
+       \key MaximumTemperature
+       \key MinimumTemperature
+       \key HumidityRatio
+       \key MaximumHumidityRatio
+       \key MinimumHumidityRatio
+  N1 , \field Setpoint at Low Reference Temperature
        \units C
-       \note Applicable only if Control Variable is Temperature
-  N2 , \field Minimum Supply Temperature Setpoint
+       \note Applicable only if Control Variable is Temperature, MaximumTemperature, or MinimumTemperature.
+  N2 , \field Setpoint at High Reference Temperature
        \units C
-       \note Applicable only if Control Variable is Temperature
-  N3 , \field Maximum Return Temperature at Maximum Supply Temperature Setpoint
+       \note Applicable only if Control Variable is Temperature, MaximumTemperature, or MinimumTemperature.
+  N3 , \field Low Reference Temperature
        \units C
-       \note Applicable only if Control Variable is Temperature
-  N4 , \field Minimum Return Temperature at Minimum Supply Temperature Setpoint
+       \note Applicable only if Control Variable is Temperature, MaximumTemperature, or MinimumTemperature.
+  N4 , \field High Reference Temperature
        \units C
-       \note Applicable only if Control Variable is Temperature
-  N1 , \field Maximum Supply Humidity Ratio Setpoint
+       \note Applicable only if Control Variable is Temperature, MaximumTemperature, or MinimumTemperature.
+  N1 , \field Setpoint at Low Reference Humidity Ratio
        \units kgWater/kgDryAir
-       \note Applicable only if Control Variable is Humidity Ratio
-  N2 , \field Minimum Supply Humidity Ratio Setpoint
+       \note Applicable only if Control Variable is HumidityRatio, MaximumHumidityRatio, or MinimumHumidityRatio
+  N2 , \field Setpoint at High Reference Humidity Ratio
        \units kgWater/kgDryAir
-       \note Applicable only if Control variable is Humidity Ratio
-  N3 , \field Maximum Humidity Ratio at Maximum Supply Humidity Ratio Setpoint
+       \note Applicable only if Control variable is Humidity Ratio, MaximumHumidityRatio, or MinimumHumidityRatio
+  N3 , \field Low Reference Humidity Ratio
        \units kgWater/kgDryAir
-       \note Applicable only if Control variable is Humidity Ratio
-  N4 , \field Minimum Humidity Ratio at Minimum Supply Humidity Ratio Setpoint
+       \note Applicable only if Control variable is Humidity Ratio, MaximumHumidityRatio, or MinimumHumidityRatio
+  N4 , \field High Reference Humidity Ratio
        \units kgWater/kgDryAir
-       \note Applicable only if Control variable is Humidity Ratio    
-  A3 , \field Return Node Name
+       \note Applicable only if Control variable is Humidity Ratio, MaximumHumidityRatio, or MinimumHumidityRatio   
+  A3 , \field Reference Node Name
        \note The name of an HVAC system node
        \required-field
        \type node
@@ -185,7 +192,7 @@ No new outputs will be created.
 
 A new subsection under Setpoint Managers will be created and contain the following text:
 
-The input object SetpointManager:SystemNodeReset provides a setpoint manager that places a temperature or humidity setpoint on a system node (or any other user-specified system node) according to the return temperature or humidity using a reset strategy. The user defines a reset rule for this strategy by specifying two supply temperature or humidity ratio setpoints at two return air temperatures or humidity ratios. Generally the lower supply temperature (or humidity ratio) setpoint is matched with the higher return air temperature (or humidity ratio) and vice versa.
+The input object SetpointManager:SystemNodeReset provides a setpoint manager that places a temperature or humidity setpoint on a system node (or any other user-specified system node) according to the return (i.e., reference) temperature or humidity using a reset strategy. The user defines a reset rule for this strategy by specifying two supply temperature or humidity ratio setpoints at two return air temperatures or humidity ratios. Generally the lower supply temperature (or humidity ratio) setpoint is matched with the higher return air temperature (or humidity ratio) and vice versa.
 
 The parameter \(T_{set}\) is determined as per the following pseudo code:
 ```
@@ -208,7 +215,7 @@ When humidity ratio is selected as the control variable, the same pseudo code, b
 
 ## Example File and Transition Changes ##
 
-A new example idf file using SetpointManager:SystemNodeReset will be created to demonstrate how this new feature can be used. The Output:Variable objects in the example idf will be added so that this example file produces the output files showing how SetpointManager:SystemNodeReset plays a role to determine the setpoint.
+A new example idf file using SetpointManager:SystemNodeReset will be created to demonstrate how this new feature can be used. This example file will demonstrate how this new SetpointManager will be applied to air loop and plant loop nodes. Also, the Output:Variable objects in the example idf will be added so that this example file produces the output files showing how SetpointManager:SystemNodeReset plays a role to determine the setpoint.
 
 No transition changes are expected.
 
@@ -224,8 +231,10 @@ This new feature revises modules: SetpointManager.
 A new object called SetpointManager:SystemNodeReset, as shown in the Input Description Section, will be added to the idd file.
 
 ## Setpoint Manager ##
-This code change adds a new structure called `DefineSystemNdResetSetPointManager` to the heading file (`SetPointManager.hh`) and the other changes are made to `SetPointManager.cc`.
+This code change adds a new structure called `DefineSysNodeResetSetPointManager` to the heading file (`SetPointManager.hh`) and the other changes are made to `SetPointManager.cc`.
 
 The inputs will be grabbed through the `GetSetPointManagerInputData` function, similar with other SetpointManager objects. The following are the cases that the error gets produced: (1) when the invalid control variable is inputted, (2) the maximum temperature or humidity ratio setpoint is higher than the minimum temperature or humidity ratio setpoint.
 
-The new function called `DefineSystemNdResetSetPointManager::calculate` will determine which input parameters will be used for setpoint calculation depending on the selected control variable. In addition, the function called `DefineSystemNdResetSetPointManager::CalcSetPoint` will calculate the setpoint using the logic introduced in the pseudo code above. The calculated setpoint gets applied through `InitSetPointManagers`, `SimSetPointManagers`, and `UpdateSetPointManagers` functions, similar with other SetpointManager objects.
+The new function called `DefineSystemNdResetSetPointManager::calculate` will determine which input parameters will be used for setpoint calculation depending on the selected control variable. Since the calculation for the sepoint is the same as the SetpointManager:OutdoorAirReset (`DefineOutsideAirSetPointManager::CalcSetPoint`), thie function will be independently written outside the `DefineOutsideAirSetPointManager` struct and then applied to `DefineOutsideAirSetPointManager::calculate` and `DefineSysNodeResetSetPointManager::calculate`.
+
+The calculated setpoint gets applied through `InitSetPointManagers`, `SimSetPointManagers`, and `UpdateSetPointManagers` functions, similar with other SetpointManager objects.
