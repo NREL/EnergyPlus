@@ -139,6 +139,16 @@ namespace HVACInterfaceManager {
 
     void SetupCommonPipes(EnergyPlusData &state);
 
+    // In-Place Right Shift by 1 of Array Elements
+    inline void rshift1(std::array<Real64, DataConvergParams::ConvergLogStackDepth> &a)
+    {
+        Real64 lastVal = a[a.size() - 1];
+        for (unsigned int i = a.size() - 1; i > 0; --i) {
+            a[i] = a[i - 1];
+        }
+        a[0] = lastVal;
+    }
+
 } // namespace HVACInterfaceManager
 
 struct HVACInterfaceManagerData : BaseGlobalStruct

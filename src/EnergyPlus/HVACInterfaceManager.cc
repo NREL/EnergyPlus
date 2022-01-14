@@ -364,16 +364,6 @@ void UpdateHVACInterface(EnergyPlusData &state,
     }
 }
 
-// In-Place Right Shift by 1 of Array Elements
-inline void rshift1(std::array<Real64, DataConvergParams::ConvergLogStackDepth> &a)
-{
-    Real64 lastVal = a[a.size() - 1];
-    for (unsigned int i = a.size() - 1; i > 0; --i) {
-        a[i] = a[i - 1];
-    }
-    a[0] = lastVal;
-}
-
 void UpdatePlantLoopInterface(EnergyPlusData &state,
                               PlantLocation const &plantLoc,    // The 'outlet node' Location
                               int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
@@ -916,12 +906,11 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
     // SUBROUTINE PARAMETER DEFINITIONS:
     enum class UpdateType
     {
-        Invalid,
         DemandLedPrimaryInlet,
         DemandLedSecondaryInlet,
         SupplyLedPrimaryInlet,
         SupplyLedSecondaryInlet
-    } CurCallingCase;
+    } curCallingCase = UpdateType::SupplyLedPrimaryInlet;
     constexpr int MaxIterLimitCaseA(8);
     constexpr int MaxIterLimitCaseB(4);
 
@@ -978,28 +967,27 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
     // determine current case
     // which side is being updated
     // commonpipe control point is the inlet of one of the half loops
-    CurCallingCase = UpdateType::Invalid;
     if (plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) { // update primary inlet
         if (thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
             !thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
-            CurCallingCase = UpdateType::SupplyLedPrimaryInlet;
+            curCallingCase = UpdateType::SupplyLedPrimaryInlet;
 
         } else if (!thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
                    thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
-            CurCallingCase = UpdateType::DemandLedPrimaryInlet;
+            curCallingCase = UpdateType::DemandLedPrimaryInlet;
         }
     } else { // update secondary inlet
         if (thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
             !thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
-            CurCallingCase = UpdateType::SupplyLedSecondaryInlet;
+            curCallingCase = UpdateType::SupplyLedSecondaryInlet;
 
         } else if (!thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
                    thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
-            CurCallingCase = UpdateType::DemandLedSecondaryInlet;
+            curCallingCase = UpdateType::DemandLedSecondaryInlet;
         }
     }
 
-    switch (CurCallingCase) {
+    switch (curCallingCase) {
     case UpdateType::SupplyLedPrimaryInlet:
     case UpdateType::SupplyLedSecondaryInlet:
         // CASE A, Primary/Supply Led
@@ -1030,7 +1018,7 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
             }
 
             // eq. 3
-            if ((plantCommonPipe.SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == UpdateType::SupplyLedPrimaryInlet)) {
+            if ((plantCommonPipe.SupplySideInletPumpType == FlowType::Variable) && (curCallingCase == UpdateType::SupplyLedPrimaryInlet)) {
                 // MdotPri is a variable to be calculated and flow request needs to be made
                 if (std::abs(TempCPPrimaryCntrlSetPoint) > DataPlant::DeltaTempTol) {
 
@@ -1075,7 +1063,7 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
             }
 
             // eq. 3
-            if ((plantCommonPipe.SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == UpdateType::DemandLedPrimaryInlet)) {
+            if ((plantCommonPipe.SupplySideInletPumpType == FlowType::Variable) && (curCallingCase == UpdateType::DemandLedPrimaryInlet)) {
                 // MdotPri is a variable to be calculated and flow request made
                 if (std::abs(TempPriOutTankOut - TempPriInlet) > DataPlant::DeltaTempTol) {
                     MdotPri = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempPriInlet);
@@ -1102,9 +1090,6 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
                 TempSecInlet = TempPriOutTankOut;
             }
         }
-        break;
-    case UpdateType::Invalid:
-        assert(false);
     }
 
     // update
