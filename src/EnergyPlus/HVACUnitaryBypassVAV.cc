@@ -1474,7 +1474,7 @@ namespace HVACUnitaryBypassVAV {
             // speed up test based on code from 16 years ago to correct cycling fan economizer defect
             // see https://github.com/NREL/EnergyPlusArchive/commit/a2202f8a168fd0330bf3a45392833405e8bd08f2
             // This test sets simple flag so air loop doesn't iterate twice each pass (reverts above change)
-            // AirLoopControlInfo(AirLoopNum).Simple = true;
+            // AirLoopControlInfo(AirplantLoc.loopNum).Simple = true;
         }
 
         if (state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -1486,10 +1486,7 @@ namespace HVACUnitaryBypassVAV {
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             CBVAV(CBVAVNum).HeatCoilName,
                                                             DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                                            CBVAV(CBVAVNum).LoopNum,
-                                                            CBVAV(CBVAVNum).LoopSide,
-                                                            CBVAV(CBVAVNum).BranchNum,
-                                                            CBVAV(CBVAVNum).CompNum,
+                                                            CBVAV(CBVAVNum).plantLoc,
                                                             ErrorFlag,
                                                             _,
                                                             _,
@@ -1504,11 +1501,12 @@ namespace HVACUnitaryBypassVAV {
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, ErrorsFound);
 
                     if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
-                        Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                                                state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                                                DataGlobalConstants::HWInitConvTemp,
-                                                                                state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
-                                                                                RoutineName);
+                        Real64 FluidDensity =
+                            FluidProperties::GetDensityGlycol(state,
+                                                              state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidName,
+                                                              DataGlobalConstants::HWInitConvTemp,
+                                                              state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidIndex,
+                                                              RoutineName);
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, ErrorsFound) *
                             FluidDensity;
@@ -1520,10 +1518,7 @@ namespace HVACUnitaryBypassVAV {
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             CBVAV(CBVAVNum).HeatCoilName,
                                                             DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                                            CBVAV(CBVAVNum).LoopNum,
-                                                            CBVAV(CBVAVNum).LoopSide,
-                                                            CBVAV(CBVAVNum).BranchNum,
-                                                            CBVAV(CBVAVNum).CompNum,
+                                                            CBVAV(CBVAVNum).plantLoc,
                                                             ErrorFlag,
                                                             _,
                                                             _,
@@ -1547,11 +1542,7 @@ namespace HVACUnitaryBypassVAV {
                 }
 
                 // fill outlet node for heating coil
-                CBVAV(CBVAVNum).CoilOutletNode = state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum)
-                                                     .LoopSide(CBVAV(CBVAVNum).LoopSide)
-                                                     .Branch(CBVAV(CBVAVNum).BranchNum)
-                                                     .Comp(CBVAV(CBVAVNum).CompNum)
-                                                     .NodeNumOut;
+                CBVAV(CBVAVNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, CBVAV(CBVAVNum).plantLoc).NodeNumOut;
                 state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
 
             } else { // CBVAV is not connected to plant
@@ -1620,11 +1611,12 @@ namespace HVACUnitaryBypassVAV {
                             ErrorsFound = true;
                         }
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                                                    state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                                                    DataGlobalConstants::HWInitConvTemp,
-                                                                                    state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
-                                                                                    RoutineName);
+                            Real64 FluidDensity =
+                                FluidProperties::GetDensityGlycol(state,
+                                                                  state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidName,
+                                                                  DataGlobalConstants::HWInitConvTemp,
+                                                                  state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidIndex,
+                                                                  RoutineName);
                             CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
                         }
                     }
@@ -1649,15 +1641,8 @@ namespace HVACUnitaryBypassVAV {
                     }
                 } // end of IF(CBVAV(CBVAVNum)%MaxHeatCoilFluidFlow .EQ. DataSizing::AutoSize)THEN
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   CBVAV(CBVAVNum).MaxHeatCoilFluidFlow,
-                                                   CBVAV(CBVAVNum).CoilControlNode,
-                                                   CBVAV(CBVAVNum).CoilOutletNode,
-                                                   CBVAV(CBVAVNum).LoopNum,
-                                                   CBVAV(CBVAVNum).LoopSide,
-                                                   CBVAV(CBVAVNum).BranchNum,
-                                                   CBVAV(CBVAVNum).CompNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, CBVAV(CBVAVNum).MaxHeatCoilFluidFlow, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode);
 
             } // end of IF(CBVAV(CBVAVNum)%CoilControlNode .GT. 0)THEN
         }     // end one time inits
@@ -1977,14 +1962,8 @@ namespace HVACUnitaryBypassVAV {
                 //     set air-side and steam-side mass flow rates
                 state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
                 mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     mdot,
-                                                     CBVAV(CBVAVNum).CoilControlNode,
-                                                     CBVAV(CBVAVNum).CoilOutletNode,
-                                                     CBVAV(CBVAVNum).LoopNum,
-                                                     CBVAV(CBVAVNum).LoopSide,
-                                                     CBVAV(CBVAVNum).BranchNum,
-                                                     CBVAV(CBVAVNum).CompNum);
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
 
                 //     simulate water coil to find operating capacity
                 WaterCoils::SimulateWaterCoilComponents(
@@ -1998,14 +1977,8 @@ namespace HVACUnitaryBypassVAV {
                 //     set air-side and steam-side mass flow rates
                 state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
                 mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     mdot,
-                                                     CBVAV(CBVAVNum).CoilControlNode,
-                                                     CBVAV(CBVAVNum).CoilOutletNode,
-                                                     CBVAV(CBVAVNum).LoopNum,
-                                                     CBVAV(CBVAVNum).LoopSide,
-                                                     CBVAV(CBVAVNum).BranchNum,
-                                                     CBVAV(CBVAVNum).CompNum);
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
 
                 //     simulate steam coil to find operating capacity
                 SteamCoils::SimulateSteamCoilComponents(state,
@@ -2339,7 +2312,7 @@ namespace HVACUnitaryBypassVAV {
                         HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                             CBVAV(CBVAVNum).DXCoolCoilName,
                                                                             FirstHVACIteration,
-                                                                            On,
+                                                                            DataHVACGlobals::CompressorOperation::On,
                                                                             PartLoadFrac,
                                                                             CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                             DataHVACGlobals::ContFanCycCoil,
@@ -2350,7 +2323,7 @@ namespace HVACUnitaryBypassVAV {
                             HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                                 CBVAV(CBVAVNum).DXCoolCoilName,
                                                                                 FirstHVACIteration,
-                                                                                Off,
+                                                                                DataHVACGlobals::CompressorOperation::Off,
                                                                                 PartLoadFrac,
                                                                                 CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                                 DataHVACGlobals::ContFanCycCoil,
@@ -2375,7 +2348,7 @@ namespace HVACUnitaryBypassVAV {
                             HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                                 CBVAV(CBVAVNum).DXCoolCoilName,
                                                                                 FirstHVACIteration,
-                                                                                On,
+                                                                                DataHVACGlobals::CompressorOperation::On,
                                                                                 PartLoadFrac,
                                                                                 CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                                 DataHVACGlobals::ContFanCycCoil,
@@ -2427,7 +2400,7 @@ namespace HVACUnitaryBypassVAV {
                     } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                         DXCoils::SimDXCoil(state,
                                            CBVAV(CBVAVNum).DXCoolCoilName,
-                                           On,
+                                           DataHVACGlobals::CompressorOperation::On,
                                            FirstHVACIteration,
                                            CBVAV(CBVAVNum).CoolCoilCompIndex,
                                            DataHVACGlobals::ContFanCycCoil,
@@ -2438,7 +2411,7 @@ namespace HVACUnitaryBypassVAV {
                             PartLoadFrac = 0.0;
                             DXCoils::SimDXCoil(state,
                                                CBVAV(CBVAVNum).DXCoolCoilName,
-                                               On,
+                                               DataHVACGlobals::CompressorOperation::On,
                                                FirstHVACIteration,
                                                CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                DataHVACGlobals::ContFanCycCoil,
@@ -2452,7 +2425,7 @@ namespace HVACUnitaryBypassVAV {
                                 state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par);
                             DXCoils::SimDXCoil(state,
                                                CBVAV(CBVAVNum).DXCoolCoilName,
-                                               On,
+                                               DataHVACGlobals::CompressorOperation::On,
                                                FirstHVACIteration,
                                                CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                DataHVACGlobals::ContFanCycCoil,
@@ -2524,7 +2497,7 @@ namespace HVACUnitaryBypassVAV {
                                                                   MaxONOFFCyclesperHour,
                                                                   HPTimeConstant,
                                                                   FanDelayTime,
-                                                                  Off,
+                                                                  DataHVACGlobals::CompressorOperation::Off,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -2549,7 +2522,7 @@ namespace HVACUnitaryBypassVAV {
                                                                   MaxONOFFCyclesperHour,
                                                                   HPTimeConstant,
                                                                   FanDelayTime,
-                                                                  On,
+                                                                  DataHVACGlobals::CompressorOperation::On,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -2583,7 +2556,7 @@ namespace HVACUnitaryBypassVAV {
                                                                       MaxONOFFCyclesperHour,
                                                                       HPTimeConstant,
                                                                       FanDelayTime,
-                                                                      Off,
+                                                                      DataHVACGlobals::CompressorOperation::Off,
                                                                       PartLoadFrac,
                                                                       SpeedNum,
                                                                       SpeedRatio,
@@ -2619,7 +2592,7 @@ namespace HVACUnitaryBypassVAV {
                                                                           MaxONOFFCyclesperHour,
                                                                           HPTimeConstant,
                                                                           FanDelayTime,
-                                                                          On,
+                                                                          DataHVACGlobals::CompressorOperation::On,
                                                                           PartLoadFrac,
                                                                           SpeedNum,
                                                                           SpeedRatio,
@@ -2652,7 +2625,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                   MaxONOFFCyclesperHour,
                                                                                   HPTimeConstant,
                                                                                   FanDelayTime,
-                                                                                  On,
+                                                                                  DataHVACGlobals::CompressorOperation::On,
                                                                                   PartLoadFrac,
                                                                                   SpeedNum,
                                                                                   SpeedRatio,
@@ -2817,7 +2790,7 @@ namespace HVACUnitaryBypassVAV {
                         CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
                         DXCoils::SimDXCoilMultiMode(state,
                                                     CBVAV(CBVAVNum).DXCoolCoilName,
-                                                    On,
+                                                    DataHVACGlobals::CompressorOperation::On,
                                                     FirstHVACIteration,
                                                     PartLoadFrac,
                                                     DehumidMode,
@@ -2827,7 +2800,7 @@ namespace HVACUnitaryBypassVAV {
                             PartLoadFrac = 0.0;
                             DXCoils::SimDXCoilMultiMode(state,
                                                         CBVAV(CBVAVNum).DXCoolCoilName,
-                                                        On,
+                                                        DataHVACGlobals::CompressorOperation::On,
                                                         FirstHVACIteration,
                                                         PartLoadFrac,
                                                         DehumidMode,
@@ -2900,7 +2873,7 @@ namespace HVACUnitaryBypassVAV {
                             CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
                             DXCoils::SimDXCoilMultiMode(state,
                                                         CBVAV(CBVAVNum).DXCoolCoilName,
-                                                        On,
+                                                        DataHVACGlobals::CompressorOperation::On,
                                                         FirstHVACIteration,
                                                         PartLoadFrac,
                                                         DehumidMode,
@@ -2990,7 +2963,7 @@ namespace HVACUnitaryBypassVAV {
                             CBVAV(CBVAVNum).DehumidificationMode = DehumidMode;
                             DXCoils::SimDXCoilMultiMode(state,
                                                         CBVAV(CBVAVNum).DXCoolCoilName,
-                                                        On,
+                                                        DataHVACGlobals::CompressorOperation::On,
                                                         FirstHVACIteration,
                                                         PartLoadFrac,
                                                         DehumidMode,
@@ -3071,7 +3044,7 @@ namespace HVACUnitaryBypassVAV {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         CBVAV(CBVAVNum).DXCoolCoilName,
                                                                         FirstHVACIteration,
-                                                                        Off,
+                                                                        DataHVACGlobals::CompressorOperation::Off,
                                                                         0.0,
                                                                         CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                         DataHVACGlobals::ContFanCycCoil,
@@ -3080,7 +3053,7 @@ namespace HVACUnitaryBypassVAV {
                 } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                     DXCoils::SimDXCoil(state,
                                        CBVAV(CBVAVNum).DXCoolCoilName,
-                                       Off,
+                                       DataHVACGlobals::CompressorOperation::Off,
                                        FirstHVACIteration,
                                        CBVAV(CBVAVNum).CoolCoilCompIndex,
                                        DataHVACGlobals::ContFanCycCoil,
@@ -3090,7 +3063,7 @@ namespace HVACUnitaryBypassVAV {
                 } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                     DXCoils::SimDXCoilMultiMode(state,
                                                 CBVAV(CBVAVNum).DXCoolCoilName,
-                                                Off,
+                                                DataHVACGlobals::CompressorOperation::Off,
                                                 FirstHVACIteration,
                                                 0.0,
                                                 0,
@@ -3114,7 +3087,7 @@ namespace HVACUnitaryBypassVAV {
                                                               MaxONOFFCyclesperHour,
                                                               HPTimeConstant,
                                                               FanDelayTime,
-                                                              Off,
+                                                              DataHVACGlobals::CompressorOperation::Off,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -3131,7 +3104,7 @@ namespace HVACUnitaryBypassVAV {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                     CBVAV(CBVAVNum).DXCoolCoilName,
                                                                     FirstHVACIteration,
-                                                                    Off,
+                                                                    DataHVACGlobals::CompressorOperation::Off,
                                                                     0.0,
                                                                     CBVAV(CBVAVNum).CoolCoilCompIndex,
                                                                     DataHVACGlobals::ContFanCycCoil,
@@ -3139,7 +3112,7 @@ namespace HVACUnitaryBypassVAV {
             } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                 DXCoils::SimDXCoil(state,
                                    CBVAV(CBVAVNum).DXCoolCoilName,
-                                   Off,
+                                   DataHVACGlobals::CompressorOperation::Off,
                                    FirstHVACIteration,
                                    CBVAV(CBVAVNum).CoolCoilCompIndex,
                                    DataHVACGlobals::ContFanCycCoil,
@@ -3162,7 +3135,7 @@ namespace HVACUnitaryBypassVAV {
                                                           MaxONOFFCyclesperHour,
                                                           HPTimeConstant,
                                                           FanDelayTime,
-                                                          Off,
+                                                          DataHVACGlobals::CompressorOperation::Off,
                                                           PartLoadFrac,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -3172,7 +3145,7 @@ namespace HVACUnitaryBypassVAV {
             } else if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
                 DXCoils::SimDXCoilMultiMode(state,
                                             CBVAV(CBVAVNum).DXCoolCoilName,
-                                            Off,
+                                            DataHVACGlobals::CompressorOperation::Off,
                                             FirstHVACIteration,
                                             0.0,
                                             0,
@@ -3194,7 +3167,7 @@ namespace HVACUnitaryBypassVAV {
 
                         DXCoils::SimDXCoil(state,
                                            CBVAV(CBVAVNum).HeatCoilName,
-                                           On,
+                                           DataHVACGlobals::CompressorOperation::On,
                                            FirstHVACIteration,
                                            CBVAV(CBVAVNum).HeatCoilIndex,
                                            DataHVACGlobals::ContFanCycCoil,
@@ -3210,7 +3183,7 @@ namespace HVACUnitaryBypassVAV {
                                 state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
                             DXCoils::SimDXCoil(state,
                                                CBVAV(CBVAVNum).HeatCoilName,
-                                               On,
+                                               DataHVACGlobals::CompressorOperation::On,
                                                FirstHVACIteration,
                                                CBVAV(CBVAVNum).HeatCoilIndex,
                                                DataHVACGlobals::ContFanCycCoil,
@@ -3237,7 +3210,7 @@ namespace HVACUnitaryBypassVAV {
                         //       simulate DX heating coil with compressor off
                         DXCoils::SimDXCoil(state,
                                            CBVAV(CBVAVNum).HeatCoilName,
-                                           Off,
+                                           DataHVACGlobals::CompressorOperation::Off,
                                            FirstHVACIteration,
                                            CBVAV(CBVAVNum).HeatCoilIndex,
                                            DataHVACGlobals::ContFanCycCoil,
@@ -3249,7 +3222,7 @@ namespace HVACUnitaryBypassVAV {
                     //     simulate DX heating coil with compressor off when cooling load is required
                     DXCoils::SimDXCoil(state,
                                        CBVAV(CBVAVNum).HeatCoilName,
-                                       Off,
+                                       DataHVACGlobals::CompressorOperation::Off,
                                        FirstHVACIteration,
                                        CBVAV(CBVAVNum).HeatCoilIndex,
                                        DataHVACGlobals::ContFanCycCoil,
@@ -3277,7 +3250,7 @@ namespace HVACUnitaryBypassVAV {
                                                           MaxONOFFCyclesperHour,
                                                           HPTimeConstant,
                                                           FanDelayTime,
-                                                          Off,
+                                                          DataHVACGlobals::CompressorOperation::Off,
                                                           PartLoadFrac,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -3304,7 +3277,7 @@ namespace HVACUnitaryBypassVAV {
                                                           MaxONOFFCyclesperHour,
                                                           HPTimeConstant,
                                                           FanDelayTime,
-                                                          On,
+                                                          DataHVACGlobals::CompressorOperation::On,
                                                           PartLoadFrac,
                                                           SpeedNum,
                                                           SpeedRatio,
@@ -3338,7 +3311,7 @@ namespace HVACUnitaryBypassVAV {
                                                               MaxONOFFCyclesperHour,
                                                               HPTimeConstant,
                                                               FanDelayTime,
-                                                              Off,
+                                                              DataHVACGlobals::CompressorOperation::Off,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -3364,7 +3337,7 @@ namespace HVACUnitaryBypassVAV {
                                                                   MaxONOFFCyclesperHour,
                                                                   HPTimeConstant,
                                                                   FanDelayTime,
-                                                                  On,
+                                                                  DataHVACGlobals::CompressorOperation::On,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -3384,7 +3357,7 @@ namespace HVACUnitaryBypassVAV {
                                                                   MaxONOFFCyclesperHour,
                                                                   HPTimeConstant,
                                                                   FanDelayTime,
-                                                                  On,
+                                                                  DataHVACGlobals::CompressorOperation::On,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -3408,7 +3381,7 @@ namespace HVACUnitaryBypassVAV {
                                                                           MaxONOFFCyclesperHour,
                                                                           HPTimeConstant,
                                                                           FanDelayTime,
-                                                                          On,
+                                                                          DataHVACGlobals::CompressorOperation::On,
                                                                           PartLoadFrac,
                                                                           SpeedNum,
                                                                           SpeedRatio,
@@ -3480,7 +3453,7 @@ namespace HVACUnitaryBypassVAV {
                                                                       MaxONOFFCyclesperHour,
                                                                       HPTimeConstant,
                                                                       FanDelayTime,
-                                                                      On,
+                                                                      DataHVACGlobals::CompressorOperation::On,
                                                                       PartLoadFrac,
                                                                       SpeedNum,
                                                                       SpeedRatio,
@@ -3550,7 +3523,7 @@ namespace HVACUnitaryBypassVAV {
                                                                       MaxONOFFCyclesperHour,
                                                                       HPTimeConstant,
                                                                       FanDelayTime,
-                                                                      On,
+                                                                      DataHVACGlobals::CompressorOperation::On,
                                                                       PartLoadFrac,
                                                                       SpeedNum,
                                                                       SpeedRatio,
@@ -3922,7 +3895,8 @@ namespace HVACUnitaryBypassVAV {
         int CoilIndex = int(Par(1));
         Real64 OnOffAirFlowFrac = Par(3); // Ratio of compressor ON to compressor OFF air mass flow rate
 
-        DXCoils::CalcDoe2DXCoil(state, CoilIndex, On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowFrac);
+        DXCoils::CalcDoe2DXCoil(
+            state, CoilIndex, DataHVACGlobals::CompressorOperation::On, false, PartLoadFrac, DataHVACGlobals::ContFanCycCoil, _, OnOffAirFlowFrac);
 
         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Real64 Residuum = Par(2) - OutletAirTemp;
@@ -3958,8 +3932,14 @@ namespace HVACUnitaryBypassVAV {
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
-        HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-            state, CBVAV(CBVAVNumTemp).DXCoolCoilName, FirstHVACIter, On, PartLoadFrac, CoilIndex, DataHVACGlobals::ContFanCycCoil, HXUnitOn);
+        HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
+                                                            CBVAV(CBVAVNumTemp).DXCoolCoilName,
+                                                            FirstHVACIter,
+                                                            DataHVACGlobals::CompressorOperation::On,
+                                                            PartLoadFrac,
+                                                            CoilIndex,
+                                                            DataHVACGlobals::ContFanCycCoil,
+                                                            HXUnitOn);
 
         Real64 OutletAirTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumTemp).DXCoilOutletNode).Temp;
         Real64 Residuum = Par(2) - OutletAirTemp;
@@ -4023,7 +4003,7 @@ namespace HVACUnitaryBypassVAV {
         int CoilIndex = int(Par(1));
         int DehumidMode = int(Par(3));
         int FanOpMode = 2;
-        DXCoils::SimDXCoilMultiMode(state, "", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
+        DXCoils::SimDXCoilMultiMode(state, "", DataHVACGlobals::CompressorOperation::On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(CoilIndex);
         Real64 Residuum = Par(2) - OutletAirTemp;
 
@@ -4203,14 +4183,8 @@ namespace HVACUnitaryBypassVAV {
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     // simulate the heating coil at maximum hot water flow rate
                     MaxHotWaterFlow = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         MaxHotWaterFlow,
-                                                         CBVAV(CBVAVNum).CoilControlNode,
-                                                         CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).LoopNum,
-                                                         CBVAV(CBVAVNum).LoopSide,
-                                                         CBVAV(CBVAVNum).BranchNum,
-                                                         CBVAV(CBVAVNum).CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, MaxHotWaterFlow, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
                     WaterCoils::SimulateWaterCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                     if (QCoilActual > (HeatCoilLoad + DataHVACGlobals::SmallLoad)) {
@@ -4270,14 +4244,8 @@ namespace HVACUnitaryBypassVAV {
                     }
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                     mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         mdot,
-                                                         CBVAV(CBVAVNum).CoilControlNode,
-                                                         CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).LoopNum,
-                                                         CBVAV(CBVAVNum).LoopSide,
-                                                         CBVAV(CBVAVNum).BranchNum,
-                                                         CBVAV(CBVAVNum).CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
 
                     // simulate the steam heating coil
                     SteamCoils::SimulateSteamCoilComponents(
@@ -4298,28 +4266,16 @@ namespace HVACUnitaryBypassVAV {
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     mdot = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         mdot,
-                                                         CBVAV(CBVAVNum).CoilControlNode,
-                                                         CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).LoopNum,
-                                                         CBVAV(CBVAVNum).LoopSide,
-                                                         CBVAV(CBVAVNum).BranchNum,
-                                                         CBVAV(CBVAVNum).CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
                     QCoilActual = HeatCoilLoad;
                     // simulate the hot water heating coil
                     WaterCoils::SimulateWaterCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                     mdot = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         mdot,
-                                                         CBVAV(CBVAVNum).CoilControlNode,
-                                                         CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).LoopNum,
-                                                         CBVAV(CBVAVNum).LoopSide,
-                                                         CBVAV(CBVAVNum).BranchNum,
-                                                         CBVAV(CBVAVNum).CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
                     // simulate the steam heating coil
                     SteamCoils::SimulateSteamCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
@@ -4356,14 +4312,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 HeatCoilLoad = Par(3);
         Real64 QCoilActual = HeatCoilLoad;
         Real64 mdot = HWFlow;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             mdot,
-                                             CBVAV(CBVAVNum).CoilControlNode,
-                                             CBVAV(CBVAVNum).CoilOutletNode,
-                                             CBVAV(CBVAVNum).LoopNum,
-                                             CBVAV(CBVAVNum).LoopSide,
-                                             CBVAV(CBVAVNum).BranchNum,
-                                             CBVAV(CBVAVNum).CompNum);
+        PlantUtilities::SetComponentFlowRate(state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
 
         // simulate the hot water supplemental heating coil
         WaterCoils::SimulateWaterCoilComponents(
@@ -4431,7 +4380,7 @@ namespace HVACUnitaryBypassVAV {
                               CBVAV(CBVAVNum).MaxONOFFCyclesperHourCycling,
                               CBVAV(CBVAVNum).HPTimeConstantCycling,
                               CBVAV(CBVAVNum).FanDelayTimeCycling,
-                              On,
+                              DataHVACGlobals::CompressorOperation::On,
                               PartLoadRatio,
                               speedNum,
                               speedRatio,
@@ -4510,7 +4459,7 @@ namespace HVACUnitaryBypassVAV {
                               CBVAV(CBVAVNum).MaxONOFFCyclesperHourCycling,
                               CBVAV(CBVAVNum).HPTimeConstantCycling,
                               CBVAV(CBVAVNum).FanDelayTimeCycling,
-                              On,
+                              DataHVACGlobals::CompressorOperation::On,
                               partLoadRatio,
                               speedNum,
                               SpeedRatio,

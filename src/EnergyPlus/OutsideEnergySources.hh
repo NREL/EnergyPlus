@@ -78,10 +78,7 @@ namespace OutsideEnergySources {
         Real64 EnergyRate = 0.0;                                                          // cooling power
         DataPlant::PlantEquipmentType EnergyType{DataPlant::PlantEquipmentType::Invalid}; // flag for district heating OR cooling
         // loop topology variables
-        int LoopNum = 0;
-        DataPlant::LoopSideLocation LoopSideNum = DataPlant::LoopSideLocation::Invalid;
-        int BranchNum = 0;
-        int CompNum = 0;
+        PlantLocation plantLoc{};
         // flags
         bool BeginEnvrnInitFlag = true;
         bool CheckEquipName = true;

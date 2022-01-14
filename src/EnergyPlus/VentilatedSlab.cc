@@ -85,7 +85,6 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -158,9 +157,6 @@ namespace VentilatedSlab {
     int constexpr OWBControl = 5;  // Controls system using outside air wet-bulb temperature
     int constexpr SURControl = 6;  // Controls system using surface temperature !Phase2-A
     int constexpr DPTZControl = 7; // Controls system using dew-point temperature of zone!Phase2-A
-
-    // coil operation
-    int constexpr On = 1; // normal coil operation
 
     int constexpr NoneOption = 0;
     int constexpr BothOption = 1;
@@ -593,7 +589,7 @@ namespace VentilatedSlab {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                          "\"  Core Diameter is not needed for the series slabs configuration- ignored.");
-                    ShowContinueError(state, "...It has been asigned on SlabGroup.");
+                    ShowContinueError(state, "...It has been assigned on SlabGroup.");
                 }
             }
 
@@ -602,7 +598,7 @@ namespace VentilatedSlab {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                          "\"  Core Length is not needed for the series slabs configuration- ignored.");
-                    ShowContinueError(state, "...It has been asigned on SlabGroup.");
+                    ShowContinueError(state, "...It has been assigned on SlabGroup.");
                 }
             }
 
@@ -611,7 +607,7 @@ namespace VentilatedSlab {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                          "\"  Core Numbers is not needed for the series slabs configuration- ignored.");
-                    ShowContinueError(state, "...It has been asigned on SlabGroup.");
+                    ShowContinueError(state, "...It has been assigned on SlabGroup.");
                 }
             }
 
@@ -761,7 +757,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject + "-OA MIXER",
+                                                                                           CurrentModuleObject,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Internal,
@@ -780,7 +776,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode = GetOnlySingleNode(state,
                                                                                             state.dataIPShortCut->cAlphaArgs(23),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject + "-OA MIXER",
+                                                                                            CurrentModuleObject,
                                                                                             state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
@@ -801,7 +797,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject + "-OA MIXER",
+                                                                                           CurrentModuleObject,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Internal,
@@ -820,7 +816,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode = GetOnlySingleNode(state,
                                                                                             state.dataIPShortCut->cAlphaArgs(23),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject + "-OA MIXER",
+                                                                                            CurrentModuleObject,
                                                                                             state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
@@ -841,7 +837,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject + "-SYSTEM",
+                                                                                           CurrentModuleObject,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-SYSTEM",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
@@ -850,7 +846,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject + "-OA MIXER",
+                                                                                           CurrentModuleObject,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
@@ -868,7 +864,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode = GetOnlySingleNode(state,
                                                                                             state.dataIPShortCut->cAlphaArgs(23),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject + "-OA MIXER",
+                                                                                            CurrentModuleObject,
                                                                                             state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
@@ -904,7 +900,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ZoneAirInNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(20),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject + "-SYSTEM",
+                                                                                           CurrentModuleObject,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-SYSTEM",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Outlet,
@@ -926,7 +922,7 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).OutsideAirNode = GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(21),
                                                                                         ErrorsFound,
-                                                                                        CurrentModuleObject + "-OA MIXER",
+                                                                                        CurrentModuleObject,
                                                                                         state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Inlet,
@@ -945,7 +941,7 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).AirReliefNode = GetOnlySingleNode(state,
                                                                                        state.dataIPShortCut->cAlphaArgs(22),
                                                                                        ErrorsFound,
-                                                                                       CurrentModuleObject + "-OA MIXER",
+                                                                                       CurrentModuleObject,
                                                                                        state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::ReliefAir,
@@ -979,7 +975,7 @@ namespace VentilatedSlab {
 
             // Add fan to component sets array
             SetUpCompSets(state,
-                          CurrentModuleObject + "-SYSTEM",
+                          CurrentModuleObject,
                           state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
                           "UNDEFINED",
                           state.dataIPShortCut->cAlphaArgs(25),
@@ -1258,7 +1254,7 @@ namespace VentilatedSlab {
                 if (SELECT_CASE_var == BothOption) { // 'HeatingAndCooling'
                     // Add cooling coil to component sets array when present
                     SetUpCompSets(state,
-                                  CurrentModuleObject + "-SYSTEM",
+                                  CurrentModuleObject,
                                   state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
                                   state.dataIPShortCut->cAlphaArgs(30),
                                   state.dataIPShortCut->cAlphaArgs(31),
@@ -1267,7 +1263,7 @@ namespace VentilatedSlab {
 
                     // Add heating coil to component sets array when cooling coil present
                     SetUpCompSets(state,
-                                  CurrentModuleObject + "-SYSTEM",
+                                  CurrentModuleObject,
                                   state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
                                   state.dataIPShortCut->cAlphaArgs(27),
                                   state.dataIPShortCut->cAlphaArgs(28),
@@ -1277,7 +1273,7 @@ namespace VentilatedSlab {
                 } else if (SELECT_CASE_var == HeatingOption) { // 'Heating'
                     // Add heating coil to component sets array when no cooling coil present
                     SetUpCompSets(state,
-                                  CurrentModuleObject + "-SYSTEM",
+                                  CurrentModuleObject,
                                   state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
                                   state.dataIPShortCut->cAlphaArgs(27),
                                   state.dataIPShortCut->cAlphaArgs(28),
@@ -1287,7 +1283,7 @@ namespace VentilatedSlab {
                 } else if (SELECT_CASE_var == CoolingOption) { // 'Cooling'
                     // Add cooling coil to component sets array when no heating coil present
                     SetUpCompSets(state,
-                                  CurrentModuleObject + "-SYSTEM",
+                                  CurrentModuleObject,
                                   state.dataVentilatedSlab->VentSlab(Item).Name + "-SYSTEM",
                                   state.dataIPShortCut->cAlphaArgs(30),
                                   state.dataIPShortCut->cAlphaArgs(31),
@@ -1585,10 +1581,7 @@ namespace VentilatedSlab {
                 ScanPlantLoopsForObject(state,
                                         state.dataVentilatedSlab->VentSlab(Item).HCoilName,
                                         state.dataVentilatedSlab->VentSlab(Item).HeatingCoilType,
-                                        state.dataVentilatedSlab->VentSlab(Item).HWLoopNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).HWLoopSide,
-                                        state.dataVentilatedSlab->VentSlab(Item).HWBranchNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).HWCompNum,
+                                        state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -1602,11 +1595,7 @@ namespace VentilatedSlab {
                 }
 
                 state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum =
-                    state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum)
-                        .LoopSide(state.dataVentilatedSlab->VentSlab(Item).HWLoopSide)
-                        .Branch(state.dataVentilatedSlab->VentSlab(Item).HWBranchNum)
-                        .Comp(state.dataVentilatedSlab->VentSlab(Item).HWCompNum)
-                        .NodeNumOut;
+                    DataPlant::CompData::getPlantComponent(state, state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc).NodeNumOut;
             }
             if ((state.dataVentilatedSlab->VentSlab(Item).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                 (state.dataVentilatedSlab->VentSlab(Item).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
@@ -1614,10 +1603,7 @@ namespace VentilatedSlab {
                 ScanPlantLoopsForObject(state,
                                         state.dataVentilatedSlab->VentSlab(Item).CCoilPlantName,
                                         state.dataVentilatedSlab->VentSlab(Item).CoolingCoilType,
-                                        state.dataVentilatedSlab->VentSlab(Item).CWLoopNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).CWLoopSide,
-                                        state.dataVentilatedSlab->VentSlab(Item).CWBranchNum,
-                                        state.dataVentilatedSlab->VentSlab(Item).CWCompNum,
+                                        state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc,
                                         errFlag);
                 if (errFlag) {
                     ShowContinueError(state,
@@ -1625,11 +1611,7 @@ namespace VentilatedSlab {
                     ShowFatalError(state, "InitVentilatedSlab: Program terminated due to previous condition(s).");
                 }
                 state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum =
-                    state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum)
-                        .LoopSide(state.dataVentilatedSlab->VentSlab(Item).CWLoopSide)
-                        .Branch(state.dataVentilatedSlab->VentSlab(Item).CWBranchNum)
-                        .Comp(state.dataVentilatedSlab->VentSlab(Item).CWCompNum)
-                        .NodeNumOut;
+                    DataPlant::CompData::getPlantComponent(state, state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc).NodeNumOut;
             } else {
                 if (state.dataVentilatedSlab->VentSlab(Item).CCoilPresent)
                     ShowFatalError(state,
@@ -1717,9 +1699,9 @@ namespace VentilatedSlab {
                 if (state.dataVentilatedSlab->VentSlab(Item).HeatingCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating &&
                     !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
 
                     state.dataVentilatedSlab->VentSlab(Item).MaxHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow;
@@ -1729,11 +1711,7 @@ namespace VentilatedSlab {
                                        state.dataVentilatedSlab->VentSlab(Item).MinHotWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxHotWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).HotControlNode,
-                                       state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWLoopNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWLoopSide,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWBranchNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWCompNum);
+                                       state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum);
                 }
                 if (state.dataVentilatedSlab->VentSlab(Item).HeatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating &&
                     !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
@@ -1749,11 +1727,7 @@ namespace VentilatedSlab {
                                        state.dataVentilatedSlab->VentSlab(Item).MinHotSteamFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxHotSteamFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).HotControlNode,
-                                       state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWLoopNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWLoopSide,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWBranchNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).HWCompNum);
+                                       state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum);
                 }
             } //(VentSlab(Item)%HCoilPresent)
 
@@ -1762,9 +1736,9 @@ namespace VentilatedSlab {
                 if ((state.dataVentilatedSlab->VentSlab(Item).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
                     (state.dataVentilatedSlab->VentSlab(Item).CoolingCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) {
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum).FluidName,
                                            DataGlobalConstants::CWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     state.dataVentilatedSlab->VentSlab(Item).MaxColdWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow;
                     state.dataVentilatedSlab->VentSlab(Item).MinColdWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MinVolColdWaterFlow;
@@ -1772,11 +1746,7 @@ namespace VentilatedSlab {
                                        state.dataVentilatedSlab->VentSlab(Item).MinColdWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxColdWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).ColdControlNode,
-                                       state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).CWLoopNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).CWLoopSide,
-                                       state.dataVentilatedSlab->VentSlab(Item).CWBranchNum,
-                                       state.dataVentilatedSlab->VentSlab(Item).CWCompNum);
+                                       state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum);
                 }
             }
 
@@ -2302,16 +2272,18 @@ namespace VentilatedSlab {
                                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                                     DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                                 }
-                                rho = GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
-                                                       RoutineName);
-                                Cp = GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidName,
-                                                           DataGlobalConstants::HWInitConvTemp,
-                                                           state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWLoopNum).FluidIndex,
-                                                           RoutineName);
+                                rho = GetDensityGlycol(
+                                    state,
+                                    state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum).FluidName,
+                                    DataGlobalConstants::HWInitConvTemp,
+                                    state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum).FluidIndex,
+                                    RoutineName);
+                                Cp = GetSpecificHeatGlycol(
+                                    state,
+                                    state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum).FluidName,
+                                    DataGlobalConstants::HWInitConvTemp,
+                                    state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc.loopNum).FluidIndex,
+                                    RoutineName);
                                 MaxVolHotWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                             } else {
                                 MaxVolHotWaterFlowDes = 0.0;
@@ -2588,15 +2560,16 @@ namespace VentilatedSlab {
                                 DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                             }
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum).FluidName,
                                                    5.,
-                                                   state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum).FluidIndex,
                                                    RoutineName);
-                            Cp = GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidName,
-                                                       5.,
-                                                       state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWLoopNum).FluidIndex,
-                                                       RoutineName);
+                            Cp = GetSpecificHeatGlycol(
+                                state,
+                                state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum).FluidName,
+                                5.,
+                                state.dataPlnt->PlantLoop(state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc.loopNum).FluidIndex,
+                                RoutineName);
                             MaxVolColdWaterFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                         } else {
                             MaxVolColdWaterFlowDes = 0.0;
@@ -3292,9 +3265,7 @@ namespace VentilatedSlab {
                                               _,
                                               _,
                                               _,
-                                              state.dataVentilatedSlab->VentSlab(Item).HWLoopNum,
-                                              state.dataVentilatedSlab->VentSlab(Item).HWLoopSide,
-                                              state.dataVentilatedSlab->VentSlab(Item).HWBranchNum);
+                                              state.dataVentilatedSlab->VentSlab(Item).HWPlantLoc);
 
                         } else if ((SELECT_CASE_var == Heating_GasCoilType) || (SELECT_CASE_var == Heating_ElectricCoilType) ||
                                    (SELECT_CASE_var == Heating_SteamCoilType)) {
@@ -3556,9 +3527,7 @@ namespace VentilatedSlab {
                                       _,
                                       _,
                                       _,
-                                      state.dataVentilatedSlab->VentSlab(Item).CWLoopNum,
-                                      state.dataVentilatedSlab->VentSlab(Item).CWLoopSide,
-                                      state.dataVentilatedSlab->VentSlab(Item).CWBranchNum);
+                                      state.dataVentilatedSlab->VentSlab(Item).CWPlantLoc);
                 }
 
             } // ...end of HEATING/COOLING IF-THEN block
@@ -3663,7 +3632,7 @@ namespace VentilatedSlab {
                 SimHXAssistedCoolingCoil(state,
                                          state.dataVentilatedSlab->VentSlab(Item).CCoilName,
                                          FirstHVACIteration,
-                                         On,
+                                         DataHVACGlobals::CompressorOperation::On,
                                          0.0,
                                          state.dataVentilatedSlab->VentSlab(Item).CCoil_Index,
                                          ContFanCycCoil);
@@ -3872,7 +3841,7 @@ namespace VentilatedSlab {
         int FanOutletNode; // unit air outlet node
         int OAInletNode;   // unit air outlet node
         int MixoutNode;    // unit air outlet node
-        int ReturnAirNode; // discription
+        int ReturnAirNode; // description
         int ZoneAirInNode; // supply air node
         // For Phase 3
         Real64 CNumDS;
@@ -4306,25 +4275,6 @@ namespace VentilatedSlab {
                     if (RadSurfNum == 1) {
                         if (((state.dataVentilatedSlab->OperatingMode == HeatingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) <= 0.0)) ||
                             ((state.dataVentilatedSlab->OperatingMode == CoolingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) >= 0.0))) {
-                            // IF (.not. WarmupFlag) THEN
-                            //  TempComparisonErrorCount = TempComparisonErrorCount + 1
-                            //  IF (TempComparisonErrorCount <= NumOfVentSlabs) THEN
-                            //    CALL ShowWarningError(state, 'Radaint Heat exchange is negative in Heating Mode or posive in Cooling Mode')
-                            //    CALL ShowContinueError(state, 'Flow to the following ventilated slab will be shut-off to avoid heating in cooling
-                            //    mode or cooling &
-                            //                            in heating mode')
-                            //    CALL ShowContinueError(state, 'Ventilated Slab Name = '//TRIM(VentSlab(Item)%Name))
-                            //    CALL ShowContinueError(state, 'Surface Name  = '//TRIM(VentSlab(Item)%SurfaceName(RadSurfNum)))
-                            //    CALL ShowContinueError(state, 'All node temperature are reseted at the surface temperature of control zone = '// &
-                            //                           RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(1),1,2),2))
-                            //    CALL ShowContinueErrorTimeStamp(state, ' ')
-                            //  ELSE
-                            //    CALL ShowRecurringWarningErrorAtEnd(state, 'Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
-                            //                 ']  shut-off occurrence continues due to temperature comparison error.',  &
-                            //                 VentSlab(Item)%CondErrCount)
-                            //  END IF
-                            // END IF
-
                             state.dataLoopNodes->Node(SlabInNode).MassFlowRate = 0.0;
                             state.dataLoopNodes->Node(FanOutletNode).MassFlowRate = 0.0;
                             state.dataLoopNodes->Node(OAInletNode).MassFlowRate = 0.0;
@@ -4428,7 +4378,7 @@ namespace VentilatedSlab {
                 }
                 TotalVentSlabRadPower *= ZoneMult;
 
-                // Intenal Node Temperature Check
+                // Internal Node Temperature Check
 
                 MSlabAirInTemp = state.dataLoopNodes->Node(SlabInNode).Temp;
 

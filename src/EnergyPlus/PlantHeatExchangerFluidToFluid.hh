@@ -229,7 +229,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void calculateSteamToWaterHX(EnergyPlusData &state, Real64 const MyLoad, Real64 const DmdSideMdot);
 
-        void control(EnergyPlusData &state, int LoopNum, Real64 MyLoad, bool FirstHVACIteration);
+        void control(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration);
 
         void controlSteamToWaterHX(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
 

@@ -602,10 +602,10 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
         loopsidebranch.Comp.allocate(1);
     }
 
-    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.branchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.compNum = 1;
 
     state->dataPlnt->PlantLoop(1).Name = "ChilledWaterLoop";
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
@@ -917,10 +917,10 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
         loopsidebranch.Comp.allocate(1);
     }
 
-    state->dataSteamCoils->SteamCoil(1).LoopNum = 1;
-    state->dataSteamCoils->SteamCoil(1).LoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataSteamCoils->SteamCoil(1).BranchNum = 1;
-    state->dataSteamCoils->SteamCoil(1).CompNum = 1;
+    state->dataSteamCoils->SteamCoil(1).plantLoc.loopNum = 1;
+    state->dataSteamCoils->SteamCoil(1).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataSteamCoils->SteamCoil(1).plantLoc.branchNum = 1;
+    state->dataSteamCoils->SteamCoil(1).plantLoc.compNum = 1;
 
     state->dataPlnt->PlantLoop(1).Name = "SteamLoop";
     state->dataPlnt->PlantLoop(1).FluidIndex = 0;

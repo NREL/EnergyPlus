@@ -1174,10 +1174,7 @@ namespace FanCoilUnits {
                 ScanPlantLoopsForObject(state,
                                         FanCoil(FanCoilNum).HCoilName,
                                         FanCoil(FanCoilNum).HCoilPlantTypeOf,
-                                        FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                        FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                        FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                        FanCoil(FanCoilNum).HeatCoilCompNum,
+                                        FanCoil(FanCoilNum).HeatCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -1190,11 +1187,8 @@ namespace FanCoilUnits {
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
                 }
 
-                FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum)
-                                                                     .LoopSide(FanCoil(FanCoilNum).HeatCoilLoopSide)
-                                                                     .Branch(FanCoil(FanCoilNum).HeatCoilBranchNum)
-                                                                     .Comp(FanCoil(FanCoilNum).HeatCoilCompNum)
-                                                                     .NodeNumOut;
+                FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum =
+                    DataPlant::CompData::getPlantComponent(state, FanCoil(FanCoilNum).HeatCoilPlantLoc).NodeNumOut;
 
             } else if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Electric) {
                 // do nothing, valid type
@@ -1207,10 +1201,7 @@ namespace FanCoilUnits {
                 ScanPlantLoopsForObject(state,
                                         FanCoil(FanCoilNum).CCoilPlantName,
                                         FanCoil(FanCoilNum).CCoilPlantType,
-                                        FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                        FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                        FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                        FanCoil(FanCoilNum).CoolCoilCompNum,
+                                        FanCoil(FanCoilNum).CoolCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -1221,11 +1212,8 @@ namespace FanCoilUnits {
                     ShowContinueError(state, "Reference Unit=\"" + FanCoil(FanCoilNum).Name + "\", type=" + FanCoil(FanCoilNum).UnitType);
                     ShowFatalError(state, "InitFanCoilUnits: Program terminated for previous conditions.");
                 }
-                FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum = state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum)
-                                                                     .LoopSide(FanCoil(FanCoilNum).CoolCoilLoopSide)
-                                                                     .Branch(FanCoil(FanCoilNum).CoolCoilBranchNum)
-                                                                     .Comp(FanCoil(FanCoilNum).CoolCoilCompNum)
-                                                                     .NodeNumOut;
+                FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum =
+                    DataPlant::CompData::getPlantComponent(state, FanCoil(FanCoilNum).CoolCoilPlantLoc).NodeNumOut;
             } else {
                 ShowFatalError(state, "InitFanCoilUnits: FanCoil=" + FanCoil(FanCoilNum).Name + ", invalid cooling coil type. Program terminated.");
             }
@@ -1266,18 +1254,18 @@ namespace FanCoilUnits {
 
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                 rho = GetDensityGlycol(state,
-                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
+                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidName,
                                        DataGlobalConstants::HWInitConvTemp,
-                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
+                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidIndex,
                                        RoutineName);
                 FanCoil(FanCoilNum).MaxHeatCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxHotWaterVolFlow;
                 FanCoil(FanCoilNum).MinHotWaterFlow = rho * FanCoil(FanCoilNum).MinHotWaterVolFlow;
             }
 
             rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).FluidName,
                                    DataGlobalConstants::CWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).FluidIndex,
                                    RoutineName);
             FanCoil(FanCoilNum).MaxCoolCoilFluidFlow = rho * FanCoil(FanCoilNum).MaxColdWaterVolFlow;
             FanCoil(FanCoilNum).MinColdWaterFlow = rho * FanCoil(FanCoilNum).MinColdWaterVolFlow;
@@ -1288,22 +1276,14 @@ namespace FanCoilUnits {
                                    FanCoil(FanCoilNum).MinHotWaterFlow,
                                    FanCoil(FanCoilNum).MaxHeatCoilFluidFlow,
                                    FanCoil(FanCoilNum).HeatCoilFluidInletNode,
-                                   FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                   FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                   FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                   FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                   FanCoil(FanCoilNum).HeatCoilCompNum);
+                                   FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum);
             }
 
             InitComponentNodes(state,
                                FanCoil(FanCoilNum).MinColdWaterFlow,
                                FanCoil(FanCoilNum).MaxCoolCoilFluidFlow,
                                FanCoil(FanCoilNum).CoolCoilFluidInletNode,
-                               FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                               FanCoil(FanCoilNum).CoolCoilLoopNum,
-                               FanCoil(FanCoilNum).CoolCoilLoopSide,
-                               FanCoil(FanCoilNum).CoolCoilBranchNum,
-                               FanCoil(FanCoilNum).CoolCoilCompNum);
+                               FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum);
             //  Node(HotConNode)%MassFlowRateMax = FanCoil(FanCoilNum)%MaxHeatCoilFluidFlow
             //  Node(HotConNode)%MassFlowRateMin = FanCoil(FanCoilNum)%MinHotWaterFlow
             //  Node(ColdConNode)%MassFlowRateMax = FanCoil(FanCoilNum)%MaxCoolCoilFluidFlow
@@ -1911,14 +1891,14 @@ namespace FanCoilUnits {
                             FanCoil(FanCoilNum).DesHeatingLoad = DesCoilLoad;
                             if (DesCoilLoad >= SmallLoad) {
                                 rho = GetDensityGlycol(state,
-                                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidName,
                                                        DataGlobalConstants::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidIndex,
                                                        RoutineNameNoSpace);
                                 Cp = GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidName,
+                                                           state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidName,
                                                            DataGlobalConstants::HWInitConvTemp,
-                                                           state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).FluidIndex,
+                                                           state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum).FluidIndex,
                                                            RoutineNameNoSpace);
 
                                 MaxHotWaterVolFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
@@ -2106,14 +2086,14 @@ namespace FanCoilUnits {
                         FanCoil(FanCoilNum).DesCoolingLoad = DesCoilLoad;
                         if (DesCoilLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
+                                                   state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).FluidName,
                                                    5.,
-                                                   state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidIndex,
+                                                   state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).FluidIndex,
                                                    RoutineNameNoSpace);
                             Cp = GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidName,
+                                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).FluidName,
                                                        5.,
-                                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).FluidIndex,
+                                                       state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum).FluidIndex,
                                                        RoutineNameNoSpace);
                             MaxColdWaterVolFlowDes = DesCoilLoad / (WaterCoilSizDeltaT * Cp * rho);
                         } else {
@@ -2411,12 +2391,10 @@ namespace FanCoilUnits {
                                      mdot,
                                      FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                      FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                     FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                     FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                     FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                     FanCoil(FanCoilNum).CoolCoilCompNum);
-                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).LoopSide(FanCoil(FanCoilNum).CoolCoilLoopSide).FlowLock ==
-                    DataPlant::FlowLock::Locked) {
+                                     FanCoil(FanCoilNum).CoolCoilPlantLoc);
+                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum)
+                        .LoopSide(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum)
+                        .FlowLock == DataPlant::FlowLock::Locked) {
                     ColdFlowLocked = true; // check for flow lock
                 }
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
@@ -2425,12 +2403,10 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                          FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                         FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                         FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                         FanCoil(FanCoilNum).HeatCoilCompNum);
-                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).LoopSide(FanCoil(FanCoilNum).HeatCoilLoopSide).FlowLock ==
-                        DataPlant::FlowLock::Locked) {
+                                         FanCoil(FanCoilNum).HeatCoilPlantLoc);
+                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum)
+                            .LoopSide(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum)
+                            .FlowLock == DataPlant::FlowLock::Locked) {
                         HotFlowLocked = true; // save locked flow
                     }
                 }
@@ -2465,10 +2441,7 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                          FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                         FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                         FanCoil(FanCoilNum).CoolCoilCompNum);
+                                         FanCoil(FanCoilNum).CoolCoilPlantLoc);
                     Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMaxC);
                     if (!ColdFlowLocked) {
                         FanCoil(FanCoilNum).QUnitOutMaxC = QUnitOutMaxC;
@@ -2557,10 +2530,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                              FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                             FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                             FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                             FanCoil(FanCoilNum).CoolCoilCompNum);
+                                             FanCoil(FanCoilNum).CoolCoilPlantLoc);
                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut); // get QUnitOut
                     } else {
                         // flow lock on
@@ -2613,10 +2583,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                              FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                             FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                             FanCoil(FanCoilNum).HeatCoilCompNum);
+                                             FanCoil(FanCoilNum).HeatCoilPlantLoc);
                         Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMaxH);
                         if (!HotFlowLocked) {
                             FanCoil(FanCoilNum).QUnitOutMaxH = QUnitOutMaxH;
@@ -2723,10 +2690,7 @@ namespace FanCoilUnits {
                                                  mdot,
                                                  FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                                  FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                                 FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                                 FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                                 FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                                 FanCoil(FanCoilNum).HeatCoilCompNum);
+                                                 FanCoil(FanCoilNum).HeatCoilPlantLoc);
                             Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut); // get QUnitOut
                         } else {
                             // flow lock on
@@ -2794,12 +2758,10 @@ namespace FanCoilUnits {
                                      mdot,
                                      FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                      FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                     FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                     FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                     FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                     FanCoil(FanCoilNum).CoolCoilCompNum);
-                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilLoopNum).LoopSide(FanCoil(FanCoilNum).CoolCoilLoopSide).FlowLock ==
-                    DataPlant::FlowLock::Locked) {
+                                     FanCoil(FanCoilNum).CoolCoilPlantLoc);
+                if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopNum)
+                        .LoopSide(FanCoil(FanCoilNum).CoolCoilPlantLoc.loopSideNum)
+                        .FlowLock == DataPlant::FlowLock::Locked) {
                     ColdFlowLocked = true; // check for flow lock
                 }
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
@@ -2808,12 +2770,10 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                          FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                         FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                         FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                         FanCoil(FanCoilNum).HeatCoilCompNum);
-                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilLoopNum).LoopSide(FanCoil(FanCoilNum).HeatCoilLoopSide).FlowLock ==
-                        DataPlant::FlowLock::Locked) {
+                                         FanCoil(FanCoilNum).HeatCoilPlantLoc);
+                    if (state.dataPlnt->PlantLoop(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopNum)
+                            .LoopSide(FanCoil(FanCoilNum).HeatCoilPlantLoc.loopSideNum)
+                            .FlowLock == DataPlant::FlowLock::Locked) {
                         HotFlowLocked = true; // save locked flow
                     }
                 }
@@ -2863,10 +2823,7 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                          FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                         FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                         FanCoil(FanCoilNum).CoolCoilCompNum);
+                                         FanCoil(FanCoilNum).CoolCoilPlantLoc);
 
                     QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                     ControlOffset = FanCoil(FanCoilNum).ColdControlOffset;
@@ -2949,10 +2906,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                              FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                             FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                             FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                             FanCoil(FanCoilNum).CoolCoilCompNum);
+                                             FanCoil(FanCoilNum).CoolCoilPlantLoc);
                     } else {
                         PLR = 1.0;
                         mdot = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
@@ -2960,10 +2914,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                              FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                             FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                             FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                             FanCoil(FanCoilNum).CoolCoilCompNum);
+                                             FanCoil(FanCoilNum).CoolCoilPlantLoc);
                     }
 
                     // at the end calculate output
@@ -2978,10 +2929,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                              FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                             FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                             FanCoil(FanCoilNum).HeatCoilCompNum);
+                                             FanCoil(FanCoilNum).HeatCoilPlantLoc);
                     }
 
                     QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
@@ -3071,10 +3019,7 @@ namespace FanCoilUnits {
                                                  HWFlow,
                                                  FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                                  FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                                 FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                                 FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                                 FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                                 FanCoil(FanCoilNum).HeatCoilCompNum);
+                                                 FanCoil(FanCoilNum).HeatCoilPlantLoc);
 
                         } else {
                             Par(1) = double(FanCoilNum);
@@ -3092,10 +3037,7 @@ namespace FanCoilUnits {
                                                  mdot,
                                                  FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                                  FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                                 FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                                 FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                                 FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                                 FanCoil(FanCoilNum).HeatCoilCompNum);
+                                                 FanCoil(FanCoilNum).HeatCoilPlantLoc);
                         }
                     }
 
@@ -3140,10 +3082,7 @@ namespace FanCoilUnits {
                                      mdot,
                                      FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                      FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                     FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                     FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                     FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                     FanCoil(FanCoilNum).CoolCoilCompNum);
+                                     FanCoil(FanCoilNum).CoolCoilPlantLoc);
 
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                     mdot = 0.0;
@@ -3151,10 +3090,7 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                          FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                         FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                         FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                         FanCoil(FanCoilNum).HeatCoilCompNum);
+                                         FanCoil(FanCoilNum).HeatCoilPlantLoc);
                 }
 
                 OAMassFlow = 0.0;
@@ -3216,10 +3152,7 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                          FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                         FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                         FanCoil(FanCoilNum).CoolCoilCompNum);
+                                         FanCoil(FanCoilNum).CoolCoilPlantLoc);
 
                 } else if (state.dataFanCoilUnits->HeatingLoad) {
 
@@ -3231,10 +3164,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                              FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                             FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                             FanCoil(FanCoilNum).HeatCoilCompNum);
+                                             FanCoil(FanCoilNum).HeatCoilPlantLoc);
                     }
                 }
 
@@ -3251,10 +3181,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                              FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                             FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                             FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                             FanCoil(FanCoilNum).CoolCoilCompNum);
+                                             FanCoil(FanCoilNum).CoolCoilPlantLoc);
 
                         if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                             mdot = 0.0;
@@ -3262,16 +3189,13 @@ namespace FanCoilUnits {
                                                  mdot,
                                                  FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                                  FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                                 FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                                 FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                                 FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                                 FanCoil(FanCoilNum).HeatCoilCompNum);
+                                                 FanCoil(FanCoilNum).HeatCoilPlantLoc);
                         }
                     } else {
                         Real64 OnOffAirFlowRatio = 1.0;
                         bool HXUnitOn = false;
                         int AirLoopNum = 0;
-                        int CompressorOnFlag = 0;
+                        DataHVACGlobals::CompressorOperation CompressorOnFlag = DataHVACGlobals::CompressorOperation::Off;
                         auto &SZVAVModel(FanCoil(FanCoilNum));
                         // seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different
                         // models
@@ -3316,10 +3240,7 @@ namespace FanCoilUnits {
                                      mdot,
                                      FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                      FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                     FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                     FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                     FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                     FanCoil(FanCoilNum).CoolCoilCompNum);
+                                     FanCoil(FanCoilNum).CoolCoilPlantLoc);
 
                 if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                     mdot = 0.0;
@@ -3327,10 +3248,7 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                          FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                         FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                         FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                         FanCoil(FanCoilNum).HeatCoilCompNum);
+                                         FanCoil(FanCoilNum).HeatCoilPlantLoc);
                 }
                 Calc4PipeFanCoil(state,
                                  FanCoilNum,
@@ -3347,10 +3265,7 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                          FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                         FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                         FanCoil(FanCoilNum).CoolCoilCompNum);
+                                         FanCoil(FanCoilNum).CoolCoilPlantLoc);
                     QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                     ControlOffset = FanCoil(FanCoilNum).ColdControlOffset;
 
@@ -3400,10 +3315,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                              FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                             FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                             FanCoil(FanCoilNum).HeatCoilCompNum);
+                                             FanCoil(FanCoilNum).HeatCoilPlantLoc);
                     }
                     QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
                     ControlOffset = FanCoil(FanCoilNum).HotControlOffset;
@@ -3841,8 +3753,13 @@ namespace FanCoilUnits {
                 }
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataHVACGlobals::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
             }
@@ -3877,8 +3794,13 @@ namespace FanCoilUnits {
                     state, ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataHVACGlobals::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
             }
@@ -3925,8 +3847,13 @@ namespace FanCoilUnits {
             }
 
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil::HXAssist) {
-                SimHXAssistedCoolingCoil(
-                    state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state,
+                                         FanCoil(FanCoilNum).CCoilName,
+                                         FirstHVACIteration,
+                                         DataHVACGlobals::CompressorOperation::On,
+                                         0.0,
+                                         FanCoil(FanCoilNum).CCoilName_Index,
+                                         ContFanCycCoil);
             } else {
                 SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index);
             }
@@ -4055,20 +3982,14 @@ namespace FanCoilUnits {
                                  mdot,
                                  FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                  FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                 FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                 FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                 FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                 FanCoil(FanCoilNum).HeatCoilCompNum);
+                                 FanCoil(FanCoilNum).HeatCoilPlantLoc);
         }
         mdot = 0.0;
         SetComponentFlowRate(state,
                              mdot,
                              FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                              FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                             FanCoil(FanCoilNum).CoolCoilLoopNum,
-                             FanCoil(FanCoilNum).CoolCoilLoopSide,
-                             FanCoil(FanCoilNum).CoolCoilBranchNum,
-                             FanCoil(FanCoilNum).CoolCoilCompNum);
+                             FanCoil(FanCoilNum).CoolCoilPlantLoc);
         // no load output, requires setting eHeatCoilCyclingR = 0.0, for electric heating coils
         Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutNoHC, _, 0.0);
 
@@ -4190,20 +4111,14 @@ namespace FanCoilUnits {
                                      mdot,
                                      FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                      FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                     FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                     FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                     FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                     FanCoil(FanCoilNum).HeatCoilCompNum);
+                                     FanCoil(FanCoilNum).HeatCoilPlantLoc);
             }
             mdot = FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
             SetComponentFlowRate(state,
                                  mdot,
                                  FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                  FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                 FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                 FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                 FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                 FanCoil(FanCoilNum).CoolCoilCompNum);
+                                 FanCoil(FanCoilNum).CoolCoilPlantLoc);
             // select fan speed
             FanCoil(FanCoilNum).SpeedFanSel = 1;
             FanCoil(FanCoilNum).SpeedFanRatSel = FanCoil(FanCoilNum).LowSpeedRatio;
@@ -4244,10 +4159,7 @@ namespace FanCoilUnits {
                                  mdot,
                                  FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                  FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                 FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                 FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                 FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                 FanCoil(FanCoilNum).CoolCoilCompNum);
+                                 FanCoil(FanCoilNum).CoolCoilPlantLoc);
 
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil::Water) {
                 mdot = FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
@@ -4255,10 +4167,7 @@ namespace FanCoilUnits {
                                      mdot,
                                      FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                      FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                     FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                     FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                     FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                     FanCoil(FanCoilNum).HeatCoilCompNum);
+                                     FanCoil(FanCoilNum).HeatCoilPlantLoc);
             }
             // select fan speed
             FanCoil(FanCoilNum).SpeedFanSel = 1;
@@ -4325,19 +4234,13 @@ namespace FanCoilUnits {
                                      mdot,
                                      FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                      FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                     FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                     FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                     FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                     FanCoil(FanCoilNum).HeatCoilCompNum);
+                                     FanCoil(FanCoilNum).HeatCoilPlantLoc);
             }
             SetComponentFlowRate(state,
                                  mdot,
                                  FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                  FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                 FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                 FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                 FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                 FanCoil(FanCoilNum).CoolCoilCompNum);
+                                 FanCoil(FanCoilNum).CoolCoilPlantLoc);
             // No load output, eHeatCoilCyclingR = 0.0 for electric heating coil
             Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PartLoadRatio, 0.0);
         }
@@ -4449,10 +4352,7 @@ namespace FanCoilUnits {
                                          mdot,
                                          FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                          FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
-                                         FanCoil(FanCoilNum).CoolCoilLoopSide,
-                                         FanCoil(FanCoilNum).CoolCoilBranchNum,
-                                         FanCoil(FanCoilNum).CoolCoilCompNum);
+                                         FanCoil(FanCoilNum).CoolCoilPlantLoc);
                     if (FanCoil(FanCoilNum).FanOpMode == ContFanCycCoil) {
                         Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut);
                     } else {
@@ -4583,10 +4483,7 @@ namespace FanCoilUnits {
                                              mdot,
                                              FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                              FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopNum,
-                                             FanCoil(FanCoilNum).HeatCoilLoopSide,
-                                             FanCoil(FanCoilNum).HeatCoilBranchNum,
-                                             FanCoil(FanCoilNum).HeatCoilCompNum);
+                                             FanCoil(FanCoilNum).HeatCoilPlantLoc);
                         if (FanCoil(FanCoilNum).FanOpMode == ContFanCycCoil) {
                             Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut);
                         } else {

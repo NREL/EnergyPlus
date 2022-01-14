@@ -2669,9 +2669,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataLoopNodes->Node(3).Temp = 15.0;
     state->dataLoopNodes->Node(3).MassFlowRate = 0.05;
     // Plant loop must be initialized
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).plantLoc.loopNum = 1;
     state->dataPlnt->PlantLoop.allocate(LoopNum);
-    state->dataPlnt->PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).plantLoc.loopNum).FluidIndex = 1;
     auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide(EnergyPlus::DataPlant::LoopSideLocation::Supply));
     SupplySideloop.TotalBranches = 1;
     SupplySideloop.Branch.allocate(BranchNum);
@@ -2683,12 +2683,12 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
     state->dataGlobal->BeginEnvrnFlag = true;
     WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
     EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
     // Reclaimed heat successfully returned to reflect the plant impact
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, DataHVACGlobals::CompressorOperation::On, PLR, 1.0);
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource,
               state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
 
@@ -3068,7 +3068,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     // Calculate multispeed DX cooling coils
-    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
+    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 1);
 
     // Source availably heat successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
     EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity,
@@ -3115,7 +3115,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Desuperheater.SaveMode = 0;
     state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
-    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
+    DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 1);
     Tank.CalcDesuperheaterWaterHeater(*state, false);
     EXPECT_EQ(Desuperheater.Mode, 0);
     EXPECT_EQ(Desuperheater.HeaterRate, 0.0);
@@ -3210,7 +3210,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     Tank.SetPointTemp = 55.0;
 
     // Source side is in the demand side of the plant loop
-    Tank.SrcSide.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
+    Tank.SrcSidePlantLoc.loopSideNum = EnergyPlus::DataPlant::LoopSideLocation::Demand;
     Tank.SavedSourceOutletTemp = 60.0;
     rho = GetDensityGlycol(*state, "Water", Tank.TankTemp, WaterIndex, "MixedTankAlternateSchedule");
 

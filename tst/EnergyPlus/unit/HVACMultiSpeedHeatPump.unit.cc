@@ -1444,7 +1444,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecInletNodeNum = HeatRecInNode;
     state->dataHVACMultiSpdHP->MSHeatPump(1).HeatRecOutletNodeNum = HeatRecOutNode;
     state->dataHVACMultiSpdHP->MSHeatPump(1).MaxHeatRecOutletTemp = 80;
-    state->dataHVACMultiSpdHP->MSHeatPump(1).HRLoopNum = 1; // index to plant
+    state->dataHVACMultiSpdHP->MSHeatPump(1).HRPlantLoc.loopNum = 1; // index to plant
     state->dataLoopNodes->Node(HeatRecInNode).Temp = 50.0;
     state->dataHVACGlobal->MSHPWasteHeat = 1000.0;
 

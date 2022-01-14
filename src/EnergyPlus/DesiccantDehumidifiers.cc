@@ -1839,10 +1839,7 @@ namespace DesiccantDehumidifiers {
                     ScanPlantLoopsForObject(state,
                                             DesicDehum(DesicDehumNum).RegenCoilName,
                                             DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                            DesicDehum(DesicDehumNum).LoopNum,
-                                            DesicDehum(DesicDehumNum).LoopSide,
-                                            DesicDehum(DesicDehumNum).BranchNum,
-                                            DesicDehum(DesicDehumNum).CompNum,
+                                            DesicDehum(DesicDehumNum).plantLoc,
                                             ErrorFlag,
                                             _,
                                             _,
@@ -1858,9 +1855,9 @@ namespace DesiccantDehumidifiers {
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", DesicDehum(DesicDehumNum).RegenCoilName, ErrorFlag);
                     if (DesicDehum(DesicDehumNum).MaxCoilFluidFlow > 0.0) {
                         FluidDensity = GetDensityGlycol(state,
-                                                        state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
+                                                        state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).plantLoc.loopNum).FluidName,
                                                         DataGlobalConstants::HWInitConvTemp,
-                                                        state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
+                                                        state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).plantLoc.loopNum).FluidIndex,
                                                         initCBVAV);
                         DesicDehum(DesicDehumNum).MaxCoilFluidFlow *= FluidDensity;
                     }
@@ -1871,10 +1868,7 @@ namespace DesiccantDehumidifiers {
                     ScanPlantLoopsForObject(state,
                                             DesicDehum(DesicDehumNum).RegenCoilName,
                                             DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                            DesicDehum(DesicDehumNum).LoopNum,
-                                            DesicDehum(DesicDehumNum).LoopSide,
-                                            DesicDehum(DesicDehumNum).BranchNum,
-                                            DesicDehum(DesicDehumNum).CompNum,
+                                            DesicDehum(DesicDehumNum).plantLoc,
                                             ErrorFlag,
                                             _,
                                             _,
@@ -1897,11 +1891,8 @@ namespace DesiccantDehumidifiers {
                 }
 
                 // fill outlet node for regenartion hot water or steam heating coil
-                DesicDehum(DesicDehumNum).CoilOutletNode = state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum)
-                                                               .LoopSide(DesicDehum(DesicDehumNum).LoopSide)
-                                                               .Branch(DesicDehum(DesicDehumNum).BranchNum)
-                                                               .Comp(DesicDehum(DesicDehumNum).CompNum)
-                                                               .NodeNumOut;
+                DesicDehum(DesicDehumNum).CoilOutletNode =
+                    DataPlant::CompData::getPlantComponent(state, DesicDehum(DesicDehumNum).plantLoc).NodeNumOut;
                 MyPlantScanFlag(DesicDehumNum) = false;
 
             } else { // DesicDehum is not connected to plant
@@ -1986,9 +1977,9 @@ namespace DesiccantDehumidifiers {
                                 }
                                 if (CoilMaxVolFlowRate != AutoSize) {
                                     FluidDensity = GetDensityGlycol(state,
-                                                                    state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidName,
+                                                                    state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).plantLoc.loopNum).FluidName,
                                                                     DataGlobalConstants::HWInitConvTemp,
-                                                                    state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).LoopNum).FluidIndex,
+                                                                    state.dataPlnt->PlantLoop(DesicDehum(DesicDehumNum).plantLoc.loopNum).FluidIndex,
                                                                     RoutineName);
                                     DesicDehum(DesicDehumNum).MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
                                 }
@@ -2017,11 +2008,7 @@ namespace DesiccantDehumidifiers {
                                            0.0,
                                            DesicDehum(DesicDehumNum).MaxCoilFluidFlow,
                                            DesicDehum(DesicDehumNum).CoilControlNode,
-                                           DesicDehum(DesicDehumNum).CoilOutletNode,
-                                           DesicDehum(DesicDehumNum).LoopNum,
-                                           DesicDehum(DesicDehumNum).LoopSide,
-                                           DesicDehum(DesicDehumNum).BranchNum,
-                                           DesicDehum(DesicDehumNum).CompNum);
+                                           DesicDehum(DesicDehumNum).CoilOutletNode);
                     }
 
                     MyEnvrnFlag(DesicDehumNum) = false;
@@ -3383,10 +3370,7 @@ namespace DesiccantDehumidifiers {
                                          MaxHotWaterFlow,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).LoopNum,
-                                         DesicDehum(DesicDehumNum).LoopSide,
-                                         DesicDehum(DesicDehumNum).BranchNum,
-                                         DesicDehum(DesicDehumNum).CompNum);
+                                         DesicDehum(DesicDehumNum).plantLoc);
                     RegenCoilActual = RegenCoilLoad;
                     // simulate the regenerator hot water heating coil
                     SimulateWaterCoilComponents(state,
@@ -3460,10 +3444,7 @@ namespace DesiccantDehumidifiers {
                                          mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).LoopNum,
-                                         DesicDehum(DesicDehumNum).LoopSide,
-                                         DesicDehum(DesicDehumNum).BranchNum,
-                                         DesicDehum(DesicDehumNum).CompNum);
+                                         DesicDehum(DesicDehumNum).plantLoc);
                     // simulate the regenerator steam heating coil
                     SimulateSteamCoilComponents(state,
                                                 DesicDehum(DesicDehumNum).RegenCoilName,
@@ -3489,10 +3470,7 @@ namespace DesiccantDehumidifiers {
                                          mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).LoopNum,
-                                         DesicDehum(DesicDehumNum).LoopSide,
-                                         DesicDehum(DesicDehumNum).BranchNum,
-                                         DesicDehum(DesicDehumNum).CompNum);
+                                         DesicDehum(DesicDehumNum).plantLoc);
                     RegenCoilActual = RegenCoilLoad;
                     // simulate the regenerator hot water heating coil
                     SimulateWaterCoilComponents(state,
@@ -3506,10 +3484,7 @@ namespace DesiccantDehumidifiers {
                                          mdot,
                                          DesicDehum(DesicDehumNum).CoilControlNode,
                                          DesicDehum(DesicDehumNum).CoilOutletNode,
-                                         DesicDehum(DesicDehumNum).LoopNum,
-                                         DesicDehum(DesicDehumNum).LoopSide,
-                                         DesicDehum(DesicDehumNum).BranchNum,
-                                         DesicDehum(DesicDehumNum).CompNum);
+                                         DesicDehum(DesicDehumNum).plantLoc);
                     // simulate the regenerator steam heating coil
                     SimulateSteamCoilComponents(state,
                                                 DesicDehum(DesicDehumNum).RegenCoilName,
@@ -3567,10 +3542,7 @@ namespace DesiccantDehumidifiers {
                              mdot,
                              state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilControlNode,
                              state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CoilOutletNode,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).LoopNum,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).LoopSide,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).BranchNum,
-                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).CompNum);
+                             state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum).plantLoc);
 
         // simulate the hot water regenerator heating coil
         SimulateWaterCoilComponents(state,

@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -64,38 +65,23 @@ struct EnergyPlusData;
 namespace PlantUtilities {
 
     // Functions
-    void InitComponentNodes(EnergyPlusData &state,
-                            Real64 MinCompMdot,
-                            Real64 MaxCompMdot,
-                            int InletNode,                           // component's inlet node index in node structure
-                            int OutletNode,                          // component's outlet node index in node structure
-                            int LoopNum,                             // plant loop index for PlantLoop structure
-                            DataPlant::LoopSideLocation LoopSideNum, // Loop side index for PlantLoop structure
-                            int BranchIndex,                         // branch index for PlantLoop
-                            int CompIndex                            // component index for PlantLoop
-    );
+    void InitComponentNodes(EnergyPlusData &state, Real64 const MinCompMdot, Real64 const MaxCompMdot, int const InletNode, int const OutletNode);
 
     void SetComponentFlowRate(EnergyPlusData &state,
-                              Real64 &CompFlow,                        // [kg/s]
-                              int InletNode,                           // component's inlet node index in node structure
-                              int OutletNode,                          // component's outlet node index in node structure
-                              int LoopNum,                             // plant loop index for PlantLoop structure
-                              DataPlant::LoopSideLocation LoopSideNum, // Loop side index for PlantLoop structure
-                              int BranchIndex,                         // branch index for PlantLoop
-                              int CompIndex                            // component index for PlantLoop
+                              Real64 &CompFlow,             // [kg/s]
+                              int InletNode,                // component's inlet node index in node structure
+                              int OutletNode,               // component's outlet node index in node structure
+                              PlantLocation const &plantLoc // component location for PlantLoop
     );
 
     void SetActuatedBranchFlowRate(EnergyPlusData &state,
                                    Real64 &CompFlow,
                                    int ActuatedNode,
-                                   int LoopNum,
-                                   DataPlant::LoopSideLocation LoopSideNum,
-                                   int BranchNum,
+                                   PlantLocation const &plantLoc,
                                    bool ResetMode // flag to indicate if this is a real flow set, or a reset flow setting.
     );
 
-    Real64 RegulateCondenserCompFlowReqOp(
-        EnergyPlusData &state, int LoopNum, DataPlant::LoopSideLocation LoopSideNum, int BranchNum, int CompNum, Real64 TentativeFlowRequest);
+    Real64 RegulateCondenserCompFlowReqOp(EnergyPlusData &state, PlantLocation const &plantLoc, Real64 TentativeFlowRequest);
 
     bool AnyPlantSplitterMixerLacksContinuity(EnergyPlusData &state);
 
@@ -111,13 +97,9 @@ namespace PlantUtilities {
     void ResetAllPlantInterConnectFlags(EnergyPlusData &state);
 
     void PullCompInterconnectTrigger(EnergyPlusData &state,
-                                     const int LoopNum,                                   // component's loop index
-                                     const DataPlant::LoopSideLocation LoopSide,          // component's loop side number
-                                     const int BranchNum,                                 // Component's branch number
-                                     const int CompNum,                                   // Component's comp number
-                                     int &UniqueCriteriaCheckIndex,                       // An integer given to this particular check
-                                     const int ConnectedLoopNum,                          // Component's interconnected loop number
-                                     const DataPlant::LoopSideLocation ConnectedLoopSide, // Component's interconnected loop side number
+                                     const PlantLocation &plantLoc,              // Component Location
+                                     int &UniqueCriteriaCheckIndex,              // An integer given to this particular check
+                                     const PlantLocation &ConnectedPlantLoc,     // Interconnected Component's Location
                                      const DataPlant::CriteriaType CriteriaType, // The criteria check to use, see DataPlant: SimFlagCriteriaTypes
                                      const Real64 CriteriaValue                  // The value of the criteria check to evaluate
     );
@@ -158,10 +140,8 @@ namespace PlantUtilities {
                                                      bool FirstHVACIteration);
 
     void InterConnectTwoPlantLoopSides(EnergyPlusData &state,
-                                       int Loop1Num,
-                                       DataPlant::LoopSideLocation Loop1LoopSideNum,
-                                       int Loop2Num,
-                                       DataPlant::LoopSideLocation Loop2LoopSideNum,
+                                       PlantLocation const &Loop1PlantLoc,
+                                       PlantLocation const &Loop2PlantLoc,
                                        DataPlant::PlantEquipmentType ComponentType,
                                        bool Loop1DemandsOnLoop2);
 
@@ -192,10 +172,7 @@ namespace PlantUtilities {
     void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string_view CompName,
                                  DataPlant::PlantEquipmentType CompType,
-                                 int &LoopNum,
-                                 DataPlant::LoopSideLocation &LoopSideNum,
-                                 int &BranchNum,
-                                 int &CompNum,
+                                 PlantLocation &plantLoc,
                                  bool &errFlag,
                                  Optional<Real64 const> LowLimitTemp = _,
                                  Optional<Real64 const> HighLimitTemp = _,
@@ -204,11 +181,9 @@ namespace PlantUtilities {
                                  Optional_int_const SingleLoopSearch = _);
 
     void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
-                                  std::string_view const CallerName,        // really used for error messages
-                                  int NodeNum,                              // index in Node structure of node to be scanned
-                                  int &LoopNum,                             // return value for plant loop
-                                  DataPlant::LoopSideLocation &LoopSideNum, // return value for plant loop side
-                                  int &BranchNum,
+                                  std::string_view const CallerName, // really used for error messages
+                                  int NodeNum,                       // index in Node structure of node to be scanned
+                                  PlantLocation &pLantLoc,           // return value for location
                                   Optional_int CompNum = _);
 
     bool AnyPlantLoopSidesNeedSim(EnergyPlusData &state);

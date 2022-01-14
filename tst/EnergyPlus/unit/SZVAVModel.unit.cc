@@ -190,10 +190,10 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.LowSpeedHeatFanRatio = 0.5;
     thisUnit.CoolCoilFluidInletNode = 0;
     thisUnit.CoolCoilFluidOutletNodeNum = 0;
-    thisUnit.CoolCoilLoopNum = 0;
-    thisUnit.CoolCoilLoopSide = DataPlant::LoopSideLocation::Invalid;
-    thisUnit.CoolCoilBranchNum = 0;
-    thisUnit.CoolCoilCompNum = 0;
+    thisUnit.CoolCoilPlantLoc.loopNum = 0;
+    thisUnit.CoolCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
+    thisUnit.CoolCoilPlantLoc.branchNum = 0;
+    thisUnit.CoolCoilPlantLoc.compNum = 0;
     thisUnit.CoolCoilInletNodeNum = 2;
     thisUnit.CoolCoilOutletNodeNum = 4;
 
@@ -201,10 +201,10 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.MaxHeatAirMassFlow = 0.2;
     thisUnit.HeatCoilFluidInletNode = 0;
     thisUnit.HeatCoilFluidOutletNodeNum = 0;
-    thisUnit.HeatCoilLoopNum = 0;
-    thisUnit.HeatCoilLoopSide = DataPlant::LoopSideLocation::Invalid;
-    thisUnit.HeatCoilBranchNum = 0;
-    thisUnit.HeatCoilCompNum = 0;
+    thisUnit.HeatCoilPlantLoc.loopNum = 0;
+    thisUnit.HeatCoilPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Invalid;
+    thisUnit.HeatCoilPlantLoc.branchNum = 0;
+    thisUnit.HeatCoilPlantLoc.compNum = 0;
     thisUnit.HeatCoilInletNodeNum = 4;
     thisUnit.HeatCoilOutletNodeNum = 3;
 
@@ -259,7 +259,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     bool HXUnitOn = false;
     int AirLoopNum = 0;
     Real64 PLR = 0.0;
-    int CompressorOnFlag = 0;
+    DataHVACGlobals::CompressorOperation CompressorOnFlag = DataHVACGlobals::CompressorOperation::Off;
     auto &SZVAVModel(state->dataPTHP->PTUnit(1));
     // first pass through will get objects and reset node data
     SZVAVModel::calcSZVAVModel(*state,
@@ -479,7 +479,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    int CompressorOnFlag(0);
+    CompressorOperation CompressorOnFlag(CompressorOperation::Off);
     int AirLoopNum(0);
     bool FirstHVACIteration(false);
     bool ErrorsFound(false);
@@ -675,10 +675,10 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
     state->dataLoopNodes->Node(CWCoil.WaterInletNodeNum).Temp = 6.0;
-    CWCoil.WaterLoopNum = 1;
-    CWCoil.WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    CWCoil.WaterLoopBranchNum = 1;
-    CWCoil.WaterLoopCompNum = 1;
+    CWCoil.WaterPlantLoc.loopNum = 1;
+    CWCoil.WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    CWCoil.WaterPlantLoc.branchNum = 1;
+    CWCoil.WaterPlantLoc.compNum = 1;
     // electric heating coil
     auto &eHCoil(state->dataHeatingCoils->HeatingCoil(1));
     state->dataLoopNodes->Node(eHCoil.AirInletNodeNum).MassFlowRate = AirMassFlow;
@@ -742,7 +742,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     OnOffAirFlowRatio = 1.0;
     HXUnitOn = false;
     AirLoopNum = 0;
-    CompressorOnFlag = 0;
+    CompressorOnFlag = CompressorOperation::Off;
     FirstHVACIteration = true;
     auto &SZVAVModel(state->dataFanCoilUnits->FanCoil(FanCoilNum));
 

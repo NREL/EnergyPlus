@@ -338,10 +338,10 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     // set up water coil
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Cooling Coil";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.branchNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.compNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = DataSizing::AutoSize;
@@ -405,10 +405,10 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = 7;
     state->dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum = 8;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Heating Coil";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 2;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum = 2;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.branchNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.compNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = DataSizing::AutoSize;
@@ -4267,7 +4267,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
 
     int AirLoopNum(1);
     bool FirstHVACIteration(false);
-    int CompOn(1);
+    DataHVACGlobals::CompressorOperation CompressorOn(DataHVACGlobals::CompressorOperation::On);
     Real64 OnOffAirFlowRatio(1.0);
     Real64 HeatCoilLoad(0.0);
     Real64 HotWaterMassFlowRate(0.0);
@@ -4356,10 +4356,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRate = AirMassFlowRate;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).MassFlowRateMax = AirMassFlowRate;
 
-    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.branchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.compNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum = 6;
     state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum = 7;
     state->dataWaterCoils->WaterCoil(1).InletWaterTemp = 60.0;
@@ -4397,7 +4397,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataGlobal->DoingSizing = true;
     state->dataWaterCoils->WaterCoil(1).TotWaterHeatingCoilRate = 0.0;
 
-    thisSys.calcUnitaryHeatingSystem(*state, AirLoopNum, FirstHVACIteration, thisSys.m_HeatingCycRatio, CompOn, OnOffAirFlowRatio, HeatCoilLoad);
+    thisSys.calcUnitaryHeatingSystem(
+        *state, AirLoopNum, FirstHVACIteration, thisSys.m_HeatingCycRatio, CompressorOn, OnOffAirFlowRatio, HeatCoilLoad);
 
     EXPECT_NEAR(15750.0, state->dataWaterCoils->WaterCoil(1).TotWaterHeatingCoilRate, 2.0);
 }
@@ -4405,7 +4406,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
 TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
 {
 
-    int CompOn(1);
+    DataHVACGlobals::CompressorOperation CompressorOn(DataHVACGlobals::CompressorOperation::On);
     int AirLoopNum(1);
     bool FirstHVACIteration(false);
     Real64 OnOffAirFlowRatio(1.0);
@@ -4511,10 +4512,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
                                    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp,
                                    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
 
-    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.branchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.compNum = 1;
     state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum = 6;
     state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum = 7;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
@@ -4555,7 +4556,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate = 0.0;
 
     thisSys.calcUnitaryCoolingSystem(
-        *state, AirLoopNum, FirstHVACIteration, thisSys.m_CoolingCycRatio, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
+        *state, AirLoopNum, FirstHVACIteration, thisSys.m_CoolingCycRatio, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
 
     EXPECT_NEAR(27530.0, state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate, 2.0);
 }
@@ -17760,10 +17761,10 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
                                    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp,
                                    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
 
-    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.branchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.compNum = 1;
     state->dataWaterCoils->WaterCoil(1).InletWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataWaterCoils->WaterCoil(1).MaxWaterMassFlowRate = ColdWaterMassFlowRate;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
@@ -18014,10 +18015,10 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
                                    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Temp,
                                    state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).AirInletNodeNum).Enthalpy);
 
-    state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
-    state->dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.branchNum = 1;
+    state->dataWaterCoils->WaterCoil(1).WaterPlantLoc.compNum = 1;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRateMaxAvail = ColdWaterMassFlowRate;
@@ -18075,7 +18076,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataGlobal->SysSizingCalc = true;
     FirstHVACIteration = true;
     bool HXUnitOn(false);
-    int CompOn(0);
+    DataHVACGlobals::CompressorOperation CompressorOn(DataHVACGlobals::CompressorOperation::Off);
     int ZoneOAUnitNum(0);
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
@@ -18091,18 +18092,20 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     // run init and check the coil system operating condition and control status
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 1);
-    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompOn);
+    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 1.0);
-    thisSys.calcUnitaryCoolingSystem(*state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
+    thisSys.calcUnitaryCoolingSystem(
+        *state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
     EXPECT_NEAR(19267.0, state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate, 1.0);
 
     // Test 2: economizer inlet water temperature is favorable, air loop economizer flag turns coil OFF
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive = true;
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
-    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompOn);
+    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 0.0);
-    thisSys.calcUnitaryCoolingSystem(*state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
+    thisSys.calcUnitaryCoolingSystem(
+        *state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
     EXPECT_NEAR(0.0, state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate, 0.001);
 
     // Test 3: economizer inlet water temperature is NOT favorable, expect coil OFF
@@ -18111,9 +18114,10 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
-    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompOn);
+    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 0.0);
-    thisSys.calcUnitaryCoolingSystem(*state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
+    thisSys.calcUnitaryCoolingSystem(
+        *state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
     EXPECT_NEAR(0.0, state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate, 0.001);
 }
 
@@ -18280,10 +18284,10 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
                                        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(i).AirInletNodeNum).Temp,
                                        state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(i).AirInletNodeNum).Enthalpy);
 
-        state->dataWaterCoils->WaterCoil(i).WaterLoopNum = 1;
-        state->dataWaterCoils->WaterCoil(i).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-        state->dataWaterCoils->WaterCoil(i).WaterLoopBranchNum = 1;
-        state->dataWaterCoils->WaterCoil(i).WaterLoopCompNum = i;
+        state->dataWaterCoils->WaterCoil(i).WaterPlantLoc.loopNum = 1;
+        state->dataWaterCoils->WaterCoil(i).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+        state->dataWaterCoils->WaterCoil(i).WaterPlantLoc.branchNum = 1;
+        state->dataWaterCoils->WaterCoil(i).WaterPlantLoc.compNum = i;
         state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(i).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(i).InletWaterTemp;
         state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(i).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
         state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(i).WaterInletNodeNum).MassFlowRateMax = ColdWaterMassFlowRate;
@@ -18352,7 +18356,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     state->dataGlobal->SysSizingCalc = true;
     FirstHVACIteration = true;
     bool HXUnitOn(false);
-    int CompOn(0);
+    DataHVACGlobals::CompressorOperation CompressorOn(DataHVACGlobals::CompressorOperation::Off);
     int ZoneOAUnitNum(0);
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
@@ -18368,13 +18372,14 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     // run init and check the coil system operating condition and control status
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 1);
-    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompOn);
+    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 1.0);
     Real64 coil1AirInTemp = state->dataLoopNodes->Node(thisSys.AirInNode).Temp;
     Real64 coil1AirOutTemp = state->dataLoopNodes->Node(thisSys.AirOutNode).Temp;
     EXPECT_NEAR(coil1AirInTemp, 30.0, 0.001);    // coil 1 cools the air
     EXPECT_NEAR(coil1AirOutTemp, 25.302, 0.001); // outlet air temp of 25.3C is lower than inlet air temp of 30C
-    thisSys.calcUnitaryCoolingSystem(*state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
+    thisSys.calcUnitaryCoolingSystem(
+        *state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompressorOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
     EXPECT_NEAR(4798.3, state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate, 0.1);
 
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(2).WaterInletNodeNum).MassFlowRate =
@@ -18401,7 +18406,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive = true;
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
     EXPECT_EQ(thisSys.temperatureOffsetControlStatus, 0);
-    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompOn);
+    thisSys.controlCoolingSystemToSP(*state, AirLoopNum, false, HXUnitOn, CompressorOn);
     EXPECT_EQ(thisSys.m_CoolingPartLoadFrac, 0.0);
     coil1AirInTemp = state->dataLoopNodes->Node(thisSys.AirInNode).Temp;
     coil1AirOutTemp = state->dataLoopNodes->Node(thisSys.AirOutNode).Temp;
