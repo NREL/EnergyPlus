@@ -14892,11 +14892,11 @@ namespace SurfaceGeometry {
                                 std::string saveName = Enclosures(enclNum).Name;
                                 Enclosures(enclNum) = Enclosures(enclNum + 1);
                                 Enclosures(enclNum).Name = saveName;
-                                for (auto zNum : thisEnclosure.spaceNums) {
+                                for (int sNum : Enclosures(enclNum).spaceNums) {
                                     if (radiantSetup) {
-                                        state.dataHeatBal->space(zNum).radiantEnclosureNum = enclNum;
+                                        state.dataHeatBal->space(sNum).radiantEnclosureNum = enclNum;
                                     } else {
-                                        state.dataHeatBal->space(zNum).solarEnclosureNum = enclNum;
+                                        state.dataHeatBal->space(sNum).solarEnclosureNum = enclNum;
                                     }
                                 }
                             }
