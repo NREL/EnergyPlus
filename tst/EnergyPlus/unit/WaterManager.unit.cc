@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -78,6 +79,10 @@ TEST_F(EnergyPlusFixture, WaterManager_NormalAnnualPrecipitation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     WaterManager::GetWaterManagerInput(*state);
+    state->dataWeatherManager->Envrn = 1;
+    state->dataWeatherManager->Environment.allocate(1);
+    state->dataEnvrn->Year = 2000;
+    state->dataWeatherManager->Environment(1).EndYear = 2000;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
@@ -112,6 +117,11 @@ TEST_F(EnergyPlusFixture, WaterManager_UpdatePrecipitation)
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput(*state);
     state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->Envrn = 1;
+    state->dataWeatherManager->Environment.allocate(1);
+    state->dataEnvrn->Year = 2000;
+    state->dataWeatherManager->Environment(1).EndYear = 2000;
+
     state->dataScheduleMgr->Schedule(1).CurrentValue = 2.0;
 
     state->dataEnvrn->LiquidPrecipitation = 0.5;
@@ -156,6 +166,10 @@ TEST_F(EnergyPlusFixture, WaterManager_ZeroAnnualPrecipitation)
     });
     ASSERT_TRUE(process_idf(idf_objects));
     WaterManager::GetWaterManagerInput(*state);
+    state->dataWeatherManager->Envrn = 1;
+    state->dataWeatherManager->Environment.allocate(1);
+    state->dataEnvrn->Year = 2000;
+    state->dataWeatherManager->Environment(1).EndYear = 2000;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 

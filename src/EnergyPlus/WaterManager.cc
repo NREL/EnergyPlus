@@ -1677,9 +1677,6 @@ namespace WaterManager {
     void ReportRainfall(EnergyPlusData &state)
     {
         constexpr std::array<std::string_view, 12> Months{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-        // fixme: debug print
-        fmt::print("Number of simulation years: {}\n", state.dataEnvrn->MaxNumberSimYears);
-        fmt::print("Start and end: {}\n", state.dataEnvrn->EnvironmentStartEnd);
         for (int i = 0; i < 12; i++) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchMonthlyTotalPrecInWeather,

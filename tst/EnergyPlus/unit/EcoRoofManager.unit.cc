@@ -60,6 +60,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EcoRoofManager;
@@ -203,6 +204,11 @@ TEST_F(EnergyPlusFixture, EcoRoofManager_UpdateSoilProps)
     // With site:precipitation schedule
     state->dataEnvrn->LiquidPrecipitation = 0.005; // unit m
     WaterManager::GetWaterManagerInput(*state);
+    state->dataWeatherManager->Envrn = 1;
+    state->dataWeatherManager->Environment.allocate(1);
+    state->dataEnvrn->Year = 2000;
+    state->dataWeatherManager->Environment(1).EndYear = 2000;
+
     state->dataWaterData->RainFall.CurrentAmount = 0.002;
 
     EcoRoofManager::UpdateSoilProps(
