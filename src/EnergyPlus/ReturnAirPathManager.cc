@@ -356,7 +356,7 @@ namespace ReturnAirPathManager {
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_manager_list_name");
-                int availMgrNum = UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager);
+                int availMgrNum = UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
                 if (availMgrNum > 0) {
                     // normal conditions
                 } else if (availMgrNum == 0) {
