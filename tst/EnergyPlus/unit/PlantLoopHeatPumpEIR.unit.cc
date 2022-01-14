@@ -468,14 +468,14 @@ TEST_F(EnergyPlusFixture, Initialization)
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // validate that location work got done correctly
-    EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Supply, thisCoolingPLHP->loadSideLocation.loopSideNum));
-    EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.branchNum);
-    EXPECT_EQ(1, thisCoolingPLHP->loadSideLocation.compNum);
-    EXPECT_EQ(2, thisCoolingPLHP->sourceSideLocation.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, thisCoolingPLHP->sourceSideLocation.loopSideNum));
-    EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.branchNum);
-    EXPECT_EQ(1, thisCoolingPLHP->sourceSideLocation.compNum);
+    EXPECT_EQ(1, thisCoolingPLHP->loadSidePlantLoc.loopNum);
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Supply, thisCoolingPLHP->loadSidePlantLoc.loopSideNum));
+    EXPECT_EQ(1, thisCoolingPLHP->loadSidePlantLoc.branchNum);
+    EXPECT_EQ(1, thisCoolingPLHP->loadSidePlantLoc.compNum);
+    EXPECT_EQ(2, thisCoolingPLHP->sourceSidePlantLoc.loopNum);
+    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, thisCoolingPLHP->sourceSidePlantLoc.loopSideNum));
+    EXPECT_EQ(1, thisCoolingPLHP->sourceSidePlantLoc.branchNum);
+    EXPECT_EQ(1, thisCoolingPLHP->sourceSidePlantLoc.compNum);
 
     // now call for initialization again, for begin environment
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -1183,10 +1183,10 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     EIRPlantLoopHeatPump *thisCoolingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[0];
 
     // do a little setup here
-    thisCoolingPLHP->loadSideLocation.loopNum = 1;
-    thisCoolingPLHP->loadSideLocation.loopSideNum = DataPlant::LoopSideLocation::Supply;
-    thisCoolingPLHP->loadSideLocation.branchNum = 1;
-    thisCoolingPLHP->loadSideLocation.compNum = 1;
+    thisCoolingPLHP->loadSidePlantLoc.loopNum = 1;
+    thisCoolingPLHP->loadSidePlantLoc.loopSideNum = DataPlant::LoopSideLocation::Supply;
+    thisCoolingPLHP->loadSidePlantLoc.branchNum = 1;
+    thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
@@ -2675,10 +2675,10 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     EIRPlantLoopHeatPump *thisCoolingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[0];
 
     // do a little setup here
-    thisCoolingPLHP->loadSideLocation.loopNum = 1;
-    thisCoolingPLHP->loadSideLocation.loopSideNum = DataPlant::LoopSideLocation::Supply;
-    thisCoolingPLHP->loadSideLocation.branchNum = 1;
-    thisCoolingPLHP->loadSideLocation.compNum = 1;
+    thisCoolingPLHP->loadSidePlantLoc.loopNum = 1;
+    thisCoolingPLHP->loadSidePlantLoc.loopSideNum = DataPlant::LoopSideLocation::Supply;
+    thisCoolingPLHP->loadSidePlantLoc.branchNum = 1;
+    thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop

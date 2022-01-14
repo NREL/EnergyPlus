@@ -761,8 +761,7 @@ void FluidCoolerspecs::oneTimeInit_new(EnergyPlusData &state)
     this->setupOutputVars(state);
     bool ErrorsFound = false;
     // Locate the tower on the plant loops for later usage
-    PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->FluidCoolerType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->FluidCoolerType, this->plantLoc, ErrorsFound, _, _, _, _, _);
 
     if (ErrorsFound) {
         ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
@@ -773,20 +772,12 @@ void FluidCoolerspecs::initEachEnvironment(EnergyPlusData &state)
 {
     static constexpr std::string_view RoutineName("FluidCoolerspecs::initEachEnvironment");
     Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                         state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                          DataGlobalConstants::InitConvTemp,
-                                                         state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
     this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
-    PlantUtilities::InitComponentNodes(state,
-                                       0.0,
-                                       this->DesWaterMassFlowRate,
-                                       this->WaterInletNodeNum,
-                                       this->WaterOutletNodeNum,
-                                       this->LoopNum,
-                                       this->LoopSideNum,
-                                       this->BranchNum,
-                                       this->CompNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->DesWaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum);
 }
 
 void FluidCoolerspecs::initialize(EnergyPlusData &state)
@@ -835,21 +826,10 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
         this->AirWetBulb = state.dataEnvrn->OutWetBulbTemp;
     }
 
-    this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(state,
-                                                                             this->LoopNum,
-                                                                             this->LoopSideNum,
-                                                                             this->BranchNum,
-                                                                             this->CompNum,
-                                                                             this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier);
+    this->WaterMassFlowRate =
+        PlantUtilities::RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier);
 
-    PlantUtilities::SetComponentFlowRate(state,
-                                         this->WaterMassFlowRate,
-                                         this->WaterInletNodeNum,
-                                         this->WaterOutletNodeNum,
-                                         this->LoopNum,
-                                         this->LoopSideNum,
-                                         this->BranchNum,
-                                         this->CompNum);
+    PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum, this->plantLoc);
 }
 
 void FluidCoolerspecs::size(EnergyPlusData &state)
@@ -897,7 +877,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     Real64 tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
     Real64 tmpHighSpeedAirFlowRate = this->HighSpeedAirFlowRate;
     // Find the appropriate Plant Sizing object
-    int PltSizCondNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum;
+    int PltSizCondNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
 
     if (this->DesignWaterFlowRateWasAutoSized) {
         if (PltSizCondNum > 0) {
@@ -954,14 +934,14 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     if (this->PerformanceInputMethod_Num == PerfInputMethod::U_FACTOR && this->HighSpeedFluidCoolerUAWasAutoSized) {
         if (PltSizCondNum > 0) {
             rho = FluidProperties::GetDensityGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     DataGlobalConstants::InitConvTemp,
-                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                     CalledFrom);
             Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         state.dataSize->PlantSizData(PltSizCondNum).ExitTemp,
-                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                         CalledFrom);
             DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * state.dataSize->PlantSizData(PltSizCondNum).DeltaT;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->FluidCoolerNominalCapacity = DesFluidCoolerLoad;
@@ -1000,14 +980,14 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                         ShowFatalError(state, "Review and revise design input values as appropriate.");
                     }
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             DataGlobalConstants::InitConvTemp,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             CalledFrom);
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                 state.dataSize->PlantSizData(PltSizCondNum).ExitTemp,
-                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                 CalledFrom);
                     DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * state.dataSize->PlantSizData(PltSizCondNum).DeltaT;
                     tmpHighSpeedFanPower = 0.0105 * DesFluidCoolerLoad;
@@ -1089,14 +1069,14 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                         ShowFatalError(state, "Review and revise design input values as appropriate.");
                     }
                     rho = FluidProperties::GetDensityGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             DataGlobalConstants::InitConvTemp,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             CalledFrom);
                     Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                 state.dataSize->PlantSizData(PltSizCondNum).ExitTemp,
-                                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                 CalledFrom);
                     DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * state.dataSize->PlantSizData(PltSizCondNum).DeltaT;
                     tmpHighSpeedAirFlowRate = DesFluidCoolerLoad / (this->DesignEnteringWaterTemp - this->DesignEnteringAirTemp) * 4.0;
@@ -1171,14 +1151,14 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                     ShowFatalError(state, "Review and revise design input values as appropriate.");
                 }
                 rho = FluidProperties::GetDensityGlycol(state,
-                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         DataGlobalConstants::InitConvTemp,
-                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                         CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             state.dataSize->PlantSizData(PltSizCondNum).ExitTemp,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             CalledFrom);
                 DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * state.dataSize->PlantSizData(PltSizCondNum).DeltaT;
                 Par[0] = DesFluidCoolerLoad;
@@ -1283,14 +1263,14 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY) {
         if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
             rho = FluidProperties::GetDensityGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     DataGlobalConstants::InitConvTemp,
-                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                     CalledFrom);
             Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         this->DesignEnteringWaterTemp,
-                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                         CalledFrom);
             DesFluidCoolerLoad = this->FluidCoolerNominalCapacity;
             Par[0] = DesFluidCoolerLoad;
@@ -1465,14 +1445,14 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
 
         if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->FluidCoolerLowSpeedNomCap > 0.0) {
             rho = FluidProperties::GetDensityGlycol(state,
-                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     DataGlobalConstants::InitConvTemp,
-                                                    state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                    state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                     CalledFrom);
             Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         this->DesignEnteringWaterTemp,
-                                                        state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                         CalledFrom);
             DesFluidCoolerLoad = this->FluidCoolerLowSpeedNomCap;
             Par[0] = DesFluidCoolerLoad;
@@ -1631,12 +1611,12 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
     this->Qactual = 0.0;
     this->FanPower = 0.0;
     this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
-    switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+    switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
     case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-        TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
+        TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
     } break;
     case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-        TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
+        TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
     } break;
     default:
         break;
@@ -1672,9 +1652,9 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
         this->FanPower = FanPowerOn;
     }
     Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             state.dataLoopNodes->Node(waterInletNode).Temp,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             RoutineName);
     this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(waterInletNode).Temp - this->OutletWaterTemp);
 }
@@ -1739,12 +1719,12 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
     this->Qactual = 0.0;
     this->FanPower = 0.0;
     this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
-    switch (state.dataPlnt->PlantLoop(this->LoopNum).LoopDemandCalcScheme) {
+    switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
     case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-        TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
+        TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
     } break;
     case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-        TempSetPoint = state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
+        TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
     } break;
     default:
         break;
@@ -1752,7 +1732,7 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
 
     // MassFlowTol is a parameter to indicate a no flow condition
     if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance ||
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
+        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
         return;
 
     // set local variable for fluid cooler
@@ -1800,9 +1780,9 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
         }
     }
     Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             state.dataLoopNodes->Node(waterInletNode).Temp,
-                                                            state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             RoutineName);
     this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(waterInletNode).Temp - this->OutletWaterTemp);
 }
@@ -1845,9 +1825,9 @@ void CalcFluidCoolerOutlet(
     Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).AirHumRat);
     Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(
         state,
-        state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
+        state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).plantLoc.loopNum).FluidName,
         _InletWaterTemp,
-        state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
+        state.dataPlnt->PlantLoop(state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).plantLoc.loopNum).FluidIndex,
         RoutineName);
 
     // Calculate mass flow rates
@@ -1932,7 +1912,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     auto &waterOutletNode = this->WaterOutletNodeNum;
     state.dataLoopNodes->Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
-    if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
+    if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
         state.dataGlobal->WarmupFlag)
         return;
 
@@ -1958,7 +1938,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
     }
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
-    LoopMinTemp = state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
+    LoopMinTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
     if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
         ++this->OutletWaterTempErrorCount;
 

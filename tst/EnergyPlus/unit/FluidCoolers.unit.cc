@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
 
     state->dataPlnt->PlantLoop.allocate(FluidCoolerNum);
     state->dataFluidCoolers->SimpleFluidCooler.allocate(FluidCoolerNum);
-    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).LoopNum = 1;
+    state->dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).plantLoc.loopNum = 1;
     state->dataPlnt->PlantLoop(FluidCoolerNum).PlantSizNum = 0;
 
     EXPECT_FALSE(thisFluidCooler.HighSpeedFanPowerWasAutoSized);

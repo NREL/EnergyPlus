@@ -297,10 +297,10 @@ void ManageControllers(EnergyPlusData &state,
     // ControlNum = AirLoopEquip(AirLoopNum)%ComponentOfTypeNum(CompNum)
 
     // detect if plant is locked and flow cannot change
-    if (ControllerProps(ControlNum).ActuatedNodePlantLoopNum > 0) {
+    if (ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum > 0) {
 
-        if (state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum)
-                .LoopSide(ControllerProps(ControlNum).ActuatedNodePlantLoopSide)
+        if (state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum)
+                .LoopSide(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopSideNum)
                 .FlowLock == DataPlant::FlowLock::Locked) {
             // plant is rigid so controller cannot change anything.
             // Update the current Controller to the outlet nodes
@@ -797,13 +797,8 @@ void ResetController(EnergyPlusData &state, int const ControlNum, bool const DoW
     SensedNode = ControllerProps(ControlNum).SensedNode;
 
     NoFlowResetValue = 0.0;
-    SetActuatedBranchFlowRate(state,
-                              NoFlowResetValue,
-                              ControllerProps(ControlNum).ActuatedNode,
-                              ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
-                              ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
-                              ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum,
-                              true);
+    SetActuatedBranchFlowRate(
+        state, NoFlowResetValue, ControllerProps(ControlNum).ActuatedNode, ControllerProps(ControlNum).ActuatedNodePlantLoc, true);
 
     //  ENDIF
 
@@ -1104,9 +1099,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         ScanPlantLoopsForNodeNum(state,
                                  ControllerProps(ControlNum).ControllerName,
                                  ControllerProps(ControlNum).ActuatedNode,
-                                 ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
-                                 ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
-                                 ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum);
+                                 ControllerProps(ControlNum).ActuatedNodePlantLoc);
         MyPlantIndexsFlag(ControlNum) = false;
     }
 
@@ -1167,9 +1160,9 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
     if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(ControlNum)) {
 
         rho = GetDensityGlycol(state,
-                               state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidName,
+                               state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum).FluidName,
                                DataGlobalConstants::CWInitConvTemp,
-                               state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoopNum).FluidIndex,
+                               state.dataPlnt->PlantLoop(ControllerProps(ControlNum).ActuatedNodePlantLoc.loopNum).FluidIndex,
                                RoutineName);
 
         ControllerProps(ControlNum).MinActuated = rho * ControllerProps(ControlNum).MinVolFlowActuated;
@@ -1191,13 +1184,8 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         MyEnvrnFlag(ControlNum) = true;
     }
 
-    SetActuatedBranchFlowRate(state,
-                              ControllerProps(ControlNum).NextActuatedValue,
-                              ActuatedNode,
-                              ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
-                              ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
-                              ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum,
-                              false);
+    SetActuatedBranchFlowRate(
+        state, ControllerProps(ControlNum).NextActuatedValue, ActuatedNode, ControllerProps(ControlNum).ActuatedNodePlantLoc, false);
 
     // Do the following initializations (every time step): This should be the info from
     // the previous components outlets or the node data in this section.
@@ -2036,9 +2024,7 @@ void UpdateController(EnergyPlusData &state, int const ControlNum)
         SetActuatedBranchFlowRate(state,
                                   ControllerProps(ControlNum).NextActuatedValue,
                                   ControllerProps(ControlNum).ActuatedNode,
-                                  ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
-                                  ControllerProps(ControlNum).ActuatedNodePlantLoopSide,
-                                  ControllerProps(ControlNum).ActuatedNodePlantLoopBranchNum,
+                                  ControllerProps(ControlNum).ActuatedNodePlantLoc,
                                   false);
         //     Node(ActuatedNode)%MassFlowRate = ControllerProps(ControlNum)%NextActuatedValue
     } break;
