@@ -67,6 +67,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -938,8 +939,13 @@ namespace EcoRoofManager {
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
                 // aggregate to monthly for reporting
-                int month = state.dataEnvrn->Month;
-                state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
+                int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+                int CurrentYear = state.dataEnvrn->Year;
+                // only report for the last year
+                if (CurrentYear == EndYear) {
+                    int month = state.dataEnvrn->Month;
+                    state.dataWaterData->RainFall.MonthlyTotalPrecInRoofIrr[month - 1] += state.dataEcoRoofMgr->CurrentPrecipitation * 1000.0;
+                }
             }
         }
 
@@ -965,8 +971,13 @@ namespace EcoRoofManager {
         if (!state.dataGlobal->WarmupFlag) {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
             // aggregate to monthly for reporting
-            int month = state.dataEnvrn->Month;
-            state.dataEcoRoofMgr->MonthlyIrrigation[month - 1] += state.dataWaterData->Irrigation.ActualAmount * 1000.0;
+            int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+            int CurrentYear = state.dataEnvrn->Year;
+            // only report for the last year
+            if (CurrentYear == EndYear) {
+                int month = state.dataEnvrn->Month;
+                state.dataEcoRoofMgr->MonthlyIrrigation[month - 1] += state.dataWaterData->Irrigation.ActualAmount * 1000.0;
+            }
         }
 
         // Note: If soil top layer gets a massive influx of rain &/or irrigation some of

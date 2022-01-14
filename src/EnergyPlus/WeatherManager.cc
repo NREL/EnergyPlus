@@ -2294,10 +2294,15 @@ namespace WeatherManager {
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
         if (state.dataEnvrn->RunPeriodEnvironment) {
-            int month = state.dataEnvrn->Month;
-            state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1] += state.dataEnvrn->LiquidPrecipitation * 1000.0;
-            if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
-                state.dataWaterData->RainFall.numRainyHoursInWeather[month - 1] += 1;
+            int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+            int CurrentYear = state.dataEnvrn->Year;
+            // only report for the last year
+            if (CurrentYear == EndYear) {
+                int month = state.dataEnvrn->Month;
+                state.dataWaterData->RainFall.MonthlyTotalPrecInWeather[month - 1] += state.dataEnvrn->LiquidPrecipitation * 1000.0;
+                if ((state.dataEnvrn->LiquidPrecipitation > 0) && (state.dataGlobal->TimeStep == 1)) {
+                    state.dataWaterData->RainFall.numRainyHoursInWeather[month - 1] += 1;
+                }
             }
         }
         state.dataEnvrn->TotalCloudCover = state.dataWeatherManager->TodayTotalSkyCover(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);

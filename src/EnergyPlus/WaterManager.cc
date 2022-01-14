@@ -69,6 +69,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -980,10 +981,15 @@ namespace WaterManager {
             }
         }
         state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
-        int month = state.dataEnvrn->Month;
-        // change unit back to mm in the reporting in monthly rain amount used in rain collector
-        if ((SysTimestepLoop == 0) && (state.dataWaterData->RainFall.CurrentAmount > 0.0)) {
-            state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+        int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+        int CurrentYear = state.dataEnvrn->Year;
+        // only report for the last year
+        if (CurrentYear == EndYear) {
+            int month = state.dataEnvrn->Month;
+            // change unit back to mm in the reporting in monthly rain amount used in rain collector
+            if ((SysTimestepLoop == 0) && (state.dataWaterData->RainFall.CurrentAmount > 0.0)) {
+                state.dataWaterData->RainFall.MonthlyTotalPrecInRainCol[month - 1] += state.dataWaterData->RainFall.CurrentAmount * 1000.0;
+            }
         }
     }
 
@@ -1499,10 +1505,14 @@ namespace WaterManager {
 
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
-            int month = state.dataEnvrn->Month;
-            // fixme: check memory
-            state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] +=
-                state.dataWaterData->RainCollector(RainColNum).VolCollected;
+            int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+            int CurrentYear = state.dataEnvrn->Year;
+            // only report for the last year
+            if (CurrentYear == EndYear) {
+                int month = state.dataEnvrn->Month;
+                state.dataWaterData->RainCollector(RainColNum).VolCollectedMonthly[month - 1] +=
+                    state.dataWaterData->RainCollector(RainColNum).VolCollected;
+            }
         }
     }
 
@@ -1667,6 +1677,9 @@ namespace WaterManager {
     void ReportRainfall(EnergyPlusData &state)
     {
         constexpr std::array<std::string_view, 12> Months{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        // fixme: debug print
+        fmt::print("Number of simulation years: {}\n", state.dataEnvrn->MaxNumberSimYears);
+        fmt::print("Start and end: {}\n", state.dataEnvrn->EnvironmentStartEnd);
         for (int i = 0; i < 12; i++) {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchMonthlyTotalPrecInWeather,
