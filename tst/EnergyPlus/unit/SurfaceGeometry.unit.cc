@@ -6528,12 +6528,36 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).Name, "Zone 8"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).spaceNames[0], "Space 8"));
 
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 5"));
+
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Solar Enclosure 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 6"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[1], "Space 7"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[2], "Space 10"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[3], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[4], "Space 4"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[5], "Space 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[6], "Space 9"));
+
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).Name, "Zone 8"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).spaceNames[0], "Space 8"));
+
     // Loop through all spaces on all enclosures and check that space radiantEnlosureNum matches the enclosure number
     // Before the fix, Space 3 and Space 5 have incorrect radiantEnclosureNum = 2 (should be 1)
     // And all of the spaces in enclousre 2 have incorrect radiantEnclosureNum = 3
     for (int enclNum = 1; enclNum <= state->dataViewFactor->NumOfRadiantEnclosures; ++enclNum) {
         for (int spaceNum : state->dataViewFactor->EnclRadInfo(enclNum).spaceNums) {
             EXPECT_EQ(state->dataHeatBal->space(spaceNum).radiantEnclosureNum, enclNum);
+        }
+    }
+
+    // Check solar enclosures
+    for (int enclNum = 1; enclNum <= state->dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+        for (int spaceNum : state->dataViewFactor->EnclSolInfo(enclNum).spaceNums) {
+            EXPECT_EQ(state->dataHeatBal->space(spaceNum).solarEnclosureNum, enclNum);
         }
     }
 }
