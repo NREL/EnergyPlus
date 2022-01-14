@@ -179,7 +179,6 @@ namespace WindowManager {
 
         // Method to determine current construction shade type
         static EnergyPlus::DataSurfaces::WinShadingType getShadeType(EnergyPlusData &state, int ConstrNum);
-
     };
 } // namespace WindowManager
 
