@@ -233,12 +233,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
     state->dataConvergeParams->AirLoopConvergence.allocate(1);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers = 1;
@@ -943,12 +937,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
     state->dataConvergeParams->AirLoopConvergence.allocate(1);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
-    state->dataConvergeParams->AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers = 1;
