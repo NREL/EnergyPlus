@@ -5255,7 +5255,7 @@ namespace HeatBalanceManager {
                 NodeNum = GetOnlySingleNode(state,
                                             state.dataIPShortCut->cAlphaArgs(3),
                                             ErrorsFound,
-                                            cCurrentModuleObject,
+                                            DataLoopNode::ConnectionObjectType::ZonePropertyLocalEnvironment,
                                             state.dataIPShortCut->cAlphaArgs(1),
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::ConnectionType::Inlet,

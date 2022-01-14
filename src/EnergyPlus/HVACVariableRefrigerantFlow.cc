@@ -2291,15 +2291,16 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType);
                 if ((SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Air) ||
                     (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Evap)) {
-                    state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum = GetOnlySingleNode(state,
-                                                                                               cAlphaArgs(35),
-                                                                                               ErrorsFound,
-                                                                                               cCurrentModuleObject,
-                                                                                               state.dataHVACVarRefFlow->VRF(VRFNum).Name,
-                                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                                               DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                                               NodeInputManager::CompFluidStream::Primary,
-                                                                                               ObjectIsNotParent);
+                    state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum =
+                        GetOnlySingleNode(state,
+                                          cAlphaArgs(35),
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::AirConditionerVariableRefrigerantFlow,
+                                          state.dataHVACVarRefFlow->VRF(VRFNum).Name,
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::OutsideAirReference,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
                     if (!CheckOutAirNodeNumber(state, state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum)) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(35) +
@@ -2308,30 +2309,32 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Water) {
-                    state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum = GetOnlySingleNode(state,
-                                                                                               cAlphaArgs(35),
-                                                                                               ErrorsFound,
-                                                                                               cCurrentModuleObject,
-                                                                                               state.dataHVACVarRefFlow->VRF(VRFNum).Name,
-                                                                                               DataLoopNode::NodeFluidType::Water,
-                                                                                               DataLoopNode::ConnectionType::Inlet,
-                                                                                               NodeInputManager::CompFluidStream::Secondary,
-                                                                                               ObjectIsNotParent);
+                    state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum =
+                        GetOnlySingleNode(state,
+                                          cAlphaArgs(35),
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::AirConditionerVariableRefrigerantFlow,
+                                          state.dataHVACVarRefFlow->VRF(VRFNum).Name,
+                                          DataLoopNode::NodeFluidType::Water,
+                                          DataLoopNode::ConnectionType::Inlet,
+                                          NodeInputManager::CompFluidStream::Secondary,
+                                          ObjectIsNotParent);
                 } else {
                 }
             }
         }
 
         if (!lAlphaFieldBlanks(36) && state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
-            state.dataHVACVarRefFlow->VRF(VRFNum).CondenserOutletNodeNum = GetOnlySingleNode(state,
-                                                                                             cAlphaArgs(36),
-                                                                                             ErrorsFound,
-                                                                                             cCurrentModuleObject,
-                                                                                             state.dataHVACVarRefFlow->VRF(VRFNum).Name,
-                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                             DataLoopNode::ConnectionType::Outlet,
-                                                                                             NodeInputManager::CompFluidStream::Secondary,
-                                                                                             ObjectIsNotParent);
+            state.dataHVACVarRefFlow->VRF(VRFNum).CondenserOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  cAlphaArgs(36),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirConditionerVariableRefrigerantFlow,
+                                  state.dataHVACVarRefFlow->VRF(VRFNum).Name,
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Secondary,
+                                  ObjectIsNotParent);
             TestCompSet(
                 state, cCurrentModuleObject, state.dataHVACVarRefFlow->VRF(VRFNum).Name, cAlphaArgs(35), cAlphaArgs(36), "Condenser Water Nodes");
         } else if (lAlphaFieldBlanks(36) && state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
@@ -3505,25 +3508,27 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
         }
 
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum = GetOnlySingleNode(state,
-                                                                                        cAlphaArgs(3),
-                                                                                        ErrorsFound,
-                                                                                        cCurrentModuleObject,
-                                                                                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::ConnectionType::Inlet,
-                                                                                        NodeInputManager::CompFluidStream::Primary,
-                                                                                        ObjectIsParent);
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(3),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::ZoneHVACTerminalUnitVariableRefrigerantFlow,
+                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Inlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent);
 
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum = GetOnlySingleNode(state,
-                                                                                         cAlphaArgs(4),
-                                                                                         ErrorsFound,
-                                                                                         cCurrentModuleObject,
-                                                                                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
-                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::ConnectionType::Outlet,
-                                                                                         NodeInputManager::CompFluidStream::Primary,
-                                                                                         ObjectIsParent);
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum =
+            GetOnlySingleNode(state,
+                              cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::ZoneHVACTerminalUnitVariableRefrigerantFlow,
+                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Outlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsParent);
 
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow = rNumericArgs(1);
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = rNumericArgs(2);
