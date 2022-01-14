@@ -338,8 +338,6 @@ namespace SetPointManager {
         }
 
         void calculate(EnergyPlusData &state);
-
-        Real64 CalcSetPoint(Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh);
     };
 
     struct DefineSZReheatSetPointManager : SPBase // Derived type for the Single Zone Reheat Setpoint Manager data
@@ -1034,6 +1032,8 @@ namespace SetPointManager {
     bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int MixedAirSPMNum);
 
     int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int MixedAirNode);
+
+    Real64 CalcSetPointLinInt(Real64 LowVal, Real64 HighVal, Real64 RefVal, Real64 SetptAtLowVal, Real64 SetptAtHighVal);
 
 } // namespace SetPointManager
 

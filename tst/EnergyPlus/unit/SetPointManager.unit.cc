@@ -796,21 +796,20 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     EXPECT_NEAR(state->dataLoopNodes->Node(7).TempSetPoint, 26.19976, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, SetPointManager_CalcSetPointTest)
+TEST_F(EnergyPlusFixture, SetPointManager_CalcSetPointLinInt)
 {
     Real64 SetPt1, SetPt2, SetPt3, SetPt4, SetPt5, SetPt6, SetPt7, SetPt8;
     SetPointManager::DefineOutsideAirSetPointManager thisSPM;
-    // CalcSetPoint(OutLowTemp, OutHighTemp, OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
     // SetTempAtOutLow > SetTempAtOutHigh
-    SetPt1 = thisSPM.CalcSetPoint(10, 5, 0, 50, 60);
-    SetPt2 = thisSPM.CalcSetPoint(5, 10, 0, 50, 60);
-    SetPt3 = thisSPM.CalcSetPoint(5, 10, 15, 50, 60);
-    SetPt4 = thisSPM.CalcSetPoint(5, 10, 8, 50, 60);
+    SetPt1 = SetPointManager::CalcSetPointLinInt(10, 5, 0, 50, 60);
+    SetPt2 = SetPointManager::CalcSetPointLinInt(5, 10, 0, 50, 60);
+    SetPt3 = SetPointManager::CalcSetPointLinInt(5, 10, 15, 50, 60);
+    SetPt4 = SetPointManager::CalcSetPointLinInt(5, 10, 8, 50, 60);
     // SetTempAtOutLow < SetTempAtOutHigh
-    SetPt5 = thisSPM.CalcSetPoint(10, 5, 0, 60, 50);
-    SetPt6 = thisSPM.CalcSetPoint(5, 10, 0, 60, 50);
-    SetPt7 = thisSPM.CalcSetPoint(5, 10, 15, 60, 50);
-    SetPt8 = thisSPM.CalcSetPoint(5, 10, 8, 60, 50);
+    SetPt5 = SetPointManager::CalcSetPointLinInt(10, 5, 0, 60, 50);
+    SetPt6 = SetPointManager::CalcSetPointLinInt(5, 10, 0, 60, 50);
+    SetPt7 = SetPointManager::CalcSetPointLinInt(5, 10, 15, 60, 50);
+    SetPt8 = SetPointManager::CalcSetPointLinInt(5, 10, 8, 60, 50);
 
     EXPECT_EQ(55, SetPt1);
     EXPECT_EQ(50, SetPt2);

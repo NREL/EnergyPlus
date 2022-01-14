@@ -5794,26 +5794,7 @@ void DefineOutsideAirSetPointManager::calculate(EnergyPlusData &state)
         SetTempAtOutHigh = this->OutHighSetPt1;
     }
 
-    this->SetPt = CalcSetPoint(OutLowTemp, OutHighTemp, state.dataEnvrn->OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
-}
-
-Real64 DefineOutsideAirSetPointManager::CalcSetPoint(
-    Real64 OutLowTemp, Real64 OutHighTemp, Real64 OutDryBulbTemp, Real64 SetTempAtOutLow, Real64 SetTempAtOutHigh)
-{
-    Real64 SetPt;
-    if (OutLowTemp < OutHighTemp) { // && SetTempAtOutLow > SetTempAtOutHigh
-        if (OutDryBulbTemp <= OutLowTemp) {
-            SetPt = SetTempAtOutLow;
-        } else if (OutDryBulbTemp >= OutHighTemp) {
-            SetPt = SetTempAtOutHigh;
-        } else {
-            SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp) / (OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
-        }
-
-    } else {
-        SetPt = 0.5 * (SetTempAtOutLow + SetTempAtOutHigh);
-    }
-    return SetPt;
+    this->SetPt = CalcSetPointLinInt(OutLowTemp, OutHighTemp, state.dataEnvrn->OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
 }
 
 void DefineSZReheatSetPointManager::calculate(EnergyPlusData &state)
@@ -9301,5 +9282,23 @@ int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAi
 
     return MixedAirSPMNum;
 } // End of GetMixedAirNumWithCoilFreezingCheck(
+
+Real64 CalcSetPointLinInt(Real64 LowVal, Real64 HighVal, Real64 RefVal, Real64 SetptAtLowVal, Real64 SetptAtHighVal)
+{
+    Real64 SetPt;
+    if (LowVal < HighVal) {
+        if (RefVal <= LowVal) {
+            SetPt = SetptAtLowVal;
+        } else if (RefVal >= HighVal) {
+            SetPt = SetptAtHighVal;
+        } else {
+            SetPt = SetptAtLowVal - ((RefVal - LowVal) / (HighVal - LowVal)) * (SetptAtLowVal - SetptAtHighVal);
+        }
+
+    } else {
+        SetPt = 0.5 * (SetptAtLowVal + SetptAtHighVal);
+    }
+    return SetPt;
+}
 
 } // namespace EnergyPlus::SetPointManager
