@@ -1214,10 +1214,9 @@ void GetPlantInput(EnergyPlusData &state)
                         break;
                     }
                     case PlantEquipmentType::SteamToWaterPlantHtExchg: {
-                        if (LoopSideNum == DemandSide) {
+                        if (LoopSideNum == LoopSideLocation::Demand) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
-                        }
-                        else if (LoopSideNum == SupplySide) {
+                        } else if (LoopSideNum == LoopSideLocation::Supply) {
                             this_comp.CurOpSchemeType = OpScheme::FreeRejection;
                         }
                         this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(state, CompNames(CompNum));
@@ -4118,7 +4117,7 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             }
                         } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                            if (LoopSideCtr == DemandSide) {
+                            if (LoopSideCtr == LoopSideLocation::Demand) {
                                 this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
                                 this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
                             } else {
