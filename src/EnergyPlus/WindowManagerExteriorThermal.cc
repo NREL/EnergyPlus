@@ -258,7 +258,11 @@ namespace WindowManager {
         }
     }
 
-    double GetIGUUValueForNFRCReport(EnergyPlusData &state, const int surfNum, const int constrNum, const double windowWidth, const double windowHeight)
+    double GetIGUUValueForNFRCReport(EnergyPlusData &state,
+                                     const int surfNum,
+                                     const int constrNum,
+                                     const double windowWidth,
+                                     const double windowHeight)
     {
         const auto tilt{90.0};
 
@@ -288,7 +292,8 @@ namespace WindowManager {
                                         double windowHeight,
                                         EnergyPlus::DataSurfaces::NfrcVisionType vision,
                                         double &uvalue,
-                                        double &shgc, double &vt)
+                                        double &shgc,
+                                        double &vt)
     {
         auto &surface(state.dataSurface->Surface(surfNum));
         auto frameDivider(state.dataSurface->FrameDivider(state.dataSurface->Surface(surfNum).FrameDivider));
