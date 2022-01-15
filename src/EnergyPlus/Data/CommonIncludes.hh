@@ -252,6 +252,7 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
