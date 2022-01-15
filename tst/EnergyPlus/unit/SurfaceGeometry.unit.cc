@@ -6591,6 +6591,33 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "Space 3,             !- Name",
         "Zone 3;             !- Zone Name",
 
+        "  Construction,",
+        "    Dbl Clr 3mm/6mm Air,     !- Name",
+        "    CLEAR 3MM,               !- Outside Layer",
+        "    AIR 6MM,                 !- Layer 2",
+        "    CLEAR 3MM;               !- Layer 3",
+
+        "  WindowMaterial:Glazing,",
+        "    CLEAR 3MM,               !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.003,                   !- Thickness {m}",
+        "    0.837,                   !- Solar Transmittance at Normal Incidence",
+        "    0.075,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.075,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.898,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+
+        "  WindowMaterial:Gas,",
+        "    AIR 6MM,                 !- Name",
+        "    AIR,                     !- Gas Type",
+        "    0.006;                   !- Thickness {m}",
+
         "Material,",
         "    Some Material,         !- Name",
         "    VeryRough,               !- Roughness",
@@ -6682,10 +6709,42 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
         "    Space 1,                 !- Space Name",
-        "    Ground,                 !- Outside Boundary Condition",
+        "    Outdoors,                 !- Outside Boundary Condition",
         "    ,  !- Outside Boundary Condition Object",
-        "    NoSun,                   !- Sun Exposure",
-        "    NoWind,                  !- Wind Exposure",
+        "    SunExposed,                   !- Sun Exposure",
+        "    WindExposed,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "FenestrationSurface:Detailed,",
+        "WF - 1,            !-Name ",
+        " WINDOW, !-Surface Type",
+        " Dbl Clr 3mm/6mm Air,                !-Construction Name ",
+        "Zone1-Floor, !-Building Surface Name",
+        ",        !-Outside Boundary Condition Object ",
+        "autocalculate,                 !- View Factor to Ground",
+        ", !-Frame and Divider Name",
+        "1,                       !- Multiplier",
+        "4,                       !- Number of Vertices",
+        "    0.1,0.1,0,              !- Vertex 1",
+        "    0.1,0.9,0,              !- Vertex 2",
+        "    0.9,0.9,0,              !- Vertex 3",
+        "    0.9,0.1,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Floor2,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Space 1,                 !- Space Name",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    SunExposed,                   !- Sun Exposure",
+        "    WindExposed,                  !- Wind Exposure",
         "    ,                        !- View Factor to Ground",
         "    4,                       !- Number of Vertices",
         "    0,0,0,              !- Vertex 1",
@@ -6755,6 +6814,30 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
     EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
+    enclArea = state->dataHeatBal->space(2).floorArea;
+    EXPECT_EQ(state->dataViewFactor->EnclRadInfo(2).FloorArea, enclArea);
+
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 2);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 3"));
+    EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
+    enclArea = state->dataHeatBal->space(1).floorArea + state->dataHeatBal->space(3).floorArea;
+    Real64 enclExtWindowArea = state->dataHeatBal->space(1).extWindowArea + state->dataHeatBal->space(3).extWindowArea;
+    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(1).ExtWindowArea, enclExtWindowArea);
+    Real64 enclTotSurfArea = state->dataHeatBal->space(1).totalSurfArea + state->dataHeatBal->space(3).totalSurfArea;
+    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(1).TotalSurfArea, enclTotSurfArea);
+
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
+    enclArea = state->dataHeatBal->space(2).floorArea;
+    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(2).FloorArea, enclArea);
+    enclExtWindowArea = state->dataHeatBal->space(2).extWindowArea;
+    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(2).ExtWindowArea, enclExtWindowArea);
+    enclTotSurfArea = state->dataHeatBal->space(2).totalSurfArea;
+    EXPECT_EQ(state->dataViewFactor->EnclSolInfo(2).TotalSurfArea, enclTotSurfArea);
 }
 
 TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
