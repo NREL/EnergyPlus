@@ -1814,15 +1814,16 @@ void GetIHPInput(EnergyPlusData &state)
                                    ObjectIsNotParent,
                                    ErrorsFound);
 
-        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterTankoutNod = GetOnlySingleNode(state,
-                                                                                                   AlphArray(2),
-                                                                                                   ErrorsFound,
-                                                                                                   CurrentModuleObject,
-                                                                                                   AlphArray(1),
-                                                                                                   DataLoopNode::NodeFluidType::Water,
-                                                                                                   DataLoopNode::ConnectionType::Sensor,
-                                                                                                   NodeInputManager::CompFluidStream::Secondary,
-                                                                                                   ObjectIsNotParent);
+        state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).WaterTankoutNod =
+            GetOnlySingleNode(state,
+                              AlphArray(2),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::CoilSystemIntegratedHeatPumpAirSource,
+                              AlphArray(1),
+                              DataLoopNode::NodeFluidType::Water,
+                              DataLoopNode::ConnectionType::Sensor,
+                              NodeInputManager::CompFluidStream::Secondary,
+                              ObjectIsNotParent);
 
         // outdoor air node connections for water heating coils
         // DWH, SCDWH, SHDWH coils have the same outdoor air nodes

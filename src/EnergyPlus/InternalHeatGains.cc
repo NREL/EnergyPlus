@@ -1316,7 +1316,7 @@ namespace InternalHeatGains {
                             thisLights.ZoneExhaustNodeNum = GetOnlySingleNode(state,
                                                                               AlphaName(8),
                                                                               exhaustNodeError,
-                                                                              lightsModuleObject,
+                                                                              DataLoopNode::ConnectionObjectType::Lights,
                                                                               thisLights.Name,
                                                                               DataLoopNode::NodeFluidType::Air,
                                                                               DataLoopNode::ConnectionType::ZoneExhaust,

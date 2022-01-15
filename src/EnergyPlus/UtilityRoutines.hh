@@ -597,20 +597,17 @@ namespace UtilityRoutines {
 
 } // namespace UtilityRoutines
 
-template <class T> constexpr T getEnumeration(const gsl::span<const std::string_view> sList, const std::string_view s)
-{
-    for (unsigned int i = 0; i < sList.size(); ++i) {
-        if (sList[i] == s) return static_cast<T>(i);
-    }
-    return static_cast<T>(-1);
-}
-
 constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {
     for (unsigned int i = 0; i < sList.size(); ++i) {
         if (sList[i] == s) return i;
     }
     return -1;
+}
+
+template <class T> constexpr T getEnumeration(const gsl::span<const std::string_view> sList, const std::string_view s)
+{
+    return static_cast<T>(getEnumerationValue(sList, s));
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct

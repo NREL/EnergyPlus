@@ -504,7 +504,6 @@ void GetOperationSchemeInput(EnergyPlusData &state)
     //    PlantEquipmentOperation:*
 
     // Using/Aliasing
-    using NodeInputManager::GetOnlySingleNode;
     using namespace DataLoopNode;
     using namespace DataSizing;
 
@@ -687,15 +686,30 @@ void GetOperationSchemeInput(EnergyPlusData &state)
 
                 } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE") {
                     CurrentModuleObject = "PlantEquipmentOperation:OutdoorDryBulbDifference";
-                    FindDeltaTempRangeInput(state, CurrentModuleObject, DBTDBO, LoopNum, SchemeNum, ErrorsFound);
+                    FindDeltaTempRangeInput(state,
+                                            DataLoopNode::ConnectionObjectType::PlantEquipmentOperationOutdoorDrybulbDifference,
+                                            DBTDBO,
+                                            LoopNum,
+                                            SchemeNum,
+                                            ErrorsFound);
 
                 } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE") {
                     CurrentModuleObject = "PlantEquipmentOperation:OutdoorWetBulbDifference";
-                    FindDeltaTempRangeInput(state, CurrentModuleObject, WBTDBO, LoopNum, SchemeNum, ErrorsFound);
+                    FindDeltaTempRangeInput(state,
+                                            DataLoopNode::ConnectionObjectType::PlantEquipmentOperationOutdoorWetbulbDifference,
+                                            WBTDBO,
+                                            LoopNum,
+                                            SchemeNum,
+                                            ErrorsFound);
 
                 } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE") {
                     CurrentModuleObject = "PlantEquipmentOperation:OutdoorDewPointDifference";
-                    FindDeltaTempRangeInput(state, CurrentModuleObject, DPTDBO, LoopNum, SchemeNum, ErrorsFound);
+                    FindDeltaTempRangeInput(state,
+                                            DataLoopNode::ConnectionObjectType::PlantEquipmentOperationOutdoorDewpointDifference,
+                                            DPTDBO,
+                                            LoopNum,
+                                            SchemeNum,
+                                            ErrorsFound);
 
                 } else if (plantLoopOperation == "PLANTEQUIPMENTOPERATION:UNCONTROLLED") {
                     CurrentModuleObject = "PlantEquipmentOperation:Uncontrolled";
@@ -936,11 +950,11 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
 }
 
 void FindDeltaTempRangeInput(EnergyPlusData &state,
-                             std::string &CurrentModuleObject, // for ease in renaming
-                             int const NumSchemes,             // May be set here and passed on
-                             int const LoopNum,                // May be set here and passed on
-                             int const SchemeNum,              // May be set here and passed on
-                             bool &ErrorsFound                 // May be set here and passed on
+                             DataLoopNode::ConnectionObjectType const CurrentModuleObject, // for ease in renaming
+                             int const NumSchemes,                                         // May be set here and passed on
+                             int const LoopNum,                                            // May be set here and passed on
+                             int const SchemeNum,                                          // May be set here and passed on
+                             bool &ErrorsFound                                             // May be set here and passed on
 )
 {
     // SUBROUTINE INFORMATION:
@@ -987,8 +1001,10 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
 
     SchemeNameFound = true;
 
+    auto cmoStr = std::string(DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(CurrentModuleObject)]);
+
     // Determine max number of alpha and numeric arguments for all objects being read, in order to allocate local arrays
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cmoStr, TotalArgs, NumAlphas, NumNums);
 
     AlphArray.allocate(NumAlphas);
     cAlphaFields.allocate(NumAlphas);
@@ -1005,13 +1021,12 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
 
     if (NumSchemes > 0) {
         for (Num = 1; Num <= NumSchemes; ++Num) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(
-                state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
+            state.dataInputProcessing->inputProcessor->getObjectItem(state, cmoStr, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
             if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
             if (Num == NumSchemes) {
                 ShowSevereError(state,
-                                LoopOpSchemeObj + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme + "\", could not find " +
-                                    CurrentModuleObject + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
+                                LoopOpSchemeObj + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme + "\", could not find " + cmoStr +
+                                    " = \"" + state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                 ErrorsFound = true;
                 SchemeNameFound = false;
             }
@@ -1019,7 +1034,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
         if (SchemeNameFound) {
             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists = (NumAlphas - 2);
             if (state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).NumEquipLists <= 0) {
-                ShowSevereError(state, CurrentModuleObject + " = \"" + AlphArray(1) + "\", specified without equipment list.");
+                ShowSevereError(state, cmoStr + " = \"" + AlphArray(1) + "\", specified without equipment list.");
                 ErrorsFound = true;
             } else {
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList.allocate(
@@ -1045,7 +1060,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).RangeUpperLimit) {
                         ShowSevereError(state,
                                         LoopOpSchemeObj + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme +
-                                            "\", found a lower limit that is higher than an upper limit in " + CurrentModuleObject + " = \"" +
+                                            "\", found a lower limit that is higher than an upper limit in " + cmoStr + " = \"" +
                                             state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
                         ErrorsFound = true;
                     }
@@ -1055,8 +1070,8 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
         }
     } else {
         ShowSevereError(state,
-                        LoopOpSchemeObj + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme + "\", could not find " + CurrentModuleObject +
-                            " = \"" + state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
+                        LoopOpSchemeObj + " = \"" + state.dataPlnt->PlantLoop(LoopNum).OperationScheme + "\", could not find " + cmoStr + " = \"" +
+                            state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name + "\".");
         ErrorsFound = true;
     }
 

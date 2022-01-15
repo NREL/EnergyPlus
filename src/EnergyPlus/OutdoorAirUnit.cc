@@ -560,7 +560,7 @@ namespace OutdoorAirUnit {
             OutAirUnit(OAUnitNum).AirOutletNode = GetOnlySingleNode(state,
                                                                     state.dataIPShortCut->cAlphaArgs(13),
                                                                     ErrorsFound,
-                                                                    CurrentModuleObject,
+                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACOutdoorAirUnit,
                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::ConnectionType::Outlet,
@@ -570,7 +570,7 @@ namespace OutdoorAirUnit {
                 OutAirUnit(OAUnitNum).AirInletNode = GetOnlySingleNode(state,
                                                                        state.dataIPShortCut->cAlphaArgs(14),
                                                                        ErrorsFound,
-                                                                       CurrentModuleObject,
+                                                                       DataLoopNode::ConnectionObjectType::ZoneHVACOutdoorAirUnit,
                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                        DataLoopNode::NodeFluidType::Air,
                                                                        DataLoopNode::ConnectionType::Inlet,
@@ -588,7 +588,7 @@ namespace OutdoorAirUnit {
             OutAirUnit(OAUnitNum).SFanOutletNode = GetOnlySingleNode(state,
                                                                      state.dataIPShortCut->cAlphaArgs(15),
                                                                      ErrorsFound,
-                                                                     CurrentModuleObject,
+                                                                     DataLoopNode::ConnectionObjectType::ZoneHVACOutdoorAirUnit,
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::ConnectionType::Internal,
@@ -599,7 +599,7 @@ namespace OutdoorAirUnit {
             OutAirUnit(OAUnitNum).OutsideAirNode = GetOnlySingleNode(state,
                                                                      state.dataIPShortCut->cAlphaArgs(12),
                                                                      ErrorsFound,
-                                                                     CurrentModuleObject,
+                                                                     DataLoopNode::ConnectionObjectType::ZoneHVACOutdoorAirUnit,
                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::ConnectionType::OutsideAirReference,
@@ -2150,22 +2150,8 @@ namespace OutdoorAirUnit {
         using HeatRecovery::SimHeatRecovery;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterCoils::SimulateWaterCoilComponents;
-        //        using SteamCoils::SimulateSteamCoilComponents;
-        //  Use TranspiredCollector, Only:SimTranspiredCollector
-        //  Use EvaporativeCoolers, Only:SimEvapCooler
-        //  USE PhotovoltaicThermalCollectors, ONLY:SimPVTcollectors, CalledFromOutsideAirSystem
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS: None
-
-        // INTERFACE BLOCK DEFINITIONS:
-
-        // DERIVED TYPE DEFINITIONS: None
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
         Real64 OAMassFlow;

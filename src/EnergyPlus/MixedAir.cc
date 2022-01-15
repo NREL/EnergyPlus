@@ -1265,11 +1265,9 @@ void GetOAControllerInputs(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace DataDefineEquip;
-    using CurveManager::GetCurveIndex;
-
-    using NodeInputManager::GetOnlySingleNode;
     using namespace OutputReportPredefined;
 
+    using CurveManager::GetCurveIndex;
     using OutAirNodeManager::CheckOutAirNodeNumber;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2148,7 +2146,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
             state.dataMixedAir->OAMixer(OutAirNum).MixNode = GetOnlySingleNode(state,
                                                                                AlphArray(2),
                                                                                ErrorsFound,
-                                                                               CurrentModuleObject,
+                                                                               DataLoopNode::ConnectionObjectType::OutdoorAirMixer,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::ConnectionType::Outlet,
@@ -2159,7 +2157,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
             state.dataMixedAir->OAMixer(OutAirNum).InletNode = GetOnlySingleNode(state,
                                                                                  AlphArray(3),
                                                                                  ErrorsFound,
-                                                                                 CurrentModuleObject,
+                                                                                 DataLoopNode::ConnectionObjectType::OutdoorAirMixer,
                                                                                  AlphArray(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::ConnectionType::Inlet,
@@ -2168,7 +2166,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
             state.dataMixedAir->OAMixer(OutAirNum).RelNode = GetOnlySingleNode(state,
                                                                                AlphArray(4),
                                                                                ErrorsFound,
-                                                                               CurrentModuleObject,
+                                                                               DataLoopNode::ConnectionObjectType::OutdoorAirMixer,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::ConnectionType::ReliefAir,
@@ -2177,7 +2175,7 @@ void GetOAMixerInputs(EnergyPlusData &state)
             state.dataMixedAir->OAMixer(OutAirNum).RetNode = GetOnlySingleNode(state,
                                                                                AlphArray(5),
                                                                                ErrorsFound,
-                                                                               CurrentModuleObject,
+                                                                               DataLoopNode::ConnectionObjectType::OutdoorAirMixer,
                                                                                AlphArray(1),
                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::ConnectionType::Inlet,
@@ -2301,7 +2299,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     state.dataMixedAir->OAController(OutAirNum).MixNode = GetOnlySingleNode(state,
                                                                             AlphArray(4),
                                                                             ErrorsFound,
-                                                                            CurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::ConnectionType::Sensor,
@@ -2310,7 +2308,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     state.dataMixedAir->OAController(OutAirNum).OANode = GetOnlySingleNode(state,
                                                                            AlphArray(5),
                                                                            ErrorsFound,
-                                                                           CurrentModuleObject,
+                                                                           DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
                                                                            AlphArray(1),
                                                                            DataLoopNode::NodeFluidType::Air,
                                                                            DataLoopNode::ConnectionType::Actuator,
@@ -2410,7 +2408,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     state.dataMixedAir->OAController(OutAirNum).RelNode = GetOnlySingleNode(state,
                                                                             AlphArray(2),
                                                                             ErrorsFound,
-                                                                            CurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::ConnectionType::Actuator,
@@ -2419,7 +2417,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     state.dataMixedAir->OAController(OutAirNum).RetNode = GetOnlySingleNode(state,
                                                                             AlphArray(3),
                                                                             ErrorsFound,
-                                                                            CurrentModuleObject,
+                                                                            DataLoopNode::ConnectionObjectType::ControllerOutdoorAir,
                                                                             AlphArray(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::ConnectionType::Sensor,
