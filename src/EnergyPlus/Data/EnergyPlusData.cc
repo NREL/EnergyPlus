@@ -228,6 +228,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataReportFlag = std::make_unique<ReportFlagData>();
     this->dataResultsFramework = std::make_unique<ResultsFrameworkData>();
     this->dataRetAirPathMrg = std::make_unique<ReturnAirPathMgr>();
+    this->dataExhAirSystemMrg = std::make_unique<ExhaustAirSystemMgr>();
     this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
     this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
@@ -485,6 +486,7 @@ void EnergyPlusData::clear_state()
     this->dataReportFlag->clear_state();
     this->dataResultsFramework->clear_state();
     this->dataRetAirPathMrg->clear_state();
+    this->dataExhAirSystemMrg->clear_state();
     this->dataRoomAirMod->clear_state();
     this->dataRoomAirModelMgr->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();
