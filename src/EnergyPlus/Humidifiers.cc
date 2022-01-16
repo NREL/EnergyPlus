@@ -173,22 +173,18 @@ namespace Humidifiers {
         thisHum.ControlHumidifier(state, WaterAddNeeded);
 
         // call the correct humidifier calculation routine
-        {
-            auto const SELECT_CASE_var(thisHum.HumType);
-
-            if (SELECT_CASE_var == HumidType::Electric) { // 'HUMIDIFIER:STEAM:ELECTRIC'
-
-                thisHum.CalcElecSteamHumidifier(state, WaterAddNeeded);
-
-            } else if (SELECT_CASE_var == HumidType::Gas) { // 'HUMIDIFIER:STEAM:GAS'
-
-                thisHum.CalcGasSteamHumidifier(state, WaterAddNeeded);
-
-            } else {
-                ShowSevereError(state, format("SimHumidifier: Invalid Humidifier Type Code={}", thisHum.HumType));
-                ShowContinueError(state, "...Component Name=[" + std::string{CompName} + "].");
-                ShowFatalError(state, "Preceding Condition causes termination.");
-            }
+        switch (thisHum.HumType) {
+        case HumidType::Electric: { // 'HUMIDIFIER:STEAM:ELECTRIC'
+            thisHum.CalcElecSteamHumidifier(state, WaterAddNeeded);
+        } break;
+        case HumidType::Gas: { // 'HUMIDIFIER:STEAM:GAS'
+            thisHum.CalcGasSteamHumidifier(state, WaterAddNeeded);
+        } break;
+        default: {
+            ShowSevereError(state, format("SimHumidifier: Invalid Humidifier Type Code={}", thisHum.HumType));
+            ShowContinueError(state, "...Component Name=[" + std::string{CompName} + "].");
+            ShowFatalError(state, "Preceding Condition causes termination.");
+        } break;
         }
 
         thisHum.UpdateReportWaterSystem(state);
