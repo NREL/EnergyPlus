@@ -117,19 +117,6 @@ namespace NodeInputManager {
                          DataLoopNode::NodeFluidType nodeFluidType, // must be valid
                          bool &ErrorsFound);
 
-    // temporary overload to facilitate the transition to passing ObjectType as enum instead of as string
-    int GetOnlySingleNode(EnergyPlusData &state,
-                          std::string const &NodeName,
-                          bool &errFlag,
-                          std::string const &NodeObjectType,               // Node Object Type (i.e. "Chiller:Electric")
-                          std::string const &NodeObjectName,               // Node Object Name (i.e. "MyChiller")
-                          DataLoopNode::NodeFluidType nodeFluidType,       // Fluidtype for checking/setting node FluidType
-                          DataLoopNode::ConnectionType nodeConnectionType, // Node Connection Type (see DataLoopNode)
-                          CompFluidStream NodeFluidStream,                 // Which Fluid Stream (1,2,3,...)
-                          bool ObjectIsParent,                             // True/False
-                          Optional_string_const InputFieldName = _         // Input Field Name
-    );
-
     int GetOnlySingleNode(EnergyPlusData &state,
                           std::string const &NodeName,
                           bool &errFlag,

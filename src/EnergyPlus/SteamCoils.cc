@@ -303,7 +303,7 @@ namespace SteamCoils {
             state.dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum = GetOnlySingleNode(state,
                                                                                            AlphArray(3),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
                                                                                            AlphArray(1),
                                                                                            DataLoopNode::NodeFluidType::Steam,
                                                                                            DataLoopNode::ConnectionType::Inlet,
@@ -312,7 +312,7 @@ namespace SteamCoils {
             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = GetOnlySingleNode(state,
                                                                                             AlphArray(4),
                                                                                             ErrorsFound,
-                                                                                            CurrentModuleObject,
+                                                                                            DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Steam,
                                                                                             DataLoopNode::ConnectionType::Outlet,
@@ -321,7 +321,7 @@ namespace SteamCoils {
             state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                          AlphArray(5),
                                                                                          ErrorsFound,
-                                                                                         CurrentModuleObject,
+                                                                                         DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
                                                                                          AlphArray(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                          DataLoopNode::ConnectionType::Inlet,
@@ -330,7 +330,7 @@ namespace SteamCoils {
             state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                           AlphArray(6),
                                                                                           ErrorsFound,
-                                                                                          CurrentModuleObject,
+                                                                                          DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
                                                                                           AlphArray(1),
                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                           DataLoopNode::ConnectionType::Outlet,
@@ -342,15 +342,16 @@ namespace SteamCoils {
                 // TEMPERATURE SETPOINT CONTROL or ZONE LOAD CONTROLLED Coils
                 if (SELECT_CASE_var == "TEMPERATURESETPOINTCONTROL") {
                     state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = TemperatureSetPointControl;
-                    state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = GetOnlySingleNode(state,
-                                                                                                     AlphArray(8),
-                                                                                                     ErrorsFound,
-                                                                                                     CurrentModuleObject,
-                                                                                                     AlphArray(1),
-                                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                                     DataLoopNode::ConnectionType::Sensor,
-                                                                                                     NodeInputManager::CompFluidStream::Primary,
-                                                                                                     ObjectIsNotParent);
+                    state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum =
+                        GetOnlySingleNode(state,
+                                          AlphArray(8),
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::CoilHeatingSteam,
+                                          AlphArray(1),
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Sensor,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
                     if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));

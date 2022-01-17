@@ -789,6 +789,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     for (auto &classToInput : classesToInput) {
         cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
+        auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(DataLoopNode::ConnectionObjectTypeNamesUC,
+                                                                          UtilityRoutines::MakeUPPERCase(cCurrentModuleObject));
         int numPLHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numPLHP > 0) {
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -900,7 +902,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                    loadSideInletNodeName,
                                                                                    nodeErrorsFound,
-                                                                                   cCurrentModuleObject,
+                                                                                   objType,
                                                                                    thisPLHP.name,
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::ConnectionType::Inlet,
@@ -909,7 +911,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                     loadSideOutletNodeName,
                                                                                     nodeErrorsFound,
-                                                                                    cCurrentModuleObject,
+                                                                                    objType,
                                                                                     thisPLHP.name,
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::ConnectionType::Outlet,
@@ -938,7 +940,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                      sourceSideInletNodeName,
                                                                                      nodeErrorsFound,
-                                                                                     cCurrentModuleObject,
+                                                                                     objType,
                                                                                      thisPLHP.name,
                                                                                      condenserNodeType,
                                                                                      condenserNodeConnectionType_Inlet,
@@ -947,7 +949,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                       sourceSideOutletNodeName,
                                                                                       nodeErrorsFound,
-                                                                                      cCurrentModuleObject,
+                                                                                      objType,
                                                                                       thisPLHP.name,
                                                                                       condenserNodeType,
                                                                                       condenserNodeConnectionType_Outlet,

@@ -2910,6 +2910,8 @@ namespace UnitarySystems {
         static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string cCurrentModuleObject = input_data.system_type;
+        auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(DataLoopNode::ConnectionObjectTypeNamesUC,
+                                                                          UtilityRoutines::MakeUPPERCase(input_data.system_type));
         std::string thisObjectName = input_data.name;
         this->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
         sysNum = getUnitarySystemIndex(state, thisObjectName);
@@ -2920,7 +2922,7 @@ namespace UnitarySystems {
             this->AirInNode = NodeInputManager::GetOnlySingleNode(state,
                                                                   loc_AirInNodeName,
                                                                   errorsFound,
-                                                                  cCurrentModuleObject,
+                                                                  objType,
                                                                   thisObjectName,
                                                                   DataLoopNode::NodeFluidType::Air,
                                                                   DataLoopNode::ConnectionType::Inlet,
@@ -2935,7 +2937,7 @@ namespace UnitarySystems {
             this->AirOutNode = NodeInputManager::GetOnlySingleNode(state,
                                                                    loc_AirOutNodeName,
                                                                    errorsFound,
-                                                                   cCurrentModuleObject,
+                                                                   objType,
                                                                    thisObjectName,
                                                                    DataLoopNode::NodeFluidType::Air,
                                                                    DataLoopNode::ConnectionType::Outlet,
@@ -5292,7 +5294,7 @@ namespace UnitarySystems {
                 this->m_SystemCoolControlNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                        loc_m_SystemCoolControlNodeName,
                                                                                        errFlag,
-                                                                                       cCurrentModuleObject,
+                                                                                       objType,
                                                                                        thisObjectName,
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::ConnectionType::Sensor,
@@ -6613,7 +6615,7 @@ namespace UnitarySystems {
                 this->m_CondenserNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                loc_condenserInletNodeName,
                                                                                errFlag,
-                                                                               cCurrentModuleObject,
+                                                                               objType,
                                                                                thisObjectName,
                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::ConnectionType::Inlet,
@@ -6652,7 +6654,7 @@ namespace UnitarySystems {
                 this->m_HeatRecoveryInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                        loc_heatRecoveryInletNodeName,
                                                                                        errFlag,
-                                                                                       cCurrentModuleObject,
+                                                                                       objType,
                                                                                        thisObjectName,
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::ConnectionType::Inlet,
@@ -6661,7 +6663,7 @@ namespace UnitarySystems {
                 this->m_HeatRecoveryOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                         loc_heatRecoveryOutletNodeName,
                                                                                         errFlag,
-                                                                                        cCurrentModuleObject,
+                                                                                        objType,
                                                                                         thisObjectName,
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::ConnectionType::Outlet,

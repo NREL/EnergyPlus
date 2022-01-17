@@ -757,7 +757,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Internal,
@@ -766,26 +766,27 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).RadInNode = GetOnlySingleNode(state,
                                                                                        state.dataIPShortCut->cAlphaArgs(19),
                                                                                        ErrorsFound,
-                                                                                       CurrentModuleObject,
+                                                                                       DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsNotParent);
 
-                state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode = GetOnlySingleNode(state,
-                                                                                            state.dataIPShortCut->cAlphaArgs(23),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::ConnectionType::Outlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsNotParent);
+                state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode =
+                    GetOnlySingleNode(state,
+                                      state.dataIPShortCut->cAlphaArgs(23),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                      state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent);
                 state.dataVentilatedSlab->VentSlab(Item).FanOutletNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(24),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Internal,
@@ -797,7 +798,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Internal,
@@ -806,26 +807,27 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).RadInNode = GetOnlySingleNode(state,
                                                                                        state.dataIPShortCut->cAlphaArgs(19),
                                                                                        ErrorsFound,
-                                                                                       CurrentModuleObject,
+                                                                                       DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsNotParent);
 
-                state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode = GetOnlySingleNode(state,
-                                                                                            state.dataIPShortCut->cAlphaArgs(23),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::ConnectionType::Outlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsNotParent);
+                state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode =
+                    GetOnlySingleNode(state,
+                                      state.dataIPShortCut->cAlphaArgs(23),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                      state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent);
                 state.dataVentilatedSlab->VentSlab(Item).FanOutletNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(24),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Internal,
@@ -837,7 +839,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-SYSTEM",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Inlet,
@@ -846,7 +848,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ReturnAirNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Inlet,
@@ -855,25 +857,26 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).RadInNode = GetOnlySingleNode(state,
                                                                                        state.dataIPShortCut->cAlphaArgs(19),
                                                                                        ErrorsFound,
-                                                                                       CurrentModuleObject,
+                                                                                       DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                        state.dataIPShortCut->cAlphaArgs(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::ConnectionType::Inlet,
                                                                                        NodeInputManager::CompFluidStream::Primary,
                                                                                        ObjectIsNotParent);
-                state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode = GetOnlySingleNode(state,
-                                                                                            state.dataIPShortCut->cAlphaArgs(23),
-                                                                                            ErrorsFound,
-                                                                                            CurrentModuleObject,
-                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::ConnectionType::Outlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            ObjectIsNotParent);
+                state.dataVentilatedSlab->VentSlab(Item).OAMixerOutNode =
+                    GetOnlySingleNode(state,
+                                      state.dataIPShortCut->cAlphaArgs(23),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                      state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsNotParent);
                 state.dataVentilatedSlab->VentSlab(Item).FanOutletNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(24),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Internal,
@@ -900,7 +903,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ZoneAirInNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(20),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1) + "-SYSTEM",
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Outlet,
@@ -910,7 +913,7 @@ namespace VentilatedSlab {
                 state.dataVentilatedSlab->VentSlab(Item).ZoneAirInNode = GetOnlySingleNode(state,
                                                                                            state.dataIPShortCut->cAlphaArgs(20),
                                                                                            ErrorsFound,
-                                                                                           CurrentModuleObject,
+                                                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::ConnectionType::Outlet,
@@ -922,7 +925,7 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).OutsideAirNode = GetOnlySingleNode(state,
                                                                                         state.dataIPShortCut->cAlphaArgs(21),
                                                                                         ErrorsFound,
-                                                                                        CurrentModuleObject,
+                                                                                        DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                         state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::ConnectionType::Inlet,
@@ -941,7 +944,7 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->VentSlab(Item).AirReliefNode = GetOnlySingleNode(state,
                                                                                        state.dataIPShortCut->cAlphaArgs(22),
                                                                                        ErrorsFound,
-                                                                                       CurrentModuleObject,
+                                                                                       DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                                                        state.dataIPShortCut->cAlphaArgs(1) + "-OA MIXER",
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::ConnectionType::ReliefAir,
@@ -1086,15 +1089,16 @@ namespace VentilatedSlab {
                                                 " is blank and must be entered.");
                             ErrorsFound = true;
                         }
-                        state.dataVentilatedSlab->VentSlab(Item).HotControlNode = GetOnlySingleNode(state,
-                                                                                                    state.dataIPShortCut->cAlphaArgs(29),
-                                                                                                    ErrorsFound,
-                                                                                                    CurrentModuleObject,
-                                                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                                    DataLoopNode::ConnectionType::Actuator,
-                                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                                    ObjectIsParent);
+                        state.dataVentilatedSlab->VentSlab(Item).HotControlNode =
+                            GetOnlySingleNode(state,
+                                              state.dataIPShortCut->cAlphaArgs(29),
+                                              ErrorsFound,
+                                              DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                              state.dataIPShortCut->cAlphaArgs(1),
+                                              DataLoopNode::NodeFluidType::Water,
+                                              DataLoopNode::ConnectionType::Actuator,
+                                              NodeInputManager::CompFluidStream::Primary,
+                                              ObjectIsParent);
                     }
                     state.dataVentilatedSlab->VentSlab(Item).HotControlOffset = 0.001;
 
@@ -1197,15 +1201,16 @@ namespace VentilatedSlab {
 
                     state.dataVentilatedSlab->VentSlab(Item).MinVolColdWaterFlow = 0.0;
 
-                    state.dataVentilatedSlab->VentSlab(Item).ColdControlNode = GetOnlySingleNode(state,
-                                                                                                 state.dataIPShortCut->cAlphaArgs(32),
-                                                                                                 ErrorsFound,
-                                                                                                 CurrentModuleObject,
-                                                                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                                                 DataLoopNode::ConnectionType::Actuator,
-                                                                                                 NodeInputManager::CompFluidStream::Primary,
-                                                                                                 ObjectIsParent);
+                    state.dataVentilatedSlab->VentSlab(Item).ColdControlNode =
+                        GetOnlySingleNode(state,
+                                          state.dataIPShortCut->cAlphaArgs(32),
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                          state.dataIPShortCut->cAlphaArgs(1),
+                                          DataLoopNode::NodeFluidType::Water,
+                                          DataLoopNode::ConnectionType::Actuator,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsParent);
 
                     if (lAlphaBlanks(32)) {
                         ShowSevereError(state,
@@ -2975,24 +2980,26 @@ namespace VentilatedSlab {
                     SlabName = state.dataVentilatedSlab->VentSlab(Item).SurfaceName(RadSurfNum);
                     MSlabIn = state.dataVentilatedSlab->VentSlab(Item).SlabIn(RadSurfNum);
                     MSlabOut = state.dataVentilatedSlab->VentSlab(Item).SlabOut(RadSurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).MSlabInNode = GetOnlySingleNode(state,
-                                                                                             MSlabIn,
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             SlabName,
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::ConnectionType::Internal,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsNotParent);
-                    state.dataVentilatedSlab->VentSlab(Item).MSlabOutNode = GetOnlySingleNode(state,
-                                                                                              MSlabOut,
-                                                                                              ErrorsFound,
-                                                                                              CurrentModuleObject,
-                                                                                              SlabName,
-                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::ConnectionType::Internal,
-                                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                                              ObjectIsNotParent);
+                    state.dataVentilatedSlab->VentSlab(Item).MSlabInNode =
+                        GetOnlySingleNode(state,
+                                          MSlabIn,
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                          SlabName,
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Internal,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
+                    state.dataVentilatedSlab->VentSlab(Item).MSlabOutNode =
+                        GetOnlySingleNode(state,
+                                          MSlabOut,
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                          SlabName,
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Internal,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
                     MSlabInletNode = state.dataVentilatedSlab->VentSlab(Item).MSlabInNode;
                     MSlabOutletNode = state.dataVentilatedSlab->VentSlab(Item).MSlabOutNode;
 
@@ -4386,24 +4393,26 @@ namespace VentilatedSlab {
                     SlabName = state.dataVentilatedSlab->VentSlab(Item).SurfaceName(RadSurfNum);
                     MSlabIn = state.dataVentilatedSlab->VentSlab(Item).SlabIn(RadSurfNum);
                     MSlabOut = state.dataVentilatedSlab->VentSlab(Item).SlabOut(RadSurfNum);
-                    state.dataVentilatedSlab->VentSlab(Item).MSlabInNode = GetOnlySingleNode(state,
-                                                                                             MSlabIn,
-                                                                                             ErrorsFound,
-                                                                                             CurrentModuleObject,
-                                                                                             SlabName,
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::ConnectionType::Internal,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             ObjectIsNotParent);
-                    state.dataVentilatedSlab->VentSlab(Item).MSlabOutNode = GetOnlySingleNode(state,
-                                                                                              MSlabOut,
-                                                                                              ErrorsFound,
-                                                                                              CurrentModuleObject,
-                                                                                              SlabName,
-                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::ConnectionType::Internal,
-                                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                                              ObjectIsNotParent);
+                    state.dataVentilatedSlab->VentSlab(Item).MSlabInNode =
+                        GetOnlySingleNode(state,
+                                          MSlabIn,
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                          SlabName,
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Internal,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
+                    state.dataVentilatedSlab->VentSlab(Item).MSlabOutNode =
+                        GetOnlySingleNode(state,
+                                          MSlabOut,
+                                          ErrorsFound,
+                                          DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                                          SlabName,
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Internal,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
                     MSlabInletNode = state.dataVentilatedSlab->VentSlab(Item).MSlabInNode;
                     MSlabOutletNode = state.dataVentilatedSlab->VentSlab(Item).MSlabOutNode;
                     SurfNum = state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(RadSurfNum);

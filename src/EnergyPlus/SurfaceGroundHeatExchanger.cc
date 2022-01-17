@@ -249,15 +249,16 @@ namespace SurfaceGroundHeatExchanger {
 
             // get inlet node data
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNode = state.dataIPShortCut->cAlphaArgs(3);
-            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum = GetOnlySingleNode(state,
-                                                                                                     state.dataIPShortCut->cAlphaArgs(3),
-                                                                                                     ErrorsFound,
-                                                                                                     cCurrentModuleObject,
-                                                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                                     DataLoopNode::ConnectionType::Inlet,
-                                                                                                     NodeInputManager::CompFluidStream::Primary,
-                                                                                                     ObjectIsNotParent);
+            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(3),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::GroundHeatExchangerSurface,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).InletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -266,15 +267,16 @@ namespace SurfaceGroundHeatExchanger {
 
             // get outlet node data
             state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(4);
-            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum = GetOnlySingleNode(state,
-                                                                                                      state.dataIPShortCut->cAlphaArgs(4),
-                                                                                                      ErrorsFound,
-                                                                                                      cCurrentModuleObject,
-                                                                                                      state.dataIPShortCut->cAlphaArgs(1),
-                                                                                                      DataLoopNode::NodeFluidType::Water,
-                                                                                                      DataLoopNode::ConnectionType::Outlet,
-                                                                                                      NodeInputManager::CompFluidStream::Primary,
-                                                                                                      ObjectIsNotParent);
+            state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(4),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::GroundHeatExchangerSurface,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::ConnectionType::Outlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
             if (state.dataSurfaceGroundHeatExchangers->SurfaceGHE(Item).OutletNodeNum == 0) {
                 ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
                 ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));

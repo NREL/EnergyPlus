@@ -747,25 +747,6 @@ int AssignNodeNumber(EnergyPlusData &state,
     return AssignNodeNumber;
 }
 
-// temporary overload to facilitate the transition to passing ObjectType as enum instead of as string
-int GetOnlySingleNode(EnergyPlusData &state,
-                      std::string const &NodeName,
-                      bool &errFlag,
-                      std::string const &NodeObjectType,                     // Node Object Type (i.e. "Chiller:Electric")
-                      std::string const &NodeObjectName,                     // Node Object Name (i.e. "MyChiller")
-                      DataLoopNode::NodeFluidType const nodeFluidType,       // Fluidtype for checking/setting node FluidType
-                      DataLoopNode::ConnectionType const nodeConnectionType, // Node Connection Type (see DataLoopNode)
-                      CompFluidStream const NodeFluidStream,                 // Which Fluid Stream
-                      bool const ObjectIsParent,                             // True/False
-                      Optional_string_const InputFieldName                   // Input Field Name
-)
-{
-    auto objType = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(NodeObjectType)));
-    return GetOnlySingleNode(
-        state, NodeName, errFlag, objType, NodeObjectName, nodeFluidType, nodeConnectionType, NodeFluidStream, ObjectIsParent, InputFieldName);
-}
-
 int GetOnlySingleNode(EnergyPlusData &state,
                       std::string const &NodeName,
                       bool &errFlag,

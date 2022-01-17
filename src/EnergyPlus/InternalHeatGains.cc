@@ -2928,7 +2928,7 @@ namespace InternalHeatGains {
                             thisZoneITEq.SupplyAirNodeNum = GetOnlySingleNode(state,
                                                                               AlphaName(14),
                                                                               ErrorsFound,
-                                                                              itEqModuleObject,
+                                                                              DataLoopNode::ConnectionObjectType::ElectricEquipmentITEAirCooled,
                                                                               AlphaName(1),
                                                                               DataLoopNode::NodeFluidType::Air,
                                                                               DataLoopNode::ConnectionType::Sensor,

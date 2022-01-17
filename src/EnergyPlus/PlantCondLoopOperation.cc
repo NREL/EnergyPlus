@@ -1352,6 +1352,9 @@ void FindCompSPInput(EnergyPlusData &state,
 
     SchemeNameFound = true;
 
+    auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(DataLoopNode::ConnectionObjectTypeNamesUC,
+                                                                      UtilityRoutines::MakeUPPERCase(CurrentModuleObject));
+
     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
         LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
     } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
@@ -1420,7 +1423,7 @@ void FindCompSPInput(EnergyPlusData &state,
                         GetOnlySingleNode(state,
                                           state.dataIPShortCut->cAlphaArgs(CompNumA - 1),
                                           ErrorsFound,
-                                          CurrentModuleObject,
+                                          objType,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
                                           DataLoopNode::ConnectionType::Sensor,
@@ -1432,7 +1435,7 @@ void FindCompSPInput(EnergyPlusData &state,
                         GetOnlySingleNode(state,
                                           state.dataIPShortCut->cAlphaArgs(CompNumA),
                                           ErrorsFound,
-                                          CurrentModuleObject,
+                                          objType,
                                           state.dataIPShortCut->cAlphaArgs(1),
                                           DataLoopNode::NodeFluidType::Water,
                                           DataLoopNode::ConnectionType::Sensor,

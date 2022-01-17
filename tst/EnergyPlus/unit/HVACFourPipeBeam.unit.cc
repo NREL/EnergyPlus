@@ -224,16 +224,17 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
 
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 3;
     bool ErrorsFound = false;
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = NodeInputManager::GetOnlySingleNode(*state,
-                                                                                            "Zone 1 Node",
-                                                                                            ErrorsFound,
-                                                                                            "Zone",
-                                                                                            "BeamTest",
-                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                            DataLoopNode::ConnectionType::ZoneNode,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            DataLoopNode::ObjectIsNotParent,
-                                                                                            "Test zone node");
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "Zone 1 Node",
+                                            ErrorsFound,
+                                            DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                            "BeamTest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::ConnectionType::ZoneNode,
+                                            NodeInputManager::CompFluidStream::Primary,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "Test zone node");
 
     state->dataDefineEquipment->NumAirDistUnits = 1;
     state->dataDefineEquipment->AirDistUnit.allocate(1);

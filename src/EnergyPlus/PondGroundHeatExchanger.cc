@@ -214,15 +214,16 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
 
         // get inlet node data
         state.dataPondGHE->PondGHE(Item).InletNode = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPondGHE->PondGHE(Item).InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                                            state.dataIPShortCut->cAlphaArgs(2),
-                                                                                            ErrorsFound,
-                                                                                            state.dataIPShortCut->cCurrentModuleObject,
-                                                                                            state.dataIPShortCut->cAlphaArgs(1),
-                                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                                            DataLoopNode::ConnectionType::Inlet,
-                                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                                            DataLoopNode::ObjectIsNotParent);
+        state.dataPondGHE->PondGHE(Item).InletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(2),
+                                                ErrorsFound,
+                                                DataLoopNode::ConnectionObjectType::GroundHeatExchangerPond,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::ConnectionType::Inlet,
+                                                NodeInputManager::CompFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
         if (state.dataPondGHE->PondGHE(Item).InletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '=' + state.dataIPShortCut->cAlphaArgs(2));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
@@ -231,15 +232,16 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
 
         // get outlet node data
         state.dataPondGHE->PondGHE(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(3);
-        state.dataPondGHE->PondGHE(Item).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                                             state.dataIPShortCut->cAlphaArgs(3),
-                                                                                             ErrorsFound,
-                                                                                             state.dataIPShortCut->cCurrentModuleObject,
-                                                                                             state.dataIPShortCut->cAlphaArgs(1),
-                                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                                             DataLoopNode::ConnectionType::Outlet,
-                                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                                             DataLoopNode::ObjectIsNotParent);
+        state.dataPondGHE->PondGHE(Item).OutletNodeNum =
+            NodeInputManager::GetOnlySingleNode(state,
+                                                state.dataIPShortCut->cAlphaArgs(3),
+                                                ErrorsFound,
+                                                DataLoopNode::ConnectionObjectType::GroundHeatExchangerPond,
+                                                state.dataIPShortCut->cAlphaArgs(1),
+                                                DataLoopNode::NodeFluidType::Water,
+                                                DataLoopNode::ConnectionType::Outlet,
+                                                NodeInputManager::CompFluidStream::Primary,
+                                                DataLoopNode::ObjectIsNotParent);
         if (state.dataPondGHE->PondGHE(Item).OutletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));

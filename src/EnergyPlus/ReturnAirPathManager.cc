@@ -151,15 +151,16 @@ namespace ReturnAirPathManager {
                 state.dataZoneEquip->ReturnAirPath(PathNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
 
-                state.dataZoneEquip->ReturnAirPath(PathNum).OutletNodeNum = GetOnlySingleNode(state,
-                                                                                              state.dataIPShortCut->cAlphaArgs(2),
-                                                                                              ErrorsFound,
-                                                                                              cCurrentModuleObject,
-                                                                                              state.dataIPShortCut->cAlphaArgs(1),
-                                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                                              DataLoopNode::ConnectionType::Outlet,
-                                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                                              ObjectIsParent);
+                state.dataZoneEquip->ReturnAirPath(PathNum).OutletNodeNum =
+                    GetOnlySingleNode(state,
+                                      state.dataIPShortCut->cAlphaArgs(2),
+                                      ErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::AirLoopHVACReturnPath,
+                                      state.dataIPShortCut->cAlphaArgs(1),
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      ObjectIsParent);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType = "";

@@ -437,7 +437,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Outlet,
@@ -448,7 +448,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Inlet,
@@ -561,7 +561,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(9),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Outlet,
@@ -845,7 +845,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Outlet,
@@ -856,7 +856,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Inlet,
@@ -883,17 +883,7 @@ void GetSysInput(EnergyPlusData &state)
         // electric or gas reheat.
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::Gas ||
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::Electric) {
-            //          IF(.NOT. lAlphaBlanks(5)) THEN
-            //            CALL ShowWarningError(state, 'In '//TRIM(sd_airterminal(SysNum)%SysType)//' = ' //TRIM(sd_airterminal(SysNum)%SysName) &
-            //                                 // ' the '//TRIM(cAlphaFields(5))//' is not needed and will be ignored.')
-            //            CALL ShowContinueError(state, '  It is used for hot water and steam reheat coils only.')
-            //          END IF
         } else {
-            //          IF(lAlphaBlanks(5)) THEN
-            //            CALL ShowSevereError(state, 'In '//TRIM(sd_airterminal(SysNum)%SysType)//' = ' //TRIM(sd_airterminal(SysNum)%SysName) &
-            //                                 // ' the '//TRIM(cAlphaFields(5))//' is undefined.')
-            //            ErrorsFound=.TRUE.
-            //          ELSE
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 IsNotOK = false;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
@@ -907,8 +897,6 @@ void GetSysInput(EnergyPlusData &state)
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
                     ErrorsFound = true;
                 }
-                //                GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                //                              DataLoopNode::NodeFluidType::Steam,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             } else {
                 IsNotOK = false;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
@@ -922,8 +910,6 @@ void GetSysInput(EnergyPlusData &state)
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
                     ErrorsFound = true;
                 }
-                //                GetOnlySingleNode(state, Alphas(5),ErrorsFound,Sys(SysNum)%SysType,Alphas(1), &
-                //                              DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             }
             //  END IF
         }
@@ -931,7 +917,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(7),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Outlet,
@@ -1155,7 +1141,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Outlet,
@@ -1166,7 +1152,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Inlet,
@@ -1177,17 +1163,7 @@ void GetSysInput(EnergyPlusData &state)
         // electric or gas reheat.
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::Gas ||
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::Electric) {
-            //          IF(.NOT. lAlphaBlanks(5)) THEN
-            //            CALL ShowWarningError(state, 'In '//TRIM(Sys(SysNum)%SysType)//' = ' // TRIM(Sys(SysNum)%SysName) &
-            //                                 // ' the '//TRIM(cAlphaFields(5))//' is not needed and will be ignored.')
-            //            CALL ShowContinueError(state, '  It is used for hot water reheat coils only.')
-            //          END IF
         } else {
-            //          IF(lAlphaBlanks(5)) THEN
-            //            CALL ShowSevereError(state, 'In '//TRIM(Sys(SysNum)%SysType)//' = ' // TRIM(Sys(SysNum)%SysName) &
-            //                                 // ' the '//TRIM(cAlphaFields(5))//' is undefined.')
-            //            ErrorsFound=.TRUE.
-            //          END IF
             if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
                 IsNotOK = false;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
@@ -1201,8 +1177,6 @@ void GetSysInput(EnergyPlusData &state)
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
                     ErrorsFound = true;
                 }
-                //                 GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                //                               DataLoopNode::NodeFluidType::Steam,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             } else {
                 IsNotOK = false;
                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatControlNode =
@@ -1216,8 +1190,6 @@ void GetSysInput(EnergyPlusData &state)
                                           state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
                     ErrorsFound = true;
                 }
-                //                 GetOnlySingleNode(state, Alphas(5),ErrorsFound,sd_airterminal(SysNum)%SysType,Alphas(1), &
-                //                               DataLoopNode::NodeFluidType::Water,DataLoopNode::NodeConnectionType::Actuator,1,ObjectIsParent)
             }
         }
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ReheatAirOutletNode =
@@ -1388,7 +1360,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Inlet,
@@ -1399,7 +1371,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Outlet,
@@ -1590,7 +1562,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Outlet,
@@ -1601,7 +1573,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Inlet,
@@ -1852,7 +1824,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(3),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Outlet,
@@ -1863,7 +1835,7 @@ void GetSysInput(EnergyPlusData &state)
             GetOnlySingleNode(state,
                               Alphas(4),
                               ErrorsFound,
-                              state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctVAVHeatAndCoolNoReheat,
                               Alphas(1),
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::ConnectionType::Inlet,
@@ -4858,7 +4830,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     }
 
     // Active cooling with fix for issue #5592
-    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad<QCoolFanOnMin - SmallLoad &&this->sd_airterminalInlet.AirMassFlowRateMaxAvail> 0.0 &&
+    if (QTotLoad < (-1.0 * SmallLoad) && QTotLoad < QCoolFanOnMin - SmallLoad && this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0 &&
         !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
         // check that it can meet the load
         FanOp = 1;
@@ -6085,21 +6057,22 @@ void GetATMixers(EnergyPlusData &state)
         ValidateComponent(
             state, state.dataIPShortCut->cAlphaArgs(2), state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitName, errFlag, cCurrentModuleObject);
 
-        state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode = GetOnlySingleNode(state,
-                                                                                         state.dataIPShortCut->cAlphaArgs(4),
-                                                                                         ErrorsFound,
-                                                                                         cCurrentModuleObject,
-                                                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeFluidType::Air,
-                                                                                         DataLoopNode::ConnectionType::Outlet,
-                                                                                         NodeInputManager::CompFluidStream::Primary,
-                                                                                         ObjectIsNotParent,
-                                                                                         state.dataIPShortCut->cAlphaFieldNames(4));
+        state.dataSingleDuct->SysATMixer(ATMixerNum).MixedAirOutNode =
+            GetOnlySingleNode(state,
+                              state.dataIPShortCut->cAlphaArgs(4),
+                              ErrorsFound,
+                              DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctMixer,
+                              state.dataIPShortCut->cAlphaArgs(1),
+                              DataLoopNode::NodeFluidType::Air,
+                              DataLoopNode::ConnectionType::Outlet,
+                              NodeInputManager::CompFluidStream::Primary,
+                              ObjectIsNotParent,
+                              state.dataIPShortCut->cAlphaFieldNames(4));
 
         state.dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = GetOnlySingleNode(state,
                                                                                    state.dataIPShortCut->cAlphaArgs(5),
                                                                                    ErrorsFound,
-                                                                                   cCurrentModuleObject,
+                                                                                   DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctMixer,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::ConnectionType::Inlet,
@@ -6109,7 +6082,7 @@ void GetATMixers(EnergyPlusData &state)
         state.dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = GetOnlySingleNode(state,
                                                                                    state.dataIPShortCut->cAlphaArgs(6),
                                                                                    ErrorsFound,
-                                                                                   cCurrentModuleObject,
+                                                                                   DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctMixer,
                                                                                    state.dataIPShortCut->cAlphaArgs(1),
                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                    DataLoopNode::ConnectionType::Inlet,

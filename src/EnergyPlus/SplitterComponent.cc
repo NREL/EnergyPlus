@@ -222,15 +222,16 @@ namespace SplitterComponent {
             UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName = AlphArray(1);
-            state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode = GetOnlySingleNode(state,
-                                                                                                 AlphArray(2),
-                                                                                                 ErrorsFound,
-                                                                                                 CurrentModuleObject,
-                                                                                                 AlphArray(1),
-                                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                                 DataLoopNode::ConnectionType::Inlet,
-                                                                                                 NodeInputManager::CompFluidStream::Primary,
-                                                                                                 ObjectIsNotParent);
+            state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode =
+                GetOnlySingleNode(state,
+                                  AlphArray(2),
+                                  ErrorsFound,
+                                  DataLoopNode::ConnectionObjectType::AirLoopHVACZoneSplitter,
+                                  AlphArray(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::ConnectionType::Inlet,
+                                  NodeInputManager::CompFluidStream::Primary,
+                                  ObjectIsNotParent);
             state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes = NumAlphas - 2;
 
             state.dataSplitterComponent->SplitterCond(SplitterNum)
@@ -260,7 +261,7 @@ namespace SplitterComponent {
                     GetOnlySingleNode(state,
                                       AlphArray(2 + NodeNum),
                                       ErrorsFound,
-                                      CurrentModuleObject,
+                                      DataLoopNode::ConnectionObjectType::AirLoopHVACZoneSplitter,
                                       AlphArray(1),
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::ConnectionType::Outlet,
