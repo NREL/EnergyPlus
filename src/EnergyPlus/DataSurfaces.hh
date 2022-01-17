@@ -213,8 +213,7 @@ namespace DataSurfaces {
         "OnIfHighOutdoorAirTempAndHighSolarOnWindow",
         "OnIfHighOutdoorAirTempAndHighHorizontalSolar",
         "OnIfHighZoneAirTempAndHighSolarOnWindow",
-        "OnIfHighZoneAirTempAndHighHorizontalSolar"
-    };
+        "OnIfHighZoneAirTempAndHighHorizontalSolar"};
 
 
     // Parameters to indicate exterior boundary conditions for use with
@@ -1002,7 +1001,6 @@ namespace DataSurfaces {
         {
         }
     };
-
 
     struct StormWindowData
     {
