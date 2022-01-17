@@ -56,11 +56,11 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/ExhaustAirSystemManager.hh>
 // #include <EnergyPlus/ReturnAirPathManager.hh> //2022-01-14: replace with exhaust system
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh> //2022-01-14: may not needed for this exhaust system
@@ -71,9 +71,9 @@ namespace ExhaustAirSystemManager {
     // Module containing the routines dealing with the AirLoopHVAC:ReturnPath (formerly Return Air Path)
 
     // MODULE INFORMATION:
-    //       AUTHOR         
+    //       AUTHOR
     //       DATE WRITTEN   January 2022
-    //       MODIFIED       
+    //       MODIFIED
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
@@ -133,6 +133,7 @@ namespace ExhaustAirSystemManager {
         // 2022-01-12: This means a correponding data structure should be build for the exhaust path as well
         // 2022-01-12: So here is another item to be built first: stateZoneEquip->ExhaustAirPath
         // 2022-01-13: Not sure if the following is needed with the json helper method?
+        // 2022-01-17: The logic of the code seems to be allocated = process, so used to stop the processing is it is already allocated.
         if (allocated(state.dataZoneEquip->ExhaustAirSystem)) {
             return;
         }
@@ -174,6 +175,7 @@ namespace ExhaustAirSystemManager {
                     /* */
                 } else {
                     availMgrNum = 0;
+                    // maybe not need for a severe error; a regular warnign would do.
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
                     ShowContinueError(state, "Avaiability Manager Name =" + availSchName + "not found.");
                     // ErrorsFound = true;
@@ -230,7 +232,7 @@ namespace ExhaustAirSystemManager {
     void InitExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
     {
         // SUBROUTINE INFORMATION:
-        //       AUTHOR:          
+        //       AUTHOR:
         //       DATE WRITTEN:    Jan 2022
 
         // PURPOSE OF THIS SUBROUTINE: This subroutine
@@ -245,7 +247,7 @@ namespace ExhaustAirSystemManager {
     void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum)
     {
         //// SUBROUTINE INFORMATION:
-        ////       AUTHOR:          
+        ////       AUTHOR:
         ////       DATE WRITTEN:    Jan 2022
 
         //// PURPOSE OF THIS SUBROUTINE: This subroutine
@@ -257,13 +259,13 @@ namespace ExhaustAirSystemManager {
         //// USE STATEMENTS:
 
         //// Using/Aliasing
-        //using MixerComponent::SimAirMixer;
-        //using ZonePlenum::SimAirZonePlenum;
+        // using MixerComponent::SimAirMixer;
+        // using ZonePlenum::SimAirZonePlenum;
 
         //// Locals
-        //int ComponentNum;
+        // int ComponentNum;
 
-        //for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
+        // for (ComponentNum = 1; ComponentNum <= state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).NumOfComponents; ++ComponentNum) {
         //    switch (state.dataZoneEquip->ReturnAirPath(ReturnAirPathNum).ComponentTypeEnum(ComponentNum)) {
         //    case DataZoneEquipment::AirLoopHVACZone::Mixer: // 'AirLoopHVAC:ZoneMixer'
 
@@ -298,7 +300,7 @@ namespace ExhaustAirSystemManager {
     void ReportExhaustAirSystem([[maybe_unused]] int &ExhaustAirSystemNum) // maybe unused
     {
         // SUBROUTINE INFORMATION:
-        //       AUTHOR:          
+        //       AUTHOR:
         //       DATE WRITTEN:    Jan 2022
 
         // PURPOSE OF THIS SUBROUTINE: This subroutine
@@ -310,6 +312,162 @@ namespace ExhaustAirSystemManager {
         // USE STATEMENTS:
     }
 
-} // namespace ReturnAirPathManager
+    void GetZoneExhaustControlInput(EnergyPlusData &state)
+    {
+        // This function is for the ZoneExhaust Control input processing;
+        // It might not be finally belongs to here; but started here to code the processing part
+        //
+        // 
+        // Using/Aliasing
+        using NodeInputManager::GetOnlySingleNode;
+        using namespace DataLoopNode;
+
+        // Locals
+        int PathNum;
+        int CompNum;
+        int NumAlphas;
+        int NumNums;
+        int IOStat;
+        int Counter;
+        //////////// hoisted into namespace ////////////////////////////////////////////////
+        // static bool ErrorsFound( false );
+        ////////////////////////////////////////////////////////////////////////////////////
+        bool IsNotOK; // Flag to verify name
+
+        bool ErrorsFound = false;
+
+        // 2022-01-13: Use the json helper to process input
+        constexpr const char *RoutineName("GetZoneExhaustControlInput: ");
+        std::string cCurrentModuleObject = "ZoneHVAC:ExhaustControl";
+        auto &ip = state.dataInputProcessing->inputProcessor;
+        auto const instances = ip->epJSON.find(cCurrentModuleObject);
+        if (instances != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+            auto &instancesValue = instances.value();
+            int numExhaustControls = instancesValue.size();
+            int exhCtrlNum = 0;
+
+            if (numExhaustControls > 0) {
+                state.dataZoneEquip->ExhaustAirSystem.allocate(numExhaustControls);
+            }
+
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++exhCtrlNum;
+                auto const &objectFields = instance.value();
+                auto &thisExhCtrl = state.dataZoneEquip->ExhaustAirSystem(exhCtrlNum);
+                thisExhCtrl.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+
+                std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
+                int availMgrNum = 0;
+                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                // To do: here to use schedule match function to process data.
+
+                if (availMgrNum > 0) {
+                    // normal conditions
+                } else if (availMgrNum == 0) {
+                    // black or anything like that, treat as always avaialabe?
+                    /* */
+                } else {
+                    availMgrNum = 0;
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    ShowContinueError(state, "Avaiability Manager Name =" + availSchName + "not found.");
+                    // ErrorsFound = true;
+                }
+                // 2022-01-13: To do: Add related data structure to store Availability Manager  (and for all other fields as well)
+
+                std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
+                std::string outletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
+
+                Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
+
+                std::string flowControlType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type");
+                // To do: use an int or enum type to convert the flow control type from string to some numerical value
+
+                std::string exhaustFlowFractionScheduleName =
+                    ip->getAlphaFieldValue(objectFields, objectSchemaProps, "exhaust_flow_fraction_schedule_name");
+                // to do so schedule matching
+                int exhaustFlowFractionScheduleNum = 0;
+                // now here dealing with schedule rather than availability manager.
+                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                // To do: here to use schedule match function to process data.
+
+                if (exhaustFlowFractionScheduleNum > 0) {
+                    // normal conditions
+                } else if (exhaustFlowFractionScheduleNum == 0) {
+                    // black or anything like that, treat as always avaialabe?
+                    /* */
+                } else {
+                    exhaustFlowFractionScheduleNum = 0;
+                    // maybe not need for a severe error; a regular warnign would do.
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    ShowContinueError(state, "Schedule Name =" + exhaustFlowFractionScheduleName + "not found.");
+                    // ErrorsFound = true;
+                }
+
+                std::string supplyNodeOrNodelistName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "supply_node_or_nodelist_name");
+                // int zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state);
+                // to do: check the requirement dependent on the control type:
+                /* */
+
+                std::string minZoneTempLimitScheduleName =
+                    ip->getAlphaFieldValue(objectFields, objectSchemaProps, "minimum_zone_temperature_limit_schedule_name");
+                // to do so schedule matching
+                int minZoneTempLimitScheduleNum = 0;
+                // now here dealing with schedule rather than availability manager.
+                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                // To do: here to use schedule match function to process data.
+
+                if (minZoneTempLimitScheduleNum > 0) {
+                    // normal conditions
+                } else if (minZoneTempLimitScheduleNum == 0) {
+                    // black or anything like that, treat as always avaialabe?
+                    /* */
+                } else {
+                    minZoneTempLimitScheduleNum = 0;
+                    // maybe not need for a severe error; a regular warnign would do.
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    ShowContinueError(state, "Schedule Name =" + minZoneTempLimitScheduleName + "not found.");
+                    // ErrorsFound = true;
+                }
+
+                std::string minExhFlowFracScheduleName =
+                    ip->getAlphaFieldValue(objectFields, objectSchemaProps, "minimum_exhaust_flow_fraction_schedule_name");
+                // to do so schedule matching
+                int minExhFlowFracScheduleNum = 0;
+                // now here dealing with schedule rather than availability manager.
+                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                // To do: here to use schedule match function to process data.
+
+                if (minExhFlowFracScheduleNum > 0) {
+                    // normal conditions
+                } else if (minExhFlowFracScheduleNum == 0) {
+                    // black or anything like that, treat as always avaialabe?
+                    /* */
+                } else {
+                    minExhFlowFracScheduleNum = 0;
+                    // maybe not need for a severe error; a regular warnign would do.
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    ShowContinueError(state, "Schedule Name =" + minExhFlowFracScheduleName + "not found.");
+                    // ErrorsFound = true;
+                }
+            }
+
+            // 2022-01: Need an equivalent of the zone exhaust numbers
+            // However, probably need one for all numbers (sum of all zones);
+            // and also need to create a map that contains a table of for each zone how many of these exhasut controls
+            /* state.dataZoneEquip->NumZoneExhaustControls =  numExhaustControls; // or exhCtrlNum? */
+
+        } else {
+            // If no exhaust systems are defined, then do something <or nothing>:
+            /* */
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "Errors found getting ZoneHVAC:ExhaustControl.  Preceding condition(s) causes termination.");
+        }
+    }
+
+} // namespace ExhaustAirSystemManager
 
 } // namespace EnergyPlus

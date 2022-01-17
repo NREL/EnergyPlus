@@ -67,7 +67,9 @@ namespace ExhaustAirSystemManager {
 
     void CalcExhaustAirSystem(EnergyPlusData &state, int &ExhaustAirSystemNum);
 
-    void ReportExhaustAirSystem(int &ExhaustAirSystemNum); // maybe unused
+    void ReportExhaustAirSystem(int &ExhaustAirSystemNum); // may condiser reactivate this for the exhaust system
+
+    void GetZoneExhaustControlInput(EnergyPlusData &state);
 
 } // namespace ExhaustAirSystemManager
 
