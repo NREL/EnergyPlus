@@ -825,8 +825,7 @@ namespace DataSurfaces {
 
     enum class NfrcProductOptions : int
     {
-        Invalid = -2,
-        Unassigned = -1,
+        Invalid = -1,
         CasementDouble,
         CasementSingle,
         DualAction,
@@ -888,8 +887,7 @@ namespace DataSurfaces {
 
     enum class NfrcVisionType : int
     {
-        Invalid = -2,
-        Unassigned = -1,
+        Invalid = -1,
         Single,
         DualVertical,
         DualHorizontal,
