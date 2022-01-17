@@ -2073,9 +2073,9 @@ namespace SimulationManager {
                 (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::ConnectionType::Outlet)) {
                 bool ParentComponentFound = false;
                 for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
-                    if (state.dataBranchNodeConnections->ParentNodeList(Loop1).CType !=
+                    if (state.dataBranchNodeConnections->ParentNodeList(Loop1).ComponentType !=
                             state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType ||
-                        state.dataBranchNodeConnections->ParentNodeList(Loop1).CName !=
+                        state.dataBranchNodeConnections->ParentNodeList(Loop1).ComponentName !=
                             state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName)
                         continue;
                     ParentComponentFound = true;
@@ -2094,9 +2094,9 @@ namespace SimulationManager {
                 }
                 if (!ParentComponentFound) {
                     ++state.dataBranchNodeConnections->NumOfActualParents;
-                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CType =
+                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).ComponentType =
                         state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType;
-                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).CName =
+                    state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).ComponentName =
                         state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
 
                     switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
@@ -2761,10 +2761,10 @@ namespace SimulationManager {
         print(state.files.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
         for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
 
-            auto ctypeStr =
-                std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).CType)]);
+            auto ctypeStr = std::string(
+                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentType)]);
 
-            NumChildren = GetNumChildren(state, ctypeStr, state.dataBranchNodeConnections->ParentNodeList(Loop).CName);
+            NumChildren = GetNumChildren(state, ctypeStr, state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName);
             if (NumChildren > 0) {
                 ChildCType.allocate(NumChildren);
                 ChildCName.allocate(NumChildren);
@@ -2780,7 +2780,7 @@ namespace SimulationManager {
                 ChildOutNodeNum = 0;
                 GetChildrenData(state,
                                 ctypeStr,
-                                state.dataBranchNodeConnections->ParentNodeList(Loop).CName,
+                                state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
                                 NumChildren,
                                 ChildCType,
                                 ChildCName,
@@ -2794,7 +2794,7 @@ namespace SimulationManager {
                 print(state.files.debug,
                       " Parent Node,{}:{},{},{}\n",
                       ctypeStr,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).CName,
+                      state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
                 for (Loop1 = 1; Loop1 <= NumChildren; ++Loop1) {
@@ -2816,7 +2816,7 @@ namespace SimulationManager {
                 print(state.files.debug,
                       " Parent Node (no children),{}:{},{},{}\n",
                       ctypeStr,
-                      state.dataBranchNodeConnections->ParentNodeList(Loop).CName,
+                      state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).InletNodeName,
                       state.dataBranchNodeConnections->ParentNodeList(Loop).OutletNodeName);
             }

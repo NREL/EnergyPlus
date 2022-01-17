@@ -1091,13 +1091,13 @@ namespace DataLoopNode {
     struct MarkedNodeData
     {
         // Members
-        bool IsMarked;          // true if this is a marked node
-        std::string ObjectType; // Object Type that needs it "marked"
-        std::string ObjectName; // Object Name that needs it "marked"
-        std::string FieldName;  // FieldName that needs it "marked"
+        bool IsMarked;                   // true if this is a marked node
+        ConnectionObjectType ObjectType; // Object Type that needs it "marked"
+        std::string ObjectName;          // Object Name that needs it "marked"
+        std::string FieldName;           // FieldName that needs it "marked"
 
         // Default Constructor
-        MarkedNodeData() : IsMarked(false)
+        MarkedNodeData() : IsMarked(false), ObjectType(ConnectionObjectType::Invalid)
         {
         }
     };

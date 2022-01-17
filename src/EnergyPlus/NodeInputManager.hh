@@ -145,7 +145,7 @@ namespace NodeInputManager {
 
     void MarkNode(EnergyPlusData &state,
                   int NodeNumber, // Node Number to be marked
-                  std::string const &ObjectType,
+                  DataLoopNode::ConnectionObjectType ObjectType,
                   std::string const &ObjectName,
                   std::string const &FieldName);
 

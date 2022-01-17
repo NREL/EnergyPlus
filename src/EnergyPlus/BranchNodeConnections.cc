@@ -851,8 +851,8 @@ int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std:
 
     WhichOne = 0;
     for (Loop = 1; Loop <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop) {
-        if (state.dataBranchNodeConnections->ParentNodeList(Loop).CType == compTypeEnum &&
-            state.dataBranchNodeConnections->ParentNodeList(Loop).CName == ComponentName) {
+        if (state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentType == compTypeEnum &&
+            state.dataBranchNodeConnections->ParentNodeList(Loop).ComponentName == ComponentName) {
             WhichOne = Loop;
             break;
         }

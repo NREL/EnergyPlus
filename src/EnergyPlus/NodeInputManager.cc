@@ -1259,7 +1259,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
 
 void MarkNode(EnergyPlusData &state,
               int const NodeNumber, // Node Number to be marked
-              std::string const &ObjectType,
+              DataLoopNode::ConnectionObjectType const ObjectType,
               std::string const &ObjectName,
               std::string const &FieldName)
 {
@@ -1294,11 +1294,13 @@ void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
     for (int NodeNum = 1; NodeNum <= state.dataLoopNodes->NumOfNodes; ++NodeNum) {
         if (state.dataLoopNodes->MarkedNode(NodeNum).IsMarked) {
             if (state.dataNodeInputMgr->NodeRef(NodeNum) == 0) {
+                auto objType = DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataLoopNodes->MarkedNode(NodeNum).ObjectType)];
                 ShowSevereError(state, "Node=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\" did not find reference by another object.");
                 ShowContinueError(state,
-                                  "Object=\"" + state.dataLoopNodes->MarkedNode(NodeNum).ObjectType + "\", Name=\"" +
-                                      state.dataLoopNodes->MarkedNode(NodeNum).ObjectName + "\", Field=[" +
-                                      state.dataLoopNodes->MarkedNode(NodeNum).FieldName + ']');
+                                  format(R"(Object="{}", Name="{}", Field=[{}])",
+                                         objType,
+                                         state.dataLoopNodes->MarkedNode(NodeNum).ObjectName,
+                                         state.dataLoopNodes->MarkedNode(NodeNum).FieldName));
                 ErrorsFound = true;
             }
         }
