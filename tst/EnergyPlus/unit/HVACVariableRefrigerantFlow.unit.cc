@@ -5831,7 +5831,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     // call plant-side VRF
     auto vrfCondPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(*state, state->dataHVACVarRefFlow->VRF(VRFCond).Name);
     PlantLocation dummyLoc;
-    dummyLoc.loopNum = dynamic_cast<HVACVariableRefrigerantFlow::VRFCondenserEquipment *>(vrfCondPtr)->SourceLoopNum;
+    dummyLoc.loopNum = dynamic_cast<HVACVariableRefrigerantFlow::VRFCondenserEquipment *>(vrfCondPtr)->SourcePlantLoc.loopNum;
     vrfCondPtr->onInitLoopEquip(*state, dummyLoc);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = -1000.0; // set cooling load
@@ -5865,14 +5865,14 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_NEAR(SysOutputProvided, state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP, 1.0);
 
     rho = GetDensityGlycol(*state,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                            state->dataSize->PlantSizData(1).ExitTemp,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
                            RoutineName);
     Cp = GetSpecificHeatGlycol(*state,
-                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                                state->dataSize->PlantSizData(1).ExitTemp,
-                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                               state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
                                RoutineName);
     CondVolFlowRate = max(state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity, state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity) /
                       (state->dataSize->PlantSizData(1).DeltaT * Cp * rho);
@@ -5880,9 +5880,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_DOUBLE_EQ(CondVolFlowRate, state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate);
 
     rho = GetDensityGlycol(*state,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidName,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidName,
                            DataGlobalConstants::InitConvTemp,
-                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourceLoopNum).FluidIndex,
+                           state->dataPlnt->PlantLoop(state->dataHVACVarRefFlow->VRF(VRFCond).SourcePlantLoc.loopNum).FluidIndex,
                            RoutineName);
     EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
                      (state->dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho));
@@ -8314,7 +8314,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum = 1;
 
     // state->dataWaterCoils->WaterCoil(CoilNum).FuelType_Num = DataGlobalConstants::ResourceType::Natural_Gas;
     state->dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum = thisVRFTU.SuppHeatCoilAirInletNode;
@@ -8327,10 +8327,10 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
 
     state->dataWaterCoils->GetWaterCoilsInputFlag = false;
 
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.branchNum = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.compNum = 1;
 
     state->dataSize->NumPltSizInput = 1;
     state->dataSize->PlantSizData.allocate(state->dataSize->NumPltSizInput);
@@ -8429,7 +8429,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil.allocate(state->dataSteamCoils->NumSteamCoils);
     state->dataSteamCoils->SteamCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilType_Num = SteamCoils::SteamCoil_AirHeating;
-    state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamCoilTypeA = "Heating";
     state->dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataSteamCoils->SteamCoil(CoilNum).InletSteamTemp = 100.0;
@@ -8441,10 +8441,10 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->SteamCoil(CoilNum).SteamInletNodeNum = thisVRFTU.SuppHeatCoilFluidInletNode;
     state->dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = thisVRFTU.SuppHeatCoilFluidOutletNode;
     state->dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.015;
-    state->dataSteamCoils->SteamCoil(CoilNum).LoopNum = 1;
-    state->dataSteamCoils->SteamCoil(CoilNum).LoopSide = DataPlant::LoopSideLocation::Demand;
-    state->dataSteamCoils->SteamCoil(CoilNum).BranchNum = 1;
-    state->dataSteamCoils->SteamCoil(CoilNum).CompNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.branchNum = 1;
+    state->dataSteamCoils->SteamCoil(CoilNum).plantLoc.compNum = 1;
     state->dataSteamCoils->SteamCoil(CoilNum).CoilType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
     state->dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = SteamCoils::ZoneLoadControl;
     state->dataSteamCoils->GetSteamCoilsInputFlag = false;

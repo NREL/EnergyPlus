@@ -666,47 +666,46 @@ std::string cSurfaceClass(SurfaceClass const ClassNo)
     // Return value
     std::string ClassName;
 
-    {
-        auto const SELECT_CASE_var(ClassNo);
-        if (SELECT_CASE_var == SurfaceClass::Wall) {
-            ClassName = "Wall";
-
-        } else if (SELECT_CASE_var == SurfaceClass::Floor) {
-            ClassName = "Floor";
-
-        } else if (SELECT_CASE_var == SurfaceClass::Roof) {
-            ClassName = "Roof";
-
-        } else if (SELECT_CASE_var == SurfaceClass::Window) {
-            ClassName = "Window";
-
-        } else if (SELECT_CASE_var == SurfaceClass::GlassDoor) {
-            ClassName = "Glass Door";
-
-        } else if (SELECT_CASE_var == SurfaceClass::Door) {
-            ClassName = "Door";
-
-        } else if (SELECT_CASE_var == SurfaceClass::TDD_Dome) {
-            ClassName = "TubularDaylightDome";
-
-        } else if (SELECT_CASE_var == SurfaceClass::TDD_Diffuser) {
-            ClassName = "TubularDaylightDiffuser";
-
-        } else if (SELECT_CASE_var == SurfaceClass::IntMass) {
-            ClassName = "Internal Mass";
-
-        } else if (SELECT_CASE_var == SurfaceClass::Shading) {
-            ClassName = "Shading";
-
-        } else if (SELECT_CASE_var == SurfaceClass::Detached_B) {
-            ClassName = "Detached Shading:Building";
-
-        } else if (SELECT_CASE_var == SurfaceClass::Detached_F) {
-            ClassName = "Detached Shading:Fixed";
-
-        } else {
-            ClassName = "Invalid/Unknown";
-        }
+    switch (ClassNo) {
+    case SurfaceClass::Wall: {
+        ClassName = "Wall";
+    } break;
+    case SurfaceClass::Floor: {
+        ClassName = "Floor";
+    } break;
+    case SurfaceClass::Roof: {
+        ClassName = "Roof";
+    } break;
+    case SurfaceClass::Window: {
+        ClassName = "Window";
+    } break;
+    case SurfaceClass::GlassDoor: {
+        ClassName = "Glass Door";
+    } break;
+    case SurfaceClass::Door: {
+        ClassName = "Door";
+    } break;
+    case SurfaceClass::TDD_Dome: {
+        ClassName = "TubularDaylightDome";
+    } break;
+    case SurfaceClass::TDD_Diffuser: {
+        ClassName = "TubularDaylightDiffuser";
+    } break;
+    case SurfaceClass::IntMass: {
+        ClassName = "Internal Mass";
+    } break;
+    case SurfaceClass::Shading: {
+        ClassName = "Shading";
+    } break;
+    case SurfaceClass::Detached_B: {
+        ClassName = "Detached Shading:Building";
+    } break;
+    case SurfaceClass::Detached_F: {
+        ClassName = "Detached Shading:Fixed";
+    } break;
+    default: {
+        ClassName = "Invalid/Unknown";
+    } break;
     }
 
     return ClassName;

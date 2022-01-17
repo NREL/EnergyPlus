@@ -53,7 +53,6 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
@@ -742,7 +741,7 @@ int minutes(EnergyPlusState state)
     Real64 currentTimeVal = currentTime(state);
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     Real64 fractionalHoursIntoTheDay = currentTimeVal - double(thisState->dataGlobal->HourOfDay - 1);
-    Real64 fractionalMinutesIntoTheDay = fractionalHoursIntoTheDay * 60.0;
+    Real64 fractionalMinutesIntoTheDay = std::round(fractionalHoursIntoTheDay * 60.0);
     return (int)(fractionalMinutesIntoTheDay);
 }
 

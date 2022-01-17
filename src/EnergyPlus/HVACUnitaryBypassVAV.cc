@@ -1474,7 +1474,7 @@ namespace HVACUnitaryBypassVAV {
             // speed up test based on code from 16 years ago to correct cycling fan economizer defect
             // see https://github.com/NREL/EnergyPlusArchive/commit/a2202f8a168fd0330bf3a45392833405e8bd08f2
             // This test sets simple flag so air loop doesn't iterate twice each pass (reverts above change)
-            // AirLoopControlInfo(AirLoopNum).Simple = true;
+            // AirLoopControlInfo(AirplantLoc.loopNum).Simple = true;
         }
 
         if (state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -1486,10 +1486,7 @@ namespace HVACUnitaryBypassVAV {
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             CBVAV(CBVAVNum).HeatCoilName,
                                                             DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                                            CBVAV(CBVAVNum).LoopNum,
-                                                            CBVAV(CBVAVNum).LoopSide,
-                                                            CBVAV(CBVAVNum).BranchNum,
-                                                            CBVAV(CBVAVNum).CompNum,
+                                                            CBVAV(CBVAVNum).plantLoc,
                                                             ErrorFlag,
                                                             _,
                                                             _,
@@ -1504,11 +1501,12 @@ namespace HVACUnitaryBypassVAV {
                         WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, ErrorsFound);
 
                     if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow > 0.0) {
-                        Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                                                state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                                                DataGlobalConstants::HWInitConvTemp,
-                                                                                state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
-                                                                                RoutineName);
+                        Real64 FluidDensity =
+                            FluidProperties::GetDensityGlycol(state,
+                                                              state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidName,
+                                                              DataGlobalConstants::HWInitConvTemp,
+                                                              state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidIndex,
+                                                              RoutineName);
                         CBVAV(CBVAVNum).MaxHeatCoilFluidFlow =
                             WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, ErrorsFound) *
                             FluidDensity;
@@ -1520,10 +1518,7 @@ namespace HVACUnitaryBypassVAV {
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             CBVAV(CBVAVNum).HeatCoilName,
                                                             DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                                            CBVAV(CBVAVNum).LoopNum,
-                                                            CBVAV(CBVAVNum).LoopSide,
-                                                            CBVAV(CBVAVNum).BranchNum,
-                                                            CBVAV(CBVAVNum).CompNum,
+                                                            CBVAV(CBVAVNum).plantLoc,
                                                             ErrorFlag,
                                                             _,
                                                             _,
@@ -1547,11 +1542,7 @@ namespace HVACUnitaryBypassVAV {
                 }
 
                 // fill outlet node for heating coil
-                CBVAV(CBVAVNum).CoilOutletNode = state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum)
-                                                     .LoopSide(CBVAV(CBVAVNum).LoopSide)
-                                                     .Branch(CBVAV(CBVAVNum).BranchNum)
-                                                     .Comp(CBVAV(CBVAVNum).CompNum)
-                                                     .NodeNumOut;
+                CBVAV(CBVAVNum).CoilOutletNode = DataPlant::CompData::getPlantComponent(state, CBVAV(CBVAVNum).plantLoc).NodeNumOut;
                 state.dataHVACUnitaryBypassVAV->MyPlantScanFlag(CBVAVNum) = false;
 
             } else { // CBVAV is not connected to plant
@@ -1620,11 +1611,12 @@ namespace HVACUnitaryBypassVAV {
                             ErrorsFound = true;
                         }
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
-                                                                                    state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidName,
-                                                                                    DataGlobalConstants::HWInitConvTemp,
-                                                                                    state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).LoopNum).FluidIndex,
-                                                                                    RoutineName);
+                            Real64 FluidDensity =
+                                FluidProperties::GetDensityGlycol(state,
+                                                                  state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidName,
+                                                                  DataGlobalConstants::HWInitConvTemp,
+                                                                  state.dataPlnt->PlantLoop(CBVAV(CBVAVNum).plantLoc.loopNum).FluidIndex,
+                                                                  RoutineName);
                             CBVAV(CBVAVNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
                         }
                     }
@@ -1649,15 +1641,8 @@ namespace HVACUnitaryBypassVAV {
                     }
                 } // end of IF(CBVAV(CBVAVNum)%MaxHeatCoilFluidFlow .EQ. DataSizing::AutoSize)THEN
 
-                PlantUtilities::InitComponentNodes(state,
-                                                   0.0,
-                                                   CBVAV(CBVAVNum).MaxHeatCoilFluidFlow,
-                                                   CBVAV(CBVAVNum).CoilControlNode,
-                                                   CBVAV(CBVAVNum).CoilOutletNode,
-                                                   CBVAV(CBVAVNum).LoopNum,
-                                                   CBVAV(CBVAVNum).LoopSide,
-                                                   CBVAV(CBVAVNum).BranchNum,
-                                                   CBVAV(CBVAVNum).CompNum);
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, CBVAV(CBVAVNum).MaxHeatCoilFluidFlow, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode);
 
             } // end of IF(CBVAV(CBVAVNum)%CoilControlNode .GT. 0)THEN
         }     // end one time inits
@@ -1977,14 +1962,8 @@ namespace HVACUnitaryBypassVAV {
                 //     set air-side and steam-side mass flow rates
                 state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
                 mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     mdot,
-                                                     CBVAV(CBVAVNum).CoilControlNode,
-                                                     CBVAV(CBVAVNum).CoilOutletNode,
-                                                     CBVAV(CBVAVNum).LoopNum,
-                                                     CBVAV(CBVAVNum).LoopSide,
-                                                     CBVAV(CBVAVNum).BranchNum,
-                                                     CBVAV(CBVAVNum).CompNum);
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
 
                 //     simulate water coil to find operating capacity
                 WaterCoils::SimulateWaterCoilComponents(
@@ -1998,14 +1977,8 @@ namespace HVACUnitaryBypassVAV {
                 //     set air-side and steam-side mass flow rates
                 state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = state.dataHVACUnitaryBypassVAV->CompOnMassFlow;
                 mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                PlantUtilities::SetComponentFlowRate(state,
-                                                     mdot,
-                                                     CBVAV(CBVAVNum).CoilControlNode,
-                                                     CBVAV(CBVAVNum).CoilOutletNode,
-                                                     CBVAV(CBVAVNum).LoopNum,
-                                                     CBVAV(CBVAVNum).LoopSide,
-                                                     CBVAV(CBVAVNum).BranchNum,
-                                                     CBVAV(CBVAVNum).CompNum);
+                PlantUtilities::SetComponentFlowRate(
+                    state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
 
                 //     simulate steam coil to find operating capacity
                 SteamCoils::SimulateSteamCoilComponents(state,
@@ -3700,67 +3673,72 @@ namespace HVACUnitaryBypassVAV {
             }
         }
 
-        {
-            auto const SELECT_CASE_var(CBVAV(CBVAVNum).PriorityControl);
-            if (SELECT_CASE_var == PriorityCtrlMode::CoolingPriority) {
-                if (QZoneReqCool < 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                } else if (QZoneReqHeat > 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                }
-            } else if (SELECT_CASE_var == PriorityCtrlMode::HeatingPriority) {
+        switch (CBVAV(CBVAVNum).PriorityControl) {
+        case PriorityCtrlMode::CoolingPriority: {
+            if (QZoneReqCool < 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+            } else if (QZoneReqHeat > 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+            }
+        } break;
+        case PriorityCtrlMode::HeatingPriority: {
+            if (QZoneReqHeat > 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+            } else if (QZoneReqCool < 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+            }
+        } break;
+        case PriorityCtrlMode::ZonePriority: {
+            if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
                 if (QZoneReqHeat > 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 } else if (QZoneReqCool < 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 }
-            } else if (SELECT_CASE_var == PriorityCtrlMode::ZonePriority) {
-                if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
-                    if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    } else if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    }
-                } else if (CBVAV(CBVAVNum).NumZonesCooled > CBVAV(CBVAVNum).NumZonesHeated) {
-                    if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    }
-                } else {
-                    if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    } else if (std::abs(QZoneReqCool) == std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    }
+            } else if (CBVAV(CBVAVNum).NumZonesCooled > CBVAV(CBVAVNum).NumZonesHeated) {
+                if (QZoneReqCool < 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                } else if (QZoneReqHeat > 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 }
-            } else if (SELECT_CASE_var == PriorityCtrlMode::LoadPriority) {
+            } else {
                 if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                } else if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
-                    if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    } else if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    }
-                } else if (CBVAV(CBVAVNum).NumZonesHeated < CBVAV(CBVAVNum).NumZonesCooled) {
-                    if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    }
-                } else {
-                    if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    }
+                } else if (std::abs(QZoneReqCool) == std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 }
             }
+        } break;
+        case PriorityCtrlMode::LoadPriority: {
+            if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+            } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
+                CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+            } else if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
+                if (QZoneReqHeat > 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                } else if (QZoneReqCool < 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                }
+            } else if (CBVAV(CBVAVNum).NumZonesHeated < CBVAV(CBVAVNum).NumZonesCooled) {
+                if (QZoneReqCool < 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                } else if (QZoneReqHeat > 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                }
+            } else {
+                if (QZoneReqCool < 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                } else if (QZoneReqHeat > 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                }
+            }
+            break;
+        default:
+            break;
+        }
         }
 
         if (CBVAV(CBVAVNum).LastMode != CBVAV(CBVAVNum).HeatCoolMode) {
@@ -4210,14 +4188,8 @@ namespace HVACUnitaryBypassVAV {
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     // simulate the heating coil at maximum hot water flow rate
                     MaxHotWaterFlow = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         MaxHotWaterFlow,
-                                                         CBVAV(CBVAVNum).CoilControlNode,
-                                                         CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).LoopNum,
-                                                         CBVAV(CBVAVNum).LoopSide,
-                                                         CBVAV(CBVAVNum).BranchNum,
-                                                         CBVAV(CBVAVNum).CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, MaxHotWaterFlow, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
                     WaterCoils::SimulateWaterCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                     if (QCoilActual > (HeatCoilLoad + DataHVACGlobals::SmallLoad)) {
@@ -4277,14 +4249,8 @@ namespace HVACUnitaryBypassVAV {
                     }
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                     mdot = CBVAV(CBVAVNum).MaxHeatCoilFluidFlow;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         mdot,
-                                                         CBVAV(CBVAVNum).CoilControlNode,
-                                                         CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).LoopNum,
-                                                         CBVAV(CBVAVNum).LoopSide,
-                                                         CBVAV(CBVAVNum).BranchNum,
-                                                         CBVAV(CBVAVNum).CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
 
                     // simulate the steam heating coil
                     SteamCoils::SimulateSteamCoilComponents(
@@ -4305,28 +4271,16 @@ namespace HVACUnitaryBypassVAV {
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     mdot = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         mdot,
-                                                         CBVAV(CBVAVNum).CoilControlNode,
-                                                         CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).LoopNum,
-                                                         CBVAV(CBVAVNum).LoopSide,
-                                                         CBVAV(CBVAVNum).BranchNum,
-                                                         CBVAV(CBVAVNum).CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
                     QCoilActual = HeatCoilLoad;
                     // simulate the hot water heating coil
                     WaterCoils::SimulateWaterCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                     mdot = 0.0;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         mdot,
-                                                         CBVAV(CBVAVNum).CoilControlNode,
-                                                         CBVAV(CBVAVNum).CoilOutletNode,
-                                                         CBVAV(CBVAVNum).LoopNum,
-                                                         CBVAV(CBVAVNum).LoopSide,
-                                                         CBVAV(CBVAVNum).BranchNum,
-                                                         CBVAV(CBVAVNum).CompNum);
+                    PlantUtilities::SetComponentFlowRate(
+                        state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
                     // simulate the steam heating coil
                     SteamCoils::SimulateSteamCoilComponents(
                         state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, HeatCoilLoad, QCoilActual, FanMode);
@@ -4363,14 +4317,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 HeatCoilLoad = Par(3);
         Real64 QCoilActual = HeatCoilLoad;
         Real64 mdot = HWFlow;
-        PlantUtilities::SetComponentFlowRate(state,
-                                             mdot,
-                                             CBVAV(CBVAVNum).CoilControlNode,
-                                             CBVAV(CBVAVNum).CoilOutletNode,
-                                             CBVAV(CBVAVNum).LoopNum,
-                                             CBVAV(CBVAVNum).LoopSide,
-                                             CBVAV(CBVAVNum).BranchNum,
-                                             CBVAV(CBVAVNum).CompNum);
+        PlantUtilities::SetComponentFlowRate(state, mdot, CBVAV(CBVAVNum).CoilControlNode, CBVAV(CBVAVNum).CoilOutletNode, CBVAV(CBVAVNum).plantLoc);
 
         // simulate the hot water supplemental heating coil
         WaterCoils::SimulateWaterCoilComponents(

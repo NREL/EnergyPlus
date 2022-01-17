@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -107,16 +106,16 @@ void UpdateHVACInterface(EnergyPlusData &state,
     // to the inlet node of the corresponding other side of the loop.
 
     auto &TmpRealARR = state.dataHVACInterfaceMgr->TmpRealARR;
-    Real64 DeltaEnergy;
+    auto &airLoopConv = state.dataConvergeParams->AirLoopConvergence(AirLoopNum);
+    auto &thisInletNode = state.dataLoopNodes->Node(InletNode);
 
     if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNode == 0)) {
         // Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged(1) = false;
+
+        airLoopConv.HVACMassFlowNotConverged[0] = false;
+        airLoopConv.HVACHumRatNotConverged[0] = false;
+        airLoopConv.HVACTempNotConverged[0] = false;
+        airLoopConv.HVACEnergyNotConverged[0] = false;
 
         Real64 totDemandSideMassFlow = 0.0;
         Real64 totDemandSideMinAvail = 0.0;
@@ -127,273 +126,246 @@ void UpdateHVACInterface(EnergyPlusData &state,
             totDemandSideMinAvail += state.dataLoopNodes->Node(demInNode).MassFlowRateMinAvail;
             totDemandSideMaxAvail += state.dataLoopNodes->Node(demInNode).MassFlowRateMaxAvail;
         }
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue(1) =
-            std::abs(totDemandSideMassFlow - state.dataLoopNodes->Node(InletNode).MassFlowRate);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue(1) > DataConvergParams::HVACFlowRateToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(1) = true;
+        TmpRealARR = airLoopConv.HVACFlowDemandToSupplyTolValue;
+        airLoopConv.HVACFlowDemandToSupplyTolValue[0] = std::abs(totDemandSideMassFlow - thisInletNode.MassFlowRate);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACFlowDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACFlowDemandToSupplyTolValue[0] > DataConvergParams::HVACFlowRateToler) {
+            airLoopConv.HVACMassFlowNotConverged[0] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        state.dataLoopNodes->Node(InletNode).MassFlowRate = totDemandSideMassFlow;
-        state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = totDemandSideMinAvail;
-        state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = totDemandSideMaxAvail;
+        thisInletNode.MassFlowRate = totDemandSideMassFlow;
+        thisInletNode.MassFlowRateMinAvail = totDemandSideMinAvail;
+        thisInletNode.MassFlowRateMaxAvail = totDemandSideMaxAvail;
         return;
     }
 
     // Calculate the approximate energy difference across interface for comparison
-    DeltaEnergy =
+    Real64 DeltaEnergy =
         DataConvergParams::HVACCpApprox * ((state.dataLoopNodes->Node(OutletNode).MassFlowRate * state.dataLoopNodes->Node(OutletNode).Temp) -
-                                           (state.dataLoopNodes->Node(InletNode).MassFlowRate * state.dataLoopNodes->Node(InletNode).Temp));
+                                           (thisInletNode.MassFlowRate * thisInletNode.Temp));
 
     if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNode > 0)) {
 
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged(1) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged(1) = false;
+        airLoopConv.HVACMassFlowNotConverged[0] = false;
+        airLoopConv.HVACHumRatNotConverged[0] = false;
+        airLoopConv.HVACTempNotConverged[0] = false;
+        airLoopConv.HVACEnergyNotConverged[0] = false;
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - state.dataLoopNodes->Node(InletNode).MassFlowRate);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowDemandToSupplyTolValue(1) > DataConvergParams::HVACFlowRateToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(1) = true;
+        TmpRealARR = airLoopConv.HVACFlowDemandToSupplyTolValue;
+        airLoopConv.HVACFlowDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - thisInletNode.MassFlowRate);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACFlowDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACFlowDemandToSupplyTolValue[0] > DataConvergParams::HVACFlowRateToler) {
+            airLoopConv.HVACMassFlowNotConverged[0] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumDemandToSupplyTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumDemandToSupplyTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - state.dataLoopNodes->Node(InletNode).HumRat);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumDemandToSupplyTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumDemandToSupplyTolValue(1) > DataConvergParams::HVACHumRatToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(1) = true;
+        TmpRealARR = airLoopConv.HVACHumDemandToSupplyTolValue;
+        airLoopConv.HVACHumDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - thisInletNode.HumRat);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACHumDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACHumDemandToSupplyTolValue[0] > DataConvergParams::HVACHumRatToler) {
+            airLoopConv.HVACHumRatNotConverged[0] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempDemandToSupplyTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempDemandToSupplyTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Temp - state.dataLoopNodes->Node(InletNode).Temp);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempDemandToSupplyTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempDemandToSupplyTolValue(1) > DataConvergParams::HVACTemperatureToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged(1) = true;
+        TmpRealARR = airLoopConv.HVACTempDemandToSupplyTolValue;
+        airLoopConv.HVACTempDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Temp - thisInletNode.Temp);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACTempDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACTempDemandToSupplyTolValue[0] > DataConvergParams::HVACTemperatureToler) {
+            airLoopConv.HVACTempNotConverged[0] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyDemandToSupplyTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyDemandToSupplyTolValue(1) = std::abs(DeltaEnergy);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyDemandToSupplyTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
+        TmpRealARR = airLoopConv.HVACEnergyDemandToSupplyTolValue;
+        airLoopConv.HVACEnergyDemandToSupplyTolValue[0] = std::abs(DeltaEnergy);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACEnergyDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
         if (std::abs(DeltaEnergy) > DataConvergParams::HVACEnergyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged(1) = true;
+            airLoopConv.HVACEnergyNotConverged[0] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyDemandToSupplyTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyDemandToSupplyTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyDemandToSupplyTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyDemandToSupplyTolValue(1) > DataConvergParams::HVACEnthalpyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged(1) = true;
+        TmpRealARR = airLoopConv.HVACEnthalpyDemandToSupplyTolValue;
+        airLoopConv.HVACEnthalpyDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - thisInletNode.Enthalpy);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACEnthalpyDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACEnthalpyDemandToSupplyTolValue[0] > DataConvergParams::HVACEnthalpyToler) {
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureDemandToSupplyTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureDemandToSupplyTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Press - state.dataLoopNodes->Node(InletNode).Press);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureDemandToSupplyTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureDemandToSupplyTolValue(1) > DataConvergParams::HVACPressToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged(1) = true;
+        TmpRealARR = airLoopConv.HVACPressureDemandToSupplyTolValue;
+        airLoopConv.HVACPressureDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Press - thisInletNode.Press);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACPressureDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACPressureDemandToSupplyTolValue[0] > DataConvergParams::HVACPressToler) {
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
     } else if (CalledFrom == DataConvergParams::CalledFrom::AirSystemSupplySideDeck1) {
 
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(2) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(2) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged(2) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged(2) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged(2) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged(2) = false;
+        airLoopConv.HVACMassFlowNotConverged[1] = false;
+        airLoopConv.HVACHumRatNotConverged[1] = false;
+        airLoopConv.HVACTempNotConverged[1] = false;
+        airLoopConv.HVACEnergyNotConverged[1] = false;
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck1ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck1ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - state.dataLoopNodes->Node(InletNode).MassFlowRate);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck1ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck1ToDemandTolValue(1) > DataConvergParams::HVACFlowRateToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(2) = true;
+        TmpRealARR = airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue;
+        airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue[0] =
+            std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - thisInletNode.MassFlowRate);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACFlowRateToler) {
+            airLoopConv.HVACMassFlowNotConverged[1] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck1ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck1ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - state.dataLoopNodes->Node(InletNode).HumRat);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck1ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck1ToDemandTolValue(1) > DataConvergParams::HVACHumRatToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(2) = true;
+        TmpRealARR = airLoopConv.HVACHumSupplyDeck1ToDemandTolValue;
+        airLoopConv.HVACHumSupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - thisInletNode.HumRat);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACHumSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACHumSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACHumRatToler) {
+            airLoopConv.HVACHumRatNotConverged[1] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck1ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck1ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Temp - state.dataLoopNodes->Node(InletNode).Temp);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck1ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck1ToDemandTolValue(1) >
-            DataConvergParams::HVACTemperatureToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged(2) = true;
+        TmpRealARR = airLoopConv.HVACTempSupplyDeck1ToDemandTolValue;
+        airLoopConv.HVACTempSupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Temp - thisInletNode.Temp);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACTempSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACTempSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACTemperatureToler) {
+            airLoopConv.HVACTempNotConverged[1] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck1ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck1ToDemandTolValue(1) = DeltaEnergy;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck1ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
+        TmpRealARR = airLoopConv.HVACEnergySupplyDeck1ToDemandTolValue;
+        airLoopConv.HVACEnergySupplyDeck1ToDemandTolValue[0] = DeltaEnergy;
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACEnergySupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
         if (std::abs(DeltaEnergy) > DataConvergParams::HVACEnergyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged(2) = true;
+            airLoopConv.HVACEnergyNotConverged[1] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck1ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck1ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum)
-            .HVACEnthalpySupplyDeck1ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck1ToDemandTolValue(1) >
-            DataConvergParams::HVACEnthalpyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged(2) = true;
+        TmpRealARR = airLoopConv.HVACEnthalpySupplyDeck1ToDemandTolValue;
+        airLoopConv.HVACEnthalpySupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - thisInletNode.Enthalpy);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACEnthalpySupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACEnthalpySupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACEnthalpyToler) {
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureSupplyDeck1ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureSupplyDeck1ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Press - state.dataLoopNodes->Node(InletNode).Press);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum)
-            .HVACPressureSupplyDeck1ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureSupplyDeck1ToDemandTolValue(1) > DataConvergParams::HVACPressToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged(2) = true;
+        TmpRealARR = airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue;
+        airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Press - thisInletNode.Press);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACPressToler) {
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
     } else if (CalledFrom == DataConvergParams::CalledFrom::AirSystemSupplySideDeck2) {
 
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(3) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(3) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged(3) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged(3) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged(3) = false;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged(3) = false;
+        airLoopConv.HVACMassFlowNotConverged[2] = false;
+        airLoopConv.HVACHumRatNotConverged[2] = false;
+        airLoopConv.HVACTempNotConverged[2] = false;
+        airLoopConv.HVACEnergyNotConverged[2] = false;
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck2ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck2ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - state.dataLoopNodes->Node(InletNode).MassFlowRate);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck2ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACFlowSupplyDeck2ToDemandTolValue(1) > DataConvergParams::HVACFlowRateToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACMassFlowNotConverged(3) = true;
+        TmpRealARR = airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue;
+        airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue[0] =
+            std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - thisInletNode.MassFlowRate);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACFlowRateToler) {
+            airLoopConv.HVACMassFlowNotConverged[2] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck2ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck2ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - state.dataLoopNodes->Node(InletNode).HumRat);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck2ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumSupplyDeck2ToDemandTolValue(1) > DataConvergParams::HVACHumRatToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACHumRatNotConverged(3) = true;
+        TmpRealARR = airLoopConv.HVACHumSupplyDeck2ToDemandTolValue;
+        airLoopConv.HVACHumSupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - thisInletNode.HumRat);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACHumSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACHumSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACHumRatToler) {
+            airLoopConv.HVACHumRatNotConverged[2] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck2ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck2ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Temp - state.dataLoopNodes->Node(InletNode).Temp);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck2ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempSupplyDeck2ToDemandTolValue(1) >
-            DataConvergParams::HVACTemperatureToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACTempNotConverged(3) = true;
+        TmpRealARR = airLoopConv.HVACTempSupplyDeck2ToDemandTolValue;
+        airLoopConv.HVACTempSupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Temp - thisInletNode.Temp);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACTempSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACTempSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACTemperatureToler) {
+            airLoopConv.HVACTempNotConverged[2] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck2ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck2ToDemandTolValue(1) = DeltaEnergy;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergySupplyDeck2ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
+        TmpRealARR = airLoopConv.HVACEnergySupplyDeck2ToDemandTolValue;
+        airLoopConv.HVACEnergySupplyDeck2ToDemandTolValue[0] = DeltaEnergy;
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACEnergySupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
         if (std::abs(DeltaEnergy) > DataConvergParams::HVACEnergyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnergyNotConverged(3) = true;
+            airLoopConv.HVACEnergyNotConverged[2] = true;
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck2ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck2ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - state.dataLoopNodes->Node(InletNode).Enthalpy);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum)
-            .HVACEnthalpySupplyDeck2ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpySupplyDeck2ToDemandTolValue(1) >
-            DataConvergParams::HVACEnthalpyToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACEnthalpyNotConverged(3) = true;
+        TmpRealARR = airLoopConv.HVACEnthalpySupplyDeck2ToDemandTolValue;
+        airLoopConv.HVACEnthalpySupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - thisInletNode.Enthalpy);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACEnthalpySupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACEnthalpySupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACEnthalpyToler) {
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        TmpRealARR = state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressueSupplyDeck2ToDemandTolValue;
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressueSupplyDeck2ToDemandTolValue(1) =
-            std::abs(state.dataLoopNodes->Node(OutletNode).Press - state.dataLoopNodes->Node(InletNode).Press);
-        state.dataConvergeParams->AirLoopConvergence(AirLoopNum)
-            .HVACPressueSupplyDeck2ToDemandTolValue({2, DataConvergParams::ConvergLogStackDepth}) =
-            TmpRealARR({1, DataConvergParams::ConvergLogStackDepth - 1});
-        if (state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressueSupplyDeck2ToDemandTolValue(1) > DataConvergParams::HVACPressToler) {
-            state.dataConvergeParams->AirLoopConvergence(AirLoopNum).HVACPressureNotConverged(3) = true;
+        TmpRealARR = airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue;
+        airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Press - thisInletNode.Press);
+        for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+            airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+        }
+        if (airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACPressToler) {
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
     }
 
     // Always update the new inlet conditions
-    state.dataLoopNodes->Node(InletNode).Temp = state.dataLoopNodes->Node(OutletNode).Temp;
-    state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-    state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail;
-    state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(InletNode).Quality = state.dataLoopNodes->Node(OutletNode).Quality;
-    state.dataLoopNodes->Node(InletNode).Press = state.dataLoopNodes->Node(OutletNode).Press;
-    state.dataLoopNodes->Node(InletNode).Enthalpy = state.dataLoopNodes->Node(OutletNode).Enthalpy;
-    state.dataLoopNodes->Node(InletNode).HumRat = state.dataLoopNodes->Node(OutletNode).HumRat;
+    thisInletNode.Temp = state.dataLoopNodes->Node(OutletNode).Temp;
+    thisInletNode.MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
+    thisInletNode.MassFlowRateMinAvail = state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail;
+    thisInletNode.MassFlowRateMaxAvail = state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail;
+    thisInletNode.Quality = state.dataLoopNodes->Node(OutletNode).Quality;
+    thisInletNode.Press = state.dataLoopNodes->Node(OutletNode).Press;
+    thisInletNode.Enthalpy = state.dataLoopNodes->Node(OutletNode).Enthalpy;
+    thisInletNode.HumRat = state.dataLoopNodes->Node(OutletNode).HumRat;
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataLoopNodes->Node(InletNode).CO2 = state.dataLoopNodes->Node(OutletNode).CO2;
+        thisInletNode.CO2 = state.dataLoopNodes->Node(OutletNode).CO2;
     }
 
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        state.dataLoopNodes->Node(InletNode).GenContam = state.dataLoopNodes->Node(OutletNode).GenContam;
-    }
-}
-
-//***************
-
-// In-Place Right Shift by 1 of Array Elements
-void rshift1(Array1D<Real64> &a)
-{
-    assert(a.size_bounded());
-    for (int i = a.u(), e = a.l(); i > e; --i) {
-        a(i) = a(i - 1);
+        thisInletNode.GenContam = state.dataLoopNodes->Node(OutletNode).GenContam;
     }
 }
 
 void UpdatePlantLoopInterface(EnergyPlusData &state,
-                              int const LoopNum,                                 // The 'inlet/outlet node' loop number
-                              DataPlant::LoopSideLocation const ThisLoopSideNum, // The 'outlet node' LoopSide number
+                              PlantLocation const &plantLoc,    // The 'outlet node' Location
                               int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
                               int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
                               bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
@@ -422,21 +394,11 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     // flow or energy are out of tolerance.  This in effect checks flow and
     // ~.25C temperature difference.
 
-    // Using/Aliasing
-
-    using FluidProperties::GetSpecificHeatGlycol;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdatePlantLoopInterface");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 OldTankOutletTemp;
-    Real64 OldOtherLoopSideInletMdot;
-    Real64 TankOutletTemp;
-    Real64 Cp;
-    Real64 MixedOutletTemp;
-    int ThisLoopSideInletNode;
-
+    int LoopNum = plantLoc.loopNum;
+    DataPlant::LoopSideLocation ThisLoopSideNum = plantLoc.loopSideNum;
     auto &convergence(state.dataConvergeParams->PlantConvergence(LoopNum));
 
     // reset out of tolerance flags
@@ -444,14 +406,14 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     convergence.PlantTempNotConverged = false;
 
     // set the LoopSide inlet node
-    ThisLoopSideInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSideNum).NodeNumIn;
+    int ThisLoopSideInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSideNum).NodeNumIn;
 
     // save the inlet node temp for DeltaEnergy check
-    OldOtherLoopSideInletMdot = state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate;
-    OldTankOutletTemp = state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp;
+    Real64 OldOtherLoopSideInletMdot = state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate;
+    Real64 OldTankOutletTemp = state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp;
 
     // calculate the specific heat
-    Cp = GetSpecificHeatGlycol(
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, OldTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
     // update the enthalpy
@@ -460,21 +422,23 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     // update the temperatures and flow rates
     auto &flow_demand_to_supply_tol(convergence.PlantFlowDemandToSupplyTolValue);
     auto &flow_supply_to_demand_tol(convergence.PlantFlowSupplyToDemandTolValue);
+    Real64 MixedOutletTemp;
+    Real64 TankOutletTemp;
     if (CommonPipeType == DataPlant::CommonPipeType::Single || CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
         // update the temperature
-        UpdateCommonPipe(state, LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp);
+        UpdateCommonPipe(state, plantLoc, CommonPipeType, MixedOutletTemp);
         state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
         TankOutletTemp = MixedOutletTemp;
         if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
             rshift1(flow_demand_to_supply_tol);
-            flow_demand_to_supply_tol(1) = std::abs(OldOtherLoopSideInletMdot - state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
-            if (flow_demand_to_supply_tol(1) > DataConvergParams::PlantFlowRateToler) {
+            flow_demand_to_supply_tol[0] = std::abs(OldOtherLoopSideInletMdot - state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
+            if (flow_demand_to_supply_tol[0] > DataConvergParams::PlantFlowRateToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }
         } else {
             rshift1(flow_supply_to_demand_tol);
-            flow_supply_to_demand_tol(1) = std::abs(OldOtherLoopSideInletMdot - state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
-            if (flow_supply_to_demand_tol(1) > DataConvergParams::PlantFlowRateToler) {
+            flow_supply_to_demand_tol[0] = std::abs(OldOtherLoopSideInletMdot - state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
+            if (flow_supply_to_demand_tol[0] > DataConvergParams::PlantFlowRateToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }
         }
@@ -493,16 +457,16 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
         // Set the flow tolerance array
         if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
             rshift1(flow_demand_to_supply_tol);
-            flow_demand_to_supply_tol(1) = std::abs(state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate -
+            flow_demand_to_supply_tol[0] = std::abs(state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate -
                                                     state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
-            if (flow_demand_to_supply_tol(1) > DataConvergParams::PlantFlowRateToler) {
+            if (flow_demand_to_supply_tol[0] > DataConvergParams::PlantFlowRateToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }
         } else {
             rshift1(flow_supply_to_demand_tol);
-            flow_supply_to_demand_tol(1) = std::abs(state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate -
+            flow_supply_to_demand_tol[0] = std::abs(state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate -
                                                     state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
-            if (flow_supply_to_demand_tol(1) > DataConvergParams::PlantFlowRateToler) {
+            if (flow_supply_to_demand_tol[0] > DataConvergParams::PlantFlowRateToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }
         }
@@ -529,15 +493,15 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
         auto &temp_demand_to_supply_tol(convergence.PlantTempDemandToSupplyTolValue);
         rshift1(temp_demand_to_supply_tol);
-        temp_demand_to_supply_tol(1) = std::abs(OldTankOutletTemp - state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp);
-        if (temp_demand_to_supply_tol(1) > DataConvergParams::PlantTemperatureToler) {
+        temp_demand_to_supply_tol[0] = std::abs(OldTankOutletTemp - state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp);
+        if (temp_demand_to_supply_tol[0] > DataConvergParams::PlantTemperatureToler) {
             convergence.PlantTempNotConverged = true;
         }
     } else {
         auto &temp_supply_to_demand_tol(convergence.PlantTempSupplyToDemandTolValue);
         rshift1(temp_supply_to_demand_tol);
-        temp_supply_to_demand_tol(1) = std::abs(OldTankOutletTemp - state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp);
-        if (temp_supply_to_demand_tol(1) > DataConvergParams::PlantTemperatureToler) {
+        temp_supply_to_demand_tol[0] = std::abs(OldTankOutletTemp - state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp);
+        if (temp_supply_to_demand_tol[0] > DataConvergParams::PlantTemperatureToler) {
             convergence.PlantTempNotConverged = true;
         }
     }
@@ -553,8 +517,6 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
         }
     }
 }
-
-//***************
 
 void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const DataPlant::LoopSideLocation TankInletLoopSide, Real64 &TankOutletTemp)
 {
@@ -583,53 +545,30 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // tank. Note that this routine is called repeatedly to re calculate
     // loop capacitance based on current plant conditions
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
     auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
     static constexpr std::string_view RoutineName("UpdateHalfLoopInletTemp");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation TankOutletLoopSide; // inlet loopsidenumber
-    int TankInletNode;                              // inlet loop side outlet node
-    int TankOutletNode;                             // inlet loop side outlet node
-    Real64 TankInletTemp;                           // temporary variable
-    Real64 LastTankOutletTemp;                      // temporary variable
-    Real64 Cp;                                      // specific heat
-    Real64 TimeElapsed;                             // temporary value based on current clock time during simulation, fractional hours
-
-    Real64 TimeStepSeconds;
-    Real64 MassFlowRate;
-    Real64 PumpHeat;
-    Real64 ThisTankMass;
-    Real64 TankFinalTemp;
-    Real64 TankAverageTemp;
-
     // find tank inlet and outlet nodes
-    TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
-    TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
-    TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
-
-    TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
+    DataPlant::LoopSideLocation TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
+    int TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
+    Real64 TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
 
     // This needs to be based on time to deal with system downstepping and repeated timesteps
-    TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    Real64 TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
     if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
             state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed = TimeElapsed;
     }
 
-    LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
+    Real64 LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
     // calculate the specific heat for the capacitance calculation
-    Cp = GetSpecificHeatGlycol(
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LastTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
@@ -641,11 +580,12 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // tank conditions each call.
     // Analytical solution for ODE, formulated for both final tank temp and average tank temp.
 
-    TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
-    MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
-    PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
-    ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
-
+    Real64 TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
+    Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
+    Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
+    Real64 TankFinalTemp;
+    Real64 TankAverageTemp;
     if (ThisTankMass <= 0.0) { // no mass, no plant loop volume
         if (MassFlowRate > 0.0) {
             TankFinalTemp = TankInletTemp + PumpHeat / (MassFlowRate * Cp);
@@ -696,8 +636,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
 }
 
 void UpdateCommonPipe(EnergyPlusData &state,
-                      int const LoopNum,
-                      DataPlant::LoopSideLocation const TankInletLoopSide,
+                      PlantLocation const &TankInletPlantLoc,
                       DataPlant::CommonPipeType const CommonPipeType,
                       Real64 &MixedOutletTemp)
 {
@@ -726,44 +665,23 @@ void UpdateCommonPipe(EnergyPlusData &state,
     // tank. Note that this routine is called repeatedly to re calculate
     // loop capacitance based on current plant conditions
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     auto &SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     auto &TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-    using FluidProperties::GetSpecificHeatGlycol;
-
-    // Locals
-    // SUBROUTINE ARGUMENTS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateCommonPipe");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    DataPlant::LoopSideLocation TankOutletLoopSide; // inlet loopsidenumber
-    int TankInletNode;                              // inlet loop side outlet node
-    int TankOutletNode;                             // inlet loop side outlet node
-    Real64 TankInletTemp;                           // temporary variable
-    Real64 LastTankOutletTemp;                      // temporary variable
-    Real64 Cp;                                      // specific heat
-    Real64 TimeElapsed;                             // temporary value based on current clock time during simulation, fractional hours
+    // find tank inlet and outlet nodes
+    int LoopNum = TankInletPlantLoc.loopNum;
+    DataPlant::LoopSideLocation TankInletLoopSide = TankInletPlantLoc.loopSideNum;
+    DataPlant::LoopSideLocation TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletPlantLoc.loopSideNum)]; // Outlet loopside
+    int TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
+    int TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
+
+    Real64 TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
 
     Real64 FracTotLoopMass; // Fraction of total loop mass assigned to the half loop
-    Real64 TimeStepSeconds;
-    Real64 MassFlowRate;
-    Real64 PumpHeat;
-    Real64 ThisTankMass;
-    Real64 TankFinalTemp;
-    Real64 TankAverageTemp;
-
-    // find tank inlet and outlet nodes
-    TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
-    TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
-    TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
-
-    TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
-
     if (TankInletLoopSide == DataPlant::LoopSideLocation::Demand) {
         // for common pipe loops, assume 75% of plant loop volume is on the demand side
         FracTotLoopMass = 0.25;
@@ -772,17 +690,17 @@ void UpdateCommonPipe(EnergyPlusData &state,
     }
 
     // This needs to be based on time to deal with system downstepping and repeated timesteps
-    TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    Real64 TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
     if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed != TimeElapsed) {
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet =
             state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet;
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TimeElapsed = TimeElapsed;
     }
 
-    LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
+    Real64 LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
     // calculate the specific heat for the capacitance calculation
-    Cp = GetSpecificHeatGlycol(
+    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LastTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
     // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
@@ -797,11 +715,13 @@ void UpdateCommonPipe(EnergyPlusData &state,
     // no common pipe case.
     // calculation is separated because for common pipe, a different split for mass fraction is applied
     // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
-    TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
-    MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
-    PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
-    ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
+    Real64 TimeStepSeconds = TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
+    Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
+    Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
 
+    Real64 TankFinalTemp;
+    Real64 TankAverageTemp;
     if (ThisTankMass <= 0.0) { // no mass, no plant loop volume
         if (MassFlowRate > 0.0) {
             TankFinalTemp = TankInletTemp + PumpHeat / (MassFlowRate * Cp);
@@ -831,8 +751,9 @@ void UpdateCommonPipe(EnergyPlusData &state,
         ManageSingleCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp, MixedOutletTemp);
         // 2-way (controlled) common pipe simulation
     } else if (CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
+        PlantLocation TankOutletPlantLoc = {LoopNum, TankOutletLoopSide, 0, 0};
 
-        ManageTwoWayCommonPipe(state, LoopNum, TankOutletLoopSide, TankAverageTemp);
+        ManageTwoWayCommonPipe(state, TankOutletPlantLoc, TankAverageTemp);
         MixedOutletTemp = state.dataLoopNodes->Node(TankOutletNode).Temp;
     }
 
@@ -866,64 +787,49 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
     // accordingly.
 
-    // Using/Aliasing
-    using namespace DataPlant;
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS
-    Real64 MdotPri(0.0);      // flow rate on primary side kg/s
-    Real64 MdotSec(0.0);      // flow rate on secondary side kg/s
-    Real64 MdotPriRCLeg(0.0); // flow rate of primary recirculation thru common pipe kg/s
-    Real64 MdotSecRCLeg(0.0); // flow rate of secondary recirculation thru common pipe kg/s
-    Real64 TempSecInlet(0.0); // temperature at secondary inlet deg C
-    Real64 TempPriInlet(0.0); // temperature at primary inlet deg C
-    Real64 TempPriOutTankOut(0.0);
-    Real64 TempSecOutTankOut(0.0);
-    int NodeNumPriOut(0);
-    int NodeNumSecOut(0);
-    int NodeNumPriIn(0);
-    int NodeNumSecIn(0);
-    int CPFlowDir; // flow direction in single common pipe
-    Real64 CommonPipeTemp;
-
     auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
-    auto &MyEnvrnFlag(state.dataHVACInterfaceMgr->MyEnvrnFlag_SingleCommonPipe);
 
     // One time call to set up report variables and set common pipe 'type' flag
-    if (state.dataHVACInterfaceMgr->OneTimeData_SingleCommonPipe) {
-        if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
-        MyEnvrnFlag.dimension(state.dataPlnt->TotNumLoops, true);
-        state.dataHVACInterfaceMgr->OneTimeData_SingleCommonPipe = false;
-    }
+    if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
 
     // fill local node indexes
-    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).NodeNumIn;
-    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).NodeNumOut;
-    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).NodeNumIn;
-    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).NodeNumOut;
+    int NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
+    int NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut;
+    int NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
+    int NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
-    if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
+    auto &MyEnvrnFlag(PlantCommonPipe(LoopNum).MyEnvrnFlag);
+    if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         PlantCommonPipe(LoopNum).Flow = 0.0;
         PlantCommonPipe(LoopNum).Temp = 0.0;
         PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
-        MyEnvrnFlag(LoopNum) = false;
+        MyEnvrnFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag(LoopNum) = true;
+        MyEnvrnFlag = true;
     }
 
     // every time inits
-    MdotSec = state.dataLoopNodes->Node(NodeNumSecOut).MassFlowRate;
-    MdotPri = state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate;
+    Real64 MdotSec = state.dataLoopNodes->Node(NodeNumSecOut).MassFlowRate;
+    Real64 MdotPri = state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate;
 
-    if (LoopSide == LoopSideLocation::Supply) {
+    Real64 TempSecOutTankOut;
+    Real64 TempPriOutTankOut;
+    if (LoopSide == DataPlant::LoopSideLocation::Supply) {
         TempSecOutTankOut = TankOutletTemp;
-        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Demand).LoopSideInlet_TankTemp;
+        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).LoopSideInlet_TankTemp;
     } else {
         TempPriOutTankOut = TankOutletTemp;
-        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).LoopSideInlet_TankTemp;
+        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).LoopSideInlet_TankTemp;
     }
 
     // first do mass balances and find common pipe flow rate and direction
+    Real64 MdotPriRCLeg; // flow rate of primary recirculation thru common pipe kg/s
+    Real64 MdotSecRCLeg; // flow rate of secondary recirculation thru common pipe kg/s
+    Real64 TempSecInlet; // temperature at secondary inlet deg C
+    Real64 TempPriInlet; // temperature at primary inlet deg C
+    int CPFlowDir;       // flow direction in single common pipe
+    Real64 CommonPipeTemp;
     if (MdotPri > MdotSec) {
         MdotPriRCLeg = MdotPri - MdotSec;
         if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
@@ -971,14 +877,14 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
     state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
 
-    if (LoopSide == LoopSideLocation::Supply) {
+    if (LoopSide == DataPlant::LoopSideLocation::Supply) {
         MixedOutletTemp = TempPriInlet;
     } else {
         MixedOutletTemp = TempSecInlet;
     }
 }
 
-void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant::LoopSideLocation const LoopSide, Real64 const TankOutletTemp)
+void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc, Real64 const TankOutletTemp)
 {
 
     // SUBROUTINE INFORMATION:
@@ -997,223 +903,200 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, DataPlant:
     // REFERENCES:
     // reimplementation of CheckTwoWayCommonPipeConditions by Sankaranarayanan K P Jan 2007
 
-    // Using/Aliasing
-    using DataPlant::DeltaTempTol;
-    using PlantUtilities::SetActuatedBranchFlowRate;
-
     // SUBROUTINE PARAMETER DEFINITIONS:
-    int constexpr DemandLedPrimaryInletUpdate(101);
-    int constexpr DemandLedSecondaryInletUpdate(102);
-    int constexpr SupplyLedPrimaryInletUpdate(103);
-    int constexpr SupplyLedSecondaryInletUpdate(104);
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CurCallingCase;       // local temporary
-    Real64 MdotPri(0.0);      // flow rate on primary side kg/s
-    Real64 MdotSec(0.0);      // flow rate on secondary side kg/s
-    Real64 MdotPriToSec(0.0); // flow rate between primary and secondary side kg/s
-    Real64 MdotPriRCLeg(0.0); // flow rate on primary recirculation common pipe kg/s
-    Real64 MdotSecRCLeg(0.0); // flow rate on secondary recirculation common pipe kg/s
-    Real64 TempSecInlet(0.0); // temperature at secondary inlet deg C
-    Real64 TempPriInlet(0.0); // temperature at primary inlet deg C
-    Real64 TempPriOutTankOut(0.0);
-    Real64 TempSecOutTankOut(0.0);
-    Real64 TempCPPrimaryCntrlSetPoint(0.0);
-    Real64 TempCPSecondaryCntrlSetPoint(0.0);
-    int NodeNumPriOut(0);
-    int NodeNumSecOut(0);
-    int NodeNumPriIn(0);
-    int NodeNumSecIn(0);
+    enum class UpdateType
+    {
+        DemandLedPrimaryInlet,
+        DemandLedSecondaryInlet,
+        SupplyLedPrimaryInlet,
+        SupplyLedSecondaryInlet
+    } curCallingCase = UpdateType::SupplyLedPrimaryInlet;
     constexpr int MaxIterLimitCaseA(8);
     constexpr int MaxIterLimitCaseB(4);
 
-    int loop; // iteration loop counter
-
-    auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
-    auto &MyEnvrnFlag(state.dataHVACInterfaceMgr->MyEnvrnFlag_TwoWayCommonPipe);
-
     // one time setups
-    if (state.dataHVACInterfaceMgr->OneTimeData_TwoWayCommonPipe) {
-        if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
-        MyEnvrnFlag.dimension(state.dataPlnt->TotNumLoops, true);
-        state.dataHVACInterfaceMgr->OneTimeData_TwoWayCommonPipe = false;
-    }
+    if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
+
+    auto &plantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe(plantLoc.loopNum));
+    auto &thisPlantLoop = state.dataPlnt->PlantLoop(plantLoc.loopNum);
 
     // fill local node indexes
-    NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
-    NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut;
-    NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
-    NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
+    int const NodeNumPriIn = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
+    int const NodeNumPriOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut;
+    int const NodeNumSecIn = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
+    int const NodeNumSecOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
     // begin environment inits
-    if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
-        PlantCommonPipe(LoopNum).PriToSecFlow = 0.0;
-        PlantCommonPipe(LoopNum).SecToPriFlow = 0.0;
-        PlantCommonPipe(LoopNum).PriCPLegFlow = 0.0;
-        PlantCommonPipe(LoopNum).SecCPLegFlow = 0.0;
-        MyEnvrnFlag(LoopNum) = false;
+    auto &MyEnvrnFlag(plantCommonPipe.MyEnvrnFlag);
+    if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+        plantCommonPipe.PriToSecFlow = 0.0;
+        plantCommonPipe.SecToPriFlow = 0.0;
+        plantCommonPipe.PriCPLegFlow = 0.0;
+        plantCommonPipe.SecCPLegFlow = 0.0;
+        MyEnvrnFlag = false;
     }
 
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        MyEnvrnFlag(LoopNum) = true;
+        MyEnvrnFlag = true;
     }
 
     // every time inits
-    MdotSec = state.dataLoopNodes->Node(NodeNumSecOut).MassFlowRate; // assume known and fixed by demand side operation
-    TempCPPrimaryCntrlSetPoint = state.dataLoopNodes->Node(NodeNumPriIn).TempSetPoint;
-    TempCPSecondaryCntrlSetPoint = state.dataLoopNodes->Node(NodeNumSecIn).TempSetPoint;
+    Real64 MdotSec = state.dataLoopNodes->Node(NodeNumSecOut).MassFlowRate; // assume known and fixed by demand side operation
+    Real64 TempCPPrimaryCntrlSetPoint = state.dataLoopNodes->Node(NodeNumPriIn).TempSetPoint;
+    Real64 TempCPSecondaryCntrlSetPoint = state.dataLoopNodes->Node(NodeNumSecIn).TempSetPoint;
 
     // 6 unknowns follow, fill with current values
-    MdotPriToSec = PlantCommonPipe(LoopNum).PriToSecFlow;
-    MdotPriRCLeg = PlantCommonPipe(LoopNum).PriCPLegFlow;
-    MdotSecRCLeg = PlantCommonPipe(LoopNum).SecCPLegFlow;
-    TempSecInlet = state.dataLoopNodes->Node(NodeNumSecIn).Temp;
-    TempPriInlet = state.dataLoopNodes->Node(NodeNumPriIn).Temp;
-    MdotPri = state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate; // may or may not be an unknown, If variable speed primary side, then unknown
+    Real64 MdotPriToSec = plantCommonPipe.PriToSecFlow;
+    Real64 MdotPriRCLeg = plantCommonPipe.PriCPLegFlow;
+    Real64 MdotSecRCLeg = plantCommonPipe.SecCPLegFlow;
+    Real64 TempSecInlet = state.dataLoopNodes->Node(NodeNumSecIn).Temp;
+    Real64 TempPriInlet = state.dataLoopNodes->Node(NodeNumPriIn).Temp;
+    Real64 MdotPri =
+        state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate; // may or may not be an unknown, If variable speed primary side, then unknown
 
-    if (LoopSide == DataPlant::LoopSideLocation::Supply) {
+    Real64 TempPriOutTankOut;
+    Real64 TempSecOutTankOut;
+    if (plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
         TempSecOutTankOut = TankOutletTemp;
-        TempPriOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).LoopSideInlet_TankTemp;
+        TempPriOutTankOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).LoopSideInlet_TankTemp;
     } else {
         TempPriOutTankOut = TankOutletTemp;
-        TempSecOutTankOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).LoopSideInlet_TankTemp;
+        TempSecOutTankOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).LoopSideInlet_TankTemp;
     }
 
     // determine current case
     // which side is being updated
     // commonpipe control point is the inlet of one of the half loops
-    CurCallingCase = 0;
-    if (LoopSide == DataPlant::LoopSideLocation::Supply) { // update primary inlet
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
-            !state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
-            CurCallingCase = SupplyLedPrimaryInletUpdate;
+    if (plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) { // update primary inlet
+        if (thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
+            !thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+            curCallingCase = UpdateType::SupplyLedPrimaryInlet;
 
-        } else if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
-                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
-            CurCallingCase = DemandLedPrimaryInletUpdate;
+        } else if (!thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
+                   thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+            curCallingCase = UpdateType::DemandLedPrimaryInlet;
         }
     } else { // update secondary inlet
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
-            !state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
-            CurCallingCase = SupplyLedSecondaryInletUpdate;
+        if (thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
+            !thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+            curCallingCase = UpdateType::SupplyLedSecondaryInlet;
 
-        } else if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
-                   state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
-            CurCallingCase = DemandLedSecondaryInletUpdate;
+        } else if (!thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InletNodeSetPt &&
+                   thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InletNodeSetPt) {
+            curCallingCase = UpdateType::DemandLedSecondaryInlet;
         }
     }
 
-    {
-        auto const SELECT_CASE_var(CurCallingCase);
+    switch (curCallingCase) {
+    case UpdateType::SupplyLedPrimaryInlet:
+    case UpdateType::SupplyLedSecondaryInlet:
+        // CASE A, Primary/Supply Led
+        // six equations and six unknowns (although one has a setpoint)
+        for (int loop = 1; loop <= MaxIterLimitCaseA; ++loop) {
 
-        if ((SELECT_CASE_var == SupplyLedPrimaryInletUpdate) || (SELECT_CASE_var == SupplyLedSecondaryInletUpdate)) {
-            // CASE A, Primary/Supply Led
-            // six equations and six unknowns (although one has a setpoint)
-            for (loop = 1; loop <= MaxIterLimitCaseA; ++loop) {
-
-                // eq 1
-                if (std::abs(TempSecOutTankOut - TempCPPrimaryCntrlSetPoint) > DeltaTempTol) {
-                    MdotPriToSec = MdotPriRCLeg * (TempCPPrimaryCntrlSetPoint - TempPriOutTankOut) / (TempSecOutTankOut - TempCPPrimaryCntrlSetPoint);
-                    if (MdotPriToSec < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriToSec = 0.0;
-                    if (MdotPriToSec > MdotSec) MdotPriToSec = MdotSec;
-                } else {
-                    MdotPriToSec = MdotSec; //  what to do (?)
-                }
-                // eq. 5
-                MdotPriRCLeg = MdotPri - MdotPriToSec;
-                if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriRCLeg = 0.0;
-
-                // eq. 4
-                MdotSecRCLeg = MdotSec - MdotPriToSec;
-                if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotSecRCLeg = 0.0;
-
-                // eq  6
-                if ((MdotPriToSec + MdotSecRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    TempSecInlet = (MdotPriToSec * TempPriOutTankOut + MdotSecRCLeg * TempSecOutTankOut) / (MdotPriToSec + MdotSecRCLeg);
-                } else {
-                    TempSecInlet = TempPriOutTankOut;
-                }
-
-                // eq. 3
-                if ((PlantCommonPipe(LoopNum).SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == SupplyLedPrimaryInletUpdate)) {
-                    // MdotPri is a variable to be calculated and flow request needs to be made
-                    if (std::abs(TempCPPrimaryCntrlSetPoint) > DeltaTempTol) {
-
-                        MdotPri = (MdotPriRCLeg * TempPriOutTankOut + MdotPriToSec * TempSecOutTankOut) / (TempCPPrimaryCntrlSetPoint);
-
-                        if (MdotPri < DataBranchAirLoopPlant::MassFlowTolerance) MdotPri = 0.0;
-                    } else {
-                        MdotPri = MdotSec;
-                    }
-                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, DataPlant::LoopSideLocation::Supply, 1, false);
-                }
-
-                // eq. 2
-                if ((MdotPriToSec + MdotPriRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    TempPriInlet = (MdotPriToSec * TempSecOutTankOut + MdotPriRCLeg * TempPriOutTankOut) / (MdotPriToSec + MdotPriRCLeg);
-                } else {
-                    TempPriInlet = TempSecOutTankOut;
-                }
+            // eq 1
+            if (std::abs(TempSecOutTankOut - TempCPPrimaryCntrlSetPoint) > DataPlant::DeltaTempTol) {
+                MdotPriToSec = MdotPriRCLeg * (TempCPPrimaryCntrlSetPoint - TempPriOutTankOut) / (TempSecOutTankOut - TempCPPrimaryCntrlSetPoint);
+                if (MdotPriToSec < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriToSec = 0.0;
+                if (MdotPriToSec > MdotSec) MdotPriToSec = MdotSec;
+            } else {
+                MdotPriToSec = MdotSec; //  what to do (?)
             }
-        } else if ((SELECT_CASE_var == DemandLedPrimaryInletUpdate) || (SELECT_CASE_var == DemandLedSecondaryInletUpdate)) {
-            // case B. Secondary/demand led
+            // eq. 5
+            MdotPriRCLeg = MdotPri - MdotPriToSec;
+            if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriRCLeg = 0.0;
 
-            // six equations and six unknowns (although one has a setpoint)
-            for (loop = 1; loop <= MaxIterLimitCaseB; ++loop) {
-                // eq 1,
-                if (std::abs(TempPriOutTankOut - TempSecOutTankOut) > DeltaTempTol) {
-                    MdotPriToSec = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempSecOutTankOut);
-                    if (MdotPriToSec < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriToSec = 0.0;
-                    if (MdotPriToSec > MdotSec) MdotPriToSec = MdotSec;
-                } else {
-                    MdotPriToSec = MdotSec;
-                }
+            // eq. 4
+            MdotSecRCLeg = MdotSec - MdotPriToSec;
+            if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotSecRCLeg = 0.0;
 
-                // eq. 2,
-                if ((MdotPriToSec + MdotPriRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    TempPriInlet = (MdotPriToSec * TempSecOutTankOut + MdotPriRCLeg * TempPriOutTankOut) / (MdotPriToSec + MdotPriRCLeg);
-                } else {
-                    TempPriInlet = TempSecOutTankOut;
-                }
-
-                // eq. 3
-                if ((PlantCommonPipe(LoopNum).SupplySideInletPumpType == FlowType::Variable) && (CurCallingCase == DemandLedPrimaryInletUpdate)) {
-                    // MdotPri is a variable to be calculated and flow request made
-                    if (std::abs(TempPriOutTankOut - TempPriInlet) > DeltaTempTol) {
-                        MdotPri = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempPriInlet);
-                        if (MdotPri < DataBranchAirLoopPlant::MassFlowTolerance) MdotPri = 0.0;
-                    } else {
-                        MdotPri = MdotSec;
-                    }
-                    SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, LoopNum, DataPlant::LoopSideLocation::Supply, 1, false);
-                }
-
-                // eq. 4
-                MdotSecRCLeg = MdotSec - MdotPriToSec;
-                if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotSecRCLeg = 0.0;
-
-                // eq. 5
-                MdotPriRCLeg = MdotPri - MdotPriToSec;
-                if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriRCLeg = 0.0;
-
-                // eq  6
-                if ((MdotPriToSec + MdotSecRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
-                    TempSecInlet = (MdotPriToSec * TempPriOutTankOut + MdotSecRCLeg * TempSecOutTankOut) / (MdotPriToSec + MdotSecRCLeg);
-                } else {
-                    TempSecInlet = TempPriOutTankOut;
-                }
+            // eq  6
+            if ((MdotPriToSec + MdotSecRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
+                TempSecInlet = (MdotPriToSec * TempPriOutTankOut + MdotSecRCLeg * TempSecOutTankOut) / (MdotPriToSec + MdotSecRCLeg);
+            } else {
+                TempSecInlet = TempPriOutTankOut;
             }
 
-        } else {
-            //???      CALL ShowFatalError('ManageTwoWayCommonPipe: Calling Case Fall Through')
+            // eq. 3
+            if ((plantCommonPipe.SupplySideInletPumpType == FlowType::Variable) && (curCallingCase == UpdateType::SupplyLedPrimaryInlet)) {
+                // MdotPri is a variable to be calculated and flow request needs to be made
+                if (std::abs(TempCPPrimaryCntrlSetPoint) > DataPlant::DeltaTempTol) {
+
+                    MdotPri = (MdotPriRCLeg * TempPriOutTankOut + MdotPriToSec * TempSecOutTankOut) / (TempCPPrimaryCntrlSetPoint);
+
+                    if (MdotPri < DataBranchAirLoopPlant::MassFlowTolerance) MdotPri = 0.0;
+                } else {
+                    MdotPri = MdotSec;
+                }
+                PlantLocation thisPlantLoc = {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0};
+                PlantUtilities::SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, thisPlantLoc, false);
+            }
+
+            // eq. 2
+            if ((MdotPriToSec + MdotPriRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
+                TempPriInlet = (MdotPriToSec * TempSecOutTankOut + MdotPriRCLeg * TempPriOutTankOut) / (MdotPriToSec + MdotPriRCLeg);
+            } else {
+                TempPriInlet = TempSecOutTankOut;
+            }
+        }
+        break;
+    case UpdateType::DemandLedPrimaryInlet:
+    case UpdateType::DemandLedSecondaryInlet:
+        // case B. Secondary/demand led
+
+        // six equations and six unknowns (although one has a setpoint)
+        for (int loop = 1; loop <= MaxIterLimitCaseB; ++loop) {
+            // eq 1,
+            if (std::abs(TempPriOutTankOut - TempSecOutTankOut) > DataPlant::DeltaTempTol) {
+                MdotPriToSec = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempSecOutTankOut);
+                if (MdotPriToSec < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriToSec = 0.0;
+                if (MdotPriToSec > MdotSec) MdotPriToSec = MdotSec;
+            } else {
+                MdotPriToSec = MdotSec;
+            }
+
+            // eq. 2,
+            if ((MdotPriToSec + MdotPriRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
+                TempPriInlet = (MdotPriToSec * TempSecOutTankOut + MdotPriRCLeg * TempPriOutTankOut) / (MdotPriToSec + MdotPriRCLeg);
+            } else {
+                TempPriInlet = TempSecOutTankOut;
+            }
+
+            // eq. 3
+            if ((plantCommonPipe.SupplySideInletPumpType == FlowType::Variable) && (curCallingCase == UpdateType::DemandLedPrimaryInlet)) {
+                // MdotPri is a variable to be calculated and flow request made
+                if (std::abs(TempPriOutTankOut - TempPriInlet) > DataPlant::DeltaTempTol) {
+                    MdotPri = MdotSec * (TempCPSecondaryCntrlSetPoint - TempSecOutTankOut) / (TempPriOutTankOut - TempPriInlet);
+                    if (MdotPri < DataBranchAirLoopPlant::MassFlowTolerance) MdotPri = 0.0;
+                } else {
+                    MdotPri = MdotSec;
+                }
+                PlantLocation thisPlantLoc = {plantLoc.loopNum, DataPlant::LoopSideLocation::Supply, 1, 0};
+                PlantUtilities::SetActuatedBranchFlowRate(state, MdotPri, NodeNumPriIn, thisPlantLoc, false);
+            }
+
+            // eq. 4
+            MdotSecRCLeg = MdotSec - MdotPriToSec;
+            if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotSecRCLeg = 0.0;
+
+            // eq. 5
+            MdotPriRCLeg = MdotPri - MdotPriToSec;
+            if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) MdotPriRCLeg = 0.0;
+
+            // eq  6
+            if ((MdotPriToSec + MdotSecRCLeg) > DataBranchAirLoopPlant::MassFlowTolerance) {
+                TempSecInlet = (MdotPriToSec * TempPriOutTankOut + MdotSecRCLeg * TempSecOutTankOut) / (MdotPriToSec + MdotSecRCLeg);
+            } else {
+                TempSecInlet = TempPriOutTankOut;
+            }
         }
     }
 
     // update
-    PlantCommonPipe(LoopNum).PriToSecFlow = MdotPriToSec;
-    PlantCommonPipe(LoopNum).SecToPriFlow = MdotPriToSec;
-    PlantCommonPipe(LoopNum).PriCPLegFlow = MdotPriRCLeg;
-    PlantCommonPipe(LoopNum).SecCPLegFlow = MdotSecRCLeg;
+    plantCommonPipe.PriToSecFlow = MdotPriToSec;
+    plantCommonPipe.SecToPriFlow = MdotPriToSec;
+    plantCommonPipe.PriCPLegFlow = MdotPriRCLeg;
+    plantCommonPipe.SecCPLegFlow = MdotSecRCLeg;
     state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
     state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
 }
@@ -1230,108 +1113,103 @@ void SetupCommonPipes(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // collect allocation, outputs, and other set up for common pipes
 
-    // Using/Aliasing
-    using namespace DataPlant;
+    state.dataHVACInterfaceMgr->PlantCommonPipe.allocate(state.dataPlnt->TotNumLoops);
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CurLoopNum; // local do loop counter
-
-    auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
-
-    PlantCommonPipe.allocate(state.dataPlnt->TotNumLoops);
-
-    for (CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
+    for (int CurLoopNum = 1; CurLoopNum <= state.dataPlnt->TotNumLoops; ++CurLoopNum) {
 
         // reference to easily lookup the first item once
-        auto &first_demand_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(LoopSideLocation::Demand).Branch(1).Comp(1).Type);
-        auto &first_supply_component_type(state.dataPlnt->PlantLoop(CurLoopNum).LoopSide(LoopSideLocation::Supply).Branch(1).Comp(1).Type);
+        auto &thisPlantLoop = state.dataPlnt->PlantLoop(CurLoopNum);
+        auto &thisCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(CurLoopNum);
+        auto &first_demand_component_type(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type);
+        auto &first_supply_component_type(thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).Type);
 
-        {
-            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(CurLoopNum).CommonPipeType);
-            if (SELECT_CASE_var == DataPlant::CommonPipeType::No) {
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::No;
+        switch (thisPlantLoop.CommonPipeType) {
+        case DataPlant::CommonPipeType::No:
+            thisCommonPipe.CommonPipeType = DataPlant::CommonPipeType::No;
+            break;
+        case DataPlant::CommonPipeType::Single: // Uncontrolled ('single') common pipe
+            thisCommonPipe.CommonPipeType = DataPlant::CommonPipeType::Single;
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                thisCommonPipe.Flow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisPlantLoop.Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Temperature",
+                                OutputProcessor::Unit::C,
+                                thisCommonPipe.Temp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisPlantLoop.Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Flow Direction Status",
+                                OutputProcessor::Unit::None,
+                                thisCommonPipe.FlowDir,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisPlantLoop.Name);
 
-            } else if (SELECT_CASE_var == DataPlant::CommonPipeType::Single) { // Uncontrolled ('single') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::Single;
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).Flow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Temperature",
-                                    OutputProcessor::Unit::C,
-                                    PlantCommonPipe(CurLoopNum).Temp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Flow Direction Status",
-                                    OutputProcessor::Unit::None,
-                                    PlantCommonPipe(CurLoopNum).FlowDir,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-
-                if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
-                    // If/when the model supports variable-pumping primary, this can be removed.
-                    ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
-                    ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                    ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
-                    ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
-                }
-
-            } else if (SELECT_CASE_var == DataPlant::CommonPipeType::TwoWay) { // Controlled ('two-way') common pipe
-                PlantCommonPipe(CurLoopNum).CommonPipeType = DataPlant::CommonPipeType::TwoWay;
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Primary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).PriCPLegFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Secondary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).SecCPLegFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Primary to Secondary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).PriToSecFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                SetupOutputVariable(state,
-                                    "Plant Common Pipe Secondary to Primary Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    PlantCommonPipe(CurLoopNum).SecToPriFlow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
-                                    state.dataPlnt->PlantLoop(CurLoopNum).Name);
-
-                // check type of pump on supply side inlet
-                if (first_supply_component_type == PlantEquipmentType::PumpConstantSpeed) {
-                    PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Constant;
-                } else if (first_supply_component_type == PlantEquipmentType::PumpVariableSpeed) {
-                    PlantCommonPipe(CurLoopNum).SupplySideInletPumpType = FlowType::Variable;
-                    // If/when the model supports variable-pumping primary, this can be removed.
-                    ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
-                    ShowContinueError(state, "Occurs on plant loop name = " + state.dataPlnt->PlantLoop(CurLoopNum).Name);
-                    ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
-                    ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
-                }
-                // check type of pump on demand side inlet
-                if (first_demand_component_type == PlantEquipmentType::PumpConstantSpeed) {
-                    PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Constant;
-                } else if (first_demand_component_type == PlantEquipmentType::PumpVariableSpeed) {
-                    PlantCommonPipe(CurLoopNum).DemandSideInletPumpType = FlowType::Variable;
-                }
+            if (first_supply_component_type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
+                // If/when the model supports variable-pumping primary, this can be removed.
+                ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of CommonPipe plant loop");
+                ShowContinueError(state, "Occurs on plant loop name = " + thisPlantLoop.Name);
+                ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
+                ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
             }
+            break;
+        case DataPlant::CommonPipeType::TwoWay: // Controlled ('two-way') common pipe
+            thisCommonPipe.CommonPipeType = DataPlant::CommonPipeType::TwoWay;
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Primary Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                thisCommonPipe.PriCPLegFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisPlantLoop.Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Secondary Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                thisCommonPipe.SecCPLegFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisPlantLoop.Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Primary to Secondary Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                thisCommonPipe.PriToSecFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisPlantLoop.Name);
+            SetupOutputVariable(state,
+                                "Plant Common Pipe Secondary to Primary Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                thisCommonPipe.SecToPriFlow,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                thisPlantLoop.Name);
+
+            // check type of pump on supply side inlet
+            if (first_supply_component_type == DataPlant::PlantEquipmentType::PumpConstantSpeed) {
+                thisCommonPipe.SupplySideInletPumpType = FlowType::Constant;
+            } else if (first_supply_component_type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
+                thisCommonPipe.SupplySideInletPumpType = FlowType::Variable;
+                // If/when the model supports variable-pumping primary, this can be removed.
+                ShowWarningError(state, "SetupCommonPipes: detected variable speed pump on supply inlet of TwoWayCommonPipe plant loop");
+                ShowContinueError(state, "Occurs on plant loop name = " + thisPlantLoop.Name);
+                ShowContinueError(state, "The common pipe model does not support varying the flow rate on the primary/supply side");
+                ShowContinueError(state, "The primary/supply side will operate as if constant speed, and the simulation continues");
+            }
+            // check type of pump on demand side inlet
+            if (first_demand_component_type == DataPlant::PlantEquipmentType::PumpConstantSpeed) {
+                thisCommonPipe.DemandSideInletPumpType = FlowType::Constant;
+            } else if (first_demand_component_type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
+                thisCommonPipe.DemandSideInletPumpType = FlowType::Variable;
+            }
+            break;
+        default:
+            assert(false);
         }
     }
 
