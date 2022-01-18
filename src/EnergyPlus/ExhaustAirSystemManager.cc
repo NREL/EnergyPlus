@@ -214,6 +214,9 @@ namespace ExhaustAirSystemManager {
 
                 std::string centralFanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
                 int centralFanIndex = 0; // zero based 
+                // 2022-01: also in general, should this processing may need to checked first that
+                // all the fan objects have already been processed already to be fail-safe.
+                // probably simialr to other like schedules etc, although schedules might have been processed early in most cases.
                 centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
                 if (centralFanIndex >= 0) {
                     // normal index 
@@ -221,6 +224,7 @@ namespace ExhaustAirSystemManager {
                     /* */
                 } else {
                     centralFanIndex = -1;
+                    // here a severe error message is needed
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
                     ShowContinueError(state, "Fan Name =" + centralFanName + "not found.");
                     ErrorsFound = true;
@@ -380,8 +384,9 @@ namespace ExhaustAirSystemManager {
                     /* */
                 } else {
                     availSchNum = 0;
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
-                    ShowContinueError(state, "Avaiability Manager Name =" + availSchName + "not found.");
+                    // a regular warning is ok.
+                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    ShowContinueError(state, "Avaiability Manager Name = " + availSchName + "not found.");
                     // ErrorsFound = true;
                 }
                 // 2022-01-13: To do: Add related data structure to store Availability Manager  (and for all other fields as well)
@@ -396,6 +401,7 @@ namespace ExhaustAirSystemManager {
 
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
+                // to do (for all locals): add data zone equip struct connections.
 
                 std::string flowControlType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type");
                 // To do: use an int or enum type to convert the flow control type from string to some numerical value
@@ -415,8 +421,8 @@ namespace ExhaustAirSystemManager {
                     /* */
                 } else {
                     exhaustFlowFractionScheduleNum = 0;
-                    // maybe not need for a severe error; a regular warnign would do.
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    // a regular warning would do.
+                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
                     ShowContinueError(state, "Schedule Name =" + exhaustFlowFractionScheduleName + "not found.");
                     // ErrorsFound = true;
                 }
@@ -444,8 +450,8 @@ namespace ExhaustAirSystemManager {
                     /* */
                 } else {
                     minZoneTempLimitScheduleNum = 0;
-                    // maybe not need for a severe error; a regular warnign would do.
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    // a regular warning would do.
+                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
                     ShowContinueError(state, "Schedule Name =" + minZoneTempLimitScheduleName + "not found.");
                     // ErrorsFound = true;
                 }
@@ -464,8 +470,8 @@ namespace ExhaustAirSystemManager {
                     /* */
                 } else {
                     minExhFlowFracScheduleNum = 0;
-                    // maybe not need for a severe error; a regular warnign would do.
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    // a regular warning would do.
+                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
                     ShowContinueError(state, "Schedule Name =" + minExhFlowFracScheduleName + "not found.");
                     // ErrorsFound = true;
                 }
@@ -484,8 +490,8 @@ namespace ExhaustAirSystemManager {
                     /* */
                 } else {
                     balancedExhFracScheduleNum = 0;
-                    // maybe not need for a severe error; a regular warnign would do.
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    // a regular warning would do.
+                    ShowWarningError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
                     ShowContinueError(state, "Schedule Name =" + balancedExhFracScheduleName + "not found.");
                     // ErrorsFound = true;
                 }
