@@ -4106,27 +4106,25 @@ namespace HeatBalanceManager {
 
             for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
 
-                {
-                    auto const SELECT_CASE_var(state.dataMaterial->Material(MaterNum).Group);
-                    if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Air) {
-                        print(state.files.eio,
-                              Format_702,
-                              state.dataMaterial->Material(MaterNum).Name,
-                              state.dataMaterial->Material(MaterNum).Resistance);
-                    } else {
-                        print(state.files.eio,
-                              Format_701,
-                              state.dataMaterial->Material(MaterNum).Name,
-                              state.dataMaterial->Material(MaterNum).Resistance,
-                              DisplayMaterialRoughness(state.dataMaterial->Material(MaterNum).Roughness),
-                              state.dataMaterial->Material(MaterNum).Thickness,
-                              state.dataMaterial->Material(MaterNum).Conductivity,
-                              state.dataMaterial->Material(MaterNum).Density,
-                              state.dataMaterial->Material(MaterNum).SpecHeat,
-                              state.dataMaterial->Material(MaterNum).AbsorpThermal,
-                              state.dataMaterial->Material(MaterNum).AbsorpSolar,
-                              state.dataMaterial->Material(MaterNum).AbsorpVisible);
-                    }
+                switch (state.dataMaterial->Material(MaterNum).Group) {
+                case DataHeatBalance::MaterialGroup::Air: {
+                    print(
+                        state.files.eio, Format_702, state.dataMaterial->Material(MaterNum).Name, state.dataMaterial->Material(MaterNum).Resistance);
+                } break;
+                default: {
+                    print(state.files.eio,
+                          Format_701,
+                          state.dataMaterial->Material(MaterNum).Name,
+                          state.dataMaterial->Material(MaterNum).Resistance,
+                          DisplayMaterialRoughness(state.dataMaterial->Material(MaterNum).Roughness),
+                          state.dataMaterial->Material(MaterNum).Thickness,
+                          state.dataMaterial->Material(MaterNum).Conductivity,
+                          state.dataMaterial->Material(MaterNum).Density,
+                          state.dataMaterial->Material(MaterNum).SpecHeat,
+                          state.dataMaterial->Material(MaterNum).AbsorpThermal,
+                          state.dataMaterial->Material(MaterNum).AbsorpSolar,
+                          state.dataMaterial->Material(MaterNum).AbsorpVisible);
+                } break;
                 }
             }
         }
