@@ -3449,6 +3449,13 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     }
 
     cCurrentModuleObject = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
+    // Just load the DXCoils here and don't check later on
+    if (state.dataHVACVarRefFlow->NumVRFTU > 0) {
+        if (state.dataDXCoils->GetCoilsInputFlag) {
+            DXCoils::GetDXCoils(state);
+            state.dataDXCoils->GetCoilsInputFlag = false;
+        }
+    }
     for (VRFNum = 1; VRFNum <= state.dataHVACVarRefFlow->NumVRFTU; ++VRFNum) {
         VRFTUNum = VRFNum;
 
@@ -3797,42 +3804,30 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                               "...occurs in " + cCurrentModuleObject + " \"" + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name + "\"");
 
                         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0) {
-                            SetDXCoolingCoilData(state,
-                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
-                                                 ErrorsFound,
-                                                 _,
-                                                 state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserType);
-                            SetDXCoolingCoilData(state,
-                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
-                                                 ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserNodeNum);
-                            SetDXCoolingCoilData(state,
-                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
-                                                 ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCCHeater);
-                            SetDXCoolingCoilData(state,
-                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
-                                                 ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MinOATCooling);
-                            SetDXCoolingCoilData(state,
-                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
-                                                 ErrorsFound,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 _,
-                                                 state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCooling);
+                            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex <= 0 ||
+                                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex > state.dataDXCoils->NumDXCoils) {
+                                ShowSevereError(state,
+                                                format("{}called with DX Cooling Coil Number out of range={} should be >0 and <{}",
+                                                       RoutineName,
+                                                       state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
+                                                       state.dataDXCoils->NumDXCoils));
+                                ErrorsFound = true;
+                            } else {
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).CondenserType =
+                                    state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserType;
 
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).CondenserInletNodeNum(1) =
+                                    state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).CondenserNodeNum;
+
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).MaxOATCrankcaseHeater =
+                                    state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCCHeater;
+
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).MaxOATCompressor =
+                                    state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MinOATCooling;
+
+                                state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).MaxOATCompressor =
+                                    state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).MaxOATCooling;
+                            }
                             state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).VRFIUPtr = VRFTUNum;
                             state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).VRFOUPtr =
                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum;

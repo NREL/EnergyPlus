@@ -4482,35 +4482,8 @@ namespace UnitarySystems {
 
                     if (this->m_FanExists) {
                         errFlag = false;
-                        DXCoils::SetDXCoolingCoilData(
-                            state, this->m_CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, loc_m_FanName);
-                        DXCoils::SetDXCoolingCoilData(
-                            state, this->m_CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, this->m_FanIndex);
-                        DXCoils::SetDXCoolingCoilData(state,
-                                                      this->m_CoolingCoilIndex,
-                                                      errFlag,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      _,
-                                                      this->m_FanType_Num);
+                        DXCoils::SetDXCoolingCoilFanData(
+                            state, this->m_CoolingCoilIndex, errFlag, this->m_FanIndex, loc_m_FanName, this->m_FanType_Num);
                         if (errFlag) {
                             ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;

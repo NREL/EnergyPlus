@@ -16536,6 +16536,64 @@ int GetDXCoilCapFTCurveIndex(EnergyPlusData &state,
     return CapFTCurveIndex;
 }
 
+void SetDXCoolingCoilFanData(EnergyPlusData &state,
+                             int const DXCoilNum, // Number of DX Cooling Coil
+                             bool &ErrorsFound,   // Set to true if certain errors found
+                             int SupplyFanIndex,
+                             std::string_view const SupplyFanName,
+                             Optional_int SupplyFan_TypeNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Richard Raustad, FSEC
+    //       DATE WRITTEN   December 2008
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This routine was extracted from the routine that was designed to allow
+    // the DX coil to access information from a gas or electric heating coil
+    // when these coils are each used in a parent object.
+
+    // Using/Aliasing
+
+    // Obtains and Allocates DXCoils
+    if (state.dataDXCoils->GetCoilsInputFlag) {
+        GetDXCoils(state);
+        state.dataDXCoils->GetCoilsInputFlag = false;
+    }
+
+    if (DXCoilNum <= 0 || DXCoilNum > state.dataDXCoils->NumDXCoils) {
+        ShowSevereError(state,
+                        format("SetDXCoolingCoilFanData: called with DX Cooling Coil Number out of range={} should be >0 and <{}",
+                               DXCoilNum,
+                               state.dataDXCoils->NumDXCoils));
+        ErrorsFound = true;
+    } else {
+        state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex = SupplyFanIndex;
+        state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName = SupplyFanName;
+        state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum = SupplyFan_TypeNum;
+        if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > -1) {
+            if (SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                    state,
+                    state.dataDXCoils->DXCoil(DXCoilNum).Name,
+                    state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
+                    state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->name,
+                    DataAirSystems::ObjectVectorOOFanSystemModel,
+                    state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
+            } else {
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                    state,
+                    state.dataDXCoils->DXCoil(DXCoilNum).Name,
+                    state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
+                    state.dataFans->Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,
+                    DataAirSystems::StructArrayLegacyFanModels,
+                    state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
+            }
+        }
+    }
+}
+
+
 void SetDXCoolingCoilData(EnergyPlusData &state,
                           int const DXCoilNum,                                          // Number of DX Cooling Coil
                           bool &ErrorsFound,                                            // Set to true if certain errors found
@@ -16556,11 +16614,7 @@ void SetDXCoolingCoilData(EnergyPlusData &state,
                           Optional<Real64> MaxOATDefrost,
                           Optional_bool CoolingCoilPresent,
                           Optional_bool HeatingCoilPresent,
-                          Optional<Real64> HeatSizeRatio,
-                          Optional<Real64> TotCap,
-                          Optional_int SupplyFanIndex,
-                          Optional_string SupplyFanName,
-                          Optional_int SupplyFan_TypeNum)
+                          Optional<Real64> HeatSizeRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -16659,41 +16713,6 @@ void SetDXCoolingCoilData(EnergyPlusData &state,
 
     if (present(HeatSizeRatio)) {
         state.dataDXCoils->DXCoil(DXCoilNum).HeatSizeRatio = HeatSizeRatio;
-    }
-
-    if (present(TotCap)) {
-        state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(1) = TotCap;
-    }
-
-    if (present(SupplyFanIndex)) {
-        state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex = SupplyFanIndex;
-    }
-
-    if (present(SupplyFanName)) {
-        state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanName = SupplyFanName;
-    }
-
-    if (present(SupplyFan_TypeNum)) {
-        state.dataDXCoils->DXCoil(DXCoilNum).SupplyFan_TypeNum = SupplyFan_TypeNum;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex > -1) {
-            if (SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                    state,
-                    state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                    state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
-                    state.dataHVACFan->fanObjs[state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex]->name,
-                    DataAirSystems::ObjectVectorOOFanSystemModel,
-                    state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
-            } else {
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                    state,
-                    state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                    state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
-                    state.dataFans->Fan(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex).FanName,
-                    DataAirSystems::StructArrayLegacyFanModels,
-                    state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
-            }
-        }
     }
 }
 

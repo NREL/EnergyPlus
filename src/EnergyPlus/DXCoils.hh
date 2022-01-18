@@ -808,6 +808,13 @@ namespace DXCoils {
                                  bool &ErrorsFound    // set to true if problem
     );
 
+    void SetDXCoolingCoilFanData(EnergyPlusData &state,
+                                 int const DXCoilNum, // Number of DX Cooling Coil
+                                 bool &ErrorsFound,   // Set to true if certain errors found
+                                 int SupplyFanIndex,
+                                 std::string_view const SupplyFanName,
+                                 Optional_int SupplyFan_TypeNum);
+
     void SetDXCoolingCoilData(EnergyPlusData &state,
                               int const DXCoilNum,                     // Number of DX Cooling Coil
                               bool &ErrorsFound,                       // Set to true if certain errors found
@@ -828,11 +835,7 @@ namespace DXCoils {
                               Optional<Real64> MaxOATDefrost = _,
                               Optional_bool CoolingCoilPresent = _,
                               Optional_bool HeatingCoilPresent = _,
-                              Optional<Real64> HeatSizeRatio = _,
-                              Optional<Real64> TotCap = _,
-                              Optional_int SupplyFanIndex = _,
-                              Optional_string SupplyFanName = _,
-                              Optional_int SupplyFan_TypeNum = _);
+                              Optional<Real64> HeatSizeRatio = _);
 
     void SetCoilSystemHeatingDXFlag(EnergyPlusData &state,
                                     std::string const &CoilType, // must match coil types in this module
