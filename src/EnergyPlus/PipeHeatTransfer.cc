@@ -144,13 +144,13 @@ void PipeHTData::simulate(EnergyPlusData &state,
     this->InitPipesHeatTransfer(state, FirstHVACIteration);
     // make the calculations
     for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= state.dataPipeHT->nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
-        {
-            auto const SELECT_CASE_var(this->EnvironmentPtr);
-            if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-                this->CalcBuriedPipeSoil(state);
-            } else {
-                this->CalcPipesHeatTransfer(state);
-            }
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::GroundEnv: {
+            this->CalcBuriedPipeSoil(state);
+        } break;
+        default: {
+            this->CalcPipesHeatTransfer(state);
+        } break;
         }
         this->PushInnerTimeStepArrays();
     }
@@ -909,8 +909,7 @@ void PipeHTData::ValidatePipeConstruction(EnergyPlusData &state,
 void PipeHTData::oneTimeInit_new(EnergyPlusData &state)
 {
     bool errFlag = false;
-    PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->Type, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+    PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->Type, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
     }
@@ -1033,19 +1032,24 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
         }
 
         // should next choose environment temperature according to coupled with air or ground
-        {
-            auto const SELECT_CASE_var(this->EnvironmentPtr);
-            if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-                // EnvironmentTemp = GroundTemp
-            } else if (SELECT_CASE_var == EnvrnPtr::OutsideAirEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
-            } else if (SELECT_CASE_var == EnvrnPtr::ZoneEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
-            } else if (SELECT_CASE_var == EnvrnPtr::ScheduleEnv) {
-                state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
-            } else if (SELECT_CASE_var == EnvrnPtr::None) { // default to outside temp
-                state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
-            }
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::GroundEnv: {
+            // EnvironmentTemp = GroundTemp
+        } break;
+        case EnvrnPtr::OutsideAirEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
+        } break;
+        case EnvrnPtr::ZoneEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+        } break;
+        case EnvrnPtr::ScheduleEnv: {
+            state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
+        } break;
+        case EnvrnPtr::None: { // default to outside temp
+            state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
+        } break;
+        default:
+            break;
         }
 
         this->BeginEnvrnupdateFlag = false;
@@ -1112,14 +1116,14 @@ void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHV
     // Thus, this is called at the beginning of every time step once.
 
     this->FluidSpecHeat = GetSpecificHeatGlycol(state,
-                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                 state.dataPipeHT->nsvInletTemp,
-                                                state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                 RoutineName);
     this->FluidDensity = GetDensityGlycol(state,
-                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                           state.dataPipeHT->nsvInletTemp,
-                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                           RoutineName);
 
     // At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
@@ -1210,23 +1214,27 @@ void PipeHTData::CalcPipesHeatTransfer(EnergyPlusData &state, Optional_int_const
     FluidConvCoef = this->CalcPipeHeatTransCoef(state, state.dataPipeHT->nsvInletTemp, state.dataPipeHT->nsvMassFlowRate, this->PipeID);
 
     // heat transfer to air or ground
-    {
-        auto const SELECT_CASE_var(this->EnvironmentPtr);
-        if (SELECT_CASE_var == EnvrnPtr::GroundEnv) {
-            // Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
-            // between pipe wall and next closest node.
-            EnvHeatTransCoef = this->SoilConductivity / (this->dSregular - (this->PipeID / 2.0));
-        } else if (SELECT_CASE_var == EnvrnPtr::OutsideAirEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::ZoneEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::ScheduleEnv) {
-            EnvHeatTransCoef = AirConvCoef;
-        } else if (SELECT_CASE_var == EnvrnPtr::None) {
-            EnvHeatTransCoef = 0.0;
-        } else {
-            EnvHeatTransCoef = 0.0;
-        }
+    switch (this->EnvironmentPtr) {
+    case EnvrnPtr::GroundEnv: {
+        // Approximate conductance using ground conductivity, (h=k/L), where L is grid spacing
+        // between pipe wall and next closest node.
+        EnvHeatTransCoef = this->SoilConductivity / (this->dSregular - (this->PipeID / 2.0));
+    } break;
+    case EnvrnPtr::OutsideAirEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::ZoneEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::ScheduleEnv: {
+        EnvHeatTransCoef = AirConvCoef;
+    } break;
+    case EnvrnPtr::None: {
+        EnvHeatTransCoef = 0.0;
+    } break;
+    default: {
+        EnvHeatTransCoef = 0.0;
+    } break;
     }
 
     // work out the coefficients
@@ -1569,7 +1577,7 @@ void PipeHTData::UpdatePipesHeatTransfer(EnergyPlusData &state)
         state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).MassFlowRateMaxAvail;
     state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Quality = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Quality;
     // Only pass pressure if we aren't doing a pressure simulation
-    switch (state.dataPlnt->PlantLoop(this->LoopNum).PressureSimType) {
+    switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PressureSimType) {
     case DataPlant::PressSimType::NoPressure:
         state.dataLoopNodes->Node(state.dataPipeHT->nsvOutletNodeNum).Press = state.dataLoopNodes->Node(state.dataPipeHT->nsvInletNodeNum).Press;
         break;
@@ -1727,7 +1735,7 @@ Real64 PipeHTData::CalcPipeHeatTransCoef(EnergyPlusData &state,
     int LoopNum;
 
     // retrieve loop index for this component so we can look up fluid properties
-    LoopNum = this->LoopNum;
+    LoopNum = this->plantLoc.loopNum;
 
     // since the fluid properties routine doesn't have Prandtl, we'll just use water values
     idx = 0;
@@ -1840,33 +1848,33 @@ Real64 PipeHTData::OutsidePipeHeatTransCoef(EnergyPlusData &state)
     bool CoefSet;
 
     // Set environmental variables
-    {
-        auto const SELECT_CASE_var(this->Type);
-
-        if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeInterior) {
-
-            {
-                auto const SELECT_CASE_var1(this->EnvironmentPtr);
-                if (SELECT_CASE_var1 == EnvrnPtr::ScheduleEnv) {
-                    AirTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
-                    AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
-
-                } else if (SELECT_CASE_var1 == EnvrnPtr::ZoneEnv) {
-                    AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
-                    AirVel = RoomAirVel;
-                }
-            }
-
-        } else if (SELECT_CASE_var == DataPlant::PlantEquipmentType::PipeExterior) {
-
-            {
-                auto const SELECT_CASE_var1(this->EnvironmentPtr);
-                if (SELECT_CASE_var1 == EnvrnPtr::OutsideAirEnv) {
-                    AirTemp = state.dataLoopNodes->Node(this->EnvrAirNodeNum).Temp;
-                    AirVel = state.dataEnvrn->WindSpeed;
-                }
-            }
+    switch (this->Type) {
+    case DataPlant::PlantEquipmentType::PipeInterior: {
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::ScheduleEnv: {
+            AirTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
+            AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
+        } break;
+        case EnvrnPtr::ZoneEnv: {
+            AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
+            AirVel = RoomAirVel;
+        } break;
+        default:
+            break;
         }
+    } break;
+    case DataPlant::PlantEquipmentType::PipeExterior: {
+        switch (this->EnvironmentPtr) {
+        case EnvrnPtr::OutsideAirEnv: {
+            AirTemp = state.dataLoopNodes->Node(this->EnvrAirNodeNum).Temp;
+            AirVel = state.dataEnvrn->WindSpeed;
+        } break;
+        default:
+            break;
+        }
+    } break;
+    default:
+        break;
     }
 
     PipeOD = this->InsulationOD;

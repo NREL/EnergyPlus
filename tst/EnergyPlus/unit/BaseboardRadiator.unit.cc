@@ -409,7 +409,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     // do baseboard sizing
-    state->dataBaseboardRadiator->Baseboard(BaseboardNum).LoopNum = 1;
+    state->dataBaseboardRadiator->Baseboard(BaseboardNum).plantLoc.loopNum = 1;
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).ZonePtr = 1;
     BaseboardRadiator::SizeBaseboard(*state, BaseboardNum);
     // check UA value
@@ -436,7 +436,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do baseboard sizing
-    state->dataBaseboardRadiator->Baseboard(BaseboardNum).LoopNum = 1;
+    state->dataBaseboardRadiator->Baseboard(BaseboardNum).plantLoc.loopNum = 1;
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).ZonePtr = 2;
     BaseboardRadiator::SizeBaseboard(*state, BaseboardNum);
     // check UA value
@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do baseboard sizing
-    state->dataBaseboardRadiator->Baseboard(BaseboardNum).LoopNum = 1;
+    state->dataBaseboardRadiator->Baseboard(BaseboardNum).plantLoc.loopNum = 1;
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).ZonePtr = 3;
     BaseboardRadiator::SizeBaseboard(*state, BaseboardNum);
     // check UA value

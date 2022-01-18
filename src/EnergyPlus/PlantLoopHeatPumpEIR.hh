@@ -122,8 +122,8 @@ namespace EIRPlantLoopHeatPumps {
         bool running = false;
 
         // topology variables
-        PlantLocation loadSideLocation;
-        PlantLocation sourceSideLocation;
+        PlantLocation loadSidePlantLoc;
+        PlantLocation sourceSidePlantLoc;
         InOutNodePair loadSideNodes;
         InOutNodePair sourceSideNodes;
 
