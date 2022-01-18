@@ -376,6 +376,8 @@ namespace ExhaustAirSystemManager {
                 }
                 // 2022-01-13: To do: Add related data structure to store Availability Manager  (and for all other fields as well)
 
+
+                // These two nodes are required inputs: 
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
                 std::string outletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
 
@@ -449,6 +451,27 @@ namespace ExhaustAirSystemManager {
                     // maybe not need for a severe error; a regular warnign would do.
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
                     ShowContinueError(state, "Schedule Name =" + minExhFlowFracScheduleName + "not found.");
+                    // ErrorsFound = true;
+                }
+
+                std::string balancedExhFracScheduleName =
+                    ip->getAlphaFieldValue(objectFields, objectSchemaProps, "balanced_exhaust_fraction_schedule_name");
+                // to do so schedule matching
+                int balancedExhFracScheduleNum = 0;
+                // now here dealing with schedule rather than availability manager.
+                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                // To do: here to use schedule match function to process data.
+
+                if (balancedExhFracScheduleNum > 0) {
+                    // normal conditions
+                } else if (balancedExhFracScheduleNum == 0) {
+                    // black or anything like that, treat as always avaialabe?
+                    /* */
+                } else {
+                    balancedExhFracScheduleNum = 0;
+                    // maybe not need for a severe error; a regular warnign would do.
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
+                    ShowContinueError(state, "Schedule Name =" + balancedExhFracScheduleName + "not found.");
                     // ErrorsFound = true;
                 }
             }
