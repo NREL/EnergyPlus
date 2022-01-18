@@ -939,7 +939,7 @@ namespace EcoRoofManager {
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataEcoRoofMgr->CumPrecip += state.dataEcoRoofMgr->CurrentPrecipitation;
                 // aggregate to monthly for reporting
-                int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+                int EndYear = state.dataEnvrn->EndYear;
                 int CurrentYear = state.dataEnvrn->Year;
                 // only report for the last year
                 if (CurrentYear == EndYear) {
@@ -971,7 +971,7 @@ namespace EcoRoofManager {
         if (!state.dataGlobal->WarmupFlag) {
             state.dataEcoRoofMgr->CumIrrigation += state.dataEcoRoofMgr->CurrentIrrigation;
             // aggregate to monthly for reporting
-            int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+            int EndYear = state.dataEnvrn->EndYear;
             int CurrentYear = state.dataEnvrn->Year;
             // only report for the last year
             if (CurrentYear == EndYear) {

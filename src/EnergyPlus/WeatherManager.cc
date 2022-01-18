@@ -997,6 +997,8 @@ namespace WeatherManager {
                             EnDate += format("/{}", state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear);
                         }
                         state.dataEnvrn->EnvironmentStartEnd = StDate + " - " + EnDate;
+                        state.dataEnvrn->StartYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartYear;
+                        state.dataEnvrn->EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
 
                         int TWeekDay = (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DayOfWeek == 0)
                                            ? 1
@@ -2294,7 +2296,7 @@ namespace WeatherManager {
         state.dataEnvrn->LiquidPrecipitation =
             state.dataWeatherManager->TodayLiquidPrecip(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay) / 1000.0; // convert from mm to m
         if (state.dataEnvrn->RunPeriodEnvironment) {
-            int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+            int EndYear = state.dataEnvrn->EndYear;
             int CurrentYear = state.dataEnvrn->Year;
             // only report for the last year
             if (CurrentYear == EndYear) {

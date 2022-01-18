@@ -981,7 +981,7 @@ namespace WaterManager {
             }
         }
         state.dataWaterData->RainFall.CurrentAmount = state.dataWaterData->RainFall.CurrentRate * (TimeStepSys * DataGlobalConstants::SecInHour);
-        int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+        int EndYear = state.dataEnvrn->EndYear;
         int CurrentYear = state.dataEnvrn->Year;
         // only report for the last year
         if (CurrentYear == EndYear) {
@@ -1505,7 +1505,7 @@ namespace WaterManager {
 
             state.dataWaterData->RainCollector(RainColNum).VdotAvail = VdotAvail;
             state.dataWaterData->RainCollector(RainColNum).VolCollected = VdotAvail * TimeStepSys * DataGlobalConstants::SecInHour;
-            int EndYear = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear;
+            int EndYear = state.dataEnvrn->EndYear;
             int CurrentYear = state.dataEnvrn->Year;
             // only report for the last year
             if (CurrentYear == EndYear) {
