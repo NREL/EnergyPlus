@@ -197,34 +197,34 @@ namespace ExhaustAirSystemManager {
                 }
                 // 2022-01-13: To do: Add related data struct to store zoneMixer number (actually need a local zone num definition as well)
 
-                std::string centralfanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
-                int centralfanTypeNum = 0; // UtilityRoutines::FindItemInList(centralfanType, state.dataFans); // 2022-01-13: need some kind of
+                std::string centralFanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
+                int centralFanTypeNum = 0; // UtilityRoutines::FindItemInList(centralfanType, state.dataFans); // 2022-01-13: need some kind of
                                            // function overload definition?
                 // 2022-01: Check fan types and gives warnings
-                if (UtilityRoutines::SameString(centralfanType, "Fan:SystemModel")) {
-                //
-                } else if (UtilityRoutines::SameString(centralfanType, "Fan:ComponentModel")) {
-                //
+                if (UtilityRoutines::SameString(centralFanType, "Fan:SystemModel")) {
+                    centralFanTypeNum = DataHVACGlobals::FanType_SystemModelObject;
+                } else if (UtilityRoutines::SameString(centralFanType, "Fan:ComponentModel")) {
+                    centralFanTypeNum = DataHVACGlobals::FanType_ComponentModel;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                    ShowContinueError(state, "Fan Type =" + centralfanType + "not supported; ");
+                    ShowContinueError(state, "Fan Type =" + centralFanType + "not supported; ");
                     ShowContinueError(state, "it needs to be either Fan:SystemModel or Fan:ComponentModel.");
                     ErrorsFound = true;
                 }
 
-                std::string centralfanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
-                int fanNum = 0; // UtilityRoutines::FindItemInList(centralfanName, state.dataFans); // 2022-01-13: need some kind of function overload
+                std::string centralFanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
+                int centralFanNum = 0; // UtilityRoutines::FindItemInList(centralfanName, state.dataFans); // 2022-01-13: need some kind of function overload
                                 // definition?
 
-                if (fanNum > 0) {
+                if (centralFanNum > 0) {
                     // normal conditions
-                } else if (fanNum == 0) {
+                } else if (centralFanNum == 0) {
                     // black or anything like that, treat as always avaialabe?
                     /* */
                 } else {
-                    fanNum = 0;
+                    centralFanNum = 0;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
-                    ShowContinueError(state, "Fan Name =" + centralfanName + "not found.");
+                    ShowContinueError(state, "Fan Name =" + centralFanName + "not found.");
                     ErrorsFound = true;
                 }
             }
