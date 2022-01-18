@@ -62,6 +62,7 @@
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 // #include <EnergyPlus/ReturnAirPathManager.hh> //2022-01-14: replace with exhaust system
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZonePlenum.hh> //2022-01-14: may not needed for this exhaust system
 
@@ -360,6 +361,7 @@ namespace ExhaustAirSystemManager {
 
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
                 int availSchNum = 0;
+                availSchNum = ScheduleManager::GetScheduleIndex(state, availSchName);
                 // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
                 // To do: here to use schedule match function to process data.
 
@@ -395,7 +397,7 @@ namespace ExhaustAirSystemManager {
                 // to do so schedule matching
                 int exhaustFlowFractionScheduleNum = 0;
                 // now here dealing with schedule rather than availability manager.
-                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                exhaustFlowFractionScheduleNum = ScheduleManager::GetScheduleIndex(state, exhaustFlowFractionScheduleName);
                 // To do: here to use schedule match function to process data.
 
                 if (exhaustFlowFractionScheduleNum > 0) {
@@ -424,7 +426,7 @@ namespace ExhaustAirSystemManager {
                 // to do so schedule matching
                 int minZoneTempLimitScheduleNum = 0;
                 // now here dealing with schedule rather than availability manager.
-                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                minZoneTempLimitScheduleNum = ScheduleManager::GetScheduleIndex(state, minZoneTempLimitScheduleName);
                 // To do: here to use schedule match function to process data.
 
                 if (minZoneTempLimitScheduleNum > 0) {
@@ -444,8 +446,7 @@ namespace ExhaustAirSystemManager {
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "minimum_exhaust_flow_fraction_schedule_name");
                 // to do so schedule matching
                 int minExhFlowFracScheduleNum = 0;
-                // now here dealing with schedule rather than availability manager.
-                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                minExhFlowFracScheduleNum = ScheduleManager::GetScheduleIndex(state, minExhFlowFracScheduleName);
                 // To do: here to use schedule match function to process data.
 
                 if (minExhFlowFracScheduleNum > 0) {
@@ -465,8 +466,7 @@ namespace ExhaustAirSystemManager {
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "balanced_exhaust_fraction_schedule_name");
                 // to do so schedule matching
                 int balancedExhFracScheduleNum = 0;
-                // now here dealing with schedule rather than availability manager.
-                // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
+                balancedExhFracScheduleNum = ScheduleManager::GetScheduleIndex(state, balancedExhFracScheduleName);
                 // To do: here to use schedule match function to process data.
 
                 if (balancedExhFracScheduleNum > 0) {
