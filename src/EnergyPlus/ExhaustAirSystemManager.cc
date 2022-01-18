@@ -200,12 +200,22 @@ namespace ExhaustAirSystemManager {
                 std::string centralfanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
                 int centralfanTypeNum = 0; // UtilityRoutines::FindItemInList(centralfanType, state.dataFans); // 2022-01-13: need some kind of
                                            // function overload definition?
-                // 2022-01-13: To-do match fan object types and determine what to do
-                /* */
+                // 2022-01: Check fan types and gives warnings
+                if (UtilityRoutines::SameString(centralfanType, "Fan:SystemModel")) {
+                //
+                } else if (UtilityRoutines::SameString(centralfanType, "Fan:ComponentModel")) {
+                //
+                } else {
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
+                    ShowContinueError(state, "Fan Type =" + centralfanType + "not supported; ");
+                    ShowContinueError(state, "it needs to be either Fan:SystemModel or Fan:ComponentModel.");
+                    ErrorsFound = true;
+                }
 
                 std::string centralfanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
                 int fanNum = 0; // UtilityRoutines::FindItemInList(centralfanName, state.dataFans); // 2022-01-13: need some kind of function overload
                                 // definition?
+
                 if (fanNum > 0) {
                     // normal conditions
                 } else if (fanNum == 0) {
