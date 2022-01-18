@@ -487,6 +487,33 @@ namespace DataZoneEquipment {
         }
     };
 
+    struct ZoneExhaustControl
+    {
+        std::string Name;
+        int NumOfComponents; // not sure if this is necessary
+
+        int AvailSchNum;
+        int InletNodeNum;
+        int OutletNodeNum;
+
+        Real64 DesignExhaustFlowRate;
+        int FlowControlType; // for now define 0 = Scheduled; 1 = Follow-supply
+        int ExhaustFlowFractionScheduleNum;
+        int SupplyNodeOrNodelistNum;
+        int MinZoneTempLimitScheduleNum;
+        int MinExhFlowFracScheduleNum;
+        int BalancedExhFracScheduleName;
+
+        // default constructor
+        // Question: why the constructor skipped the first element std::string Name?
+        ZoneExhaustControl()
+            : NumOfComponents(0), AvailSchNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0), FlowControlType(0),
+              ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0), MinExhFlowFracScheduleNum(0),
+              BalancedExhFracScheduleName(0)
+        {
+        }
+    };
+
     void GetZoneEquipmentData(EnergyPlusData &state);
 
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
@@ -545,6 +572,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
     Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
     Array1D<DataZoneEquipment::ExhaustAir> ExhaustAirSystem;
+    Array1D<DataZoneEquipment::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
 
     void clear_state() override
     {
@@ -568,6 +596,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
         this->SupplyAirPath.deallocate();
         this->ReturnAirPath.deallocate();
         this->ExhaustAirSystem.deallocate();
+        this->ZoneExhaustControlSystem.deallocate();
     }
 };
 
