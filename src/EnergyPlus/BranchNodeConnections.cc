@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -109,12 +108,12 @@ void RegisterNodeConnection(EnergyPlusData &state,
         ShowContinueError(state, format("Occurs for Node={}, ObjectName={}", std::string{NodeName}, std::string{ObjectName}));
         ErrorsFoundHere = true;
     }
-    std::string objTypeStr = std::string(DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(ObjectType)]);
+
+    auto objTypeStr = DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(ObjectType)];
 
     if ((ConnectionType == DataLoopNode::ConnectionType::Invalid) || (ConnectionType == DataLoopNode::ConnectionType::Num)) {
         ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
-        ShowContinueError(state,
-                          "Occurs for Node=" + std::string{NodeName} + ", ObjectType=" + objTypeStr + ", ObjectName=" + std::string{ObjectName});
+        ShowContinueError(state, format("Occurs for Node={}, ObjectType={}, ObjectName={}", NodeName, objTypeStr, ObjectName));
         ErrorsFoundHere = true;
     }
 
@@ -173,17 +172,16 @@ void RegisterNodeConnection(EnergyPlusData &state,
             if (Found != 0) { // Nodename already used
                 ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
                 ShowContinueError(state,
-                                  "NodeName=\"" + std::string{NodeName} +
-                                      "\", entered as type=" + std::string(ConnectionTypeNames[static_cast<int>(ConnectionType)]));
+                                  format("NodeName=\"{}\", entered as type={}", NodeName, ConnectionTypeNamesUC[static_cast<int>(ConnectionType)]));
                 ShowContinueError(state, "In Field=" + InputFieldName());
-                ShowContinueError(state,
-                                  "Already used in " + objTypeStr + "=\"" +
-                                      state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectName + "\".");
-                ShowContinueError(state,
-                                  " as type=" +
-                                      std::string(ConnectionTypeNames[static_cast<int>(
-                                          state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ConnectionType)]) +
-                                      ", In Field=" + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).InputFieldName);
+                ShowContinueError(
+                    state,
+                    format("Already used in {}=\"{}\".", objTypeStr, state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectName));
+                ShowContinueError(
+                    state,
+                    format(" as type={}, In Field={}",
+                           ConnectionTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ConnectionType)],
+                           state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).InputFieldName));
                 ErrorsFoundHere = true;
             } else {
                 state.dataBranchNodeConnections->AirTerminalNodeConnections(state.dataBranchNodeConnections->NumOfAirTerminalNodes).NodeName =
@@ -307,7 +305,6 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     bool MatchedAtLeastOne;
     int ErrorCounter;
     int Object;
-    int StartConnect;
     int EndConnect;
     Array1D_int FluidStreamInletCount;
     Array1D_int FluidStreamOutletCount;
@@ -337,14 +334,15 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         }
         if (!IsValid) {
             ShowSevereError(state,
-                            "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                "\", Sensor node did not find a matching node of appropriate type (other than Actuator or Sensor).");
+                            format("Node Connection Error, Node=\"{}\", Sensor node did not find a matching node of appropriate type (other than "
+                                   "Actuator or Sensor).",
+                                   state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+            ShowContinueError(
+                state,
+                format("Reference Object={}, Name={}",
+                       ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
             ++ErrorCounter;
             ErrorsFound = true;
         }
@@ -369,14 +367,15 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         }
         if (!IsValid) {
             ShowSevereError(state,
-                            "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                "\", Actuator node did not find a matching node of appropriate type (other than Actuator, Sensor, OutsideAir).");
+                            format("Node Connection Error, Node=\"{}\", Actuator node did not find a matching node of appropriate type (other than "
+                                   "Actuator, Sensor, OutsideAir).",
+                                   state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+            ShowContinueError(
+                state,
+                format("Reference Object={}, Name={}",
+                       ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
             ++ErrorCounter;
             ErrorsFound = true;
         }
@@ -408,30 +407,30 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         }
         if (!IsValid) {
             ShowSevereError(state,
-                            "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                "\", Setpoint node did not find a matching node of appropriate type (other than Setpoint, OutsideAir).");
+                            format("Node Connection Error, Node=\"{}\", Setpoint node did not find a matching node of appropriate type (other than "
+                                   "Setpoint, OutsideAir).",
+                                   state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+            ShowContinueError(
+                state,
+                format("Reference Object={}, Name={}",
+                       ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
             ++ErrorCounter;
             ErrorsFound = true;
         }
         if (!IsInlet && !IsOutlet) {
             ShowSevereError(state,
-                            "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
-                                "\", Setpoint node did not find a matching node of type Inlet or Outlet.");
+                            format("Node Connection Error, Node=\"{}\", Setpoint node did not find a matching node of type Inlet or Outlet.",
+                                   state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName));
             ShowContinueError(state, "It appears this node is not part of the HVAC system.");
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+            ShowContinueError(
+                state,
+                format("Reference Object={}, Name={}",
+                       ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
             ++ErrorCounter;
-            //      ErrorsFound=.TRUE.
         }
     }
 
@@ -454,13 +453,12 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                             "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", ZoneInlet node did not find an outlet node.");
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+            ShowContinueError(
+                state,
+                format("Reference Object={}, Name={}",
+                       ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
             ++ErrorCounter;
-            //      ErrorsFound=.TRUE.
         }
     }
 
@@ -481,13 +479,12 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                             "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", ZoneExhaust node did not find a matching inlet node.");
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+            ShowContinueError(
+                state,
+                format("Reference Object={}, Name={}",
+                       ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
             ++ErrorCounter;
-            //      ErrorsFound=.TRUE.
         }
     }
 
@@ -508,11 +505,11 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                             "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                 "\", Return plenum induced air outlet node did not find a matching inlet node.");
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+            ShowContinueError(
+                state,
+                format("Reference Object={}, Name={}",
+                       ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
             ++ErrorCounter;
             ErrorsFound = true;
         }
@@ -560,13 +557,12 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                                    R"(", Inlet node did not find an appropriate matching "outlet" node.)"));
             ShowContinueError(state, "If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.");
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+            ShowContinueError(
+                state,
+                format("Reference Object={}, Name={}",
+                       ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
             ++ErrorCounter;
-            //      ErrorsFound=.TRUE.
         }
     }
 
@@ -585,19 +581,18 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                                 "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                     "\", The same node appears as a non-parent Inlet node more than once.");
 
-                std::string refObjStr = std::string(
-                    DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
+                ShowContinueError(
+                    state,
+                    format("Reference Object={}, Name={}",
+                           ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                           state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
 
-                ShowContinueError(state,
-                                  "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
-
-                std::string refObjStr2 = std::string(
-                    DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType)]);
-
-                ShowContinueError(state,
-                                  "Reference Object=" + refObjStr2 + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
+                ShowContinueError(
+                    state,
+                    format("Reference Object={}, Name={}",
+                           ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType)],
+                           state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName));
                 ++ErrorCounter;
-                //        ErrorsFound=.TRUE.
                 break;
             }
         }
@@ -620,17 +615,18 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                                 "Node Connection Error, Node=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                     "\", The same node appears as a non-parent Outlet node more than once.");
 
-                std::string refObjStr = std::string(
-                    DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
+                ShowContinueError(state,
+                                  format("Reference Object={}, Name={}",
+                                         DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(
+                                             state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                                         state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
 
                 ShowContinueError(state,
-                                  "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                                  format("Reference Object={}, Name={}",
+                                         DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(
+                                             state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType)],
+                                         state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName));
 
-                std::string refObjStr2 = std::string(
-                    DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType)]);
-
-                ShowContinueError(state,
-                                  "Reference Object=" + refObjStr2 + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
                 ++ErrorCounter;
                 break;
             }
@@ -658,13 +654,14 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                                    R"(", Outdoor Air Reference did not find an appropriate "outdoor air" node.)"));
             ShowContinueError(state, "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object in order to set its conditions.");
 
-            std::string refObjStr = std::string(
-                DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
+            ShowContinueError(
+                state,
+                format(
+                    "Reference Object={}, Name={}",
+                    DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                    state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
 
-            ShowContinueError(state,
-                              "Reference Object=" + refObjStr + ", Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
             ++ErrorCounter;
-            //      ErrorsFound=.TRUE.
         }
     }
 
@@ -682,7 +679,6 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
         FluidStreamCounts = false;
         // Following code relies on node connections for single object type/name being grouped together
         Object = 1;
-        StartConnect = 1;
         EndConnect = 0;
         NumObjects = 2;
         NodeObjects(1) = 1;
@@ -727,12 +723,12 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             }
             if (!IsValid) {
 
-                std::string refObjStr = std::string(
-                    DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
-
                 ShowSevereError(state,
-                                "(Developer) Node Connection Error, Object=" + refObjStr + ':' +
-                                    state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                                format("(Developer) Node Connection Error, Object={}:{}",
+                                       DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(
+                                           state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                                       state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
+
                 ShowContinueError(state, "Object has multiple connections on both inlet and outlet fluid streams.");
                 for (Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2) {
                     if (FluidStreamCounts(Loop2)) ShowContinueError(state, format("...occurs in Fluid Stream [{}].", Loop2));
@@ -766,17 +762,18 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
                                 "Node Connection Error, Node Name=\"" + state.dataBranchNodeConnections->NodeConnections(Loop1).NodeName +
                                     "\", The same zone node appears more than once.");
 
-                std::string refObjStr = std::string(
-                    DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)]);
+                ShowContinueError(state,
+                                  format("Reference Object={}, Object Name={}",
+                                         DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(
+                                             state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectType)],
+                                         state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
 
-                ShowContinueError(
-                    state, "Reference Object=" + refObjStr + ", Object Name=" + state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName);
+                ShowContinueError(state,
+                                  format("Reference Object={}, Object Name={}",
+                                         DataLoopNode::ConnectionObjectTypeNamesUC[static_cast<int>(
+                                             state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType)],
+                                         state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectName));
 
-                std::string refObjStr2 = std::string(
-                    DataLoopNode::ConnectionObjectTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectType)]);
-
-                ShowContinueError(
-                    state, "Reference Object=" + refObjStr2 + ", Object Name=" + state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectName);
                 ++ErrorCounter;
                 ErrorsFound = true;
             }
@@ -1162,7 +1159,6 @@ void GetChildrenData(EnergyPlusData &state,
     std::string ParentOutletNodeName;
     int ParentInletNodeNum;
     int ParentOutletNodeNum;
-    // unused1109  LOGICAL Matched
     int CountMatchLoop;
 
     ChildrenCType = std::string();
