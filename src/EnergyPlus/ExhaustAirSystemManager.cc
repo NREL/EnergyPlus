@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -198,8 +199,7 @@ namespace ExhaustAirSystemManager {
                 // 2022-01-13: To do: Add related data struct to store zoneMixer number (actually need a local zone num definition as well)
 
                 std::string centralFanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
-                int centralFanTypeNum = 0; // UtilityRoutines::FindItemInList(centralfanType, state.dataFans); // 2022-01-13: need some kind of
-                                           // function overload definition?
+                int centralFanTypeNum = 0; 
                 // 2022-01: Check fan types and gives warnings
                 if (UtilityRoutines::SameString(centralFanType, "Fan:SystemModel")) {
                     centralFanTypeNum = DataHVACGlobals::FanType_SystemModelObject;
@@ -213,16 +213,14 @@ namespace ExhaustAirSystemManager {
                 }
 
                 std::string centralFanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
-                int centralFanNum = 0; // UtilityRoutines::FindItemInList(centralfanName, state.dataFans); // 2022-01-13: need some kind of function overload
-                                // definition?
-
-                if (centralFanNum > 0) {
-                    // normal conditions
-                } else if (centralFanNum == 0) {
-                    // black or anything like that, treat as always avaialabe?
+                int centralFanIndex = 0; // zero based 
+                centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
+                if (centralFanIndex >= 0) {
+                    // normal index 
+                    // 2022-01: to do: if some constant information need to be extracted, here might be a good place to do so:
                     /* */
                 } else {
-                    centralFanNum = 0;
+                    centralFanIndex = -1;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
                     ShowContinueError(state, "Fan Name =" + centralFanName + "not found.");
                     ErrorsFound = true;
