@@ -2910,8 +2910,8 @@ namespace UnitarySystems {
         static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string cCurrentModuleObject = input_data.system_type;
-        auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(DataLoopNode::ConnectionObjectTypeNamesUC,
-                                                                          UtilityRoutines::MakeUPPERCase(input_data.system_type));
+        auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC,
+                                                                               UtilityRoutines::MakeUPPERCase(input_data.system_type));
         std::string thisObjectName = input_data.name;
         this->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
         sysNum = getUnitarySystemIndex(state, thisObjectName);

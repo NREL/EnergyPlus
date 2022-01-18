@@ -1568,7 +1568,7 @@ void GetPTUnit(EnergyPlusData &state)
                       CompSetSupHeatOutlet);
 
         if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTHPUnit) {
-            auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(
+            auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(
                 DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataPTHP->PTUnit(PTUnitNum).UnitType));
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                 // Add heating coil water inlet node as actuator node for coil
@@ -2482,7 +2482,7 @@ void GetPTUnit(EnergyPlusData &state)
                       state.dataLoopNodes->NodeID(HeatCoilOutletNodeNum));
 
         if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTACUnit) {
-            auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(
+            auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(
                 DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataPTHP->PTUnit(PTUnitNum).UnitType));
             if (state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                 // Add heating coil water inlet node as actuator node for coil
@@ -3309,7 +3309,7 @@ void GetPTUnit(EnergyPlusData &state)
                       CompSetSupHeatOutlet);
 
         if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == PTHPType::PTWSHPUnit) {
-            auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(
+            auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(
                 DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataPTHP->PTUnit(PTUnitNum).UnitType));
             if (state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                 // Add heating coil water inlet node as actuator node for coil

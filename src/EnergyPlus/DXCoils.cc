@@ -1814,8 +1814,8 @@ void GetDXCoils(EnergyPlusData &state)
                                 GetOnlySingleNode(state,
                                                   Alphas2(7),
                                                   ErrorsFound,
-                                                  getEnumeration<DataLoopNode::ConnectionObjectType>(DataLoopNode::ConnectionObjectTypeNamesUC,
-                                                                                                     UtilityRoutines::MakeUPPERCase(PerfObjectType)),
+                                                  (DataLoopNode::ConnectionObjectType)getEnumerationValue(
+                                                      DataLoopNode::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(PerfObjectType)),
                                                   PerfObjectName,
                                                   DataLoopNode::NodeFluidType::Air,
                                                   DataLoopNode::ConnectionType::OutsideAirReference,

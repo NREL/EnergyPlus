@@ -956,7 +956,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) =
-                    getEnumeration<AirLoopHVACZone>(AirLoopHVACTypeNamesUC, AlphArray(Counter));
+                    (AirLoopHVACZone)getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter));
             } else {
                 ShowSevereError(state, std::string{RoutineName} + cAlphaFields(1) + "=\"" + state.dataZoneEquip->SupplyAirPath(PathNum).Name + "\"");
                 ShowContinueError(state, "Unhandled component type =\"" + AlphArray(Counter) + "\".");

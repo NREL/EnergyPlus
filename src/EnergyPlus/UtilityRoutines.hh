@@ -605,11 +605,6 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
     return -1;
 }
 
-template <class T> constexpr T getEnumeration(const gsl::span<const std::string_view> sList, const std::string_view s)
-{
-    return static_cast<T>(getEnumerationValue(sList, s));
-}
-
 struct UtilityRoutinesData : BaseGlobalStruct
 {
 

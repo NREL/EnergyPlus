@@ -789,8 +789,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     for (auto &classToInput : classesToInput) {
         cCurrentModuleObject = DataPlant::PlantEquipTypeNames[static_cast<int>(classToInput.thisType)];
-        auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(DataLoopNode::ConnectionObjectTypeNamesUC,
-                                                                          UtilityRoutines::MakeUPPERCase(cCurrentModuleObject));
+        auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC,
+                                                                               UtilityRoutines::MakeUPPERCase(cCurrentModuleObject));
         int numPLHP = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (numPLHP > 0) {
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);

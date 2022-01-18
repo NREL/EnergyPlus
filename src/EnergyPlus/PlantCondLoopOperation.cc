@@ -1352,8 +1352,8 @@ void FindCompSPInput(EnergyPlusData &state,
 
     SchemeNameFound = true;
 
-    auto objType = getEnumeration<DataLoopNode::ConnectionObjectType>(DataLoopNode::ConnectionObjectTypeNamesUC,
-                                                                      UtilityRoutines::MakeUPPERCase(CurrentModuleObject));
+    auto objType = (DataLoopNode::ConnectionObjectType)getEnumerationValue(DataLoopNode::ConnectionObjectTypeNamesUC,
+                                                                           UtilityRoutines::MakeUPPERCase(CurrentModuleObject));
 
     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
         LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
