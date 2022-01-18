@@ -219,9 +219,15 @@ namespace ExhaustAirSystemManager {
                 // probably simialr to other like schedules etc, although schedules might have been processed early in most cases.
                 centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
                 if (centralFanIndex >= 0) {
-                    // normal index 
-                    // 2022-01: to do: if some constant information need to be extracted, here might be a good place to do so:
-                    /* */
+                // normal index
+                // 2022-01: to do: if some constant information need to be extracted, here might be a good place to do so:
+                    /* //e.g. an example in PIU processing: 
+                    if (HVACFan::checkIfFanNameIsAFanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)) {
+                        state.dataPowerInductionUnits->PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
+                    state.dataHVACFan->fanObjs.emplace_back(
+                    new HVACFan::FanSystem(state, state.dataPowerInductionUnits->PIU(PIUNum).FanName)); // call constructor
+                    } 
+                    */
                 } else {
                     centralFanIndex = -1;
                     // here a severe error message is needed
