@@ -70,8 +70,8 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->GTChiller(1).HeatRecCapacityFraction = 0.5;
     state->dataPlantChillers->GTChiller(1).HeatRecActive = true;
     state->dataPlantChillers->GTChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
-    state->dataPlantChillers->GTChiller(1).CWLoopNum = 1;
-    state->dataPlantChillers->GTChiller(1).CDLoopNum = 2;
+    state->dataPlantChillers->GTChiller(1).CWPlantLoc.loopNum = 1;
+    state->dataPlantChillers->GTChiller(1).CDPlantLoc.loopNum = 2;
     state->dataPlantChillers->GTChiller(1).EvapVolFlowRate = 1.0;
     state->dataPlantChillers->GTChiller(1).CondVolFlowRate = 1.0;
     state->dataPlantChillers->GTChiller(1).NomCap = 10000;
@@ -107,8 +107,8 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     state->dataPlantChillers->EngineDrivenChiller(1).HeatRecCapacityFraction = 0.5;
     state->dataPlantChillers->EngineDrivenChiller(1).HeatRecActive = true;
     state->dataPlantChillers->EngineDrivenChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
-    state->dataPlantChillers->EngineDrivenChiller(1).CWLoopNum = 1;
-    state->dataPlantChillers->EngineDrivenChiller(1).CDLoopNum = 2;
+    state->dataPlantChillers->EngineDrivenChiller(1).CWPlantLoc.loopNum = 1;
+    state->dataPlantChillers->EngineDrivenChiller(1).CDPlantLoc.loopNum = 2;
     state->dataPlantChillers->EngineDrivenChiller(1).EvapVolFlowRate = 1.0;
     state->dataPlantChillers->EngineDrivenChiller(1).CondVolFlowRate = 1.0;
     state->dataPlantChillers->EngineDrivenChiller(1).NomCap = 10000;

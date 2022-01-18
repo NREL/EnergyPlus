@@ -8967,15 +8967,16 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
     iConst = state.dataSurface->SurfaceWindow(iWin).ComplexFen.State(CurCplxFenState).Konst;
     SolBmIndex = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurCplxFenState).SolBmIndex(iHour, state.dataGlobal->TimeStep);
 
-    {
-        auto const SELECT_CASE_var(CalledFrom);
-        if (SELECT_CASE_var == DataDaylighting::CalledFor::RefPoint) {
-            WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(iWin).SolidAngAtRefPtWtd(iRefPoint);
-        } else if (SELECT_CASE_var == DataDaylighting::CalledFor::MapPoint) {
-            WindowSolidAngleDaylightPoint = 0.0;
-        } else {
-            assert(false); // Bad CalledFrom argument
-        }
+    switch (CalledFrom) {
+    case DataDaylighting::CalledFor::RefPoint: {
+        WindowSolidAngleDaylightPoint = state.dataSurface->SurfaceWindow(iWin).SolidAngAtRefPtWtd(iRefPoint);
+    } break;
+    case DataDaylighting::CalledFor::MapPoint: {
+        WindowSolidAngleDaylightPoint = 0.0;
+    } break;
+    default: {
+        assert(false); // Bad CalledFrom argument
+    } break;
     }
 
     if (WindowSolidAngleDaylightPoint < 1e-6) return;

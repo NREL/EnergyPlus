@@ -180,17 +180,19 @@ void SimPackagedTerminalUnit(EnergyPlusData &state,
         }
         CompIndex = state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex;
     } else {
-        {
-            auto const SELECT_CASE_var(PTUnitType);
-            if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-                PTUnitNum = CompIndex;
-            } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-                PTUnitNum = CompIndex + state.dataPTHP->NumPTHP;
-            } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-                PTUnitNum = CompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-            } else {
-                assert(false);
-            }
+        switch (PTUnitType) {
+        case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+            PTUnitNum = CompIndex;
+        } break;
+        case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+            PTUnitNum = CompIndex + state.dataPTHP->NumPTHP;
+        } break;
+        case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+            PTUnitNum = CompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+        } break;
+        default: {
+            assert(false);
+        } break;
         }
         if (PTUnitNum > state.dataPTHP->NumPTUs || PTUnitNum < 1) {
             ShowFatalError(state,
@@ -4116,10 +4118,7 @@ void InitPTUnit(EnergyPlusData &state,
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum,
+                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -4138,9 +4137,9 @@ void InitPTUnit(EnergyPlusData &state,
 
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
 
                     state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow =
@@ -4153,10 +4152,7 @@ void InitPTUnit(EnergyPlusData &state,
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum,
+                                        state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -4183,11 +4179,8 @@ void InitPTUnit(EnergyPlusData &state,
             }
 
             // fill outlet node for coil
-            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum)
-                                                                        .LoopSide(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide)
-                                                                        .Branch(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum)
-                                                                        .Comp(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum)
-                                                                        .NodeNumOut;
+            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode =
+                DataPlant::CompData::getPlantComponent(state, state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc).NodeNumOut;
             state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidOutletNodeNum = state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode;
             MyPlantScanFlag(PTUnitNum) = false;
 
@@ -4198,10 +4191,7 @@ void InitPTUnit(EnergyPlusData &state,
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilWaterSimpleHeating,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum,
+                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -4216,9 +4206,9 @@ void InitPTUnit(EnergyPlusData &state,
 
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(state,
-                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
+                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum).FluidName,
                                            DataGlobalConstants::HWInitConvTemp,
-                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
+                                           state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum).FluidIndex,
                                            RoutineName);
                     state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow =
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound) * rho;
@@ -4228,10 +4218,7 @@ void InitPTUnit(EnergyPlusData &state,
                 ScanPlantLoopsForObject(state,
                                         state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                         DataPlant::PlantEquipmentType::CoilSteamAirHeating,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum,
+                                        state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -4253,11 +4240,8 @@ void InitPTUnit(EnergyPlusData &state,
                 }
             }
             // fill outlet node for coil
-            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode = state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum)
-                                                                        .LoopSide(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide)
-                                                                        .Branch(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum)
-                                                                        .Comp(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum)
-                                                                        .NodeNumOut;
+            state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode =
+                DataPlant::CompData::getPlantComponent(state, state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc).NodeNumOut;
             MyPlantScanFlag(PTUnitNum) = false;
         } else { // pthp not connected to plant
             MyPlantScanFlag(PTUnitNum) = false;
@@ -4620,9 +4604,9 @@ void InitPTUnit(EnergyPlusData &state,
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
                     if (CoilMaxVolFlowRate != AutoSize) {
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc.loopNum).FluidIndex,
                                                RoutineNameSpace);
                         state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
                     }
@@ -4646,11 +4630,7 @@ void InitPTUnit(EnergyPlusData &state,
                                0.0,
                                state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow,
                                state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                               state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                               state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode);
         }
 
         if (state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode > 0) {
@@ -4665,9 +4645,9 @@ void InitPTUnit(EnergyPlusData &state,
                         GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
                     if (CoilMaxVolFlowRate != AutoSize) {
                         rho = GetDensityGlycol(state,
-                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
+                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum).FluidName,
                                                DataGlobalConstants::HWInitConvTemp,
-                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
+                                               state.dataPlnt->PlantLoop(state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc.loopNum).FluidIndex,
                                                RoutineNameSpace);
                         state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
                     }
@@ -4692,11 +4672,7 @@ void InitPTUnit(EnergyPlusData &state,
                                0.0,
                                state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
                                state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                               state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                               state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode);
         }
     } // end one time inits
 
@@ -4903,10 +4879,7 @@ void InitPTUnit(EnergyPlusData &state,
                                  mdot,
                                  state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                  state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
             //     simulate water coil to find operating capacity
             SimulateWaterCoilComponents(state,
@@ -4928,10 +4901,7 @@ void InitPTUnit(EnergyPlusData &state,
                                  mdot,
                                  state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                  state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                 state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
             //     simulate steam coil to find operating capacity
             SimulateSteamCoilComponents(state,
@@ -4954,10 +4924,7 @@ void InitPTUnit(EnergyPlusData &state,
                                  mdot,
                                  state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                  state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
 
             //     simulate water coil to find operating capacity
             SimulateWaterCoilComponents(state,
@@ -4977,10 +4944,7 @@ void InitPTUnit(EnergyPlusData &state,
                                  mdot,
                                  state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                  state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                 state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
 
             //     simulate steam coil to find operating capacity
             SimulateSteamCoilComponents(state,
@@ -6146,10 +6110,7 @@ void ControlPTUnitOutput(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -6163,10 +6124,7 @@ void ControlPTUnitOutput(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -6320,88 +6278,92 @@ void CalcPTUnit(EnergyPlusData &state,
     }
 
     if (state.dataPTHP->CoolingLoad && OutsideDryBulbTemp > state.dataPTHP->PTUnit(PTUnitNum).MinOATCompressorCooling) {
-        {
-            auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-            if ((SELECT_CASE_var == PTHPType::PTACUnit) || (SELECT_CASE_var == PTHPType::PTHPUnit)) {
-                if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-                    SimHXAssistedCoolingCoil(state,
-                                             state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                                             FirstHVACIteration,
-                                             CompressorOperation::On,
-                                             PartLoadFrac,
-                                             state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
-                                             state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                                             HXUnitOn);
-                } else {
-                    SimDXCoil(state,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                              CompressorOperation::On,
-                              FirstHVACIteration,
-                              state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
-                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                              PartLoadFrac,
-                              OnOffAirFlowRatio);
-                }
-                state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum);
-            } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
-                HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
-                SimWatertoAirHPSimple(state,
-                                      std::string(),
-                                      state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
-                                      QZnReq,
-                                      dOne,
-                                      OpMode,
-                                      WSHPRuntimeFrac,
-                                      state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                      state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
-                                      state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      CompressorOperation::On,
-                                      PartLoadFrac,
-                                      FirstHVACIteration,
-                                      OnOffAirFlowRatio);
-                state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
+        switch (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num) {
+        case PTHPType::PTACUnit:
+        case PTHPType::PTHPUnit: {
+            if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
+                SimHXAssistedCoolingCoil(state,
+                                         state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
+                                         FirstHVACIteration,
+                                         CompressorOperation::On,
+                                         PartLoadFrac,
+                                         state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
+                                         state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                                         HXUnitOn);
             } else {
+                SimDXCoil(state,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
+                          CompressorOperation::On,
+                          FirstHVACIteration,
+                          state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
+                          state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                          PartLoadFrac,
+                          OnOffAirFlowRatio);
             }
+            state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum);
+        } break;
+        case PTHPType::PTWSHPUnit: {
+            HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
+            SimWatertoAirHPSimple(state,
+                                  std::string(),
+                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                  QZnReq,
+                                  dOne,
+                                  OpMode,
+                                  WSHPRuntimeFrac,
+                                  state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                  state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
+                                  state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
+                                  CompressorOperation::On,
+                                  PartLoadFrac,
+                                  FirstHVACIteration,
+                                  OnOffAirFlowRatio);
+            state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
+        } break;
+        default:
+            break;
         }
     } else { // cooling coil is off
-        {
-            auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-            if ((SELECT_CASE_var == PTHPType::PTACUnit) || (SELECT_CASE_var == PTHPType::PTHPUnit)) {
-                if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-                    SimHXAssistedCoolingCoil(state,
-                                             state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                                             FirstHVACIteration,
-                                             CompressorOperation::Off,
-                                             dZero,
-                                             state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
-                                             state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                                             HXUnitOn);
-                } else {
-                    SimDXCoil(state,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
-                              CompressorOperation::Off,
-                              FirstHVACIteration,
-                              state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
-                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                              dZero,
-                              OnOffAirFlowRatio);
-                }
-            } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
-                SimWatertoAirHPSimple(state,
-                                      std::string(),
-                                      state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
-                                      dZero,
-                                      dZero,
-                                      OpMode,
-                                      dZero,
-                                      state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                      state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
-                                      state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                      CompressorOperation::Off,
-                                      dZero,
-                                      FirstHVACIteration);
+        switch (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num) {
+        case PTHPType::PTACUnit:
+        case PTHPType::PTHPUnit: {
+            if (state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
+                SimHXAssistedCoolingCoil(state,
+                                         state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
+                                         FirstHVACIteration,
+                                         CompressorOperation::Off,
+                                         dZero,
+                                         state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
+                                         state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                                         HXUnitOn);
             } else {
+                SimDXCoil(state,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName,
+                          CompressorOperation::Off,
+                          FirstHVACIteration,
+                          state.dataPTHP->PTUnit(PTUnitNum).CoolCoilCompIndex,
+                          state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                          dZero,
+                          OnOffAirFlowRatio);
             }
+        } break;
+        case PTHPType::PTWSHPUnit: {
+            SimWatertoAirHPSimple(state,
+                                  std::string(),
+                                  state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                  dZero,
+                                  dZero,
+                                  OpMode,
+                                  dZero,
+                                  state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                  state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
+                                  state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
+                                  CompressorOperation::Off,
+                                  dZero,
+                                  FirstHVACIteration);
+        } break;
+        default:
+            break;
         }
     }
     if (state.dataPTHP->HeatingLoad && OutsideDryBulbTemp > state.dataPTHP->PTUnit(PTUnitNum).MinOATCompressorHeating) {
@@ -6430,10 +6392,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                      mdot,
                                      state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                      state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
                 SimulateWaterCoilComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
@@ -6449,10 +6408,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                      mdot,
                                      state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                      state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
                 SimulateSteamCoilComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
@@ -6464,37 +6420,38 @@ void CalcPTUnit(EnergyPlusData &state,
                                             PartLoadFrac);
             }
         } else {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-                if (SELECT_CASE_var == PTHPType::PTHPUnit) {
-                    SimDXCoil(state,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
-                              CompressorOperation::On,
-                              FirstHVACIteration,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                              PartLoadFrac,
-                              OnOffAirFlowRatio);
-                    state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum);
-                } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
-                    HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
-                    SimWatertoAirHPSimple(state,
-                                          std::string(),
-                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                                          QZnReq,
-                                          dZero,
-                                          OpMode,
-                                          WSHPRuntimeFrac,
-                                          state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                          state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
-                                          state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                          CompressorOperation::On,
-                                          PartLoadFrac,
-                                          FirstHVACIteration,
-                                          OnOffAirFlowRatio);
-                    state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
-                } else {
-                }
+            switch (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num) {
+            case PTHPType::PTHPUnit: {
+                SimDXCoil(state,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
+                          CompressorOperation::On,
+                          FirstHVACIteration,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                          state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                          PartLoadFrac,
+                          OnOffAirFlowRatio);
+                state.dataPTHP->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum);
+            } break;
+            case PTHPType::PTWSHPUnit: {
+                HeatPumpRunFrac(state, PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
+                SimWatertoAirHPSimple(state,
+                                      std::string(),
+                                      state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                      QZnReq,
+                                      dZero,
+                                      OpMode,
+                                      WSHPRuntimeFrac,
+                                      state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                      state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
+                                      state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
+                                      CompressorOperation::On,
+                                      PartLoadFrac,
+                                      FirstHVACIteration,
+                                      OnOffAirFlowRatio);
+                state.dataPTHP->SaveCompressorPLR = PartLoadFrac;
+            } break;
+            default:
+                break;
             }
         }
     } else {
@@ -6514,10 +6471,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                      mdot,
                                      state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                      state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
                 SimulateWaterCoilComponents(
                     state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilIndex);
@@ -6527,10 +6481,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                      mdot,
                                      state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                      state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                     state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
                 SimulateSteamCoilComponents(state,
                                             state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
@@ -6542,34 +6493,34 @@ void CalcPTUnit(EnergyPlusData &state,
                                             PartLoadFrac);
             }
         } else {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num);
-                if (SELECT_CASE_var == PTHPType::PTHPUnit) {
-                    SimDXCoil(state,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
-                              CompressorOperation::Off,
-                              FirstHVACIteration,
-                              state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                              state.dataPTHP->PTUnit(PTUnitNum).OpMode,
-                              dZero,
-                              OnOffAirFlowRatio);
-                } else if (SELECT_CASE_var == PTHPType::PTWSHPUnit) {
-                    SimWatertoAirHPSimple(state,
-                                          std::string(),
-                                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
-                                          dZero,
-                                          dZero,
-                                          OpMode,
-                                          dZero,
-                                          state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
-                                          state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
-                                          state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
-                                          CompressorOperation::Off,
-                                          dZero,
-                                          FirstHVACIteration);
-
-                } else {
-                }
+            switch (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num) {
+            case PTHPType::PTHPUnit: {
+                SimDXCoil(state,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName,
+                          CompressorOperation::Off,
+                          FirstHVACIteration,
+                          state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                          state.dataPTHP->PTUnit(PTUnitNum).OpMode,
+                          dZero,
+                          OnOffAirFlowRatio);
+            } break;
+            case PTHPType::PTWSHPUnit: {
+                SimWatertoAirHPSimple(state,
+                                      std::string(),
+                                      state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilIndexNum,
+                                      dZero,
+                                      dZero,
+                                      OpMode,
+                                      dZero,
+                                      state.dataPTHP->PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                      state.dataPTHP->PTUnit(PTUnitNum).HPTimeConstant,
+                                      state.dataPTHP->PTUnit(PTUnitNum).FanDelayTime,
+                                      CompressorOperation::Off,
+                                      dZero,
+                                      FirstHVACIteration);
+            } break;
+            default:
+                break;
             }
         }
     }
@@ -6608,10 +6559,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -6624,10 +6572,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -6655,10 +6600,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                          MaxHotWaterFlow,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     QActual = SupHeaterLoad;
                     // simulate the hot water supplemental heating coil
                     SimulateWaterCoilComponents(state,
@@ -6740,10 +6682,7 @@ void CalcPTUnit(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
 
                     // simulate the steam supplemental heating coil
                     SimulateSteamCoilComponents(state,
@@ -6971,10 +6910,7 @@ Real64 HotWaterCoilResidual(EnergyPlusData &state,
                          mdot,
                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
     // simulate the hot water supplemental heating coil
     SimulateWaterCoilComponents(state,
                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
@@ -7328,17 +7264,19 @@ int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, 
     // So ZoneEquipList()%EquipIndex() passed to this subroutine (which is actually CompIndex), is based on each object type
     // which was recalculated for total number of all three object type for use in PT data structure.
 
-    {
-        auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-            PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-        } else {
-            assert(false);
-        }
+    switch (PTUnitType) {
+    case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+        PTUnitNum = PTUnitCompIndex;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
 
     if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
@@ -7398,17 +7336,19 @@ int GetPTUnitOutAirNode(EnergyPlusData &state, int const PTUnitCompIndex, DataZo
     // So ZoneEquipList()%EquipIndex() passed to this subroutine (which is actually CompIndex), is based on each object type
     // which was recalculated for total number of all three object type for use in PT data structure.
 
-    {
-        auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-            PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-        } else {
-            assert(false);
-        }
+    switch (PTUnitType) {
+    case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+        PTUnitNum = PTUnitCompIndex;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
 
     if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
@@ -7470,17 +7410,19 @@ int GetPTUnitReturnAirNode(EnergyPlusData &state, int const PTUnitCompIndex, Dat
     // So ZoneEquipList()%EquipIndex() passed to this subroutine (which is actually CompIndex), is based on each object type
     // which was recalculated for total number of all three object type for use in PT data structure.
 
-    {
-        auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-            PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-        } else {
-            assert(false);
-        }
+    switch (PTUnitType) {
+    case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+        PTUnitNum = PTUnitCompIndex;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
 
     if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
@@ -7547,17 +7489,19 @@ int GetPTUnitMixedAirNode(EnergyPlusData &state, int const PTUnitCompIndex, Data
     // So ZoneEquipList()%EquipIndex() passed to this subroutine (which is actually CompIndex), is based on each object type
     // which was recalculated for total number of all three object type for use in PT data structure.
 
-    {
-        auto const SELECT_CASE_var(PTUnitType);
-        if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir) {
-            PTUnitNum = PTUnitCompIndex;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermACAirToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
-        } else if (SELECT_CASE_var == DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir) {
-            PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
-        } else {
-            assert(false);
-        }
+    switch (PTUnitType) {
+    case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir: {
+        PTUnitNum = PTUnitCompIndex;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP;
+    } break;
+    case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+        PTUnitNum = PTUnitCompIndex + state.dataPTHP->NumPTHP + state.dataPTHP->NumPTAC;
+    } break;
+    default: {
+        assert(false);
+    } break;
     }
 
     if (PTUnitNum > 0 && PTUnitNum <= state.dataPTHP->NumPTUs) {
@@ -8146,10 +8090,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -8163,10 +8104,7 @@ void ControlVSHPOutput(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -8652,10 +8590,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
@@ -8671,10 +8606,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
@@ -8703,10 +8635,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
@@ -8718,10 +8647,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilPlantLoc);
 
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName,
@@ -8771,10 +8697,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     SimulateWaterCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -8787,10 +8710,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     SimulateSteamCoilComponents(state,
                                                 state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName,
                                                 FirstHVACIteration,
@@ -8818,10 +8738,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          MaxHotWaterFlow,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
                     QActual = SupHeaterLoad;
                     // simulate the hot water supplemental heating coil
                     SimulateWaterCoilComponents(state,
@@ -8905,10 +8822,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                          mdot,
                                          state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                          state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilCompNum);
+                                         state.dataPTHP->PTUnit(PTUnitNum).SuppCoilPlantLoc);
 
                     // simulate the steam supplemental heating coil
                     SimulateSteamCoilComponents(state,
