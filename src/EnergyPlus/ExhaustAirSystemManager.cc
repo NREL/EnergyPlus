@@ -359,17 +359,17 @@ namespace ExhaustAirSystemManager {
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
-                int availMgrNum = 0;
+                int availSchNum = 0;
                 // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
                 // To do: here to use schedule match function to process data.
 
-                if (availMgrNum > 0) {
+                if (availSchNum > 0) {
                     // normal conditions
-                } else if (availMgrNum == 0) {
+                } else if (availSchNum == 0) {
                     // black or anything like that, treat as always avaialabe?
                     /* */
                 } else {
-                    availMgrNum = 0;
+                    availSchNum = 0;
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhCtrl.Name);
                     ShowContinueError(state, "Avaiability Manager Name =" + availSchName + "not found.");
                     // ErrorsFound = true;
@@ -380,6 +380,10 @@ namespace ExhaustAirSystemManager {
                 // These two nodes are required inputs: 
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
                 std::string outletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
+                // To do: process node names into node number: 
+                // supposedly here the nodes are already processed before this is called and actually got exectued.
+                /* Get node number using node names */
+
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
 
@@ -411,6 +415,9 @@ namespace ExhaustAirSystemManager {
                 // int zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state);
                 // to do: check the requirement dependent on the control type:
                 /* */
+                // Also to do: convert text to interger node values (or node list values?)
+                /* */
+                int supplyNodeOrNodelistNum = 0;                
 
                 std::string minZoneTempLimitScheduleName =
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "minimum_zone_temperature_limit_schedule_name");
