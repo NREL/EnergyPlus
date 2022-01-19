@@ -1611,13 +1611,15 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
     this->Qactual = 0.0;
     this->FanPower = 0.0;
     this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
-    {
-        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
-        }
+    switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
+    case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+        TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
+    } break;
+    case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+        TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
+    } break;
+    default:
+        break;
     }
 
     //   MassFlowTol is a parameter to indicate a no flow condition
@@ -1717,13 +1719,15 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
     this->Qactual = 0.0;
     this->FanPower = 0.0;
     this->OutletWaterTemp = state.dataLoopNodes->Node(waterInletNode).Temp;
-    {
-        auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme);
-        if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
-        } else if (SELECT_CASE_var == DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand) {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
-        }
+    switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
+    case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
+        TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
+    } break;
+    case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
+        TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
+    } break;
+    default:
+        break;
     }
 
     // MassFlowTol is a parameter to indicate a no flow condition

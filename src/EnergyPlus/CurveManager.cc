@@ -2594,78 +2594,96 @@ namespace CurveManager {
         Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
         Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
 
-        {
-            auto const SELECT_CASE_var(Curve.curveType);
-            if (SELECT_CASE_var == CurveType::Linear) {
-                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2;
-            } else if (SELECT_CASE_var == CurveType::Quadratic) {
-                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3);
-            } else if (SELECT_CASE_var == CurveType::QuadLinear) {
-                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5;
-            } else if (SELECT_CASE_var == CurveType::QuintLinear) {
-                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5 + V5 * Curve.Coeff6;
-            } else if (SELECT_CASE_var == CurveType::Cubic) {
-                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4));
-            } else if (SELECT_CASE_var == CurveType::Quartic) {
-                CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * (Curve.Coeff4 + V1 * Curve.Coeff5)));
-            } else if (SELECT_CASE_var == CurveType::BiQuadratic) {
-                CurveValue =
-                    Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3) + V2 * (Curve.Coeff4 + V2 * Curve.Coeff5) + V1 * V2 * Curve.Coeff6;
-            } else if (SELECT_CASE_var == CurveType::QuadraticLinear) {
-                CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3)) + (Curve.Coeff4 + V1 * (Curve.Coeff5 + V1 * Curve.Coeff6)) * V2;
-            } else if (SELECT_CASE_var == CurveType::CubicLinear) {
-                CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4))) + (Curve.Coeff5 + V1 * Curve.Coeff6) * V2;
-            } else if (SELECT_CASE_var == CurveType::BiCubic) {
-                CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 +
-                             V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 +
-                             V1 * V2 * V2 * Curve.Coeff10;
-            } else if (SELECT_CASE_var == CurveType::ChillerPartLoadWithLift) {
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 * V1 + Curve.Coeff3 * V1 * V1 + Curve.Coeff4 * V2 + Curve.Coeff5 * V2 * V2 +
-                             Curve.Coeff6 * V1 * V2 + Curve.Coeff7 * V1 * V1 * V1 + Curve.Coeff8 * V2 * V2 * V2 + Curve.Coeff9 * V1 * V1 * V2 +
-                             Curve.Coeff10 * V1 * V2 * V2 + Curve.Coeff11 * V1 * V1 * V2 * V2 + Curve.Coeff12 * V3 * V2 * V2 * V2;
-            } else if (SELECT_CASE_var == CurveType::TriQuadratic) {
-                auto const &Tri2ndOrder(Curve.Tri2ndOrder(1));
-                auto const V1s(V1 * V1);
-                auto const V2s(V2 * V2);
-                auto const V3s(V3 * V3);
-                CurveValue = Tri2ndOrder.CoeffA0 + Tri2ndOrder.CoeffA1 * V1s + Tri2ndOrder.CoeffA2 * V1 + Tri2ndOrder.CoeffA3 * V2s +
-                             Tri2ndOrder.CoeffA4 * V2 + Tri2ndOrder.CoeffA5 * V3s + Tri2ndOrder.CoeffA6 * V3 + Tri2ndOrder.CoeffA7 * V1s * V2s +
-                             Tri2ndOrder.CoeffA8 * V1 * V2 + Tri2ndOrder.CoeffA9 * V1 * V2s + Tri2ndOrder.CoeffA10 * V1s * V2 +
-                             Tri2ndOrder.CoeffA11 * V1s * V3s + Tri2ndOrder.CoeffA12 * V1 * V3 + Tri2ndOrder.CoeffA13 * V1 * V3s +
-                             Tri2ndOrder.CoeffA14 * V1s * V3 + Tri2ndOrder.CoeffA15 * V2s * V3s + Tri2ndOrder.CoeffA16 * V2 * V3 +
-                             Tri2ndOrder.CoeffA17 * V2 * V3s + Tri2ndOrder.CoeffA18 * V2s * V3 + Tri2ndOrder.CoeffA19 * V1s * V2s * V3s +
-                             Tri2ndOrder.CoeffA20 * V1s * V2s * V3 + Tri2ndOrder.CoeffA21 * V1s * V2 * V3s + Tri2ndOrder.CoeffA22 * V1 * V2s * V3s +
-                             Tri2ndOrder.CoeffA23 * V1s * V2 * V3 + Tri2ndOrder.CoeffA24 * V1 * V2s * V3 + Tri2ndOrder.CoeffA25 * V1 * V2 * V3s +
-                             Tri2ndOrder.CoeffA26 * V1 * V2 * V3;
-            } else if (SELECT_CASE_var == CurveType::Exponent) {
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow(V1, Curve.Coeff3);
-            } else if (SELECT_CASE_var == CurveType::FanPressureRise) {
-                CurveValue = V1 * (Curve.Coeff1 * V1 + Curve.Coeff2 + Curve.Coeff3 * std::sqrt(V2)) + Curve.Coeff4 * V2;
-            } else if (SELECT_CASE_var == CurveType::ExponentialSkewNormal) {
-                CoeffZ1 = (V1 - Curve.Coeff1) / Curve.Coeff2;
-                CoeffZ2 = (Curve.Coeff4 * V1 * std::exp(Curve.Coeff3 * V1) - Curve.Coeff1) / Curve.Coeff2;
-                CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
-                CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
-                CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
-                CurveValue = CurveValueNumer / CurveValueDenom;
-            } else if (SELECT_CASE_var == CurveType::Sigmoid) {
-                CurveValueExp = std::exp((Curve.Coeff3 - V1) / Curve.Coeff4);
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow(1.0 + CurveValueExp, Curve.Coeff5);
-            } else if (SELECT_CASE_var == CurveType::RectangularHyperbola1) {
-                CurveValueNumer = Curve.Coeff1 * V1;
-                CurveValueDenom = Curve.Coeff2 + V1;
-                CurveValue = (CurveValueNumer / CurveValueDenom) + Curve.Coeff3;
-            } else if (SELECT_CASE_var == CurveType::RectangularHyperbola2) {
-                CurveValueNumer = Curve.Coeff1 * V1;
-                CurveValueDenom = Curve.Coeff2 + V1;
-                CurveValue = (CurveValueNumer / CurveValueDenom) + (Curve.Coeff3 * V1);
-            } else if (SELECT_CASE_var == CurveType::ExponentialDecay) {
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1);
-            } else if (SELECT_CASE_var == CurveType::DoubleExponentialDecay) {
-                CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1) + Curve.Coeff4 * std::exp(Curve.Coeff5 * V1);
-            } else {
-                CurveValue = 0.0;
-            }
+        switch (Curve.curveType) {
+        case CurveType::Linear: {
+            CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2;
+        } break;
+        case CurveType::Quadratic: {
+            CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3);
+        } break;
+        case CurveType::QuadLinear: {
+            CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5;
+        } break;
+        case CurveType::QuintLinear: {
+            CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V2 * Curve.Coeff3 + V3 * Curve.Coeff4 + V4 * Curve.Coeff5 + V5 * Curve.Coeff6;
+        } break;
+        case CurveType::Cubic: {
+            CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4));
+        } break;
+        case CurveType::Quartic: {
+            CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * (Curve.Coeff4 + V1 * Curve.Coeff5)));
+        } break;
+        case CurveType::BiQuadratic: {
+            CurveValue = Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3) + V2 * (Curve.Coeff4 + V2 * Curve.Coeff5) + V1 * V2 * Curve.Coeff6;
+        } break;
+        case CurveType::QuadraticLinear: {
+            CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * Curve.Coeff3)) + (Curve.Coeff4 + V1 * (Curve.Coeff5 + V1 * Curve.Coeff6)) * V2;
+        } break;
+        case CurveType::CubicLinear: {
+            CurveValue = (Curve.Coeff1 + V1 * (Curve.Coeff2 + V1 * (Curve.Coeff3 + V1 * Curve.Coeff4))) + (Curve.Coeff5 + V1 * Curve.Coeff6) * V2;
+        } break;
+        case CurveType::BiCubic: {
+            CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 +
+                         V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 +
+                         V1 * V2 * V2 * Curve.Coeff10;
+        } break;
+        case CurveType::ChillerPartLoadWithLift: {
+            CurveValue = Curve.Coeff1 + Curve.Coeff2 * V1 + Curve.Coeff3 * V1 * V1 + Curve.Coeff4 * V2 + Curve.Coeff5 * V2 * V2 +
+                         Curve.Coeff6 * V1 * V2 + Curve.Coeff7 * V1 * V1 * V1 + Curve.Coeff8 * V2 * V2 * V2 + Curve.Coeff9 * V1 * V1 * V2 +
+                         Curve.Coeff10 * V1 * V2 * V2 + Curve.Coeff11 * V1 * V1 * V2 * V2 + Curve.Coeff12 * V3 * V2 * V2 * V2;
+        } break;
+        case CurveType::TriQuadratic: {
+            auto const &Tri2ndOrder(Curve.Tri2ndOrder(1));
+            auto const V1s(V1 * V1);
+            auto const V2s(V2 * V2);
+            auto const V3s(V3 * V3);
+            CurveValue = Tri2ndOrder.CoeffA0 + Tri2ndOrder.CoeffA1 * V1s + Tri2ndOrder.CoeffA2 * V1 + Tri2ndOrder.CoeffA3 * V2s +
+                         Tri2ndOrder.CoeffA4 * V2 + Tri2ndOrder.CoeffA5 * V3s + Tri2ndOrder.CoeffA6 * V3 + Tri2ndOrder.CoeffA7 * V1s * V2s +
+                         Tri2ndOrder.CoeffA8 * V1 * V2 + Tri2ndOrder.CoeffA9 * V1 * V2s + Tri2ndOrder.CoeffA10 * V1s * V2 +
+                         Tri2ndOrder.CoeffA11 * V1s * V3s + Tri2ndOrder.CoeffA12 * V1 * V3 + Tri2ndOrder.CoeffA13 * V1 * V3s +
+                         Tri2ndOrder.CoeffA14 * V1s * V3 + Tri2ndOrder.CoeffA15 * V2s * V3s + Tri2ndOrder.CoeffA16 * V2 * V3 +
+                         Tri2ndOrder.CoeffA17 * V2 * V3s + Tri2ndOrder.CoeffA18 * V2s * V3 + Tri2ndOrder.CoeffA19 * V1s * V2s * V3s +
+                         Tri2ndOrder.CoeffA20 * V1s * V2s * V3 + Tri2ndOrder.CoeffA21 * V1s * V2 * V3s + Tri2ndOrder.CoeffA22 * V1 * V2s * V3s +
+                         Tri2ndOrder.CoeffA23 * V1s * V2 * V3 + Tri2ndOrder.CoeffA24 * V1 * V2s * V3 + Tri2ndOrder.CoeffA25 * V1 * V2 * V3s +
+                         Tri2ndOrder.CoeffA26 * V1 * V2 * V3;
+        } break;
+        case CurveType::Exponent: {
+            CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::pow(V1, Curve.Coeff3);
+        } break;
+        case CurveType::FanPressureRise: {
+            CurveValue = V1 * (Curve.Coeff1 * V1 + Curve.Coeff2 + Curve.Coeff3 * std::sqrt(V2)) + Curve.Coeff4 * V2;
+        } break;
+        case CurveType::ExponentialSkewNormal: {
+            CoeffZ1 = (V1 - Curve.Coeff1) / Curve.Coeff2;
+            CoeffZ2 = (Curve.Coeff4 * V1 * std::exp(Curve.Coeff3 * V1) - Curve.Coeff1) / Curve.Coeff2;
+            CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
+            CurveValueNumer = std::exp(-0.5 * (CoeffZ1 * CoeffZ1)) * (1.0 + sign(1.0, CoeffZ2) * std::erf(std::abs(CoeffZ2) * sqrt_2_inv));
+            CurveValueDenom = std::exp(-0.5 * (CoeffZ3 * CoeffZ3)) * (1.0 + sign(1.0, CoeffZ3) * std::erf(std::abs(CoeffZ3) * sqrt_2_inv));
+            CurveValue = CurveValueNumer / CurveValueDenom;
+        } break;
+        case CurveType::Sigmoid: {
+            CurveValueExp = std::exp((Curve.Coeff3 - V1) / Curve.Coeff4);
+            CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow(1.0 + CurveValueExp, Curve.Coeff5);
+        } break;
+        case CurveType::RectangularHyperbola1: {
+            CurveValueNumer = Curve.Coeff1 * V1;
+            CurveValueDenom = Curve.Coeff2 + V1;
+            CurveValue = (CurveValueNumer / CurveValueDenom) + Curve.Coeff3;
+        } break;
+        case CurveType::RectangularHyperbola2: {
+            CurveValueNumer = Curve.Coeff1 * V1;
+            CurveValueDenom = Curve.Coeff2 + V1;
+            CurveValue = (CurveValueNumer / CurveValueDenom) + (Curve.Coeff3 * V1);
+        } break;
+        case CurveType::ExponentialDecay: {
+            CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1);
+        } break;
+        case CurveType::DoubleExponentialDecay: {
+            CurveValue = Curve.Coeff1 + Curve.Coeff2 * std::exp(Curve.Coeff3 * V1) + Curve.Coeff4 * std::exp(Curve.Coeff5 * V1);
+        } break;
+        default: {
+            CurveValue = 0.0;
+        } break;
         }
 
         if (Curve.CurveMinPresent) CurveValue = max(CurveValue, Curve.CurveMin);

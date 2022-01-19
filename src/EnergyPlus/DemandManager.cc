@@ -236,62 +236,70 @@ void SimulateDemandManagerList(EnergyPlusData &state,
 
         if (OverLimit > 0.0) {
 
-            {
-                auto const SELECT_CASE_var(DemandManagerList(ListNum).ManagerPriority);
+            switch (DemandManagerList(ListNum).ManagerPriority) {
+            case ManagePriorityType::Sequential: { // Activate first Demand Manager that can reduce demand
 
-                if (SELECT_CASE_var == ManagePriorityType::Sequential) { // Activate first Demand Manager that can reduce demand
+                for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
+                    MgrPtr = DemandManagerList(ListNum).Manager(MgrNum);
 
-                    for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
-                        MgrPtr = DemandManagerList(ListNum).Manager(MgrNum);
+                    if (DemandMgr(MgrPtr).CanReduceDemand) {
+                        DemandMgr(MgrPtr).Activate = true;
 
-                        if (DemandMgr(MgrPtr).CanReduceDemand) {
-                            DemandMgr(MgrPtr).Activate = true;
-
-                            {
-                                auto const SELECT_CASE_var1(DemandMgr(MgrPtr).Type);
-                                if (SELECT_CASE_var1 == ManagerType::ExtLights) {
-                                    ResimExt = true;
-
-                                } else if ((SELECT_CASE_var1 == ManagerType::Lights) || (SELECT_CASE_var1 == ManagerType::ElecEquip)) {
-                                    ResimHB = true;
-                                    ResimHVAC = true;
-
-                                } else if ((SELECT_CASE_var1 == ManagerType::Thermostats) || (SELECT_CASE_var1 == ManagerType::Ventilation)) {
-                                    ResimHVAC = true;
-                                }
-                            }
-
-                            break; // Leave the loop
+                        switch (DemandMgr(MgrPtr).Type) {
+                        case ManagerType::ExtLights: {
+                            ResimExt = true;
+                        } break;
+                        case ManagerType::Lights:
+                        case ManagerType::ElecEquip: {
+                            ResimHB = true;
+                            ResimHVAC = true;
+                        } break;
+                        case ManagerType::Thermostats:
+                        case ManagerType::Ventilation: {
+                            ResimHVAC = true;
+                        } break;
+                        default:
+                            break;
                         }
-                    } // MgrNum
 
-                } else if (SELECT_CASE_var == ManagePriorityType::Optimal) {
-                    // Not yet implemented
+                        break; // Leave the loop
+                    }
+                } // MgrNum
 
-                } else if (SELECT_CASE_var == ManagePriorityType::All) { // Activate ALL Demand Managers that can reduce demand
+            } break;
+            case ManagePriorityType::Optimal: {
+                // Not yet implemented
 
-                    for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
-                        MgrPtr = DemandManagerList(ListNum).Manager(MgrNum);
+            } break;
+            case ManagePriorityType::All: { // Activate ALL Demand Managers that can reduce demand
 
-                        if (DemandMgr(MgrPtr).CanReduceDemand) {
-                            DemandMgr(MgrPtr).Activate = true;
+                for (MgrNum = 1; MgrNum <= DemandManagerList(ListNum).NumOfManager; ++MgrNum) {
+                    MgrPtr = DemandManagerList(ListNum).Manager(MgrNum);
 
-                            {
-                                auto const SELECT_CASE_var1(DemandMgr(MgrPtr).Type);
-                                if (SELECT_CASE_var1 == ManagerType::ExtLights) {
-                                    ResimExt = true;
+                    if (DemandMgr(MgrPtr).CanReduceDemand) {
+                        DemandMgr(MgrPtr).Activate = true;
 
-                                } else if ((SELECT_CASE_var1 == ManagerType::Lights) || (SELECT_CASE_var1 == ManagerType::ElecEquip)) {
-                                    ResimHB = true;
-                                    ResimHVAC = true;
-
-                                } else if ((SELECT_CASE_var1 == ManagerType::Thermostats) || (SELECT_CASE_var1 == ManagerType::Ventilation)) {
-                                    ResimHVAC = true;
-                                }
-                            }
+                        switch (DemandMgr(MgrPtr).Type) {
+                        case ManagerType::ExtLights: {
+                            ResimExt = true;
+                        } break;
+                        case ManagerType::Lights:
+                        case ManagerType::ElecEquip: {
+                            ResimHB = true;
+                            ResimHVAC = true;
+                        } break;
+                        case ManagerType::Thermostats:
+                        case ManagerType::Ventilation: {
+                            ResimHVAC = true;
+                        } break;
+                        default:
+                            break;
                         }
-                    } // MgrNum
-                }
+                    }
+                } // MgrNum
+            } break;
+            default:
+                break;
             }
         }
     }
@@ -1456,63 +1464,65 @@ void ActivateDemandManagers(EnergyPlusData &state)
             DemandMgr(MgrNum).Activate = false;
             DemandMgr(MgrNum).Active = true;
 
-            {
-                auto const SELECT_CASE_var(DemandMgr(MgrNum).SelectionControl);
+            switch (DemandMgr(MgrNum).SelectionControl) {
+            case ManagerSelection::All: {
+                // Turn ON limiting on all loads
+                for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
+                    LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
+                    LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                } // LoadNum
 
-                if (SELECT_CASE_var == ManagerSelection::All) {
+            } break;
+            case ManagerSelection::Many: { // All loads are limited except for one
+                if (DemandMgr(MgrNum).NumOfLoads > 1) {
+
                     // Turn ON limiting on all loads
                     for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                         LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
                         LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                     } // LoadNum
 
-                } else if (SELECT_CASE_var == ManagerSelection::Many) { // All loads are limited except for one
-                    if (DemandMgr(MgrNum).NumOfLoads > 1) {
+                    // Set next rotated load (from last time it was active)
+                    RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
+                    ++RotatedLoadNum;
+                    if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
+                    DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
 
-                        // Turn ON limiting on all loads
-                        for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                            LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                            LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
-                        } // LoadNum
-
-                        // Set next rotated load (from last time it was active)
-                        RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
-                        ++RotatedLoadNum;
-                        if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
-                        DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
-
-                        // Turn OFF limiting for the new rotated load
-                        LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                        LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
-                    } else {
-                        // Turn ON limiting for the one and only load
-                        LoadPtr = DemandMgr(MgrNum).Load(1);
-                        LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
-                    }
-
-                } else if (SELECT_CASE_var == ManagerSelection::One) { // Only one load is limited
-                    if (DemandMgr(MgrNum).NumOfLoads > 1) {
-                        // Turn OFF limiting on all loads
-                        for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                            LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                            LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
-                        } // LoadNum
-
-                        // Set next rotated load (from last time it was active)
-                        RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
-                        ++RotatedLoadNum;
-                        if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
-                        DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
-
-                        // Turn ON limiting for the new rotated load
-                        LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                        LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
-                    } else {
-                        // Turn ON limiting for the one and only load
-                        LoadPtr = DemandMgr(MgrNum).Load(1);
-                        LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
-                    }
+                    // Turn OFF limiting for the new rotated load
+                    LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                    LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                } else {
+                    // Turn ON limiting for the one and only load
+                    LoadPtr = DemandMgr(MgrNum).Load(1);
+                    LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                 }
+
+            } break;
+            case ManagerSelection::One: { // Only one load is limited
+                if (DemandMgr(MgrNum).NumOfLoads > 1) {
+                    // Turn OFF limiting on all loads
+                    for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
+                        LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
+                        LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                    } // LoadNum
+
+                    // Set next rotated load (from last time it was active)
+                    RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
+                    ++RotatedLoadNum;
+                    if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
+                    DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
+
+                    // Turn ON limiting for the new rotated load
+                    LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                    LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                } else {
+                    // Turn ON limiting for the one and only load
+                    LoadPtr = DemandMgr(MgrNum).Load(1);
+                    LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                }
+            } break;
+            default:
+                break;
             }
         }
 
@@ -1581,57 +1591,60 @@ void UpdateDemandManagers(EnergyPlusData &state)
 
                 } else {
 
-                    {
-                        auto const SELECT_CASE_var(DemandMgr(MgrNum).SelectionControl);
-                        if (SELECT_CASE_var == ManagerSelection::All) {
-                            // Do nothing; limits remain on all loads
+                    switch (DemandMgr(MgrNum).SelectionControl) {
+                    case ManagerSelection::All: {
+                        // Do nothing; limits remain on all loads
 
-                        } else if (SELECT_CASE_var == ManagerSelection::Many) { // All loads are limited except for one
-                            DemandMgr(MgrNum).ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
+                    } break;
+                    case ManagerSelection::Many: { // All loads are limited except for one
+                        DemandMgr(MgrNum).ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
 
-                            if (DemandMgr(MgrNum).ElapsedRotationTime >= DemandMgr(MgrNum).RotationDuration) {
-                                DemandMgr(MgrNum).ElapsedRotationTime = 0;
+                        if (DemandMgr(MgrNum).ElapsedRotationTime >= DemandMgr(MgrNum).RotationDuration) {
+                            DemandMgr(MgrNum).ElapsedRotationTime = 0;
 
-                                if (DemandMgr(MgrNum).NumOfLoads > 1) {
-                                    // Turn ON limiting for the old rotated load
-                                    RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
-                                    LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                    LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            if (DemandMgr(MgrNum).NumOfLoads > 1) {
+                                // Turn ON limiting for the old rotated load
+                                RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
+                                LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                                LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
 
-                                    // Set next rotated load
-                                    ++RotatedLoadNum;
-                                    if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
-                                    DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
+                                // Set next rotated load
+                                ++RotatedLoadNum;
+                                if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
+                                DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
 
-                                    // Turn OFF limiting for the new rotated load
-                                    LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                    LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
-                                }
-                            }
-
-                        } else if (SELECT_CASE_var == ManagerSelection::One) { // Only one load is limited
-                            DemandMgr(MgrNum).ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
-
-                            if (DemandMgr(MgrNum).ElapsedRotationTime >= DemandMgr(MgrNum).RotationDuration) {
-                                DemandMgr(MgrNum).ElapsedRotationTime = 0;
-
-                                if (DemandMgr(MgrNum).NumOfLoads > 1) {
-                                    // Turn OFF limiting for the old rotated load
-                                    RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
-                                    LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                    LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
-
-                                    // Set next rotated load
-                                    ++RotatedLoadNum;
-                                    if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
-                                    DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
-
-                                    // Turn ON limiting for the new rotated load
-                                    LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                    LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
-                                }
+                                // Turn OFF limiting for the new rotated load
+                                LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                                LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                             }
                         }
+
+                    } break;
+                    case ManagerSelection::One: { // Only one load is limited
+                        DemandMgr(MgrNum).ElapsedRotationTime += state.dataGlobal->MinutesPerTimeStep;
+
+                        if (DemandMgr(MgrNum).ElapsedRotationTime >= DemandMgr(MgrNum).RotationDuration) {
+                            DemandMgr(MgrNum).ElapsedRotationTime = 0;
+
+                            if (DemandMgr(MgrNum).NumOfLoads > 1) {
+                                // Turn OFF limiting for the old rotated load
+                                RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
+                                LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                                LoadInterface(state, DemandAction::ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+
+                                // Set next rotated load
+                                ++RotatedLoadNum;
+                                if (RotatedLoadNum > DemandMgr(MgrNum).NumOfLoads) RotatedLoadNum = 1;
+                                DemandMgr(MgrNum).RotatedLoadNum = RotatedLoadNum;
+
+                                // Turn ON limiting for the new rotated load
+                                LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
+                                LoadInterface(state, DemandAction::SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            }
+                        }
+                    } break;
+                    default:
+                        break;
                     }
                 }
             }
@@ -1758,92 +1771,93 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
 
     CanReduceDemand = false;
 
-    {
-        auto const SELECT_CASE_var(DemandMgr(MgrNum).Type);
+    switch (DemandMgr(MgrNum).Type) {
+    case ManagerType::ExtLights: {
+        LowestPower = state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+        if (Action == DemandAction::CheckCanReduce) {
+            if (state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+        } else if (Action == DemandAction::SetLimit) {
+            state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).ManageDemand = true;
+            state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DemandLimit = LowestPower;
+        } else if (Action == DemandAction::ClearLimit) {
+            state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).ManageDemand = false;
+        }
+    } break;
+    case ManagerType::Lights: {
+        LowestPower = state.dataHeatBal->Lights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+        if (Action == DemandAction::CheckCanReduce) {
+            if (state.dataHeatBal->Lights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+        } else if (Action == DemandAction::SetLimit) {
+            state.dataHeatBal->Lights(LoadPtr).ManageDemand = true;
+            state.dataHeatBal->Lights(LoadPtr).DemandLimit = LowestPower;
+        } else if (Action == DemandAction::ClearLimit) {
+            state.dataHeatBal->Lights(LoadPtr).ManageDemand = false;
+        }
 
-        if (SELECT_CASE_var == ManagerType::ExtLights) {
-            LowestPower = state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
-            if (Action == DemandAction::CheckCanReduce) {
-                if (state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
-            } else if (Action == DemandAction::SetLimit) {
-                state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).ManageDemand = true;
-                state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).DemandLimit = LowestPower;
-            } else if (Action == DemandAction::ClearLimit) {
-                state.dataExteriorEnergyUse->ExteriorLights(LoadPtr).ManageDemand = false;
-            }
-
-        } else if (SELECT_CASE_var == ManagerType::Lights) {
-            LowestPower = state.dataHeatBal->Lights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
-            if (Action == DemandAction::CheckCanReduce) {
-                if (state.dataHeatBal->Lights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
-            } else if (Action == DemandAction::SetLimit) {
-                state.dataHeatBal->Lights(LoadPtr).ManageDemand = true;
-                state.dataHeatBal->Lights(LoadPtr).DemandLimit = LowestPower;
-            } else if (Action == DemandAction::ClearLimit) {
-                state.dataHeatBal->Lights(LoadPtr).ManageDemand = false;
-            }
-
-        } else if (SELECT_CASE_var == ManagerType::ElecEquip) {
-            LowestPower = state.dataHeatBal->ZoneElectric(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
-            if (Action == DemandAction::CheckCanReduce) {
-                if (state.dataHeatBal->ZoneElectric(LoadPtr).Power > LowestPower) CanReduceDemand = true;
-            } else if (Action == DemandAction::SetLimit) {
-                state.dataHeatBal->ZoneElectric(LoadPtr).ManageDemand = true;
-                state.dataHeatBal->ZoneElectric(LoadPtr).DemandLimit = LowestPower;
-            } else if (Action == DemandAction::ClearLimit) {
-                state.dataHeatBal->ZoneElectric(LoadPtr).ManageDemand = false;
-            }
-
-        } else if (SELECT_CASE_var == ManagerType::Thermostats) {
-            if (Action == DemandAction::CheckCanReduce) {
-                if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) >
-                        DemandMgr(MgrNum).LowerLimit ||
-                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) <
-                        DemandMgr(MgrNum).UpperLimit)
-                    CanReduceDemand = true; // Heating | Cooling
-            } else if (Action == DemandAction::SetLimit) {
-                state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = true;
-                state.dataZoneCtrls->TempControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
-                state.dataZoneCtrls->TempControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
-            } else if (Action == DemandAction::ClearLimit) {
-                state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = false;
-            }
-            if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
-                if (state.dataHeatBalFanSys->ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
-                    if (Action == DemandAction::CheckCanReduce) {
-                        if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) >
-                                DemandMgr(MgrNum).LowerLimit ||
-                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) <
-                                DemandMgr(MgrNum).UpperLimit)
-                            CanReduceDemand = true; // Heating
-                    } else if (Action == DemandAction::SetLimit) {
-                        state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = true;
-                        state.dataZoneCtrls->ComfortControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
-                        state.dataZoneCtrls->ComfortControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
-                    } else if (Action == DemandAction::ClearLimit) {
-                        state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = false;
-                    }
+    } break;
+    case ManagerType::ElecEquip: {
+        LowestPower = state.dataHeatBal->ZoneElectric(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+        if (Action == DemandAction::CheckCanReduce) {
+            if (state.dataHeatBal->ZoneElectric(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+        } else if (Action == DemandAction::SetLimit) {
+            state.dataHeatBal->ZoneElectric(LoadPtr).ManageDemand = true;
+            state.dataHeatBal->ZoneElectric(LoadPtr).DemandLimit = LowestPower;
+        } else if (Action == DemandAction::ClearLimit) {
+            state.dataHeatBal->ZoneElectric(LoadPtr).ManageDemand = false;
+        }
+    } break;
+    case ManagerType::Thermostats: {
+        if (Action == DemandAction::CheckCanReduce) {
+            if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) >
+                    DemandMgr(MgrNum).LowerLimit ||
+                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) <
+                    DemandMgr(MgrNum).UpperLimit)
+                CanReduceDemand = true; // Heating | Cooling
+        } else if (Action == DemandAction::SetLimit) {
+            state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = true;
+            state.dataZoneCtrls->TempControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
+            state.dataZoneCtrls->TempControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
+        } else if (Action == DemandAction::ClearLimit) {
+            state.dataZoneCtrls->TempControlledZone(LoadPtr).ManageDemand = false;
+        }
+        if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
+            if (state.dataHeatBalFanSys->ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) > 0) {
+                if (Action == DemandAction::CheckCanReduce) {
+                    if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) >
+                            DemandMgr(MgrNum).LowerLimit ||
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) <
+                            DemandMgr(MgrNum).UpperLimit)
+                        CanReduceDemand = true; // Heating
+                } else if (Action == DemandAction::SetLimit) {
+                    state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = true;
+                    state.dataZoneCtrls->ComfortControlledZone(LoadPtr).HeatingResetLimit = DemandMgr(MgrNum).LowerLimit;
+                    state.dataZoneCtrls->ComfortControlledZone(LoadPtr).CoolingResetLimit = DemandMgr(MgrNum).UpperLimit;
+                } else if (Action == DemandAction::ClearLimit) {
+                    state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ManageDemand = false;
                 }
-            }
-
-        } else if (SELECT_CASE_var == ManagerType::Ventilation) {
-            Real64 FlowRate(0);
-            FlowRate = OAGetFlowRate(state, LoadPtr);
-            if (Action == DemandAction::CheckCanReduce) {
-                CanReduceDemand = true;
-            } else if (Action == DemandAction::SetLimit) {
-                OASetDemandManagerVentilationState(state, LoadPtr, true);
-                if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Fixed) {
-                    OASetDemandManagerVentilationFlow(state, LoadPtr, DemandMgr(MgrNum).FixedRate);
-                } else if (DemandMgr(MgrNum).LimitControl == ManagerLimit::ReductionRatio) {
-                    Real64 DemandRate(0);
-                    DemandRate = FlowRate * DemandMgr(MgrNum).ReductionRatio;
-                    OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
-                }
-            } else if (Action == DemandAction::ClearLimit) {
-                OASetDemandManagerVentilationState(state, LoadPtr, false);
             }
         }
+    } break;
+    case ManagerType::Ventilation: {
+        Real64 FlowRate(0);
+        FlowRate = OAGetFlowRate(state, LoadPtr);
+        if (Action == DemandAction::CheckCanReduce) {
+            CanReduceDemand = true;
+        } else if (Action == DemandAction::SetLimit) {
+            OASetDemandManagerVentilationState(state, LoadPtr, true);
+            if (DemandMgr(MgrNum).LimitControl == ManagerLimit::Fixed) {
+                OASetDemandManagerVentilationFlow(state, LoadPtr, DemandMgr(MgrNum).FixedRate);
+            } else if (DemandMgr(MgrNum).LimitControl == ManagerLimit::ReductionRatio) {
+                Real64 DemandRate(0);
+                DemandRate = FlowRate * DemandMgr(MgrNum).ReductionRatio;
+                OASetDemandManagerVentilationFlow(state, LoadPtr, DemandRate);
+            }
+        } else if (Action == DemandAction::ClearLimit) {
+            OASetDemandManagerVentilationState(state, LoadPtr, false);
+        }
+    } break;
+    default:
+        break;
     }
 }
 
