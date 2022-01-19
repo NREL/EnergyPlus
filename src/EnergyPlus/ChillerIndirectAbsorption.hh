@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -154,18 +154,9 @@ namespace ChillerIndirectAbsorption {
         int MinCondInletTempIndex;                     // Low condenser temp warning message index
         int MinGenInletTempCtr;                        // Low generator temp warning message counter
         int MinGenInletTempIndex;                      // Low generator temp warning message index
-        int CWLoopNum;                                 // chilled water plant loop index number
-        int CWLoopSideNum;                             // chilled water plant loop side index
-        int CWBranchNum;                               // chilled water plant loop branch index
-        int CWCompNum;                                 // chilled water plant loop component index
-        int CDLoopNum;                                 // condenser water plant loop index number
-        int CDLoopSideNum;                             // condenser water plant loop side index
-        int CDBranchNum;                               // condenser water plant loop branch index
-        int CDCompNum;                                 // condenser water plant loop component index
-        int GenLoopNum;                                // generator plant loop index number
-        int GenLoopSideNum;                            // generator plant loop side index
-        int GenBranchNum;                              // generator plant loop branch index
-        int GenCompNum;                                // generator plant loop component index
+        PlantLocation CWPlantLoc;                      // chilled water plant loop component index
+        PlantLocation CDPlantLoc;                      // condenser water plant loop component index
+        PlantLocation GenPlantLoc;                     // generator plant loop component index
         bool FaultyChillerSWTFlag;                     // True if the chiller has SWT sensor fault
         int FaultyChillerSWTIndex;                     // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerSWTOffset;                 // Chiller SWT sensor offset
@@ -205,8 +196,7 @@ namespace ChillerIndirectAbsorption {
               CapFEvaporatorTempPtr(0), CapFGeneratorTempPtr(0), HeatInputFCondTempPtr(0), HeatInputFEvapTempPtr(0), ErrCount2(0),
               GenHeatSourceType(DataLoopNode::NodeFluidType::Blank), SteamFluidIndex(0), Available(false), ON(false),
               FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), MinCondInletTempCtr(0),
-              MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-              CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0),
+              MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0), CWPlantLoc{}, CDPlantLoc{}, GenPlantLoc{},
               FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0),
               EvapMassFlowRate(0.0), GenMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0),
               PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),

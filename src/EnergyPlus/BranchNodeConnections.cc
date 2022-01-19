@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -84,7 +84,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
                             NodeInputManager::CompFluidStream const FluidStream, // Count on Fluid Streams
                             bool const IsParent,                                 // True when node is a parent node
                             bool &errFlag,                                       // Will be True if errors already detected or if errors found here
-                            Optional_string_const InputFieldName                 // Input Field Name
+                            std::string_view const InputFieldName                // Input Field Name
 )
 {
 
@@ -153,7 +153,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
     }
 
     if (has_prefixi(ObjectType, "AirTerminal:")) {
-        if (present(InputFieldName)) {
+        if (!InputFieldName.empty()) {
             ++state.dataBranchNodeConnections->NumOfAirTerminalNodes;
             if (state.dataBranchNodeConnections->NumOfAirTerminalNodes > 1 &&
                 state.dataBranchNodeConnections->NumOfAirTerminalNodes > state.dataBranchNodeConnections->MaxNumOfAirTerminalNodes) {
@@ -172,7 +172,7 @@ void RegisterNodeConnection(EnergyPlusData &state,
             if (Found != 0) { // Nodename already used
                 ShowSevereError(state, fmt::format("{}{}=\"{}\" node name duplicated", RoutineName, ObjectType, ObjectName));
                 ShowContinueError(state, "NodeName=\"" + std::string{NodeName} + "\", entered as type=" + std::string{ConnectionType});
-                ShowContinueError(state, "In Field=" + InputFieldName());
+                ShowContinueError(state, fmt::format("In Field={}", InputFieldName));
                 ShowContinueError(state,
                                   "Already used in " + state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectType + "=\"" +
                                       state.dataBranchNodeConnections->AirTerminalNodeConnections(Found).ObjectName + "\".");
@@ -1283,13 +1283,13 @@ void GetChildrenData(EnergyPlusData &state,
 }
 
 void SetUpCompSets(EnergyPlusData &state,
-                   std::string_view ParentType,      // Parent Object Type
-                   std::string_view ParentName,      // Parent Object Name
-                   std::string_view CompType,        // Component Type
-                   std::string_view CompName,        // Component Name
-                   std::string_view InletNode,       // Inlet Node Name
-                   std::string_view OutletNode,      // Outlet Node Name
-                   Optional_string_const Description // Description
+                   std::string_view ParentType,       // Parent Object Type
+                   std::string_view ParentName,       // Parent Object Name
+                   std::string_view CompType,         // Component Type
+                   std::string_view CompName,         // Component Name
+                   std::string_view InletNode,        // Inlet Node Name
+                   std::string_view OutletNode,       // Outlet Node Name
+                   std::string_view const Description // Description
 )
 {
 
@@ -1348,7 +1348,9 @@ void SetUpCompSets(EnergyPlusData &state,
             // Assume this is a further definition for this compset
             state.dataBranchNodeConnections->CompSets(Count).ParentCType = ParentTypeUC;
             state.dataBranchNodeConnections->CompSets(Count).ParentCName = ParentName;
-            if (present(Description)) state.dataBranchNodeConnections->CompSets(Count).Description = Description;
+            if (!Description.empty()) {
+                state.dataBranchNodeConnections->CompSets(Count).Description = Description;
+            }
             Found = Count;
             break;
         }
@@ -1458,7 +1460,7 @@ void SetUpCompSets(EnergyPlusData &state,
             UtilityRoutines::MakeUPPERCase(InletNode); // TODO: Fix this....
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).OutletNodeName =
             UtilityRoutines::MakeUPPERCase(OutletNode); // TODO: Fix this....
-        if (present(Description)) {
+        if (!Description.empty()) {
             state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).Description = Description;
         } else {
             state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).Description = "UNDEFINED";

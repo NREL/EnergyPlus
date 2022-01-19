@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -217,9 +217,7 @@ namespace SteamBaseboardRadiator {
                                           _,
                                           _,
                                           _,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum);
+                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc);
                     } else {
                         ShowSevereError(state,
                                         "SimSteamBaseboard: Errors in Baseboard=" +
@@ -239,10 +237,7 @@ namespace SteamBaseboardRadiator {
                                      mdot,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum);
+                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc);
                 CalcSteamBaseboard(state, BaseboardNum, PowerMet);
             }
 
@@ -949,10 +944,7 @@ namespace SteamBaseboardRadiator {
                 ScanPlantLoopsForObject(state,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
+                                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                         errFlag,
                                         _,
                                         _,
@@ -997,11 +989,7 @@ namespace SteamBaseboardRadiator {
                                0.0,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRateMax,
                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum);
+                               state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode);
             state.dataLoopNodes->Node(SteamInletNode).Enthalpy = StartEnthSteam;
             state.dataLoopNodes->Node(SteamInletNode).Quality = 1.0;
             state.dataLoopNodes->Node(SteamInletNode).HumRat = 0.0;
@@ -1108,7 +1096,7 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
         // Find the appropriate steam plant sizing object
-        PltSizSteamNum = state.dataPlnt->PlantLoop(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum).PlantSizNum;
+        PltSizSteamNum = state.dataPlnt->PlantLoop(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc.loopNum).PlantSizNum;
         //    PltSizSteamNum = MyPlantSizingIndex('Coil:Heating:Steam', SteamBaseboard(BaseboardNum)%EquipID, &
         //                    SteamBaseboard(BaseboardNum)%SteamInletNode, &
         //                    SteamBaseboard(BaseboardNum)%SteamOutletNode, ErrorsFound)
@@ -1654,15 +1642,16 @@ namespace SteamBaseboardRadiator {
         return SumHATsurf;
     }
 
-    void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
-                                             DataPlant::PlantEquipmentType BaseboardType, // type index
-                                             std::string const &BaseboardName,            // component name
-                                             [[maybe_unused]] int const EquipFlowCtrl,    // Flow control mode for the equipment
-                                             [[maybe_unused]] int const LoopNum,          // Plant loop index for where called from
-                                             [[maybe_unused]] int const LoopSide,         // Plant loop side index for where called from
-                                             int &CompIndex,                              // Chiller number pointer
-                                             [[maybe_unused]] bool const FirstHVACIteration,
-                                             bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
+    void
+    UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
+                                        DataPlant::PlantEquipmentType BaseboardType,                 // type index
+                                        std::string const &BaseboardName,                            // component name
+                                        [[maybe_unused]] int const EquipFlowCtrl,                    // Flow control mode for the equipment
+                                        [[maybe_unused]] int const LoopNum,                          // Plant loop index for where called from
+                                        [[maybe_unused]] const DataPlant::LoopSideLocation LoopSide, // Plant loop side index for where called from
+                                        int &CompIndex,                                              // Chiller number pointer
+                                        [[maybe_unused]] bool const FirstHVACIteration,
+                                        bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     )
     {
 
@@ -1733,35 +1722,23 @@ namespace SteamBaseboardRadiator {
         }
 
         PullCompInterconnectTrigger(state,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::HeatTransferRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).Power);
 
         PullCompInterconnectTrigger(state,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::MassFlowRate,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamMassFlowRate);
 
         PullCompInterconnectTrigger(state,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BranchNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).BBLoadReSimIndex,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopNum,
-                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LoopSideNum,
+                                    state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc,
                                     DataPlant::CriteriaType::Temperature,
                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletTemp);
     }

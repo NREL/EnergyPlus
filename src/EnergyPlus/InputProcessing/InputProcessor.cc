@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1249,17 +1249,15 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
     return getIDFObjNum(state, ObjType, object_item_num); // if incoming input is idf, then return idf object order
 }
 
-void InputProcessor::rangeCheck(EnergyPlusData &state,
-                                bool &ErrorsFound,                       // Set to true if error detected
-                                std::string const &WhatFieldString,      // Descriptive field for string
-                                std::string const &WhatObjectString,     // Descriptive field for object, Zone Name, etc.
-                                std::string const &ErrorLevel,           // 'Warning','Severe','Fatal')
-                                Optional_string_const LowerBoundString,  // String for error message, if applicable
-                                Optional_bool_const LowerBoundCondition, // Condition for error condition, if applicable
-                                Optional_string_const UpperBoundString,  // String for error message, if applicable
-                                Optional_bool_const UpperBoundCondition, // Condition for error condition, if applicable
-                                Optional_string_const ValueString,       // Value with digits if to be displayed with error
-                                Optional_string_const WhatObjectName     // ObjectName -- used for error messages
+void InputProcessor::lowerRangeCheck(EnergyPlusData &state,
+                                     bool &ErrorsFound,                    // Set to true if error detected
+                                     std::string const &WhatFieldString,   // Descriptive field for string
+                                     std::string const &WhatObjectString,  // Descriptive field for object, Zone Name, etc.
+                                     std::string const &ErrorLevel,        // 'Warning','Severe','Fatal')
+                                     std::string const &LowerBoundString,  // String for error message, if applicable
+                                     bool const LowerBoundCondition,       // Condition for error condition, if applicable
+                                     std::string_view const ValueString,   // Value with digits if to be displayed with error
+                                     std::string_view const WhatObjectName // ObjectName -- used for error messages
 )
 {
 
@@ -1273,34 +1271,104 @@ void InputProcessor::rangeCheck(EnergyPlusData &state,
     // This subroutine is a general purpose "range check" routine for GetInput routines.
     // Using the standard "ErrorsFound" logical, this routine can produce a reasonable
     // error message to describe the situation in addition to setting the ErrorsFound variable
-    // to true.
+    // to true. This function is an overload to handle the lower bound check only. It is only
+    // used in WeatherManager.
 
     std::string ErrorString; // Uppercase representation of ErrorLevel
     std::string Message1;
     std::string Message2;
 
     bool Error = false;
-    if (present(UpperBoundCondition)) {
-        if (!UpperBoundCondition) Error = true;
+    if (!LowerBoundCondition) Error = true;
+
+    if (Error) {
+        ConvertCaseToUpper(ErrorLevel, ErrorString);
+        Message1 = WhatObjectString;
+        if (!WhatObjectName.empty()) {
+            Message1 += fmt::format("=\"{}\", out of range data", WhatObjectName);
+        }
+        Message2 = "Out of range value field=" + WhatFieldString;
+        if (!ValueString.empty()) {
+            Message2 += fmt::format(", Value=[{}]", ValueString);
+        }
+        Message2 += fmt::format(", range={{{}}}", LowerBoundString);
+
+        {
+            auto const errorCheck(ErrorString[0]);
+
+            if ((errorCheck == 'W') || (errorCheck == 'w')) {
+                ShowWarningError(state, Message1);
+                ShowContinueError(state, Message2);
+
+            } else if ((errorCheck == 'S') || (errorCheck == 's')) {
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
+                ErrorsFound = true;
+
+            } else if ((errorCheck == 'F') || (errorCheck == 'f')) {
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
+                ShowFatalError(state, "Program terminates due to preceding condition(s).");
+
+            } else {
+                ShowSevereError(state, Message1);
+                ShowContinueError(state, Message2);
+                ErrorsFound = true;
+            }
+        }
     }
-    if (present(LowerBoundCondition)) {
-        if (!LowerBoundCondition) Error = true;
+}
+
+void InputProcessor::rangeCheck(EnergyPlusData &state,
+                                bool &ErrorsFound,                    // Set to true if error detected
+                                std::string const &WhatFieldString,   // Descriptive field for string
+                                std::string const &WhatObjectString,  // Descriptive field for object, Zone Name, etc.
+                                std::string const &ErrorLevel,        // 'Warning','Severe','Fatal')
+                                std::string const &LowerBoundString,  // String for error message, if applicable
+                                bool const LowerBoundCondition,       // Condition for error condition, if applicable
+                                std::string const &UpperBoundString,  // String for error message, if applicable
+                                bool const UpperBoundCondition,       // Condition for error condition, if applicable
+                                std::string_view const ValueString,   // Value with digits if to be displayed with error
+                                std::string_view const WhatObjectName // ObjectName -- used for error messages
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   July 2000
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine is a general purpose "range check" routine for GetInput routines.
+    // Using the standard "ErrorsFound" logical, this routine can produce a reasonable
+    // error message to describe the situation in addition to setting the ErrorsFound variable
+    // to true. This function originally could do just the upper bound, but it was not used
+    // that way so that option has been removed. It is only used in WeatherManager.
+
+    std::string ErrorString; // Uppercase representation of ErrorLevel
+    std::string Message1;
+    std::string Message2;
+
+    bool Error = false;
+    if (!UpperBoundCondition) {
+        Error = true;
+    }
+    if (!LowerBoundCondition) {
+        Error = true;
     }
 
     if (Error) {
         ConvertCaseToUpper(ErrorLevel, ErrorString);
         Message1 = WhatObjectString;
-        if (present(WhatObjectName)) Message1 += "=\"" + WhatObjectName + "\", out of range data";
-        Message2 = "Out of range value field=" + WhatFieldString;
-        if (present(ValueString)) Message2 += ", Value=[" + ValueString + ']';
-        Message2 += ", range={";
-        if (present(LowerBoundString)) Message2 += LowerBoundString;
-        if (present(LowerBoundString) && present(UpperBoundString)) {
-            Message2 += " and " + UpperBoundString;
-        } else if (present(UpperBoundString)) {
-            Message2 += UpperBoundString;
+        if (!WhatObjectName.empty()) {
+            Message1 += fmt::format("=\"{}\", out of range data", WhatObjectName);
         }
-        Message2 += "}";
+        Message2 = "Out of range value field=" + WhatFieldString;
+        if (!ValueString.empty()) {
+            Message2 += fmt::format(", Value=[{}]", ValueString);
+        }
+        Message2 += fmt::format(", range={{{} and {}}}", LowerBoundString, UpperBoundString);
 
         {
             auto const errorCheck(ErrorString[0]);

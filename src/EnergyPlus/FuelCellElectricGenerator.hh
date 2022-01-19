@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -525,10 +525,7 @@ namespace FuelCellElectricGenerator {
         FCInverterDataStruct Inverter;       // data for Inverter module
         std::string NameStackCooler;         // name of Inverter Module
         FCStackCoolerDataStruct StackCooler; // data for Inverter module
-        int CWLoopNum;                       // cooling water plant loop index number
-        int CWLoopSideNum;                   // cooling water plant loop side index
-        int CWBranchNum;                     // cooling water plant loop branch index
-        int CWCompNum;                       // cooling water plant loop component index
+        PlantLocation CWPlantLoc;            // cooling water plant loop component index
         FCReportDataStruct Report;           // data for reporting as E+ output variables
         // calculated whole-system level variables
         Real64 ACPowerGen; // Net output from SOFC unit
@@ -547,10 +544,9 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCDataStruct()
-            : Type(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-              ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0), DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true),
-              MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true), SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0),
-              SolverErr_Type2_IterIndex(0)
+            : Type(DataPlant::PlantEquipmentType::Invalid), FuelSupNum(0), CWPlantLoc{}, ACPowerGen(0.0), QconvZone(0.0), QradZone(0.0),
+              DynamicsControlID(0), TimeElapsed(0.0), MyEnvrnFlag_Init(true), MyWarmupFlag_Init(false), MyPlantScanFlag_Init(true),
+              SolverErr_Type1_Iter(0), SolverErr_Type1_IterIndex(0), SolverErr_Type2_Iter(0), SolverErr_Type2_IterIndex(0)
         {
         }
 

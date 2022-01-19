@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,8 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -203,17 +205,11 @@ namespace LowTempRadiantSystem {
         bool HeatingSystem = false;  // .TRUE. when the system is able to heat (parameters are valid)
         int HotWaterInNode = 0;      // hot water inlet node
         int HotWaterOutNode = 0;     // hot water outlet node
-        int HWLoopNum = 0;
-        int HWLoopSide = 0;
-        int HWBranchNum = 0;
-        int HWCompNum = 0;
+        PlantLocation HWPlantLoc{};
         bool CoolingSystem = false; // .TRUE. when the system is able to cool (parameters are valid)
         int ColdWaterInNode = 0;    // cold water inlet node
         int ColdWaterOutNode = 0;   // cold water outlet node
-        int CWLoopNum = 0;
-        int CWLoopSide = 0;
-        int CWBranchNum = 0;
-        int CWCompNum = 0;
+        PlantLocation CWPlantLoc{};
         int GlycolIndex = 0;             // Index to Glycol (Water) Properties
         int CondErrIndex = 0;            // Error index for recurring warning messages
         Real64 CondCausedTimeOff = 0.0;  // Amount of time condensation did or could have turned system off

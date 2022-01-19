@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataSize->PlantSizData(PltSizNum).DeltaT = 10.0;
     state->dataSize->PlantSizData(PltSizNum).LoopType = DataSizing::CoolingLoop;
     // Assign to the wrapper
-    state->dataPlantCentralGSHP->Wrapper(1).CWLoopNum = PltSizNum;
+    state->dataPlantCentralGSHP->Wrapper(1).CWPlantLoc.loopNum = PltSizNum;
 
     // Condenser Loop
     int PltSizCondNum = 2;
@@ -134,7 +134,7 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataSize->PlantSizData(PltSizCondNum).DeltaT = 5.6;
     state->dataSize->PlantSizData(PltSizCondNum).LoopType = DataSizing::CondenserLoop;
     // Assign to the wrapper
-    state->dataPlantCentralGSHP->Wrapper(1).GLHELoopNum = PltSizCondNum;
+    state->dataPlantCentralGSHP->Wrapper(1).GLHEPlantLoc.loopNum = PltSizCondNum;
 
     // Calculate expected values
     Real64 rho_evap = FluidProperties::GetDensityGlycol(*state,
@@ -199,4 +199,166 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Heating COP = Heating Cap / Heating Power
     Real64 RefCOPClgHtgExpected = RefCapClgHtgExpected / RefPowerClgHtgExpected;
     EXPECT_DOUBLE_EQ(RefCOPClgHtgExpected, state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).RefCOPClgHtg);
+}
+
+TEST_F(EnergyPlusFixture, Test_CentralHeatPumpSystem_Control_Schedule_fix)
+{
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,",
+        "Always1, !-Name",
+        "On/Off, !-Schedule Type Limits Name",
+        "Through: 12/31, !-Field 1",
+        "For: AllDays, !-Field 2",
+        "Until: 24:00, 1; !-Field 3 ",
+
+        "CentralHeatPumpSystem,",
+        "ChW_Loop HeatPump1, !-Name",
+        "SmartMixing, !-Control Method",
+        "ChW_Loop HeatPump1 ChW Inlet, !-Cooling Loop Inlet Node Name",
+        "ChW_Loop HeatPump1 ChW Outlet, !-Cooling Loop Outlet Node Name",
+        "ChW_Loop HeatPump1 Cnd Inlet, !-Source Loop Inlet Node Name",
+        "ChW_Loop HeatPump1 Cnd Outlet, !-Source Loop Outlet Node Name",
+        "ChW_Loop HeatPump1 HHW Inlet, !-Heating Loop Inlet Node Name",
+        "ChW_Loop HeatPump1 HHW Outlet, !-Heating Loop Outlet Node Name",
+        "460,  !-Ancillary Power{W}",
+        ",  !-Ancillary Operation Schedule Name",
+        "ChillerHeaterPerformance:Electric:EIR, !-Chiller Heater Modules Performance Component Object Type 1",
+        "ChW_Loop HeatPump1 Module, !-Chiller Heater Modules Performance Component Name 1",
+        "Always_1_typo, !-Chiller Heater Modules Control Schedule Name 1",
+        "2; !-Number of Chiller Heater Modules 1",
+
+        "ChillerHeaterPerformance:Electric:EIR,",
+        "    ChW_Loop HeatPump1 Module,  !- Name",
+        "    autosize,                !- Reference Cooling Mode Evaporator Capacity {W}",
+        "    1.5,                     !- Reference Cooling Mode COP {W/W}",
+        "    6.67,                    !- Reference Cooling Mode Leaving Chilled Water Temperature {C}",
+        "    29.4,                    !- Reference Cooling Mode Entering Condenser Fluid Temperature {C}",
+        "    35.0,                    !- Reference Cooling Mode Leaving Condenser Water Temperature {C}",
+        "    0.74,                    !- Reference Heating Mode Cooling Capacity Ratio",
+        "    0.925,                   !- Reference Heating Mode Cooling Power Input Ratio",
+        "    6.67,                    !- Reference Heating Mode Leaving Chilled Water Temperature {C}",
+        "    60,                      !- Reference Heating Mode Leaving Condenser Water Temperature {C}",
+        "    29.4,                    !- Reference Heating Mode Entering Condenser Fluid Temperature {C}",
+        "    5,                       !- Heating Mode Entering Chilled Water Temperature Low Limit {C}",
+        "    VariableFlow,            !- Chilled Water Flow Mode Type",
+        "    autosize,                !- Design Chilled Water Flow Rate {m3/s}",
+        "    autosize,                !- Design Condenser Water Flow Rate {m3/s}",
+        "    0.01684,                 !- Design Hot Water Flow Rate {m3/s}",
+        "    1,                       !- Compressor Motor Efficiency",
+        "    WaterCooled,             !- Condenser Type",
+        "    EnteringCondenser,       !- Cooling Mode Temperature Curve Condenser Water Independent Variable",
+        "    ChillerHeaterClgCapFT,   !- Cooling Mode Cooling Capacity Function of Temperature Curve Name",
+        "    ChillerHeaterClgEIRFT,   !- Cooling Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name",
+        "    ChillerHeaterClgEIRFPLR, !- Cooling Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
+        "    1,                       !- Cooling Mode Cooling Capacity Optimum Part Load Ratio",
+        "    LeavingCondenser,        !- Heating Mode Temperature Curve Condenser Water Independent Variable",
+        "    ChillerHeaterHtgCapFT,   !- Heating Mode Cooling Capacity Function of Temperature Curve Name",
+        "    ChillerHeaterHtgEIRFT,   !- Heating Mode Electric Input to Cooling Output Ratio Function of Temperature Curve Name",
+        "    ChillerHeaterHtgEIRFPLR, !- Heating Mode Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name",
+        "    1,                       !- Heating Mode Cooling Capacity Optimum Part Load Ratio",
+        "    1;                       !- Sizing Factor",
+
+        "Curve:Biquadratic,",
+        "    ChillerHeaterClgCapFT,   !- Name",
+        "    0.950829,                !- Coefficient1 Constant",
+        "    3.419327E-02,            !- Coefficient2 x",
+        "    2.66642E-04,             !- Coefficient3 x**2",
+        "    -1.733397E-03,           !- Coefficient4 y",
+        "    -1.762417E-04,           !- Coefficient5 y**2",
+        "    -3.69198E-05,            !- Coefficient6 x*y",
+        "    4.44,                    !- Minimum Value of x",
+        "    12.78,                   !- Maximum Value of x",
+        "    12.78,                   !- Minimum Value of y",
+        "    29.44,                   !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "    ChillerHeaterHtgCapFT,   !- Name",
+        "    0.9415266,               !- Coefficient1 Constant",
+        "    5.527431E-02,            !- Coefficient2 x",
+        "    3.573558E-04,            !- Coefficient3 x**2",
+        "    1.258391E-03,            !- Coefficient4 y",
+        "    -6.420546E-05,           !- Coefficient5 y**2",
+        "    -5.350989E-04,           !- Coefficient6 x*y",
+        "    4.44,                    !- Minimum Value of x",
+        "    15.56,                   !- Maximum Value of x",
+        "    35,                      !- Minimum Value of y",
+        "    57.22,                   !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "    ChillerHeaterClgEIRFT,   !- Name",
+        "    0.7362431,               !- Coefficient1 Constant",
+        "    2.136491E-02,            !- Coefficient2 x",
+        "    3.638909E-04,            !- Coefficient3 x**2",
+        "    -4.284947E-03,           !- Coefficient4 y",
+        "    3.389817E-04,            !- Coefficient5 y**2",
+        "    -3.632396E-04,           !- Coefficient6 x*y",
+        "    4.44,                    !- Minimum Value of x",
+        "    12.78,                   !- Maximum Value of x",
+        "    12.78,                   !- Minimum Value of y",
+        "    29.44,                   !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "    ChillerHeaterHtgEIRFT,   !- Name",
+        "    0.2286246,               !- Coefficient1 Constant",
+        "    2.498714E-02,            !- Coefficient2 x",
+        "    -1.267106E-05,           !- Coefficient3 x**2",
+        "    9.327184E-03,            !- Coefficient4 y",
+        "    5.892037E-05,            !- Coefficient5 y**2",
+        "    -3.268512E-04,           !- Coefficient6 x*y",
+        "    4.44,                    !- Minimum Value of x",
+        "    15.56,                   !- Maximum Value of x",
+        "    35.0,                    !- Minimum Value of y",
+        "    57.22,                   !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        " Curve:Cubic,",
+        "     ChillerHeaterClgEIRFPLR, !- Name",
+        "     0.0,                     !- Coefficient1 Constant",
+        "     1.22895,                 !- Coefficient2 x",
+        "     -0.751383,               !- Coefficient3 x**2",
+        "     0.517396,                !- Coefficient4 x**3",
+        "     0.2,                     !- Minimum Value of x",
+        "     1;                       !- Maximum Value of x",
+
+        "Curve:Cubic,",
+        "    ChillerHeaterHtgEIRFPLR, !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    1.12853,                 !- Coefficient2 x",
+        "    -0.0264962,              !- Coefficient3 x**2",
+        "    -0.103811,               !- Coefficient4 x**3",
+        "    0.3,                     !- Minimum Value of x",
+        "    1;                       !- Maximum Value of x"
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // May not need for direct wrapper input processing call (need when caling factory)
+    state->dataPlantCentralGSHP->getWrapperInputFlag = true;
+
+    // call the central heat pump system input processing function
+    PlantCentralGSHP::GetWrapperInput(*state);
+
+    // verify that under this scenario of not finding a schedule match, ScheduleAlwaysOn is the treated default
+    EXPECT_EQ(state->dataPlantCentralGSHP->Wrapper(1).WrapperComp(1).CHSchedPtr, DataGlobalConstants::ScheduleAlwaysOn);
 }

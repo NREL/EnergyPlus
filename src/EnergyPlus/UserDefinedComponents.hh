@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,14 +69,11 @@ namespace UserDefinedComponents {
     struct PlantConnectionStruct
     {
         // Members
-        int ErlInitProgramMngr;                 // points to an EMS:ProgramManager to run for setup and sizing
-        int ErlSimProgramMngr;                  // points to an EMS:ProgramManager to run only when this connection is called
-        int simPluginLocation;                  // If Python Plugins are used to simulate this, this defines the location in the plugin structure
-        int initPluginLocation;                 // If Python Plugins are used to init this, this defines the location in the plugin structure
-        int LoopNum;                            // plant loop connection index
-        int LoopSideNum;                        // plant loop side connection index
-        int BranchNum;                          // plant loop branch connection index
-        int CompNum;                            // plant loop component connection index
+        int ErlInitProgramMngr; // points to an EMS:ProgramManager to run for setup and sizing
+        int ErlSimProgramMngr;  // points to an EMS:ProgramManager to run only when this connection is called
+        int simPluginLocation;  // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        PlantLocation plantLoc;
         int InletNodeNum;                       // plant loop inlet node index
         int OutletNodeNum;                      // plant loop outlet node index
         DataPlant::LoopFlowStatus FlowPriority; // how component affects overall loop flow determination
@@ -99,11 +96,10 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         PlantConnectionStruct()
-            : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), LoopNum(0), LoopSideNum(0), BranchNum(0),
-              CompNum(0), InletNodeNum(0), OutletNodeNum(0), FlowPriority(DataPlant::LoopFlowStatus::Invalid),
-              HowLoadServed(DataPlant::HowMet::Invalid), LowOutTempLimit(0.0), HiOutTempLimit(0.0), MassFlowRateRequest(0.0), MassFlowRateMin(0.0),
-              MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0),
-              InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
+            : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), plantLoc{}, InletNodeNum(0),
+              OutletNodeNum(0), FlowPriority(DataPlant::LoopFlowStatus::Invalid), HowLoadServed(DataPlant::HowMet::Invalid), LowOutTempLimit(0.0),
+              HiOutTempLimit(0.0), MassFlowRateRequest(0.0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0),
+              MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0), InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
         {
         }
     };

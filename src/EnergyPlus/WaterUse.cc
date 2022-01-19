@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -853,7 +853,6 @@ namespace WaterUse {
 
             SetupZoneInternalGain(state,
                                   this->Zone,
-                                  "WaterUse:Equipment",
                                   this->Name,
                                   DataHeatBalance::IntGainType::WaterUseEquipment,
                                   &this->SensibleRateNoMultiplier,
@@ -1335,15 +1334,7 @@ namespace WaterUse {
             if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
                 // Clear node initial conditions
                 if (this->InletNode > 0 && this->OutletNode > 0) {
-                    PlantUtilities::InitComponentNodes(state,
-                                                       0.0,
-                                                       this->PeakMassFlowRate,
-                                                       this->InletNode,
-                                                       this->OutletNode,
-                                                       this->PlantLoopNum,
-                                                       this->PlantLoopSide,
-                                                       this->PlantLoopBranchNum,
-                                                       this->PlantLoopCompNum);
+                    PlantUtilities::InitComponentNodes(state, 0.0, this->PeakMassFlowRate, this->InletNode, this->OutletNode);
 
                     this->ReturnTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 }
@@ -1395,25 +1386,11 @@ namespace WaterUse {
             if (this->InletNode > 0) {
                 if (FirstHVACIteration) {
                     // Request the mass flow rate from the demand side manager
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         this->HotMassFlowRate,
-                                                         this->InletNode,
-                                                         this->OutletNode,
-                                                         this->PlantLoopNum,
-                                                         this->PlantLoopSide,
-                                                         this->PlantLoopBranchNum,
-                                                         this->PlantLoopCompNum);
+                    PlantUtilities::SetComponentFlowRate(state, this->HotMassFlowRate, this->InletNode, this->OutletNode, this->plantLoc);
 
                 } else {
                     Real64 DesiredHotWaterMassFlow = this->HotMassFlowRate;
-                    PlantUtilities::SetComponentFlowRate(state,
-                                                         DesiredHotWaterMassFlow,
-                                                         this->InletNode,
-                                                         this->OutletNode,
-                                                         this->PlantLoopNum,
-                                                         this->PlantLoopSide,
-                                                         this->PlantLoopBranchNum,
-                                                         this->PlantLoopCompNum);
+                    PlantUtilities::SetComponentFlowRate(state, DesiredHotWaterMassFlow, this->InletNode, this->OutletNode, this->plantLoc);
                     // readjust if more than actual available mass flow rate determined by the demand side manager
                     if ((this->HotMassFlowRate != DesiredHotWaterMassFlow) && (this->HotMassFlowRate > 0.0)) { // plant didn't give what was asked for
 
@@ -1604,7 +1581,7 @@ namespace WaterUse {
 
         if (this->InletNode > 0 && this->OutletNode > 0) {
             // Pass all variables from inlet to outlet node
-            PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->PlantLoopNum);
+            PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->plantLoc.loopNum);
 
             // Set outlet node variables that are possibly changed
             state.dataLoopNodes->Node(this->OutletNode).Temp = this->ReturnTemp;
@@ -1698,19 +1675,8 @@ namespace WaterUse {
 
         if (allocated(state.dataPlnt->PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::PlantEquipmentType::WaterUseConnection,
-                                                    this->PlantLoopNum,
-                                                    this->PlantLoopSide,
-                                                    this->PlantLoopBranchNum,
-                                                    this->PlantLoopCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, DataPlant::PlantEquipmentType::WaterUseConnection, this->plantLoc, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError(state, "InitConnections: Program terminated due to previous condition(s).");
             }

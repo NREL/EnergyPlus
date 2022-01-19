@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -96,7 +96,7 @@ void GetNodeNums(EnergyPlusData &state,
                  CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                  bool const ObjectIsParent,                                 // True/False
                  Optional_bool_const IncrementFluidStream,                  // True/False
-                 Optional_string_const InputFieldName                       // Input Field Name
+                 std::string_view const InputFieldName                      // Input Field Name
 )
 {
 
@@ -146,7 +146,9 @@ void GetNodeNums(EnergyPlusData &state,
                     state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != DataLoopNode::NodeFluidType::Blank) {
                     if (state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != NodeFluidType) {
                         ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
-                        if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
+                        if (!InputFieldName.empty()) {
+                            ShowContinueError(state, fmt::format("...Ref field={}", InputFieldName));
+                        }
                         ShowContinueError(
                             state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NodeNumbers(Loop)));
                         ShowContinueError(
@@ -750,7 +752,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
                       DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
                       CompFluidStream const NodeFluidStream,                     // Which Fluid Stream
                       bool const ObjectIsParent,                                 // True/False
-                      Optional_string_const InputFieldName                       // Input Field Name
+                      std::string_view const InputFieldName                      // Input Field Name
 )
 {
 
@@ -804,7 +806,9 @@ int GetOnlySingleNode(EnergyPlusData &state,
 
     if (NumNodes > 1) {
         ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
-        if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
+        if (!InputFieldName.empty()) {
+            ShowContinueError(state, fmt::format("...Ref field={}", InputFieldName));
+        }
         ShowContinueError(state, "Only 1st Node used from NodeList=\"" + NodeName + "\".");
         ShowContinueError(state, "...a Nodelist may not be valid in this context.");
         errFlag = true;
@@ -867,13 +871,8 @@ void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     state.dataNodeInputMgr->CurCheckContextName = ContextName;
 }
 
-void CheckUniqueNodes(EnergyPlusData &state,
-                      std::string const &NodeTypes,
-                      std::string const &CheckType,
-                      bool &ErrorsFound,
-                      Optional_string_const CheckName,
-                      Optional_int_const CheckNumber,
-                      Optional_string_const ObjectName)
+void CheckUniqueNodeNames(
+    EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, std::string const &CheckName, std::string const &ObjectName)
 {
 
     // SUBROUTINE INFORMATION:
@@ -886,11 +885,8 @@ void CheckUniqueNodes(EnergyPlusData &state,
     // This subroutine checks the appropriate input argument for uniqueness.
     // Call CheckUniqueNodes(NodeTypes,CheckType,ErrorsFound,CheckName,CheckNumber)
     // NodeTypes - used in error message (if any produced)
-    // CheckType - "NodeName' or 'NodeNumber' (only 1 can be input per time)
     // ErrorsFound - true if error found by routine
     // CheckName - NodeName entered
-    // CheckNumber - Node Number entered
-    // only 1 of CheckName or CheckNumber need be entered.
     // ObjectName - "Name" field of object (i.e., CurCheckContextName)
 
     // METHODOLOGY EMPLOYED:
@@ -899,56 +895,64 @@ void CheckUniqueNodes(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Found;
 
-    {
-        auto const nodeType(CheckType);
-
-        if (nodeType == "NodeName") {
-            if (!present(CheckName)) {
-                ShowFatalError(state, "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument.");
-            }
-            if (!CheckName().empty()) {
-                Found = UtilityRoutines::FindItemInList(CheckName(), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
-                if (Found != 0) {
-                    ShowSevereError(state, state.dataNodeInputMgr->CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
-                    ShowContinueError(state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\".");
-                    ShowContinueError(state, "...Nodes must be unique across instances of this object.");
-                    //          CALL ShowSevereError(state, 'Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(CheckName))
-                    //          CALL ShowContinueError(state, 'Context='//TRIM(CurCheckContextName))
-                    ErrorsFound = true;
-                } else {
-                    ++state.dataNodeInputMgr->NumCheckNodes;
-                    if (state.dataNodeInputMgr->NumCheckNodes > state.dataNodeInputMgr->MaxCheckNodes) {
-                        state.dataNodeInputMgr->UniqueNodeNames.redimension(state.dataNodeInputMgr->MaxCheckNodes += 100);
-                    }
-                    state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = CheckName;
-                }
-            }
-
-        } else if (nodeType == "NodeNumber") {
-            if (!present(CheckNumber)) {
-                ShowFatalError(state, "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument.");
-            }
-            if (CheckNumber != 0) {
-                Found = UtilityRoutines::FindItemInList(
-                    state.dataLoopNodes->NodeID(CheckNumber), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
-                if (Found != 0) {
-                    ShowSevereError(state, state.dataNodeInputMgr->CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
-                    ShowContinueError(
-                        state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + state.dataLoopNodes->NodeID(CheckNumber) + "\".");
-                    ShowContinueError(state, "...Nodes must be unique across instances of this object.");
-                    ErrorsFound = true;
-                } else {
-                    ++state.dataNodeInputMgr->NumCheckNodes;
-                    if (state.dataNodeInputMgr->NumCheckNodes > state.dataNodeInputMgr->MaxCheckNodes) {
-                        state.dataNodeInputMgr->UniqueNodeNames.redimension(state.dataNodeInputMgr->MaxCheckNodes += 100);
-                    }
-                    state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = state.dataLoopNodes->NodeID(CheckNumber);
-                }
-            }
-
-        } else {
-            ShowFatalError(state, "CheckUniqueNodes called with invalid Check Type=" + CheckType);
+    if (!CheckName.empty()) {
+        Found = UtilityRoutines::FindItemInList(CheckName, state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
+        if (Found != 0) {
+            ShowSevereError(state, state.dataNodeInputMgr->CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
+            ShowContinueError(state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\".");
+            ShowContinueError(state, "...Nodes must be unique across instances of this object.");
+            //          CALL ShowSevereError(state, 'Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(CheckName))
+            //          CALL ShowContinueError(state, 'Context='//TRIM(CurCheckContextName))
             ErrorsFound = true;
+        } else {
+            ++state.dataNodeInputMgr->NumCheckNodes;
+            if (state.dataNodeInputMgr->NumCheckNodes > state.dataNodeInputMgr->MaxCheckNodes) {
+                state.dataNodeInputMgr->UniqueNodeNames.redimension(state.dataNodeInputMgr->MaxCheckNodes += 100);
+            }
+            state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = CheckName;
+        }
+    }
+}
+
+void CheckUniqueNodeNumbers(
+    EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, int const CheckNumber, std::string const ObjectName)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   November 2002
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This subroutine checks the appropriate input argument for uniqueness.
+    // Call CheckUniqueNodes(NodeTypes,CheckType,ErrorsFound,CheckName,CheckNumber)
+    // NodeTypes - used in error message (if any produced)
+    // ErrorsFound - true if error found by routine
+    // CheckNumber - Node Number entered
+    // ObjectName - "Name" field of object (i.e., CurCheckContextName)
+
+    // METHODOLOGY EMPLOYED:
+    // checks the current list of items for this (again)
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int Found;
+
+    if (CheckNumber != 0) {
+        Found = UtilityRoutines::FindItemInList(
+            state.dataLoopNodes->NodeID(CheckNumber), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
+        if (Found != 0) {
+            ShowSevereError(state, state.dataNodeInputMgr->CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
+            ShowContinueError(state,
+                              "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + state.dataLoopNodes->NodeID(CheckNumber) + "\".");
+            ShowContinueError(state, "...Nodes must be unique across instances of this object.");
+            ErrorsFound = true;
+        } else {
+            ++state.dataNodeInputMgr->NumCheckNodes;
+            if (state.dataNodeInputMgr->NumCheckNodes > state.dataNodeInputMgr->MaxCheckNodes) {
+                state.dataNodeInputMgr->UniqueNodeNames.redimension(state.dataNodeInputMgr->MaxCheckNodes += 100);
+            }
+            state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = state.dataLoopNodes->NodeID(CheckNumber);
         }
     }
 }

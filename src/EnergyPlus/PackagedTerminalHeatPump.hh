@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
@@ -69,9 +70,6 @@ namespace PackagedTerminalHeatPump {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    // Compressor operation
-    constexpr int On(1);  // normal compressor operation
-    constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // Last mode of operation
     enum class CompMode
@@ -217,10 +215,7 @@ namespace PackagedTerminalHeatPump {
         bool simASHRAEModel;            // flag denoting that ASHRAE model (SZVAV) should be used
         Real64 CompPartLoadFrac;        // compressor part load ratio
         int PlantCoilOutletNode;        // outlet node for water coil
-        int SuppCoilLoopNum;            // plant loop index for water heating coil
-        int SuppCoilLoopSide;           // plant loop side  index for water heating coil
-        int SuppCoilBranchNum;          // plant loop branch index for water heating coil
-        int SuppCoilCompNum;            // plant loop component index for water heating coil
+        PlantLocation SuppCoilPlantLoc; // plant loop component location for water heating coil
         Real64 MaxSuppCoilFluidFlow;    // water or steam mass flow rate supp. heating coil [kg/s]
         int HotWaterCoilMaxIterIndex;   // Index to recurring warning message
         int HotWaterCoilMaxIterIndex2;  // Index to recurring warning message
@@ -275,14 +270,8 @@ namespace PackagedTerminalHeatPump {
         Real64 LowSpeedHeatFanRatio;     // heating mode ratio of low speed fan flow to full flow rate
         Real64 MaxCoolCoilFluidFlow;     // water flow rate for cooling coil [kg/s] - NOT USED in PTHP
         Real64 MaxHeatCoilFluidFlow;     // water or steam mass flow rate for heating coil [kg/s]
-        int CoolCoilLoopNum;             // plant loop index for water cooling coil - NOT USED in PTHP
-        int CoolCoilLoopSide;            // plant loop side  index for water cooling coil - NOT USED in PTHP
-        int CoolCoilBranchNum;           // plant loop branch index for water cooling coil - NOT USED in PTHP
-        int CoolCoilCompNum;             // plant loop component index for water cooling coil - NOT USED in PTHP
-        int HeatCoilLoopNum;             // plant loop index for water heating coil
-        int HeatCoilLoopSide;            // plant loop side  index for water heating coil
-        int HeatCoilBranchNum;           // plant loop branch index for water heating coil
-        int HeatCoilCompNum;             // plant loop component index for water heating coil
+        PlantLocation CoolCoilPlantLoc;  // Component location for water cooling coil - NOT USED in PTHP
+        PlantLocation HeatCoilPlantLoc;  // Component location for water heating coil
         int CoolCoilFluidInletNode;      // water cooling coil water inlet node number NOT USED in PTHP
         int CoolCoilFluidOutletNodeNum;  // water cooling coil water outlet node number NOT USED in PTHP
         int CoolCoilInletNodeNum;        // cooling coil air inlet node number
@@ -310,22 +299,20 @@ namespace PackagedTerminalHeatPump {
               TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0),
               LatHeatEnergyRate(0.0), LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0),
               CompPartLoadRatio(0.0), LastMode(CompMode::Invalid), AirFlowControl(AirflowCtrlMode::Invalid), controlType(PTHPCtrlType::Invalid),
-              validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false), CompPartLoadFrac(0.0), PlantCoilOutletNode(0),
-              SuppCoilLoopNum(0), SuppCoilLoopSide(0), SuppCoilBranchNum(0), SuppCoilCompNum(0), MaxSuppCoilFluidFlow(0.0),
-              HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
-              NoHeatCoolSpeedRatio(1.0), AvailStatus(0), HeatCoolMode(CompMode::Invalid), NumOfSpeedCooling(0), NumOfSpeedHeating(0),
-              IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true),
-              HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              MSHeatingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), MSCoolingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
-              CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0), ErrIndexVar(0), ZonePtr(0), HVACSizingIndex(0), FirstPass(true),
-              HeatCoilWaterFlowRate(0.0), ControlZoneMassFlowFrac(1.0),
+              validASHRAECoolCoil(false), validASHRAEHeatCoil(false), simASHRAEModel(false), CompPartLoadFrac(0.0),
+              PlantCoilOutletNode(0), SuppCoilPlantLoc{}, MaxSuppCoilFluidFlow(0.0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0),
+              ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0), NoHeatCoolSpeedRatio(1.0), AvailStatus(0),
+              HeatCoolMode(CompMode::Invalid), NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0),
+              IdleMassFlowRate(0.0), FanVolFlow(0.0), CheckFanFlow(true), HeatVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              HeatMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), CoolVolumeFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              CoolMassFlowRate(DataGlobalConstants::MaxSpeedLevels, 0.0), MSHeatingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0),
+              MSCoolingSpeedRatio(DataGlobalConstants::MaxSpeedLevels, 0.0), CompSpeedNum(0), CompSpeedRatio(0.0), ErrIndexCyc(0), ErrIndexVar(0),
+              ZonePtr(0), HVACSizingIndex(0), FirstPass(true), HeatCoilWaterFlowRate(0.0), ControlZoneMassFlowFrac(1.0),
               // variables used in SZVAV model:
               MaxIterIndex(0), NodeNumOfControlledZone(0), RegulaFalsiFailedIndex(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
               HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
-              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0),
-              HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), CoolCoilFluidInletNode(0),
+              MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilPlantLoc{}, HeatCoilPlantLoc{}, CoolCoilFluidInletNode(0),
               CoolCoilFluidOutletNodeNum(0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), HeatCoilFluidInletNode(0),
               HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0)
         {
@@ -457,19 +444,19 @@ namespace PackagedTerminalHeatPump {
     //******************************************************************************
 
     void ControlVSHPOutput(EnergyPlusData &state,
-                           int PTUnitNum,             // Unit index in fan coil array
-                           bool FirstHVACIteration,   // flag for 1st HVAC iteration in the time step
-                           int CompOp,                // compressor operation; 1=on, 0=off
-                           int OpMode,                // operating mode: CycFanCycCoil | ContFanCycCoil
-                           Real64 QZnReq,             // cooling or heating output needed by zone [W]
-                           Real64 QLatReq,            // latent cooling output needed by zone [W]
-                           int ZoneNum,               // Index to zone number
-                           int &SpeedNum,             // Speed number
-                           Real64 &SpeedRatio,        // unit speed ratio for DX coils
-                           Real64 &PartLoadFrac,      // unit part load fraction
-                           Real64 &OnOffAirFlowRatio, // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                           Real64 &SupHeaterLoad,     // Supplemental heater load [W]
-                           bool HXUnitOn              // flag to enable heat exchanger
+                           int PTUnitNum,                                     // Unit index in fan coil array
+                           bool FirstHVACIteration,                           // flag for 1st HVAC iteration in the time step
+                           DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
+                           int OpMode,                                        // operating mode: CycFanCycCoil | ContFanCycCoil
+                           Real64 QZnReq,                                     // cooling or heating output needed by zone [W]
+                           Real64 QLatReq,                                    // latent cooling output needed by zone [W]
+                           int ZoneNum,                                       // Index to zone number
+                           int &SpeedNum,                                     // Speed number
+                           Real64 &SpeedRatio,                                // unit speed ratio for DX coils
+                           Real64 &PartLoadFrac,                              // unit part load fraction
+                           Real64 &OnOffAirFlowRatio,                         // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                           Real64 &SupHeaterLoad,                             // Supplemental heater load [W]
+                           bool HXUnitOn                                      // flag to enable heat exchanger
     );
 
     //******************************************************************************
@@ -491,14 +478,14 @@ namespace PackagedTerminalHeatPump {
     //******************************************************************************
 
     void CalcVarSpeedHeatPump(EnergyPlusData &state,
-                              int PTUnitNum,             // Unit index in fan coil array
-                              int ZoneNum,               // Zone index
-                              bool FirstHVACIteration,   // flag for 1st HVAC iteration in the time step
-                              int CompOp,                // Compressor on/off; 1=on, 0=off
-                              int SpeedNum,              // Speed number
-                              Real64 SpeedRatio,         // Compressor speed ratio
-                              Real64 PartLoadFrac,       // compressor part load fraction
-                              Real64 &LoadMet,           // load met by unit (W)
+                              int PTUnitNum,                                     // Unit index in fan coil array
+                              int ZoneNum,                                       // Zone index
+                              bool FirstHVACIteration,                           // flag for 1st HVAC iteration in the time step
+                              DataHVACGlobals::CompressorOperation CompressorOp, // Compressor on/off; 1=on, 0=off
+                              int SpeedNum,                                      // Speed number
+                              Real64 SpeedRatio,                                 // Compressor speed ratio
+                              Real64 PartLoadFrac,                               // compressor part load fraction
+                              Real64 &LoadMet,                                   // load met by unit (W)
                               Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
                               Real64 QZnReq,             // Zone load (W) unused1208
                               Real64 QLatReq,            // Zone latent load []

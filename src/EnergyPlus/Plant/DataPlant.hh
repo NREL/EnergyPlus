@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -79,11 +79,6 @@ namespace DataPlant {
     constexpr Real64 CriteriaDelta_MassFlowRate(0.001);
     constexpr Real64 CriteriaDelta_Temperature(0.010);
     constexpr Real64 CriteriaDelta_HeatTransferRate(0.100);
-
-    // Parameters for loop side location
-    constexpr int DemandSupply_No(0);
-    constexpr int DemandSide(1);
-    constexpr int SupplySide(2);
 
     // Parameters for tolerance
     constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
@@ -318,10 +313,8 @@ struct DataPlantData : BaseGlobalStruct
     int PlantManageHalfLoopCalls = 0; // tracks number of half loop calls
     Array1D<DataPlant::PlantLoopData> PlantLoop;
     Array1D<DataPlant::PlantAvailMgrData> PlantAvailMgr;
-    Array1D<DataPlant::ReportLoopData> VentRepPlantSupplySide;
-    Array1D<DataPlant::ReportLoopData> VentRepPlantDemandSide;
-    Array1D<DataPlant::ReportLoopData> VentRepCondSupplySide;
-    Array1D<DataPlant::ReportLoopData> VentRepCondDemandSide;
+    std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepPlant;
+    std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepCond;
     Array1D<DataPlant::PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
 
     void clear_state() override
@@ -338,10 +331,10 @@ struct DataPlantData : BaseGlobalStruct
         this->PlantManageHalfLoopCalls = 0;
         this->PlantLoop.deallocate();
         this->PlantAvailMgr.deallocate();
-        this->VentRepPlantSupplySide.deallocate();
-        this->VentRepPlantDemandSide.deallocate();
-        this->VentRepCondSupplySide.deallocate();
-        this->VentRepCondDemandSide.deallocate();
+        this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
+        this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Supply)].deallocate();
+        this->VentRepCond[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
+        this->VentRepCond[static_cast<int>(DataPlant::LoopSideLocation::Supply)].deallocate();
         this->PlantCallingOrderInfo.deallocate();
     }
 };

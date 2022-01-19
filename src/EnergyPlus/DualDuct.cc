@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -165,21 +165,18 @@ namespace DualDuct {
             thisDualDuct.InitDualDuct(state, FirstHVACIteration); // Initialize all Damper related parameters
 
             // Calculate the Correct Damper Model with the current DDNum
-            {
-                auto const SELECT_CASE_var(thisDualDuct.DamperType);
-
-                if (SELECT_CASE_var == DualDuctDamper::ConstantVolume) { // 'AirTerminal:DualDuct:ConstantVolume'
-
-                    thisDualDuct.SimDualDuctConstVol(state, ZoneNum, ZoneNodeNum);
-
-                } else if (SELECT_CASE_var == DualDuctDamper::VariableVolume) { // 'AirTerminal:DualDuct:VAV'
-
-                    thisDualDuct.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
-
-                } else if (SELECT_CASE_var == DualDuctDamper::OutdoorAir) {
-
-                    thisDualDuct.SimDualDuctVAVOutdoorAir(state, ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
-                }
+            switch (thisDualDuct.DamperType) {
+            case DualDuctDamper::ConstantVolume: { // 'AirTerminal:DualDuct:ConstantVolume'
+                thisDualDuct.SimDualDuctConstVol(state, ZoneNum, ZoneNodeNum);
+            } break;
+            case DualDuctDamper::VariableVolume: { // 'AirTerminal:DualDuct:VAV'
+                thisDualDuct.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
+            } break;
+            case DualDuctDamper::OutdoorAir: {
+                thisDualDuct.SimDualDuctVAVOutdoorAir(state, ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
+            } break;
+            default:
+                break;
             }
 
             // Update the current Damper to the outlet nodes

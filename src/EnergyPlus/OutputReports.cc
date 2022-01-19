@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -435,7 +435,7 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
     }
 }
 
-static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile &of, bool const DELight)
+static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile &of)
 {
     using namespace DataSurfaceColors;
 
@@ -443,27 +443,31 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
 
     // Do any daylighting reference points on layer for zone
     if (state.dataDaylightingData->TotRefPoints > 0) {
-        // TODO MJW: Keep zone loop for now to maintain order
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
-                auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-                if (thisDaylightControl.zoneIndex != zoneNum) continue;
-                // TODO MJW: Post an issue to fix duplicate ref points in dxf files, but leave this off for now
-                // if (DELight && thisDaylightControl.DaylightMethod != DataDaylighting::iDaylightingMethod::DElightDaylighting) continue;
-                auto curcolorno = ColorNo::DaylSensor1;
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= state.dataDaylightingData->totDaylightingControls; ++daylightCtrlNum) {
+            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+            auto curcolorno = ColorNo::DaylSensor1;
+            std::string refPtType;
+            if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
+                refPtType = "DEDayRefPt";
+            } else if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
+                refPtType = "DayRefPt";
+            }
 
-                for (int refpt = 1; refpt <= thisDaylightControl.TotalDaylRefPoints; ++refpt) {
-                    print<FormatSyntax::FMT>(of, "999\n{}:{}:{}\n", thisDaylightControl.ZoneName, DELight ? "DEDayRefPt" : "DayRefPt", refpt);
-                    print<check_syntax(Format_709)>(of,
-                                                    Format_709,
-                                                    normalizeName(thisDaylightControl.ZoneName),
-                                                    state.dataSurfColor->DXFcolorno[static_cast<int>(curcolorno)],
-                                                    thisDaylightControl.DaylRefPtAbsCoord(1, refpt),
-                                                    thisDaylightControl.DaylRefPtAbsCoord(2, refpt),
-                                                    thisDaylightControl.DaylRefPtAbsCoord(3, refpt),
-                                                    0.2);
-                    curcolorno = ColorNo::DaylSensor2; // ref pts 2 and later are this color
-                }
+            for (int refpt = 1; refpt <= thisDaylightControl.TotalDaylRefPoints; ++refpt) {
+                print<FormatSyntax::FMT>(of,
+                                         "999\n{}:{}:{}\n",
+                                         thisDaylightControl.ZoneName,
+                                         refPtType,
+                                         state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refpt)).Name);
+                print<check_syntax(Format_709)>(of,
+                                                Format_709,
+                                                normalizeName(thisDaylightControl.ZoneName),
+                                                state.dataSurfColor->DXFcolorno[static_cast<int>(curcolorno)],
+                                                thisDaylightControl.DaylRefPtAbsCoord(1, refpt),
+                                                thisDaylightControl.DaylRefPtAbsCoord(2, refpt),
+                                                thisDaylightControl.DaylRefPtAbsCoord(3, refpt),
+                                                0.2);
+                curcolorno = ColorNo::DaylSensor2; // ref pts 2 and later are this color
             }
         }
     }
@@ -878,7 +882,7 @@ void DXFOut(EnergyPlusData &state,
     //  712 format(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,  &
     //             ' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)
 
-    DXFDaylightingReferencePoints(state, dxffile, false);
+    DXFDaylightingReferencePoints(state, dxffile);
 
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const auto curcolorno = ColorNo::DaylSensor1;
@@ -898,8 +902,6 @@ void DXFOut(EnergyPlusData &state,
             }
         }
     }
-
-    DXFDaylightingReferencePoints(state, dxffile, true);
 
     print(dxffile, Format_706);
 }
@@ -1095,8 +1097,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
         }
     }
 
-    DXFDaylightingReferencePoints(state, dxffile, false);
-    DXFDaylightingReferencePoints(state, dxffile, true);
+    DXFDaylightingReferencePoints(state, dxffile);
 
     print(dxffile, Format_706);
 }
@@ -1256,8 +1257,7 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         }
     }
 
-    DXFDaylightingReferencePoints(state, dxffile, false);
-    DXFDaylightingReferencePoints(state, dxffile, true);
+    DXFDaylightingReferencePoints(state, dxffile);
 
     print(dxffile, Format_706);
 }
@@ -1482,45 +1482,44 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                     state.dataSurface->Surface(surf).Construction <= state.dataHeatBal->TotConstructs) {
                     cNominalUwithConvCoeffs = "";
                     ConstructionName = state.dataConstruction->Construct(state.dataSurface->Surface(surf).Construction).Name;
-                    {
-                        auto const SELECT_CASE_var(state.dataSurface->Surface(surf).Class);
-                        if (SELECT_CASE_var == SurfaceClass::Wall) {
-                            // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
-                            // Exterior:  vertical, exterior wind exposure, Rcout = 0.17 ft2-F-hr/BTU
-                            if (state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction) > 0.0) {
-                                NominalUwithConvCoeffs =
-                                    1.0 /
-                                    (0.1197548 + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction)) + 0.0299387);
-                            } else {
-                                cNominalUwithConvCoeffs = "[invalid]";
-                            }
-                        } else if (SELECT_CASE_var == SurfaceClass::Floor) {
-                            // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
-                            // Exterior:  horizontal, semi-exterior (crawlspace), Rcout = 0.46 ft2-F-hr/BTU
-                            if (state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction) > 0.0) {
-                                NominalUwithConvCoeffs =
-                                    1.0 /
-                                    (0.1620212 + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction)) + 0.0810106);
-                            } else {
-                                cNominalUwithConvCoeffs = "[invalid]";
-                            }
-                        } else if (SELECT_CASE_var == SurfaceClass::Roof) {
-                            // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
-                            // Exterior:  horizontal, semi-exterior (attic), Rcout = 0.46 ft2-F-hr/BTU
-                            if (state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction) > 0.0) {
-                                NominalUwithConvCoeffs =
-                                    1.0 /
-                                    (0.1074271 + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction)) + 0.0810106);
-                            } else {
-                                cNominalUwithConvCoeffs = "[invalid]";
-                            }
+                    switch (state.dataSurface->Surface(surf).Class) {
+                    case SurfaceClass::Wall: {
+                        // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+                        // Exterior:  vertical, exterior wind exposure, Rcout = 0.17 ft2-F-hr/BTU
+                        if (state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction) > 0.0) {
+                            NominalUwithConvCoeffs =
+                                1.0 / (0.1197548 + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction)) + 0.0299387);
                         } else {
-                            if (state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction) > 0.0) {
-                                NominalUwithConvCoeffs = state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction);
-                            } else {
-                                cNominalUwithConvCoeffs = "[invalid]";
-                            }
+                            cNominalUwithConvCoeffs = "[invalid]";
                         }
+                    } break;
+                    case SurfaceClass::Floor: {
+                        // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+                        // Exterior:  horizontal, semi-exterior (crawlspace), Rcout = 0.46 ft2-F-hr/BTU
+                        if (state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction) > 0.0) {
+                            NominalUwithConvCoeffs =
+                                1.0 / (0.1620212 + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction)) + 0.0810106);
+                        } else {
+                            cNominalUwithConvCoeffs = "[invalid]";
+                        }
+                    } break;
+                    case SurfaceClass::Roof: {
+                        // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+                        // Exterior:  horizontal, semi-exterior (attic), Rcout = 0.46 ft2-F-hr/BTU
+                        if (state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction) > 0.0) {
+                            NominalUwithConvCoeffs =
+                                1.0 / (0.1074271 + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction)) + 0.0810106);
+                        } else {
+                            cNominalUwithConvCoeffs = "[invalid]";
+                        }
+                    } break;
+                    default: {
+                        if (state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction) > 0.0) {
+                            NominalUwithConvCoeffs = state.dataHeatBal->NominalU(state.dataSurface->Surface(surf).Construction);
+                        } else {
+                            cNominalUwithConvCoeffs = "[invalid]";
+                        }
+                    } break;
                     }
                     if (cNominalUwithConvCoeffs == "") {
                         cNominalUwithConvCoeffs = format("{:.3R}", NominalUwithConvCoeffs);

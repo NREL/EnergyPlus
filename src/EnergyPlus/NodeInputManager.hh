@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -105,7 +105,7 @@ namespace NodeInputManager {
                      CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                      bool const ObjectIsParent,                                 // True/False
                      Optional_bool_const IncrementFluidStream = _,              // True/False
-                     Optional_string_const InputFieldName = _                   // Input Field Name
+                     std::string_view const InputFieldName = {}                 // Input Field Name
     );
 
     void SetupNodeVarsForReporting(EnergyPlusData &state);
@@ -126,18 +126,16 @@ namespace NodeInputManager {
                           DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
                           CompFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
                           bool const ObjectIsParent,                                 // True/False
-                          Optional_string_const InputFieldName = _                   // Input Field Name
+                          std::string_view const InputFieldName = {}                 // Input Field Name
     );
 
     void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 
-    void CheckUniqueNodes(EnergyPlusData &state,
-                          std::string const &NodeTypes,
-                          std::string const &CheckType,
-                          bool &ErrorsFound,
-                          Optional_string_const CheckName = _,
-                          Optional_int_const CheckNumber = _,
-                          Optional_string_const ObjectName = _);
+    void CheckUniqueNodeNames(
+        EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, std::string const &CheckName, std::string const &ObjectName);
+
+    void CheckUniqueNodeNumbers(
+        EnergyPlusData &state, std::string const &NodeTypes, bool &ErrorsFound, int const CheckNumber, std::string const ObjectName);
 
     void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
 

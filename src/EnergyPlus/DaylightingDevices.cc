@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -304,7 +304,6 @@ namespace DaylightingDevices {
 
                     SetupZoneInternalGain(state,
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum),
-                                          "DaylightingDevice:Tubular",
                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name,
                                           DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                           &state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
@@ -1355,29 +1354,31 @@ namespace DaylightingDevices {
         constDiff = state.dataSurface->Surface(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser).Construction;
 
         // Get the transmittance of each component and of total TDD
-        {
-            auto const SELECT_CASE_var(RadiationType);
+        switch (RadiationType) {
+        case DataDaylightingDevices::RadType::VisibleBeam: {
+            transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransVisBeamCoef);
+            transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam);
+            transDiff = state.dataConstruction->Construct(constDiff).TransDiffVis; // May want to change to POLYF also!
 
-            if (SELECT_CASE_var == DataDaylightingDevices::RadType::VisibleBeam) {
-                transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransVisBeamCoef);
-                transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam);
-                transDiff = state.dataConstruction->Construct(constDiff).TransDiffVis; // May want to change to POLYF also!
+            TransTDD = transDome * transPipe * transDiff;
 
-                TransTDD = transDome * transPipe * transDiff;
+        } break;
+        case DataDaylightingDevices::RadType::SolarBeam: {
+            transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransSolBeamCoef);
+            transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam);
+            transDiff = state.dataConstruction->Construct(constDiff).TransDiff; // May want to change to POLYF also!
 
-            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarBeam) {
-                transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransSolBeamCoef);
-                transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam);
-                transDiff = state.dataConstruction->Construct(constDiff).TransDiff; // May want to change to POLYF also!
+            TransTDD = transDome * transPipe * transDiff;
 
-                TransTDD = transDome * transPipe * transDiff;
-
-            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarAniso) {
-                TransTDD = CalcTDDTransSolAniso(state, PipeNum, COSI);
-
-            } else if (SELECT_CASE_var == DataDaylightingDevices::RadType::SolarIso) {
-                TransTDD = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso;
-            }
+        } break;
+        case DataDaylightingDevices::RadType::SolarAniso: {
+            TransTDD = CalcTDDTransSolAniso(state, PipeNum, COSI);
+        } break;
+        case DataDaylightingDevices::RadType::SolarIso: {
+            TransTDD = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso;
+        } break;
+        default:
+            break;
         }
 
         return TransTDD;

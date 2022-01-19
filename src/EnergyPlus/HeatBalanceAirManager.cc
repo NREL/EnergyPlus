@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -4578,23 +4578,33 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         {
             static constexpr std::string_view RoomAirZoneFmt("RoomAir Model,{},{}\n");
 
-            auto const SELECT_CASE_var(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType);
-            if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) {
+            switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType) {
+            case DataRoomAirModel::RoomAirModel::Mixing: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "Mixing/Well-Stirred");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::Mundt: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "OneNodeDisplacementVentilation");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UCSDDV: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "ThreeNodeDisplacementVentilation");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UCSDCV: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "CrossVentilation");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UCSDUFI: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UnderFloorAirDistributionInterior");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UCSDUFE: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UnderFloorAirDistributionExterior");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::UserDefined: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UserDefined");
-            } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+            } break;
+            case DataRoomAirModel::RoomAirModel::AirflowNetwork: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "AirflowNetwork");
+            } break;
+            default:
+                break;
             }
         }
     }

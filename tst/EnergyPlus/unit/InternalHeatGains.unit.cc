@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -669,12 +669,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     for (int gainType = 0; gainType < numGainTypes; ++gainType) {
         convGains(gainType) = 100 * gainType;
         expectedTotConvGains += convGains(gainType);
-        SetupZoneInternalGain(*state,
-                              zoneNum,
-                              format(DataHeatBalance::IntGainTypeNamesCC[gainType]),
-                              "Gain",
-                              static_cast<DataHeatBalance::IntGainType>(gainType),
-                              &convGains(gainType));
+        SetupZoneInternalGain(*state, zoneNum, "Gain", static_cast<DataHeatBalance::IntGainType>(gainType), &convGains(gainType));
     }
 
     InternalHeatGains::UpdateInternalGainValues(*state);

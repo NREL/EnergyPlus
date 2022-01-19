@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -877,10 +877,7 @@ void InitPIU(EnergyPlusData &state,
             ScanPlantLoopsForObject(state,
                                     state.dataPowerInductionUnits->PIU(PIUNum).HCoil,
                                     state.dataPowerInductionUnits->PIU(PIUNum).HCoil_PlantType,
-                                    state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                                    state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                                    state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                                    state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum,
+                                    state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc,
                                     errFlag,
                                     _,
                                     _,
@@ -891,11 +888,7 @@ void InitPIU(EnergyPlusData &state,
                 ShowFatalError(state, "InitPIU: Program terminated due to previous condition(s).");
             }
             state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum =
-                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum)
-                    .LoopSide(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide)
-                    .Branch(state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum)
-                    .Comp(state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum)
-                    .NodeNumOut;
+                DataPlant::CompData::getPlantComponent(state, state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc).NodeNumOut;
         }
         MyPlantScanFlag(PIUNum) = false;
     } else if (MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
@@ -929,9 +922,9 @@ void InitPIU(EnergyPlusData &state,
         if (HotConNode > 0) {
             // plant upgrade note? why no separate handling of steam coil? add it ?
             rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidName,
+                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
                                    DataGlobalConstants::HWInitConvTemp,
-                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidIndex,
+                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
                                    RoutineName);
 
             state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow = rho * state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow;
@@ -940,11 +933,7 @@ void InitPIU(EnergyPlusData &state,
                                state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum);
+                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum);
         }
 
         MySizeFlag(PIUNum) = false;
@@ -986,11 +975,7 @@ void InitPIU(EnergyPlusData &state,
                                state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                               state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum);
+                               state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum);
         }
 
         if (state.dataPowerInductionUnits->PIU(PIUNum).AirLoopNum == 0) { // fill air loop index
@@ -1535,16 +1520,18 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                             DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
-                            rho = GetDensityGlycol(state,
-                                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidName,
-                                                   DataGlobalConstants::HWInitConvTemp,
-                                                   state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidIndex,
-                                                   RoutineName);
-                            Cp = GetSpecificHeatGlycol(state,
-                                                       state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidName,
-                                                       DataGlobalConstants::HWInitConvTemp,
-                                                       state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidIndex,
-                                                       RoutineName);
+                            rho =
+                                GetDensityGlycol(state,
+                                                 state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
+                                                 DataGlobalConstants::HWInitConvTemp,
+                                                 state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
+                                                 RoutineName);
+                            Cp = GetSpecificHeatGlycol(
+                                state,
+                                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidName,
+                                DataGlobalConstants::HWInitConvTemp,
+                                state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc.loopNum).FluidIndex,
+                                RoutineName);
 
                             MaxVolHotWaterFlowDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
                         } else {
@@ -1959,10 +1946,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                                  mdot,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum);
+                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
 
             SimulateWaterCoilComponents(
                 state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
@@ -1985,9 +1969,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                               _,
                               _,
                               _,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum);
+                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
         }
         break;
     }
@@ -2283,10 +2265,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                                  mdot,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                  state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum,
-                                 state.dataPowerInductionUnits->PIU(PIUNum).HWCompNum);
+                                 state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
             SimulateWaterCoilComponents(
                 state, state.dataPowerInductionUnits->PIU(PIUNum).HCoil, FirstHVACIteration, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_Index);
         } else {
@@ -2308,9 +2287,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                               _,
                               _,
                               _,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWLoopSide,
-                              state.dataPowerInductionUnits->PIU(PIUNum).HWBranchNum);
+                              state.dataPowerInductionUnits->PIU(PIUNum).HWplantLoc);
         }
         break;
     }

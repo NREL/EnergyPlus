@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -106,17 +106,30 @@ def process_enum_str(input_str: str, file_name: str, line_no: int, print_errors:
     # check for null names at 0-th position
     if keys_uc[0] not in valid_null_enum_value_names:
         # exceptions listed by <FILE>:<ENUM NAME>
-        exceptions = ["CsvParser.hh:Token", "IdfParser.hh:Token", "OutputProcessor.hh:ReportingFrequency"]
+        exceptions = [
+            "CsvParser.hh:Token",
+            "IdfParser.hh:Token",
+            "OutputProcessor.hh:ReportingFrequency",
+            "HVACInterfaceManager.cc:UpdateType",
+        ]
         if f"{file_name}:{name}" not in exceptions:
             error_str += "\tMissing 'Invalid' at position 0\n"
 
     # check for null value = -1 at 0-th position
     if keys_uc[0] in valid_null_enum_value_names and values[0] != -1:
-        error_str += f"\t{keys_uc[0]} must = -1\n"
+        # exceptions listed by <FILE>:<ENUM NAME>
+        exceptions = [
+            "HVACInterfaceManager.cc:UpdateType"
+        ]
+        if f"{file_name}:{name}" not in exceptions:
+            error_str += f"\t{keys_uc[0]} must = -1\n"
 
     # check for num names at N-th position
     if keys_uc[-1] not in valid_num_enum_value_names:
-        error_str += "\tMissing 'Num' at position N\n"
+        # exceptions listed by <FILE>:<ENUM NAME>
+        exceptions = ["HVACInterfaceManager.cc:UpdateType"]
+        if f"{file_name}:{name}" not in exceptions:
+            error_str += "\tMissing 'Num' at position N\n"
 
     # check for "unassigned" in names
     if "UNASSIGNED" in keys_uc:
