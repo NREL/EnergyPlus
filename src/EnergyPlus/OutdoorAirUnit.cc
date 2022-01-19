@@ -402,8 +402,7 @@ namespace OutdoorAirUnit {
                     OutAirUnit(OAUnitNum).SFanAvailSchedPtr =
                         GetFanAvailSchPtr(state, cFanTypes(OutAirUnit(OAUnitNum).SFanType), OutAirUnit(OAUnitNum).SFanName, errFlag);
                     // get fan index
-                    GetFanIndex(
-                        state, OutAirUnit(OAUnitNum).SFanName, OutAirUnit(OAUnitNum).SFan_Index, ErrorsFound, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, OutAirUnit(OAUnitNum).SFanName, OutAirUnit(OAUnitNum).SFan_Index, ErrorsFound);
                 } else {
                     ErrorsFound = true;
                 }
@@ -457,11 +456,7 @@ namespace OutdoorAirUnit {
                         OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr =
                             GetFanAvailSchPtr(state, cFanTypes(OutAirUnit(OAUnitNum).ExtFanType), OutAirUnit(OAUnitNum).ExtFanName, errFlag);
                         // get fan index
-                        GetFanIndex(state,
-                                    OutAirUnit(OAUnitNum).ExtFanName,
-                                    OutAirUnit(OAUnitNum).ExtFan_Index,
-                                    ErrorsFound,
-                                    ObjexxFCL::Optional_string_const());
+                        GetFanIndex(state, OutAirUnit(OAUnitNum).ExtFanName, OutAirUnit(OAUnitNum).ExtFan_Index, ErrorsFound);
                     } else {
                         ErrorsFound = true;
                     }

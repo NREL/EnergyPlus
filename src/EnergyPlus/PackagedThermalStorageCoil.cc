@@ -5401,7 +5401,8 @@ void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoil
         DataGlobalConstants::SecInHour;
 }
 
-void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
+void GetTESCoilIndex(
+    EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string_view const CurrentModuleObject)
 {
 
     // SUBROUTINE INFORMATION:
@@ -5428,8 +5429,8 @@ void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &Co
     }
 
     if (CoilIndex == 0) {
-        if (present(CurrentModuleObject)) {
-            ShowSevereError(state, CurrentModuleObject() + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
+        if (!CurrentModuleObject.empty()) {
+            ShowSevereError(state, fmt::format("{}, GetTESCoilIndex: TES Cooling Coil not found={}", CurrentModuleObject, CoilName));
         } else {
             ShowSevereError(state, "GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
         }

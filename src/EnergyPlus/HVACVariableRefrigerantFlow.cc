@@ -3620,7 +3620,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(state, FanName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, errFlag, ObjexxFCL::Optional_string_const());
+                    GetFanIndex(state, FanName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, "...occurs in " + cCurrentModuleObject + " = " + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
                         ErrorsFound = true;
@@ -3776,8 +3776,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        cAlphaArgs(12),
                                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                        errFlag,
-                                       DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling),
-                                       ObjexxFCL::Optional_bool_const());
+                                       DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling));
                         CCoilInletNodeNum = GetDXCoilInletNode(
                             state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling), cAlphaArgs(12), errFlag);
                         CCoilOutletNodeNum = GetDXCoilOutletNode(
@@ -3886,8 +3885,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        cAlphaArgs(12),
                                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex,
                                        errFlag,
-                                       DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling),
-                                       ObjexxFCL::Optional_bool_const());
+                                       DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling));
                         CCoilInletNodeNum =
                             GetDXCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
                         CCoilOutletNodeNum =
@@ -3990,8 +3988,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        cAlphaArgs(14),
                                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                        errFlag,
-                                       DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating),
-                                       ObjexxFCL::Optional_bool_const());
+                                       DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating));
                         HCoilInletNodeNum = GetDXCoilInletNode(
                             state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating), cAlphaArgs(14), errFlag);
                         HCoilOutletNodeNum = GetDXCoilOutletNode(
@@ -4262,8 +4259,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                        cAlphaArgs(14),
                                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                        errFlag,
-                                       DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating),
-                                       ObjexxFCL::Optional_bool_const());
+                                       DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating));
                         HCoilInletNodeNum =
                             GetDXCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
                         HCoilOutletNodeNum =
@@ -4477,8 +4473,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                         state,
                                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                         ErrorsFound,
-                                        DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXHeatCoilType_Num),
-                                        ObjexxFCL::Optional_bool_const()),
+                                        DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXHeatCoilType_Num)),
                                     GetDXCoilCapFTCurveIndex(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound),
                                     "Heating Capacity Ratio Modifier Function of Temperature Curve Name",
                                     CurveManager::GetCurveName(
@@ -4494,8 +4489,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                         state,
                                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex,
                                         ErrorsFound,
-                                        DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXHeatCoilType_Num),
-                                        ObjexxFCL::Optional_bool_const()),
+                                        DataHVACGlobals::cAllCoilTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).DXHeatCoilType_Num)),
                                     GetDXCoilCapFTCurveIndex(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatCoilIndex, ErrorsFound),
                                     "Heating Capacity Ratio Modifier Function of Temperature Curve Name",
                                     CurveManager::GetCurveName(
