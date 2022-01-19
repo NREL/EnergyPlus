@@ -176,7 +176,7 @@ namespace SetPointManager {
         SystemNodeReset,
         Unknown
     };
-    int constexpr NumValidSPMTypes = 30;
+    int constexpr NumValidSPMTypes = 31;
     inline const char *managerTypeName(SetPointManagerType t)
     {
         switch (t) {
