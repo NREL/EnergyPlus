@@ -1745,8 +1745,8 @@ namespace RefrigeratedCase {
                                   int &IndexPtr,
                                   DataHeatBalance::RefrigSystemType SysType,
                                   bool &ErrorsFound,
-                                  Optional_string_const ThisObjectType = _,
-                                  const Optional_bool_const &SuppressWarning = _);
+                                  std::string_view const ThisObjectType = {},
+                                  bool const SuppressWarning = false);
 
     void ReportRefrigerationComponents(EnergyPlusData &state);
 

@@ -128,8 +128,11 @@ namespace HVACHXAssistedCoolingCoil {
                                    Optional_bool_const EconomizerFlag = _   // OA (or airloop) econommizer status
     );
 
-    void GetHXDXCoilIndex(
-        EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
+    void GetHXDXCoilIndex(EnergyPlusData &state,
+                          std::string const &HXDXCoilName,
+                          int &HXDXCoilIndex,
+                          bool &ErrorsFound,
+                          std::string_view const CurrentModuleObject = {});
 
     void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state,
                                             std::string const &CompType, // unused1208

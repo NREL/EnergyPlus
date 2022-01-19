@@ -13355,8 +13355,8 @@ void GetRefrigeratedRackIndex(EnergyPlusData &state,
                               int &IndexPtr,
                               DataHeatBalance::RefrigSystemType const SysType,
                               bool &ErrorsFound,
-                              Optional_string_const ThisObjectType,
-                              const Optional_bool_const &SuppressWarning)
+                              std::string_view const ThisObjectType,
+                              bool const SuppressWarning)
 {
 
     // SUBROUTINE INFORMATION:
@@ -13377,13 +13377,17 @@ void GetRefrigeratedRackIndex(EnergyPlusData &state,
     case DataHeatBalance::RefrigSystemType::Rack: {
         IndexPtr = UtilityRoutines::FindItemInList(Name, RefrigRack);
         if (IndexPtr == 0) {
-            if (present(SuppressWarning)) {
+            if (SuppressWarning) {
                 //     No warning printed if only searching for the existence of a refrigerated rack
             } else {
-                if (present(ThisObjectType)) {
-                    ShowSevereError(state, ThisObjectType + ", GetRefrigeratedRackIndex: Rack not found=" + Name);
+                if (!ThisObjectType.empty()) {
+                    ShowSevereError(state, fmt::format("{}, GetRefrigeratedRackIndex: Rack not found={}", ThisObjectType, Name));
                 } else {
-                    ShowSevereError(state, "GetRefrigeratedRackIndex: Rack not found=" + Name);
+                    if (!ThisObjectType.empty()) {
+                        ShowSevereError(state, fmt::format("{}, GetRefrigeratedRackIndex: Rack not found={}", ThisObjectType, Name));
+                    } else {
+                        ShowSevereError(state, "GetRefrigeratedRackIndex: Rack not found=" + Name);
+                    }
                 }
             }
             ErrorsFound = true;
@@ -13392,17 +13396,17 @@ void GetRefrigeratedRackIndex(EnergyPlusData &state,
     case DataHeatBalance::RefrigSystemType::Detailed: {
         IndexPtr = UtilityRoutines::FindItemInList(Name, Condenser);
         if (IndexPtr == 0) {
-            if (present(SuppressWarning)) {
+            if (SuppressWarning) {
                 //     No warning printed if only searching for the existence of a refrigeration Condenser
             } else {
-                if (present(ThisObjectType)) {
-                    ShowSevereError(state, ThisObjectType + ", GetRefrigeratedRackIndex: Condenser not found=" + Name);
+                if (!ThisObjectType.empty()) {
+                    ShowSevereError(state, fmt::format("{}, GetRefrigeratedRackIndex: Condenser not found={}", ThisObjectType, Name));
                 } else {
                     ShowSevereError(state, "GetRefrigeratedRackIndex: Condenser not found=" + Name);
                 }
             }
-            ErrorsFound = true;
         }
+        ErrorsFound = true;
     } break;
     default:
         break;
