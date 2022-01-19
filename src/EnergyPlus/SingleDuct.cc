@@ -5913,7 +5913,7 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
                                std::string const &SDSName,
                                int &SDSIndex,
                                bool &ErrorsFound,
-                               Optional_string_const ThisObjectType,
+                               std::string_view const ThisObjectType,
                                Optional_int DamperInletNode, // Damper inlet node number
                                Optional_int DamperOutletNode // Damper outlet node number
 )
@@ -5936,8 +5936,8 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
 
     SDSIndex = UtilityRoutines::FindItemInList(SDSName, state.dataSingleDuct->sd_airterminal, &SingleDuctAirTerminal::SysName);
     if (SDSIndex == 0) {
-        if (present(ThisObjectType)) {
-            ShowSevereError(state, ThisObjectType() + ", GetHVACSingleDuctSysIndex: Single duct system not found=" + SDSName);
+        if (!ThisObjectType.empty()) {
+            ShowSevereError(state, fmt::format("{}, GetHVACSingleDuctSysIndex: Single duct system not found={}", ThisObjectType, SDSName));
         } else {
             ShowSevereError(state, "GetHVACSingleDuctSysIndex: Single duct system not found=" + SDSName);
         }
@@ -5945,7 +5945,11 @@ void GetHVACSingleDuctSysIndex(EnergyPlusData &state,
     } else {
         if ((state.dataSingleDuct->sd_airterminal(SDSIndex).SysType_Num != SysType::SingleDuctConstVolReheat) &&
             (state.dataSingleDuct->sd_airterminal(SDSIndex).SysType_Num != SysType::SingleDuctVAVReheat)) {
-            ShowSevereError(state, ThisObjectType() + ", GetHVACSingleDuctSysIndex: Could not find allowed types=" + SDSName);
+            if (!ThisObjectType.empty()) {
+                ShowSevereError(state, fmt::format("{}, GetHVACSingleDuctSysIndex: Could not find allowed types={}", ThisObjectType, SDSName));
+            } else {
+                ShowSevereError(state, "GetHVACSingleDuctSysIndex: Could not find allowed types=" + SDSName);
+            }
             ShowContinueError(state, "The allowed types are: AirTerminal:SingleDuct:ConstantVolume:Reheat and AirTerminal:SingleDuct:VAV:Reheat");
             ErrorsFound = true;
         }

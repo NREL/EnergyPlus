@@ -1906,7 +1906,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
     if (fanEnumType == DataAirSystems::StructArrayLegacyFanModels) {
         if (fanIndex <= 0) {
             bool errorsFound(false);
-            Fans::GetFanIndex(state, fanName, locFanIndex, errorsFound, ObjexxFCL::Optional_string_const());
+            Fans::GetFanIndex(state, fanName, locFanIndex, errorsFound);
         } else {
             locFanIndex = fanIndex;
         }

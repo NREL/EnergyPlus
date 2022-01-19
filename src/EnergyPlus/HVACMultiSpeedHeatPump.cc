@@ -836,12 +836,8 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                 }
                 LocalError = false;
-                GetDXCoilIndex(state,
-                               MSHeatPump(MSHPNum).DXHeatCoilName,
-                               MSHeatPump(MSHPNum).DXHeatCoilIndex,
-                               LocalError,
-                               "Coil:Heating:DX:MultiSpeed",
-                               ObjexxFCL::Optional_bool_const());
+                GetDXCoilIndex(
+                    state, MSHeatPump(MSHPNum).DXHeatCoilName, MSHeatPump(MSHPNum).DXHeatCoilIndex, LocalError, "Coil:Heating:DX:MultiSpeed");
                 if (LocalError) {
                     ShowSevereError(state, "The index of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
                     ShowContinueError(state, "...occurs in " + state.dataHVACMultiSpdHP->CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1088,12 +1084,8 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                 }
                 LocalError = false;
-                GetDXCoilIndex(state,
-                               MSHeatPump(MSHPNum).DXCoolCoilName,
-                               MSHeatPump(MSHPNum).DXCoolCoilIndex,
-                               LocalError,
-                               "Coil:Cooling:DX:MultiSpeed",
-                               ObjexxFCL::Optional_bool_const());
+                GetDXCoilIndex(
+                    state, MSHeatPump(MSHPNum).DXCoolCoilName, MSHeatPump(MSHPNum).DXCoolCoilIndex, LocalError, "Coil:Cooling:DX:MultiSpeed");
                 if (LocalError) {
                     ShowSevereError(state, "The index of " + cAlphaFields(13) + " is not found \"" + Alphas(13) + "\"");
                     ShowContinueError(state, "...occurs in " + state.dataHVACMultiSpdHP->CurrentModuleObject + " \"" + Alphas(1) + "\"");
