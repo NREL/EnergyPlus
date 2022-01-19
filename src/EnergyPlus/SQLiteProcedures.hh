@@ -169,7 +169,7 @@ public:
                                             std::string const &units,
                                             int const reportingFreq,
                                             bool isMeter,
-                                            Optional_string_const ScheduleName = _);
+                                            std::string_view const ScheduleName = {});
 
     void createSQLiteReportDataRecord(int const recordIndex,
                                       Real64 const value,

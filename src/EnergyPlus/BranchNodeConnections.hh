@@ -76,7 +76,7 @@ namespace BranchNodeConnections {
                                 NodeInputManager::CompFluidStream FluidStream, // Count on Fluid Streams
                                 bool IsParent,                                 // True when node is a parent node
                                 bool &errFlag,                                 // Will be True if errors already detected or if errors found here
-                                Optional_string_const InputFieldName = _       // Input Field Name
+                                std::string_view const InputFieldName = {}     // Input Field Name
     );
 
     void OverrideNodeConnectionType(EnergyPlusData &state,
@@ -139,13 +139,13 @@ namespace BranchNodeConnections {
                          bool &ErrorsFound);
 
     void SetUpCompSets(EnergyPlusData &state,
-                       std::string_view ParentType,          // Parent Object Type
-                       std::string_view ParentName,          // Parent Object Name
-                       std::string_view CompType,            // Component Type
-                       std::string_view CompName,            // Component Name
-                       std::string_view InletNode,           // Inlet Node Name
-                       std::string_view OutletNode,          // Outlet Node Name
-                       Optional_string_const Description = _ // Description
+                       std::string_view ParentType,            // Parent Object Type
+                       std::string_view ParentName,            // Parent Object Name
+                       std::string_view CompType,              // Component Type
+                       std::string_view CompName,              // Component Name
+                       std::string_view InletNode,             // Inlet Node Name
+                       std::string_view OutletNode,            // Outlet Node Name
+                       std::string_view const Description = {} // Description
     );
 
     void TestInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);

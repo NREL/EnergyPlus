@@ -222,7 +222,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
 
     // Using/Aliasing
     using DataZoneEquipment::EquipConfiguration;
-    using NodeInputManager::CheckUniqueNodes;
+    using NodeInputManager::CheckUniqueNodeNumbers;
     using NodeInputManager::EndUniqueNodeCheck;
     using NodeInputManager::GetNodeNums;
     using NodeInputManager::GetOnlySingleNode;
@@ -415,7 +415,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
                 state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).InducedNode(NodeNum) = NodeNums(NodeNum);
                 UniqueNodeError = false;
                 if (!CheckPurchasedAirForReturnPlenum(state, ZonePlenumNum)) {
-                    CheckUniqueNodes(state, "Return Plenum Induced Air Nodes", "NodeNumber", UniqueNodeError, _, NodeNums(NodeNum));
+                    CheckUniqueNodeNumbers(state, "Return Plenum Induced Air Nodes", UniqueNodeError, NodeNums(NodeNum), CurrentModuleObject);
                     if (UniqueNodeError) {
                         ShowContinueError(state, "Occurs for ReturnPlenum = " + AlphArray(1));
                         ErrorsFound = true;

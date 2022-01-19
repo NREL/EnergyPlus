@@ -165,17 +165,28 @@ public:
                          std::string const &ObjName      // Name of the object type
     );
 
+    void lowerRangeCheck(EnergyPlusData &state,
+                         bool &ErrorsFound,                         // Set to true if error detected
+                         std::string const &WhatFieldString,        // Descriptive field for string
+                         std::string const &WhatObjectString,       // Descriptive field for object, Zone Name, etc.
+                         std::string const &ErrorLevel,             // 'Warning','Severe','Fatal')
+                         std::string const &LowerBoundString,       // String for error message, if applicable
+                         bool const LowerBoundCondition,            // Condition for error condition, if applicable
+                         std::string_view const ValueString = {},   // Value with digits if to be displayed with error
+                         std::string_view const WhatObjectName = {} // ObjectName -- used for error messages
+    );
+
     void rangeCheck(EnergyPlusData &state,
-                    bool &ErrorsFound,                           // Set to true if error detected
-                    std::string const &WhatFieldString,          // Descriptive field for string
-                    std::string const &WhatObjectString,         // Descriptive field for object, Zone Name, etc.
-                    std::string const &ErrorLevel,               // 'Warning','Severe','Fatal')
-                    Optional_string_const LowerBoundString = _,  // String for error message, if applicable
-                    Optional_bool_const LowerBoundCondition = _, // Condition for error condition, if applicable
-                    Optional_string_const UpperBoundString = _,  // String for error message, if applicable
-                    Optional_bool_const UpperBoundCondition = _, // Condition for error condition, if applicable
-                    Optional_string_const ValueString = _,       // Value with digits if to be displayed with error
-                    Optional_string_const WhatObjectName = _     // ObjectName -- used for error messages
+                    bool &ErrorsFound,                         // Set to true if error detected
+                    std::string const &WhatFieldString,        // Descriptive field for string
+                    std::string const &WhatObjectString,       // Descriptive field for object, Zone Name, etc.
+                    std::string const &ErrorLevel,             // 'Warning','Severe','Fatal')
+                    std::string const &LowerBoundString,       // String for error message, if applicable
+                    bool const LowerBoundCondition,            // Condition for error condition, if applicable
+                    std::string const &UpperBoundString,       // String for error message, if applicable
+                    bool const UpperBoundCondition,            // Condition for error condition, if applicable
+                    std::string_view const ValueString = {},   // Value with digits if to be displayed with error
+                    std::string_view const WhatObjectName = {} // ObjectName -- used for error messages
     );
 
     void getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumeric);

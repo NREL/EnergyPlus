@@ -347,7 +347,7 @@ namespace SingleDuct {
                                    std::string const &SDSName,
                                    int &SDSIndex,
                                    bool &ErrorsFound,
-                                   Optional_string_const ThisObjectType = _,
+                                   std::string_view const ThisObjectType = {},
                                    Optional_int DamperInletNode = _, // Damper inlet node number
                                    Optional_int DamperOutletNode = _ // Damper outlet node number
     );
