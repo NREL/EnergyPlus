@@ -196,37 +196,35 @@ namespace SteamBaseboardRadiator {
                         state.dataLoopNodes->Node(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode).MassFlowRateMinAvail;
                 }
 
-                {
-                    auto const SELECT_CASE_var(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType);
-
-                    if (SELECT_CASE_var == DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
-                        ControlCompOutput(state,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
-                                          state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
-                                          BaseboardNum,
-                                          FirstHVACIteration,
-                                          QZnReq,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
-                                          MaxSteamFlow,
-                                          MinSteamFlow,
-                                          SteamBaseboardDesignDataObject.Offset,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ControlCompTypeNum,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompErrIndex,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          _,
-                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc);
-                    } else {
-                        ShowSevereError(state,
-                                        "SimSteamBaseboard: Errors in Baseboard=" +
-                                            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
-                        ShowContinueError(state,
-                                          format("Invalid or unimplemented equipment type={}",
-                                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType));
-                        ShowFatalError(state, "Preceding condition causes termination.");
-                    }
+                switch (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType) {
+                case DataPlant::PlantEquipmentType::Baseboard_Rad_Conv_Steam: { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
+                    ControlCompOutput(state,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
+                                      state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
+                                      BaseboardNum,
+                                      FirstHVACIteration,
+                                      QZnReq,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode,
+                                      MaxSteamFlow,
+                                      MinSteamFlow,
+                                      SteamBaseboardDesignDataObject.Offset,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ControlCompTypeNum,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).CompErrIndex,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      _,
+                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).plantLoc);
+                } break;
+                default: {
+                    ShowSevereError(
+                        state, "SimSteamBaseboard: Errors in Baseboard=" + state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID);
+                    ShowContinueError(state,
+                                      format("Invalid or unimplemented equipment type={}",
+                                             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipType));
+                    ShowFatalError(state, "Preceding condition causes termination.");
+                } break;
                 }
 
                 PowerMet = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotPower;
