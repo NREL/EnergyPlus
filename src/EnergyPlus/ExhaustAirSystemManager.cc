@@ -446,14 +446,31 @@ namespace ExhaustAirSystemManager {
 
                 // These two nodes are required inputs: 
                 std::string inletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "inlet_node_name");
-                std::string outletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
-                // To do: process node names into node number: 
-                // supposedly here the nodes are already processed before this is called and actually got exectued.
-                /* Get node number using node names */
+                // 2022-01: What about nodelist, can GetOnlySingleNode() still used for that?
+                int inletNodeNum = GetOnlySingleNode(state,
+                                                  inletNodeName,
+                                                  ErrorsFound,
+                                                  cCurrentModuleObject,
+                                                  thisExhCtrl.Name,
+                                                  DataLoopNode::NodeFluidType::Air,
+                                                  DataLoopNode::NodeConnectionType::Inlet,
+                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  ObjectIsParent);
 
+                std::string outletNodeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "outlet_node_name");
+
+                 int outletNodeNum = GetOnlySingleNode(state,
+                                                     outletNodeName,
+                                                     ErrorsFound,
+                                                     cCurrentModuleObject,
+                                                     thisExhCtrl.Name,
+                                                     DataLoopNode::NodeFluidType::Air,
+                                                     DataLoopNode::NodeConnectionType::Outlet,
+                                                     NodeInputManager::CompFluidStream::Primary,
+                                                     ObjectIsParent);
 
                 Real64 designExhaustFlowRate = ip->getRealFieldValue(objectFields, objectSchemaProps, "design_exhaust_flow_rate_");
-                // to do (for all locals): add data zone equip struct connections.
+                // 2022-01: to do (for all locals): add data zone equip struct connections.
 
                 std::string flowControlType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type");
                 // To do: use an int or enum type to convert the flow control type from string to some numerical value
