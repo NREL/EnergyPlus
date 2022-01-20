@@ -474,15 +474,24 @@ namespace DataZoneEquipment {
     {
         // Members
         std::string Name;
-        int NumOfComponents;
-        int OutletNodeNum;
-        Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
-        Array1D<DataZoneEquipment::AirLoopHVACZone> ComponentTypeEnum;
-        Array1D_string ComponentName;
-        Array1D_int ComponentIndex;
+        // int NumOfComponents;
+        // int OutletNodeNum;
+
+        // 2022-01-20: Exhaust system does not need to be specified this way, so the following lines
+        // should be replaced by some new variables, which might be simpler to handle. 
+        // Array1D_string ComponentType; // TODO: Convert this from string to enum and remove ComponentTypeEnum below
+        // Array1D<DataZoneEquipment::AirLoopHVACZone> ComponentTypeEnum;
+        // Array1D_string ComponentName;
+        // Array1D_int ComponentIndex;
+
+        int AvailScheduleNum;
+        std::string ZoneMixerName;
+        int ZoneMixerIndex;
+        int CentralFanTypeNum;
+        int CentralFanIndex;
 
         // Default Constructor
-        ExhaustAir() : NumOfComponents(0), OutletNodeNum(0)
+        ExhaustAir() : AvailScheduleNum(0), ZoneMixerName(""), ZoneMixerIndex(0), CentralFanTypeNum(0), CentralFanIndex(0)
         {
         }
     };
@@ -490,7 +499,7 @@ namespace DataZoneEquipment {
     struct ZoneExhaustControl
     {
         std::string Name;
-        int NumOfComponents; // not sure if this is necessary
+        // int NumOfComponents; // not sure if this is necessary
 
         int AvailSchNum;
         int InletNodeNum;
@@ -502,14 +511,14 @@ namespace DataZoneEquipment {
         int SupplyNodeOrNodelistNum;
         int MinZoneTempLimitScheduleNum;
         int MinExhFlowFracScheduleNum;
-        int BalancedExhFracScheduleName;
+        int BalancedExhFracScheduleNum;
 
         // default constructor
         // Question: why the constructor skipped the first element std::string Name?
         ZoneExhaustControl()
-            : NumOfComponents(0), AvailSchNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0), FlowControlType(0),
+            : AvailSchNum(0), InletNodeNum(0), OutletNodeNum(0), DesignExhaustFlowRate(0.0), FlowControlType(0),
               ExhaustFlowFractionScheduleNum(0), SupplyNodeOrNodelistNum(0), MinZoneTempLimitScheduleNum(0), MinExhFlowFracScheduleNum(0),
-              BalancedExhFracScheduleName(0)
+              BalancedExhFracScheduleNum(0)
         {
         }
     };
