@@ -1811,6 +1811,8 @@ namespace HeatBalFiniteDiffManager {
         // EMS Conductivity Override
         if (condActuator.isActuated) {
             kt = condActuator.actuatedValue;
+            ktA1 = kt;
+            ktA2 = kt;
         }
 
         // EMS Specific Heat Override
@@ -1824,14 +1826,18 @@ namespace HeatBalFiniteDiffManager {
 
         Real64 const DelX(state.dataHeatBalFiniteDiffMgr->ConstructFD(ConstrNum).DelX(Lay));
         Real64 const Cp_DelX_RhoS_Delt(Cp * DelX * RhoS / Delt);
-        if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::CrankNicholsonSecondOrder) { // Adams-Moulton second order
+
+        switch (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType) {
+        case CondFDScheme::CrankNicholsonSecondOrder: { // Adams-Moulton second order
             Real64 const inv2DelX(1.0 / (2.0 * DelX));
             TDT_i = ((Cp_DelX_RhoS_Delt * TD_i) + ((ktA1 * (TD(i + 1) - TD_i + TDT_p) + ktA2 * (TD(i - 1) - TD_i + TDT_m)) * inv2DelX)) /
                     (((ktA1 + ktA2) * inv2DelX) + Cp_DelX_RhoS_Delt);
-        } else if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::FullyImplicitFirstOrder) { // Adams-Moulton First order
+        } break;
+        case CondFDScheme::FullyImplicitFirstOrder: { // Adams-Moulton First order
             Real64 const invDelX(1.0 / DelX);
             TDT_i = ((Cp_DelX_RhoS_Delt * TD_i) + ((ktA2 * TDT_m) + (ktA1 * TDT_p)) * invDelX) / (((ktA1 + ktA2) * invDelX) + Cp_DelX_RhoS_Delt);
-        } else {
+        } break;
+        default:
             assert(false); // Illegal CondFDSchemeType
         }
 
@@ -2017,6 +2023,22 @@ namespace HeatBalFiniteDiffManager {
                         }
                     }
 
+                    // EMS Conductivity 2 Override
+                    if (condActuator2.isActuated) {
+                        kt2 = condActuator1.actuatedValue;
+                    }
+
+                    // EMS Specific Heat 2 Override
+                    if (specHeatActuator2.isActuated) {
+                        Cp2 = specHeatActuator1.actuatedValue;
+                    }
+
+                    // Update EMS internal variables
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
+
                     // R layer first, then PCM or regular layer
                     Real64 const Delt_Delx2(Delt * Delx2);
                     Real64 const Cp2_fac(Cp2 * pow_2(Delx2) * RhoS2 * Rlayer);
@@ -2061,26 +2083,16 @@ namespace HeatBalFiniteDiffManager {
                         kt1 = condActuator1.actuatedValue;
                     }
 
-                    // EMS Conductivity 2 Override
-                    if (condActuator2.isActuated) {
-                        kt2 = condActuator2.actuatedValue;
-                    }
-
                     // EMS Specific Heat 1 Override
                     if (specHeatActuator1.isActuated) {
                         Cp1 = specHeatActuator1.actuatedValue;
                     }
 
-                    // EMS Specific Heat 2 Override
-                    if (specHeatActuator2.isActuated) {
-                        Cp2 = specHeatActuator2.actuatedValue;
-                    }
-
                     // Update EMS internal variables
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i) = kt1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i) = Cp1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i + 1) = kt2;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i + 1) = Cp2;
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
 
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Cp1_fac(Cp1 * pow_2(Delx1) * RhoS1 * Rlayer2);
@@ -2178,10 +2190,10 @@ namespace HeatBalFiniteDiffManager {
                     }
 
                     // Update EMS internal variables
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i) = kt1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i) = Cp1;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).condNodeReport(i + 1) = kt2;
-                    state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).specHeatNodeReport(i + 1) = Cp2;
+                    surfFD.condNodeReport(i) = kt1;
+                    surfFD.specHeatNodeReport(i) = Cp1;
+                    surfFD.condNodeReport(i + 1) = kt2;
+                    surfFD.specHeatNodeReport(i + 1) = Cp2;
 
                     Real64 const Delt_Delx1(Delt * Delx1);
                     Real64 const Delt_Delx2(Delt * Delx2);

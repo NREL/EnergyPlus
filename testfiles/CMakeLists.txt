@@ -19,6 +19,7 @@ add_simulation_test(IDF_FILE 1ZoneDataCenterCRAC_wApproachTemp.idf EPW_FILE USA_
 add_simulation_test(IDF_FILE 2ZoneDataCenterHVAC_wEconomizer.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneEvapCooler.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+add_simulation_test(IDF_FILE _1ZoneUncontrolled_9161.idf EPW_FILE weather_file_issue_9161.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolled3SurfaceZone.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolledAnnualOutputs.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 add_simulation_test(IDF_FILE 1ZoneUncontrolledCondFDWithVariableKat24C.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)

@@ -99,10 +99,6 @@ namespace MixedAir {
         Num
     };
 
-    // coil operation
-    constexpr int On(1);  // normal coil operation
-    constexpr int Off(0); // signal coil shouldn't run
-
     enum class MixedAirControllerType
     {
         Invalid = -1,

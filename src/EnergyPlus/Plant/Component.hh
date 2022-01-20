@@ -134,6 +134,8 @@ namespace DataPlant {
         void simulate(EnergyPlusData &state, bool FirstHVACIteration);
 
         void oneTimeInit(EnergyPlusData &state) const;
+
+        static CompData &getPlantComponent(EnergyPlusData &state, PlantLocation const &plantLoc);
     };
 } // namespace DataPlant
 } // namespace EnergyPlus

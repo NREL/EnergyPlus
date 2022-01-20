@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     EXPECT_DOUBLE_EQ(0.5, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
     bool firstHVACIteration = true;
-    int compOp = 1;
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     Real64 zoneLoad = 1000;
     Real64 moistureLoad = 0.0;
     Real64 heatCoilLoad = 0.0;
@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->CoolingLoad = false;
 
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).MdotFurnace, 0.5); // CompOnMassFlow rate
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.5);  // furnace inlet node mass flow rate
     EXPECT_EQ(state->dataFurnaces->Furnace(1).CoolPartLoadRatio, 0.0);
@@ -274,31 +274,29 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).AirOutletNodeNum = 3;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterInletNodeNum = 5;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).WaterOutletNodeNum = 6;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopNum = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).LoopSide = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).BranchNum = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).CompNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.loopNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.branchNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).plantLoc.compNum = 1;
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirInletNodeNum = 3;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).AirOutletNodeNum = 2;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterInletNodeNum = 7;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).WaterOutletNodeNum = 8;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopNum = 2;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).LoopSide = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).BranchNum = 1;
-    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).CompNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.loopNum = 2;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.branchNum = 1;
+    state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).plantLoc.compNum = 1;
 
     // set up plant loop
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
 
     for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
-        auto &loop(state->dataPlnt->PlantLoop(loopindex));
-        loop.LoopSide.allocate(2);
-        auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(1));
+        auto &loopside(state->dataPlnt->PlantLoop(loopindex).LoopSide(DataPlant::LoopSideLocation::Demand));
         loopside.TotalBranches = 1;
         loopside.Branch.allocate(1);
-        auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide(1).Branch(1));
+        auto &loopsidebranch(state->dataPlnt->PlantLoop(loopindex).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1));
         loopsidebranch.TotalComponents = 2;
         loopsidebranch.Comp.allocate(2);
     }
@@ -310,16 +308,18 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
 
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
-    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATERCOOLINGCOIL";
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
-    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = "WATERHEATINGCOIL";
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "WATERCOOLINGCOIL";
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
+        DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "WATERHEATINGCOIL";
 
     state->dataHeatBal->HeatReclaimSimple_WAHPCoil.allocate(2);
 
     state->dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false; // turn off water source coil GetInput
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).MdotFurnace, 0.2); // flow rate is at idle speed flow rate
     EXPECT_EQ(state->dataLoopNodes->Node(1).MassFlowRate, 0.2);  // furnace inlet node mass flow rate is at idle speed flow rate
     EXPECT_EQ(state->dataFurnaces->Furnace(1).CoolPartLoadRatio, 0.0);
@@ -328,7 +328,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     state->dataFurnaces->Furnace(1).HeatPartLoadRatio = 1.0;
     state->dataFurnaces->HeatingLoad = true;
     CalcNewZoneHeatCoolFlowRates(
-        *state, FurnaceNum, firstHVACIteration, compOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
+        *state, FurnaceNum, firstHVACIteration, CompressorOp, zoneLoad, moistureLoad, heatCoilLoad, reheatCoilLoad, onOffAirFlowRatio, hXUnitOn);
     EXPECT_EQ(state->dataFurnaces->Furnace(1).HeatPartLoadRatio, 1.0);
 }
 

@@ -66,10 +66,6 @@ struct EnergyPlusData;
 
 namespace SimAirServingZones {
 
-    // coil operation
-    constexpr int CoilOn(1);  // normal coil operation
-    constexpr int CoilOff(0); // signal coil shouldn't run
-
     constexpr int BeforeBranchSim(1);
     constexpr int AfterBranchSim(2);
 

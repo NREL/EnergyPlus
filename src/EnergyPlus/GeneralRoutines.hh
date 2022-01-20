@@ -57,6 +57,8 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -138,9 +140,7 @@ void ControlCompOutput(EnergyPlusData &state,
                        Optional<Real64 const> AirMassFlow = _,    // air mass flow rate
                        Optional_int_const Action = _,             // 1=reverse; 2=normal
                        Optional_int_const EquipIndex = _,         // Identifier for equipment of Outdoor Air Unit "ONLY"
-                       Optional_int_const LoopNum = _,            // for plant components, plant loop index
-                       Optional_int_const LoopSide = _,           // for plant components, plant loop side index
-                       Optional_int_const BranchIndex = _,        // for plant components, plant branch index
+                       PlantLocation const &plantLoc = {},        // for plant components, Location
                        Optional_int_const ControlledZoneIndex = _ // controlled zone index for the zone containing the component
 );
 

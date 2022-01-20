@@ -521,10 +521,7 @@ namespace RefrigeratedCase {
         Real64 InletTemp;               // Water-cooling condenser inlet temperature (C)
         int OutletNode;                 // Water-cooled condenser outlet node number
         int PlantTypeOfNum;             // Water-cooled condenser plant equipment type
-        int PlantLoopNum;               // Water-cooled condenser plant loop number
-        int PlantLoopSideNum;           // Water-cooled condenser plant loop side number
-        int PlantBranchNum;             // Water-cooled condenser plant branch number
-        int PlantCompNum;               // Water-cooled condenser plant component number
+        PlantLocation plantLoc;         // Water-cooled condenser plant location
         Real64 OutletTemp;              // Water-cooling condenser outlet temperature (C)
         int OutletTempSchedPtr;         // Schedule pointer for condenser outlet temp setting
         Real64 VolFlowRate;             // Water-cooled condenser volumetric flow rate (m3/s)
@@ -552,10 +549,10 @@ namespace RefrigeratedCase {
               RackElecConsumption(0.0), RackCapacity(0.0), RackCoolingEnergy(0.0), CondenserFanPower(0.0), TotCondFTempPtr(0),
               ActualCondenserFanPower(0.0), CondenserFanConsumption(0.0), SensZoneCreditHeatRate(0.0), SensZoneCreditHeat(0.0),
               SensHVACCreditHeatRate(0.0), SensHVACCreditHeat(0.0), EvapFreezeWarnIndex(0), NoFlowWarnIndex(0), HighTempWarnIndex(0),
-              LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), InletTemp(0.0), OutletNode(0), PlantTypeOfNum(0),
-              PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0), OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0),
-              DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0), FlowType(CndsrFlowType::VariableFlow), VolFlowRateMax(0.0),
-              MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
+              LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), InletTemp(0.0), OutletNode(0),
+              PlantTypeOfNum(0), plantLoc{}, OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0),
+              CondLoad(0.0), CondEnergy(0.0), FlowType(CndsrFlowType::VariableFlow), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0),
+              OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
         {
         }
 
@@ -971,10 +968,7 @@ namespace RefrigeratedCase {
         int EvapWaterTankDemandARRID;                       // Demand index when evap condenser uses water from storage tank
         int OutletNode;                                     // Water-cooled condenser outlet node number
         int PlantTypeOfNum;                                 // Water-cooled condenser plant equipment type
-        int PlantLoopNum;                                   // Water-cooled condenser plant loop number
-        int PlantLoopSideNum;                               // Water-cooled condenser plant loop side number
-        int PlantBranchNum;                                 // Water-cooled condenser plant branch number
-        int PlantCompNum;                                   // Water-cooled condenser plant component number
+        PlantLocation plantLoc;                             // Water-cooled condenser plant location
         int OutletTempSchedPtr;                             // Schedule pointer for condenser outlet temp setting
         int InletAirNodeNum;                                // Inlet air node number, can be outside or in a zone
         int InletAirZoneNum;                                // Inlet air zone number, if located in a zone
@@ -1048,19 +1042,19 @@ namespace RefrigeratedCase {
               CondCreditWarnIndex1(0), CondCreditWarnIndex2(0), CondCreditWarnIndex3(0), CondCreditWarnIndex4(0), CondCreditWarnIndex5(0),
               CondCreditWarnIndex6(0), CondCreditWarnIndex7(0), NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0),
               HighInletWarnIndex(0), InletNode(0), EvapSchedPtr(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0),
-              EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0),
-              OutletTempSchedPtr(0), InletAirNodeNum(0), InletAirZoneNum(0), FanSpeedControlType(FanSpeedCtrlType::Invalid), CapCurvePtr(0),
-              CascadeSysID(0), CascadeTempControl(CascadeCndsrTempCtrlType::Invalid), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0),
-              MinCondLoad(0.0), TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0),
-              EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0),
-              BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), FanMinAirFlowRatio(0.0), RatedFanPower(0.0),
-              ActualFanPower(0.0), FanElecEnergy(0.0), InletTemp(0.0), OutletTemp(0.0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0),
-              RatedTCondense(0.0), CondLoad(0.0), CondEnergy(0.0), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0),
-              RatedSubcool(0.0), RatedDelT(0.0), RatedCapacity(0.0), RatedWaterInletT(0.0), RatedApproachT(0.0), MinCapFacEvap(0.0),
-              MaxCapFacEvap(0.0), EvapCoeff1(0.0), EvapCoeff2(0.0), EvapCoeff3(0.0), EvapCoeff4(0.0), EvapElevFact(1.0), RefOpCharge(0.0),
-              RefReceiverInventory(0.0), RefPipingInventory(0.0), TotalHeatRecoveredEnergy(0.0), TotalHeatRecoveredLoad(0.0),
-              ExternalEnergyRecovered(0.0), InternalEnergyRecovered(0.0), ExternalHeatRecoveredLoad(0.0), InternalHeatRecoveredLoad(0.0),
-              LaggedUsedWaterHeater(0.0), LaggedUsedHVACCoil(0.0)
+              EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0), plantLoc{}, OutletTempSchedPtr(0), InletAirNodeNum(0),
+              InletAirZoneNum(0), FanSpeedControlType(FanSpeedCtrlType::Invalid), CapCurvePtr(0), CascadeSysID(0),
+              CascadeTempControl(CascadeCndsrTempCtrlType::Invalid), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0), MinCondLoad(0.0),
+              TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0),
+              EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0),
+              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), FanMinAirFlowRatio(0.0), RatedFanPower(0.0), ActualFanPower(0.0),
+              FanElecEnergy(0.0), InletTemp(0.0), OutletTemp(0.0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0), RatedTCondense(0.0),
+              CondLoad(0.0), CondEnergy(0.0), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), RatedSubcool(0.0),
+              RatedDelT(0.0), RatedCapacity(0.0), RatedWaterInletT(0.0), RatedApproachT(0.0), MinCapFacEvap(0.0), MaxCapFacEvap(0.0), EvapCoeff1(0.0),
+              EvapCoeff2(0.0), EvapCoeff3(0.0), EvapCoeff4(0.0), EvapElevFact(1.0), RefOpCharge(0.0), RefReceiverInventory(0.0),
+              RefPipingInventory(0.0), TotalHeatRecoveredEnergy(0.0), TotalHeatRecoveredLoad(0.0), ExternalEnergyRecovered(0.0),
+              InternalEnergyRecovered(0.0), ExternalHeatRecoveredLoad(0.0), InternalHeatRecoveredLoad(0.0), LaggedUsedWaterHeater(0.0),
+              LaggedUsedHVACCoil(0.0)
         {
         }
 
@@ -1751,8 +1745,8 @@ namespace RefrigeratedCase {
                                   int &IndexPtr,
                                   DataHeatBalance::RefrigSystemType SysType,
                                   bool &ErrorsFound,
-                                  Optional_string_const ThisObjectType = _,
-                                  const Optional_bool_const &SuppressWarning = _);
+                                  std::string_view const ThisObjectType = {},
+                                  bool const SuppressWarning = false);
 
     void ReportRefrigerationComponents(EnergyPlusData &state);
 

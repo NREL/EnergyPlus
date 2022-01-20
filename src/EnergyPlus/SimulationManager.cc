@@ -2309,13 +2309,13 @@ namespace SimulationManager {
               "{}\n",
               "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
         for (int Count = 1; Count <= state.dataHVACGlobal->NumPlantLoops; ++Count) {
-            for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 //  Plant Supply Side Loop
-                // Demandside and supplyside is parametrized in DataPlant
+                // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
                 const auto LoopString = [&]() {
-                    if (LoopSideNum == DemandSide) {
+                    if (LoopSideNum == LoopSideLocation::Demand) {
                         return "Demand";
-                    } else if (LoopSideNum == SupplySide) {
+                    } else if (LoopSideNum == LoopSideLocation::Supply) {
                         return "Supply";
                     } else {
                         return "";
@@ -2429,13 +2429,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameIn);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameIn);
 
         } //  Plant Demand Side Loop
 
@@ -2465,13 +2465,13 @@ namespace SimulationManager {
               "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
 
         for (int Count = state.dataHVACGlobal->NumPlantLoops + 1; Count <= state.dataPlnt->TotNumLoops; ++Count) {
-            for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+            for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
                 //  Plant Supply Side Loop
-                // Demandside and supplyside is parametrized in DataPlant
+                // LoopSideLocation::Demand and LoopSideLocation::Supply is parametrized in DataPlant
                 const auto LoopString = [&]() {
-                    if (LoopSideNum == DemandSide) {
+                    if (LoopSideNum == LoopSideLocation::Demand) {
                         return "Demand";
-                    } else if (LoopSideNum == SupplySide) {
+                    } else if (LoopSideNum == LoopSideLocation::Supply) {
                         return "Supply";
                     } else {
                         return "";
@@ -2587,13 +2587,13 @@ namespace SimulationManager {
             print(state.files.bnd,
                   " Plant Loop Supply Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameIn);
             print(state.files.bnd,
                   " Plant Loop Return Connection,{},{},{}\n",
                   state.dataPlnt->PlantLoop(Count).Name,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
-                  state.dataPlnt->PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Demand).NodeNameOut,
+                  state.dataPlnt->PlantLoop(Count).LoopSide(LoopSideLocation::Supply).NodeNameIn);
 
         } //  Plant Demand Side Loop
 

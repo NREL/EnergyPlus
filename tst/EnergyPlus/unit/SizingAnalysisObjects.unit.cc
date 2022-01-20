@@ -120,10 +120,6 @@ protected:
 
         state->dataPlnt->TotNumLoops = 1;
         state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-        for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
-            auto &loop(state->dataPlnt->PlantLoop(l));
-            loop.LoopSide.allocate(2);
-        }
         state->dataPlnt->PlantLoop(1).Name = "Test Plant Loop 1";
         state->dataPlnt->PlantLoop(1).MaxVolFlowRateWasAutoSized = true;
         state->dataPlnt->PlantLoop(1).MaxVolFlowRate = 0.002;

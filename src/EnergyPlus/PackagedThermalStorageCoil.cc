@@ -383,7 +383,6 @@ void GetTESCoilInput(EnergyPlusData &state)
         if (ZoneIndexTrial > 0) { // tank is inside a zone so setup internal gains
             SetupZoneInternalGain(state,
                                   ZoneIndexTrial,
-                                  "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                   state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                                   DataHeatBalance::IntGainType::PackagedTESCoilTank,
                                   &state.dataPackagedThermalStorageCoil->TESCoil(item).QdotAmbient);
@@ -2197,10 +2196,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     auto &MyEnvrnFlag = state.dataPackagedThermalStorageCoil->MyEnvrnFlag;
     auto &MyWarmupFlag = state.dataPackagedThermalStorageCoil->MyWarmupFlag;
     bool errFlag;
-    int plloopnum;
-    int lsnum;
-    int brnum;
-    int cpnum;
+    PlantLocation plantLoc{};
     Real64 tmpSchedValue;
 
     if (state.dataPackagedThermalStorageCoil->MyOneTimeFlag) {
@@ -2223,24 +2219,21 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
             ScanPlantLoopsForObject(state,
                                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name,
                                     DataPlant::PlantEquipmentType::PackagedTESCoolingCoil,
-                                    plloopnum,
-                                    lsnum,
-                                    brnum,
-                                    cpnum,
+                                    plantLoc,
                                     errFlag);
 
             // double check node names match
             if (errFlag) {
                 ShowFatalError(state, "InitTESCoil: Program terminated due to previous condition(s).");
             }
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantLoopNum = plloopnum;
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantLoopSideNum = lsnum;
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantBranchNum = brnum;
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantCompNum = cpnum;
+            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantLoopNum = plantLoc.loopNum;
+            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantLoopSideNum = plantLoc.loopSideNum;
+            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantBranchNum = plantLoc.branchNum;
+            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantCompNum = plantLoc.compNum;
 
-            if ((state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn !=
+            if ((DataPlant::CompData::getPlantComponent(state, plantLoc).NodeNumIn !=
                  state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantInletNodeNum) ||
-                (state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut !=
+                (DataPlant::CompData::getPlantComponent(state, plantLoc).NodeNumOut !=
                  state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantOutletNodeNum)) {
                 ShowSevereError(state,
                                 "InitTESCoil: Coil:Cooling:DX:SingleSpeed:ThermalStorage =\"" +
@@ -2252,13 +2245,10 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                           .Branch(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantBranchNum)
                                           .Name +
                                       "\", Component referenced with:");
-                ShowContinueError(state,
-                                  "...Inlet Node=\"" + state.dataLoopNodes->NodeID(
-                                                           state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
                 ShowContinueError(
-                    state,
-                    "...Outlet Node=\"" +
-                        state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
+                    state, "...Inlet Node=\"" + state.dataLoopNodes->NodeID(DataPlant::CompData::getPlantComponent(state, plantLoc).NodeNumIn));
+                ShowContinueError(
+                    state, "...Outlet Node=\"" + state.dataLoopNodes->NodeID(DataPlant::CompData::getPlantComponent(state, plantLoc).NodeNumOut));
                 ShowContinueError(state,
                                   "...TES Inlet Node=\"" +
                                       state.dataLoopNodes->NodeID(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).TESPlantInletNodeNum));
@@ -5411,7 +5401,8 @@ void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoil
         DataGlobalConstants::SecInHour;
 }
 
-void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
+void GetTESCoilIndex(
+    EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string_view const CurrentModuleObject)
 {
 
     // SUBROUTINE INFORMATION:
@@ -5438,8 +5429,8 @@ void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &Co
     }
 
     if (CoilIndex == 0) {
-        if (present(CurrentModuleObject)) {
-            ShowSevereError(state, CurrentModuleObject() + ", GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
+        if (!CurrentModuleObject.empty()) {
+            ShowSevereError(state, fmt::format("{}, GetTESCoilIndex: TES Cooling Coil not found={}", CurrentModuleObject, CoilName));
         } else {
             ShowSevereError(state, "GetTESCoilIndex: TES Cooling Coil not found=" + CoilName);
         }
