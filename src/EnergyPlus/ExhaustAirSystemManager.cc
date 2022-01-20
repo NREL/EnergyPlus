@@ -169,14 +169,14 @@ namespace ExhaustAirSystemManager {
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_manager_list_name");
-                int availMgrNum = 0; // UtilityRoutines::FindItemInList(availSchName, state.dataSystemAvailabilityManager->SchedSysAvailMgrData);
-                if (availMgrNum > 0) {
+                int availSchNum = ScheduleManager::GetScheduleIndex(state, availSchName);
+                if (availSchNum > 0) {
                     // normal conditions
-                } else if (availMgrNum == 0) {
-                    // black or anything like that, treat as always avaialabe?
+                } else if (availSchNum == 0) {
+                    // blank or anything like that, treat as always avaialabe
                     /* */
                 } else {
-                    availMgrNum = 0;
+                    availSchNum = 0;
                     // maybe not need for a severe error; a regular warnign would do.
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisExhSys.Name);
                     ShowContinueError(state, "Avaiability Manager Name =" + availSchName + "not found.");
@@ -199,7 +199,7 @@ namespace ExhaustAirSystemManager {
                     zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state.dataMixerComponent->MixerCond, &EnergyPlus::MixerComponent::MixerConditions::MixerName);
                     if (zoneMixerNum == 0) {
                         // 2022-01-19: May need to change the message a little bit to get rid of "SimAirLoopMixer:"
-                        ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + std::string{zoneMixerName});
+                        ShowFatalError(state, "GetExhaustAirSystemInput: Mixer not found=" + std::string{zoneMixerName});
                     }
                     zoneMixerIndex = zoneMixerNum;
                 } else {
@@ -430,7 +430,7 @@ namespace ExhaustAirSystemManager {
                 if (availSchNum > 0) {
                     // normal conditions
                 } else if (availSchNum == 0) {
-                    // black or anything like that, treat as always avaialabe?
+                    // blank or anything like that, treat as always avaialabe
                     /* //may not need to process the detailed schedule value here, but if yes, use this example: 
                     GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr)
                     */
@@ -486,7 +486,7 @@ namespace ExhaustAirSystemManager {
                 if (exhaustFlowFractionScheduleNum > 0) {
                     // normal conditions
                 } else if (exhaustFlowFractionScheduleNum == 0) {
-                    // black or anything like that, treat as always avaialabe?
+                    // blank or anything like that, treat as always avaialabe?
                     /* */
                 } else {
                     exhaustFlowFractionScheduleNum = 0;
@@ -515,7 +515,7 @@ namespace ExhaustAirSystemManager {
                 if (minZoneTempLimitScheduleNum > 0) {
                     // normal conditions
                 } else if (minZoneTempLimitScheduleNum == 0) {
-                    // black or anything like that, treat as always avaialabe?
+                    // blank or anything like that, treat as always avaialabe?
                     /* */
                 } else {
                     minZoneTempLimitScheduleNum = 0;
@@ -535,7 +535,7 @@ namespace ExhaustAirSystemManager {
                 if (minExhFlowFracScheduleNum > 0) {
                     // normal conditions
                 } else if (minExhFlowFracScheduleNum == 0) {
-                    // black or anything like that, treat as always avaialabe?
+                    // blank or anything like that, treat as always avaialabe?
                     /* */
                 } else {
                     minExhFlowFracScheduleNum = 0;
@@ -555,7 +555,7 @@ namespace ExhaustAirSystemManager {
                 if (balancedExhFracScheduleNum > 0) {
                     // normal conditions
                 } else if (balancedExhFracScheduleNum == 0) {
-                    // black or anything like that, treat as always avaialabe?
+                    // blank or anything like that, treat as always avaialabe?
                     /* */
                 } else {
                     balancedExhFracScheduleNum = 0;
