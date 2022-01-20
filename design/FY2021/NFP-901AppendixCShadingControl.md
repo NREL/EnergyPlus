@@ -3,7 +3,7 @@
 **Xuechen (Jerry) Lei, Jeremy Lerond, and Jian Zhang. PNNL**
 
 - Original Date: 06/09/2021
-- Revision Date: 11/29/2021
+- Revision Date: 01/06/2021
 
 ## Justification for New Feature
 
@@ -21,7 +21,7 @@ Everyone who tries to adopt Appendix C in their model should be able to implemen
 
 The current ASHRAE 90.1 narrative does not descibe sufficiently on the detail about 1) whether the luminance requirement for shading control in Appendix C is regarding a photosensor, and if it is, where should that photosensor location be; 2) what exactly should be considered as "rest of the day" in this context. The PNNL team reached out to ASHRAE 90.1 ESC (Envelope Subcommittee) and confirmed that 1) the luminance value for this control is to be based on the photosensor location defined in the daylighting reference point; 2) once the shade is lowered, it will remain down until the end of the day, i.e. midnight.
 
-When interpreting "rest of the day" being "midnight", feedback collected during technicalities call suggests expanding the implementation to cover three additional shading off options: 1) sunset; 2) sunrise next day; and 3) when luminance value drops below a setpoint, which requires adding one more field 'Setpoint3' under WindowShadingControl. The rest of this document describes the case of adding one new windows shading control option which accounts for the control option of shading off by midnight, other control options will be implemented in similar ways.
+When interpreting "rest of the day" being "midnight", feedback collected during technicalities call suggests expanding the implementation to cover three additional shading off options: 1) sunset; 2) sunrise next day; and 3) when luminance value drops below a setpoint, which requires adding one more field 'Setpoint3' under WindowShadingControl. **The rest of this document describes the case of adding one new windows shading control option which accounts for the control option of shading off by midnight, other control options will be implemented in similar ways.**
 
 Feedback collected during technicalities call also suggests not adding luminance from different windows. We further confirm with lightning experts that the luminance control described in the code implies control for the maximum luminance through any window and adding luminance values from different windows view at the same reference point does not make sense.
 
@@ -48,6 +48,8 @@ Based on the current setpoints setup, for the new control option, direct solar t
 <!-- To add a setpoint for luminance based control in the option to be implemented, we will be using `Daylighting:Control` object for the Zone luminance setpoint. This requires adding one more field for luminance setpoint in the `Daylighting:Control` object and expanding the application of `Daylighting:Control` object as it was dedicated for illuminance based control in its current version. -->
 
 To add a setpoint for luminance based control in the option to be implemented, we will be using the Setpoint field of `WindowShadingControl` object for the Zone luminance setpoint and expand the application of this field with "cd/m2 for luminance-based controls". We choose not to use `Daylighting:Control` object as this object is dedicated for illuminance based control and adding luminance based control would change its scope and cause confusion (for instance, we would not support luminance based electric lighting control).
+
+In the meantime, we decide to continue using the daylighting objects (control and reference points) to specify daylighting reference points for measuring luminance values and to calculate luminance values with existing routines associated with daylighting control object.
 
 <!-- ## Design document - Adding a new window shading control method "OnIfHighLuminanceOrHighSolarTillMidnight" -->
 
@@ -86,7 +88,9 @@ Under 1.10.58 WindowShadingControl
 
 ## Outputs Description
 
-- Add a new output variable option: `Daylighting Reference Point {} Luminance`
+N/A
+
+<!-- - Add a new output variable option: `Daylighting Reference Point {} Luminance` -->
 <!-- - We may need to add a report variable for luminance based control, check illuminance based one to see what's in there. -->
 
 <!-- ## Engineering Reference
