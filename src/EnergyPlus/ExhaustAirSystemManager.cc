@@ -185,8 +185,52 @@ namespace ExhaustAirSystemManager {
                 // 2022-01-13: To do: Add related data structure to store Availability Manager  (and for all other fields as well)
 
                 std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "airloophvac_zonemixer_name");
-                // int zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state); // 2022-01-13: need some kind of function overload
-                // definition?
+                int zoneMixerNum = 0;
+                int zoneMixerIndex = 0; 
+
+                // Obtains and Allocates Mixer related parameters from input file
+                if (state.dataMixerComponent->SimAirMixerInputFlag) { // First time subroutine has been entered
+                    EnergyPlus::MixerComponent::GetMixerInput(state);
+                    state.dataMixerComponent->SimAirMixerInputFlag = false;
+                }
+
+                // Find the correct MixerNumber
+                if (zoneMixerNum == 0) {
+                    zoneMixerNum = UtilityRoutines::FindItemInList(zoneMixerName, state.dataMixerComponent->MixerCond, &EnergyPlus::MixerComponent::MixerConditions::MixerName);
+                    if (zoneMixerNum == 0) {
+                        // 2022-01-19: May need to change the message a little bit to get rid of "SimAirLoopMixer:"
+                        ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + std::string{zoneMixerName});
+                    }
+                    zoneMixerIndex = zoneMixerNum;
+                } else {
+                    zoneMixerNum = zoneMixerIndex;
+                    if (zoneMixerNum > state.dataMixerComponent->NumMixers || zoneMixerNum < 1) {
+                        // 2022-01-19: May need to change the warning mesage a little bit
+                        ShowFatalError(state,
+                                       format("GetExhaustAirSystemInput: Invalid zoneMixerIndex passed={}, Number of Mixers={}, Mixer name={}",
+                                              zoneMixerNum,
+                                              state.dataMixerComponent->NumMixers,
+                                              zoneMixerName));
+                    }
+                    if (state.dataMixerComponent->CheckEquipName(zoneMixerNum)) {
+                        if (zoneMixerName != state.dataMixerComponent->MixerCond(zoneMixerNum).MixerName) {
+                            // 2022-01-19: May need to change the warning mesage a little bit
+                            ShowFatalError(state,
+                                           format("GetExhaustAirSystemInput: Invalid zoneMixerIndex passed={}, Mixer name={}, stored Mixer Name for that index={}",
+                                                  zoneMixerNum,
+                                                  zoneMixerName,
+                                                  state.dataMixerComponent->MixerCond(zoneMixerNum).MixerName));
+                        }
+                        state.dataMixerComponent->CheckEquipName(zoneMixerNum) = false;
+                    }
+                }
+
+                // With the correct MixerNum Initialize
+                EnergyPlus::MixerComponent::InitAirMixer(state, zoneMixerNum); // Initialize all Mixer related parameters
+                // 2022-01-19: Till this point are the code revised from example
+
+                // 2022-01-19: Originally put the following lines to check componets a few days ago. But now it seems 
+                // redudant with the zone mixer's CheckEquipName() function. 
                 ValidateComponent(state, "AirLoopHVAC:ZoneMixer", zoneMixerName, IsNotOK, "AirLoopHVAC:ExhaustSystem");
                 if (IsNotOK) {
                     // zoneMixerNum = 0;
@@ -195,8 +239,8 @@ namespace ExhaustAirSystemManager {
                     ErrorsFound = true;
                 } else {
                     // normal conditions
+                    // 2022-01-13: To do: Add related data struct to store zoneMixer number (actually need a local zone num definition as well)
                 }
-                // 2022-01-13: To do: Add related data struct to store zoneMixer number (actually need a local zone num definition as well)
 
                 std::string centralFanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
                 int centralFanTypeNum = 0; 
@@ -387,7 +431,9 @@ namespace ExhaustAirSystemManager {
                     // normal conditions
                 } else if (availSchNum == 0) {
                     // black or anything like that, treat as always avaialabe?
-                    /* */
+                    /* //may not need to process the detailed schedule value here, but if yes, use this example: 
+                    GetCurrentScheduleValue(state, state.dataPowerInductionUnits->PIU(PIUNum).SchedPtr)
+                    */
                 } else {
                     availSchNum = 0;
                     // a regular warning is ok.
